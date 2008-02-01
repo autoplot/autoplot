@@ -1,0 +1,213 @@
+/*
+ * AggregatingDataSourceFactory.java
+ *
+ * Created on October 25, 2007, 11:02 AM
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+package org.virbo.aggragator;
+
+import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import edu.uiowa.physics.pw.das.util.fileSystem.FileStorageModel;
+import edu.uiowa.physics.pw.das.util.fileSystem.FileSystem;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import org.virbo.datasource.CompletionContext;
+import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.MetadataModel;
+
+/**
+ * ftp://cdaweb.gsfc.nasa.gov/pub/istp/noaa/noaa14/%Y/noaa14_meped1min_sem_%Y%m%d_v01.cdf?timerange=2000-01-01
+ * @author jbf
+ */
+public class AggregatingDataSourceFactory implements DataSourceFactory {
+
+    /** Creates a new instance of AggregatingDataSourceFactory */
+    public AggregatingDataSourceFactory() {
+    }
+
+    public DataSource getDataSource(URL url) throws Exception {
+        String surl = url.toString();
+        AggregatingDataSource ads = new AggregatingDataSource(url);
+        FileStorageModel fsm = getFileStorageModel(surl);
+        ads.setFsm(fsm);
+        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        Map parms = DataSetURL.parseParams(split.params);
+        ads.setViewRange(DatumRangeUtil.parseTimeRange((String) parms.get("timerange")));
+
+        parms.remove("timerange");
+        if (parms.size() > 0) {
+            ads.setParams(DataSetURL.formatParams(parms));
+        }
+
+        return ads;
+    }
+
+    private static int splitIndex(String surl) {
+        int i = surl.indexOf('%');
+        i = surl.lastIndexOf('/', i);
+        return i;
+    }
+
+    public static FileStorageModel getFileStorageModel(String surl) throws IOException {
+        int i = surl.indexOf('?');
+
+        String sansArgs = i == -1 ? surl : surl.substring(0, i);
+
+        i = splitIndex(sansArgs);
+        FileSystem fs = FileSystem.create(new URL(sansArgs.substring(0, i)));
+        FileStorageModel fsm = FileStorageModel.create(fs, sansArgs.substring(i));
+
+        return fsm;
+    }
+
+    public static CompletionContext getDelegateDataSourceCompletionContext(CompletionContext cc) throws IOException {
+
+        String surl = cc.surl;
+        int carotPos = cc.surlpos;
+        int urlLen = 0; //this is the position as we parse and process surl.
+
+        FileStorageModel fsm = getFileStorageModel(surl);
+
+        String delegateFile = fsm.getRepresentativeFile(new NullProgressMonitor());
+
+        if (delegateFile == null) {
+            throw new IllegalArgumentException("unable to find any files");
+        }
+
+        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+
+        String delegateFfile = new URL(fsm.getFileSystem().getRootURL(), delegateFile).toString();
+        urlLen += delegateFfile.length();
+        carotPos -= urlLen - delegateFfile.length();
+        split.file = delegateFfile;
+
+        int i = surl.lastIndexOf("timerange=", cc.surlpos);
+
+        if (i != -1) {
+            int i1 = surl.indexOf("&", i);
+            carotPos -= (i1 - i);
+        }
+
+        Map parms = DataSetURL.parseParams(split.params);
+
+        Object value = parms.remove("timerange");
+
+        split.params = DataSetURL.formatParams(parms);
+
+        String delegateUrl = DataSetURL.format(split);
+
+        CompletionContext delegatecc = new CompletionContext();
+        delegatecc.surl = delegateUrl;
+        delegatecc.surlpos = carotPos;
+        delegatecc.context = cc.context;
+
+        return delegatecc;
+    }
+
+    /**
+     * @throws IllegalArgumentException if it is not able to find any data files.
+     */
+    public static String getDelegateDataSourceFactoryUrl(String surl) throws IOException, IllegalArgumentException {
+        FileStorageModel fsm = getFileStorageModel(surl);
+
+        String file = fsm.getRepresentativeFile(new NullProgressMonitor());
+
+        if (file == null) {
+            throw new IllegalArgumentException("unable to find any files");
+        }
+
+        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+
+        Map parms = DataSetURL.parseParams(split.params);
+        parms.remove("timerange");
+        split.params = DataSetURL.formatParams(parms);
+
+        try {
+            String scompUrl = fsm.getFileSystem().getRootURL() + file;
+            if (split.params.length() > 0) {
+                scompUrl += "?" + split.params;
+            }
+            URL compUrl = new URL(scompUrl);
+            return compUrl.toString();
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException {
+        URL delegateURL = new URL(getDelegateDataSourceFactoryUrl(surl));
+        return DataSetURL.getDataSourceFactory(delegateURL, new NullProgressMonitor());
+    }
+
+    public String editPanel(String surl) throws Exception {
+        return surl;
+    }
+
+    public MetadataModel getMetadataModel(URL url) {
+        try {
+            return getDelegateDataSourceFactory(url.toString()).getMetadataModel(url);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public List<CompletionContext> getCompletions(CompletionContext cc) throws Exception {
+        DataSourceFactory f = getDelegateDataSourceFactory(cc.surl);
+        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        String afile = getDelegateDataSourceFactoryUrl(cc.surl);
+        CompletionContext delegatecc = getDelegateDataSourceCompletionContext(cc);
+
+        List<CompletionContext> delegateCompletions = f.getCompletions(delegatecc);
+        result.addAll(delegateCompletions);
+
+        if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", this, null));
+
+        } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
+            String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
+            if (paramName.equals("timerange")) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<timerange>"));
+            }
+        } else {
+        }
+        return result;
+    }
+
+    public boolean reject(String surl) {
+        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        Map map = DataSetURL.parseParams(split.params);
+
+        try {
+            if (!map.containsKey("timerange")) {
+                return true;
+            }
+            String timeRange = (String) map.get("timerange");
+            if (timeRange.length() < 4) {
+                return true;
+            }
+            String delegateSurl = getDelegateDataSourceFactoryUrl(surl);
+            return getDelegateDataSourceFactory(surl).reject(delegateSurl);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return true;
+        }
+    }
+
+    public String urlForServer(String surl) {
+        return surl; //TODO
+    }
+
+}
