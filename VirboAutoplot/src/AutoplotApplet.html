@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+  <head>
+    <title></title>
+  </head>
+  <body>
+    
+    <SCRIPT language="javascript" src="FORMDATA.JS" defer></script>
+    <applet  width="800" height="600" id="applet1" 
+          code="org.virbo.autoplot.AutoplotApplet" archive="lib/poi-2.5.1-final-20040804.jar, lib/xerces.jar, lib/jdom.jar, lib/swing-layout-1.0.jar, lib/commons-logging-1.0.4.jar, lib/QDataSet.jar, lib/visadNoDods.jar, lib/itext-1.2.jar, lib/xercesImpl.jar, lib/grib-5.0.04.jar, lib/prefsAll.jar, lib/lucene.jar, lib/batik-svggen.jar, lib/nlog4j-1.2.21.jar, lib/bufr.jar, lib/batik-util.jar, lib/gnu-regexp-1.1.4.jar, lib/xml-apis.jar, lib/commons-httpclient-3.0.jar, lib/dasCore-virbo.jar, lib/jpeg2000.jar, lib/netcdfUI-2.2.18.jar, lib/resourcesOptional.jar, lib/batik-awt-util.jar, lib/commons-codec-1.3.jar, virboAutoplot.jar">
+      <param name="datasetID" value="ascii.d2s">
+    </applet>
+    <form>
+         Enter a dataset URL here:<br>
+        <textarea id="datasetID" cols="100" rows="1" onchange="doTextArea()"></textarea><br>
+         for example, L:/fun/realEstate/to1960.latlon.xls?column=M[1:]<br>
+         http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density
+         
+    </form>
+    <script language="javascript">
+      formdata= createRequestObject();
+      if ( formdata.url ) {
+         document.getElementById('datasetID').value= formdata.url;
+         document.getElementById('applet1').setDataSetURL( formdata.url );
+      }
+      
+      function doTextArea() {
+         document.getElementById('applet1').setDataSetURL( document.getElementById('datasetID').value );
+      }
+    </script>
+  </body>

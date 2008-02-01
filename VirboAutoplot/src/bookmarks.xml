@@ -1,0 +1,11 @@
+<!-- note title is not supported yet -->
+<bookmark-list>
+    <bookmark>
+        <title>demo autoplot</title>
+        <url>http://autoplot.org/autoplot.vap</url>
+    </bookmark>
+    <bookmark>
+        <title>Storm Event</title>
+        <url>http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density</url>
+    </bookmark>
+</bookmark-list>

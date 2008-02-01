@@ -1,0 +1,43 @@
+<html>
+<head>
+    <title>Autoplot Application</title>
+</head>
+<body>
+    <H3>ViRBO autoplot application</H3>
+        <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
+	<img src="screen.png">
+	<p>This demonstration application attempts to allow plotting of data from many data sources, including local files and dods servers.  
+	Datasets are identified with URLS, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
+displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.  Additional metadata can then 
+be applied to the data, for example, specifying valid range and fill data.
+	</p>
+	<p>data is input from: 
+	<li>ascii files (.dat,.txt)</li>
+	<li>excel spread sheets (.xls)</li>
+	<li>das2Streams (.d2s or .das2Stream)</li>
+	<li>netcdf files (.nc,.ncml)</li>
+        <li>cdf files(.cdf)</li>
+	<li>dods servers (.dds)</li>
+	</p>
+	<p>This is not complete, and limitations include:</p>
+	<li>Often time tags are not loaded, and index number is used for the tags.</li>
+	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) or greater cannot be plotted.</li>
+	<li>Vector quantities such as B(GSM) cannot be plotted.</li>
+         
+         <a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
+         more information than this launch page.
+         
+        
+    </p>
+	
+	Click <a href="autoplot.jnlp">here</a> to launch.
+        
+        <p>One-of releases:</p>
+        <ul>
+            <li>(none)
+        </ul>
+	<br>
+	<br>
+	<br>
+</body>
+</html>
