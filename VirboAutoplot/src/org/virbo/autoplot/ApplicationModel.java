@@ -280,7 +280,7 @@ public class ApplicationModel {
         seriesRend.setDataSetLoader(null);
 
         overSeriesRend = new SeriesRenderer();
-
+        
         plot.addRenderer(seriesRend);
         overviewPlot.addRenderer(overSeriesRend);
         overviewPlot.setPreviewEnabled(true);
@@ -306,6 +306,8 @@ public class ApplicationModel {
         spectrogramRend = new SpectrogramRenderer(null, colorbar);
         spectrogramRend.addPropertyChangeListener(listener);
 
+        spectrogramRend.setActive(false);
+        
         overSpectrogramRend = new SpectrogramRenderer(null, colorbar);
         plot.addRenderer(spectrogramRend);
         overviewPlot.addRenderer(overSpectrogramRend);
@@ -661,7 +663,9 @@ public class ApplicationModel {
             } else {
                 ds = DataSetOps.slice0(fillDs, index);
             }
-            ds = new TransposeRank2DataSet(ds);
+            if ( transpose ) {
+                ds = new TransposeRank2DataSet(ds);
+            }
             fillDs = DDataSet.copy(ds);
             spec = true;
         }
@@ -1572,6 +1576,7 @@ public class ApplicationModel {
         updateFill();
         propertyChangeSupport.firePropertyChange(PROP_LEAFSLICE, oldleafSlice, newleafSlice);
     }
+    
     private int sliceIndex = 1;
     public static final String PROP_SLICEINDEX = "sliceIndex";
 
@@ -1596,5 +1601,18 @@ public class ApplicationModel {
         propertyChangeSupport.firePropertyChange(PROP_SLICEINDEX, oldsliceIndex, newsliceIndex);
     }
     
+    private boolean transpose= false;
+    public static final String PROP_TRANSPOSE = "transpose";
+    
+    public void setTranspose( boolean val ) {
+        boolean oldVal= this.transpose;
+        this.transpose= val;
+        updateFill();
+        propertyChangeSupport.firePropertyChange(PROP_TRANSPOSE, oldVal, val );
+    }
+
+    public boolean isTranspose() {
+        return this.transpose;
+    }
 }
 
