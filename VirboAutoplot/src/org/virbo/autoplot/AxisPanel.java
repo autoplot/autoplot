@@ -81,6 +81,8 @@ public class AxisPanel extends javax.swing.JPanel {
         
         b= bc.addBinding( applicationModel, "${sliceIndex}", this.sliceIndexSpinner, "value" );
                 
+        b= bc.addBinding( applicationModel, "${transpose}", this.transposeCheckBox, "selected" );
+                
         bc.bind();
         
         applicationModel.addPropertyChangeListener( new PropertyChangeListener() {
@@ -123,6 +125,7 @@ public class AxisPanel extends javax.swing.JPanel {
         sliceTypeComboBox = new javax.swing.JComboBox();
         sliceIndexSpinner = new javax.swing.JSpinner();
         jLabel5 = new javax.swing.JLabel();
+        transposeCheckBox = new javax.swing.JCheckBox();
 
         jLabel1.setText("Axes");
 
@@ -130,13 +133,11 @@ public class AxisPanel extends javax.swing.JPanel {
 
         xLog.setText("log");
         xLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        xLog.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         xAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
         showOverviewPlot.setText("Show context overview plot");
         showOverviewPlot.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        showOverviewPlot.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
         xAxisPanel.setLayout(xAxisPanelLayout);
@@ -158,14 +159,13 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(xLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(showOverviewPlot)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Z Axis"));
 
         zLog.setText("log");
         zLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        zLog.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         zAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
@@ -186,7 +186,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(zLog)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         yAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Y Axis"));
@@ -195,13 +195,11 @@ public class AxisPanel extends javax.swing.JPanel {
 
         yLog.setText("log");
         yLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        yLog.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         isotropicCheckBox.setText("Isotropic");
         isotropicCheckBox.setToolTipText("When units are convertable to X Axis units, automatically set y axis to ensure pixel:data ratio is the same.");
         isotropicCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         isotropicCheckBox.setEnabled(false);
-        isotropicCheckBox.setMargin(new java.awt.Insets(0, 0, 0, 0));
 
         org.jdesktop.layout.GroupLayout yAxisPanelLayout = new org.jdesktop.layout.GroupLayout(yAxisPanel);
         yAxisPanel.setLayout(yAxisPanelLayout);
@@ -223,7 +221,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(yLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(isotropicCheckBox)
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("autoranging"));
@@ -259,7 +257,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(validRangeLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -300,6 +298,13 @@ public class AxisPanel extends javax.swing.JPanel {
 
         jLabel5.setText("Slice Index:");
 
+        transposeCheckBox.setText("transpose");
+        transposeCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                transposeCheckBoxActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -307,7 +312,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -316,7 +321,8 @@ public class AxisPanel extends javax.swing.JPanel {
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(9, 9, 9)))
+                        .add(9, 9, 9))
+                    .add(transposeCheckBox))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -329,7 +335,9 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(sliceTypeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel5))
-                .addContainerGap(112, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(transposeCheckBox)
+                .addContainerGap(85, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -391,6 +399,10 @@ public class AxisPanel extends javax.swing.JPanel {
     private void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
         applicationModel.setLeafSlice( sliceTypeComboBox.getSelectedItem().equals("last" ) );
     }//GEN-LAST:event_sliceTypeComboBoxActionPerformed
+
+    private void transposeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transposeCheckBoxActionPerformed
+        // TODO add your handling code here:
+}//GEN-LAST:event_transposeCheckBoxActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -407,6 +419,7 @@ public class AxisPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox showOverviewPlot;
     private javax.swing.JSpinner sliceIndexSpinner;
     private javax.swing.JComboBox sliceTypeComboBox;
+    private javax.swing.JCheckBox transposeCheckBox;
     private javax.swing.JComboBox validRangeComboBox;
     private javax.swing.JLabel validRangeLabel;
     private javax.swing.JPanel xAxisPanel;
