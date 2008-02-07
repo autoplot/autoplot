@@ -298,6 +298,6 @@ public class CefReaderData {
 
         System.err.println("Reading of data complete");
 
-        return builder.getDataSet();
+        return builder==null ? null : builder.getDataSet();
     }
 }
