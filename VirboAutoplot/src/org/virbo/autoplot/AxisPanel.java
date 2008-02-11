@@ -159,7 +159,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(xLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(showOverviewPlot)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Z Axis"));
@@ -221,7 +221,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(yLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(isotropicCheckBox)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("autoranging"));
@@ -289,7 +289,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         jLabel4.setText("Slice Dimension:");
 
-        sliceTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "first", "last" }));
+        sliceTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "first", "second", "last" }));
         sliceTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sliceTypeComboBoxActionPerformed(evt);
@@ -317,11 +317,10 @@ public class AxisPanel extends javax.swing.JPanel {
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(sliceTypeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 26, Short.MAX_VALUE)
+                        .add(18, 18, 18)
                         .add(jLabel5)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(9, 9, 9))
+                        .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 43, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(transposeCheckBox))
                 .addContainerGap())
         );
@@ -333,11 +332,11 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
                     .add(sliceTypeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel5))
+                    .add(jLabel5)
+                    .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(transposeCheckBox)
-                .addContainerGap(85, Short.MAX_VALUE))
+                .addContainerGap(99, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -397,7 +396,7 @@ public class AxisPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_fillValueComboBoxActionPerformed
 
     private void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
-        applicationModel.setLeafSlice( sliceTypeComboBox.getSelectedItem().equals("last" ) );
+        applicationModel.setSliceDimension( sliceTypeComboBox.getSelectedIndex() );
     }//GEN-LAST:event_sliceTypeComboBoxActionPerformed
 
     private void transposeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transposeCheckBoxActionPerformed
