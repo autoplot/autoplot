@@ -263,7 +263,7 @@ public class ApplicationModel {
         plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("reset zoom") {
 
             public void actionPerformed(ActionEvent e) {
-                updateFill();
+                updateFill(true);
             }
         }));
 
@@ -466,6 +466,7 @@ public class ApplicationModel {
     }
 
     private double guessCadence(QDataSet xds, QDataSet yds) {
+        if ( yds==null ) yds= DataSetUtil.indexGenDataSet(xds.length());
         assert (xds.length() == yds.length());
         Units u = (Units) yds.property(QDataSet.UNITS);
         if (u == null) {
@@ -503,7 +504,7 @@ public class ApplicationModel {
         return cadenceS / cadenceN;
     }
 
-    private void updateFillSpec(WritableDataSet fillDs) {
+    private void updateFillSpec(WritableDataSet fillDs,boolean autoRange) {
         QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
         if (xds == null) {
             xds = DataSetUtil.indexGenDataSet(fillDs.length());
@@ -515,7 +516,7 @@ public class ApplicationModel {
             fillDs.putProperty(QDataSet.DEPEND_1, yds);
         }
 
-        double cadence = guessCadence(xds, DataSetUtil.indexGenDataSet(xds.length()));
+        double cadence = guessCadence(xds, null );
         ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
 
         spectrogramRend.setDataSet(null);
@@ -524,7 +525,7 @@ public class ApplicationModel {
         AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds);
         AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds);
 
-        if (!autoRangeSuppress) {
+        if ( autoRange && !autoRangeSuppress) {
 
             AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs);
 
@@ -546,6 +547,7 @@ public class ApplicationModel {
         }
 
         overviewPlot.getYAxis().resetRange(ydesc.range);
+        overviewPlot.getYAxis().setLog(ydesc.log);
         overviewPlot.getXAxis().resetRange(xdesc.range);
         overviewPlot.getXAxis().setLog(xdesc.log);
 
@@ -554,7 +556,7 @@ public class ApplicationModel {
         overSpectrogramRend.setDataSet(TableDataSetAdapter.create(fillDs));
     }
 
-    private void updateFillSeries(WritableDataSet fillDs) {
+    private void updateFillSeries(WritableDataSet fillDs,boolean autoRange) {
 
         seriesRend.setDataSet(null);
 
@@ -567,7 +569,7 @@ public class ApplicationModel {
         double cadence = guessCadence(xds, fillDs);
         ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
 
-        if (!autoRangeSuppress) {
+        if ( autoRange && !autoRangeSuppress) {
 
             boolean isSeries;
             QDataSet depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
@@ -628,7 +630,7 @@ public class ApplicationModel {
         Runnable run = new Runnable() {
 
             public void run() {
-                updateFill();
+                updateFill(true);
             }
         };
         new Thread(run, "updateFillThread").start();
@@ -638,7 +640,7 @@ public class ApplicationModel {
      * the fill parameters have changed, so update the auto range stats.
      * This should not be run on the AWT event thread!
      */
-    public void updateFill() {
+    private void updateFill( boolean autorange ) {
         if (dataset == null) {
             return;
         }
@@ -655,14 +657,18 @@ public class ApplicationModel {
         }
 
         if (fillDs.rank() == 3) {
-            int index = Math.min(fillDs.length(0, 0) - 1, sliceIndex);
+            
             QDataSet ds;
-            if (this.leafSlice) {
+            if ( this.sliceDimension==2 ) {
+                int index = Math.min( fillDs.length(0, 0) - 1, sliceIndex );
                 ds = DataSetOps.slice2(fillDs, index);
-
-            } else {
+            } else if ( this.sliceDimension==1 ) {
+                int index = Math.min( fillDs.length(0) - 1, sliceIndex );
+                ds = DataSetOps.slice1(fillDs, index);
+            } else if ( this.sliceDimension==0 ) {
+                int index = Math.min( fillDs.length() - 1, sliceIndex );
                 ds = DataSetOps.slice0(fillDs, index);
-            }
+            } else throw new IllegalStateException("sliceDimension");
             if ( transpose ) {
                 ds = new TransposeRank2DataSet(ds);
             }
@@ -671,10 +677,10 @@ public class ApplicationModel {
         }
 
         if (spec) {
-            updateFillSpec(fillDs);
+            updateFillSpec(fillDs,autorange);
             setRenderer(spectrogramRend, overSpectrogramRend);
         } else {
-            updateFillSeries(fillDs);
+            updateFillSeries(fillDs,autorange);
             setRenderer(seriesRend, overSeriesRend);
         }
 
@@ -715,6 +721,7 @@ public class ApplicationModel {
                 /*** here is the data load ***/
                 Logger.getLogger("ap").info("loading dataset");
                 setStatus("loading dataset");
+                
                 QDataSet dataset = loadDataSet(0);
                 if (dataset == null) {
                     seriesRend.setDataSet(null);
@@ -724,7 +731,7 @@ public class ApplicationModel {
 
                 Logger.getLogger("ap").info("update fill");
                 setStatus("apply fill and autorange");
-                updateFill();
+                updateFill(true);
 
                 if (interpretMetadata) {
                     doInterpretMetadata();
@@ -1078,7 +1085,7 @@ public class ApplicationModel {
     }
 
     void resetZoom() {
-        updateFill();
+        updateFill(true);
     }
 
     DasAxis getXAxis() {
@@ -1372,7 +1379,7 @@ public class ApplicationModel {
         try {
             StreamTool.readStream(channel, handler);
             this.dataset = DataSetAdapter.create(handler.getDataSet());
-            updateFill();
+            updateFill(true);
         } catch (StreamException ex) {
             ex.printStackTrace();
         }
@@ -1553,29 +1560,22 @@ public class ApplicationModel {
         }
         propertyChangeSupport.firePropertyChange("isotropic", new Boolean(oldIsotropic), new Boolean(isotropic));
     }
-    private boolean leafSlice=true;
-    public static final String PROP_LEAFSLICE = "leafSlice";
+        
+    private int sliceDimension= 0;
 
-    /**
-     * Get the value of leafSlice
-     *
-     * @return the value of leafSlice
-     */
-    public boolean isLeafSlice() {
-        return this.leafSlice;
+    public static final String PROP_SLICEDIMENSION = "sliceDimension";
+
+    public int getSliceDimension() {
+        return this.sliceDimension;
     }
 
-    /**
-     * Set the value of leafSlice
-     *
-     * @param newleafSlice new value of leafSlice
-     */
-    public void setLeafSlice(boolean newleafSlice) {
-        boolean oldleafSlice = leafSlice;
-        this.leafSlice = newleafSlice;
-        updateFill();
-        propertyChangeSupport.firePropertyChange(PROP_LEAFSLICE, oldleafSlice, newleafSlice);
+    public void setSliceDimension(int newsliceDimension) {
+        int oldsliceDimension = sliceDimension;
+        this.sliceDimension = newsliceDimension;
+        updateFill(true);
+        propertyChangeSupport.firePropertyChange(PROP_SLICEDIMENSION, oldsliceDimension, newsliceDimension);
     }
+
     
     private int sliceIndex = 1;
     public static final String PROP_SLICEINDEX = "sliceIndex";
@@ -1597,7 +1597,7 @@ public class ApplicationModel {
     public void setSliceIndex(int newsliceIndex) {
         int oldsliceIndex = sliceIndex;
         this.sliceIndex = newsliceIndex;
-        updateFill();
+        updateFill(false);
         propertyChangeSupport.firePropertyChange(PROP_SLICEINDEX, oldsliceIndex, newsliceIndex);
     }
     
@@ -1607,7 +1607,7 @@ public class ApplicationModel {
     public void setTranspose( boolean val ) {
         boolean oldVal= this.transpose;
         this.transpose= val;
-        updateFill();
+        updateFill(true);
         propertyChangeSupport.firePropertyChange(PROP_TRANSPOSE, oldVal, val );
     }
 
