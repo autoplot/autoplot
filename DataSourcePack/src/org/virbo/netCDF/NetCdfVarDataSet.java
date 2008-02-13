@@ -45,7 +45,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
         shape= v.getShape();
         properties.put( QDataSet.NAME, variable.getName() );
-        if ( shape.length>1 ) properties.put( QDataSet.QUBE, shape );
+        if ( shape.length>1 ) properties.put( QDataSet.QUBE, Boolean.TRUE );
         
         for ( int ir=0; ir<a.getRank(); ir++ ) {
             ucar.nc2.Dimension d= v.getDimension(ir);
