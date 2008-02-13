@@ -267,14 +267,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
-                        int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
-                        BoundedRangeModel model = editor.getHorizontalVisibility();
+                        try {
+                            int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
+                            BoundedRangeModel model = editor.getHorizontalVisibility();
 
-                        final double xpos = xpos2 - model.getValue();
+                            final double xpos = xpos2 - model.getValue();
 
-                        completionsPopupMenu.show(dataSetSelector, (int) xpos, dataSetSelector.getHeight());
-                        completionsRunnable = null;
-
+                            completionsPopupMenu.show(dataSetSelector, (int) xpos, dataSetSelector.getHeight());
+                            completionsRunnable = null;
+                        } catch (NullPointerException ex) {
+                            ex.printStackTrace(); // TODO: look into this
+                        }
                     }
                 });
 
