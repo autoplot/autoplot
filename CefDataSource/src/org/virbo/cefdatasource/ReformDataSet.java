@@ -5,14 +5,15 @@
 package org.virbo.cefdatasource;
 
 import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.HighRankDataSet;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.RankNDataSet;
 import org.virbo.dataset.QDataSet;
 
 /**
  *
  * @author jbf
  */
-public class ReformDataSet extends AbstractDataSet implements HighRankDataSet {
+public class ReformDataSet extends AbstractDataSet implements RankNDataSet {
 
     int dsLen1;
     int n0, n1, n2, n3; // copy for performance sake
@@ -35,13 +36,14 @@ public class ReformDataSet extends AbstractDataSet implements HighRankDataSet {
 
         this.ds = ds;
         dsLen1 = ds.length(0);
+        
+        this.offset= offset;
 
         if (ds.rank() != 2) {
             throw new IllegalArgumentException("input rank must==2");
         }
 
-        int[] qube0 = (int[]) ds.property(QDataSet.QUBE);
-        if (qube0 == null) {
+        if ( ! Boolean.TRUE.equals( ds.property(QDataSet.QUBE) ) ) {
             throw new IllegalArgumentException("dataset must be marked as QUBE");
         }
 
@@ -71,7 +73,8 @@ public class ReformDataSet extends AbstractDataSet implements HighRankDataSet {
             }
         }
 
-        putProperty(QDataSet.QUBE, sizes);
+        DataSetUtil.putProperties( DataSetUtil.getProperties(ds), this );
+        putProperty( QDataSet.DEPEND_1, null );
     }
 
     public int rank() {
@@ -102,8 +105,11 @@ public class ReformDataSet extends AbstractDataSet implements HighRankDataSet {
 
     @Override
     public Object property(String name) {
-        Object p = properties.get(name);
-        return (p != null) ? p : ds.property(name);
+        if ( properties.containsKey(name) ) {
+            return properties.get(name);
+        } else {
+            return ds.property(name);
+        }
     }
 
     @Override
