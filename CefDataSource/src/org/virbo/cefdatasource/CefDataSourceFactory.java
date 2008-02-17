@@ -21,6 +21,7 @@ import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.MetadataModel;
 
 /**
  *
@@ -80,5 +81,11 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
     public boolean reject( String surl ) {
         return ! surl.contains("?") || surl.indexOf("?")==surl.length()-1;
     }
+
+    @Override
+    public MetadataModel getMetadataModel(URL url) {
+        return new CefMetadataModel();
+    }
+    
     
 }
