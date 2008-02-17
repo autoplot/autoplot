@@ -89,7 +89,7 @@ public class CefReaderHeader {
             if (tempRecord.length() > 0 && tempRecord.charAt(0) == '!') {
             //; PRINT, tempRecord
             } else if (tempRecord.length() > 0 && tempRecord.charAt(tempRecord.length() - 1) == '\\') {
-                recordBuf.append(tempRecord);
+                recordBuf.append( tempRecord.substring(0,tempRecord.length() - 1) );
             } else {
                 recordBuf.append(tempRecord);
                 // *** if not blank then finish read  of this record ***
@@ -179,9 +179,6 @@ public class CefReaderHeader {
             }
             recordNumber++;
 
-            if (recordNumber == 273) {
-                System.err.println("here10");
-            }
             //*** Get the keyword/value(s) for this record            
             if (cefSplitRec(record.data, kv)) {
 
