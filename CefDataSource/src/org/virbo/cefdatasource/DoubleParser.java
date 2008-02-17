@@ -48,7 +48,7 @@ public class DoubleParser {
 
 // Reads sign.
         boolean isNegative = (c == '-');
-        if ((isNegative || (c == '+')) && (++i < length)) {
+        if ((isNegative || (c == '+')) && (++i < fin )) {
             c = (char)csq.get(i);
         }
 
