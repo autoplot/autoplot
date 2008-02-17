@@ -20,8 +20,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.tree.TreeModel;
+import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SortDataSet;
@@ -88,7 +92,6 @@ public class CefDataSource extends AbstractDataSource {
         return NameValueTreeModel.create("METADATA(CEF)", entries);
     }
 
-    
     /**
      * read in the vars, interpret the metadata.  
      * @param var variable to read in.
@@ -102,44 +105,115 @@ public class CefDataSource extends AbstractDataSource {
     private MutablePropertyDataSet createDataSet(String var, MutablePropertyDataSet tds, DasProgressMonitorReadableByteChannel cmon) throws IOException, NumberFormatException, ParseException {
         CefReaderHeader.ParamStruct param = cef.parameters.get(var);
 
+        int collapseDim = 999; // >999 indicates a dimension was collapsed to reduce rank.
+        int rank0; // rank before collapse
+
+        boolean peace = false;
+        if (var.indexOf("Data__C") == 0) {
+            peace = true;
+        }
+
+        Units u = Units.dimensionless;
+        double fill = u.getFillDouble();
+        String sceffill = (String) param.entries.get("FILLVAL");
+
+        double ceffill;
+        if (!param.entries.get("VALUE_TYPE").equals("ISO_TIME")) {
+            ceffill = (sceffill != null) ? Double.parseDouble(sceffill) : fill;
+        } else {
+            ceffill = fill;
+        }
+
         MutablePropertyDataSet ds;
-        if (param.cefFieldPos[0] == -1) {
+        if (param.cefFieldPos[0] == -1) { // data is inside the CEF header
             String[] data = (String[]) param.entries.get("DATA");
             double[] ddata = new double[data.length];
             for (int i = 0; i < data.length; i++) {
-                ddata[i] = Double.parseDouble(data[i]);
+                try {
+                    ddata[i] = Double.parseDouble(data[i]);
+                    if (ddata[i] == ceffill) {
+                        ddata[i] = fill;
+                    }
+                } catch (NumberFormatException ex) {
+                    throw new NumberFormatException("format error in data of param.name=" + param.name + ": " + data[i]);
+                }
             }
             ds = DDataSet.wrap(ddata);
-        } else {
+            ds.putProperty(QDataSet.NAME, var);
+            rank0 = ds.rank();
+
+        // TODO: check for fill
+        } else { // data should be extracted from rank 2 table.
             if (tds == null) {
                 CefReaderData readerd = new CefReaderData();
+                for (int i = 0; i < readerd.MAX_FIELDS; i++) {
+                    readerd.skipParse(i);
+                }
+                setParseFlags(cef, var, readerd);
                 tds = readerd.cefReadData(cmon, cef);
             }
 
             if (param.sizes.length > 1 || param.sizes[0] > 1) {
                 if (tds == null) { // create empty dataset with correct geometry
-                    DataSetBuilder result = new DataSetBuilder( 2, 0, param.cefFieldPos[1] - param.cefFieldPos[0] + 1, 1 );
+                    DataSetBuilder result = new DataSetBuilder(2, 0, param.cefFieldPos[1] - param.cefFieldPos[0] + 1, 1);
                     ds = result.getDataSet();
                 } else {
                     ds = org.virbo.dataset.DataSetOps.leafTrim(tds, param.cefFieldPos[0], param.cefFieldPos[1] + 1);
                 }
+
+                DDataSet dds = DDataSet.copy(ds);
+                dds.putProperty(QDataSet.UNITS, u);
+                for (int i = 0; i < dds.length(); i++) {
+                    for (int j = 0; j < dds.length(i); j++) {
+                        if (dds.value(i, j) == ceffill) {
+                            dds.putValue(i, j, fill);
+                        }
+                    }
+                }
+                ds = dds;
+
+
+                ds.putProperty(QDataSet.NAME, var);
+
                 if (param.sizes.length > 2) {
                     int[] sizes = new int[param.sizes.length + 1];
                     sizes[0] = ds.length();
+                    int ndim = sizes.length;
                     for (int i = 1; i < sizes.length; i++) {
-                        sizes[i] = param.sizes[i - 1];
+                        sizes[i] = param.sizes[ndim - i - 1];
                     }
                     ds = new ReformDataSet(ds, sizes);
+                    rank0 = ds.rank();
+
                     if (ds.rank() == 4) {
-                        ds = DataSetOps.collapse(ds);
+                        collapseDim = 2;
+                        ds = DataSetOps.collapse2(ds); // for PEACE -- this is why we have to plug in units.
                     }
+                } else {
+                    rank0 = ds.rank();
                 }
+
             } else {
-                if ( tds==null ) {
-                    ds= DDataSet.createRank1(0);
+                if (tds == null) {
+                    ds = DDataSet.createRank1(0);
                 } else {
                     ds = org.virbo.dataset.DataSetOps.slice1(tds, param.cefFieldPos[0]);
                 }
+
+                rank0 = ds.rank();
+
+                DDataSet dds = DDataSet.copy(ds);
+                dds.putProperty(QDataSet.UNITS, u);
+                for (int i = 0; i < dds.length(); i++) {
+                    for (int j = 0; j < dds.length(i); j++) {
+                        if (dds.value(i, j) == ceffill) {
+                            dds.putValue(i, j, fill);
+                        }
+                    }
+                }
+                ds = dds;
+
+                ds.putProperty(QDataSet.NAME, var);
             }
         }
 
@@ -147,59 +221,138 @@ public class CefDataSource extends AbstractDataSource {
             ds.putProperty(QDataSet.UNITS, Units.us2000);
         }
 
-        int[] qube= (int[]) ds.property(QDataSet.QUBE);
-        
-        String s;
-        for (int i = 0; i < 3; i++) {
-            if ((s = (String) param.entries.get("DEPEND_" + i)) != null) {
-                MutablePropertyDataSet dep0ds = createDataSet(s, tds, cmon);
-                if ( dep0ds.rank()>1 ) {
-                    QDataSet dp01= (QDataSet) dep0ds.property( QDataSet.DEPEND_0 );
-                    QDataSet dp02= (QDataSet) ds.property(QDataSet.DEPEND_0 );
-                    if ( dp01.equals( dp02 ) ) {
-                        dep0ds= org.virbo.dataset.DataSetOps.slice0( dep0ds, 0 ); // kludge for CLUSTER/PEACE
-                        if ( dep0ds.length() > qube[i] ) { // second kludge for CLUSTER/PEACE
-                            dep0ds= org.virbo.dataset.DataSetOps.trim( dep0ds, 0, qube[i] );
-                        }
-                        if ( !org.virbo.dataset.DataSetUtil.isMonotonic(dep0ds) ) {                            
-                            QDataSet sort= org.virbo.dataset.DataSetOps.sort(dep0ds);
-                            dep0ds= new SortDataSet( dep0ds, sort );
-                            ds= makeMonotonic( ds, i, sort );
-                        }
-                        
+        int[] qube = DataSetUtil.qubeDims(ds);
+
+        boolean doDeps = true;
+        if (doDeps) {
+            String s;
+            for (int i = 0; i < rank0; i++) {
+                if ((s = (String) param.entries.get("DEPEND_" + i)) != null) {
+                    int newDim = i; // dimension taking rank 4 collapse into account
+                    if (i > collapseDim) {
+                        newDim = i - 1;
+                    } else if (i < collapseDim) {
+                        newDim = i;
+                    } else {
+                        continue;
                     }
+                    MutablePropertyDataSet dep0ds = createDataSet(s, tds, cmon);
+                    if (dep0ds.rank() > 1) {
+                        QDataSet dp01 = (QDataSet) dep0ds.property(QDataSet.DEPEND_0);
+                        QDataSet dp02 = (QDataSet) ds.property(QDataSet.DEPEND_0);
+                        if (dp01 != null && dp02 != null && dp01.length() == dp02.length()) {
+                            dep0ds = org.virbo.dataset.DataSetOps.slice0(dep0ds, 0); // kludge for CLUSTER/PEACE
+                            if (dep0ds.length() > qube[newDim]) { // second kludge for CLUSTER/PEACE
+                                dep0ds = org.virbo.dataset.DataSetOps.trim(dep0ds, 0, qube[newDim]);
+                            }
+                            if (!org.virbo.dataset.DataSetUtil.isMonotonic(dep0ds)) {
+                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(dep0ds);
+                                dep0ds = new SortDataSet(dep0ds, sort);
+                                ds = makeMonotonic(ds, newDim, sort);
+                                System.err.println(org.virbo.dataset.DataSetUtil.statsString(ds));
+                            }
+
+                        }
+                    }
+                    ds.putProperty("DEPEND_" + newDim, dep0ds);
+
                 }
-                ds.putProperty("DEPEND_" + i, dep0ds);
             }
         }
+
+        //if ( peace ) {
+        //    ds= DataSetOps.collapse1(ds);
+        //}
 
         return ds;
     }
 
     /**
-     * @param ds
+     * Applies the sort index to the idim-th dimension of the qube dataset ds.
+     * Note this does not rearrange the tags or planes!
+     * TODO: consider sorting multiple dimensions at once, to reduce excessive
+     *    copying
+     * @param ds, rank 1,2, or 3 qube dataset
      * @param idim the dimension being sorted.
-     * @param dep0ds
+     * @param sort rank 1 dataset of new indeces.
+     * @return new dataset that is a copy of the first, resorted.
+     * @see  org.virbo.dataset.SortDataSet for similar functionality
      */
-    private MutablePropertyDataSet makeMonotonic( MutablePropertyDataSet ds, int idim, QDataSet sort ) {
-        DDataSet cds= DDataSet.copy(ds);
-            
-        if ( idim==1 ) {
-            for ( int i=0;i<ds.length(); i++ ) {
-                for ( int j=0; j<ds.length(i); j++ ) {
-                    if ( ds.rank()>2 ) {
-                        for ( int k=0; k<ds.length(i,j); k++ ) {
-                            double d= ds.value(i,j,k);
-                            cds.putValue( i, (int)sort.value(j), k, d );                
+    private MutablePropertyDataSet makeMonotonic(MutablePropertyDataSet ds, int idim, QDataSet sort) {
+
+        if (idim > 2) {
+            throw new IllegalArgumentException("idim must be <=2 ");
+        }
+        if (ds.rank() > 3) {
+            throw new IllegalArgumentException("rank limit");
+        }
+
+        int[] qube = DataSetUtil.qubeDims(ds);
+        qube[idim] = sort.length();
+
+        DDataSet cds = DDataSet.create(qube);
+        org.virbo.dataset.DataSetUtil.putProperties(org.virbo.dataset.DataSetUtil.getProperties(ds), cds);
+
+        if (idim == 0) {
+            for (int i = 0; i < qube[0]; i++) {
+                if (ds.rank() > 1) {
+                    for (int j = 0; j < qube[1]; j++) {
+                        if (ds.rank() > 2) {
+                            for (int k = 0; k < qube[2]; k++) {
+                                double d = ds.value((int) sort.value(i), j, k);
+                                cds.putValue(i, j, k, d);
+                            }
+                        } else {
+                            double d = ds.value((int) sort.value(i), j);
+                            cds.putValue(i, j, d);
+                        }
+                    }
+                } else {
+                    double d = ds.value((int) sort.value(i));
+                    cds.putValue(i, d);
+                }
+            }
+        } else if (idim == 1) {
+            for (int i = 0; i < qube[0]; i++) {
+                for (int j = 0; j < qube[1]; j++) {
+                    if (ds.rank() > 2) {
+                        for (int k = 0; k < qube[2]; k++) {
+                            double d = ds.value(i, (int) sort.value(j), k);
+                            cds.putValue(i, j, k, d);
                         }
                     } else {
-                        double d= ds.value(i,j);
-                        cds.putValue( i, (int)sort.value(j), d );
+                        double d = ds.value(i, (int) sort.value(j));
+                        cds.putValue(i, j, d);
+                    }
+                }
+            }
+        } else if (idim == 2) {
+            for (int i = 0; i < qube[0]; i++) {
+                for (int j = 0; j < qube[1]; j++) {
+                    for (int k = 0; k < qube[2]; k++) {
+                        double d = ds.value(i, j, (int) sort.value(k));
+                        cds.putValue(i, j, k, d);
                     }
                 }
             }
         }
-        
+
         return cds;
+    }
+
+    private void setParseFlags(Cef cef, String var, CefReaderData readerd) {
+        ParamStruct param = cef.parameters.get(var);
+        if (param.cefFieldPos[0] != -1) {
+            for (int i = param.cefFieldPos[0]; i < param.cefFieldPos[1] + 1; i++) {
+                readerd.doParse(i);
+            }
+        }
+        String s;
+        for (int i = 0; i < 4; i++) {
+            if ((s = (String) param.entries.get("DEPEND_" + i)) != null) {
+                setParseFlags(cef, s, readerd);
+            }
+        }
+
     }
 }
