@@ -29,16 +29,29 @@ public class CefReaderData {
     Cef cef;
     FieldParser[] parsers;
     CharsetDecoder charsetDecoder;
+    
     // *** Define the delimeters used in the CEF file
     byte eor;
     byte comma = (byte) ',';
     final Units u = Units.us2000;
 
+    public static final int MAX_FIELDS=40000;
+    boolean [] doParse= new boolean[MAX_FIELDS]; 
+    
     public CefReaderData() {
         Charset charset = Charset.availableCharsets().get("US-ASCII");
         charsetDecoder = charset.newDecoder();
+        for ( int i=0; i<doParse.length; i++ ) doParse[i]=true;
     }
 
+    public void skipParse( int i ) {
+        doParse[i]= false;
+    }
+    
+    public void doParse( int i ) {
+        doParse[i]= true;
+    }
+    
     private final int countFields(ByteBuffer work_buffer) {
         int n_fields = 1;
         for (int k = 0;; k++) {
@@ -69,7 +82,9 @@ public class CefReaderData {
 
     private void parseRecord(ByteBuffer bbuf, int irec, int[] fieldDelim, DataSetBuilder builder) throws CharacterCodingException, ParseException {
         for (int i = 0; i < fieldDelim.length - 1; i++) {
-            builder.putValue(irec, i, parsers[i].parseField(bbuf, fieldDelim[i], fieldDelim[i + 1] - fieldDelim[i] - 1));
+            if ( parsers[i]!=null ) {
+                builder.putValue(irec, i, parsers[i].parseField(bbuf, fieldDelim[i], fieldDelim[i + 1] - fieldDelim[i] - 1));
+            }
         }
     }
 
@@ -112,7 +127,7 @@ public class CefReaderData {
         int[] fieldDelim = new int[n_fields + 1]; // +1 is for record delim position
         splitRecord(work_buffer, 0, work_size, fieldDelim);
         for (int i = 0; i < n_fields; i++) {
-            parsers[i] = new DoubleFieldParser();
+            if ( this.doParse[i] ) parsers[i] = new DoubleFieldParser(); else parsers[i]=null;
         }
 
         final FieldParser timeParser;
