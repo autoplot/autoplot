@@ -27,7 +27,7 @@
     </security>
     
     <resources> 
-        <j2se version="1.5+" initial-heap-size="96m" max-heap-size="256m"
+        <j2se version="1.5+" initial-heap-size="96m" max-heap-size="1024m"
               href="http://java.sun.com/products/autodl/j2se" > 
         </j2se>
         
@@ -72,6 +72,7 @@
         <jar href="lib/JFontChooser.jar" />
         <jar href="lib/CdfDataSource.jar" />
         <jar href="lib/WavDataSource.jar" />
+        <jar href="lib/CefDataSource.jar" />
         
         <!-- cdf -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
