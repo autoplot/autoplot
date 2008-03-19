@@ -14,9 +14,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
+import java.util.List;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
 import javax.beans.binding.BindingConverter;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.SpinnerNumberModel;
 
 /**
@@ -88,11 +91,42 @@ public class AxisPanel extends javax.swing.JPanel {
         applicationModel.addPropertyChangeListener( new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 zAxisPanel.setEnabled( applicationModel.colorbar.isVisible() );
+                if ( evt.getPropertyName().equals(applicationModel.PROP_DEPNAMES) ) {
+                    sliceTypeComboBox.setModel( new DefaultComboBoxModel( applicationModel.getDepnames().toArray() ) ); 
+                }
             }
         } );
         
     }
     
+    
+    private List<String> dummy;
+
+    public static final String PROP_DUMMY = "dummy";
+
+    public List<String> getDummy() {
+        return this.dummy;
+    }
+
+    public void setDummy(List<String> newdummy) {
+        List<String> olddummy = dummy;
+        this.dummy = newdummy;
+        propertyChangeSupport.firePropertyChange(PROP_DUMMY, olddummy, newdummy);
+    }
+
+
+    private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(java.beans.PropertyChangeListener listener )
+    {
+        propertyChangeSupport.addPropertyChangeListener( listener );
+    }
+
+    public void removePropertyChangeListener(java.beans.PropertyChangeListener listener )
+    {
+        propertyChangeSupport.removePropertyChangeListener( listener );
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -159,7 +193,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(xLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(showOverviewPlot)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Z Axis"));
@@ -186,7 +220,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(zLog)
-                .addContainerGap(36, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         yAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Y Axis"));
@@ -221,7 +255,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(yLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(isotropicCheckBox)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("autoranging"));
@@ -257,7 +291,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(validRangeLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -290,6 +324,7 @@ public class AxisPanel extends javax.swing.JPanel {
         jLabel4.setText("Slice Dimension:");
 
         sliceTypeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "first", "second", "last" }));
+        sliceTypeComboBox.setSelectedIndex(2);
         sliceTypeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 sliceTypeComboBoxActionPerformed(evt);
@@ -312,7 +347,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -336,7 +371,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(transposeCheckBox)
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(108, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
