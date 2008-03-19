@@ -63,6 +63,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -172,7 +173,7 @@ public class ApplicationModel {
                     setShowContextOverview(true);
                 }
             }
-            firePropertyChangeListenerPropertyChange(e);
+            propertyChangeSupport.firePropertyChange( e );
         }
     };
 
@@ -280,7 +281,7 @@ public class ApplicationModel {
         seriesRend.setDataSetLoader(null);
 
         overSeriesRend = new SeriesRenderer();
-        
+
         plot.addRenderer(seriesRend);
         overviewPlot.addRenderer(overSeriesRend);
         overviewPlot.setPreviewEnabled(true);
@@ -290,7 +291,7 @@ public class ApplicationModel {
         overviewPlotConnector.setBottomCurtain(true);
         overviewPlotConnector.setCurtainOpacityPercent(80);
         overviewPlotConnector.getMouseAdapter().setPrimaryModule(overviewZoom);
-        overviewPlotConnector.getMouseAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(plot.getXAxis(), overviewPlot.getXAxis()));
+        overviewPlotConnector.getMouseAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(plot, overviewPlot));
 
         overviewPlotConnector.setVisible(false);
         overviewPlot.setVisible(false);
@@ -307,7 +308,7 @@ public class ApplicationModel {
         spectrogramRend.addPropertyChangeListener(listener);
 
         spectrogramRend.setActive(false);
-        
+
         overSpectrogramRend = new SpectrogramRenderer(null, colorbar);
         plot.addRenderer(spectrogramRend);
         overviewPlot.addRenderer(overSpectrogramRend);
@@ -319,7 +320,7 @@ public class ApplicationModel {
         overSpectrogramRend.setActive(false);
 
         seriesRend.setColorBar(colorbar);
-        seriesRend.setColorByDataSetId("plane0");
+        seriesRend.setColorByDataSetId( QDataSet.PLANE_0 );
 
         seriesRend.setAntiAliased(true);
 
@@ -408,7 +409,7 @@ public class ApplicationModel {
         }
         if (oldSource == null || !oldSource.equals(ds)) {
             update();
-            firePropertyChangeListenerPropertyChange(PROPERTY_DATASOURCE, oldSource, ds);
+            propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, ds);
         }
     }
 
@@ -466,7 +467,9 @@ public class ApplicationModel {
     }
 
     private double guessCadence(QDataSet xds, QDataSet yds) {
-        if ( yds==null ) yds= DataSetUtil.indexGenDataSet(xds.length());
+        if (yds == null) {
+            yds = DataSetUtil.indexGenDataSet(xds.length());
+        }
         assert (xds.length() == yds.length());
         Units u = (Units) yds.property(QDataSet.UNITS);
         if (u == null) {
@@ -504,7 +507,7 @@ public class ApplicationModel {
         return cadenceS / cadenceN;
     }
 
-    private void updateFillSpec(WritableDataSet fillDs,boolean autoRange) {
+    private void updateFillSpec(WritableDataSet fillDs, boolean autoRange) {
         QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
         if (xds == null) {
             xds = DataSetUtil.indexGenDataSet(fillDs.length());
@@ -516,7 +519,7 @@ public class ApplicationModel {
             fillDs.putProperty(QDataSet.DEPEND_1, yds);
         }
 
-        double cadence = guessCadence(xds, null );
+        double cadence = guessCadence(xds, null);
         ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
 
         spectrogramRend.setDataSet(null);
@@ -525,7 +528,7 @@ public class ApplicationModel {
         AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds);
         AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds);
 
-        if ( autoRange && !autoRangeSuppress) {
+        if (autoRange && !autoRangeSuppress) {
 
             AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs);
 
@@ -556,7 +559,7 @@ public class ApplicationModel {
         overSpectrogramRend.setDataSet(TableDataSetAdapter.create(fillDs));
     }
 
-    private void updateFillSeries(WritableDataSet fillDs,boolean autoRange) {
+    private void updateFillSeries(WritableDataSet fillDs, boolean autoRange) {
 
         seriesRend.setDataSet(null);
 
@@ -569,7 +572,7 @@ public class ApplicationModel {
         double cadence = guessCadence(xds, fillDs);
         ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
 
-        if ( autoRange && !autoRangeSuppress) {
+        if (autoRange && !autoRangeSuppress) {
 
             boolean isSeries;
             QDataSet depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
@@ -640,7 +643,7 @@ public class ApplicationModel {
      * the fill parameters have changed, so update the auto range stats.
      * This should not be run on the AWT event thread!
      */
-    private void updateFill( boolean autorange ) {
+    private void updateFill(boolean autorange) {
         if (dataset == null) {
             return;
         }
@@ -657,19 +660,21 @@ public class ApplicationModel {
         }
 
         if (fillDs.rank() == 3) {
-            
+
             QDataSet ds;
-            if ( this.sliceDimension==2 ) {
-                int index = Math.min( fillDs.length(0, 0) - 1, sliceIndex );
+            if (this.sliceDimension == 2) {
+                int index = Math.min(fillDs.length(0, 0) - 1, sliceIndex);
                 ds = DataSetOps.slice2(fillDs, index);
-            } else if ( this.sliceDimension==1 ) {
-                int index = Math.min( fillDs.length(0) - 1, sliceIndex );
+            } else if (this.sliceDimension == 1) {
+                int index = Math.min(fillDs.length(0) - 1, sliceIndex);
                 ds = DataSetOps.slice1(fillDs, index);
-            } else if ( this.sliceDimension==0 ) {
-                int index = Math.min( fillDs.length() - 1, sliceIndex );
+            } else if (this.sliceDimension == 0) {
+                int index = Math.min(fillDs.length() - 1, sliceIndex);
                 ds = DataSetOps.slice0(fillDs, index);
-            } else throw new IllegalStateException("sliceDimension");
-            if ( transpose ) {
+            } else {
+                throw new IllegalStateException("sliceDimension");
+            }
+            if (transpose) {
                 ds = new TransposeRank2DataSet(ds);
             }
             fillDs = DDataSet.copy(ds);
@@ -677,16 +682,16 @@ public class ApplicationModel {
         }
 
         if (spec) {
-            updateFillSpec(fillDs,autorange);
+            updateFillSpec(fillDs, autorange);
             setRenderer(spectrogramRend, overSpectrogramRend);
         } else {
-            updateFillSeries(fillDs,autorange);
+            updateFillSeries(fillDs, autorange);
             setRenderer(seriesRend, overSeriesRend);
         }
 
         fillDataset = fillDs;
 
-        firePropertyChangeListenerPropertyChange(PROPERTY_FILL, null, null);
+        propertyChangeSupport.firePropertyChange(PROPERTY_FILL, null, null);
     }
 
     private void doInterpretMetadata() {
@@ -721,7 +726,7 @@ public class ApplicationModel {
                 /*** here is the data load ***/
                 Logger.getLogger("ap").info("loading dataset");
                 setStatus("loading dataset");
-                
+
                 QDataSet dataset = loadDataSet(0);
                 if (dataset == null) {
                     seriesRend.setDataSet(null);
@@ -731,6 +736,23 @@ public class ApplicationModel {
 
                 Logger.getLogger("ap").info("update fill");
                 setStatus("apply fill and autorange");
+
+                int[] qube = DataSetUtil.qubeDims( dataset );
+                String[] depNames = new String[3];
+                for (int i = 0; i < 3; i++) {
+                    depNames[i] = "";
+                    QDataSet dep0 = (QDataSet) dataset.property("DEPEND_" + i);
+                    if (dep0 != null) {
+                        String dname = (String) dep0.property(QDataSet.NAME);
+                        if (dname != null) {
+                            depNames[i] = dname + ( qube != null ? "=" + qube[i] : "" );
+                        }
+                    }
+                }
+                
+                Logger.getLogger("ap").fine("dep names: "+ Arrays.asList(depNames));
+                setDepnames(Arrays.asList(depNames));
+
                 updateFill(true);
 
                 if (interpretMetadata) {
@@ -749,7 +771,7 @@ public class ApplicationModel {
 
                 Logger.getLogger("ap").info("fire datasource property change");
                 setStatus("");
-                firePropertyChangeListenerPropertyChange(PROPERTY_DATASOURCE, null, null);
+                propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, null, null);
                 if (autoRangeSuppress) {
                     autoRangeSuppress = false;
                 }
@@ -787,59 +809,13 @@ public class ApplicationModel {
         }
         return dataset;
     }
-    /**
-     * Utility field holding list of PropertyChangeListeners.
-     */
-    private transient java.util.ArrayList propertyChangeListenerList;
 
-    /**
-     * Registers PropertyChangeListener to receive events.
-     * @param listener The listener to register.
-     */
     public synchronized void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
-        if (propertyChangeListenerList == null) {
-            propertyChangeListenerList = new java.util.ArrayList();
-        }
-        propertyChangeListenerList.add(listener);
+        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    /**
-     * Removes PropertyChangeListener from the list of listeners.
-     * @param listener The listener to remove.
-     */
     public synchronized void removePropertyChangeListener(java.beans.PropertyChangeListener listener) {
-        if (propertyChangeListenerList != null) {
-            propertyChangeListenerList.remove(listener);
-        }
-    }
-
-    /**
-     * Notifies all registered listeners about the event.
-     *
-     * @param event The event to be fired
-     */
-    private void firePropertyChangeListenerPropertyChange(String propertyName, Object oldValue, Object newValue) {
-        java.beans.PropertyChangeEvent event;
-        event = new PropertyChangeEvent(this, propertyName, oldValue, newValue);
-        firePropertyChangeListenerPropertyChange(event);
-    }
-
-    /**
-     * Notifies all registered listeners about the event.
-     *
-     * @param event The event to be fired
-     */
-    private void firePropertyChangeListenerPropertyChange(PropertyChangeEvent event) {
-        java.util.ArrayList list;
-        synchronized (this) {
-            if (propertyChangeListenerList == null) {
-                return;
-            }
-            list = (java.util.ArrayList) propertyChangeListenerList.clone();
-        }
-        for (int i = 0; i < list.size(); i++) {
-            ((java.beans.PropertyChangeListener) list.get(i)).propertyChange(event);
-        }
+        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
     /**
@@ -924,7 +900,7 @@ public class ApplicationModel {
             }
         }
 
-        firePropertyChangeListenerPropertyChange(PROPERTY_FILL, null, null);
+        propertyChangeSupport.firePropertyChange(PROPERTY_FILL, null, null);
     }
     protected List<Bookmark> recent = new LinkedList<Bookmark>();
     protected List<Bookmark> bookmarks = new ArrayList<Bookmark>();
@@ -1018,7 +994,7 @@ public class ApplicationModel {
         } catch (BackingStoreException ex) {
             ex.printStackTrace();
         }
-        firePropertyChangeListenerPropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
+        propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
     }
 
     private static String strjoin(Collection<String> c, String delim) {
@@ -1049,7 +1025,7 @@ public class ApplicationModel {
         } catch (BackingStoreException ex) {
             ex.printStackTrace();
         }
-        firePropertyChangeListenerPropertyChange(PROPERTY_RECENT, oldValue, recent);
+        propertyChangeSupport.firePropertyChange(PROPERTY_RECENT, oldValue, recent);
     }
 
     public void addBookmark(String surl) {
@@ -1066,7 +1042,7 @@ public class ApplicationModel {
         } catch (BackingStoreException ex) {
             ex.printStackTrace();
         }
-        firePropertyChangeListenerPropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
+        propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
     }
 
     public void exit() {
@@ -1249,7 +1225,7 @@ public class ApplicationModel {
         restoreState(state, true);
         setUseEmbeddedDataSet(false);
         allowAutoContext = true;
-        firePropertyChangeListenerPropertyChange("file", null, f);
+        propertyChangeSupport.firePropertyChange("file", null, f);
     }
     /**
      * Holds value of property validRange.
@@ -1276,7 +1252,7 @@ public class ApplicationModel {
         } catch (ParseException ex) {
             ex.printStackTrace();
         }
-        firePropertyChangeListenerPropertyChange("validRange", oldValue, validRange);
+        propertyChangeSupport.firePropertyChange("validRange", oldValue, validRange);
     }
     private String sfill = "";
 
@@ -1474,7 +1450,7 @@ public class ApplicationModel {
         overviewPlotConnector.setVisible(showContextOverview);
         allowAutoContext = false;
         canvas.repaint();
-        firePropertyChangeListenerPropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
+        propertyChangeSupport.firePropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
 
     }
     /**
@@ -1533,7 +1509,7 @@ public class ApplicationModel {
     private void setStatus(String status) {
         String oldVal = this.status;
         this.status = status;
-        firePropertyChangeListenerPropertyChange(PROPERTY_STATUS, oldVal, status);
+        propertyChangeSupport.firePropertyChange( PROPERTY_STATUS, oldVal, status );
     }
     /**
      * Holds value of property isotropic.
@@ -1560,9 +1536,7 @@ public class ApplicationModel {
         }
         propertyChangeSupport.firePropertyChange("isotropic", new Boolean(oldIsotropic), new Boolean(isotropic));
     }
-        
-    private int sliceDimension= 0;
-
+    private int sliceDimension = 0;
     public static final String PROP_SLICEDIMENSION = "sliceDimension";
 
     public int getSliceDimension() {
@@ -1570,13 +1544,14 @@ public class ApplicationModel {
     }
 
     public void setSliceDimension(int newsliceDimension) {
+        if (newsliceDimension < 0 || newsliceDimension > 2) {
+            return;
+        }
         int oldsliceDimension = sliceDimension;
         this.sliceDimension = newsliceDimension;
         updateFill(true);
         propertyChangeSupport.firePropertyChange(PROP_SLICEDIMENSION, oldsliceDimension, newsliceDimension);
     }
-
-    
     private int sliceIndex = 1;
     public static final String PROP_SLICEINDEX = "sliceIndex";
 
@@ -1600,19 +1575,31 @@ public class ApplicationModel {
         updateFill(false);
         propertyChangeSupport.firePropertyChange(PROP_SLICEINDEX, oldsliceIndex, newsliceIndex);
     }
-    
-    private boolean transpose= false;
+    private boolean transpose = false;
     public static final String PROP_TRANSPOSE = "transpose";
-    
-    public void setTranspose( boolean val ) {
-        boolean oldVal= this.transpose;
-        this.transpose= val;
+
+    public void setTranspose(boolean val) {
+        boolean oldVal = this.transpose;
+        this.transpose = val;
         updateFill(true);
-        propertyChangeSupport.firePropertyChange(PROP_TRANSPOSE, oldVal, val );
+        propertyChangeSupport.firePropertyChange(PROP_TRANSPOSE, oldVal, val);
     }
 
     public boolean isTranspose() {
         return this.transpose;
+    }
+    private List<String> depnames = Arrays.asList(new String[]{"first", "second", "last"});
+    public static final String PROP_DEPNAMES = "depnames";
+
+    public List<String> getDepnames() {
+        return this.depnames;
+    }
+
+    public void setDepnames(List<String> newdepnames) {
+        List<String> olddepnames = depnames;
+        this.depnames = newdepnames;
+        System.err.println( newdepnames );
+        propertyChangeSupport.firePropertyChange(PROP_DEPNAMES, olddepnames, newdepnames);
     }
 }
 
