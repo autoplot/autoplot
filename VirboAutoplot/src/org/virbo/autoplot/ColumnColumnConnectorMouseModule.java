@@ -6,7 +6,6 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-
 package org.virbo.autoplot;
 
 import edu.uiowa.physics.pw.das.datum.Datum;
@@ -18,6 +17,7 @@ import edu.uiowa.physics.pw.das.graph.DasPlot;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import javax.swing.SwingUtilities;
 
 /**
  * provides zoom/pan on the connector object itself.  
@@ -25,88 +25,134 @@ import java.awt.event.MouseWheelEvent;
  * @author jbf
  */
 public class ColumnColumnConnectorMouseModule extends MouseModule {
-    
+
+    DasPlot topPlot;
+    DasPlot bottomPlot;
+    DasPlot panPlot;  // the plot that is panning
+    DasPlot oppositePlot; // this plot we're dragging along
     DasAxis topAxis;
     DasAxis bottomAxis;
-    
     Point p0;
     DatumRange topAxisRange0;
     DatumRange bottomAxisRange0;
-    
-    DasAxis panAxis=null; // this is the axis we're panning
+    DasAxis panAxis = null; // this is the axis we're panning
     DatumRange panAxisRange0;
-    DasAxis oppositeAxis=null;  // this is the axis we're dragging along
-    
-    public ColumnColumnConnectorMouseModule( DasAxis topAxis, DasAxis bottomAxis ) {
-        this.topAxis= topAxis;
-        this.bottomAxis= bottomAxis;
-        super.setLabel( "Connector Zoom Pan" );
+    DasAxis oppositeAxis = null;  // this is the axis we're dragging along
+    DasAxis.Lock panAxisLock;
+    // -- vertical panning --
+    DasAxis panAxisV = null; // this is the axis we're panning
+    DatumRange panAxisRange0V;
+    DasAxis oppositeAxisV = null;  // this is the axis we're dragging along
+    DasAxis.Lock panAxisLockV;
+
+    public ColumnColumnConnectorMouseModule(DasPlot topPlot, DasPlot bottomPlot) {
+        this.topPlot = topPlot;
+        this.bottomPlot = bottomPlot;
+        super.setLabel("Connector Zoom Pan");
     }
-    
+
     public void mouseWheelMoved(MouseWheelEvent e) {
         double nmin, nmax;
-        if ( e.getWheelRotation()<0 ) {
-            nmin= 0.20;
-            nmax= 0.80;
+        if (e.getWheelRotation() < 0) {
+            nmin = 0.20;
+            nmax = 0.80;
         } else {
-            nmin= -0.25;
-            nmax= 1.25;
+            nmin = -0.25;
+            nmax = 1.25;
         }
-        if ( panAxis!=null ) {
+        if (panAxis != null) {
             DatumRange dr;
-            if ( panAxis.isLog() ) {
-                dr= DatumRangeUtil.rescaleLog( panAxis.getDatumRange(), nmin, nmax );
+            if (panAxis.isLog()) {
+                dr = DatumRangeUtil.rescaleLog(panAxis.getDatumRange(), nmin, nmax);
             } else {
-                dr= DatumRangeUtil.rescale( panAxis.getDatumRange(), nmin, nmax );
+                dr = DatumRangeUtil.rescale(panAxis.getDatumRange(), nmin, nmax);
             }
-            panAxis.setDatumRange( dr );
+            panAxis.setDatumRange(dr);
+        }
+        if (panAxisV != null) {
+            DatumRange dr;
+            if (panAxisV.isLog()) {
+                dr = DatumRangeUtil.rescaleLog(panAxisV.getDatumRange(), nmin, nmax);
+            } else {
+                dr = DatumRangeUtil.rescale(panAxisV.getDatumRange(), nmin, nmax);
+            }
+            panAxisV.setDatumRange(dr);
         }
         super.mouseWheelMoved(e);
     }
-    
+
     public void mouseReleased(MouseEvent e) {
         super.mouseReleased(e);
-        if ( panAxis!=null ) {
+        if (panAxis != null) {
             panAxisLock.unlock();
-            panAxisLock= null;
-        }
-    }
-    
-    public void mouseDragged(MouseEvent e) {
-        super.mouseDragged(e);
-        Point p2= e.getPoint();
-        if ( panAxis!=null ) {
-            DatumRange dr;
-            if ( panAxis.isLog() ) {
-                Datum delta= oppositeAxis.invTransform( p0.getX() ).divide( oppositeAxis.invTransform( p2.getX() ) );
-                dr= new DatumRange( panAxisRange0.min().divide(delta), panAxisRange0.max().divide(delta) );
-            } else {
-                Datum delta= oppositeAxis.invTransform( p0.getX() ).subtract( oppositeAxis.invTransform( p2.getX() ) );
-                dr= new DatumRange( panAxisRange0.min().subtract(delta), panAxisRange0.max().subtract(delta) );
-            }
-            panAxis.setDatumRange( dr );
+            panAxisLock = null;
+            panAxis= null;
+        } 
+        if (panAxisV != null) {
+            panAxisLockV.unlock();
+            panAxisLockV = null;
+            panAxisV= null;
         }
     }
 
-    DasAxis.Lock panAxisLock;
-    
+    public void mouseDragged(MouseEvent e) {
+        super.mouseDragged(e);
+        Point p2 = e.getPoint();
+        if (panAxis != null) {
+            DatumRange dr;
+            if (panAxis.isLog()) {
+                Datum delta = oppositeAxis.invTransform(p0.getX()).divide(oppositeAxis.invTransform(p2.getX()));
+                dr = new DatumRange(panAxisRange0.min().divide(delta), panAxisRange0.max().divide(delta));
+            } else {
+                Datum delta = oppositeAxis.invTransform(p0.getX()).subtract(oppositeAxis.invTransform(p2.getX()));
+                dr = new DatumRange(panAxisRange0.min().subtract(delta), panAxisRange0.max().subtract(delta));
+            }
+            panAxis.setDatumRange(dr);
+        }
+        if (panAxisV != null) {
+            DatumRange dr;
+            if (panAxisV.isLog()) {
+                Datum delta = oppositeAxisV.invTransform(p0.getY()).divide(oppositeAxisV.invTransform(p2.getY()));
+                dr = new DatumRange(panAxisRange0V.min().divide(delta), panAxisRange0V.max().divide(delta));
+            } else {
+                Datum delta = oppositeAxisV.invTransform(p0.getY()).subtract(oppositeAxisV.invTransform(p2.getY()));
+                dr = new DatumRange(panAxisRange0V.min().subtract(delta), panAxisRange0V.max().subtract(delta));
+            }
+            panAxisV.setDatumRange(dr);
+        }
+    }
+
     public void mousePressed(MouseEvent e) {
         super.mousePressed(e);
-        p0= e.getPoint();
-        if ( p0.getY() < 20 ) {
-            panAxis= bottomAxis;
-            oppositeAxis= topAxis;
+        p0 = e.getPoint();
+        if (p0.getY() < 20) {
+            panAxis = bottomPlot.getXAxis();
+            oppositeAxis = topPlot.getXAxis();
         } else {
-            panAxis= topAxis;
-            oppositeAxis= bottomAxis;
+            Point p= e.getPoint();
+            p= SwingUtilities.convertPoint( e.getComponent(), p, bottomPlot.getCanvas() );
+            boolean doHoriz= topPlot.getXAxis().getDatumRange().contains( bottomPlot.getXAxis().invTransform( p.getX() ) );
+            System.err.println( "" + p.getY() + " " + bottomPlot.getYAxis().invTransform( p.getY() )  );
+            boolean doVert= topPlot.getYAxis().getDatumRange().contains( bottomPlot.getYAxis().invTransform( p.getY() ) );
+            if ( doHoriz ) {
+                panAxis = topPlot.getXAxis();
+                oppositeAxis = bottomPlot.getXAxis();
+            } 
+            if ( doVert ) {
+                panAxisV = topPlot.getYAxis();
+                oppositeAxisV = bottomPlot.getYAxis();                
+            }
         }
-        if ( panAxis!=null ) {
-            panAxisRange0= panAxis.getDatumRange();
-            panAxisLock= panAxis.mutatorLock();
+        if (panAxis != null) {
+            panAxisRange0 = panAxis.getDatumRange();
+            panAxisLock = panAxis.mutatorLock();
             panAxisLock.lock();
         }
-        
+        if ( panAxisV !=null ) {
+            panAxisRange0V = panAxisV.getDatumRange();
+            panAxisLockV = panAxisV.mutatorLock();
+            panAxisLockV.lock();            
+        }
+
     }
-    
-    
 }
