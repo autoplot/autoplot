@@ -9,7 +9,7 @@
 
 package org.virbo.cdfdatasource;
 
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import gsfc.nssdc.cdf.CDF;
 import java.io.File;
 import java.net.URL;

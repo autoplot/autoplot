@@ -10,7 +10,7 @@
 package org.virbo.cdfdatasource;
 
 import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFException;
@@ -77,7 +77,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         return properties;
     }
     
-    public org.virbo.dataset.QDataSet getDataSet( DasProgressMonitor mon) throws IOException, CDFException {
+    public org.virbo.dataset.QDataSet getDataSet( ProgressMonitor mon) throws IOException, CDFException {
         File cdfFile;
         cdfFile= getFile( mon );
         
@@ -145,7 +145,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         return true;
     }
     
-    public TreeModel getMetaData( DasProgressMonitor mon ) {
+    public TreeModel getMetaData( ProgressMonitor mon ) {
         
         if ( attributes==null ) return null; // transient state
         
