@@ -43,8 +43,8 @@ import edu.uiowa.physics.pw.das.graph.SeriesRenderer;
 import edu.uiowa.physics.pw.das.graph.SpectrogramRenderer;
 import edu.uiowa.physics.pw.das.stream.StreamException;
 import edu.uiowa.physics.pw.das.system.RequestProcessor;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.StreamTool;
 import java.awt.Font;
 import java.awt.Rectangle;
@@ -795,7 +795,7 @@ public class ApplicationModel {
         }
         QDataSet result;
         if (dataset == null) {
-            DasProgressMonitor mon = application.getMonitorFactory().getMonitor(plot, "loading data", "loading " + dataSource);
+            ProgressMonitor mon = application.getMonitorFactory().getMonitor(plot, "loading data", "loading " + dataSource);
             try {
                 dataset = dataSource.getDataSet(mon);
                 embedDsDirty = true;
@@ -821,7 +821,7 @@ public class ApplicationModel {
     /**
      * TODO: document me
      */
-    protected void resetDataSetSourceURL(String surl, DasProgressMonitor mon) {
+    protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
         this.surl = surl;
         if (surl == null) {
             return;

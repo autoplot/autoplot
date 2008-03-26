@@ -11,8 +11,8 @@ import edu.uiowa.physics.pw.das.dasml.DOMBuilder;
 import edu.uiowa.physics.pw.das.dasml.SerializeUtil;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -58,13 +58,13 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
     GuiSupport support;
     PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
-        public Element serialize(Document document, DasProgressMonitor monitor) {
+        public Element serialize(Document document, ProgressMonitor monitor) {
             DOMBuilder builder = new DOMBuilder(applicationModel);
             Element element = builder.serialize(document, DasProgressPanel.createFramed("Serializing Application"));
             return element;
         }
 
-        public void deserialize(Document document, DasProgressMonitor monitor) {
+        public void deserialize(Document document, ProgressMonitor monitor) {
             Element element = document.getDocumentElement();
             SerializeUtil.processElement(element, applicationModel);
         }

@@ -9,8 +9,8 @@ import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.DatumUtil;
 import edu.uiowa.physics.pw.das.datum.Units;
 import edu.uiowa.physics.pw.das.util.CombinedTreeModel;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
@@ -45,7 +45,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
         try {
             DataSource dsrc = applicationModel.dataSource();
             if (dsrc != null) {
-                DasProgressMonitor mon = new NullProgressMonitor();
+                ProgressMonitor mon = new NullProgressMonitor();
                 TreeModel dsrcMeta = dsrc.getMetaData(mon);
                 if (dsrcMeta != null) {
                     tree.mountTree(dsrcMeta);
