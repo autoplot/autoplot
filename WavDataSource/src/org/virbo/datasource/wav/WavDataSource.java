@@ -5,7 +5,7 @@
 package org.virbo.datasource.wav;
 
 import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
@@ -39,7 +39,7 @@ public class WavDataSource extends AbstractDataSource {
     }
 
     @Override
-    public QDataSet getDataSet(DasProgressMonitor mon) throws Exception {
+    public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         File wavFile = DataSetURL.getFile(this.url, mon);
                 
@@ -100,7 +100,7 @@ public class WavDataSource extends AbstractDataSource {
     }
 
     @Override
-    public TreeModel getMetaData(DasProgressMonitor mon) throws Exception {
+    public TreeModel getMetaData(ProgressMonitor mon) throws Exception {
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(resourceURL);
         AudioFormat audioFormat= fileFormat.getFormat();
         Map properies= new HashMap( audioFormat.properties() );
