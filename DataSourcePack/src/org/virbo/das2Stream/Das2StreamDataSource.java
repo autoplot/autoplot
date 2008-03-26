@@ -11,7 +11,7 @@ package org.virbo.das2Stream;
 
 import edu.uiowa.physics.pw.das.client.DataSetStreamHandler;
 import edu.uiowa.physics.pw.das.stream.StreamException;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import edu.uiowa.physics.pw.das.util.StreamTool;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +44,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
     }
     
     
-    public QDataSet getDataSet(DasProgressMonitor mon) throws FileNotFoundException, StreamException, IOException {
+    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException {
         
         File f= getFile( mon );
         

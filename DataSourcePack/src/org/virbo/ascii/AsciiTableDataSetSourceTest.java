@@ -9,7 +9,7 @@
 
 package org.virbo.ascii;
 
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import java.net.URL;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;

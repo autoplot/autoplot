@@ -9,7 +9,7 @@
 
 package org.virbo.excel;
 
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         super(url);
     }
     
-    public QDataSet getDataSet(DasProgressMonitor mon) throws IOException {
+    public QDataSet getDataSet(ProgressMonitor mon) throws IOException {
         File file= DataSetURL.getFile( url, mon );
         InputStream in= new FileInputStream( file );
         fs=   new POIFSFileSystem( in );

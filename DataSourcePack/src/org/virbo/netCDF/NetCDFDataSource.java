@@ -9,7 +9,7 @@
 
 package org.virbo.netCDF;
 
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -74,13 +74,13 @@ public class NetCDFDataSource extends AbstractDataSource {
         }
     }
     
-    public QDataSet getDataSet( DasProgressMonitor mon) throws IOException {
+    public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         readData(mon);
         QDataSet result= new NetCdfVarDataSet( variable );
         return result;
     }
     
-    private synchronized void readData( DasProgressMonitor mon ) throws IOException {
+    private synchronized void readData( ProgressMonitor mon ) throws IOException {
 
         File file= getFile(mon);
         
@@ -122,7 +122,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         return new NetCDFDataSourceFactory();
     }
     
-    public TreeModel getMetaData( DasProgressMonitor mon ) throws Exception {
+    public TreeModel getMetaData( ProgressMonitor mon ) throws Exception {
         readData( mon );
         List attr= variable.getAttributes();
         

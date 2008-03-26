@@ -9,7 +9,7 @@
 
 package org.virbo.spase;
 
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import java.net.URL;
 import java.util.Map;
 import javax.swing.tree.TreeModel;

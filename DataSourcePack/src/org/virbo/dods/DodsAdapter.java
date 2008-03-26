@@ -23,7 +23,7 @@ import dods.dap.PrimitiveVector;
 import dods.dap.StatusUI;
 import dods.dap.parser.ParseException;
 import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -124,7 +124,7 @@ public class DodsAdapter {
         }
     }
     
-    public void loadDataset( final DasProgressMonitor mon ) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException {
+    public void loadDataset( final ProgressMonitor mon ) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException {
         if ( constraint==null ) {
             throw new IllegalArgumentException("constraint not set");
         }

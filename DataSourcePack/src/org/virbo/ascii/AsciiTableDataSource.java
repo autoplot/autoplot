@@ -11,7 +11,7 @@ package org.virbo.ascii;
 
 
 import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -55,7 +55,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         
     }
     
-    public QDataSet getDataSet(DasProgressMonitor mon) throws IOException {
+    public QDataSet getDataSet(ProgressMonitor mon) throws IOException {
         
         ds = doReadFile(mon); //DANGER
         
@@ -89,7 +89,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         
     }
     
-    private DDataSet doReadFile(final DasProgressMonitor mon) throws NumberFormatException, IOException, FileNotFoundException {
+    private DDataSet doReadFile(final ProgressMonitor mon) throws NumberFormatException, IOException, FileNotFoundException {
         
         Map params= DataSetURL.parseParams( url.getQuery() );
         Object o;
@@ -261,7 +261,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         return ds;
     }
     
-    public TreeModel getMetaData( DasProgressMonitor mon ) throws Exception {
+    public TreeModel getMetaData( ProgressMonitor mon ) throws Exception {
         if ( ds==null ) return NameValueTreeModel.create( "no metadata", new HashMap() );
         Map props= ds.getProperties();
         TreeModel retValue= NameValueTreeModel.create("properties",props);

@@ -9,8 +9,8 @@
 
 package org.virbo.spase;
 
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -116,7 +116,7 @@ public class SpaseRecordDataSource implements DataSource {
     }
     
     
-    public QDataSet getDataSet(DasProgressMonitor mon) throws Exception {
+    public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         return delegate.getDataSet(mon);
     }
     
@@ -136,7 +136,7 @@ public class SpaseRecordDataSource implements DataSource {
         
     }
     
-    public TreeModel getMetaData( DasProgressMonitor mon ) throws Exception {
+    public TreeModel getMetaData( ProgressMonitor mon ) throws Exception {
         // If we're using a DOM Level 2 implementation, then our Document
         // object ought to implement DocumentTraversal
         DocumentTraversal traversal = (DocumentTraversal)document;

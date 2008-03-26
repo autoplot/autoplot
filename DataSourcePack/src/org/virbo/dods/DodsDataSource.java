@@ -15,7 +15,7 @@ import dods.dap.DASException;
 import dods.dap.DDSException;
 import dods.dap.DODSException;
 import dods.dap.parser.ParseException;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -29,7 +29,7 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.metatree.NameValueTreeModel;
 import dods.dap.Attribute;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import java.util.HashMap;
 import java.util.Map;
 import org.virbo.datasource.Util;
@@ -131,7 +131,7 @@ public class DodsDataSource extends AbstractDataSource {
         return constraint1.toString();
     }
 
-    public QDataSet getDataSet(DasProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException {
+    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException {
         //if (sMyUrl.endsWith(".cdf")) {
         MyDDSParser parser = new MyDDSParser();
         parser.parse(new URL(adapter.getSource().toString() + ".dds").openStream());
@@ -215,7 +215,7 @@ public class DodsDataSource extends AbstractDataSource {
         }
     }
 
-    private TreeModel getMetaData(DasProgressMonitor mon, String variable) throws IOException, DASException, ParseException {
+    private TreeModel getMetaData(ProgressMonitor mon, String variable) throws IOException, DASException, ParseException {
 
         TreeModel treeresult;
 
@@ -228,7 +228,7 @@ public class DodsDataSource extends AbstractDataSource {
     }
 
     @Override
-    public synchronized TreeModel getMetaData(DasProgressMonitor mon) throws IOException, DASException, ParseException {
+    public synchronized TreeModel getMetaData(ProgressMonitor mon) throws IOException, DASException, ParseException {
         if (metadata == null) {
             metadata = getMetaData(mon, adapter.getVariable());
         }
