@@ -9,10 +9,10 @@
 
 package org.virbo.datasource;
 
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
-import edu.uiowa.physics.pw.das.util.fileSystem.FileObject;
-import edu.uiowa.physics.pw.das.util.fileSystem.FileSystem;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.filesystem.FileObject;
+import org.das2.util.filesystem.FileSystem;
 import ftpfs.FTPBeanFileSystemFactory;
 import java.io.BufferedReader;
 import java.io.File;
@@ -188,7 +188,7 @@ public class DataSetURL {
     /**
      * get the datasource factory for the URL.
      */
-    public static DataSourceFactory getDataSourceFactory(final URL url, DasProgressMonitor mon) throws IOException, IllegalArgumentException {
+    public static DataSourceFactory getDataSourceFactory(final URL url, ProgressMonitor mon) throws IOException, IllegalArgumentException {
         
         if ( isAggregating( url.toString() ) ) {
             return new AggregatingDataSourceFactory();
@@ -295,7 +295,7 @@ public class DataSetURL {
      * Linux: file:/home/jbf/fun/realEstate/to1960.latlon.xls?column=C[1:]&depend0=H[1:]
      *
      */
-    public static File getFile( URL url, DasProgressMonitor mon ) throws IOException {
+    public static File getFile( URL url, ProgressMonitor mon ) throws IOException {
         URLSplit split= parse( url.toString() );
         url= new URL( split.file );
         
@@ -359,7 +359,7 @@ public class DataSetURL {
     
     // "L:/ct/virbo/sampexTimeL/sampex.dat?fixedColumns=90&rank2"
     //                                          ^        ^
-    public static String[] getCompletions2( String surl1, int carotPos, DasProgressMonitor mon ) throws Exception {
+    public static String[] getCompletions2( String surl1, int carotPos, ProgressMonitor mon ) throws Exception {
         CompletionContext cc= new CompletionContext();
         int qpos=surl1.lastIndexOf( '?', carotPos );
         
@@ -600,7 +600,7 @@ public class DataSetURL {
         
     }
     
-/*    public static String[] getCompletions( String surl , DasProgressMonitor mon) throws Exception {
+/*    public static String[] getCompletions( String surl , ProgressMonitor mon) throws Exception {
         String[] result;
         try {
             

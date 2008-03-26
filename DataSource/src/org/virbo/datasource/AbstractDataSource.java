@@ -9,8 +9,8 @@
 
 package org.virbo.datasource;
 
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -53,7 +53,7 @@ public abstract class AbstractDataSource implements DataSource {
         }
     }
     
-    public abstract QDataSet getDataSet(DasProgressMonitor mon) throws Exception;
+    public abstract QDataSet getDataSet(ProgressMonitor mon) throws Exception;
     
     public boolean asynchronousLoad() {
         return true;
@@ -70,7 +70,7 @@ public abstract class AbstractDataSource implements DataSource {
     /**
      * make the remote file available.
      */
-    protected File getFile( DasProgressMonitor mon ) throws IOException {
+    protected File getFile( ProgressMonitor mon ) throws IOException {
        return DataSetURL.getFile( url, mon ); 
     }
     
@@ -93,7 +93,7 @@ public abstract class AbstractDataSource implements DataSource {
      * abstract class version returns an empty tree.  Override this method
      * to provide metadata.
      */
-    public TreeModel getMetaData( DasProgressMonitor mon ) throws Exception {
+    public TreeModel getMetaData( ProgressMonitor mon ) throws Exception {
         final Object ROOT= "(no metadata provided)";
         
         return new TreeModel() {

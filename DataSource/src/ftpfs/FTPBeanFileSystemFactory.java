@@ -9,8 +9,8 @@
 
 package ftpfs;
 
-import edu.uiowa.physics.pw.das.util.fileSystem.FileSystem;
-import edu.uiowa.physics.pw.das.util.fileSystem.FileSystemFactory;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystemFactory;
 import java.net.URL;
 
 /**

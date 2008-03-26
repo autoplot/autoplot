@@ -15,7 +15,7 @@ import edu.uiowa.physics.pw.das.dataset.DataSetDescriptor;
 import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
 
@@ -32,7 +32,7 @@ public class DataSetDescriptorAdapter extends DataSetDescriptor {
         this.source= source;
     }
     
-    protected DataSet getDataSetImpl(Datum start, Datum end, Datum resolution, DasProgressMonitor monitor) throws DasException {
+    protected DataSet getDataSetImpl(Datum start, Datum end, Datum resolution, ProgressMonitor monitor) throws DasException {
         source.setViewRange( new DatumRange( start, end ) );
         try {
             org.virbo.dataset.QDataSet ds= source.getDataSet( monitor );

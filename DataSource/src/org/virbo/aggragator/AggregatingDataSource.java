@@ -13,11 +13,11 @@ import edu.uiowa.physics.pw.das.dataset.CacheTag;
 import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
-import edu.uiowa.physics.pw.das.util.SubTaskMonitor;
-import edu.uiowa.physics.pw.das.util.fileSystem.FileStorageModel;
-import edu.uiowa.physics.pw.das.util.fileSystem.FileSystem;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.SubTaskMonitor;
+import org.das2.util.filesystem.FileStorageModel;
+import org.das2.util.filesystem.FileSystem;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -61,7 +61,7 @@ public class AggregatingDataSource extends AbstractDataSource {
         } );
     }
     
-    public QDataSet getDataSet(DasProgressMonitor mon) throws Exception {
+    public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String[] ss= getFsm().getNamesFor(viewRange);
         
         DDataSet result=null;
@@ -80,7 +80,7 @@ public class AggregatingDataSource extends AbstractDataSource {
             
             DataSource delegateDataSource= delegateDataSourceFactory.getDataSource(compUrl);
             
-            DasProgressMonitor mon1;
+            ProgressMonitor mon1;
             if ( ss.length>1 ) {
                 mon.setProgressMessage( "getting "+ss[i] );
                 mon1= SubTaskMonitor.create(mon,i*10,10*(i+1));
@@ -117,7 +117,7 @@ public class AggregatingDataSource extends AbstractDataSource {
     /**
      * returns the metadata provided by the first delegate dataset.
      */
-    public TreeModel getMetaData(DasProgressMonitor mon) throws Exception {
+    public TreeModel getMetaData(ProgressMonitor mon) throws Exception {
         if ( metadata==null ) {
             TreeModel retValue;
             retValue = super.getMetaData(mon);

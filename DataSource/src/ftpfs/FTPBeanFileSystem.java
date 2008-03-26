@@ -7,9 +7,9 @@
  */
 package ftpfs;
 
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
-import edu.uiowa.physics.pw.das.util.fileSystem.*;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.filesystem.*;
 import ftpfs.ftp.FtpBean;
 import ftpfs.ftp.FtpException;
 import ftpfs.ftp.FtpListResult;
@@ -222,7 +222,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
     }
 
-    protected void downloadFile(String filename, java.io.File targetFile, File partFile, final DasProgressMonitor mon) throws java.io.IOException {
+    protected void downloadFile(String filename, java.io.File targetFile, File partFile, final ProgressMonitor mon) throws java.io.IOException {
         FileOutputStream out = null;
         InputStream is = null;
         try {

@@ -7,11 +7,9 @@ package org.virbo.datasource;
 
 import edu.uiowa.physics.pw.das.DasApplication;
 import edu.uiowa.physics.pw.das.util.DasExceptionHandler;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
-import edu.uiowa.physics.pw.das.util.fileSystem.FileSystem;
-import edu.uiowa.physics.pw.das.util.fileSystem.FileSystem.FileSystemOfflineException;
-import java.awt.Point;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.filesystem.FileSystem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -54,7 +52,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * current completions task
      */
     Runnable completionsRunnable = null;
-    DasProgressMonitor completionsMonitor = null;
+    ProgressMonitor completionsMonitor = null;
     JPopupMenu completionsPopupMenu = null;
     JTextField editor;
     public static final String PROPERTY_MESSAGE = "message";
@@ -225,7 +223,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
             public void run() {
                 DataSetURL.URLSplit split = DataSetURL.parse(surl);
-                DasProgressMonitor mon = DasApplication.getDefaultApplication().getMonitorFactory().getMonitor("getting completions", "getting remote listing");
+                ProgressMonitor mon = DasApplication.getDefaultApplication().getMonitorFactory().getMonitor("getting completions", "getting remote listing");
 
                 FileSystem fs = null;
                 try {

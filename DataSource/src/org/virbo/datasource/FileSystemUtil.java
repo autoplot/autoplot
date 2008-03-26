@@ -9,7 +9,7 @@
 
 package org.virbo.datasource;
 
-import edu.uiowa.physics.pw.das.util.fileSystem.FileSystem;
+import org.das2.util.filesystem.FileSystem;
 
 /**
  *
