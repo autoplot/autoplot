@@ -5,10 +5,9 @@
 package org.virbo.cefdatasource;
 
 import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import edu.uiowa.physics.pw.das.util.DasProgressMonitorReadableByteChannel;
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,7 +45,7 @@ public class CefDataSource extends AbstractDataSource {
         super(url);
     }
 
-    public synchronized QDataSet getDataSet(DasProgressMonitor mon) throws Exception {
+    public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         File f = DataSetURL.getFile(url, new NullProgressMonitor());
         ReadableByteChannel c = Channels.newChannel(new FileInputStream(f));
@@ -70,7 +69,7 @@ public class CefDataSource extends AbstractDataSource {
     }
 
     @Override
-    public synchronized TreeModel getMetaData(DasProgressMonitor mon) throws Exception {
+    public synchronized TreeModel getMetaData(ProgressMonitor mon) throws Exception {
         String var = (String) getParams().get("arg_0");
 
         CefReaderHeader.ParamStruct param = cef.parameters.get(var);

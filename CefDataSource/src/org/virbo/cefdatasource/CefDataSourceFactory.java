@@ -4,7 +4,7 @@
  */
 package org.virbo.cefdatasource;
 
-import edu.uiowa.physics.pw.das.util.NullProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

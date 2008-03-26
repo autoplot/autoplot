@@ -6,7 +6,7 @@ package org.virbo.cefdatasource;
 
 import edu.uiowa.physics.pw.das.util.TimeParser;
 import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
