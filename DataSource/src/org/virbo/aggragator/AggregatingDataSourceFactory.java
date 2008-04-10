@@ -10,7 +10,7 @@ package org.virbo.aggragator;
 
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.filesystem.FileStorageModel;
+import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import java.io.IOException;
 import java.net.MalformedURLException;
