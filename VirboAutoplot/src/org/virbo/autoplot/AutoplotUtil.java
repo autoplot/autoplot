@@ -237,11 +237,15 @@ public class AutoplotUtil {
                 result.log = true;
             }
             
-            if (result.log) {
-                result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
-                        DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
+            if ( UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u) ) {
+                if (result.log) {
+                    result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
+                            DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
+                } else {
+                    result.range = DatumRangeUtil.rescale(DatumRange.newDatumRange(result.robustMin, result.robustMax, u), -0.05, 1.05);
+                }
             } else {
-                result.range = DatumRangeUtil.rescale(DatumRange.newDatumRange(result.robustMin, result.robustMax, u), -0.05, 1.05);
+                result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
             }
             
         }
