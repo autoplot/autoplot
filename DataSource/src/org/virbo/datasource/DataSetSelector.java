@@ -19,7 +19,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -30,6 +34,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -46,6 +51,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         initComponents();
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());
         addCompletionKeys();
+        addAbouts();
     }
     boolean needToAddKeys = true;
     /**
@@ -55,6 +61,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     ProgressMonitor completionsMonitor = null;
     JPopupMenu completionsPopupMenu = null;
     JTextField editor;
+    DataSetSelectorSupport support = new DataSetSelectorSupport(this);
     public static final String PROPERTY_MESSAGE = "message";
 
     /**
@@ -66,16 +73,22 @@ public class DataSetSelector extends javax.swing.JPanel {
         if (surl.equals("")) {
             return;
         }
-        if (actionTriggerRegex != null && Pattern.matches(actionTriggerRegex, surl)) {
-            action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
-            return;
+
+        for (String actionTriggerRegex : this.actionTriggers.keySet()) {
+            if (Pattern.matches(actionTriggerRegex, surl)) {
+                Action action = actionTriggers.get(actionTriggerRegex);
+                action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
+                return;
+            }
         }
+
         try {
             if (surl.endsWith("/")) {
                 int carotpos = surl.length();
                 setMessage("ends with /, filesystem completions");
                 showCompletions(surl, carotpos);
             } else if (surl.endsWith("/..")) { // pop up one directory
+
                 int carotpos = surl.lastIndexOf("/..");
                 carotpos = surl.lastIndexOf("/", carotpos - 1);
                 if (carotpos != -1) {
@@ -222,26 +235,32 @@ public class DataSetSelector extends javax.swing.JPanel {
         completionsRunnable = new Runnable() {
 
             public void run() {
+
                 DataSetURL.URLSplit split = DataSetURL.parse(surl);
+                String prefix = split.file.substring(split.path.length());
+                String surlDir = split.path;
+
                 ProgressMonitor mon = DasApplication.getDefaultApplication().getMonitorFactory().getMonitor("getting completions", "getting remote listing");
 
                 FileSystem fs = null;
+                String[] s;
                 try {
                     fs = FileSystem.create(new URL(split.path));
+
+                    s = fs.listDirectory("/");
+
                 } catch (MalformedURLException ex) {
                     setMessage(ex.getMessage());
                     ex.printStackTrace();
                     return;
-                } catch (FileSystem.FileSystemOfflineException ex) {
+
+                } catch ( IOException ex ) {
                     setMessage(ex.getMessage());
                     ex.printStackTrace();
                     return;
+                    
                 }
 
-                String prefix = split.file.substring(split.path.length());
-                String surlDir = split.path;
-
-                String[] s = fs.listDirectory("/");
                 boolean foldCase = Boolean.TRUE.equals(fs.getProperty(fs.PROP_CASE_INSENSITIVE));
                 if (foldCase) {
                     prefix = prefix.toLowerCase();
@@ -254,6 +273,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         if (s[j].endsWith("contents.html")) {
                             s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
                         } // kludge for dods
+
                         completions.add(surlDir + s[j]);
                     }
                 }
@@ -275,6 +295,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             completionsRunnable = null;
                         } catch (NullPointerException ex) {
                             ex.printStackTrace(); // TODO: look into this
+
                         }
                     }
                 });
@@ -370,6 +391,49 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         needToAddKeys = false;
     }
+    private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
+
+        public void actionPerformed(ActionEvent e) {
+            StringBuffer buf = new StringBuffer();
+            buf.append("<html>");
+            {
+                buf.append("<h1>Plugins by Extension:</h1>");
+                Map m = DataSourceRegistry.getInstance().dataSourcesByExt;
+                for (Object k : m.keySet()) {
+                    buf.append("" + k + ": " + m.get(k) + "<br>");
+                }
+            }
+            {
+                buf.append("<h1>Plugins by Mime Type:</h1>");
+                Map m = DataSourceRegistry.getInstance().dataSourcesByMime;
+                for (Object k : m.keySet()) {
+                    buf.append("" + k + ": " + m.get(k) + "<br>");
+                }
+            }
+            buf.append("</html>");
+
+            JOptionPane.showMessageDialog(DataSetSelector.this, buf.toString());
+        }
+    };
+
+    public void addAbouts() {
+        final String regex = "about:(.*)";
+        registerActionTrigger(regex, new AbstractAction() {
+
+            public void actionPerformed(ActionEvent e) {
+                String ss = DataSetSelector.this.getValue();
+                Pattern p = Pattern.compile(regex);
+                Matcher m = p.matcher(ss);
+                if (!m.matches()) {
+                    throw new IllegalArgumentException("huh?");
+                }
+                String arg = m.group(1);
+                if (arg.equals("plugins")) {
+                    ABOUT_PLUGINS_ACTION.actionPerformed(e);
+                }
+            }
+        });
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -430,7 +494,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
-    // this is not used because focus lost causes event fire.  Instead we listen to the JTextField.
+        // this is not used because focus lost causes event fire.  Instead we listen to the JTextField.
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void plotItButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotItButtonActionPerformed
@@ -593,6 +657,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         List<String> oldRecent = this.recent;
         this.recent = recent;
         dataSetSelector.setModel(new DefaultComboBoxModel(recent.toArray()));
+        support.refreshRecentFilesMenu();
         propertyChangeSupport.firePropertyChange("recent", oldRecent, recent);
     }
     /**
@@ -617,15 +682,21 @@ public class DataSetSelector extends javax.swing.JPanel {
         this.message = message;
         propertyChangeSupport.firePropertyChange(PROPERTY_MESSAGE, oldMessage, message);
     }
-    String actionTriggerRegex;
-    Action action;
+    HashMap<String, Action> actionTriggers = new LinkedHashMap<String, Action>();
 
     /**
      * This is how we allow .vap files to be in the datasetSelector.  We register
      * a pattern for which an action is invoked.
      */
     public void registerActionTrigger(String regex, Action action) {
-        this.actionTriggerRegex = regex;
-        this.action = action;
+        actionTriggers.put(regex, action);
+    }
+
+    public Action getOpenLocalAction() {
+        return support.openLocalAction();
+    }
+
+    public JMenu getRecentMenu() {
+        return support.recentMenu();
     }
 }
