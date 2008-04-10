@@ -93,7 +93,6 @@ import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.xml.sax.SAXException;
 
@@ -173,7 +172,7 @@ public class ApplicationModel {
                     setShowContextOverview(true);
                 }
             }
-            propertyChangeSupport.firePropertyChange( e );
+            propertyChangeSupport.firePropertyChange(e);
         }
     };
 
@@ -320,7 +319,7 @@ public class ApplicationModel {
         overSpectrogramRend.setActive(false);
 
         seriesRend.setColorBar(colorbar);
-        seriesRend.setColorByDataSetId( QDataSet.PLANE_0 );
+        seriesRend.setColorByDataSetId(QDataSet.PLANE_0);
 
         seriesRend.setAntiAliased(true);
 
@@ -555,8 +554,8 @@ public class ApplicationModel {
         overviewPlot.getXAxis().setLog(xdesc.log);
 
 
-        spectrogramRend.setDataSet(TableDataSetAdapter.create(fillDs));
-        overSpectrogramRend.setDataSet(TableDataSetAdapter.create(fillDs));
+        spectrogramRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
+        overSpectrogramRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
     }
 
     private void updateFillSeries(WritableDataSet fillDs, boolean autoRange) {
@@ -622,8 +621,8 @@ public class ApplicationModel {
         colorbar.setVisible(fillDs.property(QDataSet.PLANE_0) != null);
 
         try {
-            seriesRend.setDataSet(VectorDataSetAdapter.create(fillDs));
-            overSeriesRend.setDataSet(VectorDataSetAdapter.create(fillDs));
+            seriesRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
+            overSeriesRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
         }
@@ -639,6 +638,18 @@ public class ApplicationModel {
         new Thread(run, "updateFillThread").start();
     }
 
+    private boolean isVectorOrBundleIndex(QDataSet dep1) {
+        boolean result = false;
+        Units dep1Units = (Units) dep1.property(QDataSet.UNITS);
+        if ( dep1Units!=null && dep1Units instanceof EnumerationUnits) {
+            result = true;
+        } 
+        if ( dep1.property( QDataSet.COORDINATE_FRAME )!=null ) {
+            result= true;
+        }
+        return result;
+    }
+
     /**
      * the fill parameters have changed, so update the auto range stats.
      * This should not be run on the AWT event thread!
@@ -651,13 +662,8 @@ public class ApplicationModel {
 
         boolean spec = fillDs.rank() == 2;
         QDataSet dep1 = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
-        if (spec && dep1 != null) {
-            Units dep1Units = (Units) dep1.property(QDataSet.UNITS);
-            if (dep1Units instanceof EnumerationUnits) {
-                spec = false;
-                fillDs = DDataSet.copy(DataSetOps.slice1(fillDs, 0));
-            }
-        }
+
+        if ( dep1!=null && isVectorOrBundleIndex(dep1) ) spec= false;
 
         if (fillDs.rank() == 3) {
 
@@ -686,6 +692,9 @@ public class ApplicationModel {
             setRenderer(spectrogramRend, overSpectrogramRend);
         } else {
             updateFillSeries(fillDs, autorange);
+            if ( fillDs.rank()==2 ) {  // SeriesRenderer rank 3 must have solid lines.
+                seriesRend.setPsymConnector(PsymConnector.SOLID);
+            }
             setRenderer(seriesRend, overSeriesRend);
         }
 
@@ -704,6 +713,8 @@ public class ApplicationModel {
         }
         if ((v = properties.get(DDataSet.VALID_RANGE)) != null) {
             setValidRange(String.valueOf(v));
+        } else {
+            setValidRange("");
         }
         if ((v = properties.get(DDataSet.SCALE_TYPE)) != null) {
             if (spectrogramRend.isActive()) {
@@ -737,20 +748,20 @@ public class ApplicationModel {
                 Logger.getLogger("ap").info("update fill");
                 setStatus("apply fill and autorange");
 
-                int[] qube = DataSetUtil.qubeDims( dataset );
+                int[] qube = DataSetUtil.qubeDims(dataset);
                 String[] depNames = new String[3];
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < dataset.rank(); i++) {
                     depNames[i] = "";
                     QDataSet dep0 = (QDataSet) dataset.property("DEPEND_" + i);
                     if (dep0 != null) {
                         String dname = (String) dep0.property(QDataSet.NAME);
                         if (dname != null) {
-                            depNames[i] = dname + ( qube != null ? "=" + qube[i] : "" );
+                            depNames[i] = dname + (qube != null ? "=" + qube[i] : "");
                         }
                     }
                 }
-                
-                Logger.getLogger("ap").fine("dep names: "+ Arrays.asList(depNames));
+
+                Logger.getLogger("ap").fine("dep names: " + Arrays.asList(depNames));
                 setDepnames(Arrays.asList(depNames));
 
                 updateFill(true);
@@ -1509,7 +1520,7 @@ public class ApplicationModel {
     private void setStatus(String status) {
         String oldVal = this.status;
         this.status = status;
-        propertyChangeSupport.firePropertyChange( PROPERTY_STATUS, oldVal, status );
+        propertyChangeSupport.firePropertyChange(PROPERTY_STATUS, oldVal, status);
     }
     /**
      * Holds value of property isotropic.
@@ -1598,7 +1609,7 @@ public class ApplicationModel {
     public void setDepnames(List<String> newdepnames) {
         List<String> olddepnames = depnames;
         this.depnames = newdepnames;
-        System.err.println( newdepnames );
+        System.err.println(newdepnames);
         propertyChangeSupport.firePropertyChange(PROP_DEPNAMES, olddepnames, newdepnames);
     }
 }
