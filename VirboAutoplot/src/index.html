@@ -3,11 +3,11 @@
     <title>Autoplot Application</title>
 </head>
 <body>
-    <H3>ViRBO autoplot application</H3>
+    <H3>ViRBO Autoplot Application</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
 	<p>This demonstration application attempts to allow plotting of data from many data sources, including local files and dods servers.  
-	Datasets are identified with URLS, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
+	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.  Additional metadata can then 
 be applied to the data, for example, specifying valid range and fill data.
 	</p>
@@ -18,17 +18,16 @@ be applied to the data, for example, specifying valid range and fill data.
 	<li>netcdf files (.nc,.ncml)</li>
         <li>cdf files(.cdf)</li>
 	<li>dods servers (.dds)</li>
+         <li>Cluster Exchange Format files (.cef)</li>
 	</p>
 	<p>This is not complete, and limitations include:</p>
-	<li>Often time tags are not loaded, and index number is used for the tags.</li>
-	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) or greater cannot be plotted.</li>
-	<li>Vector quantities such as B(GSM) cannot be plotted.</li>
+	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
+	<li>Quantities of rank 4 dimensionality cannot be plotted.</li>
+	<li>Vector quantities such as B(GSM) are plotted as a stack of lineplots, with limited controls.</li>
          
-         <a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
-         more information than this launch page.
+         <p><a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
+         more information than this launch page.</p>
          
-        
-    </p>
 	
 	Click <a href="autoplot.jnlp">here</a> to launch.
         
