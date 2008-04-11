@@ -711,6 +711,11 @@ public class ApplicationModel {
         } else {
             plot.setTitle("");
         }
+        if ((v = properties.get(DDataSet.FILL_VALUE)) != null ) {
+            setFill(String.valueOf(v));
+        } else {
+            setFill("");
+        }
         if ((v = properties.get(DDataSet.VALID_RANGE)) != null) {
             setValidRange(String.valueOf(v));
         } else {
@@ -1511,7 +1516,6 @@ public class ApplicationModel {
         bc.addBinding(spectrogramRend, "${active}", overSpectrogramRend, "active");
         bc.addBinding(spectrogramRend, "${rebinner}", overSpectrogramRend, "rebinner");
         bc.addBinding(plot.getYAxis(), "${log}", overviewPlot.getYAxis(), "log");
-
         bc.bind();
 
     }
