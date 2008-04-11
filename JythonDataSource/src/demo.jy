@@ -1,0 +1,11 @@
+
+ds1= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.H.20080404.smooth/density.20080404.H.20080404.smooth.d2s" )
+ds2= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.water.20080404.smooth/density.20080404.water.20080404.smooth.d2s" )
+
+result= add( ds1, ds2 )
+
+ds3= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.H.20080404.out/density.20080404.H.20080404.out.d2s" )
+ds4= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.water.20080404.out/density.20080404.water.20080404.out.d2s" )
+
+result2= add( ds3, ds4 )
+result3= ds3 + ds4
