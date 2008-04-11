@@ -6,8 +6,10 @@
 package org.virbo.datasource.jython;
 
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.IndexGenDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dsutil.DataSetBuilder;
 
 /**
  *
@@ -80,5 +82,28 @@ public class Ops {
         }
         return result;
     }
+    
+    public static QDataSet where( QDataSet ds ) {
+        DataSetBuilder builder= new DataSetBuilder( 2, 100, ds.rank(), 1 );
+        
+        DataSetIterator iter= DataSetIterator.create(ds);
+        
+        int count=0;
+        int i0,i1=0,i2=0;
+        while ( iter.hasNext() ) {
+            i0= iter.getIndex(0);
+            if ( ds.rank()>1 ) i1= iter.getIndex(1);
+            if ( ds.rank()>2 ) i2= iter.getIndex(2);
+            if ( iter.next() != 0. ) {
+                builder.putValue( count, 0, i0 );
+                if ( ds.rank()>1 ) builder.putValue( count, 1, i1 );
+                if ( ds.rank()>2 ) builder.putValue( count, 2, i2 );
+                builder.nextRecord();
+            }
+        }
+        
+        return builder.getDataSet();        
+    }
+    
             
 }
