@@ -569,7 +569,22 @@ public class ApplicationState {
     public void setShowContextOverview(boolean showContextOverview) {
         boolean oldShowContextOverview = this.showContextOverview;
         this.showContextOverview = showContextOverview;
-        propertyChangeSupport.firePropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
+        //propertyChangeSupport.firePropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
+    }
+
+    
+    private boolean autoOverview = true;
+
+    public static final String PROP_AUTOOVERVIEW = "autoOverview";
+
+    public boolean isAutoOverview() {
+        return this.autoOverview;
+    }
+
+    public void setAutoOverview(boolean newautoOverview) {
+        boolean oldautoOverview = autoOverview;
+        this.autoOverview = newautoOverview;
+        //propertyChangeSupport.firePropertyChange(PROP_AUTOOVERVIEW, oldautoOverview, newautoOverview);
     }
 
     /**

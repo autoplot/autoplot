@@ -7,14 +7,9 @@
 package org.virbo.autoplot;
 
 import edu.uiowa.physics.pw.das.components.DatumRangeEditor;
-import edu.uiowa.physics.pw.das.components.propertyeditor.ColorEditor;
-import edu.uiowa.physics.pw.das.components.propertyeditor.EnumerationEditor;
-import edu.uiowa.physics.pw.das.components.propertyeditor.PropertyEditor;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collections;
 import java.util.List;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
@@ -78,6 +73,8 @@ public class AxisPanel extends javax.swing.JPanel {
                 
         b= bc.addBinding( applicationModel, "${showContextOverview}", showOverviewPlot, "selected" );
         
+        b= bc.addBinding( applicationModel, "${autoOverview}", this.autoContextOverview, "selected" );
+        
         b= bc.addBinding( applicationModel, "${validRange}", this.validRangeComboBox, "selectedItem" );
         
         b= bc.addBinding( applicationModel, "${isotropic}", this.isotropicCheckBox, "selected" );
@@ -140,6 +137,7 @@ public class AxisPanel extends javax.swing.JPanel {
         xLog = new javax.swing.JCheckBox();
         xAxisRangePanel = new javax.swing.JPanel();
         showOverviewPlot = new javax.swing.JCheckBox();
+        autoContextOverview = new javax.swing.JCheckBox();
         zAxisPanel = new javax.swing.JPanel();
         zLog = new javax.swing.JCheckBox();
         zAxisRangePanel = new javax.swing.JPanel();
@@ -173,6 +171,8 @@ public class AxisPanel extends javax.swing.JPanel {
         showOverviewPlot.setText("Show context overview plot");
         showOverviewPlot.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
+        autoContextOverview.setText("Auto");
+
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
         xAxisPanel.setLayout(xAxisPanelLayout);
         xAxisPanelLayout.setHorizontalGroup(
@@ -180,9 +180,12 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(xAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
                     .add(xLog)
-                    .add(showOverviewPlot))
+                    .add(xAxisPanelLayout.createSequentialGroup()
+                        .add(showOverviewPlot)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(autoContextOverview)))
                 .addContainerGap())
         );
         xAxisPanelLayout.setVerticalGroup(
@@ -192,7 +195,9 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(xLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(showOverviewPlot)
+                .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(showOverviewPlot)
+                    .add(autoContextOverview))
                 .addContainerGap(18, Short.MAX_VALUE))
         );
 
@@ -211,7 +216,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(zLog)
-                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE))
+                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE))
                 .addContainerGap())
         );
         zAxisPanelLayout.setVerticalGroup(
@@ -220,7 +225,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(zLog)
-                .addContainerGap(39, Short.MAX_VALUE))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
 
         yAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Y Axis"));
@@ -243,7 +248,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(yAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(yLog)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
                     .add(isotropicCheckBox))
                 .addContainerGap())
         );
@@ -255,7 +260,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(yLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(isotropicCheckBox)
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("autoranging"));
@@ -291,7 +296,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(validRangeLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -347,7 +352,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 346, Short.MAX_VALUE)
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 335, Short.MAX_VALUE)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel4)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -371,7 +376,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(transposeCheckBox)
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(112, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -402,7 +407,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 126, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
@@ -440,6 +445,7 @@ public class AxisPanel extends javax.swing.JPanel {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox autoContextOverview;
     private javax.swing.JComboBox fillValueComboBox;
     private javax.swing.JLabel fillValueLabel;
     private javax.swing.JCheckBox isotropicCheckBox;

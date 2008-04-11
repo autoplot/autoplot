@@ -168,7 +168,7 @@ public class ApplicationModel {
                 }
             }
             if (e.getPropertyName().equals("datumRange") && e.getSource() == plot.getXAxis()) {
-                if (allowAutoContext && originalXRange != null && originalXRange.getUnits().isConvertableTo(plot.getXAxis().getUnits()) && originalXRange.contains(plot.getXAxis().getDatumRange())) {
+                if ( autoOverview && allowAutoContext && originalXRange != null && originalXRange.getUnits().isConvertableTo(plot.getXAxis().getUnits()) && originalXRange.contains(plot.getXAxis().getDatumRange())) {
                     setShowContextOverview(true);
                 }
             }
@@ -773,7 +773,7 @@ public class ApplicationModel {
                 originalXRange = plot.getXAxis().getDatumRange();
                 originalYRange = plot.getYAxis().getDatumRange();
                 originalZRange = colorbar.getDatumRange();
-                if (!autoRangeSuppress) {
+                if ( autoOverview && !autoRangeSuppress) {
                     setShowContextOverview(false);
                 }
                 if (!autoRangeSuppress) {
@@ -1120,7 +1120,8 @@ public class ApplicationModel {
         state.setSymbolConnector(formatObject(seriesRend.getPsymConnector()));
 
         state.setShowContextOverview(isShowContextOverview());
-
+        state.setAutoOverview( isAutoOverview() );
+        
         state.setUseEmbeddedDataSet(isUseEmbeddedDataSet());
 
         if (deep && isUseEmbeddedDataSet()) {
@@ -1196,7 +1197,8 @@ public class ApplicationModel {
             seriesRend.setPsymConnector((PsymConnector) parseObject(seriesRend.getPsymConnector(), state.getSymbolConnector()));
         }
         setShowContextOverview(state.isShowContextOverview());
-
+        setAutoOverview( state.isAutoOverview() );
+        
         setUseEmbeddedDataSet(state.isUseEmbeddedDataSet());
 
         if (deep && state.isUseEmbeddedDataSet() && !"".equals(state.getEmbeddedDataSet())) {
@@ -1439,19 +1441,11 @@ public class ApplicationModel {
      */
     private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
 
-    /**
-     * Getter for property showContextOverview.
-     * @return Value of property showContextOverview.
-     */
     public boolean isShowContextOverview() {
         return this.showContextOverview;
     }
     private static final double OVERVIEW_PERCENT = 0.60;
 
-    /**
-     * Setter for property showContextOverview.
-     * @param showContextOverview New value of property showContextOverview.
-     */
     public void setShowContextOverview(boolean showContextOverview) {
         boolean oldShowContextOverview = this.showContextOverview;
         this.showContextOverview = showContextOverview;
@@ -1464,6 +1458,23 @@ public class ApplicationModel {
         propertyChangeSupport.firePropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
 
     }
+    
+    
+    private boolean autoOverview = true;
+
+    public static final String PROP_AUTOOVERVIEW = "autoOverview";
+
+    public boolean isAutoOverview() {
+        return this.autoOverview;
+    }
+
+    public void setAutoOverview(boolean newautoOverview) {
+        boolean oldautoOverview = autoOverview;
+        this.autoOverview = newautoOverview;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOOVERVIEW, oldautoOverview, newautoOverview);
+    }
+
+    
     /**
      * Holds value of property interpretMetadata.
      */
@@ -1611,6 +1622,14 @@ public class ApplicationModel {
         this.depnames = newdepnames;
         System.err.println(newdepnames);
         propertyChangeSupport.firePropertyChange(PROP_DEPNAMES, olddepnames, newdepnames);
+    }
+    
+    public DasPlot getPlot() {
+        return this.plot;
+    }
+    
+    public DasPlot getOverviewPlot() {
+        return this.overviewPlot;
     }
 }
 
