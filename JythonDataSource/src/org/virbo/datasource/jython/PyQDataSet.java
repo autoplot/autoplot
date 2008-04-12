@@ -43,6 +43,11 @@ public class PyQDataSet extends PyJavaInstance {
         QDataSet that= ((QDataSet)o);
         return new PyQDataSet( Ops.add( ds, Ops.negate(that) ) );
     }
+
+    @Override
+    public PyObject __neg__() {
+        return new PyQDataSet( Ops.negate(ds) );
+    }
     
     
     
