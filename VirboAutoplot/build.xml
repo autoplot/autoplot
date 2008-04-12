@@ -103,6 +103,6 @@
         <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
     </target>
     
-    <target name="-post-jar" depends="jnlp-release"/>
+    <!-- <target name="-post-jar" depends="jnlp-release"/> -->
     
 </project>

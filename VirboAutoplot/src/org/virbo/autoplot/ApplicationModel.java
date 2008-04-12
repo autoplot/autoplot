@@ -527,7 +527,7 @@ public class ApplicationModel {
         AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds);
         AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds);
 
-        if (autoRange && !autoRangeSuppress) {
+        if ( autoranging && autoRange && !autoRangeSuppress) {
 
             AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs);
 
@@ -571,7 +571,7 @@ public class ApplicationModel {
         double cadence = guessCadence(xds, fillDs);
         ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
 
-        if (autoRange && !autoRangeSuppress) {
+        if ( autoranging && autoRange && !autoRangeSuppress) {
 
             boolean isSeries;
             QDataSet depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
@@ -590,7 +590,7 @@ public class ApplicationModel {
         AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs);
         AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds);
 
-        if (!autoRangeSuppress) {
+        if ( autoranging && !autoRangeSuppress) {
             plot.getYAxis().setLog(desc.log);
             plot.getYAxis().resetRange(desc.range);
 
@@ -1127,6 +1127,7 @@ public class ApplicationModel {
         state.setShowContextOverview(isShowContextOverview());
         state.setAutoOverview( isAutoOverview() );
         
+        state.setAutoranging( isAutoranging() );
         state.setUseEmbeddedDataSet(isUseEmbeddedDataSet());
 
         if (deep && isUseEmbeddedDataSet()) {
@@ -1203,6 +1204,7 @@ public class ApplicationModel {
         }
         setShowContextOverview(state.isShowContextOverview());
         setAutoOverview( state.isAutoOverview() );
+        setAutoranging( state.isAutoranging() );
         
         setUseEmbeddedDataSet(state.isUseEmbeddedDataSet());
 
@@ -1477,6 +1479,21 @@ public class ApplicationModel {
         boolean oldautoOverview = autoOverview;
         this.autoOverview = newautoOverview;
         propertyChangeSupport.firePropertyChange(PROP_AUTOOVERVIEW, oldautoOverview, newautoOverview);
+    }
+
+    
+    private boolean autoranging = true;
+
+    public static final String PROP_AUTORANGING = "autoranging";
+
+    public boolean isAutoranging() {
+        return this.autoranging;
+    }
+
+    public void setAutoranging(boolean newautoranging) {
+        boolean oldautoranging = autoranging;
+        this.autoranging = newautoranging;
+        propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
     }
 
     

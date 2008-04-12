@@ -5,6 +5,8 @@ from javax.beans.binding import *;
 model = ApplicationModel()
 app = AutoPlotMatisse(model)
 
+model.autoOverview= False
+
 contoursRenderer= ContoursRenderer()
 contoursRenderer.contours="1,3,10,30,50"
 
@@ -19,7 +21,6 @@ print specRend
 bc= BindingContext()
 bc.addBinding( specRend, "${dataSet}", contoursRenderer, "dataSet", [] )
 bc.addBinding( specRend, "${active}", contoursRenderer, "active", [] )
-bc.addBinding( model, "${dataSourceURL}", model.plot, "title", [] )
 
 bc.bind()
 

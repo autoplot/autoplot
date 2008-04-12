@@ -632,5 +632,20 @@ public class ApplicationState {
         this.foregroundColor = foregroundColor;
         propertyChangeSupport.firePropertyChange ("foregroundColor", oldForegroundColor, foregroundColor);
     }
+
     
+    private boolean autoranging = true;
+
+    public static final String PROP_AUTORANGING = "autoranging";
+
+    public boolean isAutoranging() {
+        return this.autoranging;
+    }
+
+    public void setAutoranging(boolean newautoranging) {
+        boolean oldautoranging = autoranging;
+        this.autoranging = newautoranging;
+        propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
+    }
+
 }
