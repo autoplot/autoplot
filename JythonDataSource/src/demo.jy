@@ -9,3 +9,5 @@ ds4= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.w
 
 result2= add( ds3, ds4 )
 result3= ds3 + ds4
+
+result4= ds3 - ds4
