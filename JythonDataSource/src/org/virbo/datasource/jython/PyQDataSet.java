@@ -96,6 +96,12 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.negate(ds));
     }
 
+    @Override
+    public PyObject __abs__() {
+        return new PyQDataSet(Ops.abs(ds));
+    }
+
+    
 
     /* pow operator (**) */
     @Override
@@ -125,6 +131,66 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.gt(ds, that));
     }
 
+    @Override
+    public PyObject __ge__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.ge(ds, that ) );
+    }
+
+    @Override
+    public PyObject __le__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.le(ds, that ) );
+    }
+
+    @Override
+    public PyObject __lt__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.lt(ds, that ) );
+    }
+
+    @Override
+    public PyObject __ne__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.ne(ds, that ) );
+    }
+
+    /* logic operators
+     * There's a problem here, that you can't override "and" "or" and "not." 
+     * We use the symbols ~ for not, | for or, and & for and.
+     * These use the object's __nonzero__ method.
+     * TODO: I don't like these any more than C-style booleans.  This should
+     * require nominal units that convert the values to boolean.
+     */
+    @Override
+    public PyObject __and__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.and(ds, that ) );
+    }
+
+    @Override
+    public PyObject __or__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.or(ds, that ) );
+    }
+
+    @Override
+    public PyObject __rand__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.and( that, ds ) );
+    }
+
+    @Override
+    public PyObject __ror__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.or( that, ds ) );
+    }
+
+    @Override
+    public PyObject __invert__() {
+        return new PyQDataSet( Ops.not( ds ) );
+    }
+    
     
     /* accessor and mutator */
     @Override

@@ -1,5 +1,7 @@
-result= ( dindgen(100)/100*3 + 1.2 )
-result= 10**result
+result1= ( dindgen(100)/100*3 + 1.2 )
+result1= 10**result1
 
-result= dindgen(100)/50 - 1.0
-result= exp( -1 * result * result )
+result2= dindgen(100)/5 - 10.0
+result2= exp( -1 * result2 * result2 )
+
+result3= abs( sin( dindgen(1000)/10 ) ) 
