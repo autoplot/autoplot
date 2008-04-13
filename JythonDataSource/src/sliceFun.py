@@ -1,0 +1,20 @@
+#a= randomn( 0, 2000, 30 )
+#result= a[:,:]
+#r2= result[9,:]
+#result[9,:]= 9
+#d= randomn( 0, 1000 )
+#print d
+#s= sort(d)
+#print d[s]
+#result= d[s]
+
+#a= dindgen( 10 )/5 + 3
+a= dindgen( 10 ) 
+a[5]=0
+#print a
+#a[2:5]= 0
+#for i in range(10):
+#   print a[i]
+
+a= dindgen( 100 )+0
+a[::2]= dindgen(50)

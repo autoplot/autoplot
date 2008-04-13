@@ -5,7 +5,9 @@
 
 package org.virbo.datasource.jython;
 
+import java.io.FileInputStream;
 import java.net.URL;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyObject;
@@ -30,9 +32,12 @@ public class JythonDataSource extends AbstractDataSource {
         
         interp.execfile( JythonDataSource.class.getResource("imports.py").openStream(), "imports.py" );
 
-        interp.execfile( super.url.openStream() );
+        interp.execfile( new FileInputStream( super.getFile( new NullProgressMonitor() ) ) );
         
-        PyObject result= interp.eval( super.params.get("arg_0") );
+        String expr= super.params.get("arg_0");
+        if ( expr==null ) expr="result";
+        
+        PyObject result= interp.eval( expr );
         
         return (QDataSet) result.__tojava__( QDataSet.class );
     }

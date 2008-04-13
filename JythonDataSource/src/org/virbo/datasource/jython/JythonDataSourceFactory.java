@@ -2,10 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.virbo.datasource.jython;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.DataSource;
 
@@ -20,4 +21,13 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         return new JythonDataSource(url);
     }
 
+    @Override
+    public List<String> extensions() {
+        return Collections.singletonList("jy");
+    }
+
+    @Override
+    public List<String> mimeTypes() {
+        return Collections.emptyList();
+    }
 }
