@@ -256,9 +256,9 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
 
     private void fillFileMenu() {
 
-        fileMenu.add(stateSupport.createOpenAction());
-        fileMenu.add(stateSupport.createOpenRecentMenu());
-        fileMenu.add(stateSupport.createSaveAsAction());
+        fileMenu.add( dataSetSelector.getOpenLocalAction() );
+        fileMenu.add( dataSetSelector.getRecentMenu() );
+        fileMenu.add( stateSupport.createSaveAsAction() );
         /*new AbstractAction( "save as" ) {
         public void actionPerformed( ActionEvent e ) {
         JFileChooser chooser= new JFileChooser();
@@ -270,15 +270,15 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
         } );
          */
 
-        fileMenu.add(stateSupport.createSaveAction());
-        fileMenu.add(new AbstractAction("Save With Data...") {
+        fileMenu.add( stateSupport.createSaveAction() );
+        fileMenu.add( new AbstractAction("Save With Data...") {
 
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 applicationModel.setUseEmbeddedDataSet(true);
                 stateSupport.createSaveAction().actionPerformed(e);
             }
-        });
+        } );
         fileMenu.addSeparator();
         fileMenu.add(applicationModel.getCanvas().PRINT_ACTION);
 
@@ -751,6 +751,7 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
      */
     public static void main(final String args[]) {
 
+        System.err.println("welcome to autoplot");
         Logger.getLogger("ap").info("welcome to autoplot ");
         final ApplicationModel model = new ApplicationModel();
         final String initialURL;
