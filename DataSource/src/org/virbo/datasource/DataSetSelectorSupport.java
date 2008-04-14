@@ -72,7 +72,6 @@ public class DataSetSelectorSupport {
                 FileFilter ff= new FileFilter() {
                     @Override
                     public boolean accept(File f) {
-                        System.err.println(f);
                         if ( f.isDirectory() ) return true;
                         String t= f.toString();
                         String ext= getExt(t);
