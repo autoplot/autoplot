@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.tree.TreeModel;
 import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
 import org.virbo.dataset.DDataSet;
@@ -107,11 +105,6 @@ public class CefDataSource extends AbstractDataSource {
         int collapseDim = 999; // >999 indicates a dimension was collapsed to reduce rank.
         int rank0; // rank before collapse
 
-        boolean peace = false;
-        if (var.indexOf("Data__C") == 0) {
-            peace = true;
-        }
-
         Units u = Units.dimensionless;
         double fill = u.getFillDouble();
         String sceffill = (String) param.entries.get("FILLVAL");
@@ -145,7 +138,7 @@ public class CefDataSource extends AbstractDataSource {
         } else { // data should be extracted from rank 2 table.
             if (tds == null) {
                 CefReaderData readerd = new CefReaderData();
-                for (int i = 0; i < readerd.MAX_FIELDS; i++) {
+                for (int i = 0; i < CefReaderData.MAX_FIELDS; i++) {
                     readerd.skipParse(i);
                 }
                 setParseFlags(cef, var, readerd);
@@ -218,6 +211,7 @@ public class CefDataSource extends AbstractDataSource {
 
         if (param.entries.get("VALUE_TYPE").equals("ISO_TIME")) {
             ds.putProperty(QDataSet.UNITS, Units.us2000);
+            if ( DataSetUtil.isMonotonic(ds) ) ds.putProperty(QDataSet.MONOTONIC, Boolean.TRUE );
         }
 
         int[] qube = DataSetUtil.qubeDims(ds);
@@ -259,9 +253,15 @@ public class CefDataSource extends AbstractDataSource {
             }
         }
 
-        //if ( peace ) {
-        //    ds= DataSetOps.collapse1(ds);
-        //}
+        try {
+            TreeModel m = this.getMetaData(new NullProgressMonitor());
+            Map props = new CefMetadataModel().properties(m);
+            DataSetUtil.putProperties(props, ds);
+        } catch (Exception e) {
+            e.printStackTrace();
+        // do nothing...
+
+        }
 
         return ds;
     }
