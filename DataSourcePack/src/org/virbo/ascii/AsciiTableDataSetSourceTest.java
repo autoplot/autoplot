@@ -12,7 +12,6 @@ package org.virbo.ascii;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.net.URL;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 
 /**
