@@ -27,9 +27,10 @@ public class Ops {
     private static final QDataSet applyUnaryOp( QDataSet ds1, UnaryOp op ) {
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
 
-        DataSetIterator it1 = DataSetIterator.create(ds1);
+        QubeDataSetIterator it1 = new QubeDataSetIterator(ds1);
         while (it1.hasNext()) {
-            double d1 = it1.next();
+            it1.next();
+            double d1 = getValue( ds1, it1 );
             putValue(result, it1, op.op( d1 ) );
         }
         return result;        
@@ -51,11 +52,13 @@ public class Ops {
     private static final QDataSet applyBinaryOp( QDataSet ds1, QDataSet ds2, BinaryOp op ) {
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
 
-        DataSetIterator it1 = DataSetIterator.create(ds1);
-        DataSetIterator it2 = DataSetIterator.create(ds2);
+        QubeDataSetIterator it1 = new QubeDataSetIterator(ds1);
+        QubeDataSetIterator it2 = new QubeDataSetIterator(ds2);
         while (it1.hasNext()) {
-            double d1 = it1.next();
-            double d2 = it2.next();
+            it1.next();
+            double d1 = getValue( ds1, it1 );
+            it2.next();
+            double d2 = getValue( ds2, it2 );
             putValue(result, it1, op.op( d1, d2) );
         }
         return result;        
@@ -64,24 +67,37 @@ public class Ops {
     private static final QDataSet applyBinaryOp( QDataSet ds1, double d2, BinaryOp op ) {
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
 
-        DataSetIterator it1 = DataSetIterator.create(ds1);
+        QubeDataSetIterator it1 = new QubeDataSetIterator(ds1);
         while (it1.hasNext()) {
-            double d1 = it1.next();
-            putValue(result, it1, op.op( d1, d2) );
+            it1.next();
+            putValue(result, it1, op.op( getValue( ds1, it1 ), d2) );
         }
         return result;        
     }
     
-    private static final void putValue(WritableDataSet ds, DataSetIterator it, double v) {
+    private static final double getValue( QDataSet ds, QubeDataSetIterator it ) {
         switch (ds.rank()) {
             case 1:
-                ds.putValue(it.getIndex(0), v);
+                return ds.value(it.index(0) );
+            case 2:
+                return ds.value(it.index(0), it.index(1) );
+            case 3:
+                return ds.value(it.index(0), it.index(1), it.index(2) );
+            default:
+                throw new IllegalArgumentException("rank limit");
+        }        
+    }
+    
+    private static final void putValue( WritableDataSet ds, QubeDataSetIterator it, double v ) {
+        switch (ds.rank()) {
+            case 1:
+                ds.putValue(it.index(0), v);
                 return;
             case 2:
-                ds.putValue(it.getIndex(0), it.getIndex(1), v);
+                ds.putValue(it.index(0), it.index(1), v);
                 return;
             case 3:
-                ds.putValue(it.getIndex(0), it.getIndex(1), it.getIndex(2), v);
+                ds.putValue(it.index(0), it.index(1), it.index(2), v);
                 return;
             default:
                 throw new IllegalArgumentException("rank limit");
