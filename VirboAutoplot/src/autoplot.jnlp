@@ -73,6 +73,7 @@
         <jar href="lib/CdfDataSource.jar" />
         <jar href="lib/WavDataSource.jar" />
         <jar href="lib/CefDataSource.jar" />
+        <jar href="lib/JythonDataSource.jar" />
         
         <!-- cdf -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
