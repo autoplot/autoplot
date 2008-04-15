@@ -1,0 +1,4 @@
+Information for building Autoplot from source is found here:
+http://www.autoplot.org/autoplot/index.php/Autoplot_from_source
+
+Once this process stabilizes, the procedure will be copied to here.

@@ -311,7 +311,13 @@ is divided into following sections:
                 ===================
             -->
     <target depends="init" name="deps-jar" unless="no.deps">
+        <ant antfile="${project.CdfDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init,deps-jar" name="-pre-pre-compile">
         <mkdir dir="${build.classes.dir}"/>
@@ -619,7 +625,13 @@ is divided into following sections:
                 ===============
             -->
     <target depends="init" name="deps-clean" unless="no.deps">
+        <ant antfile="${project.CdfDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="clean"/>
     </target>
     <target depends="init" name="-do-clean">
         <delete dir="${build.dir}"/>
