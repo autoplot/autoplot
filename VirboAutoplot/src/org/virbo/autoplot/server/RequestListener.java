@@ -40,8 +40,6 @@ public class RequestListener {
                         Socket socket = listen.accept();
                         setSocket( socket );
                         
-                        requestCount++;
-
                         InputStream in = socket.getInputStream();
 
                         StringBuffer buf = new StringBuffer();
@@ -52,6 +50,8 @@ public class RequestListener {
                             i = in.read();
                         }
                         setData( buf.toString() );
+                        setRequestCount( getRequestCount() + 1 );
+                        
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(RequestListener.class.getName()).log(Level.SEVERE, null, ex);
@@ -114,6 +114,7 @@ public class RequestListener {
     public void setData(String newdata) {
         String olddata = data;
         this.data = newdata;
+        System.err.println("fire data property change");
         propertyChangeSupport.firePropertyChange(PROP_DATA, olddata, newdata);
     }
     
