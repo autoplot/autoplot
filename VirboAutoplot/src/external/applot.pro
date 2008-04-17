@@ -21,9 +21,10 @@ pro applot, x, y, z, _extra=e, respawn=respawn
       if !version.os_family eq 'Windows' then begin
         spawn, cmd, pid=appid, /nowait
       endif else begin
-        spawn, cmd+' &', pid=appid, /nowait
+        spawn, cmd+' &', pid=appid
       endelse
       wait, 1.0
+      print, 'survived spawn'
    endif
 
    tmpfile= getenv('IDL_TMPDIR') + 'autoplot.d2s'
