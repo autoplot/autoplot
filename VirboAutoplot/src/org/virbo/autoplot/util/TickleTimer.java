@@ -45,7 +45,7 @@ public class TickleTimer {
         if ( delay<=0 ) {
             newRunnable().run();
         } else {
-            new Thread( newRunnable() ).start();
+            new Thread( newRunnable(), "tickleTimerThread" ).start();
         }
     }
     

@@ -648,4 +648,19 @@ public class ApplicationState {
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
     }
 
+    
+    private String title = "";
+
+    public static final String PROP_TITLE = "title";
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public void setTitle(String newtitle) {
+        String oldtitle = title;
+        this.title = newtitle;
+        propertyChangeSupport.firePropertyChange(PROP_TITLE, oldtitle, newtitle);
+    }
+
 }

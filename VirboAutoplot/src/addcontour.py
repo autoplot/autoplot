@@ -1,9 +1,9 @@
-from org.virbo.autoplot import *;
 from edu.uiowa.physics.pw.das.graph import ContoursRenderer, SpectrogramRenderer;
 from javax.beans.binding import *;
 
-model = ApplicationModel()
-app = AutoPlotMatisse(model)
+createGui()
+
+model = getApplicationModel()
 
 model.autoOverview= False
 
@@ -18,11 +18,9 @@ specRend.rebinner= SpectrogramRenderer.RebinnerEnum.nearestNeighbor
 model.isotropic= True
 
 print specRend
-bc= BindingContext()
-bc.addBinding( specRend, "${dataSet}", contoursRenderer, "dataSet", [] )
-bc.addBinding( specRend, "${active}", contoursRenderer, "active", [] )
 
-bc.bind()
+bind( specRend, "dataSet", contoursRenderer, "dataSet" )
+bind( specRend, "active", contoursRenderer, "active" )
 
-app.setVisible(True);
-
+model.plot.drawGrid= True
+model.plot.drawMinorGrid= True

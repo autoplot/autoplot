@@ -7,10 +7,12 @@ package org.virbo.autoplot;
 
 import edu.uiowa.physics.pw.das.components.DasProgressPanel;
 import edu.uiowa.physics.pw.das.components.TearoffTabbedPane;
+import edu.uiowa.physics.pw.das.components.propertyeditor.PropertyEditor;
 import edu.uiowa.physics.pw.das.dasml.DOMBuilder;
 import edu.uiowa.physics.pw.das.dasml.SerializeUtil;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import edu.uiowa.physics.pw.das.util.ArgumentList;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
@@ -38,6 +40,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import org.virbo.autoplot.server.RequestHandler;
+import org.virbo.autoplot.server.RequestListener;
+import org.virbo.autoplot.state.ApplicationState;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetURL;
@@ -48,7 +53,7 @@ import org.w3c.dom.Element;
  *
  * @author  jbf
  */
-public class AutoPlotMatisse extends javax.swing.JFrame {
+public class AutoPlotUI extends javax.swing.JFrame {
 
     TearoffTabbedPane tabs;
     ApplicationModel applicationModel;
@@ -83,7 +88,7 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
     }
 
     /** Creates new form AutoPlotMatisse */
-    public AutoPlotMatisse(ApplicationModel model) {
+    public AutoPlotUI(ApplicationModel model) {
 
         support = new GuiSupport(this);
 
@@ -218,8 +223,6 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
             }
         });
 
-        applicationModel.getCanvas().setPrintingTag("");
-
         tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
 
         tabbedPanelContainer.validate();
@@ -236,6 +239,7 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
         Binding b;
 
         BindingConverter conv = new BindingConverter() { // for debugging
+
 
             public Object sourceToTarget(Object value) {
                 return value;
@@ -256,9 +260,9 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
 
     private void fillFileMenu() {
 
-        fileMenu.add( dataSetSelector.getOpenLocalAction() );
-        fileMenu.add( dataSetSelector.getRecentMenu() );
-        fileMenu.add( stateSupport.createSaveAsAction() );
+        fileMenu.add(dataSetSelector.getOpenLocalAction());
+        fileMenu.add(dataSetSelector.getRecentMenu());
+        fileMenu.add(stateSupport.createSaveAsAction());
         /*new AbstractAction( "save as" ) {
         public void actionPerformed( ActionEvent e ) {
         JFileChooser chooser= new JFileChooser();
@@ -270,15 +274,15 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
         } );
          */
 
-        fileMenu.add( stateSupport.createSaveAction() );
-        fileMenu.add( new AbstractAction("Save With Data...") {
+        fileMenu.add(stateSupport.createSaveAction());
+        fileMenu.add(new AbstractAction("Save With Data...") {
 
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 applicationModel.setUseEmbeddedDataSet(true);
                 stateSupport.createSaveAction().actionPerformed(e);
             }
-        } );
+        });
         fileMenu.addSeparator();
         fileMenu.add(applicationModel.getCanvas().PRINT_ACTION);
 
@@ -380,7 +384,7 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
         bookmarksMenu.add(new AbstractAction("Manage Bookmarks") {
 
             public void actionPerformed(ActionEvent e) {
-                BookmarksManager man = new BookmarksManager(AutoPlotMatisse.this, true);
+                BookmarksManager man = new BookmarksManager(AutoPlotUI.this, true);
                 man.setList(applicationModel.getBookmarks());
                 man.setVisible(true);
                 applicationModel.setBookmarks(man.getList());
@@ -427,6 +431,8 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
         undoMenuItem = new javax.swing.JMenuItem();
         redoMenuItem = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
+        editModelMenuItem = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JSeparator();
         pasteDataSetURLMenuItem = new javax.swing.JMenuItem();
         copyDataSetURLMenuItem = new javax.swing.JMenuItem();
         copyImageMenuItem = new javax.swing.JMenuItem();
@@ -478,6 +484,15 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
         redoMenuItem.setText("Redo");
         editMenu.add(redoMenuItem);
         editMenu.add(jSeparator1);
+
+        editModelMenuItem.setText("Edit Model");
+        editModelMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editModelMenuItemActionPerformed(evt);
+            }
+        });
+        editMenu.add(editModelMenuItem);
+        editMenu.add(jSeparator2);
 
         pasteDataSetURLMenuItem.setText("Paste URL");
         pasteDataSetURLMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -707,31 +722,30 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
     private void aboutAutoplotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutAutoplotMenuItemActionPerformed
         try {
             StringBuffer buffy = new StringBuffer();
-            URL aboutHtml = AutoPlotMatisse.class.getResource("aboutAutoplot.html");
-            
+            URL aboutHtml = AutoPlotUI.class.getResource("aboutAutoplot.html");
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()));
             String s = reader.readLine();
             while (s != null) {
-                buffy.append(s+"");
+                buffy.append(s + "");
                 s = reader.readLine();
             }
             reader.close();
-            
+
             buffy.append("    <h2>Build Information:</h2>");
-            
-            List<String> bi= Util.getBuildInfos();
-            for ( String ss: bi ) {
-                buffy.append("    <li>"+ss+"");
+
+            List<String> bi = Util.getBuildInfos();
+            for (String ss : bi) {
+                buffy.append("    <li>" + ss + "");
             }
             buffy.append("    </p></html>");
-                    
-            System.err.println(buffy.toString() );
-            JOptionPane.showMessageDialog( this, buffy.toString() );
-            
-        } catch (IOException ex) {
 
+            System.err.println(buffy.toString());
+            JOptionPane.showMessageDialog(this, buffy.toString());
+
+        } catch (IOException ex) {
         }
-        
+
     }//GEN-LAST:event_aboutAutoplotMenuItemActionPerformed
 
     private void aboutDas2MenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutDas2MenuItemActionPerformed
@@ -743,13 +757,24 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
 }//GEN-LAST:event_autoplotHomepageButtonActionPerformed
 
     private void helpMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpMenuActionPerformed
-    // TODO add your handling code here:
+        // TODO add your handling code here:
     }//GEN-LAST:event_helpMenuActionPerformed
+
+private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editModelMenuItemActionPerformed
+    PropertyEditor edit = new PropertyEditor(this.applicationModel);
+    edit.showDialog(this);
+}//GEN-LAST:event_editModelMenuItemActionPerformed
 
     /**
      * @param args the command line arguments
      */
     public static void main(final String args[]) {
+
+        final ArgumentList alm = new ArgumentList("AutoPlotUI");
+        alm.addOptionalPositionArgument(0, "URL", null, "initial URL to load");
+        alm.addOptionalPositionArgument(1, "bookmarks", null, "bookmarks to load");
+        alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port");
+        alm.process(args);
 
         System.err.println("welcome to autoplot");
         Logger.getLogger("ap").info("welcome to autoplot ");
@@ -757,11 +782,11 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
         final String initialURL;
         final String bookmarks;
 
-        if (args.length > 0) {
-            initialURL = args[0];
-            Logger.getLogger("ap").info("setting initial URL to >>>" + args[0] + "<<<");
+        if (alm.getValue("URL") != null) {
+            initialURL = alm.getValue("URL");
+            Logger.getLogger("ap").info("setting initial URL to >>>" + initialURL + "<<<");
 
-            bookmarks = args.length > 1 ? args[1] : null;
+            bookmarks = alm.getValue("bookmarks");
 
         } else {
             initialURL = null;
@@ -771,8 +796,14 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                final AutoPlotMatisse app = new AutoPlotMatisse(model);
-                Thread.currentThread().setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+                final AutoPlotUI app = new AutoPlotUI(model);
+
+                if (!alm.getValue("port").equals("-1")) {
+                    int iport = Integer.parseInt(alm.getValue("port"));
+                    app.setupServer( iport, model );
+                }
+
+                Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
                     public void uncaughtException(Thread t, Throwable e) {
                         app.setStatus("caught exception: " + e.getMessage());
@@ -799,12 +830,40 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
                             }
                         }
                     };
-                    new Thread(run).start();
+                    new Thread(run, "LoadBookmarksThread").start();
 
                 }
 
             }
         });
+    }
+
+    /**
+     * initializes a SocketListener that accepts jython scripts that affect
+     * the application state.  This implements the "--port" option.
+     * @param port
+     * @param model
+     */
+    private void setupServer( int port, final ApplicationModel model ) {
+        ScriptContext.setApplicationModel(model);
+        ScriptContext.setView(this);
+
+        final RequestListener rlistener = new RequestListener();
+        rlistener.setPort(port);
+        final RequestHandler rhandler = new RequestHandler();
+
+        rlistener.addPropertyChangeListener(RequestListener.PROP_DATA, new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                try {
+                    System.err.println("Got Data: " + rlistener.getData());
+                    rhandler.handleRequest(rlistener.getData(), model, rlistener.getSocket().getOutputStream());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        rlistener.startListening();
     }
 
     public void setMessage(String message) {
@@ -820,11 +879,13 @@ public class AutoPlotMatisse extends javax.swing.JFrame {
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
     private javax.swing.JMenu editMenu;
+    private javax.swing.JMenuItem editModelMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JMenuItem pasteDataSetURLMenuItem;
     private javax.swing.JMenu plotStyleMenu;

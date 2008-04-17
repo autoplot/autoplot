@@ -12,6 +12,8 @@ package org.virbo.autoplot;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import org.python.core.Py;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -32,7 +34,7 @@ public class JythonMain {
     
     public static void main(String[] args) throws Exception {
         
-        interp = new PythonInterpreter();
+        interp = new PythonInterpreter( );
         
         interp.execfile( JythonMain.class.getResource("imports.py").openStream(), "imports.py" );
 

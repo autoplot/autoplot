@@ -4,8 +4,10 @@
  */
 package org.virbo.autoplot.server;
 
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -36,6 +38,8 @@ public class RequestListener {
                     // wait for connections forever
                     while (listening) {
                         Socket socket = listen.accept();
+                        setSocket( socket );
+                        
                         requestCount++;
 
                         InputStream in = socket.getInputStream();
@@ -51,6 +55,8 @@ public class RequestListener {
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(RequestListener.class.getName()).log(Level.SEVERE, null, ex);
+                } catch ( RuntimeException ex ) {
+                    Logger.getLogger(RequestListener.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             
@@ -58,6 +64,21 @@ public class RequestListener {
         }
     };
     
+    
+    private Socket socket = null;
+
+    public static final String PROP_SOCKET = "socket";
+
+    public Socket getSocket() {
+        return this.socket;
+    }
+
+    public void setSocket(Socket newsocket) {
+        Socket oldsocket = socket;
+        this.socket = newsocket;
+        propertyChangeSupport.firePropertyChange(PROP_SOCKET, oldsocket, newsocket);
+    }
+
     private int port = 1234;
 
     public int getPort() {
@@ -67,6 +88,12 @@ public class RequestListener {
     public void setPort(int newport) {
         this.port = newport;
     }
+    
+    public OutputStream getOutputStream() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+    
+    
     private String data = null;
     public static final String PROP_DATA = "data";
 
@@ -102,6 +129,7 @@ public class RequestListener {
         this.listening = newlistening;
         propertyChangeSupport.firePropertyChange(PROP_LISTENING, oldlistening, newlistening);
     }
+
     private int requestCount = 0;
     public static final String PROP_REQUESTCOUNT = "requestCount";
 
@@ -133,4 +161,13 @@ public class RequestListener {
     public void removePropertyChangeListener(java.beans.PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
+
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+    
 }

@@ -11,5 +11,7 @@ from javax.swing import JFrame, JComponent, JLayeredPane
 from java.io import File
 import java
 
+from org.virbo.autoplot.ScriptContext import *
+
 
 

@@ -63,6 +63,7 @@
         <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/xercesImpl.jar" />
         <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/xerces.jar" />
         <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/xml-apis.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/jython.jar" />
         
         <jar href="lib/dasCore.jar" />
         <jar href="lib/DataSource.jar" />
@@ -84,7 +85,7 @@
         
     </resources> 
     
-    <application-desc  main-class="org.virbo.autoplot.AutoPlotMatisse">  
+    <application-desc  main-class="org.virbo.autoplot.AutoPlotUI">  
         <!--<argument>http://www.cottagesystems.com/virbo/apps/autoplot/data/ascii/omni2_1972.dat?column=field17</argument>-->
     </application-desc>
 </jnlp> 

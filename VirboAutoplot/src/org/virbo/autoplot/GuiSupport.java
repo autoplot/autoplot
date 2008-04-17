@@ -41,8 +41,8 @@ import org.virbo.dataset.VectorDataSetAdapter;
  */
 public class GuiSupport {
     
-    AutoPlotMatisse parent;
-    public GuiSupport( AutoPlotMatisse parent ) {
+    AutoPlotUI parent;
+    public GuiSupport( AutoPlotUI parent ) {
         this.parent= parent;
     }
     
@@ -94,7 +94,7 @@ public class GuiSupport {
                 } );
             }
         };
-        new Thread(run).start();
+        new Thread(run,"CopyDataSetToClipboardThread").start();
     }
     
     Action getDumpDataAction() {

@@ -43,6 +43,7 @@ import edu.uiowa.physics.pw.das.graph.SeriesRenderer;
 import edu.uiowa.physics.pw.das.graph.SpectrogramRenderer;
 import edu.uiowa.physics.pw.das.stream.StreamException;
 import edu.uiowa.physics.pw.das.system.RequestProcessor;
+import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.StreamTool;
@@ -136,6 +137,17 @@ public class ApplicationModel {
     double vmax;
     double fill;
     static final Logger logger = Logger.getLogger("virbo.autoplot");
+    private int threadRunning = 0;
+    private final int UPDATE_FILL_THREAD_RUNNING = 1;
+    private final int TICKLE_TIMER_THREAD_RUNNING = 2;
+
+    private synchronized void markThreadRunning(int threadRunningMask) {
+        this.threadRunning = this.threadRunning | threadRunningMask;
+    }
+
+    private synchronized void clearThreadRunning(int threadRunningMask) {
+        this.threadRunning = this.threadRunning & (~threadRunningMask);
+    }
     /**
      * true if running in headless environment
      */
@@ -204,6 +216,8 @@ public class ApplicationModel {
 
         canvas = new DasCanvas();
         canvas.setFont(canvas.getFont().deriveFont(Font.ITALIC, 18.f));
+        canvas.setPrintingTag("");
+
         canvas.addPropertyChangeListener(listener);
 
         this.application = canvas.getApplication();
@@ -215,6 +229,7 @@ public class ApplicationModel {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals("running") && evt.getOldValue().equals(Boolean.TRUE) && evt.getNewValue().equals(Boolean.FALSE)) {
                     startUpdateUnitsThread();
+                    clearThreadRunning(TICKLE_TIMER_THREAD_RUNNING);
                 }
             }
         });
@@ -225,17 +240,6 @@ public class ApplicationModel {
             ex.printStackTrace();
         }
 
-        final RequestListener rlistener = new RequestListener();
-        final RequestHandler rhandler= new RequestHandler();
-        
-        rlistener.addPropertyChangeListener( new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                System.err.println( "Got Data: "+rlistener.getData() );
-                rhandler.handleRequest( rlistener.getData(), ApplicationModel.this );
-            }
-            
-        } );
-        rlistener.startListening();
     
     }
 
@@ -651,8 +655,10 @@ public class ApplicationModel {
 
             public void run() {
                 updateFill(true);
+                clearThreadRunning(UPDATE_FILL_THREAD_RUNNING);
             }
         };
+        markThreadRunning(UPDATE_FILL_THREAD_RUNNING);
         new Thread(run, "updateFillThread").start();
     }
 
@@ -932,6 +938,7 @@ public class ApplicationModel {
 
         if (dataSource != null) {
             if (!this.autoRangeSuppress) {
+                markThreadRunning(TICKLE_TIMER_THREAD_RUNNING);
                 tickleTimer.tickle();
             }
         }
@@ -1156,6 +1163,8 @@ public class ApplicationModel {
             state.setEmbeddedDataSet(getEmbeddedDataSet());
         }
 
+        state.setTitle( plot.getTitle() );
+        
         return state;
     }
 
@@ -1234,6 +1243,8 @@ public class ApplicationModel {
         if (deep && state.isUseEmbeddedDataSet() && !"".equals(state.getEmbeddedDataSet())) {
             setEmbeddedDataSet(state.getEmbeddedDataSet());
         }
+        
+        plot.setTitle( state.getTitle() );
 
     }
 
@@ -1667,6 +1678,16 @@ public class ApplicationModel {
 
     public DasPlot getOverviewPlot() {
         return this.overviewPlot;
+    }
+
+    /**
+     * wait for autoplot to settle.
+     */
+    public void waitUntilIdle(boolean runtimeException) throws InterruptedException {
+        while (threadRunning != 0) {
+            Thread.sleep(30);
+        }
+        canvas.waitUntilIdle();
     }
 }
 
