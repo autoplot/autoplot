@@ -230,9 +230,9 @@
               <Component id="dataSetSelector" pref="632" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="tabbedPanelContainer" alignment="0" pref="652" max="32767" attributes="2"/>
+          <Component id="tabbedPanelContainer" alignment="0" pref="656" max="32767" attributes="2"/>
           <Group type="102" alignment="0" attributes="0">
-              <Component id="statusLabel" pref="642" max="32767" attributes="0"/>
+              <Component id="statusLabel" pref="644" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>

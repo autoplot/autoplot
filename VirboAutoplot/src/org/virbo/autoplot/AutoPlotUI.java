@@ -852,7 +852,7 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
         rlistener.setPort(port);
         final RequestHandler rhandler = new RequestHandler();
 
-        rlistener.addPropertyChangeListener(RequestListener.PROP_DATA, new PropertyChangeListener() {
+        rlistener.addPropertyChangeListener(RequestListener.PROP_REQUESTCOUNT, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
