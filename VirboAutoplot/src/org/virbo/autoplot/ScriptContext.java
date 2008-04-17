@@ -4,16 +4,27 @@
  */
 package org.virbo.autoplot;
 
+import edu.uiowa.physics.pw.das.dataset.DataSet;
+import edu.uiowa.physics.pw.das.dataset.TableDataSet;
+import edu.uiowa.physics.pw.das.dataset.VectorDataSet;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
 import edu.uiowa.physics.pw.das.util.TimeParser;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 import java.text.ParseException;
 import javax.beans.binding.BindingContext;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyJavaInstance;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
+import org.virbo.dataset.DataSetAdapter;
+import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceFactory;
 
 /**
  *
@@ -158,6 +169,27 @@ public class ScriptContext extends PyJavaInstance {
         bc.addBinding( src, "${"+srcProp+"}", dst, dstProp );
         bc.bind();
     }
-            
+    
+    public static QDataSet getDataSet( String surl, ProgressMonitor mon) throws Exception {
+        URL url= new URL( surl );
+        DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
+        DataSource result = factory.getDataSource(url);
+        if ( mon==null ) mon= new NullProgressMonitor() ;
+        return result.getDataSet( mon );
+    }
+    
+    public static QDataSet getDataSet( String surl ) throws Exception {
+        return getDataSet( surl, null );
+    }
+    
+    public static void dumpToDas2Stream( QDataSet ds ) {
+        OutputStream out= System.out;
+        DataSet lds= DataSetAdapter.createLegacyDataSet(ds);
+        if ( lds instanceof TableDataSet ) {
+            edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToAsciiStream( (TableDataSet)lds, out );
+        } else {
+            edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToAsciiStream( (VectorDataSet)lds, out );
+        }
+    }
     
 }
