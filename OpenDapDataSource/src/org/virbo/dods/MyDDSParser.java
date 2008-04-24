@@ -43,7 +43,6 @@ public class MyDDSParser {
         myDDS= new DDS();
         BaseTypeFactory factory= new DefaultFactory();
         p.Dataset( myDDS, factory );
-        System.err.println( myDDS );
         
     }
     
