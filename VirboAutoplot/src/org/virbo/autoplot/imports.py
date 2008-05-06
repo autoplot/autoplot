@@ -12,6 +12,7 @@ from java.io import File
 import java
 
 from org.virbo.autoplot.ScriptContext import *
+from org.virbo.autoplot import *
 
-
+print 'imported stuff for autoplot'
 

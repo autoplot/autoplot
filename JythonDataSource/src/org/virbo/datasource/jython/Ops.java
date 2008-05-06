@@ -4,15 +4,18 @@
  */
 package org.virbo.datasource.jython;
 
+import edu.uiowa.physics.pw.das.dataset.TableDataSet;
 import edu.uiowa.physics.pw.das.datum.EnumerationUnits;
 import edu.uiowa.physics.pw.das.datum.Units;
 import edu.uiowa.physics.pw.das.math.fft.ComplexArray;
 import edu.uiowa.physics.pw.das.math.fft.FFTUtil;
 import edu.uiowa.physics.pw.das.math.fft.GeneralFFT;
+import edu.uiowa.physics.pw.das.math.fft.WaveformToSpectrum;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -651,6 +654,16 @@ public class Ops {
         return result;
     }
     
+    /**
+     * perform ffts on the rank 1 dataset to make a rank2 spectrogram.
+     * @param ds rank 1 dataset
+     * @param len the window length
+     * @return rank 2 dataset.
+     */
+    public static QDataSet fftWindow( QDataSet ds, int len ) {
+        TableDataSet result= WaveformToSpectrum.getTableDataSet( VectorDataSetAdapter.create(ds), len) ;
+        return DataSetAdapter.create(result);
+    }
     
     public static double PI = Math.PI;
     public static double E = Math.E;

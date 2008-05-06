@@ -1,3 +1,8 @@
 ds1= sin( dindgen(1000)/10 )
 ds2= fft( ds1 )
 ds3= magnitude( ds2 )
+
+#file= 'file:/home/jbf/sun/media/sounds/sweeplin.wav'
+file= 'file:/home/jbf/sun/media/sounds/sqr-100Hz.wav'
+ds4= getDataSet( file )
+ds5= fftWindow( ds4, 128 )
