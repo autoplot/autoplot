@@ -136,11 +136,4 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         return surl; // TODO
     }
     
-    public List<String> extensions() {
-        return Collections.singletonList(".cdf");
-    }
-    
-    public List<String> mimeTypes() {
-        return Collections.emptyList();
-    }
 }
