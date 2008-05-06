@@ -17,10 +17,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -100,11 +103,13 @@ public class BookmarksManager extends javax.swing.JDialog {
             Document doc= AutoplotUtil.readDoc( url.openStream() );
             List<Bookmark> book= Bookmark.parseBookmarks( doc );
             this.setList(book);
-        } catch ( IOException e ) {
-            throw new RuntimeException(e);
-        } catch ( SAXException e ) {
-            throw new RuntimeException(e);
-        }
+        } catch (SAXException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);        
+        } 
     }
     
     /** This method is called from within the constructor to
@@ -321,12 +326,12 @@ public class BookmarksManager extends javax.swing.JDialog {
                 Document doc= AutoplotUtil.readDoc( url.openStream() );
                 List<Bookmark> book= Bookmark.parseBookmarks( doc );
                 this.setList(book);
-            } catch ( MalformedURLException ex ) {
-                throw new RuntimeException(ex);
-            } catch ( IOException ex ) {
-                throw new RuntimeException(ex);
-            } catch ( SAXException ex ) {
-                throw new RuntimeException(ex);
+            } catch (SAXException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_resetToDefaultMenuItemActionPerformed
@@ -417,10 +422,12 @@ public class BookmarksManager extends javax.swing.JDialog {
             try {
                 List<Bookmark> recent= Bookmark.parseBookmarks( AutoplotUtil.readDoc( new FileInputStream( chooser.getSelectedFile()) ) );
                 setList( recent );
-            } catch ( SAXException e ){
-                e.printStackTrace();
-            } catch ( IOException e ) {
-                e.printStackTrace();
+            } catch (SAXException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
