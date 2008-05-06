@@ -43,7 +43,6 @@ import edu.uiowa.physics.pw.das.graph.SeriesRenderer;
 import edu.uiowa.physics.pw.das.graph.SpectrogramRenderer;
 import edu.uiowa.physics.pw.das.stream.StreamException;
 import edu.uiowa.physics.pw.das.system.RequestProcessor;
-import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.StreamTool;
@@ -78,9 +77,8 @@ import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import org.apache.xerces.utils.Base64;
-import org.virbo.autoplot.server.RequestHandler;
-import org.virbo.autoplot.server.RequestListener;
+import javax.xml.parsers.ParserConfigurationException;
+import org.das2.util.Base64;
 import org.virbo.autoplot.state.ApplicationState;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.util.TickleTimer;
@@ -970,6 +968,8 @@ public class ApplicationModel {
                     return new ArrayList<Bookmark>();
                 } catch (SAXException e) {
                     return new ArrayList<Bookmark>();
+                } catch (ParserConfigurationException e ) {
+                    return new ArrayList<Bookmark>();
                 }
             }
         } else {
@@ -981,6 +981,9 @@ public class ApplicationModel {
             } catch (IOException e) {
                 return new ArrayList<Bookmark>();
 
+            } catch ( ParserConfigurationException e ) {
+                return new ArrayList<Bookmark>();
+                
             }
         }
 
@@ -1379,7 +1382,8 @@ public class ApplicationModel {
         producer.setAsciiTransferTypes(false);
         producer.writeStream(out);
 
-        byte[] data = Base64.encode(out.toByteArray());
+        byte[] data = Base64.encodeBytes(out.toByteArray()).getBytes();
+        
         embedDs = new String(data);
         embedDsDirty = false;
     }
@@ -1398,7 +1402,7 @@ public class ApplicationModel {
             return;
         }
 
-        byte[] data = Base64.decode(embedDs.getBytes());
+        byte[] data = Base64.decode(embedDs);
         InputStream in = new ByteArrayInputStream(data);
 
         ReadableByteChannel channel = Channels.newChannel(in);
