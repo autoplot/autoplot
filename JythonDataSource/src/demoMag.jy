@@ -1,0 +1,13 @@
+ds= getDataSet( 'http://cdaweb.gsfc.nasa.gov/istp_public/data/ace/mfi/2007/ac_k0_mfi_20070117_v01.cdf?BGSEc' )
+result= magnitude( ds )
+
+dep1= ds.property( 'DEPEND_1' )
+ds2= pow( ds, 2 )
+#ds2= total( ds2, 1 )
+ds2= sqrt( ds2 )
+ds2.putProperty(  'DEPEND_1', dep1 )
+
+import org.virbo.dataset.DDataSet;
+
+ds3= org.virbo.dataset.DDataSet.copy( ds );
+ds3[:,:]= 1.

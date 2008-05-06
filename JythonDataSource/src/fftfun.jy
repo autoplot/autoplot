@@ -1,0 +1,3 @@
+ds1= sin( dindgen(1000)/10 )
+ds2= fft( ds1 )
+ds3= magnitude( ds2 )

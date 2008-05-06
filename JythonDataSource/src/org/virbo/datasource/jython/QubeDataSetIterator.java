@@ -22,6 +22,7 @@ public class QubeDataSetIterator {
         int index();
 
         int length();
+        
     }
 
     public interface DimensionIteratorFactory {
@@ -35,12 +36,14 @@ public class QubeDataSetIterator {
         int stop;
         int step;
         int index;
+        boolean all; // just for toString
 
-        public StartStopStepIterator(int start, int stop, int step) {
+        public StartStopStepIterator(int start, int stop, int step, boolean all ) {
             this.start = start;
             this.stop = stop;
             this.step = step;
             this.index= start-step;
+            this.all= all;
         }
 
         public boolean hasNext() {
@@ -59,6 +62,12 @@ public class QubeDataSetIterator {
         public int length() {
             return (stop - start) / step;
         }
+
+        @Override
+        public String toString() {
+            return all ? ":" : ""+start+":"+stop+( step==1 ? "" : ":"+step );
+        }
+        
     }
 
     public static class StartStopStepIteratorFactory implements DimensionIteratorFactory {
@@ -80,7 +89,7 @@ public class QubeDataSetIterator {
             if ( start1 < 0) start1 = length - start1;
             if ( stop1 < 0) stop1 = length - stop1;
             
-            return new StartStopStepIterator(start1, stop1, step1);
+            return new StartStopStepIterator(start1, stop1, step1, start==null && stop==null && step==null );
         }
     }
 
@@ -110,6 +119,12 @@ public class QubeDataSetIterator {
         public int length() {
             return ds.length();
         }
+
+        @Override
+        public String toString() {
+            return "["+ds.toString()+"]";
+        }
+        
     }
 
     public static class IndexListIteratorFactory implements DimensionIteratorFactory {
@@ -150,6 +165,12 @@ public class QubeDataSetIterator {
         public int length() {
             return 1;
         }
+
+        @Override
+        public String toString() {
+            return ""+index;
+        }
+        
     }
 
     public static class SingletonIteratorFactory implements DimensionIteratorFactory {
@@ -168,6 +189,7 @@ public class QubeDataSetIterator {
     DimensionIteratorFactory[] fit = new DimensionIteratorFactory[3];
     int rank;
     int[] qube;
+    boolean allnext= true;  // we'll have to do a borrow to get started.
     
     /**
      * dataset iterator to help in implementing the complex indexing
@@ -232,9 +254,15 @@ public class QubeDataSetIterator {
     }
 
     public void next() {
+        
+        if ( this.allnext ) {
+            for ( int i=0; i<(rank-1); i++ ) it[i].nextIndex();
+            allnext= false;
+        }
+        
         // implement borrow logic
         int i = rank - 1;
-        if (it[i].hasNext()) {
+        if ( it[i].hasNext() ) {
             it[i].nextIndex();
         } else {
             if (i > 0) {
@@ -243,6 +271,7 @@ public class QubeDataSetIterator {
                         it[j].nextIndex();
                         for ( int k=j+1; k<=i; k++ ) {
                             it[k]= fit[k].newIterator( dimLength(k) );
+                            it[k].nextIndex();
                         }
                     }
                 }
@@ -263,4 +292,17 @@ public class QubeDataSetIterator {
     public int rank() {
         return rank;
     }
+
+    @Override
+    public String toString() {
+        String its=it[0].toString();
+        String ats=""+it[0].index();
+        for ( int i=1; i<rank; i++ ) {
+            its= its + "," + it[i].toString();
+            ats= ats + "," + it[i].index();
+        }
+        return "Iter [" + its + "] @ ["+ ats + "] ";
+    }
+    
+    
 }
