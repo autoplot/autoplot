@@ -853,11 +853,9 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
         final RequestHandler rhandler = new RequestHandler();
 
         rlistener.addPropertyChangeListener(RequestListener.PROP_REQUESTCOUNT, new PropertyChangeListener() {
-
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
-                    System.err.println("Got Data: " + rlistener.getData());
-                    rhandler.handleRequest(rlistener.getData(), model, rlistener.getSocket().getOutputStream());
+                    rhandler.handleRequest( rlistener.getSocket().getInputStream(), model, rlistener.getSocket().getOutputStream());
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
