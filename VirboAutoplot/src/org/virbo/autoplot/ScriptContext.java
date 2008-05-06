@@ -10,12 +10,16 @@ import edu.uiowa.physics.pw.das.dataset.VectorDataSet;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
 import edu.uiowa.physics.pw.das.util.TimeParser;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import javax.beans.binding.BindingContext;
 import org.das2.fsm.FileStorageModel;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyJavaInstance;
@@ -39,11 +43,10 @@ public class ScriptContext extends PyJavaInstance {
             model = new ApplicationModel();
         }
     }
-    
-    protected static void setApplicationModel( ApplicationModel m ) {
-        model= m;
+
+    protected static void setApplicationModel(ApplicationModel m) {
+        model = m;
     }
-    
     private static AutoPlotUI view = null;
 
     private static synchronized void maybeInitView() {
@@ -54,10 +57,20 @@ public class ScriptContext extends PyJavaInstance {
         }
     }
 
-    protected static void setView( AutoPlotUI v ) {
-        view= v;
+    protected static void setView(AutoPlotUI v) {
+        view = v;
     }
-    
+    private static OutputStream out = System.out;
+
+    /**
+     * resets the output stream.  This method is used internally, do not use
+     * this routine.
+     * @param out
+     */
+    public static void _setOutputStream(OutputStream out) {
+        ScriptContext.out = out;
+    }
+
     /**
      * set the size of the canvas.  This is only used when the GUI is not used, and in
      * headless mode, otherwise the GUI controls the size of the canvas.
@@ -88,7 +101,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot(String surl) throws InterruptedException {
         maybeInitView();
-        model.resetDataSetSourceURL(surl, new NullProgressMonitor() );
+        model.resetDataSetSourceURL(surl, new NullProgressMonitor());
         model.waitUntilIdle(false);
     }
 
@@ -123,37 +136,37 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.io.IOException if the remote folder cannot be listed.
      * @throws java.text.ParseException if the timerange cannot be parsed.
      */
-    public static String[] getTimeRangesFor( String surl, String timeRange, String format ) throws IOException, ParseException {
-        DatumRange dr = DatumRangeUtil.parseTimeRange( timeRange );
+    public static String[] getTimeRangesFor(String surl, String timeRange, String format) throws IOException, ParseException {
+        DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
         FileStorageModel fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
-        TimeParser tf= TimeParser.create(format);
-                
-        String[] ss= fsm.getNamesFor(dr);
-        String[] result= new String[ss.length];
-        
-        for ( int i=0; i<ss.length; i++ ) {
-            DatumRange dr2=  fsm.getRangeFor( ss[i] );
-            result[i]= tf.format( dr2.min(), dr2.max() );
+        TimeParser tf = TimeParser.create(format);
+
+        String[] ss = fsm.getNamesFor(dr);
+        String[] result = new String[ss.length];
+
+        for (int i = 0; i < ss.length; i++) {
+            DatumRange dr2 = fsm.getRangeFor(ss[i]);
+            result[i] = tf.format(dr2.min(), dr2.max());
         }
-        
+
         return result;
     }
-    
+
     /**
      * set the title of the plot.
      * @param title
      */
-    public static void setTitle( String title ) {
-        model.getPlot().setTitle( title );
+    public static void setTitle(String title) {
+        model.getPlot().setTitle(title);
     }
-    
+
     /**
      * create a model with a GUI presentation layer.
      */
     public static void createGui() {
         maybeInitView();
     }
-    
+
     /**
      * returns the internal application model (the object that does all the 
      * business).  This provides access to the internal model for power users.
@@ -163,33 +176,87 @@ public class ScriptContext extends PyJavaInstance {
         maybeInitModel();
         return model;
     }
-    
-    public static void bind( Object src, String srcProp, Object dst, String dstProp ) {
-        BindingContext bc= new BindingContext();
-        bc.addBinding( src, "${"+srcProp+"}", dst, dstProp );
+
+    /**
+     * binds two bean properties together.  The properties must fire property
+     * change events for the binding mechanism to work.
+     * @param src
+     * @param srcProp
+     * @param dst
+     * @param dstProp
+     */
+    public static void bind(Object src, String srcProp, Object dst, String dstProp) {
+        BindingContext bc = new BindingContext();
+        bc.addBinding(src, "${" + srcProp + "}", dst, dstProp);
         bc.bind();
     }
-    
-    public static QDataSet getDataSet( String surl, ProgressMonitor mon) throws Exception {
-        URL url= new URL( surl );
+
+    /**
+     * load the data specified by URL into Autoplot's internal data model.  This will
+     * block until the load is complete, and a ProgressMonitor object can be used to
+     * monitor the load.
+     * TODO: combine this with dumpToDas2Stream, so that the stream can contain progress
+     * information for the consumer.
+     * @param ds
+     */    
+    public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
+        URL url = new URL(surl);
         DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
         DataSource result = factory.getDataSource(url);
-        if ( mon==null ) mon= new NullProgressMonitor() ;
-        return result.getDataSet( mon );
+        if (mon == null) {
+            mon = new NullProgressMonitor();
+        }
+        return result.getDataSet(mon);
     }
-    
-    public static QDataSet getDataSet( String surl ) throws Exception {
-        return getDataSet( surl, null );
+
+    /**
+     * load the data specified by URL into Autoplot's internal data model.  This will
+     * block until the load is complete.
+     * @param ds
+     */
+    public static QDataSet getDataSet(String surl) throws Exception {
+        return getDataSet(surl, null);
     }
-    
-    public static void dumpToDas2Stream( QDataSet ds ) {
-        OutputStream out= System.out;
-        DataSet lds= DataSetAdapter.createLegacyDataSet(ds);
-        if ( lds instanceof TableDataSet ) {
-            edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToAsciiStream( (TableDataSet)lds, out );
-        } else {
-            edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToAsciiStream( (VectorDataSet)lds, out );
+
+    /**
+     * serializes the dataset to a das2stream, a well-documented, open, streaming
+     * data format. (that's a joke.)  
+     * Currently, to keep the channel open, the stream is created in a buffer and 
+     * then the buffer is sent.  TODO: write a stream-producing code that doesn't
+     * close the output stream.
+     * @param ds
+     */
+    public static void dumpToDas2Stream(QDataSet ds) {
+        try {
+            ByteArrayOutputStream bufout = new ByteArrayOutputStream(10000);
+            DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
+            if (lds instanceof TableDataSet) {
+                edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
+            } else {
+                edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
+            }
+            out.write(bufout.toByteArray());
+        } catch (IOException ex) {
         }
     }
     
+    /**
+     * returns a list of the files in the local or remote filesystem pointed to by surl.
+     * print list( 'http://www.papco.org/data/de/eics/*' )
+     *  --> '81355_eics_de_96s_v01.cdf', '81356_eics_de_96s_v01.cdf', '81357_eics_de_96s_v01.cdf', ...
+     * @param surl
+     * @return 
+     * @throws java.net.MalformedURLException
+     * @throws java.io.IOException
+     */
+    public static String[] list( String surl ) throws MalformedURLException, IOException {
+        String[] ss= FileSystem.splitUrl(surl);
+        FileSystem fs= FileSystem.create(  new URL( ss[2] ) );
+        String glob= ss[3].substring(ss[2].length() );
+        if ( glob.length()==0 ) {
+            return fs.listDirectory("/");
+        } else {
+            return fs.listDirectory("/", Glob.getRegex(glob) );
+        }
+    }
 }
