@@ -4,20 +4,19 @@
  */
 package org.virbo.autoplot.server;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringWriter;
+import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.python.core.Py;
-import org.python.core.PyObject;
-import org.python.core.PyString;
-import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoPlotUI;
+import org.virbo.autoplot.ScriptContext;
 
 /**
  *
@@ -49,23 +48,39 @@ public class RequestHandler {
     }
 
     /**
+     * this is a hook to remind myself we want to filter the stream to ensure
+     * a secure sandbox.  This will be done by removing import statements and
+     * exec/eval statements.
+     * @param in
+     * @return
+     */
+    private InputStream untaint( InputStream in ) {
+        return in;
+    }
+    /**
      * process the python code in data.  
      * return null or in the future the data to send back.
      */
-    public String handleRequest(String data, ApplicationModel model, OutputStream out ) {
+    public String handleRequest( InputStream in, ApplicationModel model, OutputStream out ) {
         try {
             PythonInterpreter interp = new PythonInterpreter();
 
             interp.execfile(AutoPlotUI.class.getResource("imports.py").openStream(), "imports.py");
             interp.setOut( out );
-
-            InputStream in;
-            String inIdentifier;
-
-            in = new ByteArrayInputStream(data.getBytes());
-            inIdentifier = "";
-
-            interp.execfile(in, inIdentifier);
+            
+            ScriptContext._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
+            
+            BufferedReader reader= new BufferedReader( new InputStreamReader(in) );
+            String s= reader.readLine();
+            while ( s!=null ) {
+                try {
+                    interp.exec(s);
+                } catch ( RuntimeException ex ) {
+                    ex.printStackTrace( new PrintStream( out ) );
+                }
+                s = reader.readLine();
+            }
+            
 
             return null;
         } catch (IOException ex) {
