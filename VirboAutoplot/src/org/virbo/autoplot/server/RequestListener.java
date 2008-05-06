@@ -23,14 +23,25 @@ public class RequestListener {
     }
 
     public void startListening() {
-        this.listening= true;
+        this.listening = true;
         new Thread(run).start();
     }
-    
+    private boolean readData = false;
+    public static final String PROP_READDATA = "readData";
+
+    public boolean isReadData() {
+        return this.readData;
+    }
+
+    public void setReadData(boolean newreadData) {
+        boolean oldreadData = readData;
+        this.readData = newreadData;
+        propertyChangeSupport.firePropertyChange(PROP_READDATA, oldreadData, newreadData);
+    }
     private Runnable run = new Runnable() {
 
         public void run() {
-            
+
             while (listening) {
                 try {
                     ServerSocket listen = new ServerSocket(port, 1000);
@@ -38,35 +49,39 @@ public class RequestListener {
                     // wait for connections forever
                     while (listening) {
                         Socket socket = listen.accept();
-                        setSocket( socket );
-                        
-                        InputStream in = socket.getInputStream();
+                        setSocket(socket);
 
-                        StringBuffer buf = new StringBuffer();
+                        if (readData) {
+                            try {
+                                InputStream in = socket.getInputStream();
 
-                        int i = in.read();
-                        while (i != -1) {
-                            buf.append((char) i);
-                            i = in.read();
+                                StringBuffer buf = new StringBuffer();
+
+                                int i = in.read();
+                                while (i != -1) {
+                                    buf.append((char) i);
+                                    i = in.read();
+                                }
+                                setData(buf.toString());
+                            } catch (IOException ex) {
+                                Logger.getLogger(RequestListener.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
-                        setData( buf.toString() );
-                        setRequestCount( getRequestCount() + 1 );
-                        
+
+                        setRequestCount(getRequestCount() + 1);
+
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(RequestListener.class.getName()).log(Level.SEVERE, null, ex);
-                } catch ( RuntimeException ex ) {
+                    listening = false;
                     Logger.getLogger(RequestListener.class.getName()).log(Level.SEVERE, null, ex);
                 }
+
             }
-            
+
 
         }
     };
-    
-    
     private Socket socket = null;
-
     public static final String PROP_SOCKET = "socket";
 
     public Socket getSocket() {
@@ -78,7 +93,6 @@ public class RequestListener {
         this.socket = newsocket;
         propertyChangeSupport.firePropertyChange(PROP_SOCKET, oldsocket, newsocket);
     }
-
     private int port = 1234;
 
     public int getPort() {
@@ -88,12 +102,10 @@ public class RequestListener {
     public void setPort(int newport) {
         this.port = newport;
     }
-    
+
     public OutputStream getOutputStream() {
         throw new UnsupportedOperationException("Not yet implemented");
     }
-    
-    
     private String data = null;
     public static final String PROP_DATA = "data";
 
@@ -117,7 +129,6 @@ public class RequestListener {
         System.err.println("fire data property change");
         propertyChangeSupport.firePropertyChange(PROP_DATA, olddata, newdata);
     }
-    
     private boolean listening = false;
     public static final String PROP_LISTENING = "listening";
 
@@ -130,7 +141,6 @@ public class RequestListener {
         this.listening = newlistening;
         propertyChangeSupport.firePropertyChange(PROP_LISTENING, oldlistening, newlistening);
     }
-
     private int requestCount = 0;
     public static final String PROP_REQUESTCOUNT = "requestCount";
 
@@ -170,5 +180,4 @@ public class RequestListener {
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
-    
 }
