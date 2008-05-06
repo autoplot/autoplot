@@ -21,7 +21,9 @@ import java.io.Reader;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import org.apache.xerces.parsers.DOMParser;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -368,15 +370,20 @@ public class AutoplotUtil {
         return result;
     }
     
-    public static Document readDoc(InputStream is) throws SAXException, IOException {
-        DOMParser parser = new org.apache.xerces.parsers.DOMParser();
+    public static Document readDoc(InputStream is) throws SAXException, IOException, ParserConfigurationException {
+         DocumentBuilder builder;
+         builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+         InputSource source = new InputSource(new InputStreamReader(is));
+         Document document = builder.parse(source);
         
-        Reader in = new BufferedReader(new InputStreamReader(is));
-        InputSource input = new org.xml.sax.InputSource(in);
-        
-        parser.parse(input);
-        
-        Document document = parser.getDocument();
+//        DOMParser parser = new org.apache.xerces.parsers.DOMParser();
+//        
+//        Reader in = new BufferedReader(new InputStreamReader(is));
+//        InputSource input = new org.xml.sax.InputSource(in);
+//        
+//        parser.parse(input);
+//        
+//        Document document = parser.getDocument();
         return document;
     }
 
