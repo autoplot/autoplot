@@ -78,7 +78,7 @@
         
         <!-- cdf -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
-        <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.1.1.jnlp" >  
+        <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-latest.jnlp" >  
             <!--<ext-download download="lazy" ext-part="cdf" /> -->
         </extension>
         
