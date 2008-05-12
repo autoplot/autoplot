@@ -40,6 +40,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import org.virbo.autoplot.scriptconsole.ScriptPanel;
 import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.state.ApplicationState;
@@ -90,6 +91,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
 
+        ScriptContext.setApplicationModel(model);
+        ScriptContext.setView(this);
+        
         support = new GuiSupport(this);
 
         applicationModel = model;
@@ -192,6 +196,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
         tabs.insertTab("metadata", null, mdp, TOOLTIP, 3);
 
+        tabs.insertTab("script", null, new ScriptPanel(applicationModel), TOOLTIP, 4 );
+        
+
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
@@ -226,7 +233,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
 
         tabbedPanelContainer.validate();
-
+        
         updateBookmarks();
 
         pack();
@@ -845,8 +852,6 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
      * @param model
      */
     private void setupServer( int port, final ApplicationModel model ) {
-        ScriptContext.setApplicationModel(model);
-        ScriptContext.setView(this);
 
         final RequestListener rlistener = new RequestListener();
         rlistener.setPort(port);
