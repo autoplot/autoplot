@@ -198,7 +198,7 @@ public class ScriptContext extends PyJavaInstance {
      * TODO: combine this with dumpToDas2Stream, so that the stream can contain progress
      * information for the consumer.
      * @param ds
-     */    
+     */
     public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
         URL url = new URL(surl);
         DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
@@ -226,20 +226,29 @@ public class ScriptContext extends PyJavaInstance {
      * close the output stream.
      * @param ds
      */
-    public static void dumpToDas2Stream(QDataSet ds) {
+    public static void dumpToDas2Stream(QDataSet ds, boolean ascii) {
         try {
             ByteArrayOutputStream bufout = new ByteArrayOutputStream(10000);
             DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
-            if (lds instanceof TableDataSet) {
-                edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
+            if (ascii) {
+                if (lds instanceof TableDataSet) {
+                    edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
+                } else {
+                    edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
+                }
             } else {
-                edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
+                if (lds instanceof TableDataSet) {
+                    edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToBinaryStream((TableDataSet) lds, bufout);
+                } else {
+                    edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
+                }
+
             }
             out.write(bufout.toByteArray());
         } catch (IOException ex) {
         }
     }
-    
+
     /**
      * returns a list of the files in the local or remote filesystem pointed to by surl.
      * print list( 'http://www.papco.org/data/de/eics/*' )
@@ -249,14 +258,14 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.net.MalformedURLException
      * @throws java.io.IOException
      */
-    public static String[] list( String surl ) throws MalformedURLException, IOException {
-        String[] ss= FileSystem.splitUrl(surl);
-        FileSystem fs= FileSystem.create(  new URL( ss[2] ) );
-        String glob= ss[3].substring(ss[2].length() );
-        if ( glob.length()==0 ) {
+    public static String[] list(String surl) throws MalformedURLException, IOException {
+        String[] ss = FileSystem.splitUrl(surl);
+        FileSystem fs = FileSystem.create(new URL(ss[2]));
+        String glob = ss[3].substring(ss[2].length());
+        if (glob.length() == 0) {
             return fs.listDirectory("/");
         } else {
-            return fs.listDirectory("/", Glob.getRegex(glob) );
+            return fs.listDirectory("/", Glob.getRegex(glob));
         }
     }
 }
