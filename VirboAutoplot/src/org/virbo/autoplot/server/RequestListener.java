@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,6 +50,7 @@ public class RequestListener {
                     // wait for connections forever
                     while (listening) {
                         Socket socket = listen.accept();
+                        System.err.println("connect @"+new Date( System.currentTimeMillis() ) );
                         setSocket(socket);
 
                         if (readData) {
