@@ -103,6 +103,20 @@
         <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
     </target>
     
+    <target name="jumbojar" depends="jar" >
+<!--        <unjar dest="temp">
+            <fileset dir="dist/lib" includes="*.jar"/>
+            <fileset dir="dist" includes="*.jar" />
+        </unjar>
+        <concat destfile="temp/org.virbo.DataSourceFactory.extensions" >
+            
+        </concat>-->
+        <jar file="jumbo.jar" manifest="${manifest.file}">
+            <zipgroupfileset dir="dist/lib" includes="*.jar"/>
+            <zipfileset file="${dist.jar}" />
+        </jar>
+    </target>
+    
     <target name="-post-jar" depends="jnlp-release"/> 
     
 </project>
