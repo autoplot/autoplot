@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.beans.binding.Binding;
@@ -40,10 +39,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
-import org.virbo.autoplot.scriptconsole.ScriptPanel;
+import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
-import org.virbo.autoplot.state.ApplicationState;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetURL;
@@ -196,7 +194,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
         tabs.insertTab("metadata", null, mdp, TOOLTIP, 3);
 
-        tabs.insertTab("script", null, new ScriptPanel(applicationModel), TOOLTIP, 4 );
+        tabs.insertTab("script", null, new JythonScriptPanel(applicationModel), TOOLTIP, 4 );
         
 
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
