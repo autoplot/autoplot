@@ -12,7 +12,18 @@
                 <root id="test.test.dir" name="Test Packages"/>
             </test-roots>
         </data>
+        <libraries xmlns="http://www.netbeans.org/ns/ant-project-libraries/1">
+            <definitions>lib\nblibraries.properties</definitions>
+        </libraries>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
+            <reference>
+                <foreign-project>BinaryDataSource</foreign-project>
+                <artifact-type>jar</artifact-type>
+                <script>build.xml</script>
+                <target>jar</target>
+                <clean-target>clean</clean-target>
+                <id>jar</id>
+            </reference>
             <reference>
                 <foreign-project>CdfDataSource</foreign-project>
                 <artifact-type>jar</artifact-type>
