@@ -95,16 +95,21 @@ public class DataSetSelector extends javax.swing.JPanel {
                     dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
                 }
             } else {
-                DataSourceFactory f = DataSetURL.getDataSourceFactory(DataSetURL.getURL(surl), new NullProgressMonitor());
-                if (f.reject(surl)) {
-                    if (!surl.contains("?")) {
-                        surl += "?";
+                try {
+                    DataSourceFactory f = DataSetURL.getDataSourceFactory(DataSetURL.getURL(surl), new NullProgressMonitor());
+                    if (f.reject(surl)) {
+                        if (!surl.contains("?")) {
+                            surl += "?";
+                        }
+                        setValue(surl);
+                        int carotpos = surl.indexOf("?") + 1;
+                        setMessage("url ambiguous, getting inspecting resource for parameters");
+                        showCompletions(surl, carotpos);
+                    } else {
+                        ActionEvent e = new ActionEvent(this, 123, "dataSetSelect");
+                        fireActionListenerActionPerformed(e);
                     }
-                    setValue(surl);
-                    int carotpos = surl.indexOf("?") + 1;
-                    setMessage("url ambiguous, getting inspecting resource for parameters");
-                    showCompletions(surl, carotpos);
-                } else {
+                } catch (IllegalArgumentException ex) {
                     ActionEvent e = new ActionEvent(this, 123, "dataSetSelect");
                     fireActionListenerActionPerformed(e);
                 }
@@ -254,11 +259,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                     ex.printStackTrace();
                     return;
 
-                } catch ( IOException ex ) {
+                } catch (IOException ex) {
                     setMessage(ex.getMessage());
                     ex.printStackTrace();
                     return;
-                    
+
                 }
 
                 boolean foldCase = Boolean.TRUE.equals(fs.getProperty(fs.PROP_CASE_INSENSITIVE));
