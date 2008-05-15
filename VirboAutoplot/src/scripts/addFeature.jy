@@ -1,0 +1,10 @@
+from edu.uiowa.physics.pw.das.graph import ContoursRenderer, SpectrogramRenderer;
+from javax.beans.binding import *;
+from edu.uiowa.physics.pw.das.event import AnnotatorMouseModule;
+createGui()
+
+model = getApplicationModel()
+
+model.autoOverview= False
+model.plot.addMouseModule( AnnotatorMouseModule(model.plot) )
+
