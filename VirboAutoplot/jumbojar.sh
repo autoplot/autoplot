@@ -51,5 +51,10 @@ unzip -o -d ../jumbojar ../dist/*.jar
 
 cd ../jumbojar
 mv META-INF/MANIFEST.MF ..     # get it out of the way
-jar c -f ../jumbojar.jar -m ../MANIFEST.MF *
+rm META-INF/*.RSA
+rm META-INF/*.SF
+rm META-INF/build.txt
+rm META-INF/INDEX.LIST
+
+jar cmf ../MANIFEST.MF ../jumbojar.jar  *
 
