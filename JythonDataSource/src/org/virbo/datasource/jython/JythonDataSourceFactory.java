@@ -51,22 +51,29 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         interp.execfile(JythonDataSource.class.getResource("imports.py").openStream(), "imports.py");
 
         File src= DataSetURL.getFile( url, new NullProgressMonitor());
-        interp.execfile(new FileInputStream( src ) );
+        
+        try {
+            interp.execfile(new FileInputStream( src ) );
 
-        PyStringMap map= ((PyStringMap)interp.getLocals());
-        PyList list= map.keys();
+            PyStringMap map= ((PyStringMap)interp.getLocals());
+            PyList list= map.keys();
         
-        HashMap result= new HashMap();
+            HashMap result= new HashMap();
         
-        for ( int i=0; i<list.__len__(); i++ ) {
-            String key= (String)list.get(i);
-            Object o= map.get( Py.newString(key) );
-            if ( o instanceof PyQDataSet ) {
-                result.put( key, o );
+            for ( int i=0; i<list.__len__(); i++ ) {
+                String key= (String)list.get(i);
+                Object o= map.get( Py.newString(key) );
+                if ( o instanceof PyQDataSet ) {
+                    result.put( key, o );
+                }
             }
+            return result;
+        } catch ( Exception e ) {
+            HashMap result= new HashMap();
+            result.put( "EXCEPTION", e.getMessage() );
+            return result;
         }
         
-        return result;
         
     }
 
