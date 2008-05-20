@@ -10,6 +10,7 @@ import java.net.URL;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
+import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.virbo.dataset.QDataSet;
@@ -39,8 +40,13 @@ public class JythonDataSource extends AbstractDataSource {
         
         PyObject result= interp.eval( expr );
         
-        QDataSet res= (QDataSet) result.__tojava__( QDataSet.class );
-        return res;
+        if ( result instanceof PyList ) {
+            PyQDataSet qq= (PyQDataSet) new PyQDataSetAdapter().adapt(result);
+            return (QDataSet) qq.__tojava__( QDataSet.class );
+        } else {
+            QDataSet res= (QDataSet) result.__tojava__( QDataSet.class );
+            return res;
+        }
     }
 
 }
