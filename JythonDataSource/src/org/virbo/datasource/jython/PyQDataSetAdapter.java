@@ -5,8 +5,10 @@
 
 package org.virbo.datasource.jython;
 
+import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.adapter.PyObjectAdapter;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -16,12 +18,24 @@ import org.virbo.dataset.QDataSet;
 public class PyQDataSetAdapter implements PyObjectAdapter {
 
     public boolean canAdapt(Object arg0) {
-        return arg0 instanceof QDataSet;
+        return ( arg0 instanceof QDataSet )
+                || ( arg0 instanceof PyList || ((PyList)arg0).isNumberType() );
     }
 
     public PyObject adapt(Object arg0) {
-        return new PyQDataSet((QDataSet) arg0);
+        if ( arg0 instanceof PyList ) {
+            PyList p= (PyList)arg0;
+            return new PyQDataSet( adaptList(p) );
+        } else {
+            return new PyQDataSet((QDataSet) arg0);
+        }
     }
     
+    protected static QDataSet adaptList( PyList p ) {
+        double[] j= new double[ p.size() ];        
+            for ( int i=0; i<p.size(); i++ ) j[i]= ((Number)p.get(i)).doubleValue();
+            QDataSet q= DDataSet.wrap( j );
+            return q;
+    }
     
 }
