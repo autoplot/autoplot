@@ -194,7 +194,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
         tabs.insertTab("metadata", null, mdp, TOOLTIP, 3);
 
-        tabs.insertTab("script", null, new JythonScriptPanel(applicationModel), TOOLTIP, 4 );
+        tabs.insertTab("script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector ), TOOLTIP, 4 );
         
 
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {

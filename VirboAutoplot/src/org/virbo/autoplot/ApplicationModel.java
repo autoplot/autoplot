@@ -996,7 +996,7 @@ public class ApplicationModel {
         String sbookmark = prefs.get("bookmarks", "");
 
         if (sbookmark.equals("") || !sbookmark.startsWith("<")) {
-            String surl = System.getProperty("autoplot.default.bookmarks", "http://www.cottagesystems.com/virbo/apps/autoplot/bookmarks.xml");
+            String surl = System.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
             if (!surl.equals("")) {
                 try {
                     URL url = new URL(surl);
