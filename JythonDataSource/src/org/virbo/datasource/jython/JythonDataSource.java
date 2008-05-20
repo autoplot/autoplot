@@ -31,6 +31,7 @@ public class JythonDataSource extends AbstractDataSource {
         PythonInterpreter interp =  new PythonInterpreter();
         Py.getAdapter().addPostClass( new PyQDataSetAdapter() );
         
+        interp.set( "monitor", mon );
         interp.execfile( JythonDataSource.class.getResource("imports.py").openStream(), "imports.py" );
 
         interp.execfile( new FileInputStream( super.getFile( new NullProgressMonitor() ) ) );

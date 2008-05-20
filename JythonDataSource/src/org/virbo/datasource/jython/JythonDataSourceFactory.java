@@ -80,7 +80,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc) {
         try {
-            Map<String,Object> po= getNames( new URL( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) );
+            Map<String,Object> po= getNames( DataSetURL.getURL( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) );
             List<CompletionContext> result= new ArrayList<CompletionContext>();
             for ( String n: po.keySet() ) {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, n,this, "arg_0" ) );
@@ -95,7 +95,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     public boolean reject(String surl) {
         try {
             if ( surl.contains("?") ) return false;
-            Map<String,Object> po= getNames( new URL( surl ) );
+            Map<String,Object> po= getNames( DataSetURL.getURL(surl) );
             if ( po.get("result")!=null ) return false;
             return true;
         } catch ( IOException e ) {

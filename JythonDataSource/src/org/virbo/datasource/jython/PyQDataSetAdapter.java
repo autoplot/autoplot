@@ -19,7 +19,7 @@ public class PyQDataSetAdapter implements PyObjectAdapter {
 
     public boolean canAdapt(Object arg0) {
         return ( arg0 instanceof QDataSet )
-                || ( arg0 instanceof PyList || ((PyList)arg0).isNumberType() );
+                || ( arg0 instanceof PyList );
     }
 
     public PyObject adapt(Object arg0) {

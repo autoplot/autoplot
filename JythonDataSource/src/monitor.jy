@@ -1,0 +1,22 @@
+from time import sleep;
+from java.lang import System;
+
+n= 100000
+result= zeros( n )
+dep0= zeros( n )
+monitor.setTaskSize( n )
+monitor.started()
+t0= System.currentTimeMillis()
+
+for i in xrange( 0,n ):
+  monitor.setTaskProgress(i)
+  dt= System.currentTimeMillis() - t0
+  d= total( randn( 1000 ) )
+  result[i]= d
+  dep0[i]= i
+monitor.finished()
+
+result.putProperty( 'DEPEND_0', dep0 )
+
+h= histogram( result, -100,100,1 )
+

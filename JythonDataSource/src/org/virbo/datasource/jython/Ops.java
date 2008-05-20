@@ -125,6 +125,7 @@ public class Ops {
      */
     public static QDataSet add(QDataSet ds1, QDataSet ds2) {
         return applyBinaryOp(ds1, ds2, new BinaryOp() {
+
             public double op(double d1, double d2) {
                 return d1 + d2;
             }
@@ -153,27 +154,37 @@ public class Ops {
      * @param ds of Rank N.
      * @return ds of Rank N-1.
      */
-    public static QDataSet magnitude( QDataSet ds ) {
-        int r= ds.rank();
-        QDataSet depn= (QDataSet) ds.property( "DEPEND_"+(r-1) );
-        boolean isCart= false;
-        if ( depn!=null ) {
-            if ( depn.property( QDataSet.COORDINATE_FRAME ) !=null ) {
-                isCart= true;
-            } else if ( "cartesian".equals( depn.property( QDataSet.NAME ) ) ) {
-                isCart= true;
+    public static QDataSet magnitude(QDataSet ds) {
+        int r = ds.rank();
+        QDataSet depn = (QDataSet) ds.property("DEPEND_" + (r - 1));
+        boolean isCart = false;
+        if (depn != null) {
+            if (depn.property(QDataSet.COORDINATE_FRAME) != null) {
+                isCart = true;
+            } else if ("cartesian".equals(depn.property(QDataSet.NAME))) {
+                isCart = true;
             } else {
             }
         }
-        if ( isCart ) {
-            ds= pow( ds, 2 );
-            ds= total( ds, r-1, false );
-            ds= sqrt( ds );
+        if (isCart) {
+            ds = pow(ds, 2);
+            ds = total(ds, r - 1, false);
+            ds = sqrt(ds);
             return ds;
         } else {
             throw new IllegalArgumentException("last dim must have COORDINATE_FRAME property");
         }
 
+    }
+
+    public static double total( QDataSet ds ) {
+        double s=0;
+        QubeDataSetIterator it1 = new QubeDataSetIterator(ds);
+        while ( it1.hasNext() ) {
+            it1.next();
+            s+= getValue( ds, it1 );
+        }
+        return s;
     }
     
     /**
@@ -185,46 +196,46 @@ public class Ops {
      * @param normalize return the average instead of the total.
      * @return
      */
-    public static QDataSet total( QDataSet ds, int dim, boolean normalize ) {
-       int[] qube= DataSetUtil.qubeDims(ds);
-       int[] newQube= DataSetOps.removeElement( qube, dim );
-       QDataSet wds= DataSetUtil.weightsDataSet(ds);
-       DDataSet result= DDataSet.create(newQube);
-       QubeDataSetIterator it1= new QubeDataSetIterator( result );
-       double fill= (Double)wds.property(QDataSet.FILL_VALUE);
-       while ( it1.hasNext() ) {
-           it1.next();
-           int n= ds.length(dim);
-           double s= 0;
-           double w= 0;
-           QubeDataSetIterator it0= new QubeDataSetIterator( ds );
-           for ( int i=0; i<ds.rank(); i++ ) {
-               int ndim= i<dim ? i : i-1;    
-               if (i!=dim) {
-                   it0.setIndexIteratorFactory( i, new QubeDataSetIterator.SingletonIteratorFactory(it1.index(ndim)));
-               } 
-           }
-           while ( it0.hasNext() ) {
-               it0.next();
-               double w1= getValue( wds, it0 ); 
-               s+= w1*getValue( ds, it0 );
-               w+= w1;
-           }
-           putValue( result, it1, w>0 ? s : fill );
-       }
-       
-       return result;
+    public static QDataSet total(QDataSet ds, int dim, boolean normalize) {
+        int[] qube = DataSetUtil.qubeDims(ds);
+        int[] newQube = DataSetOps.removeElement(qube, dim);
+        QDataSet wds = DataSetUtil.weightsDataSet(ds);
+        DDataSet result = DDataSet.create(newQube);
+        QubeDataSetIterator it1 = new QubeDataSetIterator(result);
+        double fill = (Double) wds.property(QDataSet.FILL_VALUE);
+        while (it1.hasNext()) {
+            it1.next();
+            int n = ds.length(dim);
+            double s = 0;
+            double w = 0;
+            QubeDataSetIterator it0 = new QubeDataSetIterator(ds);
+            for (int i = 0; i < ds.rank(); i++) {
+                int ndim = i < dim ? i : i - 1;
+                if (i != dim) {
+                    it0.setIndexIteratorFactory(i, new QubeDataSetIterator.SingletonIteratorFactory(it1.index(ndim)));
+                }
+            }
+            while (it0.hasNext()) {
+                it0.next();
+                double w1 = getValue(wds, it0);
+                s += w1 * getValue(ds, it0);
+                w += w1;
+            }
+            putValue(result, it1, w > 0 ? s : fill);
+        }
+
+        return result;
     }
-    
+
     /**
      * element-wise sqrt.
      * @param ds
      * @return
      */
-    public static QDataSet sqrt( QDataSet ds ) {
-        return pow( ds, 0.5 );
+    public static QDataSet sqrt(QDataSet ds) {
+        return pow(ds, 0.5);
     }
-    
+
     /**
      * element-wise abs.  For vectors, this returns the length of each element.
      * @param ds1
@@ -232,6 +243,7 @@ public class Ops {
      */
     public static QDataSet abs(QDataSet ds1) {
         return applyUnaryOp(ds1, new UnaryOp() {
+
             public double op(double d1) {
                 return Math.abs(d1);
             }
@@ -426,7 +438,7 @@ public class Ops {
      * @param size
      * @return
      */
-    public static QDataSet dindgen(int len0 ) {
+    public static QDataSet dindgen(int len0) {
         int size = len0;
         double[] back = new double[size];
         for (int i = 0; i < size; i++) {
@@ -450,7 +462,7 @@ public class Ops {
         return DDataSet.wrap(back, 2, len0, len1, 1);
     }
 
-     /**
+    /**
      * returns rank 3 dataset with values increasing
      * @param len0
      * @param len1
@@ -467,12 +479,34 @@ public class Ops {
     }
 
     /**
+     * return a rank 1 dataset with <tt>len0</tt> linearly-spaced values, the first
+     * is min and the last is max. 
+     * @param min
+     * @param max
+     * @param len0
+     * @return
+     */
+    public static QDataSet linspace(double min, double max, int len0) {
+        double[] back = new double[len0];
+        if (len0 < 1) {
+            return DDataSet.wrap(new double[]{max});
+        } else {
+            double delta = (max - min) / (len0 - 1);
+            for (int i = 0; i < len0; i++) {
+                back[i] = min + i * delta;
+            }
+            return DDataSet.wrap(back, 1, len0, 1, 1);
+        }
+    }
+    
+
+    /**
      * returns rank 1 dataset with value
      * @param val fill the dataset with this value.
      * @param len0
      * @return
      */
-    public static QDataSet replicate( double val, int len0 ) {
+    public static QDataSet replicate(double val, int len0) {
         int size = len0;
         double[] back = new double[size];
         for (int i = 0; i < size; i++) {
@@ -488,7 +522,7 @@ public class Ops {
      * @param len1
      * @return
      */
-    public static QDataSet replicate( double val, int len0, int len1) {
+    public static QDataSet replicate(double val, int len0, int len1) {
         int size = len0 * len1;
         double[] back = new double[size];
         for (int i = 0; i < size; i++) {
@@ -497,7 +531,7 @@ public class Ops {
         return DDataSet.wrap(back, 2, len0, len1, 1);
     }
 
-     /**
+    /**
      * returns rank 3 dataset with filled with value.
      * @param val fill the dataset with this value.
      * @param len0
@@ -505,13 +539,67 @@ public class Ops {
      * @param len2
      * @return
      */
-    public static QDataSet replicate( double val, int len0, int len1, int len2) {
+    public static QDataSet replicate(double val, int len0, int len1, int len2) {
         int size = len0 * len1 * len2;
         double[] back = new double[size];
         for (int i = 0; i < size; i++) {
             back[i] = val;
         }
         return DDataSet.wrap(back, 3, len0, len1, len2);
+    }
+
+    /**
+     * return new dataset filled with zeros.
+     * @param len0
+     * @return
+     */
+    public static QDataSet zeros(int len0) {
+        return replicate(0.0, len0);
+    }
+
+    /**
+     * return new dataset filled with zeros.
+     * @param len0
+     * @return
+     */
+    public static QDataSet zeros(int len0, int len1) {
+        return replicate(0.0, len0, len1);
+    }
+
+    /**
+     * return new dataset filled with zeros.
+     * @param len0
+     * @return
+     */
+    public static QDataSet zeros(int len0, int len1, int len2) {
+        return replicate(0.0, len0, len1, len2);
+    }
+
+    /**
+     * return new dataset filled with ones.
+     * @param len0
+     * @return
+     */
+    public static QDataSet ones(int len0) {
+        return replicate(1.0, len0);
+    }
+
+    /**
+     * return new dataset filled with ones.
+     * @param len0
+     * @return
+     */
+    public static QDataSet ones(int len0, int len1) {
+        return replicate(1.0, len0, len1);
+    }
+
+    /**
+     * return new dataset filled with ones.
+     * @param len0
+     * @return
+     */
+    public static QDataSet ones(int len0, int len1, int len2) {
+        return replicate(1.0, len0, len1, len2);
     }
 
     /**
@@ -522,12 +610,84 @@ public class Ops {
      * @return 
      * @throws IllegalArgumentException if the two datasets don't have the same rank.
      */
-    public static QDataSet join( QDataSet ds1, QDataSet ds2 ) {
-        DDataSet result= DDataSet.copy(ds1);
-        result.join( DDataSet.copy(ds2) );
+    public static QDataSet join(QDataSet ds1, QDataSet ds2) {
+        DDataSet result = DDataSet.copy(ds1);
+        result.join(DDataSet.copy(ds2));
+        return result;
+    }
+
+    /**
+     * return returns a rank 1 dataset of uniform numbers from [0,1].
+     * @param len0
+     * @return
+     */
+    private static QDataSet rand( int[] qube, Random rand ) {
+        DDataSet result= DDataSet.create(qube);
+        QubeDataSetIterator it= new QubeDataSetIterator(result);
+        while ( it.hasNext() ) {
+            it.next();
+            putValue( result, it, rand.nextDouble() );
+        }
         return result;
     }
     
+    /**
+     * return returns a rank 1 dataset of random numbers of a guassian (normal) distribution.
+     * @param len0
+     * @return
+     */
+    private static QDataSet randn( int[] qube, Random rand ) {
+        DDataSet result= DDataSet.create(qube);
+        QubeDataSetIterator it= new QubeDataSetIterator(result);
+        while ( it.hasNext() ) {
+            it.next();
+            putValue( result, it, rand.nextGaussian() );
+        }
+        return result;
+    }
+    
+    /**
+     * return returns a rank 1 dataset of random uniform numbers from [0,1].
+     */
+    public static QDataSet rand( int len0 ) {
+        return rand( new int[] { len0 }, new Random() );
+    }
+
+    /**
+     * return returns a rank 2 dataset of random uniform numbers from [0,1].
+     */
+    public static QDataSet rand( int len0, int len1 ) {
+        return rand( new int[] { len0, len1 }, new Random() );
+    }
+    
+    /**
+     * return returns a rank 3 dataset of random uniform numbers from [0,1].
+     */
+    public static QDataSet rand( int len0, int len1, int len2 ) {
+        return rand( new int[] { len0, len1, len2 }, new Random() );
+    }
+    
+    /**
+     * return returns a rank 1 dataset of random numbers of a guassian (normal) distribution.
+     */
+    public static QDataSet randn( int len0 ) {
+        return randn( new int[] { len0 }, new Random() );
+    }
+
+    /**
+     * return returns a rank 2 dataset of random numbers of a guassian (normal) distribution.
+     */
+    public static QDataSet randn( int len0, int len1 ) {
+        return randn( new int[] { len0, len1 }, new Random() );
+    }
+    
+    /**
+     * return returns a rank 3 dataset of random numbers of a guassian (normal) distribution.
+     */
+    public static QDataSet randn( int len0, int len1, int len2 ) {
+        return randn( new int[] { len0, len1, len2 }, new Random() );
+    }
+
     /**
      * returns a rank 1 dataset of random numbers of a guassian (normal) distribution.
      * System.currentTimeMillis() may be used for the seed.
@@ -675,39 +835,52 @@ public class Ops {
         if (u == null) {
             u = Units.dimensionless;
         }
-        ComplexArray.Double cc= FFTUtil.fft(fft, VectorDataSetAdapter.create(ds), u);
-        DDataSet result= DDataSet.createRank2( ds.length(), 2 );
-        for ( int i=0; i<ds.length(); i++ ) {
-            result.putValue(i,0,cc.getReal(i));
-            result.putValue(i,1,cc.getImag(i));
+        ComplexArray.Double cc = FFTUtil.fft(fft, VectorDataSetAdapter.create(ds), u);
+        DDataSet result = DDataSet.createRank2(ds.length(), 2);
+        for (int i = 0; i < ds.length(); i++) {
+            result.putValue(i, 0, cc.getReal(i));
+            result.putValue(i, 1, cc.getImag(i));
         }
-        
-        QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
-        double cadence= dep0==null ? 1.0 : DataSetUtil.guessCadence(dep0);
-        
-        double[] tags= FFTUtil.getFrequencyDomainTags( cadence, ds.length() );
-        result.putProperty( QDataSet.DEPEND_0, DDataSet.wrap(tags) );
-        
-        EnumerationUnits u1= EnumerationUnits.create("complexCoordinates");
-        DDataSet dep1= DDataSet.createRank1( 2 );
-        dep1.putValue( 0, u1.createDatum("real").doubleValue(u1) );
-        dep1.putValue( 1, u1.createDatum("imag").doubleValue(u1) );
-        dep1.putProperty( QDataSet.COORDINATE_FRAME, "ComplexNumber" );
-        dep1.putProperty( QDataSet.UNITS, u1 );
-        
-        result.putProperty( QDataSet.DEPEND_1, dep1 );
+
+        QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
+        double cadence = dep0 == null ? 1.0 : DataSetUtil.guessCadence(dep0);
+
+        double[] tags = FFTUtil.getFrequencyDomainTags(cadence, ds.length());
+        result.putProperty(QDataSet.DEPEND_0, DDataSet.wrap(tags));
+
+        EnumerationUnits u1 = EnumerationUnits.create("complexCoordinates");
+        DDataSet dep1 = DDataSet.createRank1(2);
+        dep1.putValue(0, u1.createDatum("real").doubleValue(u1));
+        dep1.putValue(1, u1.createDatum("imag").doubleValue(u1));
+        dep1.putProperty(QDataSet.COORDINATE_FRAME, "ComplexNumber");
+        dep1.putProperty(QDataSet.UNITS, u1);
+
+        result.putProperty(QDataSet.DEPEND_1, dep1);
         return result;
     }
-    
+
     /**
      * perform ffts on the rank 1 dataset to make a rank2 spectrogram.
      * @param ds rank 1 dataset
      * @param len the window length
      * @return rank 2 dataset.
      */
-    public static QDataSet fftWindow( QDataSet ds, int len ) {
-        TableDataSet result= WaveformToSpectrum.getTableDataSet( VectorDataSetAdapter.create(ds), len) ;
+    public static QDataSet fftWindow(QDataSet ds, int len) {
+        TableDataSet result = WaveformToSpectrum.getTableDataSet(VectorDataSetAdapter.create(ds), len);
         return DataSetAdapter.create(result);
+    }
+    
+    /**
+     * returns histogram of dataset, the number of points falling in each bin.
+     * 
+     * @param ds
+     * @param min
+     * @param max
+     * @param binSize
+     * @return
+     */
+    public static QDataSet histogram( QDataSet ds, double min, double max, double binSize ) {
+        return DataSetOps.histogram(ds, min, max, binSize );
     }
     
     public static double PI = Math.PI;
