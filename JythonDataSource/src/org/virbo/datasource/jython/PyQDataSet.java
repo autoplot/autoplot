@@ -6,6 +6,7 @@ package org.virbo.datasource.jython;
 
 import org.python.core.Py;
 import org.python.core.PyJavaInstance;
+import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.core.PySequence;
 import org.python.core.PySlice;
@@ -357,6 +358,8 @@ public class PyQDataSet extends PyJavaInstance {
                     putValue( that, it, d );
                 }
                 return that;
+            } else if ( arg0.isSequenceType() ) {
+                return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
             } else {
                 throw Py.TypeError("unable to coerce: " + arg0);
             }
