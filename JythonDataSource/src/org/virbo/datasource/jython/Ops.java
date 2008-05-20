@@ -426,8 +426,13 @@ public class Ops {
      * @param size
      * @return
      */
-    public static QDataSet dindgen(int size) {
-        return new IndexGenDataSet(size);
+    public static QDataSet dindgen(int len0 ) {
+        int size = len0;
+        double[] back = new double[size];
+        for (int i = 0; i < size; i++) {
+            back[i] = i;
+        }
+        return DDataSet.wrap(back, 1, len0, 1, 1);
     }
 
     /**
@@ -461,28 +466,68 @@ public class Ops {
         return DDataSet.wrap(back, 3, len0, len1, len2);
     }
 
-    public static QDataSet findgen(int size) {
-        return new IndexGenDataSet(size);
+    /**
+     * returns rank 1 dataset with value
+     * @param val fill the dataset with this value.
+     * @param len0
+     * @return
+     */
+    public static QDataSet replicate( double val, int len0 ) {
+        int size = len0;
+        double[] back = new double[size];
+        for (int i = 0; i < size; i++) {
+            back[i] = val;
+        }
+        return DDataSet.wrap(back, 1, len0, 1, 1);
     }
 
-    public static QDataSet findgen(int len0, int len1) {
+    /**
+     * returns rank 2 dataset filled with value
+     * @param val fill the dataset with this value.
+     * @param len0
+     * @param len1
+     * @return
+     */
+    public static QDataSet replicate( double val, int len0, int len1) {
         int size = len0 * len1;
         double[] back = new double[size];
         for (int i = 0; i < size; i++) {
-            back[i] = i;
+            back[i] = val;
         }
         return DDataSet.wrap(back, 2, len0, len1, 1);
     }
 
-    public static QDataSet findgen(int len0, int len1, int len2) {
+     /**
+     * returns rank 3 dataset with filled with value.
+     * @param val fill the dataset with this value.
+     * @param len0
+     * @param len1
+     * @param len2
+     * @return
+     */
+    public static QDataSet replicate( double val, int len0, int len1, int len2) {
         int size = len0 * len1 * len2;
         double[] back = new double[size];
         for (int i = 0; i < size; i++) {
-            back[i] = i;
+            back[i] = val;
         }
         return DDataSet.wrap(back, 3, len0, len1, len2);
     }
 
+    /**
+     * joins the two datasets together, appending the on the zeroth dimension.
+     * The two datasets must be QUBES have similar geometry on the higher dimensions.
+     * @param ds1
+     * @param ds2
+     * @return 
+     * @throws IllegalArgumentException if the two datasets don't have the same rank.
+     */
+    public static QDataSet join( QDataSet ds1, QDataSet ds2 ) {
+        DDataSet result= DDataSet.copy(ds1);
+        result.join( DDataSet.copy(ds2) );
+        return result;
+    }
+    
     /**
      * returns a rank 1 dataset of random numbers of a guassian (normal) distribution.
      * System.currentTimeMillis() may be used for the seed.
