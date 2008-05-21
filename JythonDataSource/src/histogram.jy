@@ -1,0 +1,5 @@
+data= rand(400000)
+x= data[1:] - data[:-1]
+result= histogram(x,-1,1,0.1 )
+result2= histogram(data,-1,1,0.1 )
+result3= histogram( randn(400000), -10, 10, 0.1 )
