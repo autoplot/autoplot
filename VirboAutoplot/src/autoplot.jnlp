@@ -31,7 +31,7 @@
               href="http://java.sun.com/products/autodl/j2se" > 
         </j2se>
         
-        <property name="autoplot.default.bookmarks" value="http://autoplot.org/demos.xml" />
+        <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="VirboAutoplot.jar" />
         
