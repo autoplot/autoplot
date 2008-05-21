@@ -48,7 +48,6 @@ public class JythonDataSource extends AbstractDataSource {
             res= (QDataSet) result.__tojava__( QDataSet.class );
             
         }
-        System.err.println(res);
         return res;
     }
 
