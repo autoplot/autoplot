@@ -196,10 +196,28 @@ public class PyQDataSet extends PyJavaInstance {
         if (o == null || o == Py.NoConversion) {
             if (arg0 instanceof PySlice) {
                 PySlice slice = (PySlice) arg0;
-                int start = (Integer) slice.start.__tojava__(Integer.class);
-                int stop = (Integer) slice.stop.__tojava__(Integer.class);
-                QDataSet result = DataSetOps.trim(ds, start, stop - start);
+                QubeDataSetIterator iter = new QubeDataSetIterator(ds);
+                QubeDataSetIterator.DimensionIteratorFactory fit;
+                Integer start = (Integer) slice.start.__tojava__(Integer.class);
+                Integer stop = (Integer) slice.stop.__tojava__(Integer.class);
+                Integer step = (Integer) slice.step.__tojava__(Integer.class);
+                fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
+                iter.setIndexIteratorFactory(0, fit);
+
+                int qube[] = new int[iter.rank()];
+                for (int i = 0; i < iter.rank(); i++) {
+                    qube[i] = iter.length(i);
+                }
+                DDataSet result = DDataSet.create(qube);
+                QubeDataSetIterator resultIter= new QubeDataSetIterator(result);
+                while (iter.hasNext()) {
+                    iter.next();
+                    double d = getValue(ds, iter);
+                    resultIter.next();
+                    putValue(result, resultIter, d);
+                }
                 return new PyQDataSet(result);
+
             } else if (arg0.isNumberType()) {
                 int idx = (Integer) arg0.__tojava__(Integer.class);
                 return Py.java2py(ds.value(idx));
@@ -233,11 +251,12 @@ public class PyQDataSet extends PyJavaInstance {
                     qube[i] = iter.length(i);
                 }
                 DDataSet result = DDataSet.create(qube);
+                QubeDataSetIterator resultIter= new QubeDataSetIterator(result);
                 while (iter.hasNext()) {
                     iter.next();
                     double d = getValue(ds, iter);
-                    iter.next();
-                    putValue(result, iter, d);
+                    resultIter.next();
+                    putValue(result, resultIter, d);
                 }
                 return new PyQDataSet(result);
             } else {
