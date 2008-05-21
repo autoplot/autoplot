@@ -87,7 +87,7 @@ public class QubeDataSetIterator {
             int stop1 = stop == null ? length : stop;
             int step1 = step == null ? 1 : step;
             if ( start1 < 0) start1 = length - start1;
-            if ( stop1 < 0) stop1 = length - stop1;
+            if ( stop1 < 0) stop1 = length + stop1;
             
             return new StartStopStepIterator(start1, stop1, step1, start==null && stop==null && step==null );
         }
