@@ -41,12 +41,15 @@ public class JythonDataSource extends AbstractDataSource {
         
         PyObject result= interp.eval( expr );
         
+        QDataSet res;
         if ( result instanceof PyList ) {
-            return  PyQDataSetAdapter.adaptList((PyList)result);
+            res=   PyQDataSetAdapter.adaptList((PyList)result);
         } else {
-            QDataSet res= (QDataSet) result.__tojava__( QDataSet.class );
-            return res;
+            res= (QDataSet) result.__tojava__( QDataSet.class );
+            
         }
+        System.err.println(res);
+        return res;
     }
 
 }
