@@ -19,7 +19,6 @@ import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.IndexGenDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
@@ -601,6 +600,7 @@ public class Ops {
     public static QDataSet ones(int len0, int len1, int len2) {
         return replicate(1.0, len0, len1, len2);
     }
+    
 
     /**
      * joins the two datasets together, appending the on the zeroth dimension.
@@ -769,6 +769,49 @@ public class Ops {
     }
 
     /**
+     * element-wise atan.
+     * @param ds
+     * @return
+     */
+    public static QDataSet atan( QDataSet ds ) {
+        return applyUnaryOp( ds,  new UnaryOp() {
+            public double op( double a ) {
+                return Math.atan( a );
+            }
+        } );
+    }
+
+    /**
+     * element-wise atan2, 4-quadrant atan.
+     * @param dsy
+     * @param dsx
+     * @return
+     */
+    public static QDataSet atan2( QDataSet dsy, QDataSet dsx ) {
+        return applyBinaryOp( dsy, dsx, new BinaryOp() {
+            public double op( double y, double x ) {
+                return Math.atan2( y, x );
+            }
+        } );
+    }
+    
+    public static QDataSet toRadians( QDataSet ds ) {
+        return applyUnaryOp( ds, new UnaryOp() {
+            public double op( double y ) {
+                return y * Math.PI / 180.;
+            }
+        } );
+    }
+
+    public static QDataSet toDegrees( QDataSet ds ) {
+        return applyUnaryOp( ds, new UnaryOp() {
+            public double op( double y ) {
+                return y * 180 / Math.PI;
+            }
+        } );
+    }
+
+    /**
      * returns a dataset containing the indeces of where the dataset is non-zero.
      * For a rank 1 dataset, returns a rank 1 dataset with indeces for the values.
      * For a higher rank dataset, returns a rank 2 qube dataset with ds.rank()
@@ -882,6 +925,120 @@ public class Ops {
     public static QDataSet histogram( QDataSet ds, double min, double max, double binSize ) {
         return DataSetOps.histogram(ds, min, max, binSize );
     }
+    
+    /**
+     * returns outerProduct of two rank 1 datasets, a rank 2 dataset with 
+     * elements R[i,j]= ds1[i] * ds2[j].
+     * 
+     * @param ds1
+     * @param ds2
+     * @return
+     */
+    public static QDataSet outerProduct( QDataSet ds1, QDataSet ds2 ) {
+        DDataSet result= DDataSet.createRank2( ds1.length(), ds2.length() );
+        for ( int i=0; i<ds1.length(); i++ ) {
+            for ( int j=0; j<ds2.length(); j++ ) {
+                result.putValue( i, j, ds1.value(i) * ds2.value(j) );
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * returns the floating point index of each element of vv within the monotonically
+     * increasing dataset uu.  The result dataset will have the same geometry
+     * as vv.  The result will be negative when the element of vv is below the smallest 
+     * element of uu.  The result will be greater than or equal to the length of 
+     * uu minus one when it is greater than all elements.
+     *
+     * @param uu rank 1 monotonically increasing dataset.
+     * @param vv rank N dataset with values in the same physical dimension as uu.
+     * @return rank N dataset with the same geometry as vv.
+     */
+    public static QDataSet findex( QDataSet u, QDataSet v ) {
+        if ( ! DataSetUtil.isMonotonic(u) ) {
+            throw new IllegalArgumentException("u must be monotonic");
+        }
+        DDataSet result= DDataSet.create( DataSetUtil.qubeDims(v) );
+        QubeDataSetIterator it= new QubeDataSetIterator(v);
+        int ic0=0;
+        int ic1=1;
+        double uc0= u.value( ic0 );
+        double uc1= u.value( ic1 );
+        int n= u.length();
+        while ( it.hasNext() ) {
+            it.next();
+            double d= getValue( v, it );
+            // TODO: optimize by only doing binary search below or above ic0&ic1.
+            if ( uc0 <= d && d <= uc1 ) {
+                double ff= ( d - uc0 ) / ( uc1-uc0); // may be 1.0
+                putValue( result, it, ic0 + ff );
+            } else {
+                int index = DataSetUtil.binarySearch( u, d, 0, u.length() - 1 );
+                if ( index == -1) {
+                    index = 0; //insertion point is 0
+                    ic0= 0;
+                    ic1= 1;
+                } else if ( index < (-n) ) {
+                    ic0= n-2;
+                    ic1= n-1;
+                } else if ( index < 0) {
+                    ic1= ~index;  // usually this is the case
+                    ic0= ic1-1;
+                } else {
+                    ic0= index;
+                    ic1= index+1;
+                }
+                uc0= u.value( ic0 );
+                uc1= u.value( ic1 );
+                double ff= ( d - uc0 ) / ( uc1-uc0); // may be 1.0
+                putValue( result, it, ic0 + ff );
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * interpolate values from rank 1 dataset vv using fractional indeces 
+     * in rank N findex.
+     * 
+     * @param vv rank 1 dataset.
+     * @param findex rank N dataset of fractional indeces.
+     * @return
+     */
+    public static QDataSet interpolate( QDataSet vv, QDataSet findex  ) {
+        DDataSet result= DDataSet.create( DataSetUtil.qubeDims(findex) );
+        QubeDataSetIterator it= new QubeDataSetIterator(findex);
+        int ic0, ic1;
+        int n= vv.length();
+        
+        while ( it.hasNext() ) {
+            it.next();
+            
+            double ff= getValue( findex, it );
+            
+            if ( ff<0 ) {
+                ic0= 0; // extrapolate
+                ic1= 1;
+            } else if ( ff>=n-1 ) {
+                ic0= n-2; // extrapolate
+                ic1= n-1;
+            } else {
+                ic0= (int)Math.floor(ff);
+                ic1= ic0+1;
+            }
+            
+            double alpha= ff-ic0;
+            
+            double vv0= vv.value( ic0 );
+            double vv1= vv.value( ic1 );
+
+            putValue( result, it, vv0 + alpha * ( vv1-vv0 ) );
+            
+        }
+        return result;        
+    }
+    
     
     public static double PI = Math.PI;
     public static double E = Math.E;
