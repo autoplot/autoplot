@@ -1,0 +1,11 @@
+xx= dindgen( 20 ) + randomn( 0, 20 ) / 10.0
+yy= sin( dindgen( 20 )  )
+yy.putProperty( 'DEPEND_0', xx )
+
+ixx= outerProduct( linspace( -15, 15, 1000 ), ones(1000 ) )
+iyy= outerProduct( ones(1000 ), linspace( -15, 15, 1000 ) )
+irr= sqrt( ixx*ixx + iyy*iyy )
+
+iff= findex( xx, irr )
+iss= interpolate( yy, iff )
+
