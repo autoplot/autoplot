@@ -11,9 +11,9 @@ import edu.uiowa.physics.pw.das.math.fft.ComplexArray;
 import edu.uiowa.physics.pw.das.math.fft.FFTUtil;
 import edu.uiowa.physics.pw.das.math.fft.GeneralFFT;
 import edu.uiowa.physics.pw.das.math.fft.WaveformToSpectrum;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
+import org.python.core.PyFloat;
+import org.python.core.PyFunction;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetIterator;
@@ -176,16 +176,16 @@ public class Ops {
 
     }
 
-    public static double total( QDataSet ds ) {
-        double s=0;
+    public static double total(QDataSet ds) {
+        double s = 0;
         QubeDataSetIterator it1 = new QubeDataSetIterator(ds);
-        while ( it1.hasNext() ) {
+        while (it1.hasNext()) {
             it1.next();
-            s+= getValue( ds, it1 );
+            s += getValue(ds, it1);
         }
         return s;
     }
-    
+
     /**
      * reduce the dataset's rank by totalling all the elements along a dimension.
      * Only QUBEs are supported presently.
@@ -497,7 +497,6 @@ public class Ops {
             return DDataSet.wrap(back, 1, len0, 1, 1);
         }
     }
-    
 
     /**
      * returns rank 1 dataset with value
@@ -600,7 +599,6 @@ public class Ops {
     public static QDataSet ones(int len0, int len1, int len2) {
         return replicate(1.0, len0, len1, len2);
     }
-    
 
     /**
      * joins the two datasets together, appending the on the zeroth dimension.
@@ -621,71 +619,71 @@ public class Ops {
      * @param len0
      * @return
      */
-    private static QDataSet rand( int[] qube, Random rand ) {
-        DDataSet result= DDataSet.create(qube);
-        QubeDataSetIterator it= new QubeDataSetIterator(result);
-        while ( it.hasNext() ) {
+    private static QDataSet rand(int[] qube, Random rand) {
+        DDataSet result = DDataSet.create(qube);
+        QubeDataSetIterator it = new QubeDataSetIterator(result);
+        while (it.hasNext()) {
             it.next();
-            putValue( result, it, rand.nextDouble() );
+            putValue(result, it, rand.nextDouble());
         }
         return result;
     }
-    
+
     /**
      * return returns a rank 1 dataset of random numbers of a guassian (normal) distribution.
      * @param len0
      * @return
      */
-    private static QDataSet randn( int[] qube, Random rand ) {
-        DDataSet result= DDataSet.create(qube);
-        QubeDataSetIterator it= new QubeDataSetIterator(result);
-        while ( it.hasNext() ) {
+    private static QDataSet randn(int[] qube, Random rand) {
+        DDataSet result = DDataSet.create(qube);
+        QubeDataSetIterator it = new QubeDataSetIterator(result);
+        while (it.hasNext()) {
             it.next();
-            putValue( result, it, rand.nextGaussian() );
+            putValue(result, it, rand.nextGaussian());
         }
         return result;
     }
-    
+
     /**
      * return returns a rank 1 dataset of random uniform numbers from [0,1].
      */
-    public static QDataSet rand( int len0 ) {
-        return rand( new int[] { len0 }, new Random() );
+    public static QDataSet rand(int len0) {
+        return rand(new int[]{len0}, new Random());
     }
 
     /**
      * return returns a rank 2 dataset of random uniform numbers from [0,1].
      */
-    public static QDataSet rand( int len0, int len1 ) {
-        return rand( new int[] { len0, len1 }, new Random() );
+    public static QDataSet rand(int len0, int len1) {
+        return rand(new int[]{len0, len1}, new Random());
     }
-    
+
     /**
      * return returns a rank 3 dataset of random uniform numbers from [0,1].
      */
-    public static QDataSet rand( int len0, int len1, int len2 ) {
-        return rand( new int[] { len0, len1, len2 }, new Random() );
+    public static QDataSet rand(int len0, int len1, int len2) {
+        return rand(new int[]{len0, len1, len2}, new Random());
     }
-    
+
     /**
      * return returns a rank 1 dataset of random numbers of a guassian (normal) distribution.
      */
-    public static QDataSet randn( int len0 ) {
-        return randn( new int[] { len0 }, new Random() );
+    public static QDataSet randn(int len0) {
+        return randn(new int[]{len0}, new Random());
     }
 
     /**
      * return returns a rank 2 dataset of random numbers of a guassian (normal) distribution.
      */
-    public static QDataSet randn( int len0, int len1 ) {
-        return randn( new int[] { len0, len1 }, new Random() );
+    public static QDataSet randn(int len0, int len1) {
+        return randn(new int[]{len0, len1}, new Random());
     }
-    
+
     /**
      * return returns a rank 3 dataset of random numbers of a guassian (normal) distribution.
      */
-    public static QDataSet randn( int len0, int len1, int len2 ) {
-        return randn( new int[] { len0, len1, len2 }, new Random() );
+    public static QDataSet randn(int len0, int len1, int len2) {
+        return randn(new int[]{len0, len1, len2}, new Random());
     }
 
     /**
@@ -773,12 +771,13 @@ public class Ops {
      * @param ds
      * @return
      */
-    public static QDataSet atan( QDataSet ds ) {
-        return applyUnaryOp( ds,  new UnaryOp() {
-            public double op( double a ) {
-                return Math.atan( a );
+    public static QDataSet atan(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+
+            public double op(double a) {
+                return Math.atan(a);
             }
-        } );
+        });
     }
 
     /**
@@ -787,28 +786,31 @@ public class Ops {
      * @param dsx
      * @return
      */
-    public static QDataSet atan2( QDataSet dsy, QDataSet dsx ) {
-        return applyBinaryOp( dsy, dsx, new BinaryOp() {
-            public double op( double y, double x ) {
-                return Math.atan2( y, x );
+    public static QDataSet atan2(QDataSet dsy, QDataSet dsx) {
+        return applyBinaryOp(dsy, dsx, new BinaryOp() {
+
+            public double op(double y, double x) {
+                return Math.atan2(y, x);
             }
-        } );
-    }
-    
-    public static QDataSet toRadians( QDataSet ds ) {
-        return applyUnaryOp( ds, new UnaryOp() {
-            public double op( double y ) {
-                return y * Math.PI / 180.;
-            }
-        } );
+        });
     }
 
-    public static QDataSet toDegrees( QDataSet ds ) {
-        return applyUnaryOp( ds, new UnaryOp() {
-            public double op( double y ) {
+    public static QDataSet toRadians(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+
+            public double op(double y) {
+                return y * Math.PI / 180.;
+            }
+        });
+    }
+
+    public static QDataSet toDegrees(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+
+            public double op(double y) {
                 return y * 180 / Math.PI;
             }
-        } );
+        });
     }
 
     /**
@@ -912,7 +914,7 @@ public class Ops {
         TableDataSet result = WaveformToSpectrum.getTableDataSet(VectorDataSetAdapter.create(ds), len);
         return DataSetAdapter.create(result);
     }
-    
+
     /**
      * returns histogram of dataset, the number of points falling in each bin.
      * 
@@ -922,10 +924,10 @@ public class Ops {
      * @param binSize
      * @return
      */
-    public static QDataSet histogram( QDataSet ds, double min, double max, double binSize ) {
-        return DataSetOps.histogram(ds, min, max, binSize );
+    public static QDataSet histogram(QDataSet ds, double min, double max, double binSize) {
+        return DataSetOps.histogram(ds, min, max, binSize);
     }
-    
+
     /**
      * returns outerProduct of two rank 1 datasets, a rank 2 dataset with 
      * elements R[i,j]= ds1[i] * ds2[j].
@@ -934,16 +936,16 @@ public class Ops {
      * @param ds2
      * @return
      */
-    public static QDataSet outerProduct( QDataSet ds1, QDataSet ds2 ) {
-        DDataSet result= DDataSet.createRank2( ds1.length(), ds2.length() );
-        for ( int i=0; i<ds1.length(); i++ ) {
-            for ( int j=0; j<ds2.length(); j++ ) {
-                result.putValue( i, j, ds1.value(i) * ds2.value(j) );
+    public static QDataSet outerProduct(QDataSet ds1, QDataSet ds2) {
+        DDataSet result = DDataSet.createRank2(ds1.length(), ds2.length());
+        for (int i = 0; i < ds1.length(); i++) {
+            for (int j = 0; j < ds2.length(); j++) {
+                result.putValue(i, j, ds1.value(i) * ds2.value(j));
             }
         }
         return result;
     }
-    
+
     /**
      * returns the floating point index of each element of vv within the monotonically
      * increasing dataset uu.  The result dataset will have the same geometry
@@ -955,49 +957,53 @@ public class Ops {
      * @param vv rank N dataset with values in the same physical dimension as uu.
      * @return rank N dataset with the same geometry as vv.
      */
-    public static QDataSet findex( QDataSet u, QDataSet v ) {
-        if ( ! DataSetUtil.isMonotonic(u) ) {
+    public static QDataSet findex(QDataSet u, QDataSet v) {
+        if (!DataSetUtil.isMonotonic(u)) {
             throw new IllegalArgumentException("u must be monotonic");
         }
-        DDataSet result= DDataSet.create( DataSetUtil.qubeDims(v) );
-        QubeDataSetIterator it= new QubeDataSetIterator(v);
-        int ic0=0;
-        int ic1=1;
-        double uc0= u.value( ic0 );
-        double uc1= u.value( ic1 );
-        int n= u.length();
-        while ( it.hasNext() ) {
+        DDataSet result = DDataSet.create(DataSetUtil.qubeDims(v));
+        QubeDataSetIterator it = new QubeDataSetIterator(v);
+        int ic0 = 0;
+        int ic1 = 1;
+        double uc0 = u.value(ic0);
+        double uc1 = u.value(ic1);
+        int n = u.length();
+        while (it.hasNext()) {
             it.next();
-            double d= getValue( v, it );
+            double d = getValue(v, it);
             // TODO: optimize by only doing binary search below or above ic0&ic1.
-            if ( uc0 <= d && d <= uc1 ) {
-                double ff= ( d - uc0 ) / ( uc1-uc0); // may be 1.0
-                putValue( result, it, ic0 + ff );
+            if (uc0 <= d && d <= uc1) {
+                double ff = (d - uc0) / (uc1 - uc0); // may be 1.0
+
+                putValue(result, it, ic0 + ff);
             } else {
-                int index = DataSetUtil.binarySearch( u, d, 0, u.length() - 1 );
-                if ( index == -1) {
+                int index = DataSetUtil.binarySearch(u, d, 0, u.length() - 1);
+                if (index == -1) {
                     index = 0; //insertion point is 0
-                    ic0= 0;
-                    ic1= 1;
-                } else if ( index < (-n) ) {
-                    ic0= n-2;
-                    ic1= n-1;
-                } else if ( index < 0) {
-                    ic1= ~index;  // usually this is the case
-                    ic0= ic1-1;
+
+                    ic0 = 0;
+                    ic1 = 1;
+                } else if (index < (-n)) {
+                    ic0 = n - 2;
+                    ic1 = n - 1;
+                } else if (index < 0) {
+                    ic1 = ~index;  // usually this is the case
+
+                    ic0 = ic1 - 1;
                 } else {
-                    ic0= index;
-                    ic1= index+1;
+                    ic0 = index;
+                    ic1 = index + 1;
                 }
-                uc0= u.value( ic0 );
-                uc1= u.value( ic1 );
-                double ff= ( d - uc0 ) / ( uc1-uc0); // may be 1.0
-                putValue( result, it, ic0 + ff );
+                uc0 = u.value(ic0);
+                uc1 = u.value(ic1);
+                double ff = (d - uc0) / (uc1 - uc0); // may be 1.0
+
+                putValue(result, it, ic0 + ff);
             }
         }
         return result;
     }
-    
+
     /**
      * interpolate values from rank 1 dataset vv using fractional indeces 
      * in rank N findex.
@@ -1006,39 +1012,69 @@ public class Ops {
      * @param findex rank N dataset of fractional indeces.
      * @return
      */
-    public static QDataSet interpolate( QDataSet vv, QDataSet findex  ) {
-        DDataSet result= DDataSet.create( DataSetUtil.qubeDims(findex) );
-        QubeDataSetIterator it= new QubeDataSetIterator(findex);
+    public static QDataSet interpolate(QDataSet vv, QDataSet findex) {
+        DDataSet result = DDataSet.create(DataSetUtil.qubeDims(findex));
+        QubeDataSetIterator it = new QubeDataSetIterator(findex);
         int ic0, ic1;
-        int n= vv.length();
-        
-        while ( it.hasNext() ) {
-            it.next();
-            
-            double ff= getValue( findex, it );
-            
-            if ( ff<0 ) {
-                ic0= 0; // extrapolate
-                ic1= 1;
-            } else if ( ff>=n-1 ) {
-                ic0= n-2; // extrapolate
-                ic1= n-1;
-            } else {
-                ic0= (int)Math.floor(ff);
-                ic1= ic0+1;
-            }
-            
-            double alpha= ff-ic0;
-            
-            double vv0= vv.value( ic0 );
-            double vv1= vv.value( ic1 );
+        int n = vv.length();
 
-            putValue( result, it, vv0 + alpha * ( vv1-vv0 ) );
-            
+        while (it.hasNext()) {
+            it.next();
+
+            double ff = getValue(findex, it);
+
+            if (ff < 0) {
+                ic0 = 0; // extrapolate
+
+                ic1 = 1;
+            } else if (ff >= n - 1) {
+                ic0 = n - 2; // extrapolate
+
+                ic1 = n - 1;
+            } else {
+                ic0 = (int) Math.floor(ff);
+                ic1 = ic0 + 1;
+            }
+
+            double alpha = ff - ic0;
+
+            double vv0 = vv.value(ic0);
+            double vv1 = vv.value(ic1);
+
+            putValue(result, it, vv0 + alpha * (vv1 - vv0));
+
         }
-        return result;        
+        return result;
     }
-    
+
+    public static QDataSet applyUnary(QDataSet ds, Object o) {
+        PyFunction f = (PyFunction) o;
+
+        QubeDataSetIterator it = new QubeDataSetIterator(ds);
+        DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds));
+        while (it.hasNext()) {
+            it.next();
+            double d = getValue(ds, it);
+            PyFloat r = (PyFloat) f.__call__(new PyFloat(d));
+            putValue(result, it, r.getValue() );
+        }
+        return result;
+    }
+      
+    public static QDataSet applyBinary( QDataSet ds1, QDataSet ds2, Object o) {
+        PyFunction f = (PyFunction) o;
+
+        QubeDataSetIterator it = new QubeDataSetIterator(ds1);
+        DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
+        while (it.hasNext()) {
+            it.next();
+            double d1 = getValue(ds1, it);
+            double d2 = getValue(ds2, it);
+            PyFloat r = (PyFloat) f.__call__( new PyFloat(d1), new PyFloat(d2) );
+            putValue( result, it, r.getValue() );
+        }
+        return result;
+    }
     
     public static double PI = Math.PI;
     public static double E = Math.E;
