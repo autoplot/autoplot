@@ -1,0 +1,12 @@
+AA= ones(2,2)
+AA[0,0]= 0
+AA[1,1]= 0
+
+f1= linspace( 0, 1, 10 )
+f2= ones( 10 )
+
+ff0= outerProduct( f1,f2 )
+ff1= outerProduct( f2,f1 )
+
+result= interpolate( AA, ff0, ff1 )
+

@@ -1,0 +1,42 @@
+m= 0.79
+b= 3.8
+sig= 0.1
+
+nn= 100
+
+# do a boxcar on the data, and finish the ends with a fit
+# size must be odd
+def smoothfit( xx, yy, size ):
+    xxsmooth= xx
+    yysmooth= smooth( yy, size )
+    
+    fit= LinFit( xx[0:size], yy[0:size] )
+    yfit= xx[0:size] * fit.b + fit.a
+
+    yysmooth[0:size/2]= yfit[0:size/2]
+
+    fit= LinFit( xx[-size:], yy[-size:] )
+    yfit= xx[-size:] * fit.b + fit.a
+
+    yysmooth[-size/2:]= yfit[-size/2:]
+
+    return yysmooth
+
+xx= linspace( -20, 20, nn )
+yy= xx * m + b + randn( nn ) * sig
+yy.putProperty( 'DEPEND_0', xx )
+sig= ones(nn)
+
+from org.virbo.dsutil import LinFit
+
+fit= LinFit( xx, yy, sig )
+
+print fit.a, fit.b
+
+fitxx= linspace( -20, 20, nn )
+fityy= fitxx * fit.b + fit.a
+fityy.putProperty( 'DEPEND_0', fitxx )
+
+smoothyy= smooth( yy, 11 )
+
+smoothfityy= smoothfit( xx, yy, 11 )
