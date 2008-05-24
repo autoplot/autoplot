@@ -16,6 +16,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
+import org.virbo.datasource.jython.QubeDataSetIterator.IndexListIterator;
 
 /**
  *
@@ -212,9 +213,9 @@ public class PyQDataSet extends PyJavaInstance {
                 QubeDataSetIterator resultIter= new QubeDataSetIterator(result);
                 while (iter.hasNext()) {
                     iter.next();
-                    double d = getValue(ds, iter);
+                    double d = iter.getValue(ds);
                     resultIter.next();
-                    putValue(result, resultIter, d);
+                    resultIter.putValue(result, d);
                 }
                 return new PyQDataSet(result);
 
@@ -254,9 +255,9 @@ public class PyQDataSet extends PyJavaInstance {
                 QubeDataSetIterator resultIter= new QubeDataSetIterator(result);
                 while (iter.hasNext()) {
                     iter.next();
-                    double d = getValue(ds, iter);
+                    double d = iter.getValue(ds);
                     resultIter.next();
-                    putValue(result, resultIter, d);
+                    resultIter.putValue(result, d);
                 }
                 return new PyQDataSet(result);
             } else {
@@ -270,7 +271,7 @@ public class PyQDataSet extends PyJavaInstance {
 
     @Override
     public void __setitem__(PyObject arg0, PyObject arg1) {
-        QubeDataSetIterator iter = new QubeDataSetIterator(ds);
+        NewDataSetIterator iter = new QubeDataSetIterator(ds);
 
         if (!arg0.isSequenceType()) {
             PyObject a = arg0;
@@ -291,8 +292,18 @@ public class PyQDataSet extends PyJavaInstance {
                 fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
             }
 
-            iter.setIndexIteratorFactory(0, fit);
-
+            ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);
+        } else if ( arg0 instanceof PyQDataSet ) {
+            Object o = arg0.__tojava__(QDataSet.class);
+            QDataSet that = (QDataSet) o;
+            
+            if ( ds.rank()>1 ) {
+                iter= new IndexListDataSetIterator( that );
+            } else {
+                QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);
+            }
+            
         } else {
             PySequence slices = (PySequence) arg0;
             for (int i = 0; i < slices.__len__(); i++) {
@@ -314,7 +325,7 @@ public class PyQDataSet extends PyJavaInstance {
                     fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
                 }
 
-                iter.setIndexIteratorFactory(i, fit);
+                ((QubeDataSetIterator)iter).setIndexIteratorFactory(i, fit);
             }
 
         }
@@ -328,41 +339,11 @@ public class PyQDataSet extends PyJavaInstance {
         QubeDataSetIterator it = new QubeDataSetIterator(val);
         while (it.hasNext()) {
             it.next();
-            double d = getValue(val, it);
+            double d = it.getValue(val);
             iter.next();
-            putValue(ds, iter, d);
+            iter.putValue(ds, d);
         }
 
-    }
-
-    /* utility methods */
-    private double getValue(QDataSet wds, QubeDataSetIterator iter) {
-        switch (wds.rank()) {
-            case 1:
-                return wds.value(iter.index(0));
-            case 2:
-                return wds.value(iter.index(0), iter.index(1));
-            case 3:
-                return wds.value(iter.index(0), iter.index(1), iter.index(2));
-            default:
-                throw new IllegalArgumentException("rank");
-        }
-    }
-
-    private void putValue(WritableDataSet wds, QubeDataSetIterator iter, double val) {
-        switch (wds.rank()) {
-            case 1:
-                wds.putValue(iter.index(0), val);
-                return;
-            case 2:
-                wds.putValue(iter.index(0), iter.index(1), val);
-                return;
-            case 3:
-                wds.putValue(iter.index(0), iter.index(1), iter.index(2), val);
-                return;
-            default:
-                throw new IllegalArgumentException("rank");
-        }
     }
 
     private QDataSet coerce_ds(int qube[], PyObject arg0) {
@@ -374,7 +355,7 @@ public class PyQDataSet extends PyJavaInstance {
                 QubeDataSetIterator it = new QubeDataSetIterator(that);
                 while (it.hasNext()) {
                     it.next();
-                    putValue( that, it, d );
+                    it.putValue( that, d );
                 }
                 return that;
             } else if ( arg0.isSequenceType() ) {
