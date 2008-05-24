@@ -6,12 +6,13 @@ package org.virbo.datasource.jython;
 
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.WritableDataSet;
 
 /**
  *
  * @author jbf
  */
-public class QubeDataSetIterator {
+public class QubeDataSetIterator implements NewDataSetIterator {
 
     public interface DimensionIterator {
 
@@ -86,7 +87,7 @@ public class QubeDataSetIterator {
             int start1 = this.start = start == null ? 0 : start;
             int stop1 = stop == null ? length : stop;
             int step1 = step == null ? 1 : step;
-            if ( start1 < 0) start1 = length - start1;
+            if ( start1 < 0) start1 = length + start1;
             if ( stop1 < 0) stop1 = length + stop1;
             
             return new StartStopStepIterator(start1, stop1, step1, start==null && stop==null && step==null );
@@ -304,5 +305,43 @@ public class QubeDataSetIterator {
         return "Iter [" + its + "] @ ["+ ats + "] ";
     }
     
+    /**
+     * get the value from ds at the current iterator position.
+     * @param ds a dataset with capatible geometry as the iterator's geometry.
+     * @return the value of ds at the current iterator position.
+     */
+    public final double getValue( QDataSet ds ) {
+        switch (ds.rank()) {
+            case 1:
+                return ds.value( index(0) );
+            case 2:
+                return ds.value( index(0), index(1) );
+            case 3:
+                return ds.value( index(0), index(1), index(2) );
+            default:
+                throw new IllegalArgumentException("rank limit");
+        }        
+    }
+    
+    /**
+     * replace the value in ds at the current iterator position.
+     * @param ds a writable dataset with capatible geometry as the iterator's geometry.
+     * @param v the value to insert.
+     */
+    public final void putValue( WritableDataSet ds, double v ) {
+        switch ( rank ) {
+            case 1:
+                ds.putValue( index(0), v );
+                return;
+            case 2:
+                ds.putValue( index(0), index(1), v );
+                return;
+            case 3:
+                ds.putValue( index(0), index(1), index(2), v );
+                return;
+            default:
+                throw new IllegalArgumentException("rank limit");
+        }        
+    }
     
 }
