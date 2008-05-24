@@ -311,7 +311,7 @@ public class QubeDataSetIterator implements NewDataSetIterator {
      * @return the value of ds at the current iterator position.
      */
     public final double getValue( QDataSet ds ) {
-        switch (ds.rank()) {
+        switch ( rank ) {
             case 1:
                 return ds.value( index(0) );
             case 2:
