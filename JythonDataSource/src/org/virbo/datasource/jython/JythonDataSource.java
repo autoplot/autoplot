@@ -4,7 +4,7 @@
  */
 package org.virbo.datasource.jython;
 
-import org.virbo.datasource.jython.PyQDataSetAdapter;
+import org.virbo.jythonsupport.PyQDataSetAdapter;
 import java.io.FileInputStream;
 import java.net.URL;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -16,7 +16,7 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.jython.JythonOps;
+import org.virbo.jythonsupport.JythonOps;
 
 /**
  *

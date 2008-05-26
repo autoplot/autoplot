@@ -4,8 +4,8 @@
  */
 package org.virbo.datasource.jython;
 
-import org.virbo.datasource.jython.PyQDataSet;
-import org.virbo.datasource.jython.PyQDataSetAdapter;
+import org.virbo.jythonsupport.PyQDataSet;
+import org.virbo.jythonsupport.PyQDataSetAdapter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

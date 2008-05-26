@@ -1,0 +1,4 @@
+data= getDataSet( 'http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density' )
+data= data+0   # convert to mutable dataset
+r= where( data < 3 )
+data[r]= 3
