@@ -4,7 +4,7 @@
  */
 package org.virbo.datasource.jython;
 
-import java.net.URL;
+import java.net.URI;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
@@ -25,14 +25,14 @@ public class Util {
      * @return
      * @throws java.lang.Exception
      */
-    public static QDataSet getDataSet( String surl, ProgressMonitor mon) throws Exception {
-        URL url= new URL( surl );
+    public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
+        URI url = new URI(surl);
         DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
-        DataSource result = factory.getDataSource(url);
+        DataSource result = factory.getDataSource( DataSetURL.getWebURL(url) );
         return result.getDataSet(mon == null ? new NullProgressMonitor() : mon);
     }
-    
-    public static QDataSet getDataSet( String surl ) throws Exception {
-        return getDataSet( surl, null );
+
+    public static QDataSet getDataSet(String surl) throws Exception {
+        return getDataSet(surl, null);
     }
 }
