@@ -4,6 +4,8 @@
  */
 package org.virbo.datasource.jython;
 
+import org.virbo.datasource.jython.PyQDataSet;
+import org.virbo.datasource.jython.PyQDataSetAdapter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,6 +50,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         PythonInterpreter interp = new PythonInterpreter();
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
+        interp.set("monitor", new NullProgressMonitor() );
         interp.execfile(JythonDataSource.class.getResource("imports.py").openStream(), "imports.py");
 
         File src= DataSetURL.getFile( url, new NullProgressMonitor());
