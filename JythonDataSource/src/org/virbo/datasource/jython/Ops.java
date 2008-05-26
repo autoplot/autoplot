@@ -12,16 +12,15 @@ import edu.uiowa.physics.pw.das.math.fft.FFTUtil;
 import edu.uiowa.physics.pw.das.math.fft.GeneralFFT;
 import edu.uiowa.physics.pw.das.math.fft.WaveformToSpectrum;
 import java.util.Random;
-import org.python.core.PyFloat;
-import org.python.core.PyFunction;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.TrimStrideWrapper;
 import org.virbo.dataset.VectorDataSetAdapter;
-import org.virbo.dataset.WritableDataSet;
+import org.virbo.dsutil.BinAverage;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
@@ -30,25 +29,23 @@ import org.virbo.dsutil.DataSetBuilder;
  */
 public class Ops {
 
-    interface UnaryOp {
-
+    public interface UnaryOp {
         double op(double d1);
     }
 
-    private static final QDataSet applyUnaryOp(QDataSet ds1, UnaryOp op) {
+    public static final QDataSet applyUnaryOp(QDataSet ds1, UnaryOp op) {
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
-
         QubeDataSetIterator it1 = new QubeDataSetIterator(ds1);
         while (it1.hasNext()) {
             it1.next();
-            double d1 = getValue(ds1, it1);
-            putValue(result, it1, op.op(d1));
+            double d1 = it1.getValue(ds1);
+            it1.putValue( result, op.op(d1) );
         }
+        DataSetUtil.putProperties( DataSetUtil.getProperties(ds1), result );
         return result;
     }
 
-    interface BinaryOp {
-
+    public interface BinaryOp {
         double op(double d1, double d2);
     }
 
@@ -61,60 +58,32 @@ public class Ops {
      * @param op
      * @return
      */
-    private static final QDataSet applyBinaryOp(QDataSet ds1, QDataSet ds2, BinaryOp op) {
+    public static final QDataSet applyBinaryOp(QDataSet ds1, QDataSet ds2, BinaryOp op) {
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
 
         QubeDataSetIterator it1 = new QubeDataSetIterator(ds1);
         QubeDataSetIterator it2 = new QubeDataSetIterator(ds2);
         while (it1.hasNext()) {
             it1.next();
-            double d1 = getValue(ds1, it1);
+            double d1 = it1.getValue(ds1);
             it2.next();
-            double d2 = getValue(ds2, it2);
-            putValue(result, it1, op.op(d1, d2));
+            double d2 = it2.getValue(ds2);
+            it1.putValue( result, op.op(d1, d2) );
         }
         return result;
     }
 
-    private static final QDataSet applyBinaryOp(QDataSet ds1, double d2, BinaryOp op) {
+    public static final QDataSet applyBinaryOp(QDataSet ds1, double d2, BinaryOp op) {
         DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
 
         QubeDataSetIterator it1 = new QubeDataSetIterator(ds1);
         while (it1.hasNext()) {
             it1.next();
-            putValue(result, it1, op.op(getValue(ds1, it1), d2));
+            it1.putValue(result, op.op( it1.getValue(ds1), d2 ) );
         }
         return result;
     }
 
-    private static final double getValue(QDataSet ds, QubeDataSetIterator it) {
-        switch (ds.rank()) {
-            case 1:
-                return ds.value(it.index(0));
-            case 2:
-                return ds.value(it.index(0), it.index(1));
-            case 3:
-                return ds.value(it.index(0), it.index(1), it.index(2));
-            default:
-                throw new IllegalArgumentException("rank limit");
-        }
-    }
-
-    private static final void putValue(WritableDataSet ds, QubeDataSetIterator it, double v) {
-        switch (ds.rank()) {
-            case 1:
-                ds.putValue(it.index(0), v);
-                return;
-            case 2:
-                ds.putValue(it.index(0), it.index(1), v);
-                return;
-            case 3:
-                ds.putValue(it.index(0), it.index(1), it.index(2), v);
-                return;
-            default:
-                throw new IllegalArgumentException("rank limit");
-        }
-    }
 
     /**
      * add the two datasets have the same geometry.
@@ -127,6 +96,20 @@ public class Ops {
 
             public double op(double d1, double d2) {
                 return d1 + d2;
+            }
+        });
+    }
+
+    /**
+     * subtract one dataset from another.
+     * @param ds1
+     * @param ds2
+     * @return
+     */
+    public static QDataSet subtract(QDataSet ds1, QDataSet ds2) {
+        return applyBinaryOp(ds1, ds2, new BinaryOp() {
+            public double op(double d1, double d2) {
+                return d1 - d2;
             }
         });
     }
@@ -167,7 +150,7 @@ public class Ops {
         }
         if (isCart) {
             ds = pow(ds, 2);
-            ds = total(ds, r - 1, false);
+            ds = total( ds, r-1 );
             ds = sqrt(ds);
             return ds;
         } else {
@@ -181,11 +164,35 @@ public class Ops {
         QubeDataSetIterator it1 = new QubeDataSetIterator(ds);
         while (it1.hasNext()) {
             it1.next();
-            s += getValue(ds, it1);
+            s += it1.getValue(ds);
         }
         return s;
     }
 
+    private interface AverageOp {
+        /**
+         * average in measurement d1 with weight w1 into accum.
+         * @param d1
+         * @param w1
+         * @param store 
+         * @return
+         */
+        void accum( double d1, double w1, double[] accum );
+        
+        /**
+         * store the initial values.
+         * @param store
+         */
+        void initStore( double[] store );
+        
+        /**
+         * normalize the accumulator.  accum[0] should contain the value, accum[1] should contain the weight.
+         * @param accum
+         */
+        void normalize( double[] accum );
+        
+    }
+    
     /**
      * reduce the dataset's rank by totalling all the elements along a dimension.
      * Only QUBEs are supported presently.
@@ -195,7 +202,46 @@ public class Ops {
      * @param normalize return the average instead of the total.
      * @return
      */
-    public static QDataSet total(QDataSet ds, int dim, boolean normalize) {
+    private static QDataSet averageGen( QDataSet ds, int dim, AverageOp op ) {
+        int[] qube = DataSetUtil.qubeDims(ds);
+        int[] newQube = DataSetOps.removeElement(qube, dim);
+        QDataSet wds = DataSetUtil.weightsDataSet(ds);
+        DDataSet result = DDataSet.create(newQube);
+        QubeDataSetIterator it1 = new QubeDataSetIterator(result);
+        double fill = (Double) wds.property(QDataSet.FILL_VALUE);
+        double[] store= new double[2];
+        while (it1.hasNext()) {
+            it1.next();
+            op.initStore(store);
+            
+            QubeDataSetIterator it0 = new QubeDataSetIterator(ds);
+            for (int i = 0; i < ds.rank(); i++) {
+                int ndim = i < dim ? i : i - 1;
+                if (i != dim) {
+                    it0.setIndexIteratorFactory(i, new QubeDataSetIterator.SingletonIteratorFactory(it1.index(ndim)));
+                }
+            }
+            while (it0.hasNext()) {
+                it0.next();
+                op.accum( it0.getValue(wds), it0.getValue(ds), store );
+            }
+            op.normalize(store);
+            it1.putValue( result, store[1] > 0 ? store[0] : fill );
+        }
+
+        return result;
+    }
+    
+    /**
+     * reduce the dataset's rank by totalling all the elements along a dimension.
+     * Only QUBEs are supported presently.
+     * 
+     * @param ds rank N qube dataset.
+     * @param dim zero-based index number.
+     * @param normalize return the average instead of the total.
+     * @return
+     */
+    public static QDataSet total( QDataSet ds, int dim ) {
         int[] qube = DataSetUtil.qubeDims(ds);
         int[] newQube = DataSetOps.removeElement(qube, dim);
         QDataSet wds = DataSetUtil.weightsDataSet(ds);
@@ -216,16 +262,88 @@ public class Ops {
             }
             while (it0.hasNext()) {
                 it0.next();
-                double w1 = getValue(wds, it0);
-                s += w1 * getValue(ds, it0);
+                double w1 = it0.getValue(wds);
+                s += w1 * it0.getValue(ds);
                 w += w1;
             }
-            putValue(result, it1, w > 0 ? s : fill);
+            it1.putValue( result, w > 0 ? s : fill );
         }
 
         return result;
     }
 
+    /**
+     * reduce the dataset's rank by reporting the max of all the elements along a dimension.
+     * Only QUBEs are supported presently.
+     * 
+     * @param ds rank N qube dataset.
+     * @param dim zero-based index number.
+     * @return
+     */
+    public static QDataSet reduceMax( QDataSet ds, int dim ) {
+        return averageGen( ds, dim, new AverageOp() {
+            public void accum(double d1, double w1, double[] accum) {
+                if ( w1>0.0 ) accum[0] = Math.max( d1, accum[0] );
+            }
+            public void initStore(double[] store) {
+                store[0]= Double.NEGATIVE_INFINITY;
+                store[1]= 0.;
+            }
+            public void normalize(double[] accum) {
+                // nothing to do
+            }
+        } );
+    }
+
+    /**
+     * reduce the dataset's rank by reporting the min of all the elements along a dimension.
+     * Only QUBEs are supported presently.
+     * 
+     * @param ds rank N qube dataset.
+     * @param dim zero-based index number.
+     * @return
+     */
+    public static QDataSet reduceMin( QDataSet ds, int dim ) {
+        return averageGen( ds, dim, new AverageOp() {
+            public void accum(double d1, double w1, double[] accum) {
+                if ( w1>0.0 ) accum[0] = Math.min( d1, accum[0] );
+            }
+            public void initStore(double[] store) {
+                store[0]= Double.POSITIVE_INFINITY;
+                store[1]= 0.;
+            }
+            public void normalize(double[] accum) {
+                // nothing to do
+            }
+        } );
+    }
+
+    /**
+     * reduce the dataset's rank by reporting the max of all the elements along a dimension.
+     * Only QUBEs are supported presently.
+     * 
+     * @param ds rank N qube dataset.
+     * @param dim zero-based index number.
+     * @return
+     */
+    public static QDataSet reduceMean( QDataSet ds, int dim ) {
+        return averageGen( ds, dim, new AverageOp() {
+            public void accum(double d1, double w1, double[] accum) {
+                accum[0] += w1 * d1;
+                accum[1] += w1;
+            }
+            public void initStore(double[] store) {
+                store[0]= 0.;
+                store[1]= 0.;
+            }
+            public void normalize(double[] accum) {
+                if ( accum[1]>0 ) accum[0] /= accum[1];
+            }
+        } );
+    }
+    
+    //public static QDataSet smooth( QDataSet )
+    
     /**
      * element-wise sqrt.
      * @param ds
@@ -332,6 +450,20 @@ public class Ops {
 
             public double op(double d1, double d2) {
                 return d1 * d2;
+            }
+        });
+    }
+
+    /**
+     * element-wise divide of two datasets with the same geometry.
+     * @param ds
+     * @return
+     */
+    public static QDataSet divide( QDataSet ds1, QDataSet ds2 ) {
+        return applyBinaryOp(ds1, ds2, new BinaryOp() {
+
+            public double op( double d1, double d2 ) {
+                return d1 / d2;
             }
         });
     }
@@ -624,7 +756,7 @@ public class Ops {
         QubeDataSetIterator it = new QubeDataSetIterator(result);
         while (it.hasNext()) {
             it.next();
-            putValue(result, it, rand.nextDouble());
+            it.putValue( result, rand.nextDouble() );
         }
         return result;
     }
@@ -639,7 +771,7 @@ public class Ops {
         QubeDataSetIterator it = new QubeDataSetIterator(result);
         while (it.hasNext()) {
             it.next();
-            putValue(result, it, rand.nextGaussian());
+            it.putValue( result, rand.nextGaussian() );
         }
         return result;
     }
@@ -753,15 +885,54 @@ public class Ops {
     }
 
     /**
+     * element-wise sin.
+     * @param ds
+     * @return
+     */
+    public static QDataSet asin(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+
+            public double op(double d1) {
+                return Math.asin(d1);
+            }
+        });
+    }
+
+    /**
      * element-wise cos.
      * @param ds
      * @return
      */
     public static QDataSet cos(QDataSet ds) {
         return applyUnaryOp(ds, new UnaryOp() {
-
             public double op(double d1) {
                 return Math.cos(d1);
+            }
+        });
+    }
+
+    /**
+     * element-wise acos.
+     * @param ds
+     * @return
+     */
+    public static QDataSet acos(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+            public double op(double d1) {
+                return Math.acos(d1);
+            }
+        });
+    }
+
+    /**
+     * element-wise tan.
+     * @param ds
+     * @return
+     */
+    public static QDataSet tan(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+            public double op(double a) {
+                return Math.tan(a);
             }
         });
     }
@@ -795,9 +966,64 @@ public class Ops {
         });
     }
 
+    /**
+     * element-wise cosh.
+     * @param ds
+     * @return
+     */
+    public static QDataSet cosh(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+            public double op(double a) {
+                return Math.cosh(a);
+            }
+        });
+    }
+    
+    /**
+     * element-wise sinh.
+     * @param ds
+     * @return
+     */
+    public static QDataSet sinh(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+            public double op(double a) {
+                return Math.sinh(a);
+            }
+        });
+    }
+    
+    /**
+     * element-wise tanh.
+     * @param ds
+     * @return
+     */
+    public static QDataSet tanh(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+            public double op(double a) {
+                return Math.tanh(a);
+            }
+        });
+    }
+            
+    /**
+     * Returns <i>e</i><sup>x</sup>&nbsp;-1.  Note that for values of
+     * <i>x</i> near 0, the exact sum of
+     * <code>expm1(x)</code>&nbsp;+&nbsp;1 is much closer to the true
+     * result of <i>e</i><sup>x</sup> than <code>exp(x)</code>.
+     *
+     * @param ds
+     * @return
+     */
+    public static QDataSet expm1(QDataSet ds) {
+        return applyUnaryOp(ds, new UnaryOp() {
+            public double op(double a) {
+                return Math.expm1(a);
+            }
+        });
+    }
+    
     public static QDataSet toRadians(QDataSet ds) {
         return applyUnaryOp(ds, new UnaryOp() {
-
             public double op(double y) {
                 return y * Math.PI / 180.;
             }
@@ -806,7 +1032,6 @@ public class Ops {
 
     public static QDataSet toDegrees(QDataSet ds) {
         return applyUnaryOp(ds, new UnaryOp() {
-
             public double op(double y) {
                 return y * 180 / Math.PI;
             }
@@ -861,8 +1086,15 @@ public class Ops {
 
     /**
      * returns a rank 1 dataset of indeces that sort the rank 1 dataset ds.
-     * @param ds
-     * @return
+     * This is not the dataset sorted.  For example:
+     * <pre>
+     *   ds= randn(2000)
+     *   s= sort( ds )
+     *   dsSorted= ds[s]
+     * </pre>
+     * 
+     * @param ds rank 1 dataset
+     * @return rank 1 dataset of indeces that sort the input dataset.
      */
     public static QDataSet sort(QDataSet ds) {
         return DataSetOps.sort(ds);
@@ -946,6 +1178,46 @@ public class Ops {
         return result;
     }
 
+    public static QDataSet floor( QDataSet ds1 ) {
+        return applyUnaryOp(ds1, new UnaryOp() {
+            public double op(double a) {
+                return Math.floor(a);
+            }
+        });        
+    }
+    
+    public static QDataSet ceil( QDataSet ds1 ) {
+        return applyUnaryOp(ds1, new UnaryOp() {
+            public double op(double a) {
+                return Math.ceil(a);
+            }
+        });        
+    }
+    
+    public static QDataSet signum( QDataSet ds1 ) { 
+        return applyUnaryOp(ds1, new UnaryOp() {
+            public double op(double a) {
+                return Math.signum(a);
+            }
+        });        
+    }
+    
+    /**
+     * Returns the first floating-point argument with the sign of the
+     * second floating-point argument.
+     * @param magnitude
+     * @param sign
+     * @return
+     */
+    public static QDataSet copysign( QDataSet magnitude, QDataSet sign ) { 
+        return applyBinaryOp( magnitude, sign, new BinaryOp() {
+            public double op(double m, double s) {
+                double s1= Math.signum(s);
+                return Math.abs(m) * ( s1==0 ? 1. : s1 );
+            }
+        });        
+    }
+    
     /**
      * returns the floating point index of each element of vv within the monotonically
      * increasing dataset uu.  The result dataset will have the same geometry
@@ -970,12 +1242,11 @@ public class Ops {
         int n = u.length();
         while (it.hasNext()) {
             it.next();
-            double d = getValue(v, it);
+            double d = it.getValue(v);
             // TODO: optimize by only doing binary search below or above ic0&ic1.
             if (uc0 <= d && d <= uc1) {
                 double ff = (d - uc0) / (uc1 - uc0); // may be 1.0
-
-                putValue(result, it, ic0 + ff);
+                it.putValue( result, ic0+ff );
             } else {
                 int index = DataSetUtil.binarySearch(u, d, 0, u.length() - 1);
                 if (index == -1) {
@@ -998,7 +1269,7 @@ public class Ops {
                 uc1 = u.value(ic1);
                 double ff = (d - uc0) / (uc1 - uc0); // may be 1.0
 
-                putValue(result, it, ic0 + ff);
+                it.putValue(result,ic0 + ff);
             }
         }
         return result;
@@ -1021,7 +1292,7 @@ public class Ops {
         while (it.hasNext()) {
             it.next();
 
-            double ff = getValue(findex, it);
+            double ff = it.getValue(findex);
 
             if (ff < 0) {
                 ic0 = 0; // extrapolate
@@ -1041,39 +1312,96 @@ public class Ops {
             double vv0 = vv.value(ic0);
             double vv1 = vv.value(ic1);
 
-            putValue(result, it, vv0 + alpha * (vv1 - vv0));
+            it.putValue( result, vv0 + alpha * (vv1 - vv0) );
 
         }
         return result;
     }
 
-    public static QDataSet applyUnary(QDataSet ds, Object o) {
-        PyFunction f = (PyFunction) o;
+    /**
+     * interpolate values from rank 1 dataset vv using fractional indeces 
+     * in rank N findex, using bilinear interpolation.
+     * 
+     * @param vv rank 2 dataset.
+     * @param findex0 rank N dataset of fractional indeces for the zeroth index.
+     * @param findex1 rank N dataset of fractional indeces for the first index.
+     * @return rank N dataset 
+     */
+    public static QDataSet interpolate( QDataSet vv, QDataSet findex0, QDataSet findex1 ) {
+        
+        DDataSet result = DDataSet.create( DataSetUtil.qubeDims(findex0) );
+        QubeDataSetIterator it = new QubeDataSetIterator(findex0);
+        int ic00, ic01, ic10, ic11;
+        int n0 = vv.length();
+        int n1= vv.length(0);
 
-        QubeDataSetIterator it = new QubeDataSetIterator(ds);
-        DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds));
         while (it.hasNext()) {
             it.next();
-            double d = getValue(ds, it);
-            PyFloat r = (PyFloat) f.__call__(new PyFloat(d));
-            putValue(result, it, r.getValue() );
+
+            double ff0 = it.getValue(findex0);
+            double ff1 = it.getValue(findex1);
+            
+            if (ff0 < 0) {
+                ic00 = 0; // extrapolate
+                ic01 = 1;
+            } else if (ff0 >= n0 - 1) {
+                ic00 = n0 - 2; // extrapolate
+                ic01 = n0 - 1;
+            } else {
+                ic00 = (int) Math.floor(ff0);
+                ic01 = ic00 + 1;
+            }
+            
+            if (ff1 < 0) {
+                ic10 = 0; // extrapolate
+                ic11 = 1;
+            } else if (ff1 >= n1 - 1) {
+                ic10 = n1 - 2; // extrapolate
+                ic11 = n1 - 1;
+            } else {
+                ic10 = (int) Math.floor(ff1);
+                ic11 = ic10 + 1;
+            }
+            
+            double alpha0 = ff0 - ic00;
+            double alpha1 = ff1 - ic10;
+            
+            double vv00 = vv.value(ic00,ic10);
+            double vv01 = vv.value(ic00,ic11);
+
+            double vv10 = vv.value(ic01,ic10);
+            double vv11 = vv.value(ic01,ic11);
+
+            it.putValue( result, vv00 * (1-alpha0 ) * (1-alpha1 )
+                    + vv01 * ( 1-alpha0 ) * ( alpha1 ) 
+                    + vv10 * ( alpha0 ) * ( 1-alpha1 )
+                    + vv11 * ( alpha0 ) * ( alpha1 ) );
+
         }
         return result;
     }
-      
-    public static QDataSet applyBinary( QDataSet ds1, QDataSet ds2, Object o) {
-        PyFunction f = (PyFunction) o;
-
-        QubeDataSetIterator it = new QubeDataSetIterator(ds1);
-        DDataSet result = DDataSet.create(DataSetUtil.qubeDims(ds1));
-        while (it.hasNext()) {
-            it.next();
-            double d1 = getValue(ds1, it);
-            double d2 = getValue(ds2, it);
-            PyFloat r = (PyFloat) f.__call__( new PyFloat(d1), new PyFloat(d2) );
-            putValue( result, it, r.getValue() );
-        }
-        return result;
+    
+    /**
+     * run boxcar average over the dataset, returning a dataset of same geometry.  Points near the edge are simply copied from the
+     * source dataset.  The result dataset contains a property "weights" that is the weights for each point.
+     *
+     * @param ds a rank 1 dataset of size N
+     * @param size the number of adjacent bins to average
+     * @return rank 1 dataset of size N
+     */    
+    public static QDataSet smooth( QDataSet ds, int size ) {
+        if ( ds.rank()>1 ) throw new IllegalArgumentException("only rank 1");
+        return BinAverage.boxcar( ds, size );
+    }
+    
+    
+    public static QDataSet diff( QDataSet ds ) {
+        if ( ds.rank()>1 ) throw new IllegalArgumentException("only rank 1");
+        TrimStrideWrapper d1= new TrimStrideWrapper(ds);
+        d1.setTrim( 0, 0, ds.length()-1, 1 );
+        TrimStrideWrapper d2= new TrimStrideWrapper(ds);
+        d2.setTrim( 0, 1, ds.length(), 1 );        
+        return Ops.subtract( d2, d1 );
     }
     
     public static double PI = Math.PI;
