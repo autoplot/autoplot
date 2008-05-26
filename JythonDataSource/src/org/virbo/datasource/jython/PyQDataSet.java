@@ -50,13 +50,13 @@ public class PyQDataSet extends PyJavaInstance {
     @Override
     public PyObject __sub__(PyObject arg0) {
         QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.add(ds, Ops.negate(that)));
+        return new PyQDataSet(Ops.subtract( ds, that ));
     }
 
     @Override
     public PyObject __rsub__(PyObject arg0) {
         QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.add(that, Ops.negate(ds)));
+        return new PyQDataSet(Ops.subtract( that, ds ));
     }
 
     @Override
@@ -76,14 +76,14 @@ public class PyQDataSet extends PyJavaInstance {
     public PyObject __div__(
             PyObject arg0) {
         QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.multiply(ds, Ops.pow(that, -1)));
+        return new PyQDataSet( Ops.divide(ds, that ) );
     }
 
     @Override
     public PyObject __rdiv__(
             PyObject arg0) {
         QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.multiply(Ops.pow(ds, -1), that));
+        return new PyQDataSet(Ops.divide( that, ds ) );
     }
 
     /* unary negate and plus operator */
