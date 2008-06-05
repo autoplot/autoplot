@@ -15,6 +15,7 @@ import java.io.InputStream;
 import org.python.core.Py;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
+import org.virbo.jythonsupport.PyQDataSetAdapter;
 
 /**
  *
@@ -36,6 +37,8 @@ public class JythonMain {
         
         interp = new PythonInterpreter( );
         
+        Py.getAdapter().addPostClass(new PyQDataSetAdapter());
+
         interp.execfile( JythonMain.class.getResource("imports.py").openStream(), "imports.py" );
 
         InputStream in;
