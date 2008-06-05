@@ -76,6 +76,7 @@ public class DataSourceRegistry {
     }
 
     public DataSourceFactory getSource(String extension) {
+        if (extension.indexOf('.') != 0) extension= "."+extension;
         Object o = dataSourcesByExt.get(extension);
         if (o == null) {
             return null;
