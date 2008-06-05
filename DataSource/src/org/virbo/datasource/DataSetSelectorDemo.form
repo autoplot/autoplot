@@ -45,20 +45,22 @@
                       <EmptySpace min="10" pref="10" max="10" attributes="0"/>
                       <Component id="jLabel1" pref="605" max="32767" attributes="1"/>
                   </Group>
-                  <Component id="dataSetSelector1" alignment="0" pref="615" max="32767" attributes="2"/>
                   <Component id="statusLabel" alignment="0" pref="615" max="32767" attributes="0"/>
                   <Component id="jLabel2" alignment="0" min="-2" pref="365" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <Component id="dataSetSelector1" pref="615" max="32767" attributes="2"/>
+              <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
               <Component id="dataSetSelector1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="45" max="-2" attributes="0"/>
               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" pref="23" max="-2" attributes="0"/>

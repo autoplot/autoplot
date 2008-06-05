@@ -8,6 +8,7 @@ package org.virbo.datasource;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Arrays;
 
 /**
  *
@@ -28,6 +29,7 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
                 }
             }       
         } );
+        this.dataSetSelector1.setRecent(Arrays.asList( new String[] { "x.dat", "y.dat", "z.dat" } ) );
         DataSetURL.init(); // discover factories
     }
     
@@ -79,17 +81,18 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
                     .add(layout.createSequentialGroup()
                         .add(10, 10, 10)
                         .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE))
-                    .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 615, Short.MAX_VALUE)
                     .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 615, Short.MAX_VALUE)
                     .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 365, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
+            .add(layout.createSequentialGroup()
+                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 615, Short.MAX_VALUE)
+                .add(24, 24, 24))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(39, 39, 39)
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(45, 45, 45)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
