@@ -22,7 +22,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -72,6 +75,12 @@ public class DataSetURL {
               *   ext, the extenion, .nc
               *   params, myVariable
               */
+
+        /**
+         * the URL scheme, http, ftp, bin-http, etc.
+         */
+        public String scheme;
+        
         /**
          * the directory with http://www.example.com/data/
          */
@@ -99,9 +108,23 @@ public class DataSetURL {
     
     public static String maybeAddFile( String surl ) {
         if ( surl.length()==0 ) return "file:/";
-        if ( !( surl.startsWith("file:/") || surl.startsWith("ftp://") || surl.startsWith("http://") || surl.startsWith("https://") ) ) {
-            surl= "file://"+ ( ( surl.charAt(0)=='/' ) ? surl : ( '/' + surl ) ); // Windows c:
+        
+        String scheme;  // identify the scheme, if any.
+        int i0= surl.indexOf(":");
+        if ( i0==-1 ) {
+            scheme= "";
+        } else if ( i0==1 ) { // one letter scheme is assumed to be windows drive letter.
+            scheme= "";
+        } else {
+            scheme= surl.substring(0,i0);
         }
+        
+        if ( scheme.equals("") ) {
+            surl= "file://" + ( ( surl.charAt(0)=='/' ) ? surl : ( '/' + surl ) ); // Windows c:
+            surl= surl.replaceAll("\\\\", "/" );
+            surl= surl.replaceAll(" ", "%20" );
+        } 
+        
         return surl;
     }
     
@@ -144,6 +167,7 @@ public class DataSetURL {
             int i2= surl.indexOf("://");
             
             URLSplit result= new URLSplit();
+            result.scheme= url.getProtocol();
             result.path= surlDir+"/";
             result.file= surl.substring(0,fileEnd);
             result.ext= ext;
@@ -167,17 +191,23 @@ public class DataSetURL {
      * get the data source for the URL.
      * @throws IllegalArgumentException if the url extension is not supported.
      */
-    public static DataSource getDataSource( URL url ) throws Exception {
-        DataSourceFactory factory = getDataSourceFactory(url, new NullProgressMonitor());
+    public static DataSource getDataSource( URI uri ) throws Exception {
+        DataSourceFactory factory = getDataSourceFactory(uri, new NullProgressMonitor());
+        URL url= getWebURL(uri);
         DataSource result= factory.getDataSource( url );
         
         return result;
         
     }
     
+    public static DataSource getDataSource( String surl ) throws Exception {
+        return getDataSource( getURI(surl) );
+    }
+    
     private static boolean isAggregating( String surl ) {
         int iquest= surl.indexOf("?");
         int ipercy= surl.indexOf("%Y");
+        if ( ipercy==-1 ) ipercy= surl.indexOf("%25");
         if ( ipercy != -1 && ( iquest==-1 || ipercy < iquest ) ) {
             return true;
         } else {
@@ -186,16 +216,51 @@ public class DataSetURL {
     }
     
     /**
+     * returns a downloadable URL from the surl, perhaps popping off the 
+     * data source specifier.
+     * 
+     * @param surl
+     * @return
+     */
+    public static URL getWebURL( URI url ) {
+        int i= url.getScheme().indexOf(".");
+        if ( i==-1 ) {
+            try {
+                return url.toURL();
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            }
+        } else {
+            String s= url.toString();
+            try {
+                return new URL( s.substring(i+1) );
+            } catch ( MalformedURLException ex ) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+    
+        
+    /**
      * get the datasource factory for the URL.
      */
-    public static DataSourceFactory getDataSourceFactory(final URL url, ProgressMonitor mon) throws IOException, IllegalArgumentException {
+    public static DataSourceFactory getDataSourceFactory( URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
         
-        if ( isAggregating( url.toString() ) ) {
+
+        if ( isAggregating( uri.toString() ) ) {
             return new AggregatingDataSourceFactory();
         }
+
+        int i=  uri.getScheme().indexOf(".");
+        if ( i!=-1 ) {
+            String ext= uri.getScheme().substring(0,i);
+            return DataSourceRegistry.getInstance().getSource( ext );
+        }
         
+        URL url= uri.toURL();
+                
         String file= url.getPath();
-        int i= file.lastIndexOf(".");
+        i= file.lastIndexOf(".");
         String ext= i==-1 ? "" : file.substring(i);
         
         // check for just one ?
@@ -237,7 +302,15 @@ public class DataSetURL {
         return factory;
     }
     
-    
+    private static int indexOf( String s, char ch, char ignoreBegin, char ignoreEnd ) {
+        int i= s.indexOf(ch);
+        int i0= s.indexOf(ignoreBegin);
+        int i1= s.indexOf(ignoreEnd);
+        if ( i!=-1 && i0<i && i<i1 ) {
+            i=-1;
+        }
+        return i;
+    }
     
     /**
      *
@@ -255,7 +328,7 @@ public class DataSetURL {
         int argc=0;
         
         for ( int i=0;i<ss.length; i++ ) {
-            int j= ss[i].indexOf("=");
+            int j= indexOf( ss[i], '=', '(', ')' );
             String name, value;
             if ( j==-1 ) {
                 name= ss[i];
@@ -296,8 +369,8 @@ public class DataSetURL {
      *
      */
     public static File getFile( URL url, ProgressMonitor mon ) throws IOException {
+        
         URLSplit split= parse( url.toString() );
-        url= new URL( split.file );
         
         String proto= url.getProtocol();
         if ( proto.equals("file") ) {
@@ -314,28 +387,46 @@ public class DataSetURL {
             } else {
                 sfile= surl.substring( idx0+7 );
             }
-            
+            sfile= URLDecoder.decode(sfile, "US-ASCII");
             return new File( sfile );
             
         } else {
-            FileSystem fs= FileSystem.create( new URL( split.path ) ) ;
-            FileObject fo= fs.getFileObject( split.file.substring( split.path.length() ) );
+            try {
+                FileSystem fs= FileSystem.create( getWebURL( new URI( split.path ) ) ) ;
+                FileObject fo= fs.getFileObject( split.file.substring( split.path.length() ) );
             
-            File tfile= fo.getFile(mon);
-            return tfile;
+                File tfile= fo.getFile(mon);
+                return tfile;
+            } catch ( URISyntaxException ex ) {
+                throw new IOException(ex);
+            }
         }
     }
     
     /**
-     * canonical method for getting the URL.  If no protocol is specified, then file:// is
-     * used.
+     * canonical method for getting the URI.  If no protocol is specified, then file:// is
+     * used.  Note URIs may contain prefix like bin.http://www.cdf.org/data.cdf.
      */
-    public static URL getURL( String surl ) throws MalformedURLException {
+    public static URI getURI( String surl ) throws URISyntaxException {
         surl= maybeAddFile( surl );
         if ( surl.endsWith( "://" ) ) surl+= "/";  // what strange case is this?
-        URL result= new URL( surl );
-        if ( !result.getProtocol().equals("file") && result.getHost().equals("") ) throw new MalformedURLException( "invalid URL" );
+        surl= surl.replaceAll("%", "%25");
+        surl= surl.replaceAll(" ", "%20");
+        URI result= new URI( surl );
         return result;
+    }
+    
+    /**
+     * canonical method for getting the URL.  These will always be web-downloadable 
+     * URLs.
+     */
+    public static URL getURL( String surl ) throws MalformedURLException {
+        try {
+            URI uri= getURI( surl );
+            return getWebURL( uri );
+        } catch ( URISyntaxException ex ) {
+            throw new MalformedURLException(ex.getMessage());
+        }
     }
     
     public static List getExamples() {
@@ -395,7 +486,7 @@ public class DataSetURL {
         
         if ( cc.context== CompletionContext.CONTEXT_PARAMETER_NAME ) {
             
-            DataSourceFactory factory= getDataSourceFactory( DataSetURL.getURL( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) , new NullProgressMonitor());
+            DataSourceFactory factory= getDataSourceFactory( DataSetURL.getURI( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) , new NullProgressMonitor());
             if ( factory==null ) {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
@@ -440,7 +531,7 @@ public class DataSetURL {
             
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             
-            DataSourceFactory factory= getDataSourceFactory( DataSetURL.getURL( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) , new NullProgressMonitor());
+            DataSourceFactory factory= getDataSourceFactory( DataSetURL.getURI( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) , new NullProgressMonitor());
             if ( factory==null ) {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
@@ -472,9 +563,9 @@ public class DataSetURL {
                 } else {
                     surlDir= surl.substring(0,i);
                 }
-                URL url= getURL(surlDir);
+                URI url= getURI(surlDir);
                 String prefix= surl.substring(i+1,carotPos);
-                FileSystem fs= FileSystem.create(url);
+                FileSystem fs= FileSystem.create( getWebURL(url) );
                 String[] s= fs.listDirectory("/");
                 mon.finished();
                 List<String> result1= new ArrayList<String>(s.length);
@@ -486,7 +577,7 @@ public class DataSetURL {
                 }
                 result= result1.toArray( new String[result1.size()] );
             } catch ( MalformedURLException ex ) {
-                result= new String[] { "Malformed URL" };
+                result= new String[] { "Malformed URI" };
             } catch ( FileSystem.FileSystemOfflineException ex) {
                 result= new String[] {"FileSystem offline" };
             }
