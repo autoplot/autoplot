@@ -11,8 +11,13 @@ from javax.swing import JFrame, JComponent, JLayeredPane
 from java.io import File
 import java
 
+print 'import stuff for jython support'
+from org.virbo.jythonsupport.Ops import *
+from org.virbo.jythonsupport.JythonOps import *
+from org.virbo.jythonsupport.Util import *
+
+print 'import stuff for autoplot'
 from org.virbo.autoplot.ScriptContext import *
 from org.virbo.autoplot import *
 
-print 'imported stuff for autoplot'
 
