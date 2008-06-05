@@ -8,7 +8,8 @@ model = getApplicationModel()
 model.autoOverview= False
 
 contoursRenderer= ContoursRenderer()
-contoursRenderer.contours="1,3,10,30,50"
+contoursRenderer.contours="1,3,5,10,30,50"
+contoursRenderer.drawLabels=True
 
 model.plot.addRenderer( contoursRenderer )
 
