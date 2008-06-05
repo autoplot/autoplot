@@ -46,9 +46,11 @@ public class MetaDataPanel extends javax.swing.JPanel {
             DataSource dsrc = applicationModel.dataSource();
             if (dsrc != null) {
                 ProgressMonitor mon = new NullProgressMonitor();
-                TreeModel dsrcMeta = dsrc.getMetaData(mon);
+                final TreeModel dsrcMeta = dsrc.getMetaData(mon);
                 if (dsrcMeta != null) {
-                    tree.mountTree(dsrcMeta);
+                    SwingUtilities.invokeLater( new Runnable() { public void run() {
+                        tree.mountTree(dsrcMeta);
+                    } } );
                 }
             }
             metaDataTree.setModel(tree);
@@ -91,7 +93,15 @@ public class MetaDataPanel extends javax.swing.JPanel {
     }
 
     private void updateDataSetPropertiesView() {
-        tree.mountTree( new PropertiesTreeModel("dataset= ",applicationModel.dataset) );
+        if ( applicationModel.dataset==null ) {
+            return;
+        }
+        final PropertiesTreeModel dsTree= new PropertiesTreeModel("dataset= ",applicationModel.dataset);
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                tree.mountTree( dsTree );
+            }
+        });
     }
 
     private synchronized void updateStatisticsImmediately() {
@@ -104,7 +114,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         AutoplotUtil.MomentDescriptor moments = AutoplotUtil.moment(ds);
 
-        LinkedHashMap map = new LinkedHashMap();
+        final LinkedHashMap map = new LinkedHashMap();
 
         map.put("# invalid", String.valueOf(moments.invalidCount) + " of " + String.valueOf(moments.validCount + moments.invalidCount));
         String s;
@@ -136,7 +146,12 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         map.put("Cadence", format(d.doubleValue(u)) + " " + u);
 
-        tree.mountTree(NameValueTreeModel.create("Statistics", map));
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run( ) {
+                tree.mountTree(NameValueTreeModel.create("Statistics", map));
+            }
+        });
+        
 
         statisticsDirty = false;
     }
