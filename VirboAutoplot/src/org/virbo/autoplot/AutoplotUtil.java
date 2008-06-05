@@ -48,6 +48,7 @@ public class AutoplotUtil {
         double robustMin;
         double robustMax;
         double median;
+        public String toString() { return ""+range+" "+(log?"log":""); }
     }
     
     /**
