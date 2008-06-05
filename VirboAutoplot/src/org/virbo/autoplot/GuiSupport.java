@@ -24,8 +24,10 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -101,9 +103,13 @@ public class GuiSupport {
         return new AbstractAction( "Export Data To ASCII" ) {
             public void actionPerformed( ActionEvent e ) {
                 JFileChooser chooser= new JFileChooser();
+		Preferences prefs= Preferences.userNodeForPackage(AutoPlotUI.class);
+	        String currentFileString= prefs.get( "DumpDataCurrentFile", "" );
+		if ( !currentFileString.equals("") ) chooser.setSelectedFile( new File(currentFileString) );
                 int r= chooser.showSaveDialog( parent );
                 if ( r==JFileChooser.APPROVE_OPTION ) {
                     try {
+			prefs.put( "DumpDataCurrentFile", chooser.getSelectedFile().toString() );
                         if ( parent.applicationModel.fillDataset!=null ) {
                             if ( parent.applicationModel.fillDataset.rank()==2 ) {
                                 TableDataSet tds= TableDataSetAdapter.create( parent.applicationModel.fillDataset );
