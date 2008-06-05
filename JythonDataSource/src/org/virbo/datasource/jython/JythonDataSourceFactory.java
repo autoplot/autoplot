@@ -33,7 +33,8 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public DataSource getDataSource(URL url) throws Exception {
-        return new JythonDataSource(url);
+        JythonDataSource result= new JythonDataSource(url);
+        return result;
     }
 
     @Override
@@ -46,64 +47,80 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         return Collections.emptyList();
     }
 
-    private Map<String,Object> getNames( URL url ) throws IOException {
+    private Map<String, Object> getNames(URL url) throws IOException {
         PythonInterpreter interp = new PythonInterpreter();
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
-        interp.set("monitor", new NullProgressMonitor() );
+        interp.set("monitor", new NullProgressMonitor());
         interp.execfile(JythonDataSource.class.getResource("imports.py").openStream(), "imports.py");
 
-        File src= DataSetURL.getFile( url, new NullProgressMonitor());
-        
-        try {
-            interp.execfile(new FileInputStream( src ) );
+        File src = DataSetURL.getFile(url, new NullProgressMonitor());
 
-            PyStringMap map= ((PyStringMap)interp.getLocals());
-            PyList list= map.keys();
-        
-            HashMap result= new HashMap();
-        
-            for ( int i=0; i<list.__len__(); i++ ) {
-                String key= (String)list.get(i);
-                Object o= map.get( Py.newString(key) );
-                if ( o instanceof PyQDataSet ) {
-                    result.put( key, o );
+        DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
+        Map<String, String> params = DataSetURL.parseParams(split.params);
+        try {
+            interp.exec("params=dict()");
+            for (String s : params.keySet()) {
+                if (!s.equals("arg_0")) {
+                    interp.exec("params['" + s + "']=" + params.get(s));
+                }
+            }
+
+            interp.execfile(new FileInputStream(src));
+
+            PyStringMap map = ((PyStringMap) interp.getLocals());
+            PyList list = map.keys();
+
+            HashMap result = new HashMap();
+
+            for (int i = 0; i < list.__len__(); i++) {
+                String key = (String) list.get(i);
+                Object o = map.get(Py.newString(key));
+                if (o instanceof PyQDataSet) {
+                    result.put(key, o);
                 }
             }
             return result;
-        } catch ( Exception e ) {
-            HashMap result= new HashMap();
-            result.put( "EXCEPTION", e.getMessage() );
+        } catch (Exception e) {
+            HashMap result = new HashMap();
+            e.printStackTrace();
+            result.put("EXCEPTION", e.getMessage());
             return result;
         }
-        
-        
+
+
     }
+
 
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc) {
         try {
-            Map<String,Object> po= getNames( DataSetURL.getURL( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) );
-            List<CompletionContext> result= new ArrayList<CompletionContext>();
-            for ( String n: po.keySet() ) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, n,this, "arg_0" ) );
+            Map<String, Object> po = getNames(DataSetURL.getURL(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)));
+            List<CompletionContext> result = new ArrayList<CompletionContext>();
+            for (String n : po.keySet()) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0"));
             }
             return result;
-        } catch ( IOException e ) {
-            return Collections.singletonList( new CompletionContext(cc.context, e.getMessage() ) );
+        } catch (IOException e) {
+            return Collections.singletonList(new CompletionContext(cc.context, e.getMessage()));
         }
     }
 
     @Override
     public boolean reject(String surl) {
         try {
-            if ( surl.contains("?") ) return false;
-            Map<String,Object> po= getNames( DataSetURL.getURL(surl) );
-            if ( po.get("result")!=null ) return false;
+            if (surl.contains("?")) {
+                return false;
+            }
+            Map<String, Object> po = getNames(DataSetURL.getURL(surl));
+            if (po.get("result") != null) {
+                return false;
+            }
             return true;
-        } catch ( IOException e ) {
+        } catch (IOException e) {
             return false; // it's not the operator's fault.
+
         }
-            
+
     }
 }
