@@ -4,9 +4,11 @@
  */
 package org.virbo.autoplot;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
@@ -58,7 +60,48 @@ public class Util {
         return result;
     
     }
+    
+    /**
+     * deletes all files and folders below root, and root, just as "rm -r" would.
+     * TODO: check links
+     * @throws IllegalArgumentException if it is unable to delete a file
+     * @return true if the operation was successful.
+     */
+    public static boolean deleteFileTree(File root) throws IllegalArgumentException {
+        if (!root.exists()) {
+            return true;
+        }
+        File[] children = root.listFiles();
+        boolean success = true;
+        for (int i = 0; i < children.length; i++) {
+            if (children[i].isDirectory()) {
+                success = success && deleteFileTree(children[i]);
+            } else {
+                success = success && children[i].delete();
+                if (!success) {
+                    throw new IllegalArgumentException("unable to delete file " + children[i]);
+                }
+            }
+        }
+        success = success && (!root.exists() || root.delete());
+        if (!success) {
+            throw new IllegalArgumentException("unable to delete folder " + root);
+        }
+        return success;
+    }
+    
 
+    public static String strjoin(Collection<String> c, String delim) {
+        StringBuffer result = new StringBuffer();
+        for (String s : c) {
+            if (result.length() > 0) {
+                result.append(delim);
+            }
+            result.append(s);
+        }
+        return result.toString();
+    }
+    
     public static void main( String[] args ) throws IOException {
         getBuildInfos();
     }
