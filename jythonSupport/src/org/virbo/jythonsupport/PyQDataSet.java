@@ -4,6 +4,7 @@
  */
 package org.virbo.jythonsupport;
 
+import java.util.Map;
 import org.python.core.Py;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
@@ -356,6 +357,10 @@ public class PyQDataSet extends PyJavaInstance {
                 while (it.hasNext()) {
                     it.next();
                     it.putValue( that, d );
+                }
+                for ( int i=0; i<4; i++ ) {
+                    Object op= ds.property("DEPEND_"+i);
+                    if ( op!=null ) that.putProperty("DEPEND_"+i, op);
                 }
                 return that;
             } else if ( arg0.isSequenceType() ) {
