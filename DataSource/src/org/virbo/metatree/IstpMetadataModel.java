@@ -29,6 +29,16 @@ public class IstpMetadataModel extends MetadataModel {
      * @throws IllegalArgumentException for strings
      */
     private double doubleValue(Object o, Units units) {
+        return doubleValue( o, units, Double.NaN );
+    }
+
+
+    /**
+     * returns the Entry that is convertable to double as a double.
+     * @throws IllegalArgumentException for strings
+     */
+    private double doubleValue(Object o, Units units, double deflt ) {
+        if ( o==null ) return deflt;
         if (o instanceof Float) {
             return ((Float) o).doubleValue();
         } else if (o instanceof Double) {
@@ -44,8 +54,9 @@ public class IstpMetadataModel extends MetadataModel {
         } else {
             throw new RuntimeException("Unsupported Data Type: " + o.getClass().getName());
         }
-    }
-
+    }    
+    
+    
     private DatumRange getValidRange(HashMap attrs) {
         Units units = Units.dimensionless;
         double max = doubleValue(attrs.get("VALIDMAX"), units);
@@ -74,8 +85,8 @@ public class IstpMetadataModel extends MetadataModel {
                 max = doubleValue(attrs.get("SCALEMAX"), units);
                 min = 0;
             } else {
-                max = doubleValue(attrs.get("VALIDMAX"), units);
-                min = doubleValue(attrs.get("VALIDMIN"), units);
+                max = doubleValue(attrs.get("VALIDMAX"), units, Double.POSITIVE_INFINITY );
+                min = doubleValue(attrs.get("VALIDMIN"), units, Double.NEGATIVE_INFINITY );
             }
         }
         if (getScaleType(attrs).equals("log") && min <= 0) {
