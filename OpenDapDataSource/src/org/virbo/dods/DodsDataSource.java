@@ -8,6 +8,7 @@
  */
 package org.virbo.dods;
 
+import org.virbo.datasource.MetadataModel;
 import org.virbo.metatree.IstpMetadataModel;
 import dods.dap.AttributeTable;
 import dods.dap.DAS;
@@ -32,6 +33,7 @@ import dods.dap.Attribute;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.util.HashMap;
 import java.util.Map;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.Util;
 
 /**
@@ -140,13 +142,10 @@ public class DodsDataSource extends AbstractDataSource {
 
         Map interpretedMetadata = null;
 
-        boolean isIstp = false;
-        if (metadata != null) {
+        boolean isIstp = adapter.getSource().toString().endsWith(".cdf");
+        if ( isIstp ) {
             Map m = new IstpMetadataModel().properties(metadata);
-            if (m.containsKey(QDataSet.DEPEND_0)) {
-                isIstp = true;
-                interpretedMetadata = m;
-            }
+            interpretedMetadata = m;
         }
 
         if (isIstp) {
@@ -170,12 +169,30 @@ public class DodsDataSource extends AbstractDataSource {
 
         adapter.loadDataset(mon);
         WritableDataSet ds = (WritableDataSet) adapter.getDataSet();
+        
+        if ( isIstp ) {
+            interpretedMetadata.remove("DEPEND_0");
+            interpretedMetadata.remove("DEPEND_1");
+            interpretedMetadata.remove("DEPEND_2");
+            DataSetUtil.putProperties( interpretedMetadata, ds);
+        }
+        
         //ds.putProperty( QDataSet.UNITS, null );
         //ds.putProperty( QDataSet.DEPEND_0, null );
         return ds;
 
     }
 
+    @Override
+    public MetadataModel getMetadataModel() {
+        if ( url.toString().contains(".cdf.dds") ) {
+            return new IstpMetadataModel();
+        } else {
+            return super.getMetadataModel();
+        }
+    }
+
+    
     public boolean asynchronousLoad() {
         return true;
     }
@@ -206,8 +223,12 @@ public class DodsDataSource extends AbstractDataSource {
             while (n.hasMoreElements()) {
                 Object key = n.nextElement();
                 Attribute att = at.getAttribute((String) key);
-                names.add(att.getName());
-                values.add(att.getValueAt(0));
+                try {
+                    values.add(att.getValueAt(0));
+                    names.add(att.getName());
+                } catch ( Exception e ) {
+                    e.printStackTrace();
+                }
             }
 
             treeresult = NameValueTreeModel.create("metadata(dds)", names, values);
