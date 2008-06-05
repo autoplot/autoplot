@@ -3,10 +3,10 @@ from java.lang import System
 
 xx= dindgen( 200000 ) 
 
-yy= applyUnary( xx, lambda x : x+5 )
+yy= applyLambda( xx, lambda x : x+5 )
 
 t0= System.currentTimeMillis()
-zz= applyBinary( xx, yy, lambda x,y : Math.atan2( y,x ) )
+zz= applyLambda( xx, yy, lambda x,y : Math.atan2( y,x ) )
 t1= System.currentTimeMillis()
 
 zz2= atan2( yy, xx )
