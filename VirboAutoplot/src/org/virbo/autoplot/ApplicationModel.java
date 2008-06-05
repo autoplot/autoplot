@@ -94,6 +94,7 @@ import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.xml.sax.SAXException;
 
@@ -238,9 +239,8 @@ public class ApplicationModel {
             ex.printStackTrace();
         }
 
-    
-    }
 
+    }
 
     private void createDasPlot() {
         DatumRange x = DatumRange.newDatumRange(0, 10, Units.dimensionless);
@@ -316,6 +316,7 @@ public class ApplicationModel {
 
         DatumRange colorRange = new DatumRange(0, 100, Units.dimensionless);
         colorbar = new DasColorBar(colorRange.min(), colorRange.max(), false);
+        colorbar.setFillColor(new java.awt.Color(0, true));
         //colorbar.setVisible(false);
 
         canvas.add(overviewPlotConnector);
@@ -388,10 +389,13 @@ public class ApplicationModel {
     }
     PropertyChangeListener timeSeriesBrowseListener;
     TimeSeriesBrowse tsb = null;
+    Caching caching = null;
 
     public void setDataSource(DataSource ds) {
         DataSource oldSource = this.dataSource;
         this.dataSource = ds;
+
+        caching = ds.getCapability(Caching.class);
 
         if ((tsb = ds.getCapability(TimeSeriesBrowse.class)) != null) {
             timeSeriesBrowseListener = new PropertyChangeListener() {
@@ -484,45 +488,59 @@ public class ApplicationModel {
         return result;
     }
 
-    private double guessCadence(QDataSet xds, QDataSet yds) {
-        if (yds == null) {
-            yds = DataSetUtil.indexGenDataSet(xds.length());
-        }
-        assert (xds.length() == yds.length());
-        Units u = (Units) yds.property(QDataSet.UNITS);
-        if (u == null) {
-            u = Units.dimensionless;
-        }
-        double cadence = Double.MAX_VALUE;
+    /**
+     * set the plot range, minding the isotropic property.
+     * @param plot
+     * @param xdesc
+     * @param ydesc
+     */
+    private void setPlotRange(DasPlot plot,
+            AutoplotUtil.AutoRangeDescriptor xdesc, AutoplotUtil.AutoRangeDescriptor ydesc) {
 
-        // calculate average cadence for consistent points.  Preload to avoid extra branch.
-        double cadenceS = Double.MAX_VALUE;
-        int cadenceN = 1;
+        if (isotropic && plot.getXAxis().getUnits().isConvertableTo(plot.getYAxis().getUnits()) && xdesc.log == false && ydesc.log == false) {
 
-        int i = 0;
-        double x0 = 0;
-        while (i < xds.length() && !u.isValid(yds.value(i))) {
-            i++;
-        }
-        if (i < yds.length()) {
-            x0 = xds.value(i);
-        }
-        for (i++; i < xds.length(); i++) {
-            if (u.isValid(yds.value(i))) {
-                double cadenceAvg;
-                cadenceAvg = cadenceS / cadenceN;
-                cadence = Math.abs(xds.value(i) - x0);
-                if ((xds.value(i) - x0) < 0.5 * cadenceAvg) {
-                    cadenceS = cadence;
-                    cadenceN = 1;
-                } else if ((xds.value(i) - x0) < 1.5 * cadenceAvg) {
-                    cadenceS += cadence;
-                    cadenceN += 1;
-                }
-                x0 = xds.value(i);
+            DasAxis axis;
+            AutoplotUtil.AutoRangeDescriptor desc; // controls the range
+
+            DasAxis otherAxis;
+            AutoplotUtil.AutoRangeDescriptor otherDesc; // controls the range
+
+            if ( plot.getXAxis().getDLength() < plot.getYAxis().getDLength() ) {
+                axis = plot.getXAxis();
+                desc = xdesc; // controls the range
+                otherAxis = plot.getYAxis();
+                otherDesc = ydesc; // controls the range
+            } else {
+                axis = plot.getYAxis();
+                desc = ydesc; // controls the range
+                otherAxis = plot.getXAxis();
+                otherDesc = xdesc; // controls the range                
             }
+
+            axis.setLog(false);
+            otherAxis.setLog(false);
+            Datum ratio = desc.range.width().divide(axis.getDLength());
+            DatumRange otherRange = otherDesc.range;
+            Datum otherRatio = otherRange.width().divide(otherAxis.getDLength());
+            DasAxis.Lock lock = otherAxis.mutatorLock(); // prevent other isotropic code from kicking in.
+
+            lock.lock();
+            double expand = (ratio.divide(otherRatio).doubleValue(Units.dimensionless) - 1) / 2;
+            if (Math.abs(expand) > 0.0001) {
+                DatumRange newOtherRange = DatumRangeUtil.rescale(otherRange, 0 - expand, 1 + expand);
+                otherAxis.setDatumRange(newOtherRange);
+            } else {
+                otherAxis.setDatumRange(otherRange);
+            }
+            axis.setDatumRange(desc.range);
+            lock.unlock();
+        } else {
+            plot.getXAxis().setLog(xdesc.log);
+            plot.getXAxis().resetRange(xdesc.range);
+            plot.getYAxis().setLog(ydesc.log);
+            plot.getYAxis().resetRange(ydesc.range);
         }
-        return cadenceS / cadenceN;
+
     }
 
     private void updateFillSpec(WritableDataSet fillDs, boolean autoRange) {
@@ -538,10 +556,9 @@ public class ApplicationModel {
             fillDs.putProperty(QDataSet.DEPEND_1, yds);
         }
 
-        double cadence = guessCadence(xds, null);
+        double cadence = DataSetUtil.guessCadence(xds, null);
         ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
 
-        spectrogramRend.setDataSet(null);
         colorbar.setVisible(true);
 
         AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds);
@@ -561,18 +578,11 @@ public class ApplicationModel {
                 plot.getColumn().setDMaximum(oldx + dx);
             }
 
-            plot.getXAxis().setLog(xdesc.log);
-            plot.getXAxis().resetRange(xdesc.range);
-            plot.getYAxis().setLog(ydesc.log);
-            plot.getYAxis().resetRange(ydesc.range);
+            setPlotRange(plot, xdesc, ydesc);
 
         }
 
-        overviewPlot.getYAxis().resetRange(ydesc.range);
-        overviewPlot.getYAxis().setLog(ydesc.log);
-        overviewPlot.getXAxis().resetRange(xdesc.range);
-        overviewPlot.getXAxis().setLog(xdesc.log);
-
+        setPlotRange(overviewPlot, xdesc, ydesc);
 
         spectrogramRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
         overSpectrogramRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
@@ -580,7 +590,10 @@ public class ApplicationModel {
 
     private void updateFillSeries(WritableDataSet fillDs, boolean autoRange) {
 
-        seriesRend.setDataSet(null);
+        if (seriesRend.getDataSet() != null && seriesRend.getDataSet().getXLength() > 30000) {
+            // hide slow intermediate states
+            seriesRend.setActive(false);
+        }
 
         QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
         if (xds == null) {
@@ -588,7 +601,7 @@ public class ApplicationModel {
             fillDs.putProperty(QDataSet.DEPEND_0, xds);
         }
 
-        double cadence = guessCadence(xds, fillDs);
+        double cadence = DataSetUtil.guessCadence(xds, fillDs);
         ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
 
         if (autoranging && autoRange && !autoRangeSuppress) {
@@ -640,6 +653,7 @@ public class ApplicationModel {
 
         colorbar.setVisible(fillDs.property(QDataSet.PLANE_0) != null);
 
+        seriesRend.setActive(true);
         try {
             seriesRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
             overSeriesRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
@@ -758,7 +772,6 @@ public class ApplicationModel {
      *
      */
     public void update() {
-        List dataSources = getDataSources();
         dataset = null;
         Runnable run = new Runnable() {
 
@@ -795,7 +808,7 @@ public class ApplicationModel {
 
                 updateFill(true);
 
-                if (interpretMetadata) {
+                if (interpretMetadata && !autoRangeSuppress) {
                     doInterpretMetadata();
                 }
 
@@ -833,7 +846,6 @@ public class ApplicationModel {
         if (i != 0) {
             throw new IllegalArgumentException("only one dataset supported");
         }
-        QDataSet result;
         if (dataset == null) {
             ProgressMonitor mon = application.getMonitorFactory().getMonitor(plot, "loading data", "loading " + dataSource);
             try {
@@ -869,12 +881,10 @@ public class ApplicationModel {
 
         surl = DataSetURL.maybeAddFile(surl);
 
-        DataSetURL.URLSplit split = DataSetURL.parse(surl);
-
         try {
-            URL url = new URL(surl);
             if (surl.endsWith(".vap")) {
                 try {
+                    URL url = new URL(surl);
                     Logger.getLogger("ap").info("loading vap file");
                     mon.setProgressMessage("loading vap file");
                     File openable = DataSetURL.getFile(url, application.getMonitorFactory().getMonitor(plot, "loading vap", ""));
@@ -886,10 +896,17 @@ public class ApplicationModel {
             } else {
                 Logger.getLogger("ap").info("getting data source");
                 mon.setProgressMessage("getting data source " + surl);
-                //setStatus( "getting data source "+url );
-                DataSource source = DataSetURL.getDataSource(url);
+
+                if (caching != null) {
+                    if (caching.satisfies(surl)) {
+                        caching.resetURL(surl);
+                        update();
+                        return;
+                    }
+                }
+                DataSource source = DataSetURL.getDataSource(surl);
                 setDataSource(source);
-                //setStatus( "getting data source... done" );
+
                 mon.setProgressMessage("done getting data source");
                 Logger.getLogger("ap").info("done getting data source");
             }
@@ -968,7 +985,7 @@ public class ApplicationModel {
                     return new ArrayList<Bookmark>();
                 } catch (SAXException e) {
                     return new ArrayList<Bookmark>();
-                } catch (ParserConfigurationException e ) {
+                } catch (ParserConfigurationException e) {
                     return new ArrayList<Bookmark>();
                 }
             }
@@ -981,9 +998,9 @@ public class ApplicationModel {
             } catch (IOException e) {
                 return new ArrayList<Bookmark>();
 
-            } catch ( ParserConfigurationException e ) {
+            } catch (ParserConfigurationException e) {
                 return new ArrayList<Bookmark>();
-                
+
             }
         }
 
@@ -1041,17 +1058,6 @@ public class ApplicationModel {
             ex.printStackTrace();
         }
         propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
-    }
-
-    private static String strjoin(Collection<String> c, String delim) {
-        StringBuffer result = new StringBuffer();
-        for (String s : c) {
-            if (result.length() > 0) {
-                result.append(delim);
-            }
-            result.append(s);
-        }
-        return result.toString();
     }
 
     public void addRecent(String surl) {
@@ -1166,8 +1172,10 @@ public class ApplicationModel {
             state.setEmbeddedDataSet(getEmbeddedDataSet());
         }
 
-        state.setTitle( plot.getTitle() );
-        
+        state.setTitle(plot.getTitle());
+
+        state.setCanvasSize(this.canvas.getSize());
+
         return state;
     }
 
@@ -1246,9 +1254,10 @@ public class ApplicationModel {
         if (deep && state.isUseEmbeddedDataSet() && !"".equals(state.getEmbeddedDataSet())) {
             setEmbeddedDataSet(state.getEmbeddedDataSet());
         }
-        
-        plot.setTitle( state.getTitle() );
 
+        plot.setTitle(state.getTitle());
+
+        canvas.setSize(state.getCanvasSize());
     }
 
     private Object parseObject(Object context, String s) {
@@ -1383,7 +1392,7 @@ public class ApplicationModel {
         producer.writeStream(out);
 
         byte[] data = Base64.encodeBytes(out.toByteArray()).getBytes();
-        
+
         embedDs = new String(data);
         embedDsDirty = false;
     }
@@ -1433,35 +1442,6 @@ public class ApplicationModel {
     }
 
     /**
-     * deletes all files and folders below root, and root, just as "rm -r" would.
-     * TODO: check links
-     * @throws IllegalArgumentException if it is unable to delete a file
-     * @return true if the operation was successful.
-     */
-    private boolean deleteFileTree(File root) throws IllegalArgumentException {
-        if (!root.exists()) {
-            return true;
-        }
-        File[] children = root.listFiles();
-        boolean success = true;
-        for (int i = 0; i < children.length; i++) {
-            if (children[i].isDirectory()) {
-                success = success && deleteFileTree(children[i]);
-            } else {
-                success = success && children[i].delete();
-                if (!success) {
-                    throw new IllegalArgumentException("unable to delete file " + children[i]);
-                }
-            }
-        }
-        success = success && (!root.exists() || root.delete());
-        if (!success) {
-            throw new IllegalArgumentException("unable to delete folder " + root);
-        }
-        return success;
-    }
-
-    /**
      * remove all cached downloads.
      * Currently, this is implemented by deleting the das2 fsCache area.
      * @throws IllegalArgumentException if the delete operation fails
@@ -1476,7 +1456,7 @@ public class ApplicationModel {
         }
         local = new File(local, ".das2/fsCache/wfs/");
 
-        return deleteFileTree(local);
+        return Util.deleteFileTree(local);
     }
     /**
      * Holds value of property showContextOverview.
@@ -1672,7 +1652,6 @@ public class ApplicationModel {
     public void setDepnames(List<String> newdepnames) {
         List<String> olddepnames = depnames;
         this.depnames = newdepnames;
-        System.err.println(newdepnames);
         propertyChangeSupport.firePropertyChange(PROP_DEPNAMES, olddepnames, newdepnames);
     }
 
