@@ -234,6 +234,22 @@ public class ApplicationState {
         this.colortable = colortable;
     }
     
+    private java.awt.Dimension canvasSize = new java.awt.Dimension( 640, 480 );
+
+    public static final String PROP_CANVASSIZE = "canvasSize";
+
+    public java.awt.Dimension getCanvasSize() {
+        return this.canvasSize;
+    }
+
+    public void setCanvasSize(java.awt.Dimension newcanvasSize) {
+        java.awt.Dimension oldcanvasSize = canvasSize;
+        this.canvasSize = newcanvasSize;
+        propertyChangeSupport.firePropertyChange(PROP_CANVASSIZE, oldcanvasSize, newcanvasSize);
+    }
+
+    
+    
     private String describe( DatumRange init, DatumRange fin ) {
         if ( init.getUnits().isConvertableTo( fin.getUnits() ) ) {
             if ( init.contains(fin) ) {
