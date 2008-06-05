@@ -32,38 +32,16 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     File file;
     ApplicationModel model;
     DataSetSelector selector;
+    ScriptPanelSupport support;
     
     /** Creates new form JythonScriptPanel */
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector ) {
         initComponents();
+    
+        support= new ScriptPanelSupport( this, model, selector );
         this.model = model;
         this.selector= selector;
-        model.addPropertyChangeListener(new PropertyChangeListener() {
 
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE)) {
-                    try {
-                        String sfile = model.dataSource().getURL();
-                        DataSetURL.URLSplit split = DataSetURL.parse(sfile);
-                        if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
-                            return;
-                        }
-                        file = DataSetURL.getFile( DataSetURL.getURL(sfile), new NullProgressMonitor());
-                        StringBuffer buf = new StringBuffer();
-                        BufferedReader r = new BufferedReader(new FileReader(file));
-                        String s = r.readLine();
-                        while (s != null) {
-                            buf.append(s + "\n");
-                            s = r.readLine();
-                        }
-                        editorPanel.setText(buf.toString());
-                    } catch (IOException ex) {
-                        Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                }
-            }
-        });
     }
 
     /** This method is called from within the constructor to
@@ -78,7 +56,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         editorPanel = new javax.swing.JTextPane();
         savePlotButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        openButton = new javax.swing.JButton();
 
         jScrollPane1.setViewportView(editorPanel);
 
@@ -97,10 +75,10 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
-        jButton1.setText("open...");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        openButton.setText("open...");
+        openButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                openButtonActionPerformed(evt);
             }
         });
 
@@ -113,9 +91,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(saveAsButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jButton1)
+                .add(openButton)
                 .addContainerGap(192, Short.MAX_VALUE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -123,104 +101,35 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(savePlotButton)
                     .add(saveAsButton)
-                    .add(jButton1))
+                    .add(openButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
         );
 
-        layout.linkSize(new java.awt.Component[] {jButton1, saveAsButton, savePlotButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {openButton, saveAsButton, savePlotButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
     private void savePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePlotButtonActionPerformed
-        try {
-            boolean updateSurl = false;
-            if (file == null || file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
-                JFileChooser chooser = new JFileChooser();
-                int r = chooser.showSaveDialog(this);
-                if (r == JFileChooser.APPROVE_OPTION) {
-                    file = chooser.getSelectedFile();
-                    updateSurl = true;
-                }
-            }
-            OutputStream out = new FileOutputStream(file);
-            String text = editorPanel.getText();
-            out.write(text.getBytes());
-            out.close();
-            if (updateSurl) {
-                model.setDataSourceURL(file.toString());
-            } else {
-                if ( model.dataSource()!=null ) model.update();
-            }
-        } catch (IOException iOException) {
-            model.getCanvas().getApplication().getExceptionHandler().handle(iOException);
-        }
+        support.savePlot();
     }//GEN-LAST:event_savePlotButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
-        try {
-            boolean updateSurl = false;
-            JFileChooser chooser = new JFileChooser();
-            if (file != null) {
-                chooser.setSelectedFile(file);
-            }
-            int r = chooser.showSaveDialog(this);
-            if (r == JFileChooser.APPROVE_OPTION) {
-                file = chooser.getSelectedFile();
-                updateSurl = true;
-            }
-            OutputStream out = new FileOutputStream(file);
-            String text = editorPanel.getText();
-            out.write(text.getBytes());
-            out.close();
-            if (updateSurl) {
-                model.setDataSourceURL(file.toString());
-            } else {
-                model.update();
-            }
-        } catch (IOException iOException) {
-            model.getCanvas().getApplication().getExceptionHandler().handle(iOException);
-        }        
+        support.saveAs();    
 }//GEN-LAST:event_saveAsButtonActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try {
-            String sfile = selector.getValue();
-            DataSetURL.URLSplit split = DataSetURL.parse(sfile);
-            if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
-                file = null;
-            } else {
-                file = DataSetURL.getFile( DataSetURL.getURL(sfile), new NullProgressMonitor());
-            }
-
-
-            JFileChooser chooser = new JFileChooser();
-            if (file != null) {
-                chooser.setSelectedFile(file);
-            }
-            int r = chooser.showOpenDialog(this);
-            if (r == JFileChooser.APPROVE_OPTION) {
-                file = chooser.getSelectedFile();
-            }
-            BufferedReader read = new BufferedReader(new FileReader(file));
-            StringBuffer buf = new StringBuffer();
-            String s = read.readLine();
-            while (s != null) {
-                buf.append(s).append("\n");
-                s = read.readLine();
-            }
-
-            editorPanel.setText(buf.toString());
-
-        } catch (IOException ex) {
-            model.getCanvas().getApplication().getExceptionHandler().handle(ex);
-        }           
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
+        support.open();      
+}//GEN-LAST:event_openButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextPane editorPanel;
-    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
     private javax.swing.JButton savePlotButton;
     // End of variables declaration//GEN-END:variables
+
+    public javax.swing.JTextPane getEditorPanel() {
+        return editorPanel;
+    }
 }
