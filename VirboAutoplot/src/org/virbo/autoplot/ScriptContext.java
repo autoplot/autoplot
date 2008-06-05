@@ -11,9 +11,11 @@ import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
 import edu.uiowa.physics.pw.das.util.TimeParser;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import javax.beans.binding.BindingContext;
@@ -200,9 +202,9 @@ public class ScriptContext extends PyJavaInstance {
      * @param ds
      */
     public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
-        URL url = new URL(surl);
+        URI url = DataSetURL.getURI(surl);
         DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
-        DataSource result = factory.getDataSource(url);
+        DataSource result = factory.getDataSource(DataSetURL.getWebURL(url));
         if (mon == null) {
             mon = new NullProgressMonitor();
         }
@@ -246,6 +248,32 @@ public class ScriptContext extends PyJavaInstance {
             }
             out.write(bufout.toByteArray());
         } catch (IOException ex) {
+        }
+    }
+
+    /**
+     * serializes the dataset to a das2stream, a well-documented, open, streaming
+     * data format. (that's a joke.)  
+     * Currently, to keep the channel open, the stream is created in a buffer and 
+     * then the buffer is sent.  TODO: write a stream-producing code that doesn't
+     * close the output stream.
+     * @param ds
+     */
+    public static void dumpToDas2Stream( QDataSet ds, String file, boolean ascii ) throws IOException {
+        OutputStream bufout = new FileOutputStream(file);
+        DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
+        if (ascii) {
+            if (lds instanceof TableDataSet) {
+                edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
+            } else {
+                edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
+            }
+        } else {
+            if (lds instanceof TableDataSet) {
+                edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToBinaryStream((TableDataSet) lds, bufout);
+            } else {
+                edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
+            }
         }
     }
 
