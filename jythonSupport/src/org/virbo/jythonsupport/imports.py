@@ -1,3 +1,3 @@
-from org.virbo.datasource.jython.Ops import *
-from org.virbo.datasource.jython.JythonOps import *
-from org.virbo.datasource.jython.Util import *
+from org.virbo.jythonsupport.Ops import *
+from org.virbo.jythonsupport.JythonOps import *
+from org.virbo.jythonsupport.Util import *
