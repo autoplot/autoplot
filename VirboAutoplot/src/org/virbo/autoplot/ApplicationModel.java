@@ -897,7 +897,7 @@ public class ApplicationModel {
                 Logger.getLogger("ap").info("getting data source");
                 mon.setProgressMessage("getting data source " + surl);
 
-                if (caching != null) {
+                if (caching != null) { 
                     if (caching.satisfies(surl)) {
                         caching.resetURL(surl);
                         update();
