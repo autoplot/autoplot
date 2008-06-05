@@ -34,17 +34,6 @@ public interface DataSourceFactory {
    // String editPanel( String surl ) throws Exception;
     
     /**
-     * object for interpreting metadata, or null
-     */
-    MetadataModel getMetadataModel( URL url );
-    
-    /**
-     * for a given url, strip off the parameters the DataSource needs, leaving
-     * the url to send to the server.
-     */
-    String urlForServer( String surl );
-    
-    /**
      * quick check to see that an url looks acceptable.  This is introduced to 
      * get Bob's desired behavior, that hitting return after a CDF filename should
      * bring up the completions list.

@@ -31,6 +31,8 @@ public interface DataSource {
      */
     boolean asynchronousLoad();
     
+    MetadataModel getMetadataModel();
+    
     /**
      * even though this takes a monitor, it should be called after getDataSet.
      */

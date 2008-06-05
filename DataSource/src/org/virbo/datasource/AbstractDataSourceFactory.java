@@ -14,22 +14,18 @@ import java.util.List;
  */
 public abstract class AbstractDataSourceFactory implements DataSourceFactory {
 
+    public AbstractDataSourceFactory() {
+        System.err.println("here");
+    }
+    
     public abstract DataSource getDataSource(URL url) throws Exception;
 
     public List<CompletionContext> getCompletions(CompletionContext cc) {
         return Collections.emptyList();
     }
 
-    public MetadataModel getMetadataModel(URL url) {
-        return MetadataModel.createNullModel();
-    }
-
     public boolean reject(String surl) {
         return false;
-    }
-
-    public String urlForServer(String surl) {
-        return surl; // TODO
     }
     
     /**

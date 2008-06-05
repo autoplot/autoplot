@@ -81,14 +81,6 @@ public abstract class AbstractDataSource implements DataSource {
        return params; 
     }
     
-    public DataSourceFactory getNewFactory() {
-        try {
-            return DataSetURL.getDataSourceFactory(this.url, new NullProgressMonitor());
-        } catch ( IOException e ) {
-            throw new RuntimeException(e);  // we should be able to make a factory
-        }
-    }
-    
     /**
      * abstract class version returns an empty tree.  Override this method
      * to provide metadata.
@@ -129,9 +121,13 @@ public abstract class AbstractDataSource implements DataSource {
         };
     }
     
+    public MetadataModel getMetadataModel() {
+        return MetadataModel.createNullModel();
+    }
+    
     public Map<String,Object> getProperties() {
         try {
-            return getNewFactory().getMetadataModel(this.url).properties( getMetaData( new NullProgressMonitor() ) );
+            return getMetadataModel().properties( getMetaData( new NullProgressMonitor() ) );
         } catch (Exception e) {
             return Collections.singletonMap( "Exception",  (Object)e );
         }
