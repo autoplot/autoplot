@@ -9,12 +9,16 @@
 package org.virbo.aggragator;
 
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +26,6 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.MetadataModel;
 
 /**
  * ftp://cdaweb.gsfc.nasa.gov/pub/istp/noaa/noaa14/%Y/noaa14_meped1min_sem_%Y%m%d_v01.cdf?timerange=2000-01-01
@@ -35,7 +38,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public DataSource getDataSource(URL url) throws Exception {
-        String surl = url.toString();
+        String surl = URLDecoder.decode( url.toString(), "US-ASCII");
         AggregatingDataSource ads = new AggregatingDataSource(url);
         FileStorageModel fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
@@ -63,7 +66,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
 
         i = splitIndex(sansArgs);
-        FileSystem fs = FileSystem.create(new URL(sansArgs.substring(0, i)));
+        FileSystem fs = FileSystem.create( new URL(sansArgs.substring(0, i)) );
         FileStorageModel fsm = FileStorageModel.create(fs, sansArgs.substring(i));
 
         return fsm;
@@ -145,20 +148,18 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
     public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException {
         URL delegateURL = new URL(getDelegateDataSourceFactoryUrl(surl));
-        return DataSetURL.getDataSourceFactory(delegateURL, new NullProgressMonitor());
+        try {
+            return DataSetURL.getDataSourceFactory(delegateURL.toURI(), new NullProgressMonitor());
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(AggregatingDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        }
     }
 
     public String editPanel(String surl) throws Exception {
         return surl;
     }
 
-    public MetadataModel getMetadataModel(URL url) {
-        try {
-            return getDelegateDataSourceFactory(url.toString()).getMetadataModel(url);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
 
     public List<CompletionContext> getCompletions(CompletionContext cc) throws Exception {
         DataSourceFactory f = getDelegateDataSourceFactory(cc.surl);
@@ -203,10 +204,6 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             e.printStackTrace();
             return true;
         }
-    }
-
-    public String urlForServer(String surl) {
-        return surl; //TODO
     }
 
 }
