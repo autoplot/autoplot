@@ -26,7 +26,7 @@ public class Util {
      * @throws java.lang.Exception
      */
     public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
-        URI url = new URI(surl);
+        URI url = DataSetURL.getURI(surl);
         DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
         DataSource result = factory.getDataSource( DataSetURL.getWebURL(url) );
         return result.getDataSet(mon == null ? new NullProgressMonitor() : mon);
