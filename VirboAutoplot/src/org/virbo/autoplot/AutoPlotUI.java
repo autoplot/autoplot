@@ -38,6 +38,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.server.RequestHandler;
@@ -187,7 +188,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
         final String TOOLTIP = "right-click to undock";
 
         tabs = new TearoffTabbedPane();
-        tabs.insertTab("plot", null, applicationModel.getCanvas(), TOOLTIP, 0);
+	
+        applicationModel.getCanvas().setFitted(true);
+	JScrollPane scrollPane= new JScrollPane( applicationModel.getCanvas() );
+	tabs.insertTab("plot", null, scrollPane, TOOLTIP, 0);
+        
+        //tabs.insertTab("plot", null, applicationModel.getCanvas(), TOOLTIP, 0);
         tabs.insertTab("axes", null, new AxisPanel(applicationModel), TOOLTIP, 1);
         tabs.insertTab("style", null, new PlotStylePanel(applicationModel), TOOLTIP, 2);
 
