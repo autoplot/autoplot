@@ -34,6 +34,7 @@ import java.util.Map;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dods.DodsVarDataSet;
@@ -198,6 +199,9 @@ public class DodsAdapter {
                         tprops.put(QDataSet.UNITS, dimUnits[idim] );
                         if ( dimProperties[idim]!=null ) tprops.putAll( dimProperties[idim] );
                         DodsVarDataSet tds= DodsVarDataSet.newDataSet( t, tprops );
+                        if ( DataSetUtil.isMonotonic(tds) ) {
+                            tds.putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
+                        }
                         zds.putProperty( "DEPEND_"+idim, tds );
                     }
                 }
