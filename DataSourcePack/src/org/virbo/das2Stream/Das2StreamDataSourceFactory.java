@@ -23,7 +23,7 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         return new Das2StreamDataSource(url);
     }
 
-    public List<CompletionContext> getCompletions(CompletionContext cc) {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) {
         return Collections.emptyList();
     }
 
@@ -31,7 +31,7 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         return MetadataModel.createNullModel();
     }
 
-    public boolean reject(String surl) {
+    public boolean reject(String surl,ProgressMonitor mon) {
         return false;
     }
 
