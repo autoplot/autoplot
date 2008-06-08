@@ -35,7 +35,9 @@ public class MetaDataPanel extends javax.swing.JPanel {
     public MetaDataPanel(ApplicationModel applicationModel) {
         this.applicationModel = applicationModel;
         initComponents();
-        metaDataTree.setModel(null);
+        SwingUtilities.invokeLater( new Runnable() { public void run() {
+            metaDataTree.setModel(null);
+        } } );
         applicationModel.addPropertyChangeListener(this.appModelListener);
         update();
     }
@@ -50,10 +52,14 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 if (dsrcMeta != null) {
                     SwingUtilities.invokeLater( new Runnable() { public void run() {
                         tree.mountTree(dsrcMeta);
+                        metaDataTree.setModel(tree);
                     } } );
                 }
+            } else {
+                SwingUtilities.invokeLater( new Runnable() { public void run() {
+                    metaDataTree.setModel(tree);
+                } } );
             }
-            metaDataTree.setModel(tree);
         } catch (Exception e) {
             applicationModel.application.getExceptionHandler().handle(e);
         }
