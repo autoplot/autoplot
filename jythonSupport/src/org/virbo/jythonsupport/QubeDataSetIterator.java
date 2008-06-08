@@ -66,7 +66,7 @@ public class QubeDataSetIterator implements NewDataSetIterator {
 
         @Override
         public String toString() {
-            return all ? ":" : ""+start+":"+stop+( step==1 ? "" : ":"+step );
+            return all ? ":" : ""+start+":"+stop+( step==1 ? "" : ":"+step ) +"@"+index;
         }
         
     }
@@ -274,6 +274,7 @@ public class QubeDataSetIterator implements NewDataSetIterator {
                             it[k]= fit[k].newIterator( dimLength(k) );
                             it[k].nextIndex();
                         }
+                        break;
                     }
                 }
             } else {
