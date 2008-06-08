@@ -102,6 +102,7 @@ public abstract class MetadataModel {
     
     /**
      * Derive QDataSet properties from inspection of the metadata tree.
+     * DEPEND_0, etc are Map<String,Object>.
      * @param meta TreeModel provided by DataSource
      * @return Map with properties such as QDataSet.TITLE
      */
