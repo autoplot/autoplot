@@ -77,15 +77,15 @@ public class BinaryDataSource extends AbstractDataSource {
 
         FileChannel fc = new FileInputStream(f).getChannel();
 
-        final int offset = getIntParameter("byteoffset", 0);
+        final int offset = getIntParameter("byteOffset", 0);
 
-        int length = getIntParameter("bytelength", (((int) f.length()) - offset));
+        int length = getIntParameter("byteLength", (((int) f.length()) - offset));
 
-        int fieldCount = getIntParameter("fieldCount", params.get("dep0") == null ? 1 : 2);
+        int fieldCount = getIntParameter("fieldCount", params.get("depend0") == null ? 1 : 2);
 
         ByteBuffer buf = (MappedByteBuffer) fc.map(MapMode.READ_ONLY, offset, length);
 
-        int dep0 = getIntParameter("dep0", -1);
+        int dep0 = getIntParameter("depend0", -1);
 
         int defltcol;
         if (dep0 == -1) {
@@ -114,7 +114,7 @@ public class BinaryDataSource extends AbstractDataSource {
         MutablePropertyDataSet ds = makeDataSet(1, recCount, fieldCount, col, 1, 1, 0, buf, columnType);
 
         if (dep0 > -1) {
-            String dep0Type = getParameter("dep0Type", columnType);
+            String dep0Type = getParameter("depend0Type", columnType);
 
             QDataSet dep0ds = makeDataSet(1, recCount, fieldCount, dep0, 1, 1, 0, buf, dep0Type);
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
