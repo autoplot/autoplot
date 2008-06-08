@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
@@ -39,7 +40,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
     }
     
     
-    public List<CompletionContext> getCompletions( CompletionContext cc ) throws IOException {
+    public List<CompletionContext> getCompletions( CompletionContext cc ,org.das2.util.monitor.ProgressMonitor mon ) throws IOException {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
@@ -74,7 +75,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
     }
     
     
-    public boolean reject( String surl ) {
+    public boolean reject( String surl, ProgressMonitor mon ) {
         try {
             DataSetURL.URLSplit split = DataSetURL.parse( surl );
             Map params= DataSetURL.parseParams( split.params );
