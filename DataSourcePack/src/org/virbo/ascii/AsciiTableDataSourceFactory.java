@@ -9,17 +9,13 @@
 
 package org.virbo.ascii;
 
-import org.das2.util.monitor.NullProgressMonitor;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
@@ -46,7 +42,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         return MetadataModel.createNullModel();
     }
 
-    public List<CompletionContext> getCompletions(CompletionContext cc) throws Exception {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             List<CompletionContext> result= new ArrayList<CompletionContext>();
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "skip=" ) );
@@ -84,7 +80,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         }
     }
     
-    public boolean reject( String surl ) {
+    public boolean reject( String surl ,ProgressMonitor mon ) {
         return false;
     }
 
