@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyList;
 import org.python.core.PyStringMap;
@@ -48,11 +49,11 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         return Collections.emptyList();
     }
 
-    private Map<String, Object> getNames(URL url) throws IOException {
+    private Map<String, Object> getNames(URL url, ProgressMonitor mon) throws IOException {
         PythonInterpreter interp = new PythonInterpreter();
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
-        interp.set("monitor", new NullProgressMonitor());
+        interp.set("monitor", mon );
         interp.execfile( Ops.class.getResource("imports.py").openStream(), "imports.py");
 
         File src = DataSetURL.getFile(url, new NullProgressMonitor());
@@ -94,9 +95,9 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
 
     @Override
-    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) {
+    public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) {
         try {
-            Map<String, Object> po = getNames(DataSetURL.getURL(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)));
+            Map<String, Object> po = getNames( DataSetURL.getURL(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)), mon );
             List<CompletionContext> result = new ArrayList<CompletionContext>();
             for (String n : po.keySet()) {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0"));
@@ -108,12 +109,12 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     @Override
-    public boolean reject(String surl) {
+    public boolean reject(String surl,ProgressMonitor mon) {
         try {
             if (surl.contains("?")) {
                 return false;
             }
-            Map<String, Object> po = getNames(DataSetURL.getURL(surl));
+            Map<String, Object> po = getNames( DataSetURL.getURL(surl), new NullProgressMonitor() );
             if (po.get("result") != null) {
                 return false;
             }
