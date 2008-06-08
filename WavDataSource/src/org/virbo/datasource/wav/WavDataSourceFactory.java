@@ -25,7 +25,7 @@ public class WavDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     @Override
-    public List<CompletionContext> getCompletions(CompletionContext cc) {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME ) ) {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "offset" ) );
