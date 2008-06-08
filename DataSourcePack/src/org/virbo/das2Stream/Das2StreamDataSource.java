@@ -74,13 +74,13 @@ public class Das2StreamDataSource extends AbstractDataSource {
             public DataSource getDataSource(URL url) throws IOException {
                 return new Das2StreamDataSource( url );
             }
-            public List<CompletionContext> getCompletions( CompletionContext cc ) {
+            public List<CompletionContext> getCompletions( CompletionContext cc ,org.das2.util.monitor.ProgressMonitor mon ) {
                 return Collections.emptyList();
             }
             public MetadataModel getMetadataModel( URL url ) {
                 return MetadataModel.createNullModel();
             }
-            public boolean reject( String surl ) {
+            public boolean reject( String surl ,ProgressMonitor mon ) {
                 return false;
             }
             public String urlForServer( String surl ) {
