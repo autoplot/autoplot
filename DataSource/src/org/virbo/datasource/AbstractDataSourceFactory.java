@@ -7,6 +7,7 @@ package org.virbo.datasource;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import org.das2.util.monitor.ProgressMonitor;
 
 /**
  *
@@ -15,16 +16,15 @@ import java.util.List;
 public abstract class AbstractDataSourceFactory implements DataSourceFactory {
 
     public AbstractDataSourceFactory() {
-        System.err.println("here");
     }
     
     public abstract DataSource getDataSource(URL url) throws Exception;
 
-    public List<CompletionContext> getCompletions(CompletionContext cc) {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) {
         return Collections.emptyList();
     }
 
-    public boolean reject(String surl) {
+    public boolean reject(String surl, ProgressMonitor mon) {
         return false;
     }
     
