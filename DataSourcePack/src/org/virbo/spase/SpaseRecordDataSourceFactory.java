@@ -30,7 +30,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
         return new SpaseRecordDataSource(url);
     }
     
-    public List<CompletionContext> getCompletions(CompletionContext cc) throws Exception {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         return java.util.Collections.emptyList();
     }
     
@@ -42,7 +42,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
         return new SpaseMetadataModel();
     }
     
-    public boolean reject( String surl ) {
+    public boolean reject( String surl ,ProgressMonitor mon ) {
         return false;
     }
 
