@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -33,7 +34,7 @@ public class DodsDataSourceFactory implements DataSourceFactory {
         return new DodsDataSource( url );
     }
     
-    public List<CompletionContext> getCompletions(CompletionContext cc) throws Exception {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
@@ -65,7 +66,7 @@ public class DodsDataSourceFactory implements DataSourceFactory {
        // }
     }
     
-    public boolean reject(String surl) {
+    public boolean reject( String surl, ProgressMonitor mon) {
         return ! surl.contains("?");
     }
 
