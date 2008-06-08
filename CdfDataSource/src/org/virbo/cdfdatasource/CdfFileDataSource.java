@@ -9,6 +9,7 @@
 
 package org.virbo.cdfdatasource;
 
+import org.virbo.metatree.IstpMetadataModel;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import org.das2.util.monitor.ProgressMonitor;
 import gsfc.nssdc.cdf.Attribute;
@@ -23,9 +24,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.tree.TreeModel;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.MetadataModel;
 import org.virbo.metatree.NameValueTreeModel;
 
 /**
@@ -61,21 +64,6 @@ public class CdfFileDataSource extends AbstractDataSource {
         return properties;
     }
     
-    /* convert the Attributes into properties the Renderers look for. */
-    private HashMap readProperties( CDF cdf, Variable variable ) {
-        HashMap properties= new HashMap();
-        DatumRange range;
-        
-        HashMap attrs= readAttributes( cdf, variable );
-        range= CdfUtil.getRange( attrs );
-        properties.put( QDataSet.TYPICAL_RANGE, range );
-        properties.put( QDataSet.SCALE_TYPE, CdfUtil.getScaleType(attrs) );
-        if ( attrs.containsKey( "LABLAXIS" ) ) {
-            properties.put( QDataSet.LABEL, attrs.get("LABLAXIS") );
-        }
-        
-        return properties;
-    }
     
     public org.virbo.dataset.QDataSet getDataSet( ProgressMonitor mon) throws IOException, CDFException {
         File cdfFile;
@@ -122,6 +110,9 @@ public class CdfFileDataSource extends AbstractDataSource {
         if ( dep0!=null ) {
             try {
                 WritableDataSet depDs= wrapDataSet( cdf, dep0 , false);
+                if ( DataSetUtil.isMonotonic(depDs) ) {
+                    depDs.putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
+                }
                 result.putProperty( QDataSet.DEPEND_0, depDs );
             } catch ( Exception e ) {
                 e.printStackTrace();
@@ -132,6 +123,9 @@ public class CdfFileDataSource extends AbstractDataSource {
         if ( dep1!=null ) {
             try {
                 WritableDataSet depDs= wrapDataSet( cdf, dep1, true );
+                if ( DataSetUtil.isMonotonic(depDs) ) {
+                    depDs.putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
+                }
                 result.putProperty( QDataSet.DEPEND_1, depDs );
             } catch ( Exception e ) {
                 e.printStackTrace(); // to support lanl.
@@ -144,6 +138,12 @@ public class CdfFileDataSource extends AbstractDataSource {
     public boolean asynchronousLoad() {
         return true;
     }
+
+    @Override
+    public MetadataModel getMetadataModel() {
+        return new IstpMetadataModel();
+    }
+        
     
     public TreeModel getMetaData( ProgressMonitor mon ) {
         
