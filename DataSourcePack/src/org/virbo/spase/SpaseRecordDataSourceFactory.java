@@ -11,6 +11,7 @@ package org.virbo.spase;
 
 import java.net.URL;
 import java.util.List;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -42,7 +43,7 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
         return new SpaseMetadataModel();
     }
     
-    public boolean reject( String surl ,ProgressMonitor mon ) {
+    public boolean reject( String surl, ProgressMonitor mon ) {
         return false;
     }
 
