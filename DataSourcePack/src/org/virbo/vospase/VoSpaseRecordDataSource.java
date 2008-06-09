@@ -27,6 +27,7 @@ import org.apache.xerces.parsers.DOMParser;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.MetadataModel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -87,7 +88,7 @@ public class VoSpaseRecordDataSource implements DataSource {
             //XPathExpression expr= xpath.compile( "//book/title/text()" );
             //surl= xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
             surl= findSurl();
-            delegate= DataSetURL.getDataSource( new URL( surl ) );
+            delegate= DataSetURL.getDataSource( DataSetURL.getURI( surl ) );
         } catch ( XPathExpressionException ex) {
             throw new IllegalArgumentException("unable to get /Spase/NumericalData/AccessInformation/AccessURL/URL(): "+ex.getMessage() );
         } catch ( MalformedURLException ex) {
@@ -187,6 +188,10 @@ public class VoSpaseRecordDataSource implements DataSource {
 
     public <T> T getCapability(Class<T> clazz) {
         return null;
+    }
+
+    public MetadataModel getMetadataModel() {
+        return MetadataModel.createNullModel();
     }
     
     
