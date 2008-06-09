@@ -11,6 +11,7 @@ package org.virbo.vospase;
 
 import java.net.URL;
 import java.util.List;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
