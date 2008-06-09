@@ -6,11 +6,13 @@ package org.virbo.jythonsupport;
 
 import edu.uiowa.physics.pw.das.dataset.TableDataSet;
 import edu.uiowa.physics.pw.das.datum.EnumerationUnits;
+import edu.uiowa.physics.pw.das.datum.TimeUtil;
 import edu.uiowa.physics.pw.das.datum.Units;
 import edu.uiowa.physics.pw.das.math.fft.ComplexArray;
 import edu.uiowa.physics.pw.das.math.fft.FFTUtil;
 import edu.uiowa.physics.pw.das.math.fft.GeneralFFT;
 import edu.uiowa.physics.pw.das.math.fft.WaveformToSpectrum;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -646,6 +648,28 @@ public class Ops {
             back[i] = i;
         }
         return DDataSet.wrap(back, 3, len0, len1, len2);
+    }
+
+      
+    /**
+     * returns rank 1 dataset with values [0,1,2,...]
+     * @param baseTime e.g. "2003-02-04T00:00"
+     * @param cadence e.g. "4.3 sec" "1 day"
+     * @param len0 the number of elements.
+     * @return
+     */
+    public static QDataSet timegen( String baseTime, String cadence, int len0) throws ParseException {
+        int size = len0;
+        double base= TimeUtil.create(baseTime).doubleValue( Units.us2000 );
+        double dcadence= Units.us2000.getOffsetUnits().parse(cadence).doubleValue( Units.us2000.getOffsetUnits() );
+        
+        double[] back = new double[size];
+        for (int i = 0; i < size; i++) {
+            back[i] = base + i*dcadence;
+        }
+        DDataSet result= DDataSet.wrap(back, 1, len0, 1, 1);
+        result.putProperty( QDataSet.UNITS, Units.us2000 );
+        return result;
     }
 
     /**
