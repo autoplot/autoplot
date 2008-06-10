@@ -57,6 +57,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -562,7 +563,7 @@ public class ApplicationModel {
         double cadence = DataSetUtil.guessCadence(xds, null);
         ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
 
-        state.setColorBarVisible(true);
+        //state.setColorBarVisible(true);
 
         AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, null);
         AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, null);
@@ -1012,7 +1013,12 @@ public class ApplicationModel {
             try {
                 dataset = dataSource.getDataSet(mon);
                 embedDsDirty = true;
-
+            } catch ( InterruptedIOException ex ) {
+                seriesRend.setException(ex);
+                seriesRend.setDataSet(null);
+                spectrogramRend.setException(ex);
+                spectrogramRend.setDataSet(null);
+                
             } catch (Exception e) {
                 application.getExceptionHandler().handle(e);
             } finally {
