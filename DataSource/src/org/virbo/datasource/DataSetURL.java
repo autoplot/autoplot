@@ -274,7 +274,11 @@ public class DataSetURL {
         }
         
         DataSourceFactory factory= null;
-        if ( url.getProtocol().equals("http") ) { // get the mime type
+        
+        // see if we can identify it by ext, to avoid the head request.
+        factory= DataSourceRegistry.getInstance().getSource( ext );
+        
+        if ( factory==null && url.getProtocol().equals("http") ) { // get the mime type
             mon.setTaskSize(-1);
             mon.started();
             mon.setProgressMessage("doing HEAD request to find dataset type");
@@ -491,7 +495,7 @@ public class DataSetURL {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
             
-            List<CompletionContext> completions= factory.getCompletions( cc );
+            List<CompletionContext> completions= factory.getCompletions( cc , mon );
             
             // identify the implicit parameter names
             Map params= DataSetURL.parseParams( split.params );
@@ -531,12 +535,12 @@ public class DataSetURL {
             
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             
-            DataSourceFactory factory= getDataSourceFactory( DataSetURL.getURI( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) , new NullProgressMonitor());
+            DataSourceFactory factory= getDataSourceFactory( DataSetURL.getURI( CompletionContext.get( CompletionContext.CONTEXT_FILE, cc ) ) , mon );
             if ( factory==null ) {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
             
-            List<CompletionContext> completions= factory.getCompletions( cc );
+            List<CompletionContext> completions= factory.getCompletions( cc , mon );
             List<String> result= new ArrayList<String>();
             int i=0;
             for ( CompletionContext cc1:completions ) {
