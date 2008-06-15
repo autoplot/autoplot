@@ -15,10 +15,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.MetadataModel;
 import org.virbo.dsutil.PropertiesTreeModel;
 import org.virbo.metatree.NameValueTreeModel;
 
@@ -48,7 +50,11 @@ public class MetaDataPanel extends javax.swing.JPanel {
             DataSource dsrc = applicationModel.dataSource();
             if (dsrc != null) {
                 ProgressMonitor mon = new NullProgressMonitor();
-                final TreeModel dsrcMeta = dsrc.getMetaData(mon);
+                Map<String,Object> meta= dsrc.getMetaData(mon);
+                MetadataModel model= dsrc.getMetadataModel();
+                String root= "Metadata ("+model.getLabel()+")";
+                        
+                final TreeModel dsrcMeta = NameValueTreeModel.create( root, meta );
                 if (dsrcMeta != null) {
                     SwingUtilities.invokeLater( new Runnable() { public void run() {
                         tree.mountTree(dsrcMeta);
