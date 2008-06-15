@@ -30,9 +30,11 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.metatree.NameValueTreeModel;
 import dods.dap.Attribute;
+import edu.uiowa.physics.pw.das.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.Util;
 
@@ -52,7 +54,7 @@ public class DodsDataSource extends AbstractDataSource {
     /**
      * the metadata
      */
-    TreeModel metadata;
+    Map<String,Object> metadata;
     DAS das;
 
     /**
@@ -115,14 +117,21 @@ public class DodsDataSource extends AbstractDataSource {
         for (int i = 0; i < 3; i++) {
             String dkey = "DEPEND_" + i;
             if (meta.containsKey(dkey)) {
-                String var = Util.unquote((String) meta.get(dkey));
+                Map val= (Map) meta.get(dkey);
+                String var = (String) val.get("NAME");
                 int[] ii2 = parser.getRecDims(var);
                 constraint1.append(",").append(var).append("[0:1:" + ii2[0] + "]");
                 da.setDependName(i, var);
 
-                TreeModel depMeta= getMetaData(var);
+                Map<String,Object> depMeta= getMetaData(var);
                 
                 Map m = new IstpMetadataModel().properties(depMeta);
+
+                if ( m.containsKey(QDataSet.UNITS) ) {
+                    da.setDimUnits( i,  (Units) m.get(QDataSet.UNITS) );
+                }
+                
+
                 da.setDimProperties( i, m );
                 
             }
@@ -134,11 +143,11 @@ public class DodsDataSource extends AbstractDataSource {
     }
 
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException {
-        //if (sMyUrl.endsWith(".cdf")) {
+        
         MyDDSParser parser = new MyDDSParser();
         parser.parse(new URL(adapter.getSource().toString() + ".dds").openStream());
 
-        getMetaData(new NullProgressMonitor());
+        getMetaData( mon );
 
         Map interpretedMetadata = null;
 
@@ -149,7 +158,7 @@ public class DodsDataSource extends AbstractDataSource {
         }
 
         if (isIstp) {
-            String constraint1 = getConstraint(adapter, interpretedMetadata, parser, variable);
+            String constraint1 = getConstraint(adapter, metadata, parser, variable);
             adapter.setConstraint(constraint1);
 
         } else {
@@ -192,53 +201,48 @@ public class DodsDataSource extends AbstractDataSource {
         }
     }
 
-    
-    public boolean asynchronousLoad() {
-        return true;
-    }
-
-    public static DataSourceFactory getFactory() {
-        return new DodsDataSourceFactory();
-    }
 
     /**
      * das must be loaded.
      * @param variable
      * @return
      */
-    private TreeModel getMetaData(String variable) {
-        TreeModel treeresult;
+    private Map<String,Object> getMetaData(String variable) {
 
         AttributeTable at = das.getAttributeTable(variable);
         if (at == null) {
-            treeresult = NameValueTreeModel.create("metadata(dds)", new HashMap());
-            return treeresult;
+            return new HashMap<String,Object>();
         } else {
-
+            Pattern p= Pattern.compile("DEPEND_[0-9]");
+            
             Enumeration n = at.getNames();
 
-            ArrayList names = new ArrayList();
-            ArrayList values = new ArrayList();
-
+            Map<String,Object> result= new HashMap<String,Object>();
+            
             while (n.hasMoreElements()) {
                 Object key = n.nextElement();
                 Attribute att = at.getAttribute((String) key);
                 try {
-                    values.add(att.getValueAt(0));
-                    names.add(att.getName());
+                    if ( p.matcher(att.getName()).matches() ) {
+                        Object val= att.getValueAt(0);
+                        String name= Util.unquote((String)val);
+                        Map<String,Object> newVal= getMetaData( name );
+                        newVal.put( "NAME", name ); // tuck it away, we'll need it later.
+                        result.put( att.getName(), newVal );
+                        
+                    } else {
+                        result.put(att.getName(), att.getValueAt(0));
+                    }
                 } catch ( Exception e ) {
                     e.printStackTrace();
                 }
             }
 
-            treeresult = NameValueTreeModel.create("metadata(dds)", names, values);
-            return treeresult;
+            return result;
         }
     }
 
-    private TreeModel getMetaData(ProgressMonitor mon, String variable) throws IOException, DASException, ParseException {
-
-        TreeModel treeresult;
+    private Map<String,Object> getMetaData(ProgressMonitor mon, String variable) throws IOException, DASException, ParseException {
 
         MyDASParser parser = new MyDASParser();
         parser.parse(new URL(adapter.getSource().toString() + ".das").openStream());
@@ -249,7 +253,7 @@ public class DodsDataSource extends AbstractDataSource {
     }
 
     @Override
-    public synchronized TreeModel getMetaData(ProgressMonitor mon) throws IOException, DASException, ParseException {
+    public synchronized Map<String,Object> getMetaData(ProgressMonitor mon) throws IOException, DASException, ParseException {
         if (metadata == null) {
             metadata = getMetaData(mon, adapter.getVariable());
         }
