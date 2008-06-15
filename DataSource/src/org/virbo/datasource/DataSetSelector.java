@@ -6,6 +6,7 @@
 package org.virbo.datasource;
 
 import edu.uiowa.physics.pw.das.DasApplication;
+import edu.uiowa.physics.pw.das.components.DasProgressPanel;
 import edu.uiowa.physics.pw.das.util.DasExceptionHandler;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -16,13 +17,17 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
@@ -63,64 +68,98 @@ public class DataSetSelector extends javax.swing.JPanel {
     JTextField editor;
     DataSetSelectorSupport support = new DataSetSelectorSupport(this);
     public static final String PROPERTY_MESSAGE = "message";
+    Logger logger = Logger.getLogger("virbo.dataset.ui");
+
+    private ProgressMonitor getMonitor() {
+        return getMonitor("Please Wait", "unidentified task in progress");
+    }
+
+    private ProgressMonitor getMonitor(String label, String desc) {
+        return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
+    }
 
     /**
      * if the dataset requires parameters that aren't provided, then
      * show completion list.  Otherwise, fire off event.
      */
     public void maybePlot() {
-        String surl = getValue();
-        if (surl.equals("")) {
-            return;
-        }
-
-        for (String actionTriggerRegex : this.actionTriggers.keySet()) {
-            if (Pattern.matches(actionTriggerRegex, surl)) {
-                Action action = actionTriggers.get(actionTriggerRegex);
-                action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
-                return;
-            }
-        }
-
-        try {
-            if (surl.endsWith("/")) {
-                int carotpos = surl.length();
-                setMessage("ends with /, filesystem completions");
-                showCompletions(surl, carotpos);
-            } else if (surl.endsWith("/..")) { // pop up one directory
-
-                int carotpos = surl.lastIndexOf("/..");
-                carotpos = surl.lastIndexOf("/", carotpos - 1);
-                if (carotpos != -1) {
-                    dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
+        logger.fine("go " + getValue() + "");
+        Runnable run = new Runnable() {
+            public void run() {
+                
+                String surl = getValue();
+                if (surl.equals("")) {
+                    logger.finest("empty value, returning");
+                    return;
                 }
-            } else {
+
+                for (String actionTriggerRegex : actionTriggers.keySet()) {
+                    if (Pattern.matches(actionTriggerRegex, surl)) {
+                        logger.finest("matches action trigger");
+                        Action action = actionTriggers.get(actionTriggerRegex);
+                        action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
+                        return;
+                    }
+                }
+
                 try {
-                    DataSourceFactory f = DataSetURL.getDataSourceFactory(DataSetURL.getURL(surl), new NullProgressMonitor());
-                    if (f.reject(surl)) {
-                        if (!surl.contains("?")) {
-                            surl += "?";
-                        }
-                        setValue(surl);
-                        int carotpos = surl.indexOf("?") + 1;
-                        setMessage("url ambiguous, getting inspecting resource for parameters");
+                    if (surl.endsWith("/")) {
+                        int carotpos = surl.length();
+                        setMessage("ends with /, filesystem completions");
                         showCompletions(surl, carotpos);
+                    } else if (surl.endsWith("/..")) { // pop up one directory
+
+                        int carotpos = surl.lastIndexOf("/..");
+                        carotpos = surl.lastIndexOf("/", carotpos - 1);
+                        if (carotpos != -1) {
+                            dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
+                        }
                     } else {
-                        ActionEvent e = new ActionEvent(this, 123, "dataSetSelect");
-                        fireActionListenerActionPerformed(e);
+                        try {
+                            DataSourceFactory f = DataSetURL.getDataSourceFactory(DataSetURL.getURI(surl), getMonitor());
+                            setMessage("check to see if uri looks acceptable");
+                            if (f.reject(surl, getMonitor())) {
+                                if (!surl.contains("?")) {
+                                    surl += "?";
+                                }
+                                setValue(surl);
+                                int carotpos = surl.indexOf("?") + 1;
+                                setMessage("url ambiguous, getting inspecting resource for parameters");
+                                showCompletions(surl, carotpos);
+                            } else {
+                                firePlotDataSetURL();
+                            }
+                        } catch (IllegalArgumentException ex) {
+                            setMessage(ex.getMessage());
+                            firePlotDataSetURL();
+                        } catch (URISyntaxException ex) {
+                            setMessage(ex.getMessage());
+                            firePlotDataSetURL();
+                        }
                     }
                 } catch (IllegalArgumentException ex) {
-                    ActionEvent e = new ActionEvent(this, 123, "dataSetSelect");
-                    fireActionListenerActionPerformed(e);
+                    ex.printStackTrace();
+                    setMessage(ex.getMessage());
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    setMessage(ex.getMessage());
                 }
             }
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-            setMessage(ex.getMessage());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            setMessage(ex.getMessage());
+        };
+        new Thread(run, "maybePlot").start();
+    }
+
+    private void firePlotDataSetURL() {
+        List<String> r = new ArrayList(getRecent());
+        String value = getValue();
+        if (r.contains(value)) {
+            r.remove(value); // move to top of the list by remove then add.
         }
+        r.add(value);
+        setRecent(r);
+        ActionEvent e = new ActionEvent(this, 123, "dataSetSelect");
+        fireActionListenerActionPerformed(e);
+
     }
 
     /**
@@ -236,7 +275,8 @@ public class DataSetSelector extends javax.swing.JPanel {
             completionsRunnable = null;
         }
 
-        completionsMonitor = DasApplication.getDefaultApplication().getMonitorFactory().getMonitor("getting completions", "getting completions by delegate");
+        completionsMonitor = getMonitor();
+        completionsMonitor.setLabel("getting completions");
         completionsRunnable = new Runnable() {
 
             public void run() {
@@ -245,12 +285,13 @@ public class DataSetSelector extends javax.swing.JPanel {
                 String prefix = split.file.substring(split.path.length());
                 String surlDir = split.path;
 
-                ProgressMonitor mon = DasApplication.getDefaultApplication().getMonitorFactory().getMonitor("getting completions", "getting remote listing");
+                ProgressMonitor mon = getMonitor();
+                mon.setLabel("getting remote listing");
 
                 FileSystem fs = null;
                 String[] s;
                 try {
-                    fs = FileSystem.create(new URL(split.path));
+                    fs = FileSystem.create(DataSetURL.getWebURL(URI.create(split.path)));
 
                     s = fs.listDirectory("/");
 
@@ -319,7 +360,8 @@ public class DataSetSelector extends javax.swing.JPanel {
             completionsRunnable = null;
         }
 
-        completionsMonitor = DasApplication.getDefaultApplication().getMonitorFactory().getMonitor("getting completions", "getting completions by delegate");
+        completionsMonitor = getMonitor();
+        completionsMonitor.setLabel("getting completions by delegate");
         completionsRunnable = new Runnable() {
 
             public void run() {
@@ -327,7 +369,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 String[] completions;
                 try {
                     completions = DataSetURL.getCompletions2(surl, carotpos, completionsMonitor);
-                    setMessage("");
+                    setMessage("done getting completions");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
@@ -445,14 +487,15 @@ public class DataSetSelector extends javax.swing.JPanel {
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
         browseButton = new javax.swing.JButton();
         plotItButton = new javax.swing.JButton();
         dataSetSelector = new javax.swing.JComboBox();
 
-        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/file.png")));
-        browseButton.setToolTipText("browse for resource");
+        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/file.png"))); // NOI18N
+        browseButton.setToolTipText("show options popup");
         browseButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         browseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -460,9 +503,11 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
 
-        plotItButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png")));
+        plotItButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
         plotItButton.setToolTipText("plot this URL");
-        plotItButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        plotItButton.setMaximumSize(new java.awt.Dimension(20, 20));
+        plotItButton.setMinimumSize(new java.awt.Dimension(20, 20));
+        plotItButton.setPreferredSize(new java.awt.Dimension(20, 20));
         plotItButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotItButtonActionPerformed(evt);
@@ -470,9 +515,14 @@ public class DataSetSelector extends javax.swing.JPanel {
         });
 
         dataSetSelector.setEditable(true);
-        dataSetSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density", "file://C:/iowaCitySales2004-2006.latlong.xls?column=M[1:]", "file://c:/Documents and Settings/jbf/My Documents/xx.d2s", "L:/fun/realEstate/to1960.latlon.xls?column=C[1:]&depend0=H[1:]", "L:/fun/realEstate/to1960.latlon.xls?column=M[1:]&depend0=N[1:]&plane0=C[1:]", "L:/ct/virbo/autoplot/data/610008002FE00410.20060901.das2Stream", "P:/poes/poes_n15_20060212.nc?proton-6_dome_16_MeV", "L:/ct/virbo/autoplot/data/asciiTab.dat", "L:/ct/virbo/autoplot/data/2490lintest90005.dat" }));
+        dataSetSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(application will put recent items here)" }));
         dataSetSelector.setToolTipText("enter data source URL");
         dataSetSelector.setMinimumSize(new java.awt.Dimension(20, 20));
+        dataSetSelector.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                dataSetSelectorItemStateChanged(evt);
+            }
+        });
         dataSetSelector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dataSetSelectorActionPerformed(evt);
@@ -483,20 +533,29 @@ public class DataSetSelector extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(dataSetSelector, 0, 243, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(dataSetSelector, 0, 320, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 26, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(browseButton))
+                .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
+
+        layout.linkSize(new java.awt.Component[] {browseButton, plotItButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(browseButton))
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                        .add(plotItButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 19, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
+
+        layout.linkSize(new java.awt.Component[] {browseButton, dataSetSelector, plotItButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+
     }// </editor-fold>//GEN-END:initComponents
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
         // this is not used because focus lost causes event fire.  Instead we listen to the JTextField.
@@ -532,32 +591,15 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_browseButtonActionPerformed
+
+private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dataSetSelectorItemStateChanged
+    //maybePlot();
+}//GEN-LAST:event_dataSetSelectorItemStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
     private javax.swing.JComboBox dataSetSelector;
     private javax.swing.JButton plotItButton;
     // End of variables declaration//GEN-END:variables
-    /**
-     * Utility field used by bound properties.
-     */
-    private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
-
-    /**
-     * Adds a PropertyChangeListener to the listener list.
-     * @param l The listener to add.
-     */
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener l) {
-        propertyChangeSupport.addPropertyChangeListener(l);
-    }
-
-    /**
-     * Removes a PropertyChangeListener from the listener list.
-     * @param l The listener to remove.
-     */
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
-        propertyChangeSupport.removePropertyChangeListener(l);
-    }
-
     /**
      * Getter for property value.
      * @return Value of property value.
@@ -574,7 +616,6 @@ public class DataSetSelector extends javax.swing.JPanel {
         String oldValue = getValue();
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
-        propertyChangeSupport.firePropertyChange("value", oldValue, value);
     }
     /**
      * Holds value of property browseTypeExt.
@@ -596,7 +637,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     public void setBrowseTypeExt(String browseTypeExt) {
         String oldBrowseTypeExt = this.browseTypeExt;
         this.browseTypeExt = browseTypeExt;
-        propertyChangeSupport.firePropertyChange("browseTypeExt", oldBrowseTypeExt, browseTypeExt);
+        firePropertyChange("browseTypeExt", oldBrowseTypeExt, browseTypeExt);
     }
     /**
      * Utility field holding list of ActionListeners.
@@ -661,9 +702,15 @@ public class DataSetSelector extends javax.swing.JPanel {
     public void setRecent(List<String> recent) {
         List<String> oldRecent = this.recent;
         this.recent = recent;
-        dataSetSelector.setModel(new DefaultComboBoxModel(recent.toArray()));
+        Object value = getValue();
+        ArrayList r = new ArrayList(recent);
+        Collections.reverse(r);
+        dataSetSelector.setModel(new DefaultComboBoxModel(r.toArray()));
+        if (recent.contains(value)) {
+            dataSetSelector.setSelectedItem(value);
+        }
         support.refreshRecentFilesMenu();
-        propertyChangeSupport.firePropertyChange("recent", oldRecent, recent);
+        firePropertyChange("recent", oldRecent, recent);
     }
     /**
      * Holds value of property message.
@@ -685,7 +732,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     public void setMessage(String message) {
         String oldMessage = this.message;
         this.message = message;
-        propertyChangeSupport.firePropertyChange(PROPERTY_MESSAGE, oldMessage, message);
+        firePropertyChange(PROPERTY_MESSAGE, oldMessage, message);
     }
     HashMap<String, Action> actionTriggers = new LinkedHashMap<String, Action>();
 
