@@ -57,6 +57,8 @@ public class Main {
             if ( os.startsWith("Windows") ) {
                 cdfLib1= "dllcdf";
                 cdfLib2= "cdfNativeLibrary";
+            } else {
+                cdfLib2= "cdfNativeLibrary";
             }
         }
         

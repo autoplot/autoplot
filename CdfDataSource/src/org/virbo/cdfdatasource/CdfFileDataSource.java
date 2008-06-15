@@ -10,7 +10,6 @@
 package org.virbo.cdfdatasource;
 
 import org.virbo.metatree.IstpMetadataModel;
-import edu.uiowa.physics.pw.das.datum.DatumRange;
 import org.das2.util.monitor.ProgressMonitor;
 import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
@@ -23,13 +22,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
-import javax.swing.tree.TreeModel;
+import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.metatree.NameValueTreeModel;
 
 /**
  *
@@ -38,7 +36,7 @@ import org.virbo.metatree.NameValueTreeModel;
 public class CdfFileDataSource extends AbstractDataSource {
     
     HashMap properties;
-    HashMap attributes;
+    HashMap<String,Object> attributes;
     
     /** Creates a new instance of CdfFileDataSource */
     public CdfFileDataSource( URL url ) {
@@ -47,16 +45,28 @@ public class CdfFileDataSource extends AbstractDataSource {
     
     
     /* read all the variable attributes into a HashMap */
-    private HashMap readAttributes( CDF cdf, Variable var ) {
-        HashMap properties= new HashMap();
-        
+    private HashMap<String,Object> readAttributes( CDF cdf, Variable var, int depth ) {
+        HashMap<String,Object> properties= new HashMap<String,Object>();
+        Pattern p= Pattern.compile("DEPEND_[0-9]");
+	
         Vector v= cdf.getAttributes();
         for ( int i=0; i<v.size(); i++ ) {
             Attribute attr= (Attribute)v.get(i);
             Entry entry= null;
             try {
                 entry= attr.getEntry(var);
-                properties.put( attr.getName(), entry.getData() );
+		
+		
+		if ( p.matcher(attr.getName()).matches() & depth==0 ) {
+                    Object val= entry.getData();
+		    String name= (String)val;
+		    Map<String,Object> newVal= readAttributes( cdf, cdf.getVariable(name), depth+1 );
+                    newVal.put( "NAME", name ); // tuck it away, we'll need it later.
+		    properties.put( attr.getName(), newVal );
+                    
+		} else {
+                    properties.put( attr.getName(), entry.getData() );
+                }
             } catch ( CDFException e ) {
             }
         }
@@ -79,7 +89,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         if ( svariable==null ) svariable= (String) map.get("arg_0");
         
         Variable variable= cdf.getVariable( svariable );
-        attributes= readAttributes( cdf, variable );
+        attributes= readAttributes( cdf, variable, 0 );
         
         WritableDataSet result= wrapDataSet(cdf, svariable, false);
         cdf.close();
@@ -104,12 +114,12 @@ public class CdfFileDataSource extends AbstractDataSource {
             result= CdfUtil.wrapCdfHyperData( variable, 0, numRec );
         }
         result.putProperty( QDataSet.NAME, svariable );
-        HashMap thisAttributes= readAttributes( cdf, variable );
+        HashMap thisAttributes= readAttributes( cdf, variable, 0 );
         
-        String dep0= (String) thisAttributes.get( "DEPEND_0" );
-        if ( dep0!=null ) {
+        Map dep0m= (Map) thisAttributes.get( "DEPEND_0" );
+        if ( dep0m!=null ) {
             try {
-                WritableDataSet depDs= wrapDataSet( cdf, dep0 , false);
+                WritableDataSet depDs= wrapDataSet( cdf, (String)dep0m.get("NAME") , false);
                 if ( DataSetUtil.isMonotonic(depDs) ) {
                     depDs.putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
                 }
@@ -119,10 +129,10 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
         }
         
-        String dep1= (String) thisAttributes.get( "DEPEND_1" );
-        if ( dep1!=null ) {
+        Map dep1m= (Map) thisAttributes.get( "DEPEND_1" );
+        if ( dep1m!=null ) {
             try {
-                WritableDataSet depDs= wrapDataSet( cdf, dep1, true );
+                WritableDataSet depDs= wrapDataSet( cdf, (String)dep1m.get("NAME"), true );
                 if ( DataSetUtil.isMonotonic(depDs) ) {
                     depDs.putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
                 }
@@ -135,6 +145,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         return result;
     }
     
+    @Override
     public boolean asynchronousLoad() {
         return true;
     }
@@ -145,11 +156,11 @@ public class CdfFileDataSource extends AbstractDataSource {
     }
         
     
-    public TreeModel getMetaData( ProgressMonitor mon ) {
-        
+    @Override
+    public Map<String,Object> getMetaData( ProgressMonitor mon ) {
         if ( attributes==null ) return null; // transient state
         
-        return NameValueTreeModel.create( "metadata(CDF)", attributes );
+        return attributes;
     }
     
 }

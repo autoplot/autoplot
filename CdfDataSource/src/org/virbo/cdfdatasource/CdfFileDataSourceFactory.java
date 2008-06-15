@@ -16,11 +16,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.MetadataModel;
 
 /**
  *
@@ -56,11 +56,19 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 cdfLib2= "cdfNativeLibrary";
             } else {
                 System.err.println("no values set identifying cdf libraries, hope you're on a mac or linux!");
+                System.err.println( System.getProperty("java.library.path" ));
+                cdfLib2= "cdfNativeLibrary";
             }
         }
         
-        if (cdfLib1 != null) System.loadLibrary(cdfLib1);
-        if (cdfLib2 != null) System.loadLibrary(cdfLib2);
+        try {
+            if (cdfLib1 != null) System.loadLibrary(cdfLib1);
+            if (cdfLib2 != null) System.loadLibrary(cdfLib2);
+        } catch ( UnsatisfiedLinkError ex ) {
+            ex.printStackTrace();
+            System.err.println( System.getProperty("java.library.path" ));
+            throw ex;
+        }
         
     }
     
@@ -75,15 +83,11 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         return surl;
     }
     
-    public MetadataModel getMetadataModel(URL url) {
-        return new IstpMetadataModel();
-    }
-    
-    public List<CompletionContext> getCompletions(CompletionContext cc) throws Exception {
-        if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
+    public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
+        if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
             String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
             
-            File cdfFile= DataSetURL.getFile( DataSetURL.getURL(file), new NullProgressMonitor() );
+            File cdfFile= DataSetURL.getFile( DataSetURL.getURL(file), mon );
             String fileName= cdfFile.toString();
             if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
@@ -103,7 +107,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             if ( parmname.equals("id") ) {
                 String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
                 
-                File cdfFile= DataSetURL.getFile( DataSetURL.getURL(file), new NullProgressMonitor() );
+                File cdfFile= DataSetURL.getFile( DataSetURL.getURL(file), mon );
                 String fileName= cdfFile.toString();
                 if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
@@ -128,12 +132,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         }
     }
     
-    public boolean reject( String surl ) {
+    public boolean reject( String surl, ProgressMonitor mon ) {
         return ! surl.contains("?") || surl.indexOf("?")==surl.length()-1;
     }
     
-    public String urlForServer(String surl) {
-        return surl; // TODO
-    }
     
 }
