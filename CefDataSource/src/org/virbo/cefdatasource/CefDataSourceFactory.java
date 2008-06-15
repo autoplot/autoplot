@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
@@ -34,8 +35,8 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
         return new CefDataSource(url);
     }
 
-    private List<String> getPlottable(URL url) throws IOException {
-        File f = DataSetURL.getFile(url, new NullProgressMonitor() );
+    private List<String> getPlottable(URL url, ProgressMonitor mon ) throws IOException {
+        File f = DataSetURL.getFile(url, mon );
         ReadableByteChannel in = Channels.newChannel(new FileInputStream(f));
         CefReaderHeader reader = new CefReaderHeader();
         Cef cef = reader.read(in);
@@ -46,13 +47,13 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     @Override
-    public List<CompletionContext> getCompletions(CompletionContext cc) {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) {
         List<CompletionContext> result = new ArrayList<CompletionContext>();
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             try {
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
-                List<String> plottable = getPlottable(new URL(surl));
+                List<String> plottable = getPlottable(new URL(surl), mon );
                 for (String s : plottable) {
                     result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0" ));
                 }
@@ -78,14 +79,11 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
     }
     
     @Override
-    public boolean reject( String surl ) {
+    public boolean reject( String surl ,ProgressMonitor mon ) {
         return ! surl.contains("?") || surl.indexOf("?")==surl.length()-1;
     }
 
-    @Override
-    public MetadataModel getMetadataModel(URL url) {
-        return new CefMetadataModel();
-    }
+
     
     
 }

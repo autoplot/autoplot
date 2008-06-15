@@ -8,13 +8,11 @@
 package org.virbo.cefdatasource;
 
 import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
 import edu.uiowa.physics.pw.das.datum.EnumerationUnits;
 import edu.uiowa.physics.pw.das.datum.Units;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.tree.TreeModel;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
@@ -49,7 +47,7 @@ public class CefMetadataModel extends MetadataModel {
         }
     }
 
-    private DatumRange getValidRange(HashMap attrs) {
+    private DatumRange getValidRange( Map attrs) {
         Units units = Units.dimensionless;
         double max = doubleValue(attrs.get("VALIDMAX"), units);
         double min = doubleValue(attrs.get("VALIDMIN"), units);
@@ -61,7 +59,7 @@ public class CefMetadataModel extends MetadataModel {
      * or the required VALIDMIN/VALIDMAX parameters.  Checks for valid range when
      * SCALETYP=log.
      */
-    private DatumRange getRange(HashMap attrs) {
+    private DatumRange getRange( Map attrs) {
         DatumRange range;
         Units units = Units.dimensionless;
 
@@ -96,7 +94,7 @@ public class CefMetadataModel extends MetadataModel {
         }
     }
 
-    private String getScaleType(HashMap attrs) {
+    private String getScaleType( Map attrs) {
         String type = "linear";
         if (attrs.containsKey("SCALETYP")) {
             type = (String) attrs.get("SCALETYP");
@@ -104,14 +102,7 @@ public class CefMetadataModel extends MetadataModel {
         return type.toLowerCase();
     }
 
-    public Map<String, Object> properties(TreeModel meta) {
-        int nchild = meta.getChildCount(meta.getRoot());
-        HashMap attrs = new HashMap();
-        for (int i = 0; i < nchild; i++) {
-            String ss = String.valueOf(meta.getChild(meta.getRoot(), i));
-            int ii = ss.indexOf("=");
-            attrs.put(ss.substring(0, ii), ss.substring(ii + 1).trim());
-        }
+    public Map<String, Object> properties( Map<String,Object> attrs ) {
 
         HashMap<String, Object> properties = new HashMap<String, Object>();
 
@@ -158,4 +149,10 @@ public class CefMetadataModel extends MetadataModel {
         return properties;
 
     }
+
+    @Override
+    public String getLabel() {
+        return "CEF";
+    }
+    
 }
