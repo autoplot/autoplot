@@ -18,9 +18,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -85,40 +82,8 @@ public abstract class AbstractDataSource implements DataSource {
      * abstract class version returns an empty tree.  Override this method
      * to provide metadata.
      */
-    public TreeModel getMetaData( ProgressMonitor mon ) throws Exception {
-        final Object ROOT= "(no metadata provided)";
-        
-        return new TreeModel() {
-            public Object getRoot() {
-                return ROOT;
-            }
-
-            public Object getChild(Object parent, int index) {
-                return null;
-            }
-
-            public int getChildCount(Object parent) {
-                return 0;
-            }
-
-            public boolean isLeaf(Object node) {
-                return node!=ROOT;
-            }
-            
-            public void valueForPathChanged(TreePath path, Object newValue) {
-            }
-
-            public int getIndexOfChild(Object parent, Object child) {
-                return 0;
-            }
-            
-            public void addTreeModelListener(TreeModelListener l) {
-            }
-            
-            public void removeTreeModelListener(TreeModelListener l) {
-            }
-            
-        };
+    public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
+        return new HashMap();
     }
     
     public MetadataModel getMetadataModel() {
@@ -129,6 +94,7 @@ public abstract class AbstractDataSource implements DataSource {
         try {
             return getMetadataModel().properties( getMetaData( new NullProgressMonitor() ) );
         } catch (Exception e) {
+	    e.printStackTrace();
             return Collections.singletonMap( "Exception",  (Object)e );
         }
     }
