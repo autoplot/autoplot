@@ -20,16 +20,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.WritableDataSet;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -41,6 +44,7 @@ import org.xml.sax.SAXException;
 public class AutoplotUtil {
 
     private final static Logger log = Logger.getLogger("virbo.autoplot.AutoRangeDescriptor.autoRange");
+
 
     public static class AutoRangeDescriptor {
 
@@ -268,7 +272,7 @@ public class AutoplotUtil {
 
             // see if the typical range is consistent with range seen.  If the
             // typical range won't hide the data's structure, then use it.
-            if (range != null) {
+            if (range != null && range.getUnits().isConvertableTo(result.range.getUnits() )) {
                 double d1, d2;
                 if (result.log) {
                     Datum dd1= result.range.min().ge( range.min() ) ? result.range.min() : range.min();
@@ -447,4 +451,101 @@ public class AutoplotUtil {
             return new double[]{min, max};
         }
     }
+    
+    /**
+     * rewrite the dataset so that fill values are set by the valid range and fill
+     * controls.
+     */
+    public static WritableDataSet applyFillValidRange( QDataSet ds, double vmin, double vmax, double fill ) {
+        WritableDataSet result = DDataSet.copy(ds);
+        Units u = (Units) ds.property(QDataSet.UNITS);
+
+        if (u == null) {
+            u = Units.dimensionless;
+        }
+
+        if (ds.rank() == 1) {
+            for (int i = 0; i < ds.length(); i++) {
+                double d = ds.value(i);
+                if (d == fill || d <= vmin || d >= vmax) {
+                    result.putValue(i, u.getFillDouble());
+                }
+            }
+        } else if (ds.rank() == 2) {
+            for (int i0 = 0; i0 < ds.length(); i0++) {
+                for (int i1 = 0; i1 < ds.length(i0); i1++) {
+                    double d = ds.value(i0, i1);
+                    if (d == fill || d <= vmin || d >= vmax) {
+                        result.putValue(i0, i1, u.getFillDouble());
+                    }
+                }
+            }
+        } else {
+            for (int i0 = 0; i0 < ds.length(); i0++) {
+                for (int i1 = 0; i1 < ds.length(i0); i1++) {
+                    for (int i2 = 0; i2 < ds.length(i0, i1); i2++) {
+                        double d = ds.value(i0, i1, i2);
+                        if (d == fill || d <= vmin || d >= vmax) {
+                            result.putValue(i0, i1, i2, u.getFillDouble());
+                        }
+                    }
+                }
+            }
+        }
+
+        result.putProperty(QDataSet.UNITS, u);
+
+        return result;
+    }
+    
+    /**
+     * extract the properties from the dataset into the same format as metadata model returns.
+     * @param ds
+     * @param spec
+     * @return
+     */
+    public static Map<String,Object> extractProperties( QDataSet ds ) {
+        
+        Map<String,Object> result= DataSetUtil.getProperties(ds);
+
+        Object v;
+        
+        for ( int i=0; i<4; i++  ) {
+            final String key = "DEPEND_" + i;
+            if ((v = ds.property(key)) != null) {
+                result.put( key, extractProperties( (QDataSet)v ) ) ;
+            }            
+        }
+        
+        for ( int i=0; i<QDataSet.MAX_PLANE_COUNT; i++ ) {
+            final String key = "PLANE_" + i;
+            if ((v = ds.property(key)) != null) {
+                result.put( key, extractProperties( (QDataSet)v ) ) ;
+            }            
+            
+        }
+        
+        return result;
+    }    
+    
+    /**
+     * combine the two properties trees, using values from the first when both contain the same property.
+     * @param properties
+     * @param deflt
+     * @return
+     */
+    public static Map<String,Object> mergeProperties( Map<String, Object> properties, Map<String,Object> deflt ) {
+        if ( deflt==null ) return properties;
+        HashMap<String,Object> result= new HashMap<String,Object>(deflt);
+        for ( String key: properties.keySet() ) {
+            Object val= properties.get(key);
+            if ( val instanceof Map ) {
+                result.put(key, mergeProperties( (Map<String,Object>)val, (Map<String,Object>)deflt.get(key) ) );
+            } else {
+                result.put(key, val);
+            }
+        }
+        return result;
+    }
+    
 }
