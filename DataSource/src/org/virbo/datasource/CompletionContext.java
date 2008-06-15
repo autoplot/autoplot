@@ -15,23 +15,23 @@ package org.virbo.datasource;
  */
 public class CompletionContext {
     
-    public final static String CONTEXT_FILESYSTEM="fs";
-    public final static String CONTEXT_FILE="file";  // file and filesystem seem to be the same for now.
-    public final static String CONTEXT_PARAMETER_NAME="paramName";
-    public final static String CONTEXT_PARAMETER_VALUE="paramValue";
+    public final static Object CONTEXT_FILESYSTEM="fs";
+    public final static Object CONTEXT_FILE="file";  // file and filesystem seem to be the same for now.
+    public final static Object CONTEXT_PARAMETER_NAME="paramName";
+    public final static Object CONTEXT_PARAMETER_VALUE="paramValue";
     
     public CompletionContext() {
     }
     
-    public CompletionContext( String context, String completable ) {
+    public CompletionContext( Object context, String completable ) {
         this( context, completable, null, null, null );
     }
     
-    public CompletionContext( String context, String completable, DataSourceFactory owner, String implicitName ) {
+    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName ) {
         this( context, completable, owner, implicitName, null );
     }
     
-    public CompletionContext( String context, String completable, DataSourceFactory owner, String implicitName, String doc ) {
+    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String doc ) {
         this.context= context;
         this.completable= completable;
         this.owner= owner;
@@ -52,7 +52,7 @@ public class CompletionContext {
     /**
      * the context identifier enum for the completion. See CONTEXT_FILESYSTEM, CONTEXT_FILE, CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, etc.
      */
-    public String context;
+    public Object context;
     
     /**
      * The string to be completed
@@ -89,7 +89,7 @@ public class CompletionContext {
      * cc.surlpos= 59
      * get( COMPLETION_PARAMETER_NAME, cc ) ->  param2
      */
-    public static String get( String context, CompletionContext cc ) {
+    public static String get( Object context, CompletionContext cc ) {
         if ( context==CONTEXT_FILESYSTEM || context==CONTEXT_FILE ) {
             int i=cc.surl.indexOf('?');
             if (i==-1 ) i=cc.surl.length();
@@ -126,9 +126,15 @@ public class CompletionContext {
      * "ftp://cdaweb.gsfc.nasa.gov/pub/istp/noaa/noaa14/%Y/noaa14_meped1min_sem_%Y%m%d_v01.cdf?Epoch&timerange=2000-01-01"
      */
     public static String insert( CompletionContext cc, CompletionContext ccnew ) {
-        String context= ccnew.context;
+        Object context= ccnew.context;
         if ( context==CONTEXT_FILESYSTEM || context==CONTEXT_FILE ) {
-            DataSetURL.URLSplit split= DataSetURL.parse( cc.surl );
+            String surl= cc.surl;
+            boolean isURI= false;
+            //if ( surl.indexOf('.') < surl.indexOf(':') ) { // check for URI
+            //    surl= surl.substring( surl.indexOf('.')+1 );
+            //    isURI= true;
+            //}
+            DataSetURL.URLSplit split= DataSetURL.parse( surl );
             split.file= ccnew.completable;
             return DataSetURL.format( split );
             
@@ -162,6 +168,7 @@ public class CompletionContext {
         
     }
     
+    @Override
     public String toString() {
         return this.context + "=" + this.completable;
     }
