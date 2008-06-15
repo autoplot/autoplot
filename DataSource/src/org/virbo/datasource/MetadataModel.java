@@ -26,7 +26,7 @@ public abstract class MetadataModel {
     
     public static MetadataModel createNullModel() {
         return new MetadataModel() {
-            public Map<String, Object> properties(TreeModel meta) {
+            public Map<String, Object> properties(Map<String,Object> meta) {
                 return new HashMap<String,Object>();
             }  
         };
@@ -69,18 +69,37 @@ public abstract class MetadataModel {
         }
         return -1;
     }
+
+    
+    /**
+     * drills down through the Maps.  This returns value.
+     */
+    public static String getNodeValue( Map<String,Object> tree, String[] path ) {
+
+        Object o= tree.get( path[1] );
+        
+        for ( int i=2; i<path.length-1; i++ ) {
+            Map<String,Object> subTree= (Map<String,Object>) o;
+            o= subTree.get(path[i]);
+        }
+        
+        return String.valueOf(o);
+    }
+    
     
     /**
      * assumes the leaves of the tree are "name=value" pairs.  This returns value.
      */
-    public String getNodeValue( TreeModel tree, String[] path ) {
+    public static String getNodeValue( TreeModel tree, String[] path ) {
         
-        int index= indexOfChild( (TreeNode)tree.getRoot(), path[0] );
-        
+        if ( !path[0].equals(tree.getRoot().toString()) ) throw new IllegalArgumentException("root node didn't match");
+        int index= indexOfChild( (TreeNode)tree.getRoot(), path[1] );
+        if ( index==-1 ) throw new IllegalArgumentException("node didn't match: "+path[0]);
         Object pos= tree.getChild( tree.getRoot(), index );
         
-        for ( int i=1; i<path.length-1; i++ ) {
+        for ( int i=2; i<path.length-1; i++ ) {
             index= indexOfChild( (TreeNode)pos, path[i] );
+            if ( index==-1 ) throw new IllegalArgumentException("node didn't match: "+path[i]);
             pos= tree.getChild( pos, index );
         }
         
@@ -103,8 +122,12 @@ public abstract class MetadataModel {
     /**
      * Derive QDataSet properties from inspection of the metadata tree.
      * DEPEND_0, etc are Map<String,Object>.
-     * @param meta TreeModel provided by DataSource
+     * @param meta model provided by DataSource
      * @return Map with properties such as QDataSet.TITLE
      */
-    public abstract Map<String,Object> properties( TreeModel meta );
+    public abstract Map<String,Object> properties( Map<String,Object> meta );
+    
+    public String getLabel() {
+        return "";
+    }
 }
