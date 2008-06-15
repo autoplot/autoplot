@@ -22,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.InterruptedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 char type = aline.charAt(0);
                 if (type == 't') {
                     if (aline.indexOf("total") == 0) {
-                    //totalSize= Long.parseLong( aline.substring( 5 ).trim() );
+                        //totalSize= Long.parseLong( aline.substring( 5 ).trim() );
                     }
                 }
 
@@ -129,7 +130,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             } // if (aline.length)
 
         } // while
-        
+
         reader.close();
         //TODO: finally clause
 
@@ -250,7 +251,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     public void byteRead(int bytes) {
                         totalBytes += bytes;
                         if (mon.isCancelled()) {
-                            throw new RuntimeException("ftp download cancelled");
+                            throw new RuntimeException( new InterruptedIOException("transfer cancelled by user") );
                         }
                         long dt = System.currentTimeMillis() - t0;
                         mon.setTaskProgress(totalBytes);
@@ -265,7 +266,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 bean.getBinaryFile(ss[3].substring(ss[2].length()), partFile.toString(), observer);
                 mon.finished();
             } catch (RuntimeException ex) {
-                throw new IOException(ex.getMessage());
+                ex.printStackTrace();
+                if ( ex.getCause() instanceof IOException ) {
+                    throw (IOException)ex.getCause();
+                } else {
+                    throw new IOException(ex.getMessage());
+                }
             } catch (FtpException ex) {
                 throw new IOException(ex.getMessage());
 
