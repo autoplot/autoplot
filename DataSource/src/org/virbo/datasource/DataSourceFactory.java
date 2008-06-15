@@ -11,6 +11,7 @@ package org.virbo.datasource;
 
 import java.net.URL;
 import java.util.List;
+import org.das2.util.monitor.ProgressMonitor;
 
 /**
  * 
@@ -24,9 +25,11 @@ public interface DataSourceFactory {
     DataSource getDataSource( URL url ) throws Exception;
         
     /**
-     * return a list of context-sensitive completions
+     * return a list of context-sensitive completions.  If an exception is thrown, then an
+     * a error dialog is displayed for RuntimeExceptions.  Compile-time exceptions may be
+     * displayed more gently, relying on getMessage to aid the human operator.
      */
-    List<CompletionContext> getCompletions( CompletionContext cc ) throws Exception;
+    public List<CompletionContext> getCompletions( CompletionContext cc, ProgressMonitor mon ) throws Exception;
     
     /**
      * present the editor for customizing this URL.
@@ -38,6 +41,6 @@ public interface DataSourceFactory {
      * get Bob's desired behavior, that hitting return after a CDF filename should
      * bring up the completions list.
      */
-    boolean reject( String surl ) ;
+    public boolean reject( String surl, ProgressMonitor mon ) ;
     
 }
