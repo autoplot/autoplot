@@ -22,6 +22,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
@@ -161,13 +162,13 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
 
-    public List<CompletionContext> getCompletions(CompletionContext cc) throws Exception {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         DataSourceFactory f = getDelegateDataSourceFactory(cc.surl);
         List<CompletionContext> result = new ArrayList<CompletionContext>();
         String afile = getDelegateDataSourceFactoryUrl(cc.surl);
         CompletionContext delegatecc = getDelegateDataSourceCompletionContext(cc);
 
-        List<CompletionContext> delegateCompletions = f.getCompletions(delegatecc);
+        List<CompletionContext> delegateCompletions = f.getCompletions(delegatecc,mon);
         result.addAll(delegateCompletions);
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
@@ -183,7 +184,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return result;
     }
 
-    public boolean reject(String surl) {
+    public boolean reject( String surl, ProgressMonitor mon) {
         DataSetURL.URLSplit split = DataSetURL.parse(surl);
         Map map = DataSetURL.parseParams(split.params);
 
@@ -196,7 +197,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                 return true;
             }
             String delegateSurl = getDelegateDataSourceFactoryUrl(surl);
-            return getDelegateDataSourceFactory(surl).reject(delegateSurl);
+            return getDelegateDataSourceFactory(surl).reject( delegateSurl, mon );
         } catch (IOException e) {
             e.printStackTrace();
             return false;
