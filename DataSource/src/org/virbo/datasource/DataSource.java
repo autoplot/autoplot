@@ -36,7 +36,7 @@ public interface DataSource {
     /**
      * even though this takes a monitor, it should be called after getDataSet.
      */
-    TreeModel getMetaData( ProgressMonitor mon ) throws Exception ;
+    Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception ;
 
     String getURL();
     
