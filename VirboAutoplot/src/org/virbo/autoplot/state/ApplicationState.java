@@ -645,7 +645,7 @@ public class ApplicationState {
      */
     public void setForegroundColor(Color foregroundColor) {
         Color oldForegroundColor = this.foregroundColor;
-        this.foregroundColor = foregroundColor;
+        this.foregroundColor = new Color( foregroundColor.getRGB() ); //otherwise can't serialize
         propertyChangeSupport.firePropertyChange ("foregroundColor", oldForegroundColor, foregroundColor);
     }
 
@@ -677,6 +677,56 @@ public class ApplicationState {
         String oldtitle = title;
         this.title = newtitle;
         propertyChangeSupport.firePropertyChange(PROP_TITLE, oldtitle, newtitle);
+    }
+    
+    protected String xLabel = "";
+    public static final String PROP_XLABEL = "xLabel";
+
+    public String getXLabel() {
+	return xLabel;
+    }
+
+    public void setXLabel(String xLabel) {
+	String oldXLabel = this.xLabel;
+	this.xLabel = xLabel;
+	propertyChangeSupport.firePropertyChange(PROP_XLABEL, oldXLabel, xLabel);
+    }
+    
+    
+    protected String yLabel = "";
+    public static final String PROP_YLABEL = "yLabel";
+
+    public String getYLabel() {
+	return yLabel;
+    }
+
+    public void setYLabel(String yLabel) {
+	String oldYLabel = this.yLabel;
+	this.yLabel = yLabel;
+	propertyChangeSupport.firePropertyChange(PROP_YLABEL, oldYLabel, yLabel);
+    }
+
+    protected String zLabel = "";
+    public static final String PROP_ZLABEL = "zLabel";
+
+    public String getZLabel() {
+        return zLabel;
+    }
+
+    public void setZLabel(String zLabel) {
+        String oldZLabel = this.zLabel;
+        this.zLabel = zLabel;
+        propertyChangeSupport.firePropertyChange(PROP_ZLABEL, oldZLabel, zLabel);
+    }
+
+    protected Options options = new Options();
+
+    public Options getOptions() {
+        return options;
+    }
+
+    public void setOptions(Options options) {
+        this.options = options;
     }
 
 }
