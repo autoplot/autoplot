@@ -70,6 +70,7 @@ public class Util {
      * remove quotes from string, which pops up a lot in metadata
      */
     public static String unquote( String s ) {
+        if ( s==null ) return null;
         if ( s.startsWith("\"") ) {
             s= s.substring(1);
         }
