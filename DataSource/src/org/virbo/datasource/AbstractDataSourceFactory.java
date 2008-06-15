@@ -20,7 +20,7 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
     
     public abstract DataSource getDataSource(URL url) throws Exception;
 
-    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) {
+    public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         return Collections.emptyList();
     }
 
