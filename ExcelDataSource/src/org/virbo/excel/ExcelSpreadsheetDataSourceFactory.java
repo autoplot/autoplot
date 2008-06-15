@@ -27,9 +27,9 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) {
         List<CompletionContext> result = new ArrayList<CompletionContext>();
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column"));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend0"));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "plane0"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend0="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "plane0="));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String param = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (param.equals("column")) {
