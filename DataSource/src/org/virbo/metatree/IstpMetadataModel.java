@@ -12,7 +12,6 @@ import edu.uiowa.physics.pw.das.datum.Units;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.tree.TreeModel;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.Util;
@@ -29,39 +28,39 @@ public class IstpMetadataModel extends MetadataModel {
      * @throws IllegalArgumentException for strings
      */
     private double doubleValue(Object o, Units units) {
-        return doubleValue( o, units, Double.NaN );
+	return doubleValue(o, units, Double.NaN);
     }
-
 
     /**
      * returns the Entry that is convertable to double as a double.
      * @throws IllegalArgumentException for strings
      */
-    private double doubleValue(Object o, Units units, double deflt ) {
-        if ( o==null ) return deflt;
-        if (o instanceof Float) {
-            return ((Float) o).doubleValue();
-        } else if (o instanceof Double) {
-            return ((Double) o).doubleValue();
-        } else if (o instanceof Short) {
-            return ((Short) o).doubleValue();
-        } else if (o instanceof String) {
-            try {
-                return units.parse(Util.unquote((String) o)).doubleValue(units);
-            } catch (ParseException ex) {
-                throw new IllegalArgumentException("unable to parse " + o);
-            }
-        } else {
-            throw new RuntimeException("Unsupported Data Type: " + o.getClass().getName());
-        }
-    }    
-    
-    
-    private DatumRange getValidRange(HashMap attrs) {
-        Units units = Units.dimensionless;
-        double max = doubleValue(attrs.get("VALIDMAX"), units);
-        double min = doubleValue(attrs.get("VALIDMIN"), units);
-        return DatumRange.newDatumRange(min, max, units);
+    private double doubleValue(Object o, Units units, double deflt) {
+	if (o == null) {
+	    return deflt;
+	}
+	if (o instanceof Float) {
+	    return ((Float) o).doubleValue();
+	} else if (o instanceof Double) {
+	    return ((Double) o).doubleValue();
+	} else if (o instanceof Short) {
+	    return ((Short) o).doubleValue();
+	} else if (o instanceof String) {
+	    try {
+		return units.parse(Util.unquote((String) o)).doubleValue(units);
+	    } catch (ParseException ex) {
+		throw new IllegalArgumentException("unable to parse " + o);
+	    }
+	} else {
+	    throw new RuntimeException("Unsupported Data Type: " + o.getClass().getName());
+	}
+    }
+
+    private DatumRange getValidRange( Map attrs) {
+	Units units = Units.dimensionless;
+	double max = doubleValue(attrs.get("VALIDMAX"), units);
+	double min = doubleValue(attrs.get("VALIDMIN"), units);
+	return DatumRange.newDatumRange(min, max, units);
     }
 
     /**
@@ -69,102 +68,117 @@ public class IstpMetadataModel extends MetadataModel {
      * or the required VALIDMIN/VALIDMAX parameters.  Checks for valid range when
      * SCALETYP=log.
      */
-    private DatumRange getRange(HashMap attrs) {
-        DatumRange range;
-        Units units = Units.dimensionless;
+    private DatumRange getRange( Map attrs) {
+	DatumRange range;
+	Units units = Units.dimensionless;
 
-        if ("Epoch".equals(attrs.get("LABLAXIS")) && "ms".equals(attrs.get("UNITS"))) {
-            units = Units.cdfEpoch;
-        }
-        double min, max;
-        if (attrs.containsKey("SCALEMIN") && attrs.containsKey("SCALEMAX")) {
-            max = doubleValue(attrs.get("SCALEMAX"), units);
-            min = doubleValue(attrs.get("SCALEMIN"), units);
-        } else {
-            if (attrs.containsKey("SCALEMAX")) {
-                max = doubleValue(attrs.get("SCALEMAX"), units);
-                min = 0;
-            } else {
-                max = doubleValue(attrs.get("VALIDMAX"), units, Double.POSITIVE_INFINITY );
-                min = doubleValue(attrs.get("VALIDMIN"), units, Double.NEGATIVE_INFINITY );
+	if ("Epoch".equals(attrs.get("LABLAXIS")) && "ms".equals(attrs.get("UNITS"))) {
+	    units = Units.cdfEpoch;
+	}
+	double min, max;
+	if (attrs.containsKey("SCALEMIN") && attrs.containsKey("SCALEMAX")) {
+	    max = doubleValue(attrs.get("SCALEMAX"), units);
+	    min = doubleValue(attrs.get("SCALEMIN"), units);
+	} else {
+	    if (attrs.containsKey("SCALEMAX")) {
+		max = doubleValue(attrs.get("SCALEMAX"), units);
+		min = 0;
+	    } else {
+		max = doubleValue(attrs.get("VALIDMAX"), units, Double.POSITIVE_INFINITY);
+		min = doubleValue(attrs.get("VALIDMIN"), units, Double.NEGATIVE_INFINITY);
+	    }
+	}
+	if (getScaleType(attrs).equals("log") && min <= 0) {
+	    min = max / 10000;
+	}
+	range = new DatumRange(min, max, units);
+	return range;
+    }
+
+    private String getScaleType( Map attrs) {
+	String type = "linear";
+	if (attrs.containsKey("SCALETYP")) {
+	    type = (String) attrs.get("SCALETYP");
+	}
+	return type;
+    }
+
+    private Units lookup(String units) {
+	return Units.getByName(units);
+    }
+
+    public Map<String, Object> properties( Map<String,Object> meta ) {
+	Map attrs = meta;
+
+	HashMap<String, Object> properties = new HashMap<String, Object>();
+
+	if (attrs.containsKey("LABLAXIS")) {
+	    properties.put(QDataSet.LABEL, attrs.get("LABLAXIS"));
+	}
+
+	if (attrs.containsKey("CATDESC")) {
+	    properties.put(QDataSet.TITLE, attrs.get("CATDESC"));
+	}
+
+	if (attrs.containsKey("DISPLAY_TYPE")) {
+	    String type = (String) attrs.get("DISPLAY_TYPE");
+	    properties.put(QDataSet.RENDER_TYPE, type);
+	}
+
+	for (int i = 0; i < 4; i++) {
+	    String key= "DEPEND_" + i;
+	    if (attrs.containsKey(key)) {
+		Map<String,Object> props= (Map<String, Object>) attrs.get( key );
+		properties.put( key, properties(props) );
+	    }
+	}
+
+	if (attrs.containsKey("UNITS")) {
+	    String sunits = (String) attrs.get("UNITS");
+	    Units units;
+	    try {
+		units = lookup(Util.unquote(sunits));
+	    } catch (IllegalArgumentException e) {
+		units = Units.dimensionless;
+	    }
+
+            boolean isEpoch= ( units==Units.milliseconds )
+                    || "Epoch".equals(attrs.get( QDataSet.NAME )) 
+                    || "Epoch".equalsIgnoreCase(Util.unquote((String) attrs.get("LABLAXIS")));
+	    if ( isEpoch ) {
+		units = Units.cdfEpoch;
+                properties.put(QDataSet.LABEL, "" );
+	    } else {
+                String label= (String) attrs.get("LABLAXIS");
+                if ( label==null ) {
+                    label= sunits;
+                } else {
+                    if ( !sunits.equals("") ) label+= ", "+sunits;
+                }
+                properties.put(QDataSet.LABEL, label );
             }
-        }
-        if (getScaleType(attrs).equals("log") && min <= 0) {
-            min = max / 10000;
-        }
-        range = new DatumRange(min, max, units);
-        return range;
+	    properties.put(QDataSet.UNITS, units);
+	}
+
+	try {
+	    DatumRange range = getRange(attrs);
+	    properties.put(QDataSet.TYPICAL_RANGE, range);
+
+	    properties.put(QDataSet.VALID_RANGE, getValidRange(attrs));
+
+	    properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
+	} catch (IllegalArgumentException ex) {
+	    ex.printStackTrace();
+
+	}
+
+	return properties;
+
     }
 
-    private String getScaleType(HashMap attrs) {
-        String type = "linear";
-        if (attrs.containsKey("SCALETYP")) {
-            type = (String) attrs.get("SCALETYP");
-        }
-        return type;
-    }
-
-    private Units lookup( String units ) {
-        return Units.getByName(units);
+    @Override
+    public String getLabel() {
+        return "ISTP-CDF";
     }
     
-    
-    public Map<String, Object> properties(TreeModel meta) {
-        int nchild = meta.getChildCount(meta.getRoot());
-        HashMap attrs = new HashMap();
-        for (int i = 0; i < nchild; i++) {
-            String ss = String.valueOf(meta.getChild(meta.getRoot(), i));
-            int ii = ss.indexOf("=");
-            attrs.put(ss.substring(0, ii), ss.substring(ii + 1).trim());
-        }
-
-        HashMap<String, Object> properties = new HashMap<String, Object>();
-
-        if (attrs.containsKey("LABLAXIS")) {
-            properties.put(QDataSet.LABEL, attrs.get("LABLAXIS"));
-        }
-
-        if (attrs.containsKey("CATDESC")) {
-            properties.put(QDataSet.TITLE, attrs.get("CATDESC"));
-        }
-
-        if (attrs.containsKey("DISPLAY_TYPE")) {
-            String type = (String) attrs.get("DISPLAY_TYPE");
-            properties.put(QDataSet.RENDER_TYPE, type);
-        }
-
-        if (attrs.containsKey("DEPEND_0")) {
-            properties.put(QDataSet.DEPEND_0, attrs.get("DEPEND_0"));
-        }
-
-        if (attrs.containsKey("UNITS")) {
-            String sunits = (String)attrs.get("UNITS");
-            Units units;
-            try {
-                units = lookup( Util.unquote(sunits) );
-            } catch (IllegalArgumentException e) {
-                units = Units.dimensionless;
-            }
-
-            if (units == Units.milliseconds && ("Epoch".equalsIgnoreCase( Util.unquote( (String) attrs.get("LABLAXIS")))) ) {
-                units = Units.cdfEpoch;
-            }
-            properties.put( QDataSet.UNITS, units );
-        }
-
-        try {
-            DatumRange range = getRange(attrs);
-            properties.put(QDataSet.TYPICAL_RANGE, range);
-
-            properties.put(QDataSet.VALID_RANGE, getValidRange(attrs));
-
-            properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-
-        }
-
-        return properties;
-
-    }
 }
