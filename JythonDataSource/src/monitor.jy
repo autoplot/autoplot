@@ -1,7 +1,7 @@
 from time import sleep;
 from java.lang import System;
 
-n= 100000
+n= 10000
 result= zeros( n )
 dep0= zeros( n )
 monitor.setTaskSize( n )
@@ -9,6 +9,8 @@ monitor.started()
 t0= System.currentTimeMillis()
 
 for i in xrange( 0,n ):
+  if monitor.isCancelled():
+     break
   monitor.setTaskProgress(i)
   dt= System.currentTimeMillis() - t0
   d= total( randn( 1000 ) )

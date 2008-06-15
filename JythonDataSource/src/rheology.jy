@@ -1,4 +1,4 @@
-raw= getDataSet( 'dat.file:/L:/ct/Cabinette/ncvs/sarahFFT/lintest9/2490lintest90005.raw?skip=31&column=field1' )
+raw= getDataSet( 'dat.file:/media//ct/Cabinette/ncvs/sarahFFT/lintest9/2490lintest90005.raw?skip=31&column=field1' )
 freq= 15.47436
 nperiod= 1
 time= dindgen(512) * nperiod / freq / 512
