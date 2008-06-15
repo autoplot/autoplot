@@ -27,6 +27,10 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.ErrorManager;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
@@ -40,9 +44,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
+import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
+import org.virbo.autoplot.state.Options;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetURL;
@@ -61,6 +68,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
     UndoRedoSupport undoRedoSupport;
     TickleTimer tickleTimer;
     GuiSupport support;
+
+    final String TABS_TOOLTIP = "right-click to undock";
+    
     PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
         public Element serialize(Document document, ProgressMonitor monitor) {
@@ -74,6 +84,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
             SerializeUtil.processElement(element, applicationModel);
         }
     };
+    Options options;
+    private Logger logger= Logger.getLogger("virbo.autoplot");
 
     private Action getUndoAction() {
         return undoRedoSupport.getUndoAction();
@@ -92,7 +104,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         ScriptContext.setApplicationModel(model);
         ScriptContext.setView(this);
-        
+
         support = new GuiSupport(this);
 
         applicationModel = model;
@@ -121,7 +133,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 } else {
                     label = "";
                 }
-                statusLabel.setText(label);
+                setMessage(label);
             }
         });
 
@@ -179,29 +191,36 @@ public class AutoPlotUI extends javax.swing.JFrame {
         addBindings();
 
         dataSetSelector.addPropertyChangeListener(new PropertyChangeListener() {
-
             public void propertyChange(PropertyChangeEvent e) {
-                statusLabel.setText(dataSetSelector.getMessage());
+                Runnable run= new Runnable() {
+                    public void run() {
+                        setStatus(dataSetSelector.getMessage());
+                    }
+                };
+                //SwingUtilities.invokeLater(run);
+                run.run();
             }
         });
 
-        final String TOOLTIP = "right-click to undock";
-
         tabs = new TearoffTabbedPane();
-	
+
         applicationModel.getCanvas().setFitted(true);
-	JScrollPane scrollPane= new JScrollPane( applicationModel.getCanvas() );
-	tabs.insertTab("plot", null, scrollPane, TOOLTIP, 0);
-        
+        JScrollPane scrollPane = new JScrollPane(applicationModel.getCanvas());
+        tabs.insertTab("plot", null, scrollPane, TABS_TOOLTIP, 0);
+
         //tabs.insertTab("plot", null, applicationModel.getCanvas(), TOOLTIP, 0);
-        tabs.insertTab("axes", null, new AxisPanel(applicationModel), TOOLTIP, 1);
-        tabs.insertTab("style", null, new PlotStylePanel(applicationModel), TOOLTIP, 2);
+        tabs.insertTab("axes", null, new AxisPanel(applicationModel), TABS_TOOLTIP, 1);
+        tabs.insertTab("style", null, new PlotStylePanel(applicationModel), TABS_TOOLTIP, 2);
 
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
-        tabs.insertTab("metadata", null, mdp, TOOLTIP, 3);
+        tabs.insertTab("metadata", null, mdp, TABS_TOOLTIP, 3);
 
-        tabs.insertTab("script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector ), TOOLTIP, 4 );
-        
+        if ( model.options.isScriptVisible() ) {
+            tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector ) );
+            scriptPanelMenuItem.setEnabled(false);
+            scriptPanelMenuItem.setSelected(true);
+        }
+        if ( model.options.isLogConsoleVisible() ) initLogConsole();
 
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
 
@@ -237,7 +256,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
 
         tabbedPanelContainer.validate();
-        
+
         updateBookmarks();
 
         pack();
@@ -250,7 +269,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
         Binding b;
 
         BindingConverter conv = new BindingConverter() { // for debugging
-
 
             public Object sourceToTarget(Object value) {
                 return value;
@@ -340,6 +358,19 @@ public class AutoPlotUI extends javax.swing.JFrame {
         }
     }
 
+    private void initLogConsole() throws SecurityException {
+        LogConsole lc = new LogConsole();
+        Handler h = lc.getHandler();
+        Logger.getLogger("virbo").setLevel(Level.ALL);
+        Logger.getLogger("virbo").addHandler(h);
+        
+        setMessage("log console added");
+        tabs.addTab( "console", lc );
+        applicationModel.options.setLogConsoleVisible(true);
+        logConsoleMenuItem.setEnabled(false);
+        logConsoleMenuItem.setSelected(true);
+    }
+
     private void plotUrl() {
         try {
             Logger.getLogger("ap").info("plotUrl()");
@@ -357,15 +388,19 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }
 
     public void setStatus(String message) {
-        Logger.getLogger("ap").info(message);
-        statusLabel.setText(message);
+        logger.info(message);
+        setMessage(message);
+        if ( message.equals("") ) {
+            System.err.println("here");
+        }
     }
 
     private void clearCache() {
         try {
             if (applicationModel.clearCache()) {
-                JOptionPane.showMessageDialog(this, "cache cleared");
+                setStatus("cache cleared");
             } else {
+                setStatus("unable to clear cache");
                 JOptionPane.showMessageDialog(this, "unable to clear cache");
             }
         } catch (IllegalArgumentException ex) {
@@ -458,6 +493,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         specialEffectsMenuItem = new javax.swing.JCheckBoxMenuItem();
         plotStyleMenu = new javax.swing.JMenu();
         fontsAndColorsMenuItem = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        scriptPanelMenuItem = new javax.swing.JCheckBoxMenuItem();
+        logConsoleMenuItem = new javax.swing.JCheckBoxMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
@@ -475,6 +513,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
+        statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()-2f));
         statusLabel.setText("starting...");
 
         fileMenu.setText("File");
@@ -609,6 +648,26 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         optionsMenu.add(plotStyleMenu);
 
+        jMenu1.setText("Enable Feature");
+
+        scriptPanelMenuItem.setText("Script Panel");
+        scriptPanelMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                scriptPanelMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(scriptPanelMenuItem);
+
+        logConsoleMenuItem.setText("Log Console");
+        logConsoleMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logConsoleMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(logConsoleMenuItem);
+
+        optionsMenu.add(jMenu1);
+
         jMenuBar1.add(optionsMenu);
 
         bookmarksMenu.setText("Bookmarks");
@@ -655,23 +714,22 @@ public class AutoPlotUI extends javax.swing.JFrame {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 632, Short.MAX_VALUE)
+                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
-                .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 642, Short.MAX_VALUE)
-                .addContainerGap())
+                .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 513, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(147, Short.MAX_VALUE))
+            .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
+                .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 14, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -776,6 +834,21 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
     edit.showDialog(this);
 }//GEN-LAST:event_editModelMenuItemActionPerformed
 
+private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scriptPanelMenuItemActionPerformed
+    if ( !applicationModel.options.isScriptVisible() ) {
+        tabs.insertTab("script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector ), TABS_TOOLTIP, 4  );
+        applicationModel.options.setScriptVisible(true);
+    }
+    scriptPanelMenuItem.setEnabled(false);
+}//GEN-LAST:event_scriptPanelMenuItemActionPerformed
+
+private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
+    if ( !applicationModel.options.isLogConsoleVisible() ) {
+       initLogConsole();
+    }
+    logConsoleMenuItem.setEnabled(false);
+}//GEN-LAST:event_logConsoleMenuItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -785,6 +858,9 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
         alm.addOptionalPositionArgument(0, "URL", null, "initial URL to load");
         alm.addOptionalPositionArgument(1, "bookmarks", null, "bookmarks to load");
         alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port");
+        alm.addBooleanSwitchArgument("scriptPanel", "s", "scriptPanel", "enable script panel");
+        alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
+        alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
         alm.process(args);
 
         System.err.println("welcome to autoplot");
@@ -804,6 +880,25 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
             bookmarks = null;
         }
 
+        if (alm.getBooleanValue("scriptPanel")) {
+            model.options.setScriptVisible(true);
+        }
+
+        if (alm.getBooleanValue("logConsole")) {
+            model.options.setLogConsoleVisible(true);
+        }
+        
+        if ( alm.getBooleanValue("nativeLAF") ) {
+            try
+            {
+                javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
@@ -811,12 +906,13 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 
                 if (!alm.getValue("port").equals("-1")) {
                     int iport = Integer.parseInt(alm.getValue("port"));
-                    app.setupServer( iport, model );
+                    app.setupServer(iport, model);
                 }
 
                 Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
                     public void uncaughtException(Thread t, Throwable e) {
+                        Logger.getLogger("virbo.autoplot").severe("runtime exception: "+e);
                         app.setStatus("caught exception: " + e.getMessage());
                         model.application.getExceptionHandler().handleUncaught(e);
                     }
@@ -844,6 +940,8 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
                     new Thread(run, "LoadBookmarksThread").start();
 
                 }
+                
+                app.setStatus("ready");
 
             }
         });
@@ -855,16 +953,17 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
      * @param port
      * @param model
      */
-    private void setupServer( int port, final ApplicationModel model ) {
+    private void setupServer(int port, final ApplicationModel model) {
 
         final RequestListener rlistener = new RequestListener();
         rlistener.setPort(port);
         final RequestHandler rhandler = new RequestHandler();
 
         rlistener.addPropertyChangeListener(RequestListener.PROP_REQUESTCOUNT, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
-                    rhandler.handleRequest( rlistener.getSocket().getInputStream(), model, rlistener.getSocket().getOutputStream());
+                    rhandler.handleRequest(rlistener.getSocket().getInputStream(), model, rlistener.getSocket().getOutputStream());
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -890,15 +989,18 @@ private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
     private javax.swing.JMenu helpMenu;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JMenuItem pasteDataSetURLMenuItem;
     private javax.swing.JMenu plotStyleMenu;
     private javax.swing.JMenuItem redoMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem resetZoomMenuItem;
+    private javax.swing.JCheckBoxMenuItem scriptPanelMenuItem;
     private javax.swing.JCheckBoxMenuItem specialEffectsMenuItem;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JPanel tabbedPanelContainer;
