@@ -8,7 +8,10 @@ package org.virbo.datasource;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -101,11 +104,14 @@ public class DataSetSelectorSupport {
         };
     }
 
+    
     protected void refreshRecentFilesMenu() {
         if ( recentMenu!=null ) {
             recentMenu.removeAll();
             if ( ui.getRecent()==null ) return;
-            for ( String s : ui.getRecent() ) {
+            ArrayList<String> recent= new ArrayList<String>( ui.getRecent() );
+            Collections.reverse(recent);
+            for ( String s : recent ) {
                 final String f= s;
                 Action a= new AbstractAction( String.valueOf(f) ) {
                     public void actionPerformed( ActionEvent e ) {
