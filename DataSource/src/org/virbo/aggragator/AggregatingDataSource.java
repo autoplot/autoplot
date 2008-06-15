@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.text.ParseException;
+import java.util.Map;
 import javax.swing.tree.TreeModel;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
@@ -43,7 +44,7 @@ public class AggregatingDataSource extends AbstractDataSource {
     /**
      * metadata from the last read.
      */
-    TreeModel metadata;
+    Map<String,Object> metadata;
     MetadataModel metadataModel;
 
     /** Creates a new instance of AggregatingDataSource */
@@ -124,6 +125,7 @@ public class AggregatingDataSource extends AbstractDataSource {
 
     }
 
+    @Override
     public MetadataModel getMetadataModel() {
         return metadataModel;
     }
@@ -131,9 +133,9 @@ public class AggregatingDataSource extends AbstractDataSource {
     /**
      * returns the metadata provided by the first delegate dataset.
      */
-    public TreeModel getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String,Object> getMetaData(ProgressMonitor mon) throws Exception {
         if (metadata == null) {
-            TreeModel retValue;
+            Map<String,Object> retValue;
             retValue = super.getMetaData(mon);
             return retValue;
         } else {
