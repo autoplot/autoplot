@@ -58,17 +58,17 @@ public class AxisPanel extends javax.swing.JPanel {
                 return object;
             }
         };
-                
+        
+        b= bc.addBinding( applicationModel.plot.getXAxis(), "${label}", xTitleTextField, "text" );
         b= bc.addBinding( applicationModel.plot.getXAxis(), "${datumRange}", xredit, "value" );
-        
-        b= bc.addBinding( applicationModel.plot.getYAxis(), "${datumRange}", yredit, "value" );
-        
-        b= bc.addBinding( applicationModel.colorbar, "${datumRange}", zredit, "value" );
-        
         b= bc.addBinding( applicationModel.plot.getXAxis(), "${log}", xLog, "selected" );
-        
+
+        b= bc.addBinding( applicationModel.plot.getYAxis(), "${label}", yTitleTextField, "text" );
+        b= bc.addBinding( applicationModel.plot.getYAxis(), "${datumRange}", yredit, "value" );
         b= bc.addBinding( applicationModel.plot.getYAxis(), "${log}", yLog, "selected" );
-        
+
+        b= bc.addBinding( applicationModel.colorbar, "${label}", zTitleTextField, "text" );
+        b= bc.addBinding( applicationModel.colorbar, "${datumRange}", zredit, "value" );
         b= bc.addBinding( applicationModel.colorbar, "${log}", zLog, "selected" );
                 
         b= bc.addBinding( applicationModel, "${showContextOverview}", showOverviewPlot, "selected" );
@@ -100,32 +100,7 @@ public class AxisPanel extends javax.swing.JPanel {
     }
     
     
-    private List<String> dummy;
 
-    public static final String PROP_DUMMY = "dummy";
-
-    public List<String> getDummy() {
-        return this.dummy;
-    }
-
-    public void setDummy(List<String> newdummy) {
-        List<String> olddummy = dummy;
-        this.dummy = newdummy;
-        propertyChangeSupport.firePropertyChange(PROP_DUMMY, olddummy, newdummy);
-    }
-
-
-    private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
-
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener listener )
-    {
-        propertyChangeSupport.addPropertyChangeListener( listener );
-    }
-
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener listener )
-    {
-        propertyChangeSupport.removePropertyChangeListener( listener );
-    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -141,13 +116,16 @@ public class AxisPanel extends javax.swing.JPanel {
         xAxisRangePanel = new javax.swing.JPanel();
         showOverviewPlot = new javax.swing.JCheckBox();
         autoContextOverview = new javax.swing.JCheckBox();
+        xTitleTextField = new javax.swing.JTextField();
         zAxisPanel = new javax.swing.JPanel();
         zLog = new javax.swing.JCheckBox();
         zAxisRangePanel = new javax.swing.JPanel();
+        zTitleTextField = new javax.swing.JTextField();
         yAxisPanel = new javax.swing.JPanel();
         yAxisRangePanel = new javax.swing.JPanel();
         yLog = new javax.swing.JCheckBox();
         isotropicCheckBox = new javax.swing.JCheckBox();
+        yTitleTextField = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         validRangeLabel = new javax.swing.JLabel();
@@ -179,6 +157,8 @@ public class AxisPanel extends javax.swing.JPanel {
         autoContextOverview.setText("Auto");
         autoContextOverview.setToolTipText("Automatically show context overview plot when zooming in along a horizontal axis."); // NOI18N
 
+        xTitleTextField.setText("jTextField1");
+
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
         xAxisPanel.setLayout(xAxisPanelLayout);
         xAxisPanelLayout.setHorizontalGroup(
@@ -186,17 +166,20 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(xAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, xTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
                     .add(xLog)
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(showOverviewPlot)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(autoContextOverview)))
                 .addContainerGap())
         );
         xAxisPanelLayout.setVerticalGroup(
             xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(xAxisPanelLayout.createSequentialGroup()
+                .add(xTitleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(xLog)
@@ -204,7 +187,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(showOverviewPlot)
                     .add(autoContextOverview))
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Z Axis"));
@@ -214,6 +197,8 @@ public class AxisPanel extends javax.swing.JPanel {
 
         zAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
+        zTitleTextField.setText("jTextField1");
+
         org.jdesktop.layout.GroupLayout zAxisPanelLayout = new org.jdesktop.layout.GroupLayout(zAxisPanel);
         zAxisPanel.setLayout(zAxisPanelLayout);
         zAxisPanelLayout.setHorizontalGroup(
@@ -222,16 +207,19 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(zLog)
-                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE))
+                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
+                    .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
                 .addContainerGap())
         );
         zAxisPanelLayout.setVerticalGroup(
             zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(zAxisPanelLayout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, zAxisPanelLayout.createSequentialGroup()
+                .add(zTitleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(zLog)
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         yAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Y Axis"));
@@ -246,6 +234,8 @@ public class AxisPanel extends javax.swing.JPanel {
         isotropicCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         isotropicCheckBox.setEnabled(false);
 
+        yTitleTextField.setText("jTextField1");
+
         org.jdesktop.layout.GroupLayout yAxisPanelLayout = new org.jdesktop.layout.GroupLayout(yAxisPanel);
         yAxisPanel.setLayout(yAxisPanelLayout);
         yAxisPanelLayout.setHorizontalGroup(
@@ -253,20 +243,23 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(yAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(yAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE)
                     .add(yLog)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 253, Short.MAX_VALUE)
-                    .add(isotropicCheckBox))
+                    .add(isotropicCheckBox)
+                    .add(yTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 261, Short.MAX_VALUE))
                 .addContainerGap())
         );
         yAxisPanelLayout.setVerticalGroup(
             yAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(yAxisPanelLayout.createSequentialGroup()
+                .add(yTitleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(yLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(isotropicCheckBox)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("autoranging"));
@@ -302,7 +295,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(validRangeLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -325,7 +318,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(fillValueLabel)
                     .add(fillValueComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("rank reduction"));
@@ -360,7 +353,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE)
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
                     .add(transposeCheckBox)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jLabel4)
@@ -386,7 +379,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(jLabel5))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(transposeCheckBox)
-                .addContainerGap(102, Short.MAX_VALUE))
+                .addContainerGap(120, Short.MAX_VALUE))
         );
 
         allowAutoRangingCheckBox.setText("Allow Autoranging");
@@ -398,16 +391,15 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, xAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, zAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, yAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, yAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(xAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jLabel1)
+                    .add(zAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(allowAutoRangingCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -419,7 +411,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(layout.createSequentialGroup()
                         .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -427,16 +419,13 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(xAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(yAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(yAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 147, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(zAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(allowAutoRangingCheckBox)))
-                .addContainerGap())
+                        .add(zAxisPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(allowAutoRangingCheckBox)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        layout.linkSize(new java.awt.Component[] {xAxisPanel, yAxisPanel, zAxisPanel}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
     }// </editor-fold>//GEN-END:initComponents
 
     private void validRangeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validRangeComboBoxActionPerformed
@@ -482,12 +471,15 @@ public class AxisPanel extends javax.swing.JPanel {
     private javax.swing.JPanel xAxisPanel;
     private javax.swing.JPanel xAxisRangePanel;
     private javax.swing.JCheckBox xLog;
+    private javax.swing.JTextField xTitleTextField;
     private javax.swing.JPanel yAxisPanel;
     private javax.swing.JPanel yAxisRangePanel;
     private javax.swing.JCheckBox yLog;
+    private javax.swing.JTextField yTitleTextField;
     private javax.swing.JPanel zAxisPanel;
     private javax.swing.JPanel zAxisRangePanel;
     private javax.swing.JCheckBox zLog;
+    private javax.swing.JTextField zTitleTextField;
     // End of variables declaration//GEN-END:variables
     
 }
