@@ -25,23 +25,17 @@ public class NetcdfMetadataModel extends MetadataModel {
     public NetcdfMetadataModel() {
     }
 
-    public Map<String, Object> properties(TreeModel meta) {
-        int nchild = meta.getChildCount(meta.getRoot());
-        HashMap attrs = new HashMap();
-        for (int i = 0; i < nchild; i++) {
-            String ss = String.valueOf(meta.getChild(meta.getRoot(), i));
-            int ii = ss.indexOf("=");
-            attrs.put(ss.substring(0, ii), ss.substring(ii + 1).trim());
+    public Map<String, Object> properties( Map<String,Object> meta) {
+        Map<String,Object> result= new HashMap<String, Object>();
+        if (meta.containsKey("valid_range")) {
+            result.put( QDataSet.VALID_RANGE, meta.get("valid_range" ) );
         }
-
-
-        return new HashMap<String, Object>();
+        return result;
     }
 
     public static Map<String, Object> interpretProps(Map map) {
         HashMap<String, Object> result = new HashMap<String, Object>();
         if (map.containsKey("units")) {
-            System.err.println(map.get("units"));
             result.put(QDataSet.UNITS, Units.t1970);
         }
         if (map.containsKey("add_offset")) {
@@ -55,4 +49,10 @@ public class NetcdfMetadataModel extends MetadataModel {
         }
         return result;
     }
+
+    @Override
+    public String getLabel() {
+        return "NetCDF";
+    }
+
 }

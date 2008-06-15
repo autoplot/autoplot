@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.tree.TreeModel;
@@ -122,22 +123,19 @@ public class NetCDFDataSource extends AbstractDataSource {
         return new NetCDFDataSourceFactory();
     }
     
-    public TreeModel getMetaData( ProgressMonitor mon ) throws Exception {
+    public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
         readData( mon );
         List attr= variable.getAttributes();
         
         if ( attr==null ) return null; // transient state
         
-        List names= new ArrayList();
-        List values= new ArrayList();
-        
+        Map<String,Object> result= new LinkedHashMap<String, Object>();
         for( int i=0; i<attr.size(); i++ ) {
             Attribute at= (Attribute) attr.get(i);
-            names.add( at.getName() );
-            values.add( at.getStringValue() );
+            result.put( at.getName(), at.getStringValue() );
         }
         
-        return NameValueTreeModel.create( "variable attributes", names, values );
+        return result;
         
     }
     
