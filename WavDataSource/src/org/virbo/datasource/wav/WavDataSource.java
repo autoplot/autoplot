@@ -100,16 +100,16 @@ public class WavDataSource extends AbstractDataSource {
     }
 
     @Override
-    public TreeModel getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String,Object> getMetaData(ProgressMonitor mon) throws Exception {
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(resourceURL);
         AudioFormat audioFormat= fileFormat.getFormat();
-        Map properies= new HashMap( audioFormat.properties() );
-        properies.put( "encoding", audioFormat.getEncoding() );
-        properies.put( "endianness", audioFormat.isBigEndian()? "bigEndian" : "littleEndian" );
-        properies.put( "channels", audioFormat.getChannels() );
-        properies.put( "frame rate", audioFormat.getFrameRate() );
-        properies.put( "bits", audioFormat.getSampleSizeInBits() );
-        return NameValueTreeModel.create( "METADATA(wav)", properies );
+        Map<String,Object> properties= new HashMap( audioFormat.properties() );
+        properties.put( "encoding", audioFormat.getEncoding() );
+        properties.put( "endianness", audioFormat.isBigEndian()? "bigEndian" : "littleEndian" );
+        properties.put( "channels", audioFormat.getChannels() );
+        properties.put( "frame rate", audioFormat.getFrameRate() );
+        properties.put( "bits", audioFormat.getSampleSizeInBits() );
+        return properties;
     }
     
 }
