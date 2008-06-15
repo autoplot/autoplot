@@ -1,0 +1,10 @@
+# demonstrates the need for a semantic layer for the data model.  Kludgy code in 
+# AP requires special knowledge to get this to work.  X,Y,Z should be a dependent 
+# parameter on implicit parameter T.
+
+x= randn( 10000 )
+y= randn( 10000 )
+z= sqrt( x**2 + y**2 )
+y.putProperty( QDataSet.DEPEND_0, x )
+y.putProperty( QDataSet.PLANE_0, z )
+result= y
