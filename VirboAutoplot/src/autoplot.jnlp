@@ -3,11 +3,11 @@
 "http://www.cottagesystems.com/lib/dtd/jnlp-1.5.dtd">
 <jnlp 
     spec="1.0+" 
-    codebase="http://www.cottagesystems.com/virbo/apps/autoplot/"
+    codebase="http://www.cottagesystems.com/virbo/apps/autoplotDev/"
     href="autoplot.jnlp"> 
     
     <information> 
-        <title>Autoplot</title> 
+        <title>Autoplot(DEV)</title> 
         <vendor>VxOware</vendor> 
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
         <description kind="short">data plotter</description> 
@@ -35,61 +35,62 @@
         
         <jar href="VirboAutoplot.jar" />
         
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/batik-awt-util.jar" part="batik" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/batik-svggen.jar" part="batik"  download='lazy' />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/batik-util.jar"  part="batik"  download='lazy' />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/batik-awt-util.jar" part="batik" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/batik-svggen.jar" part="batik"  download='lazy' />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/batik-util.jar"  part="batik"  download='lazy' />
         <package name="org.apache.batik" part="batik" recursive="true"  />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/bufr.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/commons-codec-1.3.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/commons-httpclient-3.0.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/commons-logging-1.0.4.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/gnu-regexp-1.1.4.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/grib-5.0.04.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/itext-1.2.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/jdom.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/jpeg2000.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/lucene.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/netcdfUI-2.2.18.jar" part="netcdf"/>
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/bufr.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/commons-codec-1.3.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/commons-httpclient-3.0.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/commons-logging-1.0.4.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/gnu-regexp-1.1.4.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/grib-5.0.04.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/itext-1.2.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/jdom.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/jpeg2000.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/lucene.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/netcdfUI-2.2.18.jar" part="netcdf"/>
         <package name="dods" part="netcdf"  recursive="true" />
         <package name="resources" part="netcdf"  recursive="true" />
         <package name="thredds" part="netcdf"  recursive="true" />
         <package name="ucar" part="netcdf"  recursive="true" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/nlog4j-1.2.21.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/poi-2.5.1-final-20040804.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/prefsAll.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/resourcesOptional.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/swing-layout-1.0.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/visadNoDods.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/xercesImpl.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/xerces.jar" />
-        <jar href="http://www.cottagesystems.com/virbo/apps/autoplot/lib/xml-apis.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/nlog4j-1.2.21.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/poi-2.5.1-final-20040804.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/prefsAll.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/resourcesOptional.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/visadNoDods.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/xercesImpl.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/xml-apis.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/swing-layout-1.0.3.jar" />
         <jar href="http://www.cottagesystems.com/virbo/apps/lib/jython.jar" />
+        <jar href="http://www.cottagesystems.com/virbo/apps/lib/jfits-0.93.jar" />
+
+        <!-- cdf -->
+        <package name="gsfc.nssdc" part="cdf"  recursive="true" />
+        <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-latest.jnlp" >  
+        </extension>
         
         <jar href="lib/dasCore.jar" />
+        <jar href="lib/QDataSet.jar" />
+        <jar href="lib/JythonSupport.jar" />
         <jar href="lib/DataSource.jar" />
         <jar href="lib/DataSourcePack.jar" />
-        <jar href="lib/QDataSet.jar" />
+        <jar href="lib/JythonDataSource.jar" />
         <jar href="lib/beansbinding.jar"/>
         <jar href="lib/JFontChooser.jar" />
         <jar href="lib/CdfDataSource.jar" />
         <jar href="lib/WavDataSource.jar" />
         <jar href="lib/CefDataSource.jar" />
-        <jar href="lib/JythonDataSource.jar" />
         <jar href="lib/OpenDapDataSource.jar" />
         <jar href="lib/NetCdfDataSource.jar" />
         <jar href="lib/ExcelDataSource.jar" />
         <jar href="lib/BinaryDataSource.jar" />
-        
-        <!-- cdf -->
-        <package name="gsfc.nssdc" part="cdf"  recursive="true" />
-        <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-latest.jnlp" >  
-            <!--<ext-download download="lazy" ext-part="cdf" /> -->
-        </extension>
-        
+        <jar href="lib/FitsDataSource.jar" />
         
     </resources> 
     
     <application-desc  main-class="org.virbo.autoplot.AutoPlotUI">  
+        <argument>--nativeLAF</argument>
         <!--<argument>http://www.cottagesystems.com/virbo/apps/autoplot/data/ascii/omni2_1972.dat?column=field17</argument>-->
     </application-desc>
 </jnlp> 
