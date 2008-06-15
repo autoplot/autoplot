@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import org.python.core.Py;
-import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.virbo.jythonsupport.PyQDataSetAdapter;
 
