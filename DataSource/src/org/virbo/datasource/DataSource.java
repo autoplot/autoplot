@@ -31,10 +31,19 @@ public interface DataSource {
      */
     boolean asynchronousLoad();
     
+    /**
+     * return a MetadataModel that scrapes the Metadata tree returned to provide a
+     * set of properties identified in QDataSet.  
+     * @return
+     */
     MetadataModel getMetadataModel();
     
     /**
-     * even though this takes a monitor, it should be called after getDataSet.
+     * Return arbitary metadata for the dataset.  This is a map of String to Objects,
+     * and to form a tree structure, property name may map to another Map<String,Object>.
+     * Note the order of the properties may be controlled by using LinkedHashMap for the
+     * implementation.  Even though this takes a monitor, it will be called after getDataSet,
+     * and the monitor may be safely ignored.
      */
     Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception ;
 
