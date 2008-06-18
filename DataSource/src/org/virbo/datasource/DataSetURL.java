@@ -8,6 +8,8 @@
  */
 package org.virbo.datasource;
 
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
@@ -81,22 +83,18 @@ public class DataSetURL {
          * the URL scheme, http, ftp, bin-http, etc.
          */
         public String scheme;
-        
         /**
          * the directory with http://www.example.com/data/
          */
         public String path;
-        
         /**
          * the file, http://www.example.com/data/myfile.nc
          */
         public String file;
-        
         /**
          * the extenion, .nc
          */
         public String ext;
-        
         /**
          * the params, myVariable&plot=0
          */
@@ -139,50 +137,59 @@ public class DataSetURL {
      */
     public static URLSplit parse(String surl) {
         URI uri;
+
+        surl = maybeAddFile(surl);
+
+        int h = surl.indexOf(":/");
+        String scheme = surl.substring(0, h);
+
+        URL url = null;
         try {
-            surl = maybeAddFile(surl);
-            surl = surl.replaceAll("%", "%25");
-            uri = getURI(surl);
+            if (scheme.contains(".")) {
+                int j = scheme.indexOf(".");
 
-            String file = uri.getPath();
-            int i = file.lastIndexOf(".");
-            String ext = i == -1 ? "" : file.substring(i);
-
-            String params = null;
-
-            int fileEnd;
-            // check for just one ?
-            i = surl.indexOf("?");
-            if (i != -1) {
-                fileEnd = i;
-                params = surl.substring(i + 1);
-                i = surl.indexOf("?", i + 1);
-                if (i != -1) {
-                    throw new IllegalArgumentException("too many ??'s!");
-                }
+                url = new URL(surl.substring(j + 1));
             } else {
-                fileEnd = surl.length();
+                url = new URL(surl);
             }
-
-            i = surl.lastIndexOf("/");
-            String surlDir = surl.substring(0, i);
-
-            int i2 = surl.indexOf("://");
-
-            URLSplit result = new URLSplit();
-            result.scheme = uri.getScheme();
-            result.path = surlDir + "/";
-            result.file = surl.substring(0, fileEnd);
-            result.ext = ext;
-            result.params = params;
-
-            return result;
-
-        } catch ( URISyntaxException ex) {
-            ex.printStackTrace();
+        } catch (MalformedURLException ex) {
             return null;
-
         }
+
+        String file = url.getPath();
+        int i = file.lastIndexOf(".");
+        String ext = i == -1 ? "" : file.substring(i);
+
+        String params = null;
+
+        int fileEnd;
+        // check for just one ?
+        i = surl.indexOf("?");
+        if (i != -1) {
+            fileEnd = i;
+            params = surl.substring(i + 1);
+            i = surl.indexOf("?", i + 1);
+            if (i != -1) {
+                throw new IllegalArgumentException("too many ??'s!");
+            }
+        } else {
+            fileEnd = surl.length();
+        }
+
+        i = surl.lastIndexOf("/");
+        String surlDir = surl.substring(0, i);
+
+        int i2 = surl.indexOf("://");
+
+        URLSplit result = new URLSplit();
+        result.scheme = scheme;
+        result.path = surlDir + "/";
+        result.file = surl.substring(0, fileEnd);
+        result.ext = ext;
+        result.params = params;
+
+        return result;
+
 
     }
 
@@ -232,21 +239,27 @@ public class DataSetURL {
      * @return
      */
     public static URL getWebURL(URI url) {
-        int i = url.getScheme().indexOf(".");
-        if (i == -1) {
-            try {
-                return url.toURL();
-            } catch (MalformedURLException ex) {
-                throw new RuntimeException(ex);
+        try {
+            int i = url.getScheme().indexOf(".");
+            String surl;
+            if (i == -1) {
+                try {
+                    surl = url.toURL().toString();
+                } catch (MalformedURLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            } else {
+                String s = url.toString();
+                surl = s.substring(i + 1);
             }
-        } else {
-            String s = url.toString();
-            try {
-                return new URL(s.substring(i + 1));
-            } catch (MalformedURLException ex) {
-                throw new RuntimeException(ex);
-            }
+            surl = URLDecoder.decode(surl, "US-ASCII");
+            return new URL(surl);
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
         }
+
     }
 
     /**
@@ -375,7 +388,7 @@ public class DataSetURL {
                 if (value != null) {
                     result.append("&" + key + "=" + value);
                 } else {
-                    result.append("&" + key );
+                    result.append("&" + key);
                 }
             }
         }
@@ -418,8 +431,8 @@ public class DataSetURL {
             try {
                 FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
                 FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
-                if ( !fo.isLocal() ) {
-                    Logger.getLogger("virbo.dataset").info("downloading file "+fo.getNameExt());
+                if (!fo.isLocal()) {
+                    Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
                 }
                 File tfile = fo.getFile(mon);
                 return tfile;
@@ -484,7 +497,7 @@ public class DataSetURL {
         cc.surl = surl1;
         cc.surlpos = carotPos;
 
-        
+
         if (qpos != -1 && qpos < carotPos) { // in query section
             if (qpos == -1) {
                 qpos = surl1.length();
@@ -502,10 +515,10 @@ public class DataSetURL {
                 cc.context = CompletionContext.CONTEXT_PARAMETER_NAME;
                 cc.completable = surl1.substring(amppos + 1, carotPos);
                 cc.completablepos = carotPos - (amppos + 1);
-                if ( surl1.length()>carotPos && surl1.charAt(carotPos)!='&' ) {  // insert implicit "&"
-                    surl1= surl1.substring(0,carotPos)+'&'+surl1.substring(carotPos);
+                if (surl1.length() > carotPos && surl1.charAt(carotPos) != '&') {  // insert implicit "&"
+                    surl1 = surl1.substring(0, carotPos) + '&' + surl1.substring(carotPos);
                 }
-            
+
             }
         } else {
             cc.context = CompletionContext.CONTEXT_FILE;
@@ -531,21 +544,21 @@ public class DataSetURL {
 
             // identify the implicit parameter names
             Map params = DataSetURL.parseParams(split.params);
-            boolean hasImplicit= false;
+            boolean hasImplicit = false;
             for (int i = 0; i < 3; i++) {
                 String arg = (String) params.get("arg_" + i);
                 if (arg != null) {
                     for (CompletionContext cc1 : completions) {
                         if (cc1.context == CompletionContext.CONTEXT_PARAMETER_NAME && cc1.implicitName != null && cc1.completable.equals(arg)) {
                             params.put(cc1.implicitName, arg);
-                            hasImplicit= true;
+                            hasImplicit = true;
                         }
                     }
                 }
             }
-            if ( !hasImplicit ) {  // TODO: we still don't have this right.  We want to replace the key that was mistaken for a positional argument for a named parameter.                
-                for ( int i=0; i<3; i++ ) { 
-                    params.remove("arg_"+i);
+            if (!hasImplicit) {  // TODO: we still don't have this right.  We want to replace the key that was mistaken for a positional argument for a named parameter.                
+                for (int i = 0; i < 3; i++) {
+                    params.remove("arg_" + i);
                 }
             }
 
@@ -563,7 +576,7 @@ public class DataSetURL {
                     if (cc1.implicitName != null) {
                         paramsCopy.put(cc1.implicitName, cc1.completable);
                     } else {
-                        paramsCopy.put( cc1.completable, null );
+                        paramsCopy.put(cc1.completable, null);
                     }
                     String ss = split.file + "?" + DataSetURL.formatParams(paramsCopy);
                     //String ss= CompletionContext.insert( cc, cc1 );
@@ -605,11 +618,11 @@ public class DataSetURL {
 
                 int i = surl.lastIndexOf("/", carotPos);
                 String surlDir;  // name of surl, including only folders, ending with /.
-                
+
                 if (i <= 0 || surl.charAt(i - 1) == '/') {
                     surlDir = surl;
                 } else {
-                    surlDir = surl.substring(0, i+1);
+                    surlDir = surl.substring(0, i + 1);
                 }
                 URI url = getURI(surlDir);
                 String prefix = surl.substring(i + 1, carotPos);
