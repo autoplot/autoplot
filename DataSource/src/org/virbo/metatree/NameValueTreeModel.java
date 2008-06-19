@@ -10,6 +10,7 @@ package org.virbo.metatree;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -215,14 +216,19 @@ public class NameValueTreeModel implements TreeModel {
      * @return
      */
     public static NameValueTreeModel create(Object root, Map map) {
-        ArrayList nodes = new ArrayList(map.size());
-
-        for (Iterator i = map.keySet().iterator(); i.hasNext();) {
-            Object key = i.next();
-            nodes.add(createNode((String) key, map.get(key)));
+        List nodes;
+        if ( map!=null ) {
+            nodes = new ArrayList(map.size());
+            
+            for (Iterator i = map.keySet().iterator(); i.hasNext();) {
+                Object key = i.next();
+                nodes.add(createNode((String) key, map.get(key)));
+            }
+        } else {
+            nodes= Collections.EMPTY_LIST;
         }
 
-        return new NameValueTreeModel(root, nodes);
+        return new NameValueTreeModel( root, nodes );
     }
 
     public String toString() {
