@@ -197,9 +197,9 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "background color", backgroundColorButton.getBackground());
         jComboBox1.setSelectedIndex(fores.length);
+        backgroundColorButton.setForeground(c);
         backgroundColorButton.setBackground(c);
         app.getCanvas().setBackground(c);
-        jComboBox1.setSelectedIndex(2);
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
