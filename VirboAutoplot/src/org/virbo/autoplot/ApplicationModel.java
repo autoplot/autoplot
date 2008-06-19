@@ -43,12 +43,15 @@ import edu.uiowa.physics.pw.das.graph.SeriesRenderer;
 import edu.uiowa.physics.pw.das.graph.SpectrogramRenderer;
 import edu.uiowa.physics.pw.das.stream.StreamException;
 import edu.uiowa.physics.pw.das.system.RequestProcessor;
+import java.awt.event.KeyEvent;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.StreamTool;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyEditor;
@@ -83,6 +86,7 @@ import org.das2.util.Base64;
 import org.virbo.autoplot.state.ApplicationState;
 import org.virbo.autoplot.state.Options;
 import org.virbo.autoplot.state.StatePersistence;
+import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -94,6 +98,7 @@ import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.TransposeRank2DataSet;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
+import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.capability.Caching;
@@ -120,7 +125,10 @@ public class ApplicationModel {
     DasColorBar colorbar;
     TickleTimer tickleTimer;
     Options options;
-    
+
+    enum RenderType {
+        spectrogram, series, scatter
+    }
     /**
      * the one and only displayed dataset
      */
@@ -140,7 +148,6 @@ public class ApplicationModel {
     private int threadRunning = 0;
     private final int UPDATE_FILL_THREAD_RUNNING = 1;
     private final int TICKLE_TIMER_THREAD_RUNNING = 2;
-
 
     private synchronized void markThreadRunning(int threadRunningMask) {
         this.threadRunning = this.threadRunning | threadRunningMask;
@@ -214,8 +221,8 @@ public class ApplicationModel {
         DataSetURL.init();
 
         headless = "true".equals(System.getProperty("java.awt.headless"));
-        
-        options= new Options();
+
+        options = new Options();
         canvas = new DasCanvas();
         canvas.setFont(canvas.getFont().deriveFont(Font.ITALIC, 18.f));
         canvas.setPrintingTag("");
@@ -225,6 +232,11 @@ public class ApplicationModel {
         this.application = canvas.getApplication();
 
         createDasPlot();
+        try {
+            parseFillValidRange("", "");
+        } catch (ParseException ex) {
+            ex.printStackTrace();
+        }
 
         tickleTimer = new TickleTimer(100, new PropertyChangeListener() {
 
@@ -235,14 +247,6 @@ public class ApplicationModel {
                 }
             }
         });
-
-        try {
-            parseFillValidRange("", "");
-        } catch (ParseException ex) {
-            ex.printStackTrace();
-        }
-
-
     }
 
     private void createDasPlot() {
@@ -256,7 +260,8 @@ public class ApplicationModel {
         canvas.add(plot, row, col);
 
         //plot.getRow().setPosition( 0, .50 );
-        overviewPlot = DasPlot.createPlot(DatumRange.newDatumRange(0, 10, Units.dimensionless),
+        overviewPlot =
+                DasPlot.createPlot(DatumRange.newDatumRange(0, 10, Units.dimensionless),
                 DatumRange.newDatumRange(0, 1000, Units.dimensionless));
         canvas.add(overviewPlot, DasRow.create(null, plot.getRow(), "100%+5em", "100%+8em"), plot.getColumn());
         //overviewPlot.setVisible(false);
@@ -280,14 +285,18 @@ public class ApplicationModel {
         plot.getXAxis().setPlot(plot);
         plot.getYAxis().setPlot(plot);
 
-        plot.getMouseAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "slope"));
+        plot.getMouseAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
 
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("reset zoom") {
+        plot.getMouseAdapter().removeMenuItem("Dump Data");
+
+        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
 
             public void actionPerformed(ActionEvent e) {
                 updateFill(true);
             }
         }));
+
+        plot.getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(this));
 
         plot.addPropertyChangeListener(listener);
         plot.getXAxis().addPropertyChangeListener(listener);
@@ -307,7 +316,8 @@ public class ApplicationModel {
         overviewPlot.addRenderer(overSeriesRend);
         overviewPlot.setPreviewEnabled(true);
 
-        overviewPlotConnector = new ColumnColumnConnector(canvas, plot,
+        overviewPlotConnector =
+                new ColumnColumnConnector(canvas, plot,
                 DasRow.create(null, plot.getRow(), "0%", "100%+2em"), overviewPlot);
         overviewPlotConnector.setBottomCurtain(true);
         overviewPlotConnector.setCurtainOpacityPercent(80);
@@ -352,19 +362,20 @@ public class ApplicationModel {
             boxmm.setAutoUpdate(true);
         }
 
-        MouseModule zoomPan = new ZoomPanMouseModule(plot.getXAxis(), plot.getYAxis());
+        MouseModule zoomPan = new ZoomPanMouseModule(plot, plot.getXAxis(), plot.getYAxis());
         plot.getMouseAdapter().setSecondaryModule(zoomPan);
 
-        MouseModule zoomPanX = new ZoomPanMouseModule(plot.getXAxis(), null);
+        MouseModule zoomPanX = new ZoomPanMouseModule(plot.getXAxis(), plot.getXAxis(), null);
         plot.getXAxis().getMouseAdapter().setSecondaryModule(zoomPanX);
 
-        zoomPanX = new ZoomPanMouseModule(overviewPlot.getXAxis(), null);
+        zoomPanX =
+                new ZoomPanMouseModule(overviewPlot.getXAxis(), overviewPlot.getXAxis(), null);
         overviewPlot.getXAxis().getMouseAdapter().setSecondaryModule(zoomPanX);
 
-        MouseModule zoomPanY = new ZoomPanMouseModule(null, plot.getYAxis());
+        MouseModule zoomPanY = new ZoomPanMouseModule(plot.getYAxis(), null, plot.getYAxis());
         plot.getYAxis().getMouseAdapter().setSecondaryModule(zoomPanY);
 
-        MouseModule zoomPanZ = new ZoomPanMouseModule(null, colorbar);
+        MouseModule zoomPanZ = new ZoomPanMouseModule(colorbar, null, colorbar);
         colorbar.getMouseAdapter().setSecondaryModule(zoomPanZ);
 
         setSpecialEffects(false);
@@ -376,15 +387,31 @@ public class ApplicationModel {
 
     }
 
+    private RenderType getRenderType() {
+        RenderType spec = dataset.rank() >= 2 ? RenderType.spectrogram : RenderType.series;
+
+        QDataSet dep1 = (QDataSet) dataset.property(QDataSet.DEPEND_1);
+
+        if (dataset.rank() == 2 && dep1 != null && isVectorOrBundleIndex(dep1)) {
+            spec = RenderType.series;
+        }
+
+        return spec;
+    }
+
     protected void setRenderer(Renderer rend, Renderer overRend) {
         Renderer[] rends = plot.getRenderers();
-        for (int i = 0; i < rends.length; i++) {
+        for (int i = 0; i <
+                rends.length; i++) {
             rends[i].setActive(rends[i] == rend);
         }
+
         rends = overviewPlot.getRenderers();
-        for (int i = 0; i < rends.length; i++) {
+        for (int i = 0; i <
+                rends.length; i++) {
             rends[i].setActive(rends[i] == overRend);
         }
+
     }
 
     public DasCanvas getCanvas() {
@@ -414,6 +441,8 @@ public class ApplicationModel {
                     }
                     if (e.getPropertyName().equals("datumRange")) {
                         DatumRange newRange = ApplicationModel.this.plot.getXAxis().getDatumRange();
+                        // don't waste time by chasing after 10% of a dataset.
+                        newRange= DatumRangeUtil.rescale( newRange, 0.1, 0.9 ); 
                         if (tsb == null) {
                             return;
                         }
@@ -423,8 +452,7 @@ public class ApplicationModel {
                             CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
                             if (tag == null || !tag.getRange().contains(newRange)) {
                                 tsb.setTimeRange(newRange);
-                                setAutoRangeSuppress(true);
-                                update();
+                                update(false);
                             }
                         }
                     }
@@ -438,7 +466,7 @@ public class ApplicationModel {
             }
         }
         if (oldSource == null || !oldSource.equals(ds)) {
-            update();
+            update(true);
             propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, ds);
         }
     }
@@ -512,15 +540,17 @@ public class ApplicationModel {
      * @param autoRange
      * @param props, explicit settings from metadata
      */
-    private void updateFillSpec( WritableDataSet fillDs, boolean autoRange, Map props ) {
+    private void updateFillSpec(WritableDataSet fillDs, boolean autoRange, Map props) {
         if (props == null) {
             props = Collections.EMPTY_MAP;
         }
+
         QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
         if (xds == null) {
             xds = DataSetUtil.indexGenDataSet(fillDs.length());
             fillDs.putProperty(QDataSet.DEPEND_0, xds);
         }
+
         QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
         if (yds == null) {
             yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); // QUBE
@@ -560,7 +590,7 @@ public class ApplicationModel {
         overSpectrogramRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
     }
 
-    private void updateFillSeries(WritableDataSet fillDs, boolean autoRange, Map props ) {
+    private void updateFillSeries(WritableDataSet fillDs, boolean autoRange, Map props) {
 
         if (seriesRend.getDataSet() != null && seriesRend.getDataSet().getXLength() > 30000) {
             // hide slow intermediate states
@@ -580,12 +610,14 @@ public class ApplicationModel {
 
             boolean isSeries;
             QDataSet depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-            isSeries = (depend0 == null || DataSetUtil.isMonotonic(depend0));
+            isSeries =
+                    (depend0 == null || DataSetUtil.isMonotonic(depend0));
             if (isSeries) {
                 seriesRend.setPsymConnector(PsymConnector.SOLID);
             } else {
                 seriesRend.setPsymConnector(PsymConnector.NONE);
             }
+
             overSeriesRend.setPsymConnector(seriesRend.getPsymConnector());
 
             seriesRend.setLineWidth(1.0f);
@@ -615,6 +647,7 @@ public class ApplicationModel {
                     seriesRend.setSymSize(3.0);
                     overSeriesRend.setSymSize(2.0);
                 }
+
             }
 
         }
@@ -632,6 +665,7 @@ public class ApplicationModel {
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
         }
+
     }
 
     private void startUpdateUnitsThread() {
@@ -652,19 +686,19 @@ public class ApplicationModel {
         if (dep1Units != null && dep1Units instanceof EnumerationUnits) {
             result = true;
         }
+
         if (dep1.property(QDataSet.COORDINATE_FRAME) != null) {
             result = true;
         }
+
         return result;
     }
 
-
-    
     /**
      * the fill parameters have changed, so update the auto range stats.
      * This should not be run on the AWT event thread!
      */
-    private void updateFill(boolean autorange) {
+    protected void updateFill(boolean autorange) {
         if (dataset == null) {
             return;
         }
@@ -673,20 +707,20 @@ public class ApplicationModel {
 
         Map properties = new HashMap(); // QDataSet properties.
 
-        boolean spec = dataset.rank() == 2;
-        
-        // call doInterpretMetadata twice.  The first time is to set fill and valid range.
+        RenderType renderType = getRenderType();
+
+        /* begin interpret metadata */
         if (interpretMetadata && !autoRangeSuppress && autorange) {
-            
+
             newState.setXLabel("");
             newState.setYLabel("");
             newState.setZLabel("");
             newState.setTitle("");
-            
-            properties= AutoplotUtil.extractProperties(dataset);
-            properties= AutoplotUtil.mergeProperties( dataSource.getProperties(), properties );
-            doInterpretMetadata(newState, properties, spec );
-            
+
+            properties = AutoplotUtil.extractProperties(dataset);
+            properties = AutoplotUtil.mergeProperties(dataSource.getProperties(), properties);
+            doInterpretMetadata(newState, properties, renderType);
+
             boolean ars0 = this.autoRangeSuppress;
 
             this.autoRangeSuppress = true; // prevent setValidRange and setFill from reranging.
@@ -694,18 +728,21 @@ public class ApplicationModel {
             if (this.validRange.equals("")) {
                 setValidRange(newState.getValidRange());
             }
+
             if (this.sfill.equals("")) {
                 setFill(newState.getFill());
             }
+
             if (this.plot.getTitle().equals("")) {
                 this.plot.setTitle(newState.getTitle());
             }
-            
-            this.restoreState( newState, false, false );
+
+            this.restoreState(newState, false, false);
             this.autoRangeSuppress = ars0;
 
         }
 
+        /*  begin slice and fill dataset  */
         double vmin = Double.NEGATIVE_INFINITY, vmax = Double.POSITIVE_INFINITY, fill = Double.NaN;
 
         try {
@@ -717,58 +754,70 @@ public class ApplicationModel {
             ex.printStackTrace();
         }
 
-        WritableDataSet fillDs = AutoplotUtil.applyFillValidRange(dataset, vmin, vmax, fill);
+        WritableDataSet fillDs;
 
-        QDataSet dep1 = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
-
-        if (dep1 != null && isVectorOrBundleIndex(dep1)) {
-            spec = false;
-        }
-        if (fillDs.rank() == 3) {
+        if (dataset.rank() == 3) {
 
             QDataSet ds;
             if (this.sliceDimension == 2) {
-                int index = Math.min(fillDs.length(0, 0) - 1, sliceIndex);
-                ds = DataSetOps.slice2(fillDs, index);
+                int index = Math.min(dataset.length(0, 0) - 1, sliceIndex);
+                ds = DataSetOps.slice2(dataset, index);
             } else if (this.sliceDimension == 1) {
-                int index = Math.min(fillDs.length(0) - 1, sliceIndex);
-                ds = DataSetOps.slice1(fillDs, index);
+                int index = Math.min(dataset.length(0) - 1, sliceIndex);
+                ds = DataSetOps.slice1(dataset, index);
             } else if (this.sliceDimension == 0) {
-                int index = Math.min(fillDs.length() - 1, sliceIndex);
-                ds = DataSetOps.slice0(fillDs, index);
+                int index = Math.min(dataset.length() - 1, sliceIndex);
+                ds = DataSetOps.slice0(dataset, index);
             } else {
                 throw new IllegalStateException("sliceDimension");
             }
+
             if (transpose) {
                 ds = new TransposeRank2DataSet(ds);
             }
+
             fillDs = DDataSet.copy(ds);
-            spec = true;
+            fillDs = AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
+
+        } else {
+            fillDs = AutoplotUtil.applyFillValidRange(dataset, vmin, vmax, fill);
+
         }
 
-        if (spec) {
-            updateFillSpec( fillDs, autorange, properties );
+        if (renderType == RenderType.spectrogram) {
+            updateFillSpec(fillDs, autorange, properties);
             seriesRend.setDataSet(null);
             setRenderer(spectrogramRend, overSpectrogramRend);
+
         } else {
             updateFillSeries(fillDs, autorange, properties);
             if (fillDs.rank() == 2) {  // SeriesRenderer rank 3 must have solid lines.
                 seriesRend.setPsymConnector(PsymConnector.SOLID);
             }
+
             spectrogramRend.setDataSet(null);
             if (fillDs.rank() == 2) {  // SeriesRenderer rank 3 must have solid lines.
                 seriesRend.setPsymConnector(PsymConnector.SOLID);
             }
+
             setRenderer(seriesRend, overSeriesRend);
+
         }
 
+        if ( autorange ) {
+            if ( plot.getXAxis().getUnits().isConvertableTo(Units.us2000) ) {
+                plot.getXAxis().setUserDatumFormatter( new DateTimeDatumFormatter() );
+            } else {
+                plot.getXAxis().setUserDatumFormatter( null );
+            }
+        }
+        
         fillDataset = fillDs;
 
         propertyChangeSupport.firePropertyChange(PROPERTY_FILL, null, null);
     }
 
-
-    private void doInterpretMetadata( ApplicationState state, Map properties, boolean spec ) {
+    private void doInterpretMetadata(ApplicationState state, Map properties, RenderType spec) {
 
         Object v;
         if ((v = properties.get(DDataSet.TITLE)) != null) {
@@ -783,31 +832,32 @@ public class ApplicationModel {
             state.setValidRange(String.valueOf(v));
         }
 
-
-        if ( spec ) {
+        if (spec == RenderType.spectrogram) {
             if ((v = properties.get(DDataSet.SCALE_TYPE)) != null) {
                 state.setZlog(v.equals("log"));
             }
 
             if ((v = properties.get(DDataSet.LABEL)) != null) {
-                state.setZLabel((String)v);
+                state.setZLabel((String) v);
             }
+
             if ((v = properties.get(DDataSet.DEPEND_1)) != null) {
                 Map m = (Map) v;
                 Object v2 = m.get(DDataSet.LABEL);
                 if (v2 != null) {
                     state.setYLabel((String) v2);
                 }
+
             }
         } else {
             if ((v = properties.get(DDataSet.SCALE_TYPE)) != null) {
                 state.setYlog(v.equals("log"));
             }
-            
+
             if ((v = properties.get(DDataSet.LABEL)) != null) {
-                state.setYLabel((String)v);
+                state.setYLabel((String) v);
             }
-            
+
             state.setZLabel("");
         }
 
@@ -817,6 +867,7 @@ public class ApplicationModel {
             if (v2 != null) {
                 state.setXLabel((String) v2);
             }
+
         }
 
     }
@@ -824,7 +875,7 @@ public class ApplicationModel {
     /**
      *
      */
-    public void update() {
+    public void update( final boolean autorange ) {
         dataset = null;
         Runnable run = new Runnable() {
 
@@ -833,6 +884,11 @@ public class ApplicationModel {
                 setStatus("loading dataset");
 
                 QDataSet dataset = loadDataSet(0);
+                
+                if ( tsb!=null ) {
+                    ApplicationModel.this.surl= tsb.getURL().toString();
+                }
+                
                 setStatus("done loading dataset");
                 if (dataset == null) {
                     seriesRend.setDataSet(null);
@@ -858,7 +914,7 @@ public class ApplicationModel {
                 logger.fine("dep names: " + Arrays.asList(depNames));
                 setDepnames(Arrays.asList(depNames));
 
-                updateFill(true);
+                updateFill(autorange);
 
                 originalXRange = plot.getXAxis().getDatumRange();
                 originalYRange = plot.getYAxis().getDatumRange();
@@ -950,7 +1006,7 @@ public class ApplicationModel {
                 if (caching != null) {
                     if (caching.satisfies(surl)) {
                         caching.resetURL(surl);
-                        update();
+                        update(true);
                         return;
                     }
                 }
@@ -971,8 +1027,13 @@ public class ApplicationModel {
      */
     public void setDataSourceURL(String surl) {
         String oldVal = this.surl;
-        if ( surl==null && this.surl==null ) return;
-        if ( surl != null && surl.equals(this.surl)) return;
+        if (surl == null && this.surl == null) {
+            return;
+        }
+
+        if (surl != null && surl.equals(this.surl)) {
+            return;
+        }
 
         propertyChangeSupport.firePropertyChange("dataSourceURL", oldVal, surl);
         resetDataSetSourceURL(surl, new NullProgressMonitor());
@@ -1015,6 +1076,7 @@ public class ApplicationModel {
                 markThreadRunning(TICKLE_TIMER_THREAD_RUNNING);
                 tickleTimer.tickle();
             }
+
         }
 
         propertyChangeSupport.firePropertyChange(PROPERTY_FILL, null, null);
@@ -1062,9 +1124,7 @@ public class ApplicationModel {
 
             }
         }
-
         return recent;
-
     }
 
     public List<Bookmark> getBookmarks() {
@@ -1102,15 +1162,22 @@ public class ApplicationModel {
                 return new ArrayList<Bookmark>();
             }
         }
-
         return bookmarks;
     }
 
     public void setBookmarks(List<Bookmark> list) {
         List oldValue = bookmarks;
-        bookmarks = list;
+        bookmarks =
+                list;
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put("bookmarks", Bookmark.formatBooks(list));
+        prefs.put(
+                "bookmarks", Bookmark.formatBooks(list));
+
+
+
+
+
+
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
@@ -1126,12 +1193,23 @@ public class ApplicationModel {
 
             recent.remove(book);
         }
+
         recent.add(book);
         while (recent.size() > MAX_RECENT) {
             recent.remove(0);
         }
+
+
+
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put("recent", Bookmark.formatBooks(recent));
+        prefs.put(
+                "recent", Bookmark.formatBooks(recent));
+
+
+
+
+
+
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
@@ -1146,10 +1224,18 @@ public class ApplicationModel {
 
             bookmarks.remove(surl);
         }
+
         bookmarks.add(new Bookmark(surl));
 
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put("bookmarks", Bookmark.formatBooks(bookmarks));
+        prefs.put(
+                "bookmarks", Bookmark.formatBooks(bookmarks));
+
+
+
+
+
+
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
@@ -1241,15 +1327,19 @@ public class ApplicationModel {
         return state;
     }
 
-    public void restoreState( ApplicationState state, boolean deep, boolean forceFill ) {
+    public void restoreState(ApplicationState state, boolean deep, boolean forceFill) {
 
         autoRangeSuppress = true;
 
         try {
             if (state.getSurl() != null) {
-                if ( forceFill ) this.surl = ""; // TODO: why
+                if (forceFill) {
+                    this.surl = ""; // TODO: why
+                }
+
                 setDataSourceURL(state.getSurl());
             }
+
         } catch (Exception e) {
             autoRangeSuppress = false; // it's le'
 
@@ -1258,16 +1348,19 @@ public class ApplicationModel {
         if (state.getXrange() != null) {
             plot.getXAxis().resetRange(state.getXrange());
         }
+
         plot.getXAxis().setLog(state.isXlog());
 
         if (state.getYrange() != null) {
             plot.getYAxis().resetRange(state.getYrange());
         }
+
         plot.getYAxis().setLog(state.isYlog());
 
         if (state.getZrange() != null) {
             colorbar.resetRange(state.getZrange());
         }
+
         colorbar.setLog(state.isZlog());
 
         if (state.getColortable() != null) {
@@ -1280,11 +1373,13 @@ public class ApplicationModel {
         if (state.getValidRange() != null) {
             setValidRange(state.getValidRange());
         }
+
         setFill(state.getFill());
 
         if (state.getBackgroundColor() != null) {
             canvas.setBackground(state.getBackgroundColor());
         }
+
         if (state.getForegroundColor() != null) {
             canvas.setForeground(state.getForegroundColor());
         }
@@ -1296,6 +1391,7 @@ public class ApplicationModel {
         if (state.getFillColor() != null) {
             seriesRend.setFillColor(state.getFillColor());
         }
+
         seriesRend.setFillToReference(state.isFillToReference());
         if (state.getReference() != null) {
             seriesRend.setReference((Datum) parseObject(seriesRend.getReference(), state.getReference()));
@@ -1304,9 +1400,11 @@ public class ApplicationModel {
         if (state.getPlotSymbol() != null) {
             seriesRend.setPsym((PlotSymbol) parseObject(seriesRend.getPsym(), state.getPlotSymbol()));
         }
+
         if (state.getSymbolConnector() != null) {
             seriesRend.setPsymConnector((PsymConnector) parseObject(seriesRend.getPsymConnector(), state.getSymbolConnector()));
         }
+
         setShowContextOverview(state.isShowContextOverview());
         setAutoOverview(state.isAutoOverview());
         setAutoranging(state.isAutoranging());
@@ -1331,6 +1429,7 @@ public class ApplicationModel {
         if (edit == null) {
             return context;
         }
+
         edit.setValue(context);
         edit.setAsText(s);
         Object result = edit.getValue();
@@ -1342,6 +1441,7 @@ public class ApplicationModel {
         if (edit == null) {
             return "";
         }
+
         edit.setValue(obj);
         String result = edit.getAsText();
         return result;
@@ -1377,6 +1477,10 @@ public class ApplicationModel {
      * @param validRange New value of property validRange.
      */
     public void setValidRange(String validRange) {
+        if (validRange.equals(this.validRange)) {
+            return;
+        }
+
         String oldValue = this.validRange;
         this.validRange = validRange;
         try {
@@ -1384,6 +1488,7 @@ public class ApplicationModel {
         } catch (ParseException ex) {
             ex.printStackTrace();
         }
+
         propertyChangeSupport.firePropertyChange("validRange", oldValue, validRange);
     }
     private String sfill = "";
@@ -1401,12 +1506,17 @@ public class ApplicationModel {
      * @param fill New value of property fill.
      */
     public void setFill(String fill) {
+        if (fill.equals(this.sfill)) {
+            return;
+        }
+
         this.sfill = fill;
         try {
             parseFillValidRange(validRange, fill);
         } catch (ParseException ex) {
             ex.printStackTrace();
         }
+
     }
     /**
      * Holds value of property autoRangeSuppress.
@@ -1435,6 +1545,7 @@ public class ApplicationModel {
         if (isUseEmbeddedDataSet() && embedDsDirty) {
             packEmbeddedDataSet();
         }
+
         return embedDs;
     }
 
@@ -1442,7 +1553,10 @@ public class ApplicationModel {
         if (dataset == null) {
             embedDs = "";
             return;
+
         }
+
+
 
         edu.uiowa.physics.pw.das.dataset.DataSet ds;
         if (dataset.rank() == 1) {
@@ -1450,6 +1564,7 @@ public class ApplicationModel {
         } else {
             ds = TableDataSetAdapter.create(dataset);
         }
+
         ByteArrayOutputStream out = new ByteArrayOutputStream(10000);
         DataSetStreamProducer producer = new DataSetStreamProducer();
         producer.setDataSet(ds);
@@ -1492,6 +1607,7 @@ public class ApplicationModel {
         } catch (StreamException ex) {
             ex.printStackTrace();
         }
+
     }
     boolean useEmbeddedDataSet = false;
 
@@ -1505,6 +1621,7 @@ public class ApplicationModel {
 
             unpackEmbeddedDataSet();
         }
+
     }
 
     /**
@@ -1520,6 +1637,7 @@ public class ApplicationModel {
         } else {
             local = new File(System.getProperty("user.home"));
         }
+
         local = new File(local, ".das2/fsCache/wfs/");
 
         return Util.deleteFileTree(local);
@@ -1550,7 +1668,7 @@ public class ApplicationModel {
         propertyChangeSupport.firePropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
 
     }
-    private boolean autoOverview = true;
+    private boolean autoOverview = false;
     public static final String PROP_AUTOOVERVIEW = "autoOverview";
 
     public boolean isAutoOverview() {
@@ -1601,6 +1719,7 @@ public class ApplicationModel {
         if (this.surl == null) {
             this.surl = surl;
         }
+
     }
 
     private void doOverviewBindings() {
@@ -1654,6 +1773,7 @@ public class ApplicationModel {
         if (isotropic) {
             checkIsotropic(plot.getXAxis());
         }
+
         propertyChangeSupport.firePropertyChange("isotropic", new Boolean(oldIsotropic), new Boolean(isotropic));
     }
     private int sliceDimension = 0;
@@ -1667,6 +1787,7 @@ public class ApplicationModel {
         if (newsliceDimension < 0 || newsliceDimension > 2) {
             return;
         }
+
         int oldsliceDimension = sliceDimension;
         this.sliceDimension = newsliceDimension;
         updateFill(true);
