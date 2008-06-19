@@ -55,7 +55,7 @@ public class DataSetSelectorSupport {
     }
     
     public Action openLocalAction() {
-        return new AbstractAction("Open Local...") {
+        return new AbstractAction("Open File...") {
             public void actionPerformed(ActionEvent e) {
                 Preferences prefs= Preferences.userNodeForPackage(DataSetSelectorSupport.class);
                 
@@ -126,7 +126,7 @@ public class DataSetSelectorSupport {
     
     JMenu recentMenu() {
         if ( recentMenu==null ) {
-            recentMenu= new JMenu("Open recent");
+            recentMenu= new JMenu("Open Recent");
             refreshRecentFilesMenu();            
         }
         return recentMenu;
