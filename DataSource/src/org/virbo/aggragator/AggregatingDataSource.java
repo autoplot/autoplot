@@ -12,6 +12,7 @@ import edu.uiowa.physics.pw.das.dataset.CacheTag;
 import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
@@ -21,6 +22,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.swing.tree.TreeModel;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
@@ -50,22 +52,35 @@ public class AggregatingDataSource extends AbstractDataSource {
     /** Creates a new instance of AggregatingDataSource */
     public AggregatingDataSource(URL url) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(url);
-        String surl = URLDecoder.decode(url.toString(),"US-ASCII");
+        String surl = url.toString();
         delegateDataSourceFactory = AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
         addCability(TimeSeriesBrowse.class, new TimeSeriesBrowse() {
 
             public void setTimeRange(DatumRange dr) {
                 viewRange = dr;
+                Logger.getLogger("virbo.datasource.agg").fine("set timerange="+viewRange );
             }
 
             public void setTimeResolution(Datum d) {
             }
+
+            public URL getURL() {
+                try {
+                    return new URL(AggregatingDataSource.this.getURL());
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(AggregatingDataSource.class.getName()).log(Level.SEVERE, null, ex);
+                    return null;
+                }
+            }
+            
         });
     }
 
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String[] ss = getFsm().getNamesFor(viewRange);
 
+        Logger.getLogger("virbo.datasource.agg").info("aggregating "+ss.length+" files for "+viewRange );
+        
         DDataSet result = null;
 
         if (ss.length > 1) {
@@ -215,7 +230,9 @@ public class AggregatingDataSource extends AbstractDataSource {
 
     @Override
     public String getURL() {
-        String surl = this.resourceURL.toString() + params + "&timerange=" + String.valueOf(cacheRange);
+        String surl = this.resourceURL.toString() + "?";
+        if ( params!=null ) surl+= params + "&";
+        surl+= "timerange=" + String.valueOf(cacheRange);
         return surl;
     }
 }
