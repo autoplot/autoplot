@@ -186,6 +186,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         JFontChooser chooser = new JFontChooser((JFrame) this.getOwner());
+        chooser.setExampleText("Electron Differential Energy Flux\n12:00\n2001-01-10");
         chooser.setFont(app.getCanvas().getFont());
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
             app.getCanvas().setFont(chooser.getFont());
