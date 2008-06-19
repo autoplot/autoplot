@@ -11,6 +11,8 @@ package org.virbo.datasource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -80,4 +82,33 @@ public class Util {
         return s;
     }
     
+    public static String makeAggregation( String surl ) {
+        String yyyy= "/\\d{4}/";
+        String yyyymmdd= "(\\d{8})";
+        String version= "([Vv])\\d{2}";
+        String result= surl;
+        
+        String timeRange;
+        Matcher m= Pattern.compile(yyyymmdd).matcher(surl);
+        if ( m.find() ) {
+            timeRange= m.group(0);
+        } else {
+            return null;
+        }
+
+        result= result.replaceFirst(yyyy, "/%Y/");               
+        result= result.replaceFirst(yyyymmdd, "%Y%m%d");
+                
+        result= result.replaceFirst(version, "$1..");
+        
+        return result 
+                + ( result.contains("?") ? "&" : "?" )
+                + "timerange="+timeRange;
+    }
+    
+    public static void main(String[] args ) {
+        String surl= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
+        System.err.println( makeAggregation(surl) );
+                
+    }
 }
