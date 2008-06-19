@@ -261,12 +261,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
         return ds;
     }
     
-    public TreeModel getMetaData( ProgressMonitor mon ) throws Exception {
-        if ( ds==null ) return NameValueTreeModel.create( "no metadata", new HashMap() );
-        Map props= ds.getProperties();
-        TreeModel retValue= NameValueTreeModel.create("properties",props);
+    public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
+        if ( ds==null ) return new HashMap<String,Object>();
+        Map<String,Object> props= DataSetUtil.getProperties(ds);
         
-        return retValue;
+        return props;
     }
     
 }

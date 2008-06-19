@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -31,7 +32,7 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         return MetadataModel.createNullModel();
     }
 
-    public boolean reject(String surl,ProgressMonitor mon) {
+    public boolean reject(String surl, ProgressMonitor mon) {
         return false;
     }
 
