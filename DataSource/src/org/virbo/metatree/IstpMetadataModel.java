@@ -8,7 +8,9 @@
 package org.virbo.metatree;
 
 import edu.uiowa.physics.pw.das.datum.DatumRange;
+import edu.uiowa.physics.pw.das.datum.NumberUnits;
 import edu.uiowa.physics.pw.das.datum.Units;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +54,12 @@ public class IstpMetadataModel extends MetadataModel {
 		throw new IllegalArgumentException("unable to parse " + o);
 	    }
 	} else {
-	    throw new RuntimeException("Unsupported Data Type: " + o.getClass().getName());
+            Class c= o.getClass();
+            if ( c.isArray() ) {
+                return Array.getDouble(o, 0);
+            } else {
+                throw new RuntimeException("Unsupported Data Type: " + o.getClass().getName());
+            }
 	}
     }
 
@@ -104,7 +111,13 @@ public class IstpMetadataModel extends MetadataModel {
     }
 
     private Units lookup(String units) {
-	return Units.getByName(units);
+        Units result;
+        try {
+            result= Units.getByName(units);
+        } catch ( IllegalArgumentException ex ) {
+            result= new NumberUnits( units );
+        }
+        return result;
     }
 
     public Map<String, Object> properties( Map<String,Object> meta ) {
@@ -153,7 +166,7 @@ public class IstpMetadataModel extends MetadataModel {
                 if ( label==null ) {
                     label= sunits;
                 } else {
-                    if ( !sunits.equals("") ) label+= ", "+sunits;
+                    if ( !sunits.equals("") ) label+= " ("+sunits+")";
                 }
                 properties.put(QDataSet.LABEL, label );
             }
