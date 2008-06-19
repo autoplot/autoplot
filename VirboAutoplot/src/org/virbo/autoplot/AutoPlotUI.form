@@ -37,7 +37,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="editModelMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit Model"/>
+                <Property name="text" type="java.lang.String" value="Edit DOM"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editModelMenuItemActionPerformed"/>
