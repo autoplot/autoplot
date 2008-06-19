@@ -11,11 +11,15 @@ package org.virbo.datasource.capability;
 
 import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
+import java.net.URL;
 
 /**
  * This capability allows DataSources that know how to produce data sets
  * from a long time series to provide views of the DataSource for different
  * times and resolutions.
+ * 
+ * The getURL() method of the DataSource should return the URL that would return
+ * the same dataset as getDataSet.  getURL() must return the correct URL.
  *
  * Note DataSources providing this capability must insert CacheTags into the
  * QDataSets they produce.
@@ -33,4 +37,8 @@ public interface TimeSeriesBrowse {
      */
     void setTimeResolution( Datum d );
     
+    /**
+     * return the URL for the current time range and resolution.
+     */
+    URL getURL( );
 }
