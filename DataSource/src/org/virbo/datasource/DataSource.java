@@ -55,7 +55,7 @@ public interface DataSource {
     Map<String,Object> getProperties();
    
     /**
-     * cookie jar of cabilities
+     * cookie jar of cabilities, see org.virbo.datasource.capability
      */
     <T> T getCapability( Class<T> clazz );
 }
