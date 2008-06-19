@@ -103,6 +103,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
 
                 try {
+                    DataSetURL.URLSplit split= DataSetURL.parse(surl);
                     if (surl.endsWith("/")) {
                         int carotpos = surl.length();
                         setMessage("ends with /, filesystem completions");
@@ -129,6 +130,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                             } else {
                                 firePlotDataSetURL();
                             }
+                        } catch ( DataSetURL.NonResourceException ex ) { // see if it's a folder.
+                            int carotpos = surl.length();
+                            setMessage("no extension or mime type, try filesystem completions");
+                            showCompletions(surl, carotpos);
                         } catch (IllegalArgumentException ex) {
                             setMessage(ex.getMessage());
                             firePlotDataSetURL();
@@ -319,11 +324,17 @@ public class DataSetSelector extends javax.swing.JPanel {
                         if (s[j].endsWith("contents.html")) {
                             s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
                         } // kludge for dods
-
                         completions.add(surlDir + s[j]);
                     }
                 }
 
+                // check for single completion that is just a folder name with /.
+                if ( completions.size()==1 ) {
+                    if ( ( completions.get(0) ).equals(surlDir+prefix+"/") ) {
+                        // maybe we should do something special.
+                    }
+                }
+                
                 final String labelPrefix = surlDir;
                 completionsPopupMenu = fillPopupNew(completions, labelPrefix);
 
@@ -556,6 +567,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         layout.linkSize(new java.awt.Component[] {browseButton, dataSetSelector, plotItButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
+        browseButton.getAccessibleContext().setAccessibleDescription("inspect contents of file or directory");
     }// </editor-fold>//GEN-END:initComponents
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
         // this is not used because focus lost causes event fire.  Instead we listen to the JTextField.
@@ -613,7 +625,6 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
      * @param value New value of property value.
      */
     public void setValue(String value) {
-        String oldValue = getValue();
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
     }
