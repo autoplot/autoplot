@@ -148,7 +148,7 @@ public class ScriptPanelSupport {
                 if (updateSurl) {
                     model.setDataSourceURL(file.toString());
                 } else {
-                    model.update();
+                    model.update(true);
                 }
             }
 
