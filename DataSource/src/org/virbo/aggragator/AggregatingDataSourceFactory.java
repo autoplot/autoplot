@@ -39,7 +39,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public DataSource getDataSource(URL url) throws Exception {
-        String surl = URLDecoder.decode( url.toString(), "US-ASCII");
+        String surl = url.toString();
         AggregatingDataSource ads = new AggregatingDataSource(url);
         FileStorageModel fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
