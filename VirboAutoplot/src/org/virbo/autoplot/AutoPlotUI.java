@@ -18,6 +18,8 @@ import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -27,10 +29,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.ErrorManager;
 import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
@@ -44,7 +44,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
@@ -118,10 +117,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
             protected void saveImpl(File f) throws IOException {
                 applicationModel.doSave(f);
+                applicationModel.addRecent(f.toURI().toString());
+                setStatus("saved "+f);
             }
 
             protected void openImpl(final File file) throws IOException {
                 applicationModel.doOpen(file);
+                setStatus("opened "+file);
             }
         };
         stateSupport.addPropertyChangeListener(new PropertyChangeListener() {
@@ -130,16 +132,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 String label;
                 if (stateSupport.isCurrentFileOpened()) {
                     label = stateSupport.getCurrentFile() + " " + (stateSupport.isDirty() ? "*" : "");
-                } else {
-                    label = "";
+                    setMessage(label);
                 }
-                setMessage(label);
             }
         });
 
         fillFileMenu();
 
-        //List urls = DataSetURL.getExamples();
         List<String> urls = new ArrayList();
         List<Bookmark> recent = applicationModel.getRecent();
 
@@ -156,16 +155,16 @@ public class AutoPlotUI extends javax.swing.JFrame {
         applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(applicationModel.PROPERTY_RECENT)) {
+                if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_RECENT)) {
                     List<String> urls = new ArrayList();
                     List<Bookmark> recent = applicationModel.getRecent();
                     for (Bookmark b : recent) {
                         urls.add(b.getUrl());
                     }
                     dataSetSelector.setRecent(urls);
-                } else if (evt.getPropertyName().equals(applicationModel.PROPERTY_STATUS)) {
+                } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_STATUS)) {
                     setStatus(applicationModel.getStatus());
-                } else if (evt.getPropertyName().equals(applicationModel.PROPERTY_BOOKMARKS)) {
+                } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
                     updateBookmarks();
                 }
             }
@@ -186,8 +185,19 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        applicationModel.plot.getMouseAdapter().addMenuItem(support.createEZAccessMenu());
-
+        applicationModel.canvas.getGlassPane().addKeyListener( new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK ) == KeyEvent.CTRL_DOWN_MASK ) {
+                    if ( e.getKeyCode()==KeyEvent.VK_Z ) {
+                        undoRedoSupport.undo();
+                    } else if ( e.getKeyCode()==KeyEvent.VK_Z ) {
+                        undoRedoSupport.undo();
+                    }
+                }
+            }
+        } );
+        
         addBindings();
 
         dataSetSelector.addPropertyChangeListener(new PropertyChangeListener() {
@@ -241,10 +251,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(applicationModel.PROPERTY_DATASOURCE)) {
-                    dataSetSelector.setValue(applicationModel.getDataSourceURL());
-                }
-                if (evt.getPropertyName().equals(applicationModel.PROPERTY_FILL)) {
+                if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_FILL)) {
                     mdp.update();
                 }
                 if (!stateSupport.isOpening()) {
@@ -281,7 +288,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         b = bc.addBinding(applicationModel.canvas, "${antiAlias}", drawAntiAliasMenuItem, "selected");
         b = bc.addBinding(applicationModel.canvas, "${textAntiAlias}", textAntiAlias, "selected");
-        b = bc.addBinding(applicationModel, "${dataSourceURL}", this.dataSetSelector, "value");
+        this.dataSetSelector.addPropertyChangeListener("value",new PropertyChangeListener() { //one-way binding
+            public void propertyChange(PropertyChangeEvent evt) {
+                applicationModel.setDataSourceURL(dataSetSelector.getValue());
+            }
+        });
 
         b.setConverter(conv);
         bc.bind();
@@ -305,7 +316,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         fileMenu.add(stateSupport.createSaveAction());
         fileMenu.add(new AbstractAction("Save With Data...") {
-
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 applicationModel.setUseEmbeddedDataSet(true);
@@ -320,6 +330,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         JMenuItem item = new JMenuItem(applicationModel.getCanvas().SAVE_AS_PDF_ACTION);
         item.setText("PDF...");
+        printToMenu.add(item);
+
+        item = new JMenuItem(applicationModel.getCanvas().SAVE_AS_SVG_ACTION);
+        item.setText("SVG...");
         printToMenu.add(item);
 
         item = new JMenuItem(applicationModel.getCanvas().SAVE_AS_PNG_ACTION);
@@ -412,18 +426,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         List<Bookmark> bookmarks = applicationModel.getBookmarks();
         bookmarksMenu.removeAll();
 
-        bookmarksMenu.add(new AbstractAction("Bookmark This Dataset") {
-
+        bookmarksMenu.add(new AbstractAction("Add Bookmark") {
             public void actionPerformed(ActionEvent e) {
-                applicationModel.addBookmark(applicationModel.getDataSourceURL());
-            }
-        });
-
-        bookmarksMenu.add(new AbstractAction("Save and Bookmark This Page...") {
-
-            public void actionPerformed(ActionEvent e) {
-                stateSupport.createSaveAsAction().actionPerformed(e);
-                applicationModel.addBookmark(stateSupport.getCurrentFile().toString());
+                applicationModel.addBookmark( dataSetSelector.getValue() );
             }
         });
 
@@ -437,6 +442,18 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
+        bookmarksMenu.add( new JSeparator() );
+        bookmarksMenu.add( new AbstractAction("Make Aggregation From URL") {
+            public void actionPerformed(ActionEvent e) {
+                String s= dataSetSelector.getValue();
+                String agg= org.virbo.datasource.Util.makeAggregation(s);
+                if ( agg!=null ) {
+                    dataSetSelector.setValue(agg);
+                } else {
+                    JOptionPane.showMessageDialog( AutoPlotUI.this, "Unable to create aggregation spec, couldn't find yyyymmdd.");
+                }
+            }
+        });
         bookmarksMenu.add(new AbstractAction("Reset Cache") {
 
             public void actionPerformed(ActionEvent e) {
@@ -535,7 +552,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         editMenu.add(redoMenuItem);
         editMenu.add(jSeparator1);
 
-        editModelMenuItem.setText("Edit Model");
+        editModelMenuItem.setText("Edit DOM");
         editModelMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editModelMenuItemActionPerformed(evt);
@@ -913,7 +930,7 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 
                     public void uncaughtException(Thread t, Throwable e) {
                         Logger.getLogger("virbo.autoplot").severe("runtime exception: "+e);
-                        app.setStatus("caught exception: " + e.getMessage());
+                        app.setStatus("caught exception: " + e.toString() );
                         model.application.getExceptionHandler().handleUncaught(e);
                     }
                 });
