@@ -262,11 +262,17 @@ public class DataSetURL {
 
     }
 
+    // mark the special case where a resource is actually a folder.
+    public static class NonResourceException extends IllegalArgumentException {
+        public NonResourceException( String msg ) {
+            super(msg);
+        }
+    }
+    
     /**
      * get the datasource factory for the URL.
      */
     public static DataSourceFactory getDataSourceFactory(URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
-
 
         if (isAggregating(uri.toString())) {
             return new AggregatingDataSourceFactory();
@@ -322,9 +328,17 @@ public class DataSetURL {
             factory = DataSourceRegistry.getInstance().getSourceByMime(mime);
         }
 
+        // maybe it was actually a directory
+        
+        
         if (factory == null) {
-            factory = DataSourceRegistry.getInstance().getSource(ext);
+            if ( ext.equals("") ) {
+                throw new NonResourceException("resource has no extension or mime type");
+            } else {
+                factory = DataSourceRegistry.getInstance().getSource(ext);
+            }
         }
+        
         if (factory == null) {
             throw new IllegalArgumentException("Unsupported extension: " + ext);
         }
@@ -688,7 +702,7 @@ public class DataSetURL {
 
                         if (extensions != null) {
                             for (String e : extensions) {
-                                registry.register(factoryClassName, e);
+                                registry.registerExtension(factoryClassName, e, null );
                             }
                         }
 
@@ -718,7 +732,7 @@ public class DataSetURL {
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
-                            registry.register(ss[0], ss[i]);
+                            registry.registerExtension(ss[0], ss[i],null);
                         }
                     }
                     s = reader.readLine();
@@ -742,10 +756,29 @@ public class DataSetURL {
                 }
                 reader.close();
             }
+            
+            urls = DataSetURL.class.getClassLoader().getResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String s = reader.readLine().trim();
+                while (s != null) {
+                    if (s.length() > 0) {
+                        String[] ss = s.split("\\s");
+                        for (int i = 1; i < ss.length; i++) {
+                            registry.registerFormatter(ss[0], ss[i]);
+                        }
+                    }
+                    s = reader.readLine();
+                }
+                reader.close();
+            }
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     /** call this to trigger initialization */
     public static void init() {
