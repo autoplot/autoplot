@@ -137,7 +137,9 @@ public class NameValueTreeModel implements TreeModel {
     }
 
     static Object createNode(String name, Object value) {
-        if (value.getClass().isArray()) {
+        if ( value==null ) {
+            return new StringPropertyNode(name, String.valueOf(value) );
+        } else if (value.getClass().isArray()) {
             return new ArrayPropertyNode(name, value);
         } else if (value instanceof String) {
             return new StringPropertyNode(name, (String) value);
