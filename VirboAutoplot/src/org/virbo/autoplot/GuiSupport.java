@@ -83,7 +83,6 @@ public class GuiSupport {
     public void doCopyDataSetImage() {
         Runnable run = new Runnable() {
 
-            @Override
             public void run() {
                 ImageSelection imageSelection = new ImageSelection();
                 DasCanvas c = parent.applicationModel.canvas;
@@ -92,7 +91,6 @@ public class GuiSupport {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(imageSelection, new ClipboardOwner() {
 
-                    @Override
                     public void lostOwnership(Clipboard clipboard, Transferable contents) {
                     }
                 });
@@ -104,7 +102,6 @@ public class GuiSupport {
     Action getDumpDataAction() {
         return new AbstractAction("Export Data...") {
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
 
@@ -128,8 +125,11 @@ public class GuiSupport {
                 
                 Preferences prefs = Preferences.userNodeForPackage(AutoPlotUI.class);
                 String currentFileString = prefs.get("DumpDataCurrentFile", "");
-                if (!currentFileString.equals("")) {
-                    chooser.setSelectedFile(new File(currentFileString));
+                
+                if (!currentFileString.equals("") && new File( currentFileString ).exists() ) {
+                    File folder= new File( currentFileString ).getParentFile();
+                    chooser.setCurrentDirectory(folder);
+                    //chooser.setSelectedFile(new File(currentFileString));
                 }
                 int r = chooser.showSaveDialog(parent);
                 if (r == JFileChooser.APPROVE_OPTION) {
@@ -190,7 +190,6 @@ public class GuiSupport {
 
         result.add(new JMenuItem(new AbstractAction("fill below") {
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 model.seriesRend.setPsymConnector(PsymConnector.SOLID);
                 model.seriesRend.setHistogram(true);
@@ -202,7 +201,6 @@ public class GuiSupport {
 
         result.add(new JMenuItem(new AbstractAction("spectrogram") {
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 model.setRenderer(model.spectrogramRend, model.overSpectrogramRend);
             }
