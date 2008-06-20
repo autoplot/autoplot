@@ -110,7 +110,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         undoRedoSupport = new UndoRedoSupport(applicationModel);
 
         initComponents();
-
+        dataSetSelector.setMonitorContext( applicationModel.plot );
+        
         setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 
         stateSupport = new PersistentStateSupport(this, null, "vap") {
@@ -520,7 +521,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         autoplotHomepageButton = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("VxOware Autoplot");
+        setTitle("Autoplot");
 
         tabbedPanelContainer.setLayout(new java.awt.BorderLayout());
 
@@ -731,12 +732,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
                 .addContainerGap())
             .add(layout.createSequentialGroup()
                 .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 513, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(147, Short.MAX_VALUE))
-            .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
+                .addContainerGap(181, Short.MAX_VALUE))
+            .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -744,7 +745,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
+                .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
