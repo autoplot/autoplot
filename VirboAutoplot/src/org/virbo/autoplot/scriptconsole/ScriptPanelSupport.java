@@ -19,7 +19,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.datasource.DataSetSelector;
@@ -133,7 +132,18 @@ public class ScriptPanelSupport {
     }
 
     private FileFilter getFileFilter() {
-        return new FileNameExtensionFilter("python and jython scripts", "py,jy");
+        return new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                return ( f.toString().endsWith(".jy") || f.toString().endsWith(".py") );
+            }
+
+            @Override
+            public String getDescription() {
+                return "python and jython scripts";
+            }
+        };
     }
 
     protected void saveAs() {
