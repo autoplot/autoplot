@@ -9,13 +9,14 @@
 
 package org.virbo.cdfdatasource;
 
-import org.das2.util.monitor.NullProgressMonitor;
 import gsfc.nssdc.cdf.CDF;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
@@ -27,6 +28,8 @@ import org.virbo.datasource.DataSourceFactory;
  * @author jbf
  */
 public class CdfFileDataSourceFactory implements DataSourceFactory {
+    
+    private static Logger logger = Logger.getLogger("virbo.cdfdatasource");
     
     /** Creates a new instance of CdfFileDataSourceFactory */
     public CdfFileDataSourceFactory() {
@@ -69,7 +72,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             System.err.println( System.getProperty("java.library.path" ));
             throw ex;
         }
-        
+        logger.info("cdf binaries loaded");
     }
     
     
@@ -91,13 +94,18 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             String fileName= cdfFile.toString();
             if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
+            logger.fine("opening cdf file "+fileName);
             CDF cdf= CDF.open( fileName, CDF.READONLYon );
-            List result= CdfUtil.getPlottable( cdf, false , 2);
+            
+            logger.fine("inspect cdf for plottable parameters");
+            Map<String,String> result= CdfUtil.getPlottable( cdf, true , 2);
+            
+            logger.fine("close cdf");
             cdf.close();
             
             List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-            for ( int it=0; it<result.size(); it++ ) {
-                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, (String) result.get(it), this, "arg_0" );
+            for ( String key:result.keySet() ) {
+                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, key, this, "arg_0", result.get(key) );
                 ccresult.add(cc1);
             }
             return ccresult;
@@ -112,12 +120,12 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
                 CDF cdf= CDF.open( fileName, CDF.READONLYon );
-                List result= CdfUtil.getPlottable( cdf, false , 2);
+                Map<String,String> result= CdfUtil.getPlottable( cdf, true , 2);
                 cdf.close();
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
-                for ( int it=0; it<result.size(); it++ ) {
-                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, (String) result.get(it), this, null );
+                for ( String key:result.keySet() ) {
+                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, result.get(key)  );
                     ccresult.add(cc1);
                 }
                 

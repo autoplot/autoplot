@@ -20,7 +20,9 @@ import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import org.virbo.dataset.BDataSet;
 import org.virbo.dataset.DDataSet;
@@ -29,6 +31,7 @@ import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.IDataSet;
 import org.virbo.dataset.SDataSet;
 import org.virbo.dataset.WritableDataSet;
+import org.virbo.datasource.DataSetURL;
 
 /**
  * static methods supporting CdfFileDataSource
@@ -275,9 +278,17 @@ public class CdfUtil {
         return result;
     }
 
-    public static List getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws CDFException {
+    /**
+     * keys are the names of the variables. values are descriptions.
+     * @param cdf
+     * @param dataOnly
+     * @param rankLimit
+     * @return
+     * @throws gsfc.nssdc.cdf.CDFException
+     */
+    public static Map<String,String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws CDFException {
 
-        ArrayList result = new ArrayList();
+        Map<String,String> result = new LinkedHashMap<String, String>();
         Vector v = cdf.getVariables();
 
         Attribute aAttr = null, bAttr = null, cAttr = null;
@@ -314,32 +325,66 @@ public class CdfUtil {
             }
 
             if (!dataOnly) {
-                result.add(var.getName());
+                result.put( var.getName(), null );
             } else {
 
                 Vector attr = var.getAttributes();
+                
+                Variable xDependVariable=null;
+                Variable yDependVariable=null;
+                Variable zDependVariable=null;
+                
+                try {
+                    if (aAttr != null) {  // check for metadata for DEPEND_1
+                        Entry xEntry = aAttr.getEntry(var);
+                        xDependVariable = cdf.getVariable((String) xEntry.getData());
+                    }
+                } catch (CDFException e) {    
+                }
 
+                
                 try {
                     if (bAttr != null) {  // check for metadata for DEPEND_1
                         Entry yEntry = bAttr.getEntry(var);
-                        Variable yDependVariable = cdf.getVariable((String) yEntry.getData());
+                        yDependVariable = cdf.getVariable((String) yEntry.getData());
                         Attribute varType = cdf.getAttribute("VAR_TYPE");
                         Entry e = varType.getEntry(yDependVariable);
                         if (e.getData().equals("metadata")) {
                             continue;
                         }
                     }
-                } catch (CDFException e) {
+                } catch (CDFException e) {    
                 }
+                
+                
                 try {
                     if (cAttr != null) { // check for existence of DEPEND_2, dimensionality too high
                         Entry zEntry = cAttr.getEntry(var);
-                        continue;
+                        zDependVariable = cdf.getVariable((String) zEntry.getData());
+                        Attribute varType = cdf.getAttribute("VAR_TYPE");
+                        Entry e = varType.getEntry(zDependVariable);
+                        if (e.getData().equals("metadata")) {
+                            continue;
+                        }
                     }
                 } catch (CDFException e) {
                 }
 
-                result.add(var.getName());
+                
+                String desc= "" + var.getName();
+                if ( xDependVariable!=null ) {
+                    desc+= "("+ xDependVariable.getName();
+                    if ( yDependVariable!=null ) {
+                        desc+= ","+ yDependVariable.getName();
+                        if ( zDependVariable!=null ) {
+                            desc+= ","+ zDependVariable.getName();
+                        }
+                    }
+                    desc+=")";
+                }
+                
+                        
+                result.put(var.getName(),desc);
 
             }
         } // for
