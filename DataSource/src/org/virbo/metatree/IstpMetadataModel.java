@@ -8,7 +8,6 @@
 package org.virbo.metatree;
 
 import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.NumberUnits;
 import edu.uiowa.physics.pw.das.datum.Units;
 import java.lang.reflect.Array;
 import java.text.ParseException;
@@ -110,16 +109,6 @@ public class IstpMetadataModel extends MetadataModel {
 	return type;
     }
 
-    private Units lookup(String units) {
-        Units result;
-        try {
-            result= Units.getByName(units);
-        } catch ( IllegalArgumentException ex ) {
-            result= new NumberUnits( units );
-        }
-        return result;
-    }
-
     public Map<String, Object> properties( Map<String,Object> meta ) {
 	Map attrs = meta;
 
@@ -150,7 +139,7 @@ public class IstpMetadataModel extends MetadataModel {
 	    String sunits = (String) attrs.get("UNITS");
 	    Units units;
 	    try {
-		units = lookup(Util.unquote(sunits));
+		units = MetadataUtil.lookup(Util.unquote(sunits));
 	    } catch (IllegalArgumentException e) {
 		units = Units.dimensionless;
 	    }
