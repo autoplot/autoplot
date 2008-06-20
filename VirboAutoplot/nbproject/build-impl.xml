@@ -19,7 +19,7 @@ is divided into following sections:
   - cleanup
 
         -->
-<project xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1" xmlns:j2seproject2="http://www.netbeans.org/ns/j2se-project/2" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxrpc="http://www.netbeans.org/ns/j2se-project/jax-rpc" basedir=".." default="default" name="VirboAutoplot-impl">
+<project xmlns:j2seproject1="http://www.netbeans.org/ns/j2se-project/1" xmlns:j2seproject3="http://www.netbeans.org/ns/j2se-project/3" xmlns:jaxrpc="http://www.netbeans.org/ns/j2se-project/jax-rpc" basedir=".." default="default" name="VirboAutoplot-impl">
     <target depends="test,jar,javadoc" description="Build and test whole project." name="default"/>
     <!-- 
                 ======================
@@ -235,7 +235,9 @@ is divided into following sections:
             <attribute default="${build.classes.dir}" name="dir"/>
             <sequential>
                 <nbjpdareload>
-                    <fileset dir="@{dir}" includes="${fix.includes}*.class"/>
+                    <fileset dir="@{dir}" includes="${fix.classes}">
+                        <include name="${fix.includes}*.class"/>
+                    </fileset>
                 </nbjpdareload>
             </sequential>
         </macrodef>
@@ -314,7 +316,10 @@ is divided into following sections:
         <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.ExcelDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.NetCdfDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.OpenDapDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="jar"/>
@@ -631,7 +636,10 @@ is divided into following sections:
         <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.ExcelDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.NetCdfDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.OpenDapDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="clean"/>
