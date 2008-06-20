@@ -12,6 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
@@ -93,6 +94,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 interp = null;
                 cacheUrl = null;
                 cacheDate = null;
+                Logger.getLogger("virbo.jythonDataSouce").warning("exception in processing: "+causedBy);
             }
 
             return res;
