@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -252,11 +253,11 @@ public class DataSetURL {
                 String s = url.toString();
                 surl = s.substring(i + 1);
             }
-            surl = URLDecoder.decode(surl, "US-ASCII");
+            surl = surl.replaceAll("%25", "%");
+            surl = surl.replaceAll("%20", " ");
+            //surl = URLDecoder.decode(surl, "US-ASCII");
             return new URL(surl);
         } catch (MalformedURLException ex) {
-            throw new RuntimeException(ex);
-        } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
 
@@ -502,9 +503,23 @@ public class DataSetURL {
         result.add("file://P:/cdf/fast/tms/1996/fa_k0_tms_19961021_v01.cdf?L");
         return result;
     }
-    // "L:/ct/virbo/sampexTimeL/sampex.dat?fixedColumns=90&rank2"
-    //                                          ^        ^
-    public static String[] getCompletions2(String surl1, int carotPos, ProgressMonitor mon) throws Exception {
+    
+    
+    public static class CompletionResult {
+        public String completion;
+        public String doc;
+        public boolean maybePlot;
+        protected CompletionResult( String completion, String doc ) {
+            this( completion, doc, false );
+        }
+        protected CompletionResult( String completion, String doc, boolean maybePlot ) {
+            this.completion= completion;
+            this.doc= doc;
+            this.maybePlot= maybePlot;
+        }
+    }
+    
+    public static List<CompletionResult> getCompletions3( String surl1, int carotPos, ProgressMonitor mon) throws Exception {
         CompletionContext cc = new CompletionContext();
         int qpos = surl1.lastIndexOf('?', carotPos);
 
@@ -512,6 +527,8 @@ public class DataSetURL {
         cc.surlpos = carotPos;
 
 
+        List<CompletionResult> result= new ArrayList<CompletionResult>();
+        
         if (qpos != -1 && qpos < carotPos) { // in query section
             if (qpos == -1) {
                 qpos = surl1.length();
@@ -576,7 +593,6 @@ public class DataSetURL {
                 }
             }
 
-            List<String> result = new ArrayList<String>();
             int i = 0;
             for (CompletionContext cc1 : completions) {
                 String paramName = cc1.implicitName != null ? cc1.implicitName : cc1.completable;
@@ -597,11 +613,11 @@ public class DataSetURL {
                     if (dontYetHave == false) {
                         continue;  // skip it
                     }
-                    result.add(ss);
+                    result.add( new CompletionResult(ss,cc1.doc) );
                     i = i + 1;
                 }
             }
-            return result.toArray(new String[result.size()]);
+            return result;
 
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
 
@@ -611,19 +627,18 @@ public class DataSetURL {
             }
 
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
-            List<String> result = new ArrayList<String>();
+            
             int i = 0;
             for (CompletionContext cc1 : completions) {
                 if (cc1.completable.startsWith(cc.completable)) {
                     String ss = CompletionContext.insert(cc, cc1);
-                    result.add(ss);
+                    result.add( new CompletionResult(ss,cc1.doc) );
                     i = i + 1;
                 }
             }
-            return result.toArray(new String[result.size()]);
+            return result;
 
         } else {
-            String[] result;
             try {
 
                 mon.setProgressMessage("listing directory");
@@ -643,24 +658,22 @@ public class DataSetURL {
                 FileSystem fs = FileSystem.create(getWebURL(url));
                 String[] s = fs.listDirectory("/");
                 mon.finished();
-                List<String> result1 = new ArrayList<String>(s.length);
                 for (int j = 0; j < s.length; j++) {
                     if (s[j].startsWith(prefix)) {
                         CompletionContext cc1 = new CompletionContext(CompletionContext.CONTEXT_FILE, surlDir + s[j]);
-                        result1.add(CompletionContext.insert(cc, cc1));
+                        result.add( new CompletionResult( CompletionContext.insert(cc, cc1), cc1.doc, true ) );
                     }
                 }
-                result = result1.toArray(new String[result1.size()]);
             } catch (MalformedURLException ex) {
-                result = new String[]{"Malformed URI"};
+                result = Collections.singletonList( new CompletionResult("Malformed URI",null) );
             } catch (FileSystem.FileSystemOfflineException ex) {
-                result = new String[]{"FileSystem offline"};
+                result = Collections.singletonList( new CompletionResult( "FileSystem offline", null ) );
             }
             return result;
         }
-
+        
     }
-
+    
     private static void discoverFactories(DataSourceRegistry registry) {
 
         // discover Factories on the path
