@@ -1,8 +1,9 @@
 /*
  * LogConsole.java
  *
- * Created on June 14, 2008, 3:12 PM
+ * Created on June 19, 2008, 4:08 PM
  */
+
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.EventQueue;
@@ -31,10 +32,9 @@ public class LogConsole extends javax.swing.JPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 update();
             }
-        });
-
+        });        
     }
-    
+
     TickleTimer timer;
     List<LogRecord> records = new LinkedList<LogRecord>();
     int eventThreadId= -1;   
@@ -101,7 +101,7 @@ public class LogConsole extends javax.swing.JPanel {
             records.remove(0);
         }
     }
-
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -114,8 +114,8 @@ public class LogConsole extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         logTextArea = new javax.swing.JTextArea();
         clearButton = new javax.swing.JButton();
-        verbositySelect = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
+        verbositySelect = new javax.swing.JComboBox();
         timeStampsCheckBox = new javax.swing.JCheckBox();
         logLevelCheckBox = new javax.swing.JCheckBox();
 
@@ -133,6 +133,8 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
 
+        jLabel1.setText("verbosity:");
+
         verbositySelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "warnings", "informational", "debug", "all" }));
         verbositySelect.setSelectedIndex(3);
         verbositySelect.setToolTipText("filter messages by verbosity.");
@@ -141,8 +143,6 @@ public class LogConsole extends javax.swing.JPanel {
                 verbositySelectActionPerformed(evt);
             }
         });
-
-        jLabel1.setText("verbosity:");
 
         timeStampsCheckBox.setText("timing");
         timeStampsCheckBox.setToolTipText("Show time of the message, in seconds before the most recent message.");
@@ -160,44 +160,46 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(clearButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(verbositySelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(timeStampsCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(logLevelCheckBox)
-                .addGap(2, 2, 2))
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 463, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(clearButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(timeStampsCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(logLevelCheckBox)
+                .add(54, 54, 54))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(clearButton)
-                    .addComponent(jLabel1)
-                    .addComponent(verbositySelect, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(timeStampsCheckBox)
-                    .addComponent(logLevelCheckBox)))
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 300, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(clearButton)
+                    .add(jLabel1)
+                    .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(timeStampsCheckBox)
+                    .add(logLevelCheckBox)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
-    records.removeAll(records);
+records.removeAll(records);
     update();
 }//GEN-LAST:event_clearButtonActionPerformed
 
 private void verbositySelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verbositySelectActionPerformed
-    String o= (String) verbositySelect.getSelectedItem();
+String o= (String) verbositySelect.getSelectedItem();
 
     if ( o.equals("warnings") ) {
         level= Level.WARNING.intValue();
@@ -214,12 +216,13 @@ private void verbositySelectActionPerformed(java.awt.event.ActionEvent evt) {//G
 }//GEN-LAST:event_verbositySelectActionPerformed
 
 private void timeStampsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeStampsCheckBoxActionPerformed
-    update();
+update();
 }//GEN-LAST:event_timeStampsCheckBoxActionPerformed
 
 private void logLevelCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logLevelCheckBoxActionPerformed
-    update();
+update();
 }//GEN-LAST:event_logLevelCheckBoxActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearButton;
@@ -230,4 +233,5 @@ private void logLevelCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//
     private javax.swing.JCheckBox timeStampsCheckBox;
     private javax.swing.JComboBox verbositySelect;
     // End of variables declaration//GEN-END:variables
+
 }
