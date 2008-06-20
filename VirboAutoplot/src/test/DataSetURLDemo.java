@@ -10,6 +10,7 @@
 package test;
 
 import edu.uiowa.physics.pw.das.components.DasProgressPanel;
+import java.util.List;
 import org.virbo.datasource.DataSetURL;
 
 /**
@@ -63,13 +64,13 @@ public class DataSetURLDemo {
                 throw new IllegalArgumentException("bad test number");
         }
         
-        String[] ccs= DataSetURL.getCompletions2( context, carotPos, new DasProgressPanel("completions" ) );
+        List<DataSetURL.CompletionResult> ccs= DataSetURL.getCompletions3( context, carotPos, new DasProgressPanel("completions" ) );
        
         System.err.println(context);
         System.err.println(spaces.substring(0,carotPos)+"L" );
         
-        for ( int i=0; i<ccs.length; i++ ) {
-            System.err.println(ccs[i]);
+        for ( DataSetURL.CompletionResult cc: ccs ) {
+            System.err.println( ""+cc.completion );
         }
         
     }
