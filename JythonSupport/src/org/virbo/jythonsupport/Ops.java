@@ -5,6 +5,7 @@
 package org.virbo.jythonsupport;
 
 import edu.uiowa.physics.pw.das.dataset.TableDataSet;
+import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.EnumerationUnits;
 import edu.uiowa.physics.pw.das.datum.TimeUtil;
 import edu.uiowa.physics.pw.das.datum.Units;
@@ -16,13 +17,14 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SDataSet;
+import org.virbo.dataset.TransposeRank2DataSet;
 import org.virbo.dataset.TrimStrideWrapper;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
@@ -1497,6 +1499,55 @@ public class Ops {
         d2.setTrim(0, 1, ds.length(), 1);
         return Ops.subtract(d2, d1);
     }
+    
+    /**
+     * create a labels dataset for tagging rows of a dataset.
+     * Example:
+     * <tt>dep1= labels( ["X","Y","Z"], "GSM" )</tt>
+     * @param labels
+     * @param context
+     * @return rank 1 QDataSet
+     */
+    public static QDataSet labels( String[] labels, String context ) {
+        EnumerationUnits u= new EnumerationUnits( context );
+        SDataSet result= SDataSet.createRank1(labels.length);
+        for ( int i=0; i<labels.length; i++ ) {
+            Datum d= u.createDatum(labels[i]);
+            result.putValue(i,d.doubleValue(u));
+        }
+        result.putProperty(QDataSet.UNITS, u);
+        return result;
+    }
+
+    /**
+     * create a labels dataset for tagging rows of a dataset.
+     * Example:
+     * <tt>dep1= labels( ["X","Y","Z"], "GSM" )</tt>
+     * @param labels
+     * @param context
+     * @return rank 1 QDataSet
+     */
+    public static QDataSet labels( String[] labels ) {
+        return labels( labels, "default" );
+    }
+        
+    public static QDataSet reform( QDataSet ds, int[] qube ) {
+        QubeDataSetIterator it0= new QubeDataSetIterator(ds);
+        DDataSet result= DDataSet.create(qube);
+        QubeDataSetIterator it1= new QubeDataSetIterator(result);
+        while ( it0.hasNext() ) {
+            it0.next();
+            it1.next();
+            double v= it0.getValue(ds);
+            it1.putValue(result, v);
+        }
+        return result;
+    }
+    
+    public static QDataSet transpose( QDataSet ds ) {
+        return new TransposeRank2DataSet( ds );
+    }
+            
     public static double PI = Math.PI;
     public static double E = Math.E;
 }
