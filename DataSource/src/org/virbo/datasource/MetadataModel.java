@@ -78,12 +78,28 @@ public abstract class MetadataModel {
 
         Object o= tree.get( path[1] );
         
-        for ( int i=2; i<path.length-1; i++ ) {
+        for ( int i=2; i<path.length; i++ ) {
             Map<String,Object> subTree= (Map<String,Object>) o;
             o= subTree.get(path[i]);
         }
         
         return String.valueOf(o);
+    }
+    
+
+    /**
+     * drills down through the Maps.  This returns value.
+     */
+    public static Object getNode( Map<String,Object> tree, String[] path ) {
+
+        Object o= tree.get( path[1] );
+        
+        for ( int i=2; i<path.length; i++ ) {
+            Map<String,Object> subTree= (Map<String,Object>) o;
+            o= subTree.get(path[i]);
+        }
+        
+        return o;
     }
     
     
