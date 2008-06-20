@@ -146,7 +146,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
             if (!listing.canRead()) {
 
                 FtpBean bean = new FtpBean();
-                bean.ftpConnect(getRootURL().getHost(), "ftp");
+                try {
+                    bean.ftpConnect(getRootURL().getHost(), "ftp");
+                } catch ( NullPointerException ex ) {
+                    throw new IOException( "Unable to make connection to "+ getRootURL().getHost() );
+                }
                 bean.setDirectory(getRootURL().getPath() + directory.substring(1));
 
                 FtpObserver observer = new FtpObserver() {
