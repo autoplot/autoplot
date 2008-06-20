@@ -67,7 +67,7 @@
 
         <!-- cdf -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
-        <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-latest.jnlp" >  
+        <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2-latest.jnlp" >  
         </extension>
         
         <jar href="lib/dasCore.jar" />
