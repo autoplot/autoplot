@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.7.0
+Created-By: 1.6.0_03-b05 (Sun Microsystems Inc.)
+Main-Class: org.virbo.autoplot.AutoPlotUI
+Class-Path: lib/dasCore.jar lib/QDataSet.jar lib/DataSource.jar lib/Wa
+ vDataSource.jar lib/DataSourcePack.jar lib/CdfDataSource.jar lib/bati
+ k-awt-util.jar lib/batik-svggen.jar lib/batik-util.jar lib/beansbindi
+ ng.jar lib/cdfjava.jar lib/dasCore.jar lib/itext-1.2.jar lib/JFontCho
+ oser.jar lib/jython.jar lib/poi-2.5.1-final-20040804.jar lib/poi-cont
+ rib-2.5.1-final-20040804.jar lib/poi-scratchpad-2.5.1-final-20040804.
+ jar lib/CefDataSource.jar lib/JythonDataSource.jar lib/NetCdfDataSour
+ ce.jar lib/OpenDapDataSource.jar lib/BinaryDataSource.jar lib/ExcelDa
+ taSource.jar lib/AbsoluteLayout.jar lib/swing-layout-1.0.jar lib/bufr
+ .jar lib/commons-codec-1.3.jar lib/commons-httpclient-3.0.jar lib/com
+ mons-logging-1.0.4.jar lib/gnu-regexp-1.1.4.jar lib/grib-5.0.04.jar l
+ ib/jdom.jar lib/jpeg2000.jar lib/lucene.jar lib/netcdfUI-2.2.18.jar l
+ ib/nlog4j-1.2.21.jar lib/prefsAll.jar lib/resourcesOptional.jar lib/v
+ isadNoDods.jar lib/xercesImpl.jar lib/xml-apis.jar lib/jythonSupport.
+ jar
+X-COMMENT: Main-Class will be added automatically by build
+
