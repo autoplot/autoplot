@@ -11,10 +11,6 @@ package org.virbo.spase;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
-import javax.swing.tree.TreeModel;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.MetadataModel;
 
@@ -29,13 +25,19 @@ public class SpaseMetadataModel extends MetadataModel {
     }
    
     
-    public Map<String,Object> properties( TreeModel meta ) {
+    public Map<String,Object> properties( Map<String,Object> meta ) {
         HashMap<String,Object> result= new HashMap<String,Object>();
         
-        TreeModel meta2= copyTree( meta );
+        Map<String,Object> param= (Map<String, Object>) MetadataModel.getNode( meta, new String[] { "Spase", "NumericalData", "PhysicalParameter" } );
+        result.put( QDataSet.TITLE, param.get( "Name" ) );
+        result.put( QDataSet.LABEL, ""+param.get("Name")+ " (" + (String) param.get( "Units" ) + ")"  );
         
-        result.put( QDataSet.TITLE, this.getNodeValue( meta2, new String[] { "Spase", "NumericalData", "PhysicalParameter", "Name" } ) );
         return result;
+    }
+
+    @Override
+    public String getLabel() {
+        return "SPASE";
     }
     
     

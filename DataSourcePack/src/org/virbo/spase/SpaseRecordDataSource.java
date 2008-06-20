@@ -137,7 +137,7 @@ public class SpaseRecordDataSource implements DataSource {
         
     }
     
-    public TreeModel getMetaData( ProgressMonitor mon ) throws Exception {
+    public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
         // If we're using a DOM Level 2 implementation, then our Document
         // object ought to implement DocumentTraversal
         DocumentTraversal traversal = (DocumentTraversal)document;
@@ -164,7 +164,10 @@ public class SpaseRecordDataSource implements DataSource {
         TreeWalker walker = traversal.createTreeWalker( root, whatToShow,
                 filter, false);
         
-        return new DOMTreeWalkerTreeModel(walker);
+        //TreeModel tree= new DOMTreeWalkerTreeModel(walker);
+        DOMWalker walk= new DOMWalker(walker);
+        return walk.getAttributes( walk.getRoot() );
+        
     }
     
     public String getURL() {
@@ -184,7 +187,7 @@ public class SpaseRecordDataSource implements DataSource {
     }
 
     public MetadataModel getMetadataModel() {
-        return MetadataModel.createNullModel();
+        return new SpaseMetadataModel();
     }
     
     

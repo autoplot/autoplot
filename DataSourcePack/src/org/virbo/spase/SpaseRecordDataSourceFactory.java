@@ -39,9 +39,6 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
         return surl;
     }
     
-    public MetadataModel getMetadataModel(URL url) {
-        return new SpaseMetadataModel();
-    }
     
     public boolean reject( String surl, ProgressMonitor mon ) {
         return false;
