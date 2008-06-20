@@ -228,7 +228,7 @@
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
-    <Property name="title" type="java.lang.String" value="VxOware Autoplot"/>
+    <Property name="title" type="java.lang.String" value="Autoplot"/>
   </Properties>
   <SyntheticProperties>
     <SyntheticProperty name="menuBar" type="java.lang.String" value="jMenuBar1"/>
@@ -250,14 +250,14 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="dataSetSelector" pref="636" max="32767" attributes="0"/>
+              <Component id="dataSetSelector" pref="670" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
               <Component id="statusLabel" min="-2" pref="513" max="-2" attributes="0"/>
-              <EmptySpace pref="147" max="32767" attributes="0"/>
+              <EmptySpace pref="181" max="32767" attributes="0"/>
           </Group>
-          <Component id="tabbedPanelContainer" alignment="0" pref="660" max="32767" attributes="2"/>
+          <Component id="tabbedPanelContainer" alignment="0" pref="694" max="32767" attributes="2"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -266,7 +266,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dataSetSelector" min="-2" pref="27" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabbedPanelContainer" pref="385" max="32767" attributes="0"/>
+              <Component id="tabbedPanelContainer" pref="398" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="statusLabel" min="-2" pref="23" max="-2" attributes="0"/>
           </Group>
