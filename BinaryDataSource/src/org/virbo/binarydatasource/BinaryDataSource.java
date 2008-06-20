@@ -36,7 +36,8 @@ public class BinaryDataSource extends AbstractDataSource {
     public final static String INT = "int";
     public final static String SHORT = "short";
     public final static String BYTE = "byte";
-
+    public final static String UBYTE = "ubyte";
+    
     public BinaryDataSource(URL url) {
         super(url);
     }
@@ -65,6 +66,8 @@ public class BinaryDataSource extends AbstractDataSource {
         } else if (type.equals(SHORT)) {
             return 2;
         } else if (type.equals(BYTE)) {
+            return 1;
+        } else if (type.equals(UBYTE)) {
             return 1;
         } else {
             throw new IllegalArgumentException("bad type: " + type);
@@ -150,6 +153,8 @@ public class BinaryDataSource extends AbstractDataSource {
             return new Short(rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, fbuf);
         } else if (type.equals(BYTE)) {
             return new Byte(rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, buf);
+        } else if (type.equals(UBYTE)) {
+            return new UByte(rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, buf);
         } else {
             throw new IllegalArgumentException("bad type: " + type);
         }

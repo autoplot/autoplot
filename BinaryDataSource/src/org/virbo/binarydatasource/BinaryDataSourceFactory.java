@@ -61,6 +61,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "int") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "short") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") ); 
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") ); 
                 return result;
             } else if ( paramName.equals("depend0") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
@@ -72,6 +73,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "int") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "short") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") ); 
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") ); 
                 return result;
             } else if ( paramName.equals("byteOrder") ) {
                 List<CompletionContext> result= new ArrayList<CompletionContext>();
