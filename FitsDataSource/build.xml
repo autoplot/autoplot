@@ -66,4 +66,14 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <target name="-post-compile" >
+        <propertyfile comment="Build Information"
+              file="${build.classes.dir}/META-INF/build.txt">
+            <entry key="build.timestamp"
+           type="date"
+           pattern="yyyyMMdd_HHmmss"
+           value="now"/>
+            <entry key="build.user.name" value="${user.name}"/>
+        </propertyfile>
+    </target>
 </project>
