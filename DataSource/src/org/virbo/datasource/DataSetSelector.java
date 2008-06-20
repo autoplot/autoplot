@@ -6,10 +6,9 @@
 package org.virbo.datasource;
 
 import edu.uiowa.physics.pw.das.DasApplication;
-import edu.uiowa.physics.pw.das.components.DasProgressPanel;
+import edu.uiowa.physics.pw.das.graph.DasCanvasComponent;
 import edu.uiowa.physics.pw.das.util.DasExceptionHandler;
 import org.das2.util.monitor.ProgressMonitor;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileSystem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,6 +38,7 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
@@ -70,14 +70,23 @@ public class DataSetSelector extends javax.swing.JPanel {
     public static final String PROPERTY_MESSAGE = "message";
     Logger logger = Logger.getLogger("virbo.dataset.ui");
 
+    DasCanvasComponent monitorContext= null;
+            
     private ProgressMonitor getMonitor() {
         return getMonitor("Please Wait", "unidentified task in progress");
     }
 
     private ProgressMonitor getMonitor(String label, String desc) {
-        return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
+        if ( monitorContext==null ) {
+            return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
+        } else {
+            return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(monitorContext,label, desc);
+        }
     }
 
+    public void setMonitorContext( DasCanvasComponent c ) {
+        this.monitorContext= c;
+    }
     /**
      * if the dataset requires parameters that aren't provided, then
      * show completion list.  Otherwise, fire off event.
@@ -183,7 +192,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         showCompletions(surl, carotpos);
     }
 
-    private JPopupMenu fillPopupNew(final List<String> completions, final String labelprefix) {
+    private JPopupMenu fillPopupNew(final List<DataSetURL.CompletionResult> completions, final String labelprefix) {
 
         JPopupMenu popupMenu = new JPopupMenu();
 
@@ -193,21 +202,22 @@ public class DataSetSelector extends javax.swing.JPanel {
         while (i < completions.size()) {
             int stopAt = Math.min(i + 30, completions.size());
             while (i < stopAt) {
-                final String comp1 = completions.get(i);
-                String label = completions.get(i);
+                final DataSetURL.CompletionResult s1 = completions.get(i);
+                String label = s1.completion;
                 if (label.startsWith(labelprefix)) {
                     label = label.substring(labelprefix.length());
                 }
                 Action a = new AbstractAction(label) {
-
                     public void actionPerformed(ActionEvent ev) {
-                        dataSetSelector.setSelectedItem(comp1);
+                        dataSetSelector.setSelectedItem( s1.completion);
                     }
                 };
+                JMenuItem menuItem= new JMenuItem(a);
+                if ( s1.doc!=null ) menuItem.setToolTipText(s1.doc);
                 if (subMenu == null) {
-                    popupMenu.add(a);
+                    popupMenu.add(menuItem);
                 } else {
-                    subMenu.add(a);
+                    subMenu.add(menuItem);
                 }
                 i++;
             }
@@ -227,38 +237,13 @@ public class DataSetSelector extends javax.swing.JPanel {
         return popupMenu;
     }
 
-    private JPopupMenu fillPopup(final List<String> completions, final String labelprefix) {
-
-        JPopupMenu popupMenu = new JPopupMenu();
-
-        for (int i = 0; i < Math.min(30, completions.size()); i++) {
-            final String comp1 = completions.get(i);
-            String label = completions.get(i);
-            if (label.startsWith(labelprefix)) {
-                label = label.substring(labelprefix.length());
-            }
-            popupMenu.add(new AbstractAction(label) {
-
-                public void actionPerformed(ActionEvent ev) {
-                    dataSetSelector.setSelectedItem(comp1);
-                }
-            });
-        }
-        if (completions.size() > 20) {
-            popupMenu.add("<html><em>(list truncated)</em></html>");
-        }
-        if (completions.size() == 0) {
-            popupMenu.add("<html><em>(empty)</em></html>");
-        }
-        return popupMenu;
-    }
 
     private void showCompletions() {
         final String surl = (String) dataSetSelector.getEditor().getItem();
         int carotpos = ((JTextField) dataSetSelector.getEditor().getEditorComponent()).getCaretPosition();
         setMessage("getting completions");
         showCompletions(surl, carotpos);
-        setMessage("done getting completions");
+        
     }
 
     private void showCompletions(final String surl, final int carotpos) {
@@ -317,14 +302,14 @@ public class DataSetSelector extends javax.swing.JPanel {
                     prefix = prefix.toLowerCase();
                 }
 
-                List<String> completions = new ArrayList<String>(s.length);
+                List<DataSetURL.CompletionResult> completions = new ArrayList<DataSetURL.CompletionResult>(s.length);
                 for (int j = 0; j < s.length; j++) {
                     String scomp = foldCase ? s[j].toLowerCase() : s[j];
                     if (scomp.startsWith(prefix)) {
                         if (s[j].endsWith("contents.html")) {
                             s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
                         } // kludge for dods
-                        completions.add(surlDir + s[j]);
+                        completions.add( new DataSetURL.CompletionResult(surlDir + s[j],null) );
                     }
                 }
 
@@ -337,7 +322,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 
                 final String labelPrefix = surlDir;
                 completionsPopupMenu = fillPopupNew(completions, labelPrefix);
-
+                setMessage("done getting completions");
 
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -377,9 +362,9 @@ public class DataSetSelector extends javax.swing.JPanel {
 
             public void run() {
 
-                String[] completions;
+                List<DataSetURL.CompletionResult> completions2;
                 try {
-                    completions = DataSetURL.getCompletions2(surl, carotpos, completionsMonitor);
+                    completions2 = DataSetURL.getCompletions3(surl, carotpos, completionsMonitor);
                     setMessage("done getting completions");
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -390,7 +375,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 int i = surl.indexOf('?');
                 final String labelPrefix = (i == -1) ? "" : surl.substring(0, i + 1);
 
-                completionsPopupMenu = fillPopupNew(Arrays.asList(completions), labelPrefix);
+                completionsPopupMenu = fillPopupNew( completions2, labelPrefix);
 
                 SwingUtilities.invokeLater(new Runnable() {
 

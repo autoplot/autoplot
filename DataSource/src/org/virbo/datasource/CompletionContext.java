@@ -31,6 +31,14 @@ public class CompletionContext {
         this( context, completable, owner, implicitName, null );
     }
     
+    /**
+     * 
+     * @param context
+     * @param completable
+     * @param owner
+     * @param implicitName
+     * @param doc additional information that is shown in a tooltip.
+     */
     public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String doc ) {
         this.context= context;
         this.completable= completable;
