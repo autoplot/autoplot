@@ -43,15 +43,12 @@ import edu.uiowa.physics.pw.das.graph.SeriesRenderer;
 import edu.uiowa.physics.pw.das.graph.SpectrogramRenderer;
 import edu.uiowa.physics.pw.das.stream.StreamException;
 import edu.uiowa.physics.pw.das.system.RequestProcessor;
-import java.awt.event.KeyEvent;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.StreamTool;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyEditor;
@@ -80,7 +77,6 @@ import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.Base64;
 import org.virbo.autoplot.state.ApplicationState;
@@ -98,7 +94,6 @@ import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.TransposeRank2DataSet;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
-import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.capability.Caching;
@@ -127,6 +122,7 @@ public class ApplicationModel {
     Options options;
 
     enum RenderType {
+
         spectrogram, series, scatter
     }
     /**
@@ -442,7 +438,7 @@ public class ApplicationModel {
                     if (e.getPropertyName().equals("datumRange")) {
                         DatumRange newRange = ApplicationModel.this.plot.getXAxis().getDatumRange();
                         // don't waste time by chasing after 10% of a dataset.
-                        newRange= DatumRangeUtil.rescale( newRange, 0.1, 0.9 ); 
+                        newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
                         if (tsb == null) {
                             return;
                         }
@@ -804,14 +800,19 @@ public class ApplicationModel {
 
         }
 
-        if ( autorange ) {
-            if ( plot.getXAxis().getUnits().isConvertableTo(Units.us2000) ) {
-                plot.getXAxis().setUserDatumFormatter( new DateTimeDatumFormatter() );
+        if (autorange) {
+            if (plot.getXAxis().getUnits().isConvertableTo(Units.us2000)) {
+                plot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter());
             } else {
-                plot.getXAxis().setUserDatumFormatter( null );
+                plot.getXAxis().setUserDatumFormatter(null);
+            }
+            if (plot.getYAxis().getUnits().isConvertableTo(Units.us2000)) {
+                plot.getYAxis().setUserDatumFormatter(new DateTimeDatumFormatter());
+            } else {
+                plot.getYAxis().setUserDatumFormatter(null);
             }
         }
-        
+
         fillDataset = fillDs;
 
         propertyChangeSupport.firePropertyChange(PROPERTY_FILL, null, null);
@@ -875,7 +876,7 @@ public class ApplicationModel {
     /**
      *
      */
-    public void update( final boolean autorange ) {
+    public void update(final boolean autorange) {
         dataset = null;
         Runnable run = new Runnable() {
 
@@ -884,11 +885,11 @@ public class ApplicationModel {
                 setStatus("loading dataset");
 
                 QDataSet dataset = loadDataSet(0);
-                
-                if ( tsb!=null ) {
-                    ApplicationModel.this.surl= tsb.getURL().toString();
+
+                if (tsb != null) {
+                    ApplicationModel.this.surl = tsb.getURL().toString();
                 }
-                
+
                 setStatus("done loading dataset");
                 if (dataset == null) {
                     seriesRend.setDataSet(null);
@@ -1167,17 +1168,9 @@ public class ApplicationModel {
 
     public void setBookmarks(List<Bookmark> list) {
         List oldValue = bookmarks;
-        bookmarks =
-                list;
+        bookmarks = list;
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put(
-                "bookmarks", Bookmark.formatBooks(list));
-
-
-
-
-
-
+        prefs.put("bookmarks", Bookmark.formatBooks(list));
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
@@ -1188,59 +1181,47 @@ public class ApplicationModel {
 
     public void addRecent(String surl) {
         List oldValue = Collections.unmodifiableList(recent);
+        ArrayList newValue = new ArrayList(recent);
         Bookmark book = new Bookmark(surl);
-        if (recent.contains(book)) { // move it to the front of the list
-
-            recent.remove(book);
+        if (newValue.contains(book)) { // move it to the front of the list
+            newValue.remove(book);
         }
 
-        recent.add(book);
-        while (recent.size() > MAX_RECENT) {
-            recent.remove(0);
+        newValue.add(book);
+        while (newValue.size() > MAX_RECENT) {
+            newValue.remove(0);
         }
-
-
 
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put(
-                "recent", Bookmark.formatBooks(recent));
-
-
-
-
-
+        prefs.put("recent", Bookmark.formatBooks(newValue));
 
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
             ex.printStackTrace();
         }
+        this.recent = newValue;
         propertyChangeSupport.firePropertyChange(PROPERTY_RECENT, oldValue, recent);
     }
 
     public void addBookmark(String surl) {
         List oldValue = Collections.unmodifiableList(new ArrayList());
-        if (bookmarks.contains(surl)) { // move it to the front of the list
-
-            bookmarks.remove(surl);
+        List newValue = new ArrayList(bookmarks);
+        if (newValue.contains(surl)) { // move it to the front of the list
+            newValue.remove(surl);
         }
 
-        bookmarks.add(new Bookmark(surl));
+        newValue.add(new Bookmark(surl));
 
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put(
-                "bookmarks", Bookmark.formatBooks(bookmarks));
-
-
-
-
-
+        prefs.put("bookmarks", Bookmark.formatBooks(newValue));
 
         try {
             prefs.flush();
         } catch (BackingStoreException ex) {
             ex.printStackTrace();
         }
+        this.bookmarks = newValue;
         propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
     }
 
