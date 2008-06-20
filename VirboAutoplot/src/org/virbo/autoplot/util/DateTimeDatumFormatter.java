@@ -22,6 +22,9 @@ public class DateTimeDatumFormatter extends DatumFormatter {
 
     @Override
     public String format(Datum datum) {
+        if ( !datum.getUnits().isConvertableTo(Units.us2000 ) ) {
+            return "!Ktime!C!kexpected";
+        }        
         double ssm= TimeUtil.getSecondsSinceMidnight(datum);
         String date= null;
         String time= TimeDatumFormatter.MINUTES.format(datum);
@@ -49,6 +52,13 @@ public class DateTimeDatumFormatter extends DatumFormatter {
         
         int firstIndex= -1;
         String[] result= new String[datums.getLength()];
+        
+        if ( !datums.getUnits().isConvertableTo(Units.us2000 ) || !context.getUnits().isConvertableTo(Units.us2000 ) ) {
+            for ( int i=0; i<result.length; i++ ) {
+                result[i]= "!Ktime!C!kexpected";
+            }
+            return result;
+        }
         
         // calculate the scale between successive datums.
         int scale;
