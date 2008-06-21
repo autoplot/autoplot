@@ -201,7 +201,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         
         addBindings();
 
-        dataSetSelector.addPropertyChangeListener(new PropertyChangeListener() {
+        dataSetSelector.addPropertyChangeListener( dataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent e) {
                 Runnable run= new Runnable() {
                     public void run() {
@@ -405,9 +405,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
     public void setStatus(String message) {
         logger.info(message);
         setMessage(message);
-        if ( message.equals("") ) {
-            System.err.println("here");
-        }
     }
 
     private void clearCache() {
