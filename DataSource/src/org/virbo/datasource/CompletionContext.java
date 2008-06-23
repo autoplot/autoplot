@@ -9,6 +9,8 @@
 
 package org.virbo.datasource;
 
+import java.net.URL;
+
 /**
  * models a part of a dataset's URL.  
  * @author jbf
@@ -56,6 +58,16 @@ public class CompletionContext {
      * the position of the carot within the url
      */
     public int surlpos;
+    
+    /**
+     * resource file, no params
+     */
+    public URL resource;
+    
+    /**
+     * params parsed
+     */
+    public String params;
     
     /**
      * the context identifier enum for the completion. See CONTEXT_FILESYSTEM, CONTEXT_FILE, CONTEXT_PARAMETER_NAME, CONTEXT_PARAMETER_VALUE, etc.
