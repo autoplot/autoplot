@@ -571,6 +571,12 @@ public class DataSetURL {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
 
+            
+            URI uri= DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+            
+            cc.resource= DataSetURL.getWebURL(uri);
+            cc.params= split.params;
+
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
 
             // identify the implicit parameter names
@@ -620,8 +626,12 @@ public class DataSetURL {
             return result;
 
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
-
-            DataSourceFactory factory = getDataSourceFactory(DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)), mon);
+            URI uri= DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+            DataSourceFactory factory = getDataSourceFactory(uri, mon);
+            
+            cc.resource= DataSetURL.getWebURL(uri);
+            cc.params= split.params;
+                    
             if (factory == null) {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
