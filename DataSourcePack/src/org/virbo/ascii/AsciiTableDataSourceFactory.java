@@ -9,17 +9,21 @@
 
 package org.virbo.ascii;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
+import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.dsutil.AsciiParser;
 
 /**
  *
@@ -58,17 +62,32 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
             if ( paramName.equals("skip") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
+                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", this, null, "the number of lines to skip before attempting to parse." ) );
             } else if ( paramName.equals("rank2" ) ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
             } else if ( paramName.equals("column") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "field<int>" ) );
+                String[] columns= getFieldNames( cc, mon );
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                for ( String s: columns ) {
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, s ) );
+                }
+                return result;
             } else if ( paramName.equals("fixedColumns") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
+                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", this, null, "Hint at the number of columns to expect, then use fast parser that assumes fixed columns." ) );
             } else if ( paramName.equals("time") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<columnName>", this, null, "Identify column to be parsed as time, and is by default the absissa" ) );
+                String[] columns= getFieldNames( cc, mon );
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                for ( String s: columns ) {
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, s ) );
+                }
+                return result;
             } else if ( paramName.equals("depend0") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<columnName>" ) );
+                String[] columns= getFieldNames( cc, mon );
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                for ( String s: columns ) {
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, s ) );
+                }
+                return result;
             } else if ( paramName.equals("timeFormat") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%Y %j %H" ) );
             } else if ( paramName.equals("fill") ) {
@@ -87,6 +106,19 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
 
     public String urlForServer(String surl) {
         return surl;
+    }
+
+    private String[] getFieldNames(CompletionContext cc, ProgressMonitor mon ) throws IOException {
+        
+        Map params= DataSetURL.parseParams( cc.params );
+        Object o;
+        File file= DataSetURL.getFile( cc.resource, mon  );
+        
+        AsciiParser parser=  AsciiParser.newParser(5);
+        if ( params.containsKey("skip") ) parser.setSkipLines( Integer.parseInt((String) params.get("skip")) );
+        
+        parser.guessDelimParser( parser.readFirstRecord(file.toString()) );
+        return parser.getFieldNames();
     }
 
 }
