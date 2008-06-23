@@ -40,6 +40,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     AsciiParser parser;
     File file;
     String column= "field0";
+    
     String depend0= null;
     
     DDataSet ds=null;
@@ -64,6 +65,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
         
         if ( column!=null ) {
             int icol= parser.getFieldIndex(column);
+            if ( icol==-1 ) {
+                if ( Pattern.matches("field[0-9]+", column ) ) {
+                    icol= Integer.parseInt(column.substring(5) );
+                }
+            }
             vds= DDataSet.copy( DataSetOps.slice1( ds, icol ) );
             vds.putProperty( QDataSet.UNITS, parser.getUnits(icol) );
         }
@@ -91,7 +97,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
     
     private DDataSet doReadFile(final ProgressMonitor mon) throws NumberFormatException, IOException, FileNotFoundException {
         
-        Map params= DataSetURL.parseParams( url.getQuery() );
         Object o;
         file= DataSetURL.getFile( url , mon  );
         
@@ -133,10 +138,15 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if ( o!=null ) {
             delim= (String)o;
         } else {
-            delim= "\\s+";
+            delim= null;
         }
-        columnCount= parser.setDelimParser( file.toString(), delim ).fieldCount();
-        parser.setPropertyPattern( Pattern.compile("^#\\s*(.+)\\s*\\:\\s*(.+)\\s*") );
+        if ( delim==null ) {
+            columnCount= parser.guessDelimParser( parser.readFirstRecord(file.toString()) ).fieldCount();            
+        } else {
+            columnCount= parser.setDelimParser( file.toString(), delim ).fieldCount();
+        }
+        //parser.setPropertyPattern( Pattern.compile("^#\\s*(.+)\\s*\\:\\s*(.+)\\s*") );
+        parser.setPropertyPattern( Pattern.compile("\\s*(.+)\\s*\\:\\s*(.+)\\s*") );
         
         o=params.get("fixedColumns");
         if ( o!=null ) {
@@ -261,9 +271,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
         return ds;
     }
     
+    @Override
     public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
         if ( ds==null ) return new HashMap<String,Object>();
-        Map<String,Object> props= DataSetUtil.getProperties(ds);
+        Map<String,Object> props= (Map<String, Object>) ds.property( QDataSet.USER_PROPERTIES );
         
         return props;
     }
