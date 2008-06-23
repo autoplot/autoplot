@@ -134,7 +134,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                 }
                                 setValue(surl);
                                 int carotpos = surl.indexOf("?") + 1;
-                                setMessage("url ambiguous, getting inspecting resource for parameters");
+                                setMessage("url ambiguous, inspecting resource for parameters");
                                 showCompletions(surl, carotpos);
                             } else {
                                 firePlotDataSetURL();
