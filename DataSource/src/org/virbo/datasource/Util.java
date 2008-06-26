@@ -84,7 +84,7 @@ public class Util {
     
     public static String makeAggregation( String surl ) {
         String yyyy= "/\\d{4}/";
-        String yyyymmdd= "(\\d{8})";
+        String yyyymmdd= "(?<!\\d)(\\d{8})(?!\\d)"; //"(\\d{8})";
         String version= "([Vv])\\d{2}";
         String result= surl;
         
