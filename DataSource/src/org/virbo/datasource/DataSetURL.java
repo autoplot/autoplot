@@ -8,8 +8,6 @@
  */
 package org.virbo.datasource;
 
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
@@ -30,7 +28,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -452,7 +449,7 @@ public class DataSetURL {
                 File tfile = fo.getFile(mon);
                 return tfile;
             } catch (URISyntaxException ex) {
-                throw new IOException(ex);
+                throw new IOException("URI Syntax Exception: " + ex.getMessage() );
             }
         }
     }
