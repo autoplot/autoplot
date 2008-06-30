@@ -125,7 +125,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 for ( String key:result.keySet() ) {
-                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, result.get(key)  );
+                    CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, key, this, null, result.get(key), true  );
                     ccresult.add(cc1);
                 }
                 
