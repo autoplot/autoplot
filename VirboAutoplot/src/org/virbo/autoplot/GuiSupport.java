@@ -113,7 +113,7 @@ public class GuiSupport {
                     chooser.addChoosableFileFilter(new FileFilter() {
                         @Override
                         public boolean accept(File f) {
-                            return f.toString().endsWith(ex);
+                            return f.toString().endsWith(ex) || f.isDirectory();
                         }
 
                         @Override
