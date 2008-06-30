@@ -33,6 +33,14 @@ public class CompletionContext {
         this( context, completable, owner, implicitName, null );
     }
     
+    public CompletionContext( Object context, String completable, String doc ) {
+        this( context, completable, null, null, doc, false );
+    }
+
+    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String doc ) {
+        this( context, completable, owner, implicitName, doc, false );
+    }
+
     /**
      * 
      * @param context
@@ -41,7 +49,7 @@ public class CompletionContext {
      * @param implicitName
      * @param doc additional information that is shown in a tooltip.
      */
-    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String doc ) {
+    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String doc, boolean maybePlot ) {
         this.context= context;
         this.completable= completable;
         this.owner= owner;
@@ -100,6 +108,11 @@ public class CompletionContext {
      * one-line documentation
      */
     public String doc;
+    
+    /**
+     * hint that this completion should finish a valid URL, so go ahead and try to use it.
+     */
+    public boolean maybePlot;
     
     /**
      * returns the value for the context
