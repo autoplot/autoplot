@@ -19,7 +19,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-import javax.swing.tree.TreeModel;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -29,7 +28,6 @@ import org.virbo.dsutil.AsciiParser;
 import edu.uiowa.physics.pw.das.util.TimeParser;
 import java.text.ParseException;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.metatree.NameValueTreeModel;
 
 /**
  *
@@ -141,7 +139,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
             delim= null;
         }
         if ( delim==null ) {
-            columnCount= parser.guessDelimParser( parser.readFirstRecord(file.toString()) ).fieldCount();            
+            AsciiParser.DelimParser p= parser.guessDelimParser( parser.readFirstRecord(file.toString()) );
+            columnCount= p.fieldCount();
+            delim= p.getDelim();
         } else {
             columnCount= parser.setDelimParser( file.toString(), delim ).fieldCount();
         }
@@ -195,8 +195,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
             timeParser= TimeParser.create((String)o);
             String timeColumnName= (String)params.get("time");
             
-            if ( delim!=null && timeFormat.split(delim).length>1 ) {
-                timeColumns= timeFormat.split(delim).length;
+            if ( delim!=null && timeFormat.split("%").length>1 ) {
+                timeColumns= (timeFormat.split("%").length)-1;  //TODO: consider simply splitting on %, regardless of delim.
                 
             } else {
                 int i= parser.getFieldIndex( timeColumnName );
@@ -253,22 +253,23 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
         
         // --- done configuration, now read ---
-        DDataSet ds= (DDataSet) parser.readFile( file.toString(), mon ); //DANGER
+        DDataSet ds1= (DDataSet) parser.readFile( file.toString(), mon ); //DANGER
         
         // combine times if necessary
         if ( timeColumns>1 ) {
             final Units u= Units.t2000;
             // replace the first column with the datum time
-            for ( int i=0; i<ds.length(); i++ ) {
+            // timeParser knows the order of the digits.
+            for ( int i=0; i<ds1.length(); i++ ) {
                 for ( int j=0; j<timeColumns; j++ ) {
-                    timeParser.setDigit( j, (int) ds.value( i, timeColumn+j ) );
+                    timeParser.setDigit( j, (int) ds1.value( i, timeColumn+j ) );
                 }
-                ds.putValue( i, timeColumn, timeParser.getTime( Units.t2000 ) );
+                ds1.putValue( i, timeColumn, timeParser.getTime( Units.t2000 ) );
             }
             parser.setUnits( timeColumn, Units.t2000 );
         }
         
-        return ds;
+        return ds1;
     }
     
     @Override
