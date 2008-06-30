@@ -117,12 +117,14 @@ public class DataSetSelector extends javax.swing.JPanel {
                         int carotpos = surl.length();
                         setMessage("ends with /, filesystem completions");
                         showCompletions(surl, carotpos);
+			
                     } else if (surl.endsWith("/..")) { // pop up one directory
-
                         int carotpos = surl.lastIndexOf("/..");
                         carotpos = surl.lastIndexOf("/", carotpos - 1);
                         if (carotpos != -1) {
+			    setValue(surl.substring(0, carotpos + 1));
                             dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
+			    maybePlot();
                         }
                     } else {
                         try {
@@ -209,7 +211,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
                 Action a = new AbstractAction(label) {
                     public void actionPerformed(ActionEvent ev) {
-                        dataSetSelector.setSelectedItem( s1.completion);
+                        dataSetSelector.setSelectedItem( s1.completion );
+			if ( s1.maybePlot ) {
+			    maybePlot();
+			}
                     }
                 };
                 JMenuItem menuItem= new JMenuItem(a);
@@ -309,7 +314,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         if (s[j].endsWith("contents.html")) {
                             s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
                         } // kludge for dods
-                        completions.add( new DataSetURL.CompletionResult(surlDir + s[j],null) );
+                        completions.add( new DataSetURL.CompletionResult( surlDir + s[j], null, true ) );
                     }
                 }
 
@@ -357,7 +362,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
 
         completionsMonitor = getMonitor();
-        completionsMonitor.setLabel("getting completions by delegate");
+        completionsMonitor.setLabel("getting completions");
         completionsRunnable = new Runnable() {
 
             public void run() {
