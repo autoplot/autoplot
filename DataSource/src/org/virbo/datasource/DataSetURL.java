@@ -616,7 +616,7 @@ public class DataSetURL {
                     if (dontYetHave == false) {
                         continue;  // skip it
                     }
-                    result.add( new CompletionResult(ss,cc1.doc) );
+                    result.add( new CompletionResult(ss,cc1.doc,cc1.maybePlot) );
                     i = i + 1;
                 }
             }
@@ -639,7 +639,7 @@ public class DataSetURL {
             for (CompletionContext cc1 : completions) {
                 if (cc1.completable.startsWith(cc.completable)) {
                     String ss = CompletionContext.insert(cc, cc1);
-                    result.add( new CompletionResult(ss,cc1.doc) );
+                    result.add( new CompletionResult(ss,cc1.doc,cc1.maybePlot) );
                     i = i + 1;
                 }
             }
