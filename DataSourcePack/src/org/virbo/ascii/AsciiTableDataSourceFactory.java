@@ -89,7 +89,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 }
                 return result;
             } else if ( paramName.equals("timeFormat") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%Y %j %H" ) );
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "%Y %j %H" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601" ) );
+                return result;
             } else if ( paramName.equals("fill") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
             } else {
