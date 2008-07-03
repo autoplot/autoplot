@@ -12,7 +12,7 @@ import org.virbo.dataset.WritableDataSet;
  *
  * @author jbf
  */
-public class IndexListDataSetIterator implements NewDataSetIterator {
+public class IndexListDataSetIterator implements DataSetIterator {
 
     /* rank 2 dataset of indeces */
     QDataSet indeces;

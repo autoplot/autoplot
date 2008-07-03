@@ -12,7 +12,7 @@ import org.virbo.dataset.WritableDataSet;
  *
  * @author jbf
  */
-public class QubeDataSetIterator implements NewDataSetIterator {
+public class QubeDataSetIterator implements DataSetIterator {
 
     public interface DimensionIterator {
 
@@ -190,6 +190,7 @@ public class QubeDataSetIterator implements NewDataSetIterator {
     DimensionIteratorFactory[] fit = new DimensionIteratorFactory[3];
     int rank;
     int[] qube;
+    QDataSet ds;
     boolean allnext= true;  // we'll have to do a borrow to get started.
     
     /**
@@ -199,8 +200,12 @@ public class QubeDataSetIterator implements NewDataSetIterator {
      * create a new iterator, set the index iterator factories, iterate.
      * @param ds
      */
-    QubeDataSetIterator(QDataSet ds) {
-        this.qube = DataSetUtil.qubeDims(ds);
+    public QubeDataSetIterator( QDataSet ds ) {
+        if ( Boolean.TRUE.equals(ds.property(QDataSet.QUBE)) ) {
+            this.qube = DataSetUtil.qubeDims(ds);
+        } else {
+            this.ds= ds;
+        }
         this.rank= ds.rank();
         for (int i = 0; i < ds.rank(); i++) {
             fit[i] = new StartStopStepIteratorFactory(0, null, 1);
@@ -213,7 +218,7 @@ public class QubeDataSetIterator implements NewDataSetIterator {
      * @param dim
      * @param fit
      */
-    void setIndexIteratorFactory(int dim, DimensionIteratorFactory fit) {
+    public void setIndexIteratorFactory(int dim, DimensionIteratorFactory fit) {
         this.fit[dim] = fit;
         initialize();
     }
@@ -235,7 +240,18 @@ public class QubeDataSetIterator implements NewDataSetIterator {
      * @return
      */
     private final int dimLength( int idim ) {
-        return qube[idim];
+        if ( qube!=null ) {
+            return qube[idim];
+        } else {
+            int result=0;
+            switch (idim) {
+                case 0: result= ds.length(); break;
+                case 1: result= ds.length( index(0) ); break;
+                case 2: result= ds.length( index(0), index(1) ); break;
+                default: throw new IllegalArgumentException("dimension not supported: "+idim);
+            }
+            return result;
+        }
     }
     
     public boolean hasNext() {
