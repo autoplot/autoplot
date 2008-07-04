@@ -113,19 +113,6 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             }
         };
         
-        //Map p= SPDFUtil.interpretProps( attributes );
-        //Map p= NetcdfMetadataModel.interpretProps( attributes );
-        //properties.putAll( p );
-        
-        DatumRange dr= (DatumRange) properties.get( QDataSet.VALID_RANGE );
-        if ( dr!=null ) {
-            Units u= dr.getUnits();
-            double vmin= dr.min().doubleValue(u);
-            double vmax= dr.max().doubleValue(u);
-            for ( int i=0; i<data.length; i++ ) {
-                if ( data[i]<=vmin || data[i]>=vmax ) data[i]= u.getFillDouble();
-            }
-        }
     }
     
     

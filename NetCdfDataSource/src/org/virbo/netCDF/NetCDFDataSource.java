@@ -112,10 +112,6 @@ public class NetCDFDataSource extends AbstractDataSource {
         }
     }
     
-    public boolean asynchronousLoad() {
-        return true;
-    }
-    
     public static DataSourceFactory getFactory() {
         return new NetCDFDataSourceFactory();
     }

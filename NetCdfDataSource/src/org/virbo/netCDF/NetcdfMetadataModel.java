@@ -11,7 +11,7 @@ package org.virbo.netCDF;
 import edu.uiowa.physics.pw.das.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.tree.TreeModel;
+import java.util.logging.Logger;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.MetadataModel;
 
@@ -28,7 +28,8 @@ public class NetcdfMetadataModel extends MetadataModel {
     public Map<String, Object> properties( Map<String,Object> meta) {
         Map<String,Object> result= new HashMap<String, Object>();
         if (meta.containsKey("valid_range")) {
-            result.put( QDataSet.VALID_RANGE, meta.get("valid_range" ) );
+            //result.put( QDataSet.VALID_RANGE, meta.get("valid_range" ) );
+            Logger.getLogger("virbo.netcdf").fine("here's where I didn't think there was going to be VALID_RANGE");
         }
         return result;
     }
@@ -44,9 +45,9 @@ public class NetcdfMetadataModel extends MetadataModel {
         if (map.containsKey("scale_factor")) {
             result.put( "scale_factor", (Double) map.get("scale_factor") );
         }
-        if (map.containsKey("valid_range")) {
-            result.put( QDataSet.VALID_RANGE, map.get("valid_range" ) );
-        }
+        //if (map.containsKey("valid_range")) {
+        //    result.put( QDataSet.VALID_RANGE, map.get("valid_range" ) );
+        //}
         return result;
     }
 
