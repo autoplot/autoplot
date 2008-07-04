@@ -14,6 +14,8 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import org.virbo.autoplot.ApplicationModel;
 
 /**
@@ -35,6 +37,20 @@ public class UndoRedoSupport {
                 }
             }
         });
+    }
+
+    public void refreshUndoMultipleMenu(JMenu undoMultipleMenu) {
+        undoMultipleMenu.removeAll();
+        for ( int i=stateStackPos-1; i> Math.max( 0,stateStackPos-10 ); i-- ) {
+            StateStackElement prevState= stateStack.get( i );
+            String label= prevState.deltaDesc;
+            final int ii= stateStackPos-i;
+            undoMultipleMenu.add( new JMenuItem( new AbstractAction( label ) {
+                public void actionPerformed( ActionEvent e ) {
+                    undo(ii);
+                }
+            } ) ) ;
+        }        
     }
 
     class StateStackElement {
@@ -59,7 +75,6 @@ public class UndoRedoSupport {
 
     public Action getUndoAction() {
         return new AbstractAction("Undo") {
-
             public void actionPerformed(ActionEvent e) {
                 undo();
             }
@@ -67,18 +82,22 @@ public class UndoRedoSupport {
     }
 
     public void undo() {
-        stateStackPos--;
+        undo(1);
+    }
+
+    public void undo( int level ) {
+        stateStackPos-= level;
         if (stateStackPos < 0) {
             stateStackPos = 0;
         }
         if (stateStackPos > 0) {
             StateStackElement elephant = stateStack.get(stateStackPos - 1);
             ignoringUpdates = true;
-            applicationModel.restoreState(elephant.state, false, true);
+            applicationModel.restoreState( elephant.state, false, false );
             ignoringUpdates = false;
         }
     }
-
+    
     public Action getRedoAction() {
         return new AbstractAction("redo") {
             public void actionPerformed(ActionEvent e) {
@@ -94,7 +113,7 @@ public class UndoRedoSupport {
         if (stateStackPos < stateStack.size()) {
             StateStackElement elephant = stateStack.get(stateStackPos);
             ignoringUpdates = true;
-            applicationModel.restoreState(elephant.state, false, true);
+            applicationModel.restoreState(elephant.state, false, false );
             ignoringUpdates = false;
             stateStackPos++;
         }
