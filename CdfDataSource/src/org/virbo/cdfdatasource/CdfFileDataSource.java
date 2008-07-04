@@ -75,7 +75,7 @@ public class CdfFileDataSource extends AbstractDataSource {
     }
     
     
-    public org.virbo.dataset.QDataSet getDataSet( ProgressMonitor mon) throws IOException, CDFException {
+    public org.virbo.dataset.QDataSet getDataSet( ProgressMonitor mon ) throws IOException, CDFException {
         File cdfFile;
         cdfFile= getFile( mon );
         
@@ -106,6 +106,8 @@ public class CdfFileDataSource extends AbstractDataSource {
         
         long varType= variable.getDataType();
         long numRec= variable.getNumWrittenRecords();
+        
+        if ( numRec==0 ) throw new IllegalArgumentException("variable "+svariable+" contains no records!");
         
         WritableDataSet result;
         if ( reform ) {
