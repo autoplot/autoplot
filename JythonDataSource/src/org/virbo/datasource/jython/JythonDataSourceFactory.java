@@ -29,7 +29,7 @@ import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
-import org.virbo.jythonsupport.Ops;
+import org.virbo.dsops.Ops;
 
 /**
  *

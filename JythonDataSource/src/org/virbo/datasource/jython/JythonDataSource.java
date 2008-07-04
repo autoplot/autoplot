@@ -25,7 +25,7 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.jythonsupport.JythonOps;
-import org.virbo.jythonsupport.Ops;
+import org.virbo.dsops.Ops;
 
 /**
  *
