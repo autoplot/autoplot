@@ -46,7 +46,6 @@ public class LogConsole extends javax.swing.JPanel {
 
             public synchronized void publish(LogRecord rec) {
                 synchronized( LogConsole.this ) {
-                    System.err.println("add "+rec);
                     if ( !records.contains(rec) ) {
                         records.add(rec);
                         timer.tickle();
