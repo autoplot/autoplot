@@ -37,13 +37,19 @@ import javax.beans.binding.BindingContext;
 import javax.beans.binding.BindingConverter;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
@@ -67,9 +73,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     UndoRedoSupport undoRedoSupport;
     TickleTimer tickleTimer;
     GuiSupport support;
-
     final String TABS_TOOLTIP = "right-click to undock";
-    
     PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
         public Element serialize(Document document, ProgressMonitor monitor) {
@@ -84,7 +88,38 @@ public class AutoPlotUI extends javax.swing.JFrame {
         }
     };
     Options options;
-    private Logger logger= Logger.getLogger("virbo.autoplot");
+    private Logger logger = Logger.getLogger("virbo.autoplot");
+
+    private void addKeyBindings(JPanel thisPanel) {
+        thisPanel.getActionMap().put("UNDO", getUndoAction());
+        thisPanel.getActionMap().put("REDO", getRedoAction());
+        thisPanel.getActionMap().put("RESET_ZOOM", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                applicationModel.resetZoom();
+            }
+        } );
+        thisPanel.getActionMap().put("INCREASE_FONT_SIZE", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                applicationModel.increaseFontSize();
+            }                
+        } );
+        thisPanel.getActionMap().put("DECREASE_FONT_SIZE", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                applicationModel.decreaseFontSize();
+            }                
+        } );
+        
+        InputMap map = new ComponentInputMap(thisPanel);
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), "UNDO");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), "REDO");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), "RESET_ZOOM");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK), "DECREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");  // american keyboard
+        thisPanel.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, map);
+        
+    }
 
     private Action getUndoAction() {
         return undoRedoSupport.getUndoAction();
@@ -110,8 +145,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
         undoRedoSupport = new UndoRedoSupport(applicationModel);
 
         initComponents();
-        dataSetSelector.setMonitorContext( applicationModel.plot );
+
+        addKeyBindings( (JPanel) getContentPane() );
         
+        dataSetSelector.setMonitorContext(applicationModel.plot);
+
         setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 
         stateSupport = new PersistentStateSupport(this, null, "vap") {
@@ -119,12 +157,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
             protected void saveImpl(File f) throws IOException {
                 applicationModel.doSave(f);
                 applicationModel.addRecent(f.toURI().toString());
-                setStatus("saved "+f);
+                setStatus("saved " + f);
             }
 
             protected void openImpl(final File file) throws IOException {
                 applicationModel.doOpen(file);
-                setStatus("opened "+file);
+                setStatus("opened " + file);
             }
         };
         stateSupport.addPropertyChangeListener(new PropertyChangeListener() {
@@ -186,24 +224,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        applicationModel.canvas.getGlassPane().addKeyListener( new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                if ( ( e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK ) == KeyEvent.CTRL_DOWN_MASK ) {
-                    if ( e.getKeyCode()==KeyEvent.VK_Z ) {
-                        undoRedoSupport.undo();
-                    } else if ( e.getKeyCode()==KeyEvent.VK_Z ) {
-                        undoRedoSupport.undo();
-                    }
-                }
-            }
-        } );
-        
         addBindings();
 
-        dataSetSelector.addPropertyChangeListener( dataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
+        dataSetSelector.addPropertyChangeListener(dataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent e) {
-                Runnable run= new Runnable() {
+                Runnable run = new Runnable() {
+
                     public void run() {
                         setStatus(dataSetSelector.getMessage());
                     }
@@ -226,15 +253,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
         tabs.insertTab("metadata", null, mdp, TABS_TOOLTIP, 3);
 
-        if ( model.options.isScriptVisible() ) {
-            tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector ) );
+        if (model.options.isScriptVisible()) {
+            tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector));
             scriptPanelMenuItem.setEnabled(false);
             scriptPanelMenuItem.setSelected(true);
         }
-        if ( model.options.isLogConsoleVisible() ) initLogConsole();
-
+        if (model.options.isLogConsoleVisible()) {
+            initLogConsole();
+        }
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
-
             public void propertyChange(PropertyChangeEvent evt) {
                 undoRedoSupport.pushState(evt);
                 stateSupport.markDirty();
@@ -246,6 +273,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 if (t != null) {
                     redoMenuItem.setText(t == null ? "Redo" : t);
                 }
+                SwingUtilities.invokeLater(new Runnable() { public void run() {
+                    undoRedoSupport.refreshUndoMultipleMenu( undoMultipleMenu );
+                } } );
             }
         });
 
@@ -289,7 +319,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         b = bc.addBinding(applicationModel.canvas, "${antiAlias}", drawAntiAliasMenuItem, "selected");
         b = bc.addBinding(applicationModel.canvas, "${textAntiAlias}", textAntiAlias, "selected");
-        this.dataSetSelector.addPropertyChangeListener("value",new PropertyChangeListener() { //one-way binding
+        this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
+
             public void propertyChange(PropertyChangeEvent evt) {
                 applicationModel.setDataSourceURL(dataSetSelector.getValue());
             }
@@ -317,6 +348,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         fileMenu.add(stateSupport.createSaveAction());
         fileMenu.add(new AbstractAction("Save With Data...") {
+
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 applicationModel.setUseEmbeddedDataSet(true);
@@ -378,9 +410,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         Handler h = lc.getHandler();
         Logger.getLogger("virbo").setLevel(Level.ALL);
         Logger.getLogger("virbo").addHandler(h);
-        
+
         setMessage("log console added");
-        tabs.addTab( "console", lc );
+        tabs.addTab("console", lc);
         applicationModel.options.setLogConsoleVisible(true);
         logConsoleMenuItem.setEnabled(false);
         logConsoleMenuItem.setSelected(true);
@@ -425,8 +457,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bookmarksMenu.removeAll();
 
         bookmarksMenu.add(new AbstractAction("Add Bookmark") {
+
             public void actionPerformed(ActionEvent e) {
-                applicationModel.addBookmark( dataSetSelector.getValue() );
+                applicationModel.addBookmark(dataSetSelector.getValue());
             }
         });
 
@@ -440,15 +473,16 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        bookmarksMenu.add( new JSeparator() );
-        bookmarksMenu.add( new AbstractAction("Make Aggregation From URL") {
+        bookmarksMenu.add(new JSeparator());
+        bookmarksMenu.add(new AbstractAction("Make Aggregation From URL") {
+
             public void actionPerformed(ActionEvent e) {
-                String s= dataSetSelector.getValue();
-                String agg= org.virbo.datasource.Util.makeAggregation(s);
-                if ( agg!=null ) {
+                String s = dataSetSelector.getValue();
+                String agg = org.virbo.datasource.Util.makeAggregation(s);
+                if (agg != null) {
                     dataSetSelector.setValue(agg);
                 } else {
-                    JOptionPane.showMessageDialog( AutoPlotUI.this, "Unable to create aggregation spec, couldn't find yyyymmdd.");
+                    JOptionPane.showMessageDialog(AutoPlotUI.this, "Unable to create aggregation spec, couldn't find yyyymmdd.");
                 }
             }
         });
@@ -491,8 +525,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         editMenu = new javax.swing.JMenu();
         undoMenuItem = new javax.swing.JMenuItem();
         redoMenuItem = new javax.swing.JMenuItem();
-        jSeparator1 = new javax.swing.JSeparator();
-        editModelMenuItem = new javax.swing.JMenuItem();
+        undoMultipleMenu = new javax.swing.JMenu();
         jSeparator2 = new javax.swing.JSeparator();
         pasteDataSetURLMenuItem = new javax.swing.JMenuItem();
         copyDataSetURLMenuItem = new javax.swing.JMenuItem();
@@ -548,15 +581,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         redoMenuItem.setAction(getRedoAction());
         redoMenuItem.setText("Redo");
         editMenu.add(redoMenuItem);
-        editMenu.add(jSeparator1);
 
-        editModelMenuItem.setText("Edit DOM");
-        editModelMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editModelMenuItemActionPerformed(evt);
-            }
-        });
-        editMenu.add(editModelMenuItem);
+        undoMultipleMenu.setText("Undo...");
+        editMenu.add(undoMultipleMenu);
         editMenu.add(jSeparator2);
 
         pasteDataSetURLMenuItem.setText("Paste URL");
@@ -844,22 +871,17 @@ public class AutoPlotUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_helpMenuActionPerformed
 
-private void editModelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editModelMenuItemActionPerformed
-    PropertyEditor edit = new PropertyEditor(this.applicationModel);
-    edit.showDialog(this);
-}//GEN-LAST:event_editModelMenuItemActionPerformed
-
 private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scriptPanelMenuItemActionPerformed
-    if ( !applicationModel.options.isScriptVisible() ) {
-        tabs.insertTab("script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector ), TABS_TOOLTIP, 4  );
+    if (!applicationModel.options.isScriptVisible()) {
+        tabs.insertTab("script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector), TABS_TOOLTIP, 4);
         applicationModel.options.setScriptVisible(true);
     }
     scriptPanelMenuItem.setEnabled(false);
 }//GEN-LAST:event_scriptPanelMenuItemActionPerformed
 
 private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
-    if ( !applicationModel.options.isLogConsoleVisible() ) {
-       initLogConsole();
+    if (!applicationModel.options.isLogConsoleVisible()) {
+        initLogConsole();
     }
     logConsoleMenuItem.setEnabled(false);
 }//GEN-LAST:event_logConsoleMenuItemActionPerformed
@@ -902,18 +924,15 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
         if (alm.getBooleanValue("logConsole")) {
             model.options.setLogConsoleVisible(true);
         }
-        
-        if ( alm.getBooleanValue("nativeLAF") ) {
-            try
-            {
+
+        if (alm.getBooleanValue("nativeLAF")) {
+            try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        
+
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
@@ -927,8 +946,8 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
                 Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
                     public void uncaughtException(Thread t, Throwable e) {
-                        Logger.getLogger("virbo.autoplot").severe("runtime exception: "+e);
-                        app.setStatus("caught exception: " + e.toString() );
+                        Logger.getLogger("virbo.autoplot").severe("runtime exception: " + e);
+                        app.setStatus("caught exception: " + e.toString());
                         model.application.getExceptionHandler().handleUncaught(e);
                     }
                 });
@@ -955,7 +974,7 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
                     new Thread(run, "LoadBookmarksThread").start();
 
                 }
-                
+
                 app.setStatus("ready");
 
             }
@@ -1000,13 +1019,11 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
     private javax.swing.JMenu editMenu;
-    private javax.swing.JMenuItem editModelMenuItem;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;
@@ -1021,6 +1038,7 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JPanel tabbedPanelContainer;
     private javax.swing.JCheckBoxMenuItem textAntiAlias;
     private javax.swing.JMenuItem undoMenuItem;
+    private javax.swing.JMenu undoMultipleMenu;
     private javax.swing.JMenu viewMenu;
     private javax.swing.JMenuItem zoomInMenuItem;
     private javax.swing.JMenuItem zoomOutMenuItem;
