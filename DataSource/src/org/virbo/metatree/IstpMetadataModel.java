@@ -62,8 +62,7 @@ public class IstpMetadataModel extends MetadataModel {
 	}
     }
 
-    private DatumRange getValidRange( Map attrs) {
-	Units units = Units.dimensionless;
+    private DatumRange getValidRange( Map attrs, Units units) {
 	double max = doubleValue(attrs.get("VALIDMAX"), units);
 	double min = doubleValue(attrs.get("VALIDMIN"), units);
 	return DatumRange.newDatumRange(min, max, units);
@@ -74,14 +73,10 @@ public class IstpMetadataModel extends MetadataModel {
      * or the required VALIDMIN/VALIDMAX parameters.  Checks for valid range when
      * SCALETYP=log.
      */
-    private DatumRange getRange( Map attrs) {
+    private DatumRange getRange( Map attrs, Units units ) {
 	DatumRange range;
-	Units units = Units.dimensionless;
-
-	if ("Epoch".equals(attrs.get("LABLAXIS")) && "ms".equals(attrs.get("UNITS"))) {
-	    units = Units.cdfEpoch;
-	}
-	double min, max;
+	
+        double min, max;
 	if (attrs.containsKey("SCALEMIN") && attrs.containsKey("SCALEMAX")) {
 	    max = doubleValue(attrs.get("SCALEMAX"), units);
 	    min = doubleValue(attrs.get("SCALEMIN"), units);
@@ -135,9 +130,10 @@ public class IstpMetadataModel extends MetadataModel {
 	    }
 	}
 
+        Units units= Units.dimensionless;
 	if (attrs.containsKey("UNITS")) {
 	    String sunits = (String) attrs.get("UNITS");
-	    Units units;
+	    
 	    try {
 		units = MetadataUtil.lookup(Util.unquote(sunits));
 	    } catch (IllegalArgumentException e) {
@@ -163,10 +159,12 @@ public class IstpMetadataModel extends MetadataModel {
 	}
 
 	try {
-	    DatumRange range = getRange(attrs);
-	    properties.put(QDataSet.TYPICAL_RANGE, range);
-
-	    properties.put(QDataSet.VALID_RANGE, getValidRange(attrs));
+	    DatumRange range = getRange(attrs,units);
+	    properties.put(QDataSet.TYPICAL_MIN, range.min().doubleValue(units) );
+            properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units) );
+            range= getValidRange(attrs,units);
+	    properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units) );
+            properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units) );
 
 	    properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
 	} catch (IllegalArgumentException ex) {
