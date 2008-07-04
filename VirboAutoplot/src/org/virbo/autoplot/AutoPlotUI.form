@@ -33,16 +33,11 @@
                 <Property name="text" type="java.lang.String" value="Redo"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JSeparator" name="jSeparator1">
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="editModelMenuItem">
+            <Menu class="javax.swing.JMenu" name="undoMultipleMenu">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Edit DOM"/>
+                <Property name="text" type="java.lang.String" value="Undo..."/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editModelMenuItemActionPerformed"/>
-              </Events>
-            </MenuItem>
+            </Menu>
             <MenuItem class="javax.swing.JSeparator" name="jSeparator2">
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="pasteDataSetURLMenuItem">
