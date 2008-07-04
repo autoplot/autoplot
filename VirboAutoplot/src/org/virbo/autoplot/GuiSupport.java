@@ -29,6 +29,7 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.datasource.DataSourceRegistry;
@@ -103,6 +104,12 @@ public class GuiSupport {
         return new AbstractAction("Export Data...") {
 
             public void actionPerformed(ActionEvent e) {
+                
+                if ( parent.applicationModel.fillDataset==null ) {
+                    JOptionPane.showConfirmDialog( parent, "No Data to Export.");
+                    return;
+                }
+                
                 JFileChooser chooser = new JFileChooser();
 
                 List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
@@ -144,6 +151,7 @@ public class GuiSupport {
                         
                         format.formatData( chooser.getSelectedFile(), 
                                 parent.applicationModel.fillDataset, new DasProgressPanel("formatting data") );
+                        parent.setStatus("created file "+chooser.getSelectedFile());
 
                     } catch (IOException ex) {
                         parent.applicationModel.application.getExceptionHandler().handle(ex);
