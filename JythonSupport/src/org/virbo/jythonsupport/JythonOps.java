@@ -5,6 +5,7 @@
 
 package org.virbo.jythonsupport;
 
+import org.virbo.dataset.QubeDataSetIterator;
 import org.python.core.PyFloat;
 import org.python.core.PyFunction;
 import org.python.core.PyList;

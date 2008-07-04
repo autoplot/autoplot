@@ -5,7 +5,7 @@
 
 package org.virbo.jythonsupport;
 
-import org.virbo.jythonsupport.Ops;
+import org.virbo.dsops.Ops;
 import java.util.Random;
 import org.virbo.dataset.QDataSet;
 
@@ -34,4 +34,6 @@ public class TestOp {
         System.err.print("  ");
         System.err.println(System.currentTimeMillis() - t0);
     }
+    
+    
 }

@@ -4,7 +4,10 @@
  */
 package org.virbo.jythonsupport;
 
-import java.util.Map;
+import org.virbo.dsops.Ops;
+import org.virbo.dataset.DataSetIterator;
+import org.virbo.dataset.IndexListDataSetIterator;
+import org.virbo.dataset.QubeDataSetIterator;
 import org.python.core.Py;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
@@ -12,12 +15,10 @@ import org.python.core.PyObject;
 import org.python.core.PySequence;
 import org.python.core.PySlice;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
-import org.virbo.jythonsupport.QubeDataSetIterator.IndexListIterator;
 
 /**
  *
@@ -272,7 +273,7 @@ public class PyQDataSet extends PyJavaInstance {
 
     @Override
     public void __setitem__(PyObject arg0, PyObject arg1) {
-        NewDataSetIterator iter = new QubeDataSetIterator(ds);
+        DataSetIterator iter = new QubeDataSetIterator(ds);
 
         if (!arg0.isSequenceType()) {
             PyObject a = arg0;
