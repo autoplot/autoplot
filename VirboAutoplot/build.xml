@@ -79,7 +79,7 @@
         </propertyfile>
     </target>
     
-    <target name="jnlp-release" >
+    <target name="jnlp-release" depends="-post-jar">
         <property name="jnlp.dir" location="${dist.dir}/jnlp"/>
         <mkdir dir="${jnlp.dir}"/>
         <copy file="${dist.jar}" todir="${jnlp.dir}"/>
@@ -116,7 +116,5 @@
             <zipfileset file="${dist.jar}" />
         </jar>
     </target>
-    
-    <target name="-post-jar" depends="jnlp-release"/> 
     
 </project>
