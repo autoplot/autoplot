@@ -121,10 +121,31 @@ public class ApplicationModel {
     TickleTimer tickleTimer;
     Options options;
 
-    enum RenderType {
+    /**
+     * check to make sure properties units are consistent with dataset units,
+     * otherwise we'll have problems with units conversions.
+     * @param properties
+     * @param dataset
+     */
+    private void unitsCheck(Map properties, QDataSet dataset) {
+        Units u0= (Units) dataset.property(QDataSet.UNITS);
+        Units u1= (Units) properties.get(QDataSet.UNITS);
+        if ( u0==null || u1==null || !u0.isConvertableTo(u1) ) {
+            properties.put( QDataSet.UNITS, u0 );
+        }
+        for ( int i=0; i<QDataSet.MAX_RANK; i++ ) {
+            QDataSet dep= (QDataSet) dataset.property( "DEPEND_"+i );
+            Map depprops= (Map) properties.get( "DEPEND_"+i );
+            if ( dep!=null && depprops!=null ) {
+                unitsCheck( depprops, dep );
+            }
+        }
+    }
 
+    enum RenderType {
         spectrogram, series, scatter
     }
+    
     /**
      * the one and only displayed dataset
      */
@@ -716,6 +737,8 @@ public class ApplicationModel {
             properties = AutoplotUtil.extractProperties(dataset);
             properties = AutoplotUtil.mergeProperties(dataSource.getProperties(), properties);
             doInterpretMetadata(newState, properties, renderType);
+            
+            unitsCheck( properties, dataset );
 
             boolean ars0 = this.autoRangeSuppress;
 
@@ -829,8 +852,12 @@ public class ApplicationModel {
             state.setFill(String.valueOf(v));
         }
 
-        if ((v = properties.get(DDataSet.VALID_RANGE)) != null) {
-            state.setValidRange(String.valueOf(v));
+        Double vmin= (Double) properties.get(DDataSet.VALID_MIN);
+        Double vmax= (Double) properties.get(DDataSet.VALID_MAX);
+        if ( vmin!= null || vmax!=null ) {
+            if ( vmin==null ) vmin= -1e38;
+            if ( vmax==null ) vmax= 1e38;
+            state.setValidRange( ""+vmin + " to " + vmax );
         }
 
         if (spec == RenderType.spectrogram) {
@@ -1244,6 +1271,18 @@ public class ApplicationModel {
         updateFill(true);
     }
 
+    void increaseFontSize() {
+        Font f= this.canvas.getFont();
+        f= f.deriveFont(f.getSize2D()*1.1f);
+        this.canvas.setFont(f);
+    }
+    
+    void decreaseFontSize() {
+        Font f= this.canvas.getFont();
+        f= f.deriveFont(f.getSize2D()/1.1f);
+        this.canvas.setFont(f);
+    }
+    
     DasAxis getXAxis() {
         return plot.getXAxis();
     }
@@ -1308,6 +1347,12 @@ public class ApplicationModel {
         return state;
     }
 
+    /**
+     * set the application state.
+     * @param state
+     * @param deep if true, then unpack the dataset as well.
+     * @param forceFill, force a data load
+     */
     public void restoreState(ApplicationState state, boolean deep, boolean forceFill) {
 
         autoRangeSuppress = true;
