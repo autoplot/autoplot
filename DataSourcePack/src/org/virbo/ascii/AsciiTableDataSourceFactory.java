@@ -109,6 +109,13 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
             } else if ( paramName.equals("validMax") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
+            } else if ( paramName.equals("rank2") ) {
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns" ) );
+		result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns" ) );
+                return result;
+		
             } else {
                 return Collections.emptyList();
             }
