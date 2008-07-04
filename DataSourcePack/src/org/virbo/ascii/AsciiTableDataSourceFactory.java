@@ -55,9 +55,19 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns=" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rank2" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "time=") );
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timeFormat=" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timeFormat=",
+                    "template for parsing time digits, default is ISO8601.") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fill=" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "comment=", 
+                    "comment line prefix, default is hash (#)" ) );
+	    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=",
+		    "values less than this value are treated as fill.") );
+	    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=",
+		    "values greater than this value are treated as fill." ) );	    
+	    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "delim=",
+		    "parse records by splitting on delimiter." ) );
+	    
             return result;
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
@@ -94,6 +104,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601" ) );
                 return result;
             } else if ( paramName.equals("fill") ) {
+                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
+            } else if ( paramName.equals("validMin") ) {
+                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
+            } else if ( paramName.equals("validMax") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
             } else {
                 return Collections.emptyList();
