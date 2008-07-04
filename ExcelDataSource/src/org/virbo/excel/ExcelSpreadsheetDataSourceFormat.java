@@ -1,0 +1,193 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.virbo.excel;
+
+import edu.uiowa.physics.pw.das.datum.Datum;
+import edu.uiowa.physics.pw.das.datum.Units;
+import edu.uiowa.physics.pw.das.datum.UnitsUtil;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.datasource.DataSourceFormat;
+
+/**
+ * Format the QDataSet into Ascii tables.  
+ * @author jbf
+ */
+public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
+
+    private void maybeOutputProperty(PrintWriter out, QDataSet data, String property) {
+        Object v = data.property(property);
+        if (v != null) {
+            out.println("# " + property + ": " + v);
+        }
+    }
+
+    private void formatRank2( HSSFSheet sheet, QDataSet data, ProgressMonitor mon) throws IOException {
+
+        int irow= 0;
+        short icell=0;
+        HSSFRow row= sheet.createRow(irow++);
+        HSSFCell cell;
+        
+        QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
+        QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+        if (dep1 != null) {
+            if (dep0 != null) {
+                String l = (String) dep0.property(QDataSet.LABEL);
+                cell= row.createCell(icell++);
+                cell.setCellValue( (l == null ? "dep0" : l) );
+            }
+            Units u = (Units) dep1.property(QDataSet.UNITS);
+            if (u == null) {
+                u = Units.dimensionless;
+            }
+            int i;
+            for (  i = 0; i < dep1.length(); i++) {
+                cell= row.createCell(icell++);
+                
+                Datum d= u.createDatum(dep1.value(i));
+                
+                setCellValue( cell, d);
+            }
+        }
+
+        Units u0 = null;
+        if (dep0 != null) {
+            u0 = (Units) dep0.property(QDataSet.UNITS);
+            if (u0 == null) {
+                u0 = Units.dimensionless;
+            }
+        }
+
+        Units u = (Units) data.property(QDataSet.UNITS);
+
+        mon.setTaskSize(data.length());
+        mon.started();
+        
+        for (int i = 0; i < data.length(); i++) {
+            mon.setTaskProgress(i);
+            if ( mon.isCancelled() ) break;
+            
+            row= sheet.createRow(irow++);
+            icell= 0;
+            
+            if (dep0 != null) {
+                cell= row.createCell(icell++);
+                setCellValue( cell, u0.createDatum(dep0.value(i)) );
+            }
+
+            int j;
+            for ( j = 0; j < data.length(i); j++) {
+                cell= row.createCell(icell++);
+                setCellValue( cell, u.createDatum(data.value(i, j)) );
+            }
+        }
+        
+        mon.finished();
+    }
+
+    private void formatRank1( HSSFSheet sheet, QDataSet data, ProgressMonitor mon) throws IOException {
+                
+        QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+
+        int irow= 0;
+        HSSFRow row= sheet.createRow(irow++);
+        HSSFCell cell;
+        short icell=0;
+        
+        if (dep0 != null) {
+            String l = (String) dep0.property(QDataSet.LABEL);
+            cell= row.createCell(icell++);                    
+            cell.setCellValue( (l == null ? "dep0" : l) );
+        }
+
+        {
+            String l = (String) dep0.property(QDataSet.LABEL);
+            cell= row.createCell(icell++);
+            cell.setCellValue( (l == null ? "data" : l) );
+        }
+
+        Units u0 = null;
+        if (dep0 != null) {
+            u0 = (Units) dep0.property(QDataSet.UNITS);
+            if (u0 == null) {
+                u0 = Units.dimensionless;
+            }
+        }
+        Units u = (Units) data.property(QDataSet.UNITS);
+        
+        mon.setTaskSize(data.length());
+        mon.started();
+        
+        for (int i = 0; i < data.length(); i++ ) {
+            mon.setTaskProgress(i);
+            if ( mon.isCancelled() ) break;
+            
+            row= sheet.createRow(irow++);
+            icell= 0;
+            
+            if (dep0 != null) {
+                cell= row.createCell(icell++);
+                setCellValue( cell, u0.createDatum(dep0.value(i)) );
+            }
+
+            cell= row.createCell(icell++);
+            setCellValue( cell, u.createDatum(data.value(i)) );
+
+        }
+        
+        mon.finished();
+    }
+
+    HSSFCellStyle dateCellStyle;
+    
+    Calendar c= Calendar.getInstance( TimeZone.getTimeZone("GMT") );
+    
+    private void setCellValue( HSSFCell cell, Datum datum ) {
+        Units u= datum.getUnits();
+        if ( UnitsUtil.isTimeLocation(u) ) {
+            c.setTimeInMillis( (long)( datum.doubleValue(Units.t1970) * 1000 ) );
+            cell.setCellValue( c );
+            cell.setCellStyle(dateCellStyle);
+        } else {
+            cell.setCellValue( datum.doubleValue(u) );
+        }
+    }
+    
+    public void formatData(File url, QDataSet data, ProgressMonitor mon) throws IOException {
+	
+        FileOutputStream out = new FileOutputStream(url);
+        
+        HSSFWorkbook wb= new HSSFWorkbook();
+        HSSFSheet sheet= wb.createSheet();
+        dateCellStyle= wb.createCellStyle();
+        dateCellStyle.setDataFormat( HSSFDataFormat.getBuiltinFormat("m/d/yy h:mm") );
+        
+        if (data.rank() == 2) {
+            formatRank2(sheet, data, mon);
+        } else if (data.rank() == 1) {
+            formatRank1(sheet, data, mon);
+        }
+        
+        wb.write(out);
+                
+        out.close();
+    }
+}
