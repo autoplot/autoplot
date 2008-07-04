@@ -28,7 +28,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetIterator;
+import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -113,7 +113,7 @@ public class AutoplotUtil {
         int i;
 
         //TODO: use dataset iterator
-        DataSetIterator iter = DataSetIterator.create(ds);
+        OldDataSetIterator iter = OldDataSetIterator.create(ds);
 
         while (iter.hasNext() && dc < 3) {
             double dd = iter.next();
@@ -152,6 +152,13 @@ public class AutoplotUtil {
         return new double[]{min, max};
     }
 
+    private static DatumRange getRange( Double min, Double max, Units units ) {
+        if ( min==null ) min= Double.NEGATIVE_INFINITY;
+        if ( max==null ) max= Double.POSITIVE_INFINITY;
+        if ( units==null ) units= Units.dimensionless;
+        return new DatumRange( min, max, units );
+    }
+    
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties) {
 
         log.fine("enter autoRange");
@@ -268,11 +275,15 @@ public class AutoplotUtil {
             if (log != null) {
                 result.log = log.equals("log");
             }
-            DatumRange range = (DatumRange) properties.get(QDataSet.TYPICAL_RANGE);
-
+            Double tmin= (Double) properties.get(QDataSet.TYPICAL_MIN);
+            Double tmax= (Double) properties.get(QDataSet.TYPICAL_MAX);
+            DatumRange range= getRange( 
+                    (Double)properties.get(QDataSet.TYPICAL_MIN), 
+                    (Double)properties.get(QDataSet.TYPICAL_MAX),
+                    (Units)properties.get(QDataSet.UNITS) );
             // see if the typical range is consistent with range seen.  If the
             // typical range won't hide the data's structure, then use it.
-            if (range != null && range.getUnits().isConvertableTo(result.range.getUnits() )) {
+            if ( ( tmin != null || tmax!=null ) ) {
                 double d1, d2;
                 if (result.log) {
                     Datum dd1= result.range.min().ge( range.min() ) ? result.range.min() : range.min();
@@ -355,7 +366,7 @@ public class AutoplotUtil {
 
         double approxMean = 0.;
 
-        DataSetIterator iter = DataSetIterator.create(ds);
+        OldDataSetIterator iter = OldDataSetIterator.create(ds);
         while (iter.hasNext()) {
             double d = iter.next();
             if (!u.isValid(d)) {
@@ -377,7 +388,7 @@ public class AutoplotUtil {
         double stddev = 0;
 
         if (validCount > 0) {
-            iter = DataSetIterator.create(ds);
+            iter = OldDataSetIterator.create(ds);
             while (iter.hasNext()) {
                 double d = iter.next();
                 if (u.isValid(d)) {
@@ -431,7 +442,7 @@ public class AutoplotUtil {
             u = Units.dimensionless;
         }
 
-        DataSetIterator iter = DataSetIterator.create(ds);
+        OldDataSetIterator iter = OldDataSetIterator.create(ds);
 
         // four std dev's from the mean.
         double stdmin = moment.moment[0] - moment.moment[1] * 4;
