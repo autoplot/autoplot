@@ -112,15 +112,16 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             back= (int[]) array.getPrimitiveVector().getInternalStorage();
             if ( properties.get("add_offset")!=null ) addOffset= ((Double)properties.get("add_offset")).doubleValue();
             if ( properties.get("scale_factor")!=null ) scaleFactor= ((Double)properties.get("scale_factor")).doubleValue();
+            validMin= Double.NEGATIVE_INFINITY;
+            validMax= Double.POSITIVE_INFINITY;
+            if ( properties.get("VALID_MIN")!=null ) validMin= (Double)properties.get("VALID_MIN");
+            if ( properties.get("VALID_MAX")!=null ) validMax= (Double)properties.get("VALID_MAX");
             if ( properties.get("valid_range")!=null ) {
                 String s= (String)properties.get("valid_range");
                 String[] ss= s.split(",");
                 validMin= Double.parseDouble(ss[0]);
                 validMax= Double.parseDouble(ss[1]);
-            } else {
-                validMin= Double.NEGATIVE_INFINITY;
-                validMax= Double.POSITIVE_INFINITY;
-            }
+            }             
             this.properties= properties;
         }
         
@@ -157,15 +158,16 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             back= (short[]) array.getPrimitiveVector().getInternalStorage();
             if ( properties.get("add_offset")!=null ) addOffset= ((Double)properties.get("add_offset")).doubleValue();
             if ( properties.get("scale_factor")!=null ) scaleFactor= ((Double)properties.get("scale_factor")).doubleValue();
+            validMin= Double.NEGATIVE_INFINITY;
+            validMax= Double.POSITIVE_INFINITY;
+            if ( properties.get("VALID_MIN")!=null ) validMin= (Double)properties.get("VALID_MIN");
+            if ( properties.get("VALID_MAX")!=null ) validMax= (Double)properties.get("VALID_MAX");
             if ( properties.get("valid_range")!=null ) {
                 String s= (String)properties.get("valid_range");
                 String[] ss= s.split(",");
                 validMin= Double.parseDouble(ss[0]);
                 validMax= Double.parseDouble(ss[1]);
-            } else {
-                validMin= Double.NEGATIVE_INFINITY;
-                validMax= Double.POSITIVE_INFINITY;
-            }
+            } 
             this.properties= properties;
         }
         
@@ -196,15 +198,16 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public FloatArray( DArray array, HashMap properties ) {
             super(array);
             back= (float[]) array.getPrimitiveVector().getInternalStorage();
+            validMin= Double.NEGATIVE_INFINITY;
+            validMax= Double.POSITIVE_INFINITY;
+            if ( properties.get("VALID_MIN")!=null ) validMin= (Double)properties.get("VALID_MIN");
+            if ( properties.get("VALID_MAX")!=null ) validMax= (Double)properties.get("VALID_MAX");
             if ( properties.get("valid_range")!=null ) {
                 String s= (String)properties.get("valid_range");
                 String[] ss= s.split(",");
                 validMin= Double.parseDouble(ss[0]);
                 validMax= Double.parseDouble(ss[1]);
-            } else {
-                validMin= Double.NEGATIVE_INFINITY;
-                validMax= Double.POSITIVE_INFINITY;
-            }
+            }        
             this.properties= properties;
         }
         

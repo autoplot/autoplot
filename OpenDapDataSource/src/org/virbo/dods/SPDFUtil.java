@@ -39,9 +39,12 @@ public class SPDFUtil {
             da.setUnits( (Units) m.get(QDataSet.UNITS) );
         }
         
-        if ( m.containsKey(QDataSet.VALID_RANGE ) ) {
-            DatumRange dr= (DatumRange) m.get(QDataSet.VALID_RANGE);
-            da.setValidRange( dr.min().doubleValue( da.getUnits() ), dr.max().doubleValue(da.getUnits()) );
+        if ( m.containsKey(QDataSet.VALID_MIN ) || m.containsKey(QDataSet.VALID_MAX) ) {
+            Double min= (Double) m.get(QDataSet.VALID_MIN );
+            Double max= (Double) m.get(QDataSet.VALID_MAX );
+            if ( min==null ) min= Double.NEGATIVE_INFINITY;
+            if ( max==null ) max= Double.POSITIVE_INFINITY;
+            da.setValidRange( min, max );
         }
         
         StringBuffer constraint= new StringBuffer("?");
