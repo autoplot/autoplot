@@ -652,11 +652,13 @@ public class DataSetURL {
                 mon.started();
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
 
-                int i = surl.lastIndexOf("/", carotPos);
+                int i = surl.lastIndexOf("/", carotPos-1);
                 String surlDir;  // name of surl, including only folders, ending with /.
-
-                if (i <= 0 || surl.charAt(i - 1) == '/') {
+                
+                if (i <= 0 ) {
                     surlDir = surl;
+                } else if ( surl.charAt(i - 1) == '/') { // '//'
+                    surlDir = surl.substring(0, i + 1);
                 } else {
                     surlDir = surl.substring(0, i + 1);
                 }
@@ -675,6 +677,8 @@ public class DataSetURL {
                 result = Collections.singletonList( new CompletionResult("Malformed URI",null) );
             } catch (FileSystem.FileSystemOfflineException ex) {
                 result = Collections.singletonList( new CompletionResult( "FileSystem offline", null ) );
+            } finally {
+                mon.finished();
             }
             return result;
         }
