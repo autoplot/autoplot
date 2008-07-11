@@ -134,6 +134,7 @@ public class ScriptContext extends PyJavaInstance {
      * 
      * @param surl an autoplot url with an aggregation specifier.
      * @param timeRange a string that is parsed to a time range, such as "2001"
+     * @param format format for the result, such as "%Y-%m-%d"
      * @return a list of URLs without the aggregation specifier.
      * @throws java.io.IOException if the remote folder cannot be listed.
      * @throws java.text.ParseException if the timerange cannot be parsed.
