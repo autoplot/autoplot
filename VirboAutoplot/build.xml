@@ -68,7 +68,12 @@
 
     -->
 
-    <target name="-post-compile" >
+    <target name="do-tag" >
+        <property name="das2.dotag" value="true" />
+        <ant target="jar" />
+    </target>
+    
+    <target name="-post-compile" if="das2.dotag" >
         <propertyfile comment="Build Information"
                       file="${build.classes.dir}/META-INF/build.txt">
             <entry key="build.timestamp"
@@ -79,7 +84,7 @@
         </propertyfile>
     </target>
     
-    <target name="jnlp-release" depends="-post-jar">
+    <target name="jnlp-release" depends="jar">
         <property name="jnlp.dir" location="${dist.dir}/jnlp"/>
         <mkdir dir="${jnlp.dir}"/>
         <copy file="${dist.jar}" todir="${jnlp.dir}"/>
@@ -102,6 +107,12 @@
         <copy file="${build.classes.dir}/index.html" tofile="${jnlp.dir}/index.html" />
         <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
     </target>
+    
+    
+    <target name="-pre-init" >
+        <property name="org.das2.dotag" value="true" />
+    </target>
+    
     
     <target name="jumbojar" depends="jar" >
 <!--        <unjar dest="temp">
