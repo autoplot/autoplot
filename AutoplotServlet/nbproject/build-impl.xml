@@ -369,8 +369,24 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
     <!--
                 COMPILATION SECTION
             -->
-    <target depends="init" if="no.dist.ear.dir" name="deps-module-jar" unless="no.deps"/>
-    <target depends="init" if="dist.ear.dir" name="deps-ear-jar" unless="no.deps"/>
+    <target depends="init" if="no.dist.ear.dir" name="deps-module-jar" unless="no.deps">
+        <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
+    </target>
+    <target depends="init" if="dist.ear.dir" name="deps-ear-jar" unless="no.deps">
+        <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
+    </target>
     <target depends="init, deps-module-jar, deps-ear-jar" name="deps-jar" unless="no.deps"/>
     <target depends="init,deps-jar" name="-pre-pre-compile">
         <mkdir dir="${build.classes.dir}"/>
@@ -509,11 +525,50 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist,-do-dist-with-manifest,-do-dist-without-manifest" name="do-dist"/>
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
+        <basename file="${reference.VirboAutoplot.jar}" property="included.lib.reference.VirboAutoplot.jar"/>
+        <copy-ear-war file="${reference.VirboAutoplot.jar}" propname="included.lib.reference.VirboAutoplot.jar.X"/>
+        <basename file="${reference.QDataSet.jar}" property="included.lib.reference.QDataSet.jar"/>
+        <copy-ear-war file="${reference.QDataSet.jar}" propname="included.lib.reference.QDataSet.jar.X"/>
+        <basename file="${reference.DataSource.jar}" property="included.lib.reference.DataSource.jar"/>
+        <copy-ear-war file="${reference.DataSource.jar}" propname="included.lib.reference.DataSource.jar.X"/>
+        <basename file="${reference.DataSourcePack.jar}" property="included.lib.reference.DataSourcePack.jar"/>
+        <copy-ear-war file="${reference.DataSourcePack.jar}" propname="included.lib.reference.DataSourcePack.jar.X"/>
+        <basename file="${reference.BinaryDataSource.jar}" property="included.lib.reference.BinaryDataSource.jar"/>
+        <copy-ear-war file="${reference.BinaryDataSource.jar}" propname="included.lib.reference.BinaryDataSource.jar.X"/>
+        <basename file="${reference.ImageDataSource.jar}" property="included.lib.reference.ImageDataSource.jar"/>
+        <copy-ear-war file="${reference.ImageDataSource.jar}" propname="included.lib.reference.ImageDataSource.jar.X"/>
+        <basename file="${reference.WavDataSource.jar}" property="included.lib.reference.WavDataSource.jar"/>
+        <copy-ear-war file="${reference.WavDataSource.jar}" propname="included.lib.reference.WavDataSource.jar.X"/>
+        <basename file="${file.reference.dasCore.jar}" property="included.lib.file.reference.dasCore.jar"/>
+        <copy-ear-war file="${file.reference.dasCore.jar}" propname="included.lib.file.reference.dasCore.jar.X"/>
+        <basename file="${file.reference.batik-awt-util.jar}" property="included.lib.file.reference.batik-awt-util.jar"/>
+        <copy-ear-war file="${file.reference.batik-awt-util.jar}" propname="included.lib.file.reference.batik-awt-util.jar.X"/>
+        <basename file="${file.reference.batik-svggen.jar}" property="included.lib.file.reference.batik-svggen.jar"/>
+        <copy-ear-war file="${file.reference.batik-svggen.jar}" propname="included.lib.file.reference.batik-svggen.jar.X"/>
+        <basename file="${file.reference.batik-util.jar}" property="included.lib.file.reference.batik-util.jar"/>
+        <copy-ear-war file="${file.reference.batik-util.jar}" propname="included.lib.file.reference.batik-util.jar.X"/>
+        <basename file="${file.reference.itext-1.2.jar}" property="included.lib.file.reference.itext-1.2.jar"/>
+        <copy-ear-war file="${file.reference.itext-1.2.jar}" propname="included.lib.file.reference.itext-1.2.jar.X"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
-        <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update"/>
+        <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
+            <attribute name="Class-Path" value="${included.lib.reference.VirboAutoplot.jar} ${included.lib.reference.QDataSet.jar} ${included.lib.reference.DataSource.jar} ${included.lib.reference.DataSourcePack.jar} ${included.lib.reference.BinaryDataSource.jar} ${included.lib.reference.ImageDataSource.jar} ${included.lib.reference.WavDataSource.jar} ${included.lib.file.reference.dasCore.jar} ${included.lib.file.reference.batik-awt-util.jar} ${included.lib.file.reference.batik-svggen.jar} ${included.lib.file.reference.batik-util.jar} ${included.lib.file.reference.itext-1.2.jar} "/>
+        </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
-    <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir"/>
+    <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
+        <copy file="${reference.VirboAutoplot.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.QDataSet.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.DataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.DataSourcePack.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.BinaryDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.ImageDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.WavDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.dasCore.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.batik-awt-util.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.batik-svggen.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.batik-util.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.itext-1.2.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+    </target>
     <target depends="init,compile,compile-jsps,-pre-dist,library-inclusion-in-manifest" name="do-ear-dist">
         <dirname file="${dist.ear.war}" property="dist.jar.dir"/>
         <mkdir dir="${dist.jar.dir}"/>
@@ -795,7 +850,15 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                 
                 CLEANUP SECTION
             -->
-    <target depends="init" if="no.dist.ear.dir" name="deps-clean" unless="no.deps"/>
+    <target depends="init" if="no.dist.ear.dir" name="deps-clean" unless="no.deps">
+        <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="clean"/>
+    </target>
     <target depends="init" name="do-clean">
         <condition property="build.dir.to.clean" value="${build.web.dir}">
             <isset property="dist.ear.dir"/>

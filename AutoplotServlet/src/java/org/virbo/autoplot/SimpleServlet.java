@@ -5,13 +5,20 @@
 
 package org.virbo.autoplot;
 
+import edu.uiowa.physics.pw.das.util.DasPNGConstants;
+import edu.uiowa.physics.pw.das.util.DasPNGEncoder;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSource;
 
 /**
  *
@@ -27,14 +34,10 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         
-        //response.setContentType("image/png");
-        
-        OutputStream out = response.getOutputStream();
-        out.write( "Hello".getBytes() );
-        out.close();
+        response.setContentType("image/png");
         
         try {
-            /*OutputStream out = response.getOutputStream();
+            OutputStream out = response.getOutputStream();
             
             String arg0= request.getParameter("url");
             String vap= request.getParameter("vap");
@@ -65,7 +68,7 @@ public class SimpleServlet extends HttpServlet {
             }
             
             out.close();
-            */
+            
         } catch ( Exception e ) {
             e.printStackTrace();
             throw new RuntimeException(e);
