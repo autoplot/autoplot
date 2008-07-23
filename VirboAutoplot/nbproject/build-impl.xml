@@ -333,15 +333,18 @@ is divided into following sections:
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.CdfDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.Das2ServerDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.ExcelDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.NetCdfDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.OpenDapDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init,deps-jar" name="-pre-pre-compile">
@@ -653,15 +656,18 @@ is divided into following sections:
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.CdfDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.Das2ServerDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.ExcelDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.NetCdfDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.OpenDapDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="clean"/>
     </target>
     <target depends="init" name="-do-clean">
