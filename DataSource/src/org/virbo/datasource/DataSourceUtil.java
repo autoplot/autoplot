@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  *
  * @author jbf
  */
-public class Util {
+public class DataSourceUtil {
 
     public static final URL FS_URL;
     static {
@@ -29,7 +29,7 @@ public class Util {
         }
     }
     
-    private Util() {
+    private DataSourceUtil() {
     }
     
     /**
@@ -104,6 +104,27 @@ public class Util {
         return result 
                 + ( result.contains("?") ? "&" : "?" )
                 + "timerange="+timeRange;
+    }
+    
+    /** 
+     * make a valid Java identifier from the label.  Data sources may wish
+     * to allow labels to be used to identify data sources, and this contains
+     * the standard logic.  Strings are replaced with underscores, invalid
+     * chars removed, etc.
+     * @param label
+     * @return valid Java identifier.
+     */
+    public static String toJavaIdentifier( String label ) {
+	StringBuffer buf= new StringBuffer(label.length());
+	for ( int i=0; i<label.length(); i++ ) {
+	    char ch= label.charAt(i);
+	    if ( Character.isJavaIdentifierPart(ch) ) {
+		buf.append(ch);
+	    } else if ( ch==' ' ) {
+		buf.append("_");
+	    }
+	}
+	return buf.toString();
     }
     
     public static void main(String[] args ) {
