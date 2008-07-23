@@ -12,7 +12,11 @@ package org.virbo.datasource;
 import java.net.URL;
 
 /**
- * models a part of a dataset's URL.  
+ * models a part of a dataset's URL.  This class is used to serve as both the
+ * input and output of completion engines.  An incomplete completion context is
+ * passed in, and the engine returns a set of more complete contexts.  This 
+ * process could be repeated to define a tree, where the leaf nodes are valid 
+ * datasets urls.
  * @author jbf
  */
 public class CompletionContext {
