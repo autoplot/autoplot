@@ -26,19 +26,23 @@ public class CompletionContext {
     }
     
     public CompletionContext( Object context, String completable ) {
-        this( context, completable, null, null, null );
+        this( context, completable, null, null, null ,null );
     }
     
-    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName ) {
-        this( context, completable, owner, implicitName, null );
+    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String label, String doc ) {
+        this( context, completable, owner, implicitName, label, doc, false );
     }
     
     public CompletionContext( Object context, String completable, String doc ) {
-        this( context, completable, null, null, doc, false );
+        this( context, completable, null, null, null, doc, false );
+    }
+
+    public CompletionContext( Object context, String completable, String label, String doc ) {
+        this( context, completable, null, null, label, doc, false );
     }
 
     public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String doc ) {
-        this( context, completable, owner, implicitName, doc, false );
+        this( context, completable, owner, implicitName, null, doc, false );
     }
 
     /**
@@ -47,13 +51,20 @@ public class CompletionContext {
      * @param completable
      * @param owner
      * @param implicitName
+     * @param label label to use.
      * @param doc additional information that is shown in a tooltip.
+     * @param maybePlot url should be valid if this proposal is accepted.
      */
-    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName, String doc, boolean maybePlot ) {
+    public CompletionContext( Object context, String completable, 
+            DataSourceFactory owner, 
+            String implicitName, 
+            String label,
+            String doc, 
+            boolean maybePlot ) {
         this.context= context;
         this.completable= completable;
-        this.owner= owner;
         this.implicitName= implicitName;
+        this.label= label==null ? completable : label;
         this.doc= doc;
     }
     
@@ -98,16 +109,17 @@ public class CompletionContext {
      * T01_gsmB is part of the implicit group "id" of the cdf data source factory.
      */
     public String implicitName;
-            
-    /**
-     * the factory that owns the parameter.  May be null
-     */
-    public DataSourceFactory owner;
     
     /**
      * one-line documentation
      */
     public String doc;
+    
+    /**
+     * label identifying the proposal, to be understood within the context of 
+     * surl and the insertion point.  
+     */
+    public String label;
     
     /**
      * hint that this completion should finish a valid URL, so go ahead and try to use it.
