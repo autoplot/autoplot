@@ -50,6 +50,14 @@ public class DataSourceRegistry {
         return result;
     }
 
+    public boolean hasSourceByExt(String ext) {
+        return dataSourcesByExt.get(ext)!=null;
+    }
+
+    public boolean hasSourceByMime(String mime) {
+        return dataSourcesByMime.get(mime)!=null;
+    }
+
     /**
      * register the data source factory by extension
      */
@@ -190,4 +198,5 @@ public class DataSourceRegistry {
         }
         return result;
     }
+    
 }
