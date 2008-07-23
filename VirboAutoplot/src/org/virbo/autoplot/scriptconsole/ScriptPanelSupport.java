@@ -4,7 +4,6 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
-import java.awt.HeadlessException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -71,8 +70,7 @@ public class ScriptPanelSupport {
     public int getSaveFile() throws IOException {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(getFileFilter());
-        if (file != null 
-                && ! file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString()) ) {
+        if (file != null && !file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
             chooser.setSelectedFile(file);
         }
         int r = chooser.showSaveDialog(panel);
@@ -102,8 +100,8 @@ public class ScriptPanelSupport {
     protected void savePlot() {
         try {
             boolean updateSurl = false;
-            if (file == null || file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {                
-                if ( getSaveFile() == JFileChooser.APPROVE_OPTION) {
+            if (file == null || file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
+                if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
                     updateSurl = true;
                 } else {
                     return;
@@ -114,15 +112,15 @@ public class ScriptPanelSupport {
                     if (!uriFilesEqual(selector.getValue(), file.toURI().toString())) {
                         updateSurl = true;
                     }
-                } catch ( URISyntaxException ex ) {
-                    updateSurl= true;
+                } catch (URISyntaxException ex) {
+                    updateSurl = true;
                 }
                 OutputStream out = new FileOutputStream(file);
                 String text = panel.getEditorPanel().getText();
                 out.write(text.getBytes());
                 out.close();
                 if (updateSurl) {
-                    selector.setValue( file.toURI().toString() );
+                    selector.setValue(file.toURI().toString());
                 }
                 selector.maybePlot();
             }
@@ -136,7 +134,7 @@ public class ScriptPanelSupport {
 
             @Override
             public boolean accept(File f) {
-                return ( f.toString().endsWith(".jy") || f.toString().endsWith(".py") );
+                return (f.isDirectory() || f.toString().endsWith(".jy") || f.toString().endsWith(".py"));
             }
 
             @Override
