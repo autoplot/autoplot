@@ -77,8 +77,10 @@ import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.Base64;
+import org.virbo.autoplot.layout.LayoutUtil;
 import org.virbo.autoplot.state.ApplicationState;
 import org.virbo.autoplot.state.Options;
 import org.virbo.autoplot.state.StatePersistence;
@@ -128,24 +130,24 @@ public class ApplicationModel {
      * @param dataset
      */
     private void unitsCheck(Map properties, QDataSet dataset) {
-        Units u0= (Units) dataset.property(QDataSet.UNITS);
-        Units u1= (Units) properties.get(QDataSet.UNITS);
-        if ( u0==null || u1==null || !u0.isConvertableTo(u1) ) {
-            properties.put( QDataSet.UNITS, u0 );
+        Units u0 = (Units) dataset.property(QDataSet.UNITS);
+        Units u1 = (Units) properties.get(QDataSet.UNITS);
+        if (u0 == null || u1 == null || !u0.isConvertableTo(u1)) {
+            properties.put(QDataSet.UNITS, u0);
         }
-        for ( int i=0; i<QDataSet.MAX_RANK; i++ ) {
-            QDataSet dep= (QDataSet) dataset.property( "DEPEND_"+i );
-            Map depprops= (Map) properties.get( "DEPEND_"+i );
-            if ( dep!=null && depprops!=null ) {
-                unitsCheck( depprops, dep );
+        for (int i = 0; i < QDataSet.MAX_RANK; i++) {
+            QDataSet dep = (QDataSet) dataset.property("DEPEND_" + i);
+            Map depprops = (Map) properties.get("DEPEND_" + i);
+            if (dep != null && depprops != null) {
+                unitsCheck(depprops, dep);
             }
         }
     }
 
     enum RenderType {
+
         spectrogram, series, scatter
     }
-    
     /**
      * the one and only displayed dataset
      */
@@ -440,10 +442,6 @@ public class ApplicationModel {
 
     public void setDataSource(DataSource ds) {
 
-        this.plot.setTitle("");
-        this.validRange = "";
-        this.sfill = "";
-
         DataSource oldSource = this.dataSource;
         this.dataSource = ds;
 
@@ -469,6 +467,7 @@ public class ApplicationModel {
                             CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
                             if (tag == null || !tag.getRange().contains(newRange)) {
                                 tsb.setTimeRange(newRange);
+                                tsb.setTimeResolution( newRange.width().divide(ApplicationModel.this.plot.getXAxis().getDLength() ) );
                                 update(false);
                             }
                         }
@@ -714,6 +713,7 @@ public class ApplicationModel {
     /**
      * the fill parameters have changed, so update the auto range stats.
      * This should not be run on the AWT event thread!
+     * @param autorange if false, then no autoranging is done.
      */
     protected void updateFill(boolean autorange) {
         if (dataset == null) {
@@ -729,31 +729,30 @@ public class ApplicationModel {
         /* begin interpret metadata */
         if (interpretMetadata && !autoRangeSuppress && autorange) {
 
-            newState.setXLabel("");
-            newState.setYLabel("");
-            newState.setZLabel("");
-            newState.setTitle("");
+            if ( autolabelling ) {
+                newState.setXLabel("");
+                newState.setYLabel("");
+                newState.setZLabel("");
+                newState.setTitle("");
+            }
+
+            newState.setValidRange("");
+            newState.setFill("");
 
             properties = AutoplotUtil.extractProperties(dataset);
             properties = AutoplotUtil.mergeProperties(dataSource.getProperties(), properties);
             doInterpretMetadata(newState, properties, renderType);
-            
-            unitsCheck( properties, dataset );
+
+            unitsCheck(properties, dataset);
 
             boolean ars0 = this.autoRangeSuppress;
 
             this.autoRangeSuppress = true; // prevent setValidRange and setFill from reranging.
 
-            if (this.validRange.equals("")) {
-                setValidRange(newState.getValidRange());
-            }
-
-            if (this.sfill.equals("")) {
-                setFill(newState.getFill());
-            }
-
-            if (this.plot.getTitle().equals("")) {
-                this.plot.setTitle(newState.getTitle());
+            if (!autorange) {
+                newState.setValidRange(getValidRange());
+                newState.setFill(getFill());
+                newState.setTitle(this.plot.getTitle());
             }
 
             this.restoreState(newState, false, false);
@@ -844,7 +843,7 @@ public class ApplicationModel {
     private void doInterpretMetadata(ApplicationState state, Map properties, RenderType spec) {
 
         Object v;
-        if ((v = properties.get(DDataSet.TITLE)) != null) {
+        if ( autolabelling && (v = properties.get(DDataSet.TITLE)) != null) {
             state.setTitle((String) v);
         }
 
@@ -852,24 +851,28 @@ public class ApplicationModel {
             state.setFill(String.valueOf(v));
         }
 
-        Double vmin= (Double) properties.get(DDataSet.VALID_MIN);
-        Double vmax= (Double) properties.get(DDataSet.VALID_MAX);
-        if ( vmin!= null || vmax!=null ) {
-            if ( vmin==null ) vmin= -1e38;
-            if ( vmax==null ) vmax= 1e38;
-            state.setValidRange( ""+vmin + " to " + vmax );
+        Double vmin = (Double) properties.get(DDataSet.VALID_MIN);
+        Double vmax = (Double) properties.get(DDataSet.VALID_MAX);
+        if (vmin != null || vmax != null) {
+            if (vmin == null) {
+                vmin = -1e38;
+            }
+            if (vmax == null) {
+                vmax = 1e38;
+            }
+            state.setValidRange("" + vmin + " to " + vmax);
         }
 
         if (spec == RenderType.spectrogram) {
-            if ((v = properties.get(DDataSet.SCALE_TYPE)) != null) {
+            if (autoranging && (v = properties.get(DDataSet.SCALE_TYPE)) != null) {
                 state.setZlog(v.equals("log"));
             }
 
-            if ((v = properties.get(DDataSet.LABEL)) != null) {
+            if (autolabelling && (v = properties.get(DDataSet.LABEL)) != null) {
                 state.setZLabel((String) v);
             }
 
-            if ((v = properties.get(DDataSet.DEPEND_1)) != null) {
+            if (autolabelling && (v = properties.get(DDataSet.DEPEND_1)) != null) {
                 Map m = (Map) v;
                 Object v2 = m.get(DDataSet.LABEL);
                 if (v2 != null) {
@@ -878,11 +881,11 @@ public class ApplicationModel {
 
             }
         } else {
-            if ((v = properties.get(DDataSet.SCALE_TYPE)) != null) {
+            if (autoranging && (v = properties.get(DDataSet.SCALE_TYPE)) != null) {
                 state.setYlog(v.equals("log"));
             }
 
-            if ((v = properties.get(DDataSet.LABEL)) != null) {
+            if (autolabelling && (v = properties.get(DDataSet.LABEL)) != null) {
                 state.setYLabel((String) v);
             }
 
@@ -892,7 +895,7 @@ public class ApplicationModel {
         if ((v = properties.get(DDataSet.DEPEND_0)) != null) {
             Map m = (Map) v;
             Object v2 = m.get(DDataSet.LABEL);
-            if (v2 != null) {
+            if (autolabelling && v2 != null) {
                 state.setXLabel((String) v2);
             }
 
@@ -901,7 +904,9 @@ public class ApplicationModel {
     }
 
     /**
-     *
+     * update the model and view using the new DataSource to create a new dataset,
+     * then inspecting the dataset to decide on axis settings.
+     * @param autorange if false, then no autoranging is done, just the fill part.
      */
     public void update(final boolean autorange) {
         dataset = null;
@@ -1272,17 +1277,17 @@ public class ApplicationModel {
     }
 
     void increaseFontSize() {
-        Font f= this.canvas.getFont();
-        f= f.deriveFont(f.getSize2D()*1.1f);
+        Font f = this.canvas.getFont();
+        f = f.deriveFont(f.getSize2D() * 1.1f);
         this.canvas.setFont(f);
     }
-    
+
     void decreaseFontSize() {
-        Font f= this.canvas.getFont();
-        f= f.deriveFont(f.getSize2D()/1.1f);
+        Font f = this.canvas.getFont();
+        f = f.deriveFont(f.getSize2D() / 1.1f);
         this.canvas.setFont(f);
     }
-    
+
     DasAxis getXAxis() {
         return plot.getXAxis();
     }
@@ -1717,6 +1722,28 @@ public class ApplicationModel {
         boolean oldautoranging = autoranging;
         this.autoranging = newautoranging;
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
+    }
+    protected boolean autolabelling = true;
+    public static final String PROP_AUTOLABELLING = "autolabelling";
+
+    public boolean isAutolabelling() {
+        return autolabelling;
+    }
+
+    public void setAutolabelling(boolean autolabelling) {
+        boolean oldAutolabelling = this.autolabelling;
+        this.autolabelling = autolabelling;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOLABELLING, oldAutolabelling, autolabelling);
+    }
+    protected boolean autolayout = true;
+
+    public boolean isAutolayout() {
+        return autolayout;
+    }
+
+    public void setAutolayout(boolean autolayout) {
+        this.autolayout = autolayout;
+        if ( autolayout ) LayoutUtil.autolayout( this.canvas, this.plot.getRow(), this.plot.getColumn() );
     }
     /**
      * Holds value of property interpretMetadata.
