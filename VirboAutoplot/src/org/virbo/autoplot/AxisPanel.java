@@ -269,7 +269,7 @@ public class AxisPanel extends javax.swing.JPanel {
         fillValueLabel.setToolTipText("This value is used to identify invalid data that should not be plotted.");
 
         fillValueComboBox.setEditable(true);
-        fillValueComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(none)", "-1e31", "0.0", "-1" }));
+        fillValueComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "-1e31", "0.0", "-1" }));
         fillValueComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fillValueComboBoxActionPerformed(evt);
@@ -277,7 +277,7 @@ public class AxisPanel extends javax.swing.JPanel {
         });
 
         validRangeComboBox.setEditable(true);
-        validRangeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(none)", "-1e30 to 1e30", "-1 to 101", "0 to 1e38" }));
+        validRangeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "-1e30 to 1e30", "-1 to 101", "0 to 1e38" }));
         validRangeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 validRangeComboBoxActionPerformed(evt);
@@ -292,7 +292,7 @@ public class AxisPanel extends javax.swing.JPanel {
         jLabel6.setText("Title:");
 
         autolayoutCheckbox.setText("Autolayout");
-        autolayoutCheckbox.setToolTipText("Allow the application to reposition plots so axis labels are not clipped and unused space is reduced.");
+        autolayoutCheckbox.setToolTipText("<html><p>Allow the application to reposition axes so labels are not clipped and unused space is reduced.  </P><p>Axes can be positioned manually by turning off this option, then hold shift down to enable plot corner drag anchors.</p></html>");
 
         autolabellingCheckbox.setText("Autolabelling");
         autolabellingCheckbox.setToolTipText("allow automatic setting of axis labels based on metadata.\n");
@@ -346,7 +346,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(fillValueLabel)
                     .add(fillValueComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("rank reduction"));
@@ -407,7 +407,7 @@ public class AxisPanel extends javax.swing.JPanel {
                     .add(jLabel5))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(transposeCheckBox)
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
