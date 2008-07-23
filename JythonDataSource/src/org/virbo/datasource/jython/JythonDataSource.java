@@ -4,10 +4,13 @@
  */
 package org.virbo.datasource.jython;
 
+import java.io.BufferedReader;
 import java.io.File;
 import org.virbo.jythonsupport.PyQDataSetAdapter;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
@@ -47,7 +50,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
                 interp.set("monitor", mon);
-                interp.execfile(Ops.class.getResource("imports.py").openStream(), "imports.py");
+                interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py");
 
                 // interp.exec("def getParam( x, def ):\n  return params.has_key(x) ? params[x] : def\n\n");
 
@@ -59,7 +62,19 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
 
                 try {
-                    interp.execfile(new FileInputStream(super.getFile(new NullProgressMonitor())));
+                    boolean debug= false;
+                    if ( debug ) {
+                        int i=0;
+                        BufferedReader reader= new BufferedReader( new FileReader(super.getFile(new NullProgressMonitor())));
+                        String s= reader.readLine();  i++;
+                        while ( s!=null ) {
+                            Logger.getLogger("virbo.jythondatasource").fine( ""+i+": " +s );
+                            interp.exec(s);
+                            s= reader.readLine(); i++;
+                        }
+                    } else {
+                        interp.execfile(new FileInputStream(super.getFile(new NullProgressMonitor())));
+                    }
                 } catch (PyException ex) {
                     causedBy = ex;
                     ex.printStackTrace();
