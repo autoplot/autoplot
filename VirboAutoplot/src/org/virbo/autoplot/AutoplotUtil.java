@@ -13,12 +13,21 @@ import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
 import edu.uiowa.physics.pw.das.datum.Units;
 import edu.uiowa.physics.pw.das.datum.UnitsUtil;
+import edu.uiowa.physics.pw.das.graph.DasCanvas;
+import edu.uiowa.physics.pw.das.graph.DasCanvasComponent;
+import edu.uiowa.physics.pw.das.graph.DasColumn;
+import edu.uiowa.physics.pw.das.graph.DasPlot;
+import edu.uiowa.physics.pw.das.graph.DasRow;
 import edu.uiowa.physics.pw.das.util.DasMath;
-import java.io.BufferedReader;
+import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
+import java.awt.Component;
+import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,23 +70,6 @@ public class AutoplotUtil {
         }
     }
 
-    /**
-     * return indeces that order the data.  This is a bubble sort currently.
-     * @param result an array of indeces indexing data.
-     * untested.
-     */
-    private static int[] bubbleSort(double[] data, int[] result) {
-        for (int i = 0; i < result.length - 1; i++) {
-            for (int j = i + 1; j < result.length; j++) {
-                if (data[result[i]] > data[result[j]]) {
-                    int t = result[i];
-                    result[j] = result[i];
-                    result[i] = t;
-                }
-            }
-        }
-        return result;
-    }
 
     /**
      * return the median of three numbers
@@ -558,5 +550,33 @@ public class AutoplotUtil {
         }
         return result;
     }
-    
+
+    public static PersistentStateSupport getPersistentStateSupport( final AutoPlotUI parent, final ApplicationModel applicationModel ) {
+        final PersistentStateSupport stateSupport= new PersistentStateSupport( parent, null, "vap") {
+
+            protected void saveImpl(File f) throws IOException {
+                applicationModel.doSave(f);
+                applicationModel.addRecent(f.toURI().toString());
+                parent.setStatus("saved " + f);
+            }
+
+            protected void openImpl(final File file) throws IOException {
+                applicationModel.doOpen(file);
+                parent.setStatus("opened " + file);
+            }
+        };
+        
+        stateSupport.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent ev) {
+                String label;
+                if (stateSupport.isCurrentFileOpened()) {
+                    label = stateSupport.getCurrentFile() + " " + (stateSupport.isDirty() ? "*" : "");
+                    parent.setMessage(label);
+                }
+            }
+        });
+        
+        return stateSupport;
+    }
 }
