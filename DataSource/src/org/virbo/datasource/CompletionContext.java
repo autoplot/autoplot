@@ -37,6 +37,10 @@ public class CompletionContext {
         this( context, completable, owner, implicitName, label, doc, false );
     }
     
+    public CompletionContext( Object context, String completable, DataSourceFactory owner, String implicitName ) {
+        this( context, completable, owner, implicitName, null, null, false );
+    }
+    
     public CompletionContext( Object context, String completable, String doc ) {
         this( context, completable, null, null, null, doc, false );
     }
