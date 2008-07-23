@@ -22,6 +22,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 
 /**
@@ -86,6 +87,14 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
 	return result;
     }
 	    
+    /**
+     * inspect the first row for columns.  Strings may be picked up as labels if the
+     * next row contains values.
+     * @param cc
+     * @param mon
+     * @return
+     * @throws java.io.IOException
+     */
     private List<String> getColumns( CompletionContext cc, ProgressMonitor mon) throws IOException {
 	HSSFWorkbook wb= getWorkbook(cc.resource, mon);
 	Map params= DataSetURL.parseParams(cc.params);
@@ -101,12 +110,20 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
 	String firstRowString= (String) params.get("firstRow");
 	int firstRow= firstRowString==null ? 0 : Integer.parseInt(firstRowString)-1;
 	HSSFRow row= sheet.getRow(firstRow);
+	HSSFRow nextRow= sheet.getRow(firstRow+1);
 	
 	row.getLastCellNum();
 	for ( int i=row.getFirstCellNum(); i<row.getLastCellNum(); i++ ) {
 	    HSSFCell cell= row.getCell((short)i);
+	    HSSFCell nextCell= nextRow.getCell((short)i);
 	    if ( cell!=null && cell.getCellType()==0 ) { // 1=String
 		result.add( ""+(char)(i+'A') );
+	    } else if ( nextCell!=null && nextCell.getCellType()==0 ) { // 1=String
+		if ( cell.getCellType()==1 ) {
+		    result.add( DataSourceUtil.toJavaIdentifier(cell.getStringCellValue()) );
+		} else {
+		    result.add( ""+(char)(i+'A') );
+		}
 	    }
 	}
 	return result; 
