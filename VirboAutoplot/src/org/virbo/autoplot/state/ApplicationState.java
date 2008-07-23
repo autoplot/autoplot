@@ -9,7 +9,11 @@
 
 package org.virbo.autoplot.state;
 
+import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
+import edu.uiowa.physics.pw.das.datum.DatumUtil;
+import edu.uiowa.physics.pw.das.datum.TimeUtil;
+import edu.uiowa.physics.pw.das.datum.Units;
 import edu.uiowa.physics.pw.das.graph.DefaultPlotSymbol;
 import edu.uiowa.physics.pw.das.graph.PsymConnector;
 import java.awt.Color;
@@ -248,35 +252,75 @@ public class ApplicationState {
         propertyChangeSupport.firePropertyChange(PROP_CANVASSIZE, oldcanvasSize, newcanvasSize);
     }
 
+    private DatumRange round( DatumRange range ) {
+        Datum w= range.width();
+        String s;
+        double d;
+        Datum w0= DatumUtil.asOrderOneUnits(w);
+        Datum base= w0;
+        Units hu= w0.getUnits();
+        if ( range.getUnits().isConvertableTo(Units.us2000) ) {
+            base= TimeUtil.prevMidnight(range.min());
+        } else {
+            base= w.getUnits().createDatum(0);
+        }
+        double min10= Math.round( ( range.min().subtract(base) ).doubleValue(w0.getUnits()));
+        double max10= Math.round( ( range.max().subtract(base) ).doubleValue(w0.getUnits()));
+        return new DatumRange( base.add( Datum.create( min10, hu ) ), base.add( Datum.create(max10,hu) ) );
+    }
     
+//    private String scale( DatumRange range ) {
+//        Datum w= range.width();
+//        String s;
+//        int d;
+//        if ( w.getUnits().isConvertableTo(Units.seconds) ) {
+//            Datum w0= DatumUtil.asOrderOneUnits(w);
+//            d= w0.doubleValue(w0.getUnits());
+//        }
+//        return s;
+//    }
     
     private String describe( DatumRange init, DatumRange fin ) {
         if ( init.getUnits().isConvertableTo( fin.getUnits() ) ) {
             if ( init.contains(fin) ) {
-                return "zoom in";
+                return "zoom in to "+ DatumUtil.asOrderOneUnits( round(fin).width() );
             } else if ( fin.contains(init) ) {
-                return "zoom out";
+                return "zoom out to "+ DatumUtil.asOrderOneUnits( round(fin).width() );
             } else if ( init.intersects(fin) ) {
-                return "pan";
+                return "pan"; //+ ( init.min().lt(fin.min() ) ? "right" : "left" ); duh--need to know axis orientation
             } else {
-                return "scan";
+                return "scan"; // + ( init.min().lt(fin.min() ) ? "right" : "left" );
             }
         } else {
-            return ""+init+" -> "+ fin;
+            return ""+round(init)+" -> "+ round(fin);
         }
         
         
     }
     
     /**
+     * trim the string on the left, leaving the right visible.
+     * @param s
+     * @return "..."+s.substring()
+     */
+    private static String abbreviateRight( String s, int len ) {
+        if ( s.length()>len ) {
+            s= "..."+s.substring(s.length()-len);
+        }
+        return s;
+    }
+    
+    /**
      * return a string containing the diffs, comma delineated.
+     * @param that the other state to compare.  That appears on the left, this is on the right
+     * @return string describing state changes.
      */
     public String diffs( ApplicationState that ) {
         StringBuffer buf= new StringBuffer();
         boolean same= true;
         boolean b;
         b= ( that.surl==this.surl || ( that.surl!=null && that.surl.equals(this.surl) ) ) ;
-        if ( !b ) buf.append(", surl "+ that.surl + " to " + this.surl);
+        if ( !b ) buf.append(", surl "+ abbreviateRight(that.surl, 20) + " to " + abbreviateRight(this.surl,20) );
         b=  that.colortable.equals(this.colortable) ;
         if ( !b ) buf.append(", colortable " + that.colortable + " to "+ this.colortable );
         b=  that.lineWidth==this.lineWidth ;
@@ -316,9 +360,12 @@ public class ApplicationState {
         b= that.reference.equals( this.reference );
         if ( !b ) buf.append(", reference " + that.reference+ " to " +( this.reference ));
         
-        
+            
         if ( buf.length()==0 ) {
             return "";
+        } else if ( buf.length()>50 ) {
+            int changes= 1 + buf.toString().split(",").length;
+            return ""+changes + " " + ( changes>1 ? "changes" : "change" );
         } else {
             return buf.substring(2);
         }
