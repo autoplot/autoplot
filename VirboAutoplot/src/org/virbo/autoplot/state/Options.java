@@ -58,6 +58,19 @@ public class Options {
         propertyChangeSupport.firePropertyChange(PROP_LOGCONSOLEVISIBLE, oldLogConsoleVisible, logConsoleVisible);
     }
 
+    protected boolean serverEnabled = false;
+    public static final String PROP_SERVERENABLED = "serverEnabled";
+
+    public boolean isServerEnabled() {
+        return serverEnabled;
+    }
+
+    public void setServerEnabled(boolean serverEnabled) {
+        boolean oldServerEnabled = this.serverEnabled;
+        this.serverEnabled = serverEnabled;
+        propertyChangeSupport.firePropertyChange(PROP_SERVERENABLED, oldServerEnabled, serverEnabled);
+    }
+
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
