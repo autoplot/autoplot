@@ -20,7 +20,10 @@
             <MenuItem class="javax.swing.JMenuItem" name="undoMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="getUndoAction()" type="code"/>
+                  <Connection code="undoRedoSupport.getUndoAction()" type="code"/>
+                </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+Z"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Undo"/>
               </Properties>
@@ -28,7 +31,10 @@
             <MenuItem class="javax.swing.JMenuItem" name="redoMenuItem">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="getRedoAction()" type="code"/>
+                  <Connection code="undoRedoSupport.getRedoAction()" type="code"/>
+                </Property>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+Y"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Redo"/>
               </Properties>
@@ -73,6 +79,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="resetZoomMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="Ctrl+R"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Reset Zoom"/>
               </Properties>
               <Events>
@@ -162,6 +171,7 @@
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="scriptPanelMenuItem">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Script Panel"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Script Panel adds a tab that displays scripts used for the jython data source.  It also provides a way to create new jython sources."/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="scriptPanelMenuItemActionPerformed"/>
@@ -170,9 +180,48 @@
                 <MenuItem class="javax.swing.JCheckBoxMenuItem" name="logConsoleMenuItem">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Log Console"/>
+                    <Property name="toolTipText" type="java.lang.String" value="add a tab that receives and displays messages posted to the java logging system.  "/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="logConsoleMenuItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="serverCheckBoxMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Server"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Start up back end server that allows commands to be send to Autoplot via a port. &lt;br&gt;&#xa;See &lt;a href=&apos;http://vxoware.svn.sourceforge.net/viewvc/vxoware/autoplot/trunk/VirboAutoplot/src/org/virbo/autoplot/ScriptContext.java?view=markup&apos;&gt;ScriptContext&lt;/a&gt;&#xa;&lt;/html&gt;"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="serverCheckBoxMenuItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
+            <Menu class="javax.swing.JMenu" name="jMenu2">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Text Size"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+                  <Properties>
+                    <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                      <KeyStroke key="Ctrl+EQUALS"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Bigger"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+                  <Properties>
+                    <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                      <KeyStroke key="Ctrl+MINUS"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Smaller"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem2ActionPerformed"/>
                   </Events>
                 </MenuItem>
               </SubComponents>
