@@ -7,7 +7,6 @@ package org.virbo.autoplot;
 
 import edu.uiowa.physics.pw.das.components.DasProgressPanel;
 import edu.uiowa.physics.pw.das.components.TearoffTabbedPane;
-import edu.uiowa.physics.pw.das.components.propertyeditor.PropertyEditor;
 import edu.uiowa.physics.pw.das.dasml.DOMBuilder;
 import edu.uiowa.physics.pw.das.dasml.SerializeUtil;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
@@ -18,7 +17,6 @@ import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -50,6 +48,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import org.virbo.autoplot.layout.LayoutUtil;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
@@ -57,6 +56,7 @@ import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.state.Options;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
+import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -73,6 +73,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
     UndoRedoSupport undoRedoSupport;
     TickleTimer tickleTimer;
     GuiSupport support;
+    AutoLayoutListener autoLayout;
+    
     final String TABS_TOOLTIP = "right-click to undock";
     PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
@@ -90,48 +92,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
     Options options;
     private Logger logger = Logger.getLogger("virbo.autoplot");
 
-    private void addKeyBindings(JPanel thisPanel) {
-        thisPanel.getActionMap().put("UNDO", getUndoAction());
-        thisPanel.getActionMap().put("REDO", getRedoAction());
-        thisPanel.getActionMap().put("RESET_ZOOM", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                applicationModel.resetZoom();
-            }
-        } );
-        thisPanel.getActionMap().put("INCREASE_FONT_SIZE", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                applicationModel.increaseFontSize();
-            }                
-        } );
-        thisPanel.getActionMap().put("DECREASE_FONT_SIZE", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                applicationModel.decreaseFontSize();
-            }                
-        } );
-        
-        InputMap map = new ComponentInputMap(thisPanel);
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), "UNDO");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), "REDO");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), "RESET_ZOOM");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK), "DECREASE_FONT_SIZE");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");  // american keyboard
-        thisPanel.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, map);
-        
-    }
-
-    private Action getUndoAction() {
-        return undoRedoSupport.getUndoAction();
-    }
-
-    private Action getRedoAction() {
-        return undoRedoSupport.getRedoAction();
-    }
-
-    private Action getOpenFileAction() {
-        return stateSupport.createOpenAction();
-    }
 
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
@@ -146,35 +106,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         initComponents();
 
-        addKeyBindings( (JPanel) getContentPane() );
+        support.addKeyBindings( (JPanel) getContentPane() );
         
         dataSetSelector.setMonitorContext(applicationModel.plot);
 
         setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 
-        stateSupport = new PersistentStateSupport(this, null, "vap") {
-
-            protected void saveImpl(File f) throws IOException {
-                applicationModel.doSave(f);
-                applicationModel.addRecent(f.toURI().toString());
-                setStatus("saved " + f);
-            }
-
-            protected void openImpl(final File file) throws IOException {
-                applicationModel.doOpen(file);
-                setStatus("opened " + file);
-            }
-        };
-        stateSupport.addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent ev) {
-                String label;
-                if (stateSupport.isCurrentFileOpened()) {
-                    label = stateSupport.getCurrentFile() + " " + (stateSupport.isDirty() ? "*" : "");
-                    setMessage(label);
-                }
-            }
-        });
+        stateSupport = AutoplotUtil.getPersistentStateSupport( this, applicationModel );
 
         fillFileMenu();
 
@@ -209,6 +147,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
+        autoLayout= new AutoLayoutListener(model);
+        
         dataSetSelector.registerActionTrigger(".*\\.vap", new AbstractAction("load vap") {
 
             public void actionPerformed(ActionEvent e) {
@@ -226,7 +166,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         addBindings();
 
-        dataSetSelector.addPropertyChangeListener(dataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
+        dataSetSelector.addPropertyChangeListener(DataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent e) {
                 Runnable run = new Runnable() {
@@ -407,10 +347,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
     private void initLogConsole() throws SecurityException {
         LogConsole lc = new LogConsole();
+        lc.turnOffConsoleHandlers();
+        lc.logConsoleMessages( ); // stderr, stdout logged to Logger "console"
+        
         Handler h = lc.getHandler();
         Logger.getLogger("virbo").setLevel(Level.ALL);
         Logger.getLogger("virbo").addHandler(h);
-
+        Logger.getLogger("console").setLevel(Level.ALL);
+        Logger.getLogger("console").addHandler(h); // stderr, stdout
+        
         setMessage("log console added");
         tabs.addTab("console", lc);
         applicationModel.options.setLogConsoleVisible(true);
@@ -418,6 +363,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
         logConsoleMenuItem.setSelected(true);
     }
 
+    private void initServer() {
+        String result= JOptionPane.showInputDialog( this, "Select port for server.  This port will accept jython commands to control receive services from the application", 12345 );
+        int iport = Integer.parseInt(result);
+        setupServer(iport, applicationModel );
+    }
+    
     private void plotUrl() {
         try {
             Logger.getLogger("ap").info("plotUrl()");
@@ -478,7 +429,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 String s = dataSetSelector.getValue();
-                String agg = org.virbo.datasource.Util.makeAggregation(s);
+                String agg = org.virbo.datasource.DataSourceUtil.makeAggregation(s);
                 if (agg != null) {
                     dataSetSelector.setValue(agg);
                 } else {
@@ -544,6 +495,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         scriptPanelMenuItem = new javax.swing.JCheckBoxMenuItem();
         logConsoleMenuItem = new javax.swing.JCheckBoxMenuItem();
+        serverCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
@@ -574,11 +529,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         editMenu.setText("Edit");
 
-        undoMenuItem.setAction(getUndoAction());
+        undoMenuItem.setAction(undoRedoSupport.getUndoAction());
+        undoMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
         undoMenuItem.setText("Undo");
         editMenu.add(undoMenuItem);
 
-        redoMenuItem.setAction(getRedoAction());
+        redoMenuItem.setAction(undoRedoSupport.getRedoAction());
+        redoMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_MASK));
         redoMenuItem.setText("Redo");
         editMenu.add(redoMenuItem);
 
@@ -614,6 +571,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         viewMenu.setText("View");
 
+        resetZoomMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
         resetZoomMenuItem.setText("Reset Zoom");
         resetZoomMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -693,6 +651,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu1.setText("Enable Feature");
 
         scriptPanelMenuItem.setText("Script Panel");
+        scriptPanelMenuItem.setToolTipText("Script Panel adds a tab that displays scripts used for the jython data source.  It also provides a way to create new jython sources.");
         scriptPanelMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 scriptPanelMenuItemActionPerformed(evt);
@@ -701,6 +660,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu1.add(scriptPanelMenuItem);
 
         logConsoleMenuItem.setText("Log Console");
+        logConsoleMenuItem.setToolTipText("add a tab that receives and displays messages posted to the java logging system.  ");
         logConsoleMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 logConsoleMenuItemActionPerformed(evt);
@@ -708,7 +668,38 @@ public class AutoPlotUI extends javax.swing.JFrame {
         });
         jMenu1.add(logConsoleMenuItem);
 
+        serverCheckBoxMenuItem.setText("Server");
+        serverCheckBoxMenuItem.setToolTipText("<html>\nStart up back end server that allows commands to be send to Autoplot via a port. <br>\nSee <a href='http://vxoware.svn.sourceforge.net/viewvc/vxoware/autoplot/trunk/VirboAutoplot/src/org/virbo/autoplot/ScriptContext.java?view=markup'>ScriptContext</a>\n</html>");
+        serverCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                serverCheckBoxMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(serverCheckBoxMenuItem);
+
         optionsMenu.add(jMenu1);
+
+        jMenu2.setText("Text Size");
+
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_EQUALS, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem1.setText("Bigger");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem1);
+
+        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem2.setText("Smaller");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem2);
+
+        optionsMenu.add(jMenu2);
 
         jMenuBar1.add(optionsMenu);
 
@@ -886,6 +877,21 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     logConsoleMenuItem.setEnabled(false);
 }//GEN-LAST:event_logConsoleMenuItemActionPerformed
 
+private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverCheckBoxMenuItemActionPerformed
+    if (!applicationModel.options.isServerEnabled()) {
+        initServer();
+    }
+    serverCheckBoxMenuItem.setEnabled(false);
+}//GEN-LAST:event_serverCheckBoxMenuItemActionPerformed
+
+private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    applicationModel.increaseFontSize();
+}//GEN-LAST:event_jMenuItem1ActionPerformed
+
+private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    applicationModel.decreaseFontSize();
+}//GEN-LAST:event_jMenuItem2ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -941,12 +947,15 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
                 if (!alm.getValue("port").equals("-1")) {
                     int iport = Integer.parseInt(alm.getValue("port"));
                     app.setupServer(iport, model);
+                    model.options.setServerEnabled(true);
                 }
 
                 Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
 
                     public void uncaughtException(Thread t, Throwable e) {
-                        Logger.getLogger("virbo.autoplot").severe("runtime exception: " + e);
+//                        Logger.getLogger("virbo.autoplot").severe("runtime exception: " + e);
+                        Logger.getLogger("virbo.autoplot").log( Level.SEVERE, "runtime exception: " + e, e);
+                        
                         app.setStatus("caught exception: " + e.toString());
                         model.application.getExceptionHandler().handleUncaught(e);
                     }
@@ -1023,7 +1032,10 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;
@@ -1033,6 +1045,7 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem resetZoomMenuItem;
     private javax.swing.JCheckBoxMenuItem scriptPanelMenuItem;
+    private javax.swing.JCheckBoxMenuItem serverCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem specialEffectsMenuItem;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JPanel tabbedPanelContainer;
