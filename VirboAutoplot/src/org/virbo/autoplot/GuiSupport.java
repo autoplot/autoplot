@@ -112,7 +112,7 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 
                 if ( parent.applicationModel.fillDataset==null ) {
-                    JOptionPane.showConfirmDialog( parent, "No Data to Export.");
+                    JOptionPane.showMessageDialog( parent, "No Data to Export.");
                     return;
                 }
                 
