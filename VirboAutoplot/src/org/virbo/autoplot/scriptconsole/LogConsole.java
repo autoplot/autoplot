@@ -3,54 +3,75 @@
  *
  * Created on June 19, 2008, 4:08 PM
  */
-
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.EventQueue;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
-import org.virbo.autoplot.util.TickleTimer;
+import javax.swing.Timer;
 
 /**
- *
+ * GUI for graphically handling log records.  This defines a Handler, and has
+ * methods for turning off console logging. (Another class should be used to 
+ * log stderr and stdout messages.)  Users can dump the records to a file for
+ * remote analysis.
+ * 
  * @author  jbf
  */
 public class LogConsole extends javax.swing.JPanel {
 
+    List<LogRecord> records = new LinkedList<LogRecord>();
+    int eventThreadId = -1;
+    int level = Level.ALL.intValue();
+    NumberFormat nf = new DecimalFormat("00.000");
+    private Timer timer2;
+
     /** Creates new form LogConsole */
     public LogConsole() {
         initComponents();
-        timer = new TickleTimer(100, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                update();
-            }
-        });        
+        timer2= new Timer( 100, new ActionListener() {
+           public void actionPerformed( ActionEvent e ) {
+               update();
+           } 
+        });
+        timer2.setRepeats(false);
     }
 
-    TickleTimer timer;
-    List<LogRecord> records = new LinkedList<LogRecord>();
-    int eventThreadId= -1;   
-    int level= Level.ALL.intValue();
-    NumberFormat nf= new DecimalFormat("00.000");
-    
+    /**
+     * create a handler that listens for log messages.  This handler is added
+     * to the Loggers that should be displayed here.  Also, the log levels of
+     * the Loggers should be set to ALL, since the filtering is done here.
+     * For example:
+     *         Handler h = lc.getHandler();
+     *         Logger.getLogger("virbo").setLevel(Level.ALL);
+     *         Logger.getLogger("virbo").addHandler(h);
+     * @return handler for receiving messages.
+     */
     public Handler getHandler() {
-        Handler h= new Handler() {
-
+        Handler h = new Handler() {
             public synchronized void publish(LogRecord rec) {
-                synchronized( LogConsole.this ) {
-                    if ( !records.contains(rec) ) {
+                synchronized (LogConsole.this) {
+                    if (!records.contains(rec)) {
                         records.add(rec);
-                        timer.tickle();
-                        if ( eventThreadId==-1 && EventQueue.isDispatchThread() ) {
-                            eventThreadId= rec.getThreadID();
+                        timer2.restart();
+                        //timer.tickle();
+                        if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
+                            eventThreadId = rec.getThreadID();
                         }
                     }
                 }
@@ -58,49 +79,95 @@ public class LogConsole extends javax.swing.JPanel {
 
             @Override
             public void flush() {
-                
             }
 
             @Override
             public void close() throws SecurityException {
-                
             }
         };
         h.setLevel(Level.ALL);
         return h;
     }
 
+    /**
+     * create loggers that log messages sent to System.err and System.out.
+     * This is used with turnOffConsoleHandlers.
+     * @see turnOffConsoleHandlers
+     */
+    public void logConsoleMessages( ) {
+        Logger logger;                                                         
+        LoggingOutputStream los;                                               
+                                                                               
+        logger = Logger.getLogger("console.stdout");                                   
+        los = new LoggingOutputStream(logger, Level.INFO );          
+        System.setOut(new PrintStream(los, true));                             
+                                                                               
+        logger = Logger.getLogger("console.stderr");                                   
+        los= new LoggingOutputStream(logger, Level.WARNING );
+        System.setErr(new PrintStream(los, true));       
+    }
+
+    /**
+     * iterate through the Handlers, looking for ConsoleHandlers, and turning
+     * them off.
+     * @see logConsoleMessages
+     */
+    public void turnOffConsoleHandlers() {
+        for ( Handler h : Logger.getLogger("").getHandlers() ) {
+            if ( h instanceof ConsoleHandler ) {
+                h.setLevel(Level.OFF);
+            }
+        }
+    }
+    
     private synchronized void update() {
         final StringBuffer buf = new StringBuffer();
-        
-        int n= records.size();
-        long t= n==0 ? 0 : records.get(n-1).getMillis();
-        
-        boolean timeStamps= timeStampsCheckBox.isSelected();
-        boolean logLevels= logLevelCheckBox.isSelected();
-                
+
+        int n = records.size();
+        long t = n == 0 ? 0 : records.get(n - 1).getMillis();
+
+        boolean timeStamps = timeStampsCheckBox.isSelected();
+        boolean logLevels = logLevelCheckBox.isSelected();
+
+        long lastT = 0;
         for (LogRecord rec : records) {
-            if ( rec.getLevel().intValue() >= level ) {
-                String recMsg= rec.getMessage();
-                String prefix= "";                
-                if ( timeStamps ) prefix+= nf.format( (rec.getMillis()-t)/1000. ) + " ";
-                if ( logLevels ) prefix+= rec.getLevel() + " ";
-                if ( rec.getThreadID()==eventThreadId ) prefix += "(GUI) ";
-                if ( !prefix.equals("") ) recMsg=  prefix.trim()+ ": " + recMsg;
-                
+            if (rec.getLevel().intValue() >= level) {
+                if (lastT != 0 && rec.getMillis() - lastT > 5000) {
+                    buf.append("\n");
+                }
+                lastT = rec.getMillis();
+                String recMsg = rec.getMessage();
+                String prefix = "";
+                if (loggerIDCheckBox.isSelected()) {
+                    prefix += rec.getLoggerName() + " ";
+                }
+                if (timeStamps) {
+                    prefix += nf.format((rec.getMillis() - t) / 1000.) + " ";
+                }
+                if (logLevels) {
+                    prefix += rec.getLevel() + " ";
+                }
+                if (rec.getThreadID() == eventThreadId) {
+                    prefix += "(GUI) ";
+                }
+                if (!prefix.equals("")) {
+                    recMsg = prefix.trim() + ": " + recMsg;
+                }
                 buf.append(recMsg).append("\n");
             }
         }
+        
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 logTextArea.setText(buf.toString());
             }
-        } );
-        while ( records.size()>100 ) {
+        });
+        
+        while (records.size() > 100) {
             records.remove(0);
         }
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -117,6 +184,8 @@ public class LogConsole extends javax.swing.JPanel {
         verbositySelect = new javax.swing.JComboBox();
         timeStampsCheckBox = new javax.swing.JCheckBox();
         logLevelCheckBox = new javax.swing.JCheckBox();
+        loggerIDCheckBox = new javax.swing.JCheckBox();
+        saveButton = new javax.swing.JButton();
 
         jScrollPane1.setAutoscrolls(true);
 
@@ -159,69 +228,122 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
 
+        loggerIDCheckBox.setText("logger ID");
+        loggerIDCheckBox.setToolTipText("identifies the logger posting the message");
+        loggerIDCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loggerIDCheckBoxActionPerformed(evt);
+            }
+        });
+
+        saveButton.setText("save");
+        saveButton.setToolTipText("Saves the records to file for use by software support team.");
+        saveButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 463, Short.MAX_VALUE)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 463, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(clearButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(timeStampsCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(logLevelCheckBox)
-                .add(54, 54, 54))
+                .add(saveButton)
+                .add(224, 224, 224)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(layout.createSequentialGroup()
+                        .add(loggerIDCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(timeStampsCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(logLevelCheckBox))
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 147, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 300, Short.MAX_VALUE)
-            .add(layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(clearButton)
-                    .add(jLabel1)
-                    .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(timeStampsCheckBox)
-                    .add(logLevelCheckBox)))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(jLabel1)
+                            .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(timeStampsCheckBox)
+                            .add(logLevelCheckBox)
+                            .add(loggerIDCheckBox))
+                        .add(1, 1, 1))
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(clearButton)
+                        .add(saveButton))))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
-records.removeAll(records);
+    records.removeAll(records);
     update();
 }//GEN-LAST:event_clearButtonActionPerformed
 
 private void verbositySelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verbositySelectActionPerformed
-String o= (String) verbositySelect.getSelectedItem();
+    String o = (String) verbositySelect.getSelectedItem();
 
-    if ( o.equals("warnings") ) {
-        level= Level.WARNING.intValue();
-    } else if ( o.equals("informational") ) {
-        level= Level.INFO.intValue();
-    } else if ( o.equals("debug") ) {
-        level= Level.FINEST.intValue();
-    } else if ( o.equals("all") ) {
-        level= Level.ALL.intValue();
+    if (o.equals("warnings")) {
+        level = Level.WARNING.intValue();
+    } else if (o.equals("informational")) {
+        level = Level.INFO.intValue();
+    } else if (o.equals("debug")) {
+        level = Level.FINEST.intValue();
+    } else if (o.equals("all")) {
+        level = Level.ALL.intValue();
     } else {
-        throw new RuntimeException("bad level string: "+o);
+        throw new RuntimeException("bad level string: " + o);
     }
     update();
 }//GEN-LAST:event_verbositySelectActionPerformed
 
 private void timeStampsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeStampsCheckBoxActionPerformed
-update();
+    update();
 }//GEN-LAST:event_timeStampsCheckBoxActionPerformed
 
 private void logLevelCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logLevelCheckBoxActionPerformed
-update();
+    update();
 }//GEN-LAST:event_logLevelCheckBoxActionPerformed
 
+private void loggerIDCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loggerIDCheckBoxActionPerformed
+    update();
+}//GEN-LAST:event_loggerIDCheckBoxActionPerformed
+
+private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
+    JFileChooser chooser = new JFileChooser();
+    if ( JFileChooser.APPROVE_OPTION == chooser.showSaveDialog(this) ) {
+            FileOutputStream fo = null;
+            try {
+                fo = new FileOutputStream(chooser.getSelectedFile());
+                LogConsoleUtil.serializeLogRecords( records, fo );
+                fo.close();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+            } catch ( IOException ex ) {
+                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    fo.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+    }
+}//GEN-LAST:event_saveButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearButton;
@@ -229,8 +351,9 @@ update();
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JCheckBox logLevelCheckBox;
     private javax.swing.JTextArea logTextArea;
+    private javax.swing.JCheckBox loggerIDCheckBox;
+    private javax.swing.JButton saveButton;
     private javax.swing.JCheckBox timeStampsCheckBox;
     private javax.swing.JComboBox verbositySelect;
     // End of variables declaration//GEN-END:variables
-
 }
