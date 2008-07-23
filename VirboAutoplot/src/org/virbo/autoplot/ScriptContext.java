@@ -164,7 +164,8 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * create a model with a GUI presentation layer.
+     * create a model with a GUI presentation layer.  If the GUI is already 
+     * created, then this does nothing.
      */
     public static void createGui() {
         maybeInitView();
@@ -181,12 +182,19 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * binds two bean properties together.  The properties must fire property
+     * binds two bean properties together.  Bindings are bidirectional, but
+     * the initial copy is from src to dst.  In MVC terms, src should be the model
+     * and dst should be a view.  The properties must fire property
      * change events for the binding mechanism to work.
-     * @param src
-     * @param srcProp
-     * @param dst
-     * @param dstProp
+     * 
+     * Example:
+     * model= getApplicationModel()
+     * bind( model.getPlot(), "title", model.getPlot().getXAxis(), "label" )
+     * 
+     * @param src java bean such as model.getPlot()
+     * @param srcProp a property name such as "title"
+     * @param dst java bean such as model.getPlot().getXAxis()
+     * @param dstProp a property name such as "label"
      */
     public static void bind(Object src, String srcProp, Object dst, String dstProp) {
         BindingContext bc = new BindingContext();
