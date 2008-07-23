@@ -55,7 +55,7 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
                 List<String> plottable = getPlottable(new URL(surl), mon );
                 for (String s : plottable) {
-                    result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0" ));
+                    result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0" ,null ,null ));
                 }
 
             } catch (MalformedURLException ex) {
