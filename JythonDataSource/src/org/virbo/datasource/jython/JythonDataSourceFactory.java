@@ -30,6 +30,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.dsops.Ops;
+import org.virbo.jythonsupport.JythonOps;
 
 /**
  *
@@ -58,7 +59,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
         interp.set("monitor", mon);
-        interp.execfile(Ops.class.getResource("imports.py").openStream(), "imports.py");
+        interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py");
 
         File src = DataSetURL.getFile(url, new NullProgressMonitor());
 
@@ -103,7 +104,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             Map<String, Object> po = getNames(DataSetURL.getURL(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)), mon);
             List<CompletionContext> result = new ArrayList<CompletionContext>();
             for (String n : po.keySet()) {
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0",null,null));
             }
             return result;
         } catch (IOException e) {
