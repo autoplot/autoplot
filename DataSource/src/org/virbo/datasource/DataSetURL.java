@@ -151,6 +151,7 @@ public class DataSetURL {
                 url = new URL(surl);
             }
         } catch (MalformedURLException ex) {
+            ex.printStackTrace();
             return null;
         }
 
@@ -505,15 +506,69 @@ public class DataSetURL {
     public static class CompletionResult {
         public String completion;
         public String doc;
+        public String completable;
+        public String label;
         public boolean maybePlot;
+	
         protected CompletionResult( String completion, String doc ) {
-            this( completion, doc, false );
+            this( completion, doc, null, false );
         }
-        protected CompletionResult( String completion, String doc, boolean maybePlot ) {
+	
+	protected CompletionResult( String completion, String doc, boolean maybePlot ) {
+	    this( completion, doc, null, false );
+	}
+	
+        protected CompletionResult( String completion, String doc,  String completable, boolean maybePlot ) {
+            this( completion, null, doc, null, false );
+        }
+        
+        protected CompletionResult( String completion, String label, String doc,  String completable, boolean maybePlot ) {
             this.completion= completion;
+	    this.completable= completable;
+            this.label= label==null ? completable : label;
             this.doc= doc;
             this.maybePlot= maybePlot;
         }
+    }
+    
+    public static List<CompletionResult> getFileSystemCompletions( final String surl, final int carotpos, ProgressMonitor mon ) throws IOException {
+        DataSetURL.URLSplit split = DataSetURL.parse(surl.substring(0,carotpos));
+        String prefix = split.file.substring(split.path.length());
+        String surlDir = split.path;
+
+        mon.setLabel("getting remote listing");
+
+        FileSystem fs = null;
+        String[] s;
+
+        fs = FileSystem.create(DataSetURL.getWebURL(URI.create(split.path)));
+
+        s = fs.listDirectory("/");
+
+        boolean foldCase = Boolean.TRUE.equals(fs.getProperty(fs.PROP_CASE_INSENSITIVE));
+        if (foldCase) {
+            prefix = prefix.toLowerCase();
+        }
+
+        List<DataSetURL.CompletionResult> completions = new ArrayList<DataSetURL.CompletionResult>(s.length);
+        for (int j = 0; j < s.length; j++) {
+            String scomp = foldCase ? s[j].toLowerCase() : s[j];
+            if (scomp.startsWith(prefix)) {
+                if (s[j].endsWith("contents.html")) {
+                    s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
+                } // kludge for dods
+                completions.add( new DataSetURL.CompletionResult( surlDir + s[j], s[j], null, surl.substring(0,carotpos), true ) );
+            }
+        }
+
+        // check for single completion that is just a folder name with /.
+        if (completions.size() == 1) {
+            if ((completions.get(0)).equals(surlDir + prefix + "/")) {
+                // maybe we should do something special.
+            }
+        }
+
+        return completions;
     }
     
     public static List<CompletionResult> getCompletions3( String surl1, int carotPos, ProgressMonitor mon) throws Exception {
@@ -616,7 +671,7 @@ public class DataSetURL {
                     if (dontYetHave == false) {
                         continue;  // skip it
                     }
-                    result.add( new CompletionResult(ss,cc1.doc,cc1.maybePlot) );
+                    result.add( new CompletionResult( ss, cc1.label, cc1.doc, surl1.substring(0,carotPos), cc1.maybePlot ) );
                     i = i + 1;
                 }
             }
@@ -639,7 +694,7 @@ public class DataSetURL {
             for (CompletionContext cc1 : completions) {
                 if (cc1.completable.startsWith(cc.completable)) {
                     String ss = CompletionContext.insert(cc, cc1);
-                    result.add( new CompletionResult(ss,cc1.doc,cc1.maybePlot) );
+                    result.add( new CompletionResult( ss, cc1.label, cc1.doc,surl1.substring(0,carotPos),cc1.maybePlot) );
                     i = i + 1;
                 }
             }
@@ -670,13 +725,13 @@ public class DataSetURL {
                 for (int j = 0; j < s.length; j++) {
                     if (s[j].startsWith(prefix)) {
                         CompletionContext cc1 = new CompletionContext(CompletionContext.CONTEXT_FILE, surlDir + s[j]);
-                        result.add( new CompletionResult( CompletionContext.insert(cc, cc1), cc1.doc, true ) );
+                        result.add( new CompletionResult( CompletionContext.insert(cc, cc1), cc1.label, cc1.doc, surl1.substring(0,carotPos), true ) );
                     }
                 }
             } catch (MalformedURLException ex) {
-                result = Collections.singletonList( new CompletionResult("Malformed URI",null) );
+                result = Collections.singletonList( new CompletionResult( "Malformed URI", "Something in the URL prevents processing", surl1.substring(0,carotPos), false ) );
             } catch (FileSystem.FileSystemOfflineException ex) {
-                result = Collections.singletonList( new CompletionResult( "FileSystem offline", null ) );
+                result = Collections.singletonList( new CompletionResult( "FileSystem offline", "FileSystem is offline.", surl1.substring(0,carotPos), false ) );
             } finally {
                 mon.finished();
             }
