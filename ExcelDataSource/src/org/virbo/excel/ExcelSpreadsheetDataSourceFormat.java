@@ -16,6 +16,7 @@ import java.util.TimeZone;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -112,13 +113,13 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         if (dep0 != null) {
             String l = (String) dep0.property(QDataSet.LABEL);
             cell= row.createCell(icell++);                    
-            cell.setCellValue( (l == null ? "dep0" : l) );
+            cell.setCellValue( new HSSFRichTextString( (l == null ? "dep0" : l) ) );
         }
 
         {
             String l = (String) dep0.property(QDataSet.LABEL);
             cell= row.createCell(icell++);
-            cell.setCellValue( (l == null ? "data" : l) );
+            cell.setCellValue( new HSSFRichTextString( (l == null ? "data" : l) ) );
         }
 
         Units u0 = null;
