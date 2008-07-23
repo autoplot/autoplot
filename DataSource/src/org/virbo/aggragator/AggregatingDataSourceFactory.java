@@ -172,7 +172,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         result.addAll(delegateCompletions);
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=", this, null));
+            result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timerange=" ));
 
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
