@@ -1,0 +1,125 @@
+/*
+ * UserCompletionItem.java
+ *
+ * Created on August 2, 2006, 3:34 PM
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+package org.das2.jythoncompletion;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.util.logging.Logger;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.JTextComponent;
+import org.das2.jythoncompletion.support.CompletionItem;
+import org.das2.jythoncompletion.support.CompletionResultSet;
+import org.das2.jythoncompletion.support.CompletionTask;
+
+/**
+ *
+ * @author jbf
+ */
+public class DefaultCompletionItem implements CompletionItem  {
+    
+    String text;
+    int offset;
+    String complete;
+    String label;
+    String link;
+    
+    final static Logger logger= Logger.getLogger( "pvwave" );
+    
+    /**
+     * @param text  used for sort and insert prefix.  Typically same as complete.
+     * @param offset  number of chars already typed.
+     * @param complete  complete.substring(offset) is inserted.
+     * @param label  the human readable presentation of this, maybe with html.
+     * @param link  handed over to DefaultDocumentationItem, if non null.
+     */
+    public DefaultCompletionItem( String text, int offset, String complete, String label, String link ) {
+        this.text= text;
+        this.offset= offset;
+        this.complete= complete;
+        if ( label==null ) label= complete;
+        this.label= label;
+        this.link= link;
+    }
+    
+    public static DefaultCompletionItem error( String message ) {
+        return new DefaultCompletionItem( message, 0, "", message, null );
+    }
+    
+    public void defaultAction( JTextComponent jTextComponent ) {
+        try {
+            int pos= jTextComponent.getCaretPosition();
+            Document d= jTextComponent.getDocument();
+            d.insertString( pos, complete.substring(offset), null );
+        } catch ( BadLocationException ex ) {
+            throw new RuntimeException(ex);
+        }
+        //Completion.get().hideCompletion();
+    }
+    
+    public void processKeyEvent(KeyEvent keyEvent) {
+    }
+    
+    public int getPreferredWidth(Graphics graphics, Font font) {
+        return 210;
+    }
+    
+    public void render(Graphics graphics, Font font, Color color, Color color0, int i, int i0, boolean b) {
+        //CompletionUtilities.renderHtml(null,label,null,graphics,font, color,i,i0,b);
+        graphics.drawString( text, 0, graphics.getFontMetrics().getHeight() );
+    }
+    
+    public CompletionTask createDocumentationTask() {
+        if ( link==null ) {
+            return null;
+        } else {
+            return new CompletionTask( ) {
+                public void query(CompletionResultSet resultSet) {
+                    resultSet.setDocumentation( new DefaultDocumentationItem(link) );
+                    resultSet.finish();
+                }
+                public void refresh(CompletionResultSet resultSet) {
+                    query(resultSet);
+                }
+                public void cancel() {
+                }  
+            };
+        }
+    }
+    
+    public CompletionTask createToolTipTask() {
+        return null;
+    }
+    
+    public boolean instantSubstitution(JTextComponent jTextComponent) {
+        defaultAction(jTextComponent);
+        return true;
+    }
+    
+    public int getSortPriority() {
+        return 1;
+    }
+    
+    public CharSequence getSortText() {
+        return text;
+    }
+    
+    public CharSequence getInsertPrefix() {
+        return text.substring(0,offset);
+    }
+
+    public String getLabel() {
+        return complete;
+    }
+
+    
+}

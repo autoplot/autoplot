@@ -1,0 +1,59 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.python.core;
+
+import java.lang.reflect.Method;
+
+/**
+ *
+ * @author jbf
+ */
+public class PyReflectedFunctionPeeker {
+
+    PyReflectedFunction f;
+
+    public PyReflectedFunctionPeeker(PyReflectedFunction f) {
+        this.f = f;
+    }
+
+    public int getArgsCount() {
+        return this.f.nargs;
+    }
+
+    public Class getDeclaringClass(int iarg) {
+        return this.f.argslist[iarg].declaringClass;
+    }
+
+    public Class[] getArguments(int iarg) {
+        return this.f.argslist[iarg].args;
+    }
+
+    public Method getMethod(int i) {
+        Class[] cs = getArguments(i);
+        final Class declaringClass = getDeclaringClass(i);
+        try {
+            switch (cs.length) {
+                case 0:
+                    return declaringClass.getMethod(f.__name__);
+                case 1:
+                    return declaringClass.getMethod(f.__name__, cs[0]);
+                case 2:
+                    return declaringClass.getMethod(f.__name__, cs[0],cs[1]);
+                case 3:
+                    return declaringClass.getMethod(f.__name__, cs[0],cs[1],cs[2]);
+                case 4:
+                    return declaringClass.getMethod(f.__name__, cs[0],cs[1],cs[2],cs[3]);
+                default:
+                    throw new IllegalArgumentException("too many params");
+            }
+        } catch (NoSuchMethodException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public String getName() {
+        return this.f.__name__;
+    }
+}
