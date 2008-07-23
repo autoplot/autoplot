@@ -5,23 +5,10 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JFileChooser;
-import org.das2.util.filesystem.WebFileSystem;
-import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURL;
 
 /**
  *
@@ -37,11 +24,15 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     /** Creates new form JythonScriptPanel */
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector ) {
         initComponents();
-    
+        
         support= new ScriptPanelSupport( this, model, selector );
+        //support.addCompletionKeys();
         this.model = model;
         this.selector= selector;
 
+        CompletionImpl impl= CompletionImpl.get();
+        impl.startPopup(this.textArea);
+        
     }
 
     /** This method is called from within the constructor to
@@ -52,13 +43,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        editorPanel = new javax.swing.JTextPane();
         savePlotButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
         openButton = new javax.swing.JButton();
-
-        jScrollPane1.setViewportView(editorPanel);
+        jScrollPane1 = new javax.swing.JScrollPane();
+        textArea = new javax.swing.JTextArea();
 
         savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
         savePlotButton.setText("save & plot");
@@ -82,6 +71,10 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        textArea.setColumns(20);
+        textArea.setRows(5);
+        jScrollPane1.setViewportView(textArea);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -92,7 +85,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(saveAsButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(openButton)
-                .addContainerGap(192, Short.MAX_VALUE))
+                .addContainerGap(217, Short.MAX_VALUE))
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -122,14 +115,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_openButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextPane editorPanel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
     private javax.swing.JButton savePlotButton;
+    private javax.swing.JTextArea textArea;
     // End of variables declaration//GEN-END:variables
 
-    public javax.swing.JTextPane getEditorPanel() {
-        return editorPanel;
+    public javax.swing.JTextArea getEditorPanel() {
+        return textArea;
     }
 }
