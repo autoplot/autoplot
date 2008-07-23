@@ -8,6 +8,8 @@ package org.virbo.datasource;
 import edu.uiowa.physics.pw.das.DasApplication;
 import edu.uiowa.physics.pw.das.graph.DasCanvasComponent;
 import edu.uiowa.physics.pw.das.util.DasExceptionHandler;
+import java.util.logging.Level;
+import javax.swing.text.BadLocationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.filesystem.FileSystem;
 import java.awt.event.ActionEvent;
@@ -20,7 +22,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -44,6 +45,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import org.virbo.datasource.DataSetURL.CompletionResult;
 
 /**
  *
@@ -69,24 +71,24 @@ public class DataSetSelector extends javax.swing.JPanel {
     DataSetSelectorSupport support = new DataSetSelectorSupport(this);
     public static final String PROPERTY_MESSAGE = "message";
     Logger logger = Logger.getLogger("virbo.dataset.ui");
+    DasCanvasComponent monitorContext = null;
 
-    DasCanvasComponent monitorContext= null;
-            
     private ProgressMonitor getMonitor() {
         return getMonitor("Please Wait", "unidentified task in progress");
     }
 
     private ProgressMonitor getMonitor(String label, String desc) {
-        if ( monitorContext==null ) {
+        if (monitorContext == null) {
             return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(label, desc);
         } else {
-            return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(monitorContext,label, desc);
+            return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(monitorContext, label, desc);
         }
     }
 
-    public void setMonitorContext( DasCanvasComponent c ) {
-        this.monitorContext= c;
+    public void setMonitorContext(DasCanvasComponent c) {
+        this.monitorContext = c;
     }
+
     /**
      * if the dataset requires parameters that aren't provided, then
      * show completion list.  Otherwise, fire off event.
@@ -94,8 +96,9 @@ public class DataSetSelector extends javax.swing.JPanel {
     public void maybePlot() {
         logger.fine("go " + getValue() + "");
         Runnable run = new Runnable() {
+
             public void run() {
-                
+
                 String surl = getValue();
                 if (surl.equals("")) {
                     logger.finest("empty value, returning");
@@ -112,23 +115,26 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
 
                 try {
-                    DataSetURL.URLSplit split= DataSetURL.parse(surl);
+                    DataSetURL.URLSplit split = DataSetURL.parse(surl);
                     if (surl.endsWith("/")) {
                         int carotpos = surl.length();
                         setMessage("ends with /, filesystem completions");
                         showCompletions(surl, carotpos);
-			
+
                     } else if (surl.endsWith("/..")) { // pop up one directory
                         int carotpos = surl.lastIndexOf("/..");
                         carotpos = surl.lastIndexOf("/", carotpos - 1);
                         if (carotpos != -1) {
-			    setValue(surl.substring(0, carotpos + 1));
+                            setValue(surl.substring(0, carotpos + 1));
                             dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
-			    maybePlot();
+                            maybePlot();
                         }
                     } else {
                         try {
                             DataSourceFactory f = DataSetURL.getDataSourceFactory(DataSetURL.getURI(surl), getMonitor());
+                            if ( f==null ) {
+                               throw new RuntimeException("unable to identify data source for URL, try \"about:plugins\""); 
+                            }
                             setMessage("check to see if uri looks acceptable");
                             if (f.reject(surl, getMonitor())) {
                                 if (!surl.contains("?")) {
@@ -141,7 +147,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             } else {
                                 firePlotDataSetURL();
                             }
-                        } catch ( DataSetURL.NonResourceException ex ) { // see if it's a folder.
+                        } catch (DataSetURL.NonResourceException ex) { // see if it's a folder.
                             int carotpos = surl.length();
                             setMessage("no extension or mime type, try filesystem completions");
                             showCompletions(surl, carotpos);
@@ -194,61 +200,12 @@ public class DataSetSelector extends javax.swing.JPanel {
         showCompletions(surl, carotpos);
     }
 
-    private JPopupMenu fillPopupNew(final List<DataSetURL.CompletionResult> completions, final String labelprefix) {
-
-        JPopupMenu popupMenu = new JPopupMenu();
-
-        JMenu subMenu = null;
-
-        int i = 0;
-        while (i < completions.size()) {
-            int stopAt = Math.min(i + 30, completions.size());
-            while (i < stopAt) {
-                final DataSetURL.CompletionResult s1 = completions.get(i);
-                String label = s1.completion;
-                if (label.startsWith(labelprefix)) {
-                    label = label.substring(labelprefix.length());
-                }
-                Action a = new AbstractAction(label) {
-                    public void actionPerformed(ActionEvent ev) {
-                        dataSetSelector.setSelectedItem( s1.completion );
-			if ( s1.maybePlot ) {
-			    maybePlot();
-			}
-                    }
-                };
-                JMenuItem menuItem= new JMenuItem(a);
-                if ( s1.doc!=null ) menuItem.setToolTipText(s1.doc);
-                if (subMenu == null) {
-                    popupMenu.add(menuItem);
-                } else {
-                    subMenu.add(menuItem);
-                }
-                i++;
-            }
-            if (i < completions.size()) {
-                JMenu nextSubMenu = new JMenu("more");
-                if (subMenu == null) {
-                    popupMenu.add(nextSubMenu);
-                } else {
-                    subMenu.add(nextSubMenu);
-                }
-                subMenu = nextSubMenu;
-            }
-        }
-        if (completions.size() == 0) {
-            popupMenu.add("<html><em>(empty)</em></html>");
-        }
-        return popupMenu;
-    }
-
-
     private void showCompletions() {
         final String surl = (String) dataSetSelector.getEditor().getItem();
         int carotpos = ((JTextField) dataSetSelector.getEditor().getEditorComponent()).getCaretPosition();
         setMessage("getting completions");
         showCompletions(surl, carotpos);
-        
+
     }
 
     private void showCompletions(final String surl, final int carotpos) {
@@ -275,58 +232,35 @@ public class DataSetSelector extends javax.swing.JPanel {
         completionsRunnable = new Runnable() {
 
             public void run() {
-
-                DataSetURL.URLSplit split = DataSetURL.parse(surl);
-                String prefix = split.file.substring(split.path.length());
-                String surlDir = split.path;
-
                 ProgressMonitor mon = getMonitor();
-                mon.setLabel("getting remote listing");
 
-                FileSystem fs = null;
-                String[] s;
-                try {
-                    fs = FileSystem.create(DataSetURL.getWebURL(URI.create(split.path)));
-
-                    s = fs.listDirectory("/");
-
-                } catch (MalformedURLException ex) {
-                    setMessage(ex.getMessage());
-                    ex.printStackTrace();
-                    return;
-
-                } catch (IOException ex) {
-                    setMessage(ex.getMessage());
-                    ex.printStackTrace();
-                    return;
-
-                }
-
-                boolean foldCase = Boolean.TRUE.equals(fs.getProperty(fs.PROP_CASE_INSENSITIVE));
-                if (foldCase) {
-                    prefix = prefix.toLowerCase();
-                }
-
-                List<DataSetURL.CompletionResult> completions = new ArrayList<DataSetURL.CompletionResult>(s.length);
-                for (int j = 0; j < s.length; j++) {
-                    String scomp = foldCase ? s[j].toLowerCase() : s[j];
-                    if (scomp.startsWith(prefix)) {
-                        if (s[j].endsWith("contents.html")) {
-                            s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
-                        } // kludge for dods
-                        completions.add( new DataSetURL.CompletionResult( surlDir + s[j], null, true ) );
-                    }
-                }
-
-                // check for single completion that is just a folder name with /.
-                if ( completions.size()==1 ) {
-                    if ( ( completions.get(0) ).equals(surlDir+prefix+"/") ) {
-                        // maybe we should do something special.
-                    }
-                }
+                List<CompletionResult> completions=null;
+                
+                DataSetURL.URLSplit split = DataSetURL.parse(surl);
+                String surlDir = split.path;
                 
                 final String labelPrefix = surlDir;
-                completionsPopupMenu = fillPopupNew(completions, labelPrefix);
+                
+                try {
+                    completions = DataSetURL.getFileSystemCompletions(surl, carotpos, mon);
+                } catch (IOException ex) {
+                    setMessage(ex.toString());
+                    ex.printStackTrace();
+                    
+                }
+
+                CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
+
+                    public void itemSelected(CompletionResult s1) {
+                        dataSetSelector.setSelectedItem(s1.completion);
+                        if (s1.maybePlot) {
+                            maybePlot();
+                        }
+                    }
+                };
+                
+                completionsPopupMenu = CompletionsList.fillPopupNew( completions, labelPrefix, new JPopupMenu(), listener);
+
                 setMessage("done getting completions");
 
                 SwingUtilities.invokeLater(new Runnable() {
@@ -345,7 +279,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                         }
                     }
-                });
+                } );
 
             }
         };
@@ -380,17 +314,34 @@ public class DataSetSelector extends javax.swing.JPanel {
                 int i = surl.indexOf('?');
                 final String labelPrefix = (i == -1) ? "" : surl.substring(0, i + 1);
 
-                completionsPopupMenu = fillPopupNew( completions2, labelPrefix);
+                CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
+
+                    public void itemSelected(CompletionResult s1) {
+                        dataSetSelector.setSelectedItem(s1.completion);
+                        if (s1.maybePlot) {
+                            maybePlot();
+                        }
+                    }
+                };
+
+                completionsPopupMenu = CompletionsList.fillPopupNew(completions2, labelPrefix, new JPopupMenu(), listener);
 
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
-                        double xpos;
-                        int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
-                        BoundedRangeModel model = editor.getHorizontalVisibility();
-                        xpos = xpos2 - model.getValue();
-                        completionsPopupMenu.show(dataSetSelector, (int) xpos, dataSetSelector.getHeight());
-                        completionsRunnable = null;
+                        try {
+                            double xpos;
+                            int n = editor.getCaretPosition();
+                            String t = editor.getText(0, n);
+                            int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(t);
+
+                            BoundedRangeModel model = editor.getHorizontalVisibility();
+                            xpos = xpos2 - model.getValue();
+                            completionsPopupMenu.show(dataSetSelector, (int) xpos, dataSetSelector.getHeight());
+                            completionsRunnable = null;
+                        } catch (BadLocationException ex) {
+                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                        }
 
                     }
                 });
@@ -578,7 +529,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         } else {
             try {
-                URL url = Util.newURL(new URL("file://"), context);
+                URL url = DataSourceUtil.newURL(new URL("file://"), context);
                 if (url.getProtocol().equals("file")) {
                     JFileChooser chooser = new JFileChooser(url.getPath());
                     int result = chooser.showOpenDialog(this);
