@@ -60,6 +60,10 @@ public class RequestHandler {
     /**
      * process the python code in data.  
      * return null or in the future the data to send back.
+     * @param in
+     * @param model
+     * @param out
+     * @return 
      */
     public String handleRequest( InputStream in, ApplicationModel model, OutputStream out ) {
         try {
@@ -81,8 +85,8 @@ public class RequestHandler {
                 s = reader.readLine();
             }
             
-
             return null;
+            
         } catch (IOException ex) {
             Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
             return null;
