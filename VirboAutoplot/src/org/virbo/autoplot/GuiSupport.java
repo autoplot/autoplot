@@ -20,16 +20,22 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ComponentInputMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.datasource.DataSourceRegistry;
@@ -216,4 +222,36 @@ public class GuiSupport {
 
         return result;
     }
+    
+    protected void addKeyBindings(JPanel thisPanel) {
+        thisPanel.getActionMap().put("UNDO", parent.undoRedoSupport.getUndoAction() );
+        thisPanel.getActionMap().put("REDO", parent.undoRedoSupport.getRedoAction() );
+        thisPanel.getActionMap().put("RESET_ZOOM", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                parent.applicationModel.resetZoom();
+            }
+        } );
+        thisPanel.getActionMap().put("INCREASE_FONT_SIZE", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                parent.applicationModel.increaseFontSize();
+            }                
+        } );
+        thisPanel.getActionMap().put("DECREASE_FONT_SIZE", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                parent.applicationModel.decreaseFontSize();
+            }                
+        } );
+        
+        InputMap map = new ComponentInputMap(thisPanel);
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), "UNDO");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), "REDO");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), "RESET_ZOOM");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK), "DECREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");  // american keyboard
+        thisPanel.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, map);
+        
+    }
+    
 }
