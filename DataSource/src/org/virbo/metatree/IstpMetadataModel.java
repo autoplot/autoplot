@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.Util;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  *
@@ -48,7 +48,7 @@ public class IstpMetadataModel extends MetadataModel {
 	    return ((Short) o).doubleValue();
 	} else if (o instanceof String) {
 	    try {
-		return units.parse(Util.unquote((String) o)).doubleValue(units);
+		return units.parse(DataSourceUtil.unquote((String) o)).doubleValue(units);
 	    } catch (ParseException ex) {
 		throw new IllegalArgumentException("unable to parse " + o);
 	    }
@@ -135,14 +135,14 @@ public class IstpMetadataModel extends MetadataModel {
 	    String sunits = (String) attrs.get("UNITS");
 	    
 	    try {
-		units = MetadataUtil.lookup(Util.unquote(sunits));
+		units = MetadataUtil.lookupUnits(DataSourceUtil.unquote(sunits));
 	    } catch (IllegalArgumentException e) {
 		units = Units.dimensionless;
 	    }
 
             boolean isEpoch= ( units==Units.milliseconds )
                     || "Epoch".equals(attrs.get( QDataSet.NAME )) 
-                    || "Epoch".equalsIgnoreCase(Util.unquote((String) attrs.get("LABLAXIS")));
+                    || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
 	    if ( isEpoch ) {
 		units = Units.cdfEpoch;
                 properties.put(QDataSet.LABEL, "" );
