@@ -10,6 +10,8 @@ package org.das2.jythoncompletion;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Action;
 import org.das2.jythoncompletion.support.CompletionDocumentation;
 
@@ -92,7 +94,12 @@ public class DefaultDocumentationItem implements CompletionDocumentation {
     }
 
     public CompletionDocumentation resolveLink(String string) {
-        return new DefaultDocumentationItem(string);
+        try {
+            URL url = new URL(new URL(link), string);
+            return new DefaultDocumentationItem(url.toString());
+        } catch (MalformedURLException ex) {
+            return null;
+        }
     }
 
     public Action getGotoSourceAction() {

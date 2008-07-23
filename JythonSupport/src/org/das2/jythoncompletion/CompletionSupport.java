@@ -100,7 +100,7 @@ public class CompletionSupport {
                 if ( pos < t.endColumn+1 ) {
                     myTokenIndex= thisTokenIndex;
                     if ( pos>(t.beginColumn-1) ) {
-                        completable= t.image.substring(0,pos-(t.beginColumn-1));
+                        completable= t.image.substring(0,pos-(t.beginColumn));
                     } else {
                         completable= "";
                     }

@@ -61,6 +61,7 @@ import javax.swing.text.Document;
 import javax.swing.text.EditorKit;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Keymap;
+import javax.swing.text.Utilities;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import org.das2.jythoncompletion.support.CompletionDocumentation;
@@ -135,8 +136,10 @@ public class DocumentationScrollPane extends JScrollPane {
     }
 
     private ImageIcon resolveIcon(String res) {
+        return new ImageIcon( DocumentationScrollPane.class.getResource( "/" + res));
+                
         // return new ImageIcon(org.openide.util.Utilities.loadImage (res));
-        return null;
+        //return null;
     }
 
     private void installTitleComponent() {
@@ -343,9 +346,9 @@ public class DocumentationScrollPane extends JScrollPane {
     }
 
     private void openInExternalBrowser() {
-        // URL url = currentDocumentation.getURL();
-        //if (url != null)
-        //  HtmlBrowser.URLDisplayer.getDefault().showURL(url);
+        URL url = currentDocumentation.getURL();
+        if (url != null)
+          org.das2.jythoncompletion.nbadapt.Utilities.openBrowser(url.toString());
     }
 
     private void goToSource() {
