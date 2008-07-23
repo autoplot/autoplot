@@ -50,7 +50,7 @@ public class DodsDataSourceFactory implements DataSourceFactory {
             
             String[] vars= parser.getVariableNames();
             for ( int j=0; j<vars.length;j++ ) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, vars[j], this, "arg_0" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, vars[j], this, "arg_0" ,null ,null )    );
             }
             
         }
