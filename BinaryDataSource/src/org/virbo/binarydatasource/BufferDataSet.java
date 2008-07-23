@@ -4,7 +4,6 @@
  */
 package org.virbo.binarydatasource;
 
-import java.awt.geom.Point2D;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
@@ -15,9 +14,6 @@ import org.virbo.dataset.AbstractDataSet;
 
 /**
  * rank 1,2,or 3 dataset backed by double array. 
- * Mutable datasets warning: No dataset should be mutable once it is accessible to the
- * rest of the system.  This would require clients make defensive copies which would 
- * seriously degrade performance.  
  *
  * @author jbf
  */
@@ -43,7 +39,6 @@ public abstract class BufferDataSet extends AbstractDataSet {
     public final static String BYTE= "byte";
     
     public static BufferDataSet makeDataSet( int rank, int len0, int reclen0, int recoffs0, int len1, int reclen1, int recoffs1, ByteBuffer buf, String type ) {
-        Point2D.Double d;
         
         if ( type.equals(DOUBLE) ) {
             DoubleBuffer dbuf = buf.asDoubleBuffer();
