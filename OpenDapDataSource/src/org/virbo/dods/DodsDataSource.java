@@ -21,22 +21,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import javax.swing.tree.TreeModel;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.metatree.NameValueTreeModel;
 import dods.dap.Attribute;
 import edu.uiowa.physics.pw.das.datum.Units;
-import org.das2.util.monitor.NullProgressMonitor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.datasource.Util;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  *
@@ -144,6 +139,9 @@ public class DodsDataSource extends AbstractDataSource {
 
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException {
         
+        mon.setTaskSize(-1);
+        mon.started();
+        
         MyDDSParser parser = new MyDDSParser();
         parser.parse(new URL(adapter.getSource().toString() + ".dds").openStream());
 
@@ -186,6 +184,8 @@ public class DodsDataSource extends AbstractDataSource {
             DataSetUtil.putProperties( interpretedMetadata, ds);
         }
         
+        mon.finished();
+        
         //ds.putProperty( QDataSet.UNITS, null );
         //ds.putProperty( QDataSet.DEPEND_0, null );
         return ds;
@@ -225,7 +225,7 @@ public class DodsDataSource extends AbstractDataSource {
                 try {
                     if ( p.matcher(att.getName()).matches() ) {
                         Object val= att.getValueAt(0);
-                        String name= Util.unquote((String)val);
+                        String name= DataSourceUtil.unquote((String)val);
                         Map<String,Object> newVal= getMetaData( name );
                         newVal.put( "NAME", name ); // tuck it away, we'll need it later.
                         result.put( att.getName(), newVal );
