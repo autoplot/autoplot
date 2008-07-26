@@ -10,7 +10,6 @@
 package org.virbo.netCDF;
 
 import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.TimeUtil;
 import edu.uiowa.physics.pw.das.datum.Units;
 import java.io.IOException;
@@ -19,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.virbo.dataset.AbstractDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
@@ -37,6 +37,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     double[][] data2;
     int[] shape;
     
+    @SuppressWarnings("unchecked")
     public NetCdfVarDataSet( Variable variable ) throws IOException {
         this.v= variable;
                 
@@ -47,6 +48,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         properties.put( QDataSet.NAME, variable.getName() );
         if ( shape.length>1 ) properties.put( QDataSet.QUBE, Boolean.TRUE );
         
+        boolean isCoordinateVariable= false;
+        
         for ( int ir=0; ir<a.getRank(); ir++ ) {
             ucar.nc2.Dimension d= v.getDimension(ir);
             List l= d.getCoordinateVariables();
@@ -56,6 +59,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 if ( dv!=variable ) {
                     QDataSet depend0= new NetCdfVarDataSet( dv );
                     properties.put( "DEPEND_"+ir, depend0 );
+                } else {
+                    isCoordinateVariable= true;
                 }
             }
         }
@@ -112,6 +117,10 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 if ( data[i]==fill ) data[i]= -1e31;
             }
         };
+        
+        if ( isCoordinateVariable ) {
+            properties.put( QDataSet.CADENCE, DataSetUtil.guessCadence(this) );
+        }
         
     }
     

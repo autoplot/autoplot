@@ -16,10 +16,16 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.dsutil.TransposeRankNDataSet;
 import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
@@ -73,9 +79,42 @@ public class NetCDFDataSource extends AbstractDataSource {
     }
     
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
+        mon.started();
         readData(mon);
-        QDataSet result= new NetCdfVarDataSet( variable );
-        return result;
+        NetCdfVarDataSet result= new NetCdfVarDataSet( variable );
+        QDataSet qresult= checkLatLon(result);
+        mon.finished();
+        return qresult;
+        
+    }
+    
+    
+    /**
+     * check for lat and lon tags, transpose if lat come before lon.
+     * @param v
+     */
+    private QDataSet checkLatLon( NetCdfVarDataSet v ) {
+        int lat=-1;
+        int lon=-1;
+        for ( int i=0; i<v.rank();i++ ) {
+            QDataSet dep= (QDataSet) v.property( "DEPEND_"+i );
+            if ( dep!=null ) {
+                String name= (String) dep.property("NAME");
+                if ( "lon".equals(name) ) lon=i;
+                if ( "lat".equals(name) ) lat=i;
+            }
+        }
+        if ( lat>-1 && lon>-1 && lat<lon ) {
+            int[] order= new int[v.rank()];
+            for ( int i=0;i<v.rank(); i++) order[i]= i;
+            int t= order[lat];
+            order[lat]= order[lon];
+            order[lon]= t;
+            QDataSet transpose= new TransposeRankNDataSet( v, order );
+            return transpose;
+        } else {
+            return v;
+        }
     }
     
     private synchronized void readData( ProgressMonitor mon ) throws IOException {
