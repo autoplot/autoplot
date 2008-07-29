@@ -72,7 +72,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
             if ( paramName.equals("skip") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", this, null, "the number of lines to skip before attempting to parse." ) );
+                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>",  "the number of lines to skip before attempting to parse."  )  );
             } else if ( paramName.equals("rank2" ) ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
             } else if ( paramName.equals("column") ) {
@@ -83,7 +83,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 }
                 return result;
             } else if ( paramName.equals("fixedColumns") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", this, null, "Hint at the number of columns to expect, then use fast parser that assumes fixed columns." ) );
+                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "Hint at the number of columns to expect, then use fast parser that assumes fixed columns." )  );
             } else if ( paramName.equals("time") ) {
                 String[] columns= getFieldNames( cc, mon );
                 List<CompletionContext> result= new ArrayList<CompletionContext>();
