@@ -8,7 +8,8 @@
  */
 package org.virbo.ascii;
 
-import edu.uiowa.physics.pw.das.datum.DatumRange;
+import edu.uiowa.physics.pw.das.datum.EnumerationUnits;
+import edu.uiowa.physics.pw.das.datum.TimeUtil;
 import edu.uiowa.physics.pw.das.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
@@ -27,6 +28,7 @@ import org.virbo.dsutil.AsciiParser;
 import edu.uiowa.physics.pw.das.util.TimeParser;
 import java.text.ParseException;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.metatree.MetadataUtil;
 
 /**
  *
@@ -64,7 +66,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         super(url);
 
     }
-
+    
     public QDataSet getDataSet(ProgressMonitor mon) throws IOException {
 
         ds = doReadFile(mon);
@@ -233,48 +235,57 @@ public class AsciiTableDataSource extends AbstractDataSource {
             this.validMax= Double.parseDouble((String) o);
         }
         
+        o = params.get("time");
+        if (o != null) {
+            int i = parser.getFieldIndex((String) o);
+            if (i == -1) {
+                System.err.println("field not found for time parameter: " + o);
+            } else {
+                parser.setFieldParser(i, parser.UNITS_PARSER);
+                parser.setUnits(i, Units.t2000);
+                
+                depend0 = (String) o;
+                timeColumn = i;
+            }
+        }
+        
         o = params.get("timeFormat");
         if (o != null) {
             String timeFormat = (String) o;
             timeParser = TimeParser.create((String) o);
-            String timeColumnName = (String) params.get("time");
+            String timeColumnName = params.get("time");
+            timeColumn = timeColumnName==null ? 0 : parser.getFieldIndex(timeColumnName);
 
-            if (delim != null && timeFormat.split("%").length > 1) {
-                timeColumns = (timeFormat.split("%").length) - 1;  //TODO: consider simply splitting on %, regardless of delim.
+            if (delim != null && timeFormat.split( delim,-2 ).length > 1) { 
+                // we've got a special case here: the time spans multiple columns, so we'll have to combine later.
+                
+                timeColumns = (timeFormat.split("%",-2).length) - 1;  //TODO: consider simply splitting on %, regardless of delim.
+                int ib= timeFormat.indexOf("%b"); // real trouble: months are strings.  We can deal with this.
+                if ( ib!=-1 ) {
+                    int monthColumn= timeFormat.substring(0,ib).split("%",-2).length -1;
+                    AsciiParser.FieldParser monthNameFieldParser= new AsciiParser.FieldParser() {
+                        public double parseField(String field, int columnIndex) throws ParseException {
+                            return TimeUtil.monthNumber(field);
+                        }
+                    };
+                    parser.setFieldParser(monthColumn, monthNameFieldParser );
+                }
 
             } else {
-                int i = parser.getFieldIndex(timeColumnName);
+                
                 final Units u = Units.t2000;
-                parser.setUnits(i, u);
+                parser.setUnits(timeColumn, u);
                 AsciiParser.FieldParser timeFieldParser = new AsciiParser.FieldParser() {
 
                     public double parseField(String field, int fieldIndex) throws ParseException {
                         return timeParser.parse(field).getTime(u);
                     }
                 };
-                parser.setFieldParser(i, timeFieldParser);
+                parser.setFieldParser(timeColumn, timeFieldParser);
 
             }
         } else {
             timeParser = null;
-        }
-
-        o = params.get("time");
-        if (o != null) {
-            int i = parser.getFieldIndex((String) o);
-            if (i == -1) {
-                System.err.println("field not found for time parameter: " + o);
-                if (timeColumns > 1) {
-                    timeColumns = -1;
-                }
-            } else {
-                if (timeParser == null) {
-                    parser.setFieldParser(i, parser.UNITS_PARSER);
-                    parser.setUnits(i, Units.t2000);
-                }
-                depend0 = (String) o;
-                timeColumn = i;
-            }
         }
 
         o = params.get("depend0");
@@ -343,6 +354,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
             }
         }
+        
+        o= params.get("units");
+        if (o != null) {
+            String sunits= (String) o;
+            Units u= MetadataUtil.lookupUnits(sunits);
+            if ( column!=null ) {
+                int icol= parser.getFieldIndex(column);
+                parser.setUnits(icol, u);
+                parser.setFieldParser(icol, parser.UNITS_PARSER );
+            }
+        }
 
         // --- done configuration, now read ---
         DDataSet ds1 = (DDataSet) parser.readFile(file.toString(), mon); //DANGER
@@ -359,4 +381,5 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         return props;
     }
+
 }
