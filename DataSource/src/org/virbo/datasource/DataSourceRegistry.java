@@ -9,7 +9,6 @@
 package org.virbo.datasource;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +50,7 @@ public class DataSourceRegistry {
     }
 
     public boolean hasSourceByExt(String ext) {
-        return dataSourcesByExt.get(ext)!=null;
+        return dataSourcesByExt.get(getExtension(ext))!=null;
     }
 
     public boolean hasSourceByMime(String mime) {
@@ -62,7 +61,7 @@ public class DataSourceRegistry {
      * register the data source factory by extension
      */
     public void register(DataSourceFactory factory, String extension) {
-        if (extension.indexOf('.') != 0) extension= "."+extension;
+        extension= getExtension(extension);
         dataSourcesByExt.put(extension, factory);
     }
 
@@ -70,7 +69,7 @@ public class DataSourceRegistry {
      * register the data source factory by extension and mime
      */
     public void register(DataSourceFactory factory, String extension, String mime) {
-        if (extension.indexOf('.') != 0) extension= "."+extension;
+        extension= getExtension(extension);
         dataSourcesByExt.put(extension, factory);
         dataSourcesByMime.put(mime.toLowerCase(), factory);
     }
@@ -81,7 +80,7 @@ public class DataSourceRegistry {
      * use.
      */
     public void registerExtension(String className, String extension, String description ) {
-        if (extension.indexOf('.') != 0) extension= "."+extension;
+        extension= getExtension(extension);
         dataSourcesByExt.put(extension, className);
         if ( description!=null ) extToDescription.put( extension, description );
     }
@@ -104,13 +103,13 @@ public class DataSourceRegistry {
      * register the data source factory by extension and mime
      */
     public void register(String className, String extension, String mime) {
-        if (extension.indexOf('.') != 0) extension= "."+extension;
+        extension= getExtension(extension);
         dataSourcesByExt.put(extension, className);
         dataSourcesByMime.put(mime.toLowerCase(), className);
     }
 
     public DataSourceFactory getSource(String extension) {
-        if (extension.indexOf('.') != 0) extension= "."+extension;
+        extension= getExtension(extension);
         Object o = dataSourcesByExt.get(extension);
         if (o == null) {
             return null;
@@ -139,8 +138,30 @@ public class DataSourceRegistry {
         return result;
     }
 
+    /**
+     * returns canonical extension for name by:
+     *   add a dot when it's not there.
+     *   clip off the filename part if it's there.
+     *   force to lower case.
+     * @param name, such as "http://autoplot.org/data/autoplot.gif"
+     * @return extension, such as ".gif"
+     */
+    private static String getExtension( String name ) {
+        if (name.indexOf('.') == -1 ) name= "."+name;
+        if ( name.indexOf('.') > 0 ) {
+            int i= name.lastIndexOf('.');
+            name= name.substring(i);
+        }
+        return name;
+    }
+    
+    /**
+     * return the formatter based on the extension.
+     * @param extension
+     * @return
+     */
     public DataSourceFormat getFormatByExt( String extension ) {
-        if (extension.indexOf('.') != 0) extension= "."+extension;
+        extension= getExtension(extension);
         Object o = dataSourceFormatByExt.get(extension);
         if (o == null) {
             return null;
