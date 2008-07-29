@@ -22,7 +22,7 @@ import org.virbo.datasource.datasource.DataSourceFormat;
  */
 public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
-    public void formatData(File url, QDataSet data, ProgressMonitor mon) throws Exception {
+    public void formatData(File url, java.util.Map<String,String> params, QDataSet data, ProgressMonitor mon) throws Exception {
         if ( data.rank() == 2 ) {
             TableDataSet tds = TableDataSetAdapter.create( data );
             FileOutputStream fo = new FileOutputStream( url );
