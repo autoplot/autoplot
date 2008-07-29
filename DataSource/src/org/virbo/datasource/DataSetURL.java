@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
+import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
  *
@@ -263,15 +264,40 @@ public class DataSetURL {
 
     // mark the special case where a resource is actually a folder.
     public static class NonResourceException extends IllegalArgumentException {
-        public NonResourceException( String msg ) {
+
+        public NonResourceException(String msg) {
             super(msg);
         }
     }
-    
+
+    /**
+     * for now, just hide the URI stuff from clients, let's not mess with factories
+     * @param url
+     * @return
+     */
+    public static DataSourceFormat getDataSourceFormat(URI uri) {
+        int i = uri.getScheme().indexOf(".");
+        String ext;
+
+        if (i != -1) {
+            ext = uri.getScheme().substring(0, i);
+
+        } else {
+            URL url = getWebURL(uri);
+
+            String file = url.getPath();
+            i = file.lastIndexOf(".");
+            ext = i == -1 ? "" : file.substring(i);
+        }
+        return DataSourceRegistry.getInstance().getFormatByExt(ext);
+
+    }
+
     /**
      * get the datasource factory for the URL.
      */
-    public static DataSourceFactory getDataSourceFactory(URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
+    public static DataSourceFactory getDataSourceFactory(
+            URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
 
         if (isAggregating(uri.toString())) {
             return new AggregatingDataSourceFactory();
@@ -327,7 +353,7 @@ public class DataSetURL {
             factory = DataSourceRegistry.getInstance().getSourceByMime(mime);
         }
 
-        // maybe it was actually a directory
+// maybe it was actually a directory
         
         
         if (factory == null) {
@@ -337,7 +363,7 @@ public class DataSetURL {
                 factory = DataSourceRegistry.getInstance().getSource(ext);
             }
         }
-        
+
         if (factory == null) {
             throw new IllegalArgumentException("Unsupported extension: " + ext);
         }
@@ -501,7 +527,7 @@ public class DataSetURL {
         result.add("file://P:/cdf/fast/tms/1996/fa_k0_tms_19961021_v01.cdf?L");
         return result;
     }
-    
+
     
     public static class CompletionResult {
         public String completion;
@@ -509,19 +535,19 @@ public class DataSetURL {
         public String completable;
         public String label;
         public boolean maybePlot;
-	
+
         protected CompletionResult( String completion, String doc ) {
             this( completion, doc, null, false );
         }
-	
+
 	protected CompletionResult( String completion, String doc, boolean maybePlot ) {
 	    this( completion, doc, null, false );
-	}
-	
+        }
+
         protected CompletionResult( String completion, String doc,  String completable, boolean maybePlot ) {
             this( completion, null, doc, null, false );
         }
-        
+
         protected CompletionResult( String completion, String label, String doc,  String completable, boolean maybePlot ) {
             this.completion= completion;
 	    this.completable= completable;
@@ -530,7 +556,7 @@ public class DataSetURL {
             this.maybePlot= maybePlot;
         }
     }
-    
+
     public static List<CompletionResult> getFileSystemCompletions( final String surl, final int carotpos, ProgressMonitor mon ) throws IOException {
         DataSetURL.URLSplit split = DataSetURL.parse(surl.substring(0,carotpos));
         String prefix = split.file.substring(split.path.length());
@@ -570,8 +596,8 @@ public class DataSetURL {
 
         return completions;
     }
-    
-    public static List<CompletionResult> getCompletions3( String surl1, int carotPos, ProgressMonitor mon) throws Exception {
+
+    public static List<CompletionResult> getCompletions3(String surl1, int carotPos, ProgressMonitor mon) throws Exception {
         CompletionContext cc = new CompletionContext();
         int qpos = surl1.lastIndexOf('?', carotPos);
 
@@ -579,17 +605,19 @@ public class DataSetURL {
         cc.surlpos = carotPos;
 
 
-        List<CompletionResult> result= new ArrayList<CompletionResult>();
-        
+        List<CompletionResult> result = new ArrayList<CompletionResult>();
+
         if (qpos != -1 && qpos < carotPos) { // in query section
             if (qpos == -1) {
                 qpos = surl1.length();
             }
+
             int eqpos = surl1.lastIndexOf('=', carotPos - 1);
             int amppos = surl1.lastIndexOf('&', carotPos - 1);
             if (amppos == -1) {
                 amppos = qpos;
             }
+
             if (eqpos > amppos) {
                 cc.context = CompletionContext.CONTEXT_PARAMETER_VALUE;
                 cc.completable = surl1.substring(eqpos + 1, carotPos);
@@ -611,6 +639,7 @@ public class DataSetURL {
             } else {
                 cc.completable = surl1.substring(0, qpos);
             }
+
             cc.completablepos = carotPos;
         }
 
@@ -623,11 +652,10 @@ public class DataSetURL {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
 
-            
-            URI uri= DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
-            
-            cc.resource= DataSetURL.getWebURL(uri);
-            cc.params= split.params;
+            URI uri = DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+
+            cc.resource = DataSetURL.getWebURL(uri);
+            cc.params = split.params;
 
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
 
@@ -642,6 +670,7 @@ public class DataSetURL {
                             params.put(cc1.implicitName, arg);
                             hasImplicit = true;
                         }
+
                     }
                 }
             }
@@ -649,6 +678,7 @@ public class DataSetURL {
                 for (int i = 0; i < 3; i++) {
                     params.remove("arg_" + i);
                 }
+
             }
 
             int i = 0;
@@ -657,6 +687,7 @@ public class DataSetURL {
                 if (paramName.indexOf("=") != -1) {
                     paramName = paramName.substring(0, paramName.indexOf("="));
                 }
+
                 boolean dontYetHave = !params.containsKey(paramName);
                 boolean startsWith = cc1.completable.startsWith(cc.completable);
                 if (startsWith) {
@@ -666,6 +697,7 @@ public class DataSetURL {
                     } else {
                         paramsCopy.put(cc1.completable, null);
                     }
+
                     String ss = split.file + "?" + DataSetURL.formatParams(paramsCopy);
                     //String ss= CompletionContext.insert( cc, cc1 );
                     if (dontYetHave == false) {
@@ -674,22 +706,23 @@ public class DataSetURL {
                     result.add( new CompletionResult( ss, cc1.label, cc1.doc, surl1.substring(0,carotPos), cc1.maybePlot ) );
                     i = i + 1;
                 }
+
             }
             return result;
 
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
-            URI uri= DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+            URI uri = DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
             DataSourceFactory factory = getDataSourceFactory(uri, mon);
-            
-            cc.resource= DataSetURL.getWebURL(uri);
-            cc.params= split.params;
-                    
+
+            cc.resource = DataSetURL.getWebURL(uri);
+            cc.params = split.params;
+
             if (factory == null) {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
 
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
-            
+
             int i = 0;
             for (CompletionContext cc1 : completions) {
                 if (cc1.completable.startsWith(cc.completable)) {
@@ -697,6 +730,7 @@ public class DataSetURL {
                     result.add( new CompletionResult( ss, cc1.label, cc1.doc,surl1.substring(0,carotPos),cc1.maybePlot) );
                     i = i + 1;
                 }
+
             }
             return result;
 
@@ -707,16 +741,17 @@ public class DataSetURL {
                 mon.started();
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
 
-                int i = surl.lastIndexOf("/", carotPos-1);
+                int i = surl.lastIndexOf("/", carotPos - 1);
                 String surlDir;  // name of surl, including only folders, ending with /.
-                
-                if (i <= 0 ) {
+
+                if (i <= 0) {
                     surlDir = surl;
-                } else if ( surl.charAt(i - 1) == '/') { // '//'
+                } else if (surl.charAt(i - 1) == '/') { // '//'
                     surlDir = surl.substring(0, i + 1);
                 } else {
                     surlDir = surl.substring(0, i + 1);
                 }
+
                 URI url = getURI(surlDir);
                 String prefix = surl.substring(i + 1, carotPos);
                 FileSystem fs = FileSystem.create(getWebURL(url));
@@ -725,21 +760,22 @@ public class DataSetURL {
                 for (int j = 0; j < s.length; j++) {
                     if (s[j].startsWith(prefix)) {
                         CompletionContext cc1 = new CompletionContext(CompletionContext.CONTEXT_FILE, surlDir + s[j]);
-                        result.add( new CompletionResult( CompletionContext.insert(cc, cc1), cc1.label, cc1.doc, surl1.substring(0,carotPos), true ) );
+                        result.add(new CompletionResult(CompletionContext.insert(cc, cc1), cc1.label, cc1.doc, surl1.substring(0, carotPos), true));
                     }
+
                 }
             } catch (MalformedURLException ex) {
-                result = Collections.singletonList( new CompletionResult( "Malformed URI", "Something in the URL prevents processing", surl1.substring(0,carotPos), false ) );
+                result = Collections.singletonList(new CompletionResult("Malformed URI", "Something in the URL prevents processing", surl1.substring(0, carotPos), false));
             } catch (FileSystem.FileSystemOfflineException ex) {
-                result = Collections.singletonList( new CompletionResult( "FileSystem offline", "FileSystem is offline.", surl1.substring(0,carotPos), false ) );
+                result = Collections.singletonList(new CompletionResult("FileSystem offline", "FileSystem is offline.", surl1.substring(0, carotPos), false));
             } finally {
                 mon.finished();
             }
             return result;
         }
-        
+
     }
-    
+
     private static void discoverFactories(DataSourceRegistry registry) {
 
         // discover Factories on the path
@@ -811,14 +847,13 @@ public class DataSetURL {
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
-                            registry.registerExtension(ss[0], ss[i],null);
+                            registry.registerExtension(ss[0], ss[i], null);
                         }
                     }
                     s = reader.readLine();
                 }
                 reader.close();
             }
-
             urls = DataSetURL.class.getClassLoader().getResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -835,7 +870,6 @@ public class DataSetURL {
                 }
                 reader.close();
             }
-            
             urls = DataSetURL.class.getClassLoader().getResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -852,12 +886,11 @@ public class DataSetURL {
                 }
                 reader.close();
             }
-            
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
+    }
 
     /** call this to trigger initialization */
     public static void init() {
