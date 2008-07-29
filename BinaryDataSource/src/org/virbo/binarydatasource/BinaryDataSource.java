@@ -86,7 +86,7 @@ public class BinaryDataSource extends AbstractDataSource {
 
         int fieldCount = getIntParameter("fieldCount", params.get("depend0") == null ? 1 : 2);
 
-        ByteBuffer buf = (MappedByteBuffer) fc.map(MapMode.READ_ONLY, offset, length);
+        ByteBuffer buf = fc.map(MapMode.READ_ONLY, offset, length);
 
         int dep0 = getIntParameter("depend0", -1);
 
