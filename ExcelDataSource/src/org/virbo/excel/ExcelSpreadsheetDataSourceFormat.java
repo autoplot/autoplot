@@ -169,7 +169,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         }
     }
     
-    public void formatData(File url, QDataSet data, ProgressMonitor mon) throws IOException {
+    public void formatData(File url, java.util.Map<String,String> params, QDataSet data, ProgressMonitor mon) throws IOException {
 	
         FileOutputStream out = new FileOutputStream(url);
         
