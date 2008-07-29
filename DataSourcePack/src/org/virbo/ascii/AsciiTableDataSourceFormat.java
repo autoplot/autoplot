@@ -119,7 +119,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         mon.finished();
     }
 
-    public void formatData(File url, QDataSet data, ProgressMonitor mon) throws IOException {
+    public void formatData(File url, java.util.Map<String,String> params, QDataSet data, ProgressMonitor mon) throws IOException {
         PrintWriter out = new PrintWriter(url);
         if (data.rank() == 2) {
             formatRank2(out, data, mon);
