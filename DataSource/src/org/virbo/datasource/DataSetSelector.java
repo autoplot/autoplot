@@ -393,25 +393,9 @@ public class DataSetSelector extends javax.swing.JPanel {
     private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
 
         public void actionPerformed(ActionEvent e) {
-            StringBuffer buf = new StringBuffer();
-            buf.append("<html>");
-            {
-                buf.append("<h1>Plugins by Extension:</h1>");
-                Map m = DataSourceRegistry.getInstance().dataSourcesByExt;
-                for (Object k : m.keySet()) {
-                    buf.append("" + k + ": " + m.get(k) + "<br>");
-                }
-            }
-            {
-                buf.append("<h1>Plugins by Mime Type:</h1>");
-                Map m = DataSourceRegistry.getInstance().dataSourcesByMime;
-                for (Object k : m.keySet()) {
-                    buf.append("" + k + ": " + m.get(k) + "<br>");
-                }
-            }
-            buf.append("</html>");
+            String about= support.getPluginsText();
 
-            JOptionPane.showMessageDialog(DataSetSelector.this, buf.toString());
+            JOptionPane.showMessageDialog(DataSetSelector.this, about);
         }
     };
 
