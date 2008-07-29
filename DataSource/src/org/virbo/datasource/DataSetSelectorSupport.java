@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -70,7 +71,7 @@ public class DataSetSelectorSupport {
                 JFileChooser chooser = new JFileChooser(currentDirectory);
 
                 FileFilter ff;
-                ff= new FileFilter() {
+                ff = new FileFilter() {
 
                     @Override
                     public boolean accept(File f) {
@@ -88,10 +89,10 @@ public class DataSetSelectorSupport {
                     }
                 };
 
-                
+
                 chooser.addChoosableFileFilter(ff);
-                FileFilter select= ff;
-                
+                FileFilter select = ff;
+
                 for (Object ext1 : exts.keySet()) {
                     final String extf = (String) ext1;
                     ff = new FileFilter() {
@@ -113,9 +114,9 @@ public class DataSetSelectorSupport {
                     };
                     chooser.addChoosableFileFilter(ff);
                 }
-                        
+
                 chooser.setFileFilter(select);
-                
+
                 int result = chooser.showOpenDialog(ui);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     try {
@@ -151,6 +152,27 @@ public class DataSetSelectorSupport {
                 recentMenu.add(a);
             }
         }
+    }
+
+    public static String getPluginsText() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("<html>");
+        {
+            buf.append("<h1>Plugins by Extension:</h1>");
+            Map m = DataSourceRegistry.getInstance().dataSourcesByExt;
+            for (Object k : m.keySet()) {
+                buf.append("" + k + ": " + m.get(k) + "<br>");
+            }
+        }
+        {
+            buf.append("<h1>Plugins by Mime Type:</h1>");
+            Map m = DataSourceRegistry.getInstance().dataSourcesByMime;
+            for (Object k : m.keySet()) {
+                buf.append("" + k + ": " + m.get(k) + "<br>");
+            }
+        }
+        buf.append("</html>");
+        return buf.toString();
     }
 
     JMenu recentMenu() {
