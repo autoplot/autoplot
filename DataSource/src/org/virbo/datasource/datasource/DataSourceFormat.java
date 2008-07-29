@@ -14,5 +14,5 @@ import org.virbo.dataset.QDataSet;
  * @author jbf
  */
 public interface DataSourceFormat {
-    void formatData( File url, QDataSet data, ProgressMonitor mon ) throws Exception;
+    public void formatData( File url,java.util.Map<String,String> params, QDataSet data, ProgressMonitor mon  ) throws Exception;
 }
