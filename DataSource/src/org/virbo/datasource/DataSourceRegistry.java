@@ -152,6 +152,7 @@ public class DataSourceRegistry {
             int i= name.lastIndexOf('.');
             name= name.substring(i);
         }
+        name= name.toLowerCase();
         return name;
     }
     
