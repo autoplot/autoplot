@@ -90,7 +90,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         }
 
         {
-            String l = (String) dep0.property(QDataSet.LABEL);
+            String l = (String) data.property(QDataSet.LABEL);
             out.println(" " + (l == null ? "data" : l));
         }
 
