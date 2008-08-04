@@ -117,7 +117,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         }
 
         {
-            String l = (String) dep0.property(QDataSet.LABEL);
+            String l = (String) data.property(QDataSet.LABEL);
             cell= row.createCell(icell++);
             cell.setCellValue( new HSSFRichTextString( (l == null ? "data" : l) ) );
         }
