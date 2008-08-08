@@ -9,15 +9,27 @@ import edu.uiowa.physics.pw.das.dataset.TableDataSet;
 import edu.uiowa.physics.pw.das.dataset.VectorDataSet;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import edu.uiowa.physics.pw.das.graph.DasCanvas;
+import edu.uiowa.physics.pw.das.util.DasPNGConstants;
+import edu.uiowa.physics.pw.das.util.DasPNGEncoder;
 import edu.uiowa.physics.pw.das.util.TimeParser;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.beans.binding.BindingContext;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
@@ -31,6 +43,8 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
  *
@@ -107,6 +121,13 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
     }
 
+    public static void plot(QDataSet ds) throws InterruptedException {
+        maybeInitModel();
+        model.setDataSet(ds);
+        model.waitUntilIdle(false);
+
+    }
+
     /**
      * write out the current canvas to a png file.
      * @param filename
@@ -116,6 +137,31 @@ public class ScriptContext extends PyJavaInstance {
     public static void writeToPng(String filename) throws InterruptedException, IOException {
         model.waitUntilIdle(false);
         model.getCanvas().writeToPng(filename);
+    }
+
+    public static void peekAt(Object o) throws IOException {
+        out.write(o.toString().getBytes());
+        return;
+    }
+
+    /**
+     * write out the current canvas to stdout.  This is introduced to support servers.
+     * @param OutputStream out 
+     * @throws java.lang.InterruptedException
+     * @throws java.io.IOException
+     */
+    public static void writeToPng(OutputStream out) throws InterruptedException, IOException {
+        model.waitUntilIdle(false);
+
+        DasCanvas c = model.getCanvas();
+
+        Image image = c.getImage(c.getWidth(), c.getHeight());
+
+        DasPNGEncoder encoder = new DasPNGEncoder();
+        encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+
+        encoder.write((BufferedImage) image, out);
+
     }
 
     /**
@@ -217,13 +263,46 @@ public class ScriptContext extends PyJavaInstance {
         if (mon == null) {
             mon = new NullProgressMonitor();
         }
-        return result.getDataSet(mon);
+        QDataSet ds= result.getDataSet(mon);
+        metadata= result.getMetaData( new NullProgressMonitor() );
+        metadataSurl= surl;
+        return ds;
+    }
+    
+    // cache the last metadata url.
+    private static Map<String, Object> metadata;
+    private static String metadataSurl;
+
+    /**
+     * load the metadata for the url.  This can be called independently from getDataSet,
+     * and data sources should not assume that getDataSet is called before getMetaData.
+     * Some may, in which case a bug report should be submitted.
+     * @param surl
+     * @param mon
+     * @return metadata tree created by the data source.
+     * @throws java.lang.Exception
+     */
+    public static Map<String, Object> getMetaData(String surl, ProgressMonitor mon) throws Exception {
+        if (surl.equals(metadataSurl)) {
+            return metadata;
+        } else {
+            URI url = DataSetURL.getURI(surl);
+            DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
+            DataSource result = factory.getDataSource(DataSetURL.getWebURL(url));
+            if (mon == null) {
+                mon = new NullProgressMonitor();
+            }
+            //result.getDataSet(mon);  some data sources may assume that getDataSet comes before getMetaData
+            return result.getMetaData(mon);
+        }
     }
 
     /**
      * load the data specified by URL into Autoplot's internal data model.  This will
      * block until the load is complete.
-     * @param ds
+     * @param surl
+     * @return data set for the URL.
+     * @throws Exception depending on data source.
      */
     public static QDataSet getDataSet(String surl) throws Exception {
         return getDataSet(surl, null);
@@ -268,7 +347,10 @@ public class ScriptContext extends PyJavaInstance {
      * close the output stream.
      * @param ds
      */
-    public static void dumpToDas2Stream( QDataSet ds, String file, boolean ascii ) throws IOException {
+    public static void dumpToDas2Stream(QDataSet ds, String file, boolean ascii) throws IOException {
+        if (file.startsWith("file:/")) {
+            file = new URL(file).getPath();
+        }
         OutputStream bufout = new FileOutputStream(file);
         DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
         if (ascii) {
@@ -287,6 +369,36 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
+     * Export the data into a format implied by the filename extension.  
+     * 
+     * @param ds
+     * @param file
+     * @throws java.lang.Exception
+     */
+    public static void formatDataSet(QDataSet ds, String file) throws Exception {
+        if (!file.contains(":/")) {
+            file = new File(file).toString();
+        }
+        URI uri = DataSetURL.getURI(file);
+        URL url = DataSetURL.getWebURL(uri);
+
+        DataSourceFormat format = DataSetURL.getDataSourceFormat(uri);
+        if (!url.getProtocol().equals("file")) {
+            throw new IllegalArgumentException("data may only be formatted to local files: " + url);
+        }
+        if (format == null) {
+            throw new IllegalArgumentException("no format for extension: " + file);
+        }
+
+        File f = DataSetURL.getFile(url, new NullProgressMonitor());
+        String sparams = url.getQuery();
+        HashMap<String, String> params = sparams == null ? new HashMap<String, String>() : DataSetURL.parseParams(sparams);
+
+        format.formatData(f, params, ds, new NullProgressMonitor());
+
+    }
+
+    /**
      * returns a list of the files in the local or remote filesystem pointed to by surl.
      * print list( 'http://www.papco.org/data/de/eics/*' )
      *  --> '81355_eics_de_96s_v01.cdf', '81356_eics_de_96s_v01.cdf', '81357_eics_de_96s_v01.cdf', ...
@@ -299,10 +411,13 @@ public class ScriptContext extends PyJavaInstance {
         String[] ss = FileSystem.splitUrl(surl);
         FileSystem fs = FileSystem.create(new URL(ss[2]));
         String glob = ss[3].substring(ss[2].length());
+        String[] result;
         if (glob.length() == 0) {
-            return fs.listDirectory("/");
+            result = fs.listDirectory("/");
         } else {
-            return fs.listDirectory("/", Glob.getRegex(glob));
+            result = fs.listDirectory("/", Glob.getRegex(glob));
         }
+        Arrays.sort(result);
+        return result;
     }
 }
