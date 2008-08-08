@@ -155,8 +155,8 @@ public class GuiSupport {
                         
                         DataSourceFormat format= DataSourceRegistry.getInstance().getFormatByExt(ext);
                         
-                        format.formatData( chooser.getSelectedFile(), 
-                                parent.applicationModel.fillDataset, new DasProgressPanel("formatting data") );
+                        format.formatData( chooser.getSelectedFile(),new java.util.HashMap<String, String>(), 
+                                parent.applicationModel.fillDataset, new DasProgressPanel("formatting data")  );
                         parent.setStatus("created file "+chooser.getSelectedFile());
 
                     } catch (IOException ex) {
