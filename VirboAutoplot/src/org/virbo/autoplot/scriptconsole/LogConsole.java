@@ -6,8 +6,14 @@
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.EventQueue;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -186,6 +192,7 @@ public class LogConsole extends javax.swing.JPanel {
         logLevelCheckBox = new javax.swing.JCheckBox();
         loggerIDCheckBox = new javax.swing.JCheckBox();
         saveButton = new javax.swing.JButton();
+        copyButton = new javax.swing.JButton();
 
         jScrollPane1.setAutoscrolls(true);
 
@@ -236,11 +243,19 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
 
-        saveButton.setText("save");
+        saveButton.setText("save...");
         saveButton.setToolTipText("Saves the records to file for use by software support team.");
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveButtonActionPerformed(evt);
+            }
+        });
+
+        copyButton.setText("copy");
+        copyButton.setToolTipText("copy xml of log records into system clipboard, for pasting into email.\n");
+        copyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyButtonActionPerformed(evt);
             }
         });
 
@@ -249,12 +264,14 @@ public class LogConsole extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(clearButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(saveButton)
-                .add(224, 224, 224)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
+                        .add(clearButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(saveButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(copyButton)
+                        .add(152, 152, 152)
                         .add(loggerIDCheckBox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(timeStampsCheckBox)
@@ -265,12 +282,12 @@ public class LogConsole extends javax.swing.JPanel {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 147, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
@@ -285,7 +302,8 @@ public class LogConsole extends javax.swing.JPanel {
                         .add(1, 1, 1))
                     .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                         .add(clearButton)
-                        .add(saveButton))))
+                        .add(saveButton)
+                        .add(copyButton))))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -345,8 +363,25 @@ private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     }
 }//GEN-LAST:event_saveButtonActionPerformed
 
+private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
+    try {
+    ByteArrayOutputStream out= new ByteArrayOutputStream(1000);
+    LogConsoleUtil.serializeLogRecords( records, out );
+    out.close();
+        StringSelection stringSelection = new StringSelection( out.toString() );
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, new ClipboardOwner() {
+            public void lostOwnership(Clipboard clipboard, Transferable contents) {
+            }
+        });
+    } catch ( IOException ex ) {
+        throw new RuntimeException(ex);
+    }
+}//GEN-LAST:event_copyButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton clearButton;
+    private javax.swing.JButton copyButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JCheckBox logLevelCheckBox;
