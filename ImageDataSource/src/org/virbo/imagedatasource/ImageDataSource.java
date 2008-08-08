@@ -4,16 +4,22 @@
  */
 package org.virbo.imagedatasource;
 
+import com.drew.imaging.jpeg.JpegMetadataReader;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
+import com.drew.metadata.exif.ExifDirectory;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.stream.ImageInputStream;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -37,10 +43,10 @@ class ImageDataSource extends AbstractDataSource {
         super(url);
     }
 
-    private final double toHSV( int rgb, int channel ) {
-        double r = ( rgb & 0xFF0000 ) >> 16;
-        double g = ( rgb & 0x00FF00 ) >> 8;
-        double b = ( rgb & 0x0000FF ) >> 0;
+    private final double toHSV(int rgb, int channel) {
+        double r = (rgb & 0xFF0000) >> 16;
+        double g = (rgb & 0x00FF00) >> 8;
+        double b = (rgb & 0x0000FF) >> 0;
 
         r = r / 255;
         g = g / 255;
@@ -55,7 +61,7 @@ class ImageDataSource extends AbstractDataSource {
         if (channel == CHANNEL_VALUE) {
             return value * 100;
         }
-        double hue=0, sat;
+        double hue = 0, sat;
 
         if (delta == 0) {
             hue = 0;
@@ -72,7 +78,7 @@ class ImageDataSource extends AbstractDataSource {
                 hue = (1 / 3) + del_R - del_B;
             } else if (b == maxVal) {
                 hue = (2 / 3) + del_G - del_R;
-            } 
+            }
 
             if (hue < 0) {
                 hue += 1;
@@ -83,7 +89,7 @@ class ImageDataSource extends AbstractDataSource {
             hue *= 360;
             sat *= 100;
         }
-        
+
         if (channel == CHANNEL_HUE) {
             return hue;
         } else {
@@ -96,8 +102,9 @@ class ImageDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         mon.started();
-        
-        BufferedImage image = ImageIO.read(DataSetURL.getFile(url, mon));
+
+        //BufferedImage image = ImageIO.read(DataSetURL.getFile(url, mon));
+        BufferedImage image = ImageIO.read(DataSetURL.getInputStream(url, mon));
 
         String channel = params.get("channel");
 
@@ -120,71 +127,81 @@ class ImageDataSource extends AbstractDataSource {
                     return 0.3 * r + 0.59 * g + 0.11 * b;
                 }
             };
-        } else if ( channel.equals("hue") ) {
+        } else if (channel.equals("hue")) {
             op = new ImageDataSet.ColorOp() {
+
                 public double value(int rgb) {
-                    return toHSV( rgb, CHANNEL_HUE );
+                    return toHSV(rgb, CHANNEL_HUE);
                 }
             };
-        } else if ( channel.equals("saturation") ) {
+        } else if (channel.equals("saturation")) {
             op = new ImageDataSet.ColorOp() {
+
                 public double value(int rgb) {
-                    return toHSV( rgb, CHANNEL_SATURATION );
+                    return toHSV(rgb, CHANNEL_SATURATION);
                 }
             };
-        } else if ( channel.equals("value" ) ) {
+        } else if (channel.equals("value")) {
             op = new ImageDataSet.ColorOp() {
+
                 public double value(int rgb) {
-                    return toHSV( rgb, CHANNEL_VALUE );
+                    return toHSV(rgb, CHANNEL_VALUE);
                 }
-            };            
+            };
         }
-        
+
         ImageDataSet result = new ImageDataSet(image, c, op);
-        
+
         mon.finished();
-        
+
         return result;
 
     }
 
-    @Override
-    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
-        File f=  DataSetURL.getFile(url, new NullProgressMonitor() );
-        Map<String,Object> map= new HashMap<String,Object>();
-        String ext= DataSetURL.parse( resourceURL.toString() ).ext.substring(1);
-        
-        ImageReader jpegImageReader = ImageIO.getImageReadersByFormatName(ext).next();
-        ImageInputStream imageInputStream = ImageIO.createImageInputStream( f );
-        boolean seekForwardOnly = true;
-        boolean ignoreMetadata = false;
+    public Map<String, Object> getJpegExifMetaData( ProgressMonitor mon) throws Exception {
+        InputStream in= DataSetURL.getInputStream( url, mon );
+        Metadata metadata = JpegMetadataReader.readMetadata(in);
 
-        jpegImageReader.setInput(imageInputStream, seekForwardOnly, ignoreMetadata);
-        IIOMetadata imageMetadata = jpegImageReader.getImageMetadata(0);
-        
-        Node metaDataRoot = imageMetadata.getAsTree(imageMetadata.getNativeMetadataFormatName());
- 
-        map= MetadataUtil.toMetaTree(metaDataRoot);
-        
-        if ( ext.equalsIgnoreCase("jpg") ) {
-            IIOMetadataNode unknownMarker= (IIOMetadataNode) MetadataUtil.getNode( metaDataRoot, new String[] { "markerSequence", "unknown" } );
+        Map<String, Object> map = new HashMap<String, Object>();
 
-            byte[] exifData = (byte[]) unknownMarker.getUserObject();
- 
-            StringBuffer buf= new StringBuffer();
-            
-      // Exif Spec: http://www.exif.org/Exif2-2.PDF
-            for(byte b : exifData)  {
-                int byteAsInt = b < 0 ? b + 256 : b;
-                char c= (char)byteAsInt;
-                if ( c<128 && ( Character.isLetterOrDigit(c) || Character.isWhitespace(c) || c==':' ) ) buf.append((char)c);
-                //System.out.println(String.format("  %3d  0x%02X  %5s", byteAsInt, byteAsInt, Character.toString((char) byteAsInt)));
-            }
-            map.put( "EXIF", buf.toString() );
+        Directory exifDirectory = metadata.getDirectory(ExifDirectory.class);
+
+        for (Iterator i = exifDirectory.getTagIterator(); i.hasNext();) {
+            Tag t = (Tag) i.next();
+
+            map.put(t.getTagName(), t.getDescription());
         }
-        
+
         return map;
     }
-    
-    
+
+    @Override
+    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+        
+        String ext= getExt(resourceURL);
+        
+        if ( ext.equals(".jpg") || ext.equals(".JPG") ) {
+            return getJpegExifMetaData(mon);
+            
+        } else {
+
+            File f = DataSetURL.getFile(url, new NullProgressMonitor());
+
+            Map<String, Object> map = new HashMap<String, Object>();
+
+            ImageReader jpegImageReader = ImageIO.getImageReadersByFormatName(ext.substring(1)).next();
+            ImageInputStream imageInputStream = ImageIO.createImageInputStream(f);
+            boolean seekForwardOnly = true;
+            boolean ignoreMetadata = false;
+
+            jpegImageReader.setInput(imageInputStream, seekForwardOnly, ignoreMetadata);
+            IIOMetadata imageMetadata = jpegImageReader.getImageMetadata(0);
+
+            Node metaDataRoot = imageMetadata.getAsTree(imageMetadata.getNativeMetadataFormatName());
+
+            map = MetadataUtil.toMetaTree(metaDataRoot);
+
+            return map;
+        }
+    }
 }
