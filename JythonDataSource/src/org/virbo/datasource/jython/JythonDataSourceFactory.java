@@ -29,7 +29,6 @@ import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
-import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.JythonOps;
 
 /**
@@ -54,7 +53,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         return Collections.emptyList();
     }
 
-    private Map<String, Object> getNames(URL url, ProgressMonitor mon) throws IOException {
+    private Map<String, Object> getNames(URL url, ProgressMonitor mon) throws Exception {
         PythonInterpreter interp = new PythonInterpreter();
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
@@ -88,28 +87,21 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                 }
             }
             return result;
-        } catch (Exception e) {
-            HashMap result = new HashMap();
-            e.printStackTrace();
-            result.put("EXCEPTION", e.getMessage());
-            return result;
+        } finally {
+            mon.finished();
         }
 
 
     }
 
     @Override
-    public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) {
-        try {
-            Map<String, Object> po = getNames(DataSetURL.getURL(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)), mon);
-            List<CompletionContext> result = new ArrayList<CompletionContext>();
-            for (String n : po.keySet()) {
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0",null,null));
-            }
-            return result;
-        } catch (IOException e) {
-            return Collections.singletonList(new CompletionContext(cc.context, e.getMessage()));
+    public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
+        Map<String, Object> po = getNames(DataSetURL.getURL(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)), mon);
+        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        for (String n : po.keySet()) {
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
         }
+        return result;
     }
 
     @Override
@@ -120,17 +112,17 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             try {
                 File src = DataSetURL.getFile(DataSetURL.getURL(surl), new NullProgressMonitor());
                 BufferedReader reader = new BufferedReader(new FileReader(src));
-                String s= reader.readLine();
-                boolean haveResult= false;
-                while ( s!=null ) {
-                    if ( s.trim().startsWith("result") ) {
-                        haveResult= true;
+                String s = reader.readLine();
+                boolean haveResult = false;
+                while (s != null) {
+                    if (s.trim().startsWith("result")) {
+                        haveResult = true;
                         break;
                     }
-                    s= reader.readLine();
+                    s = reader.readLine();
                 }
                 reader.close();
-                return ! haveResult;
+                return !haveResult;
             } catch (IOException ex) {
                 Logger.getLogger(JythonDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
                 return true;
