@@ -246,7 +246,7 @@ public class PyQDataSet extends PyJavaInstance {
                         fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
                     }
 
-                    iter.setIndexIteratorFactory(0, fit);
+                    iter.setIndexIteratorFactory(i, fit);
                 }
 
                 int qube[] = new int[iter.rank()];
