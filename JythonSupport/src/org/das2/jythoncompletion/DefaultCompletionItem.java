@@ -71,19 +71,19 @@ public class DefaultCompletionItem implements CompletionItem  {
     }
     
     protected void substituteText(JTextComponent c, int offset, int len, String toAdd) {
-        Document doc = (Document)c.getDocument();
-        String text = getInsertPrefix().toString().substring(offset);
-        if (text != null) {
+        Document doc = c.getDocument();
+        String textl = getInsertPrefix().toString().substring(offset);
+        if (textl != null) {
 
             try {
                 String textToReplace = doc.getText(offset, len);
-                if (text.equals(textToReplace)) {
+                if (textl.equals(textToReplace)) {
                     return;
                 }                
                 Position position = doc.createPosition(offset);
                 
                 doc.remove(offset, len);
-                doc.insertString(position.getOffset(), text, null);
+                doc.insertString(position.getOffset(), textl, null);
                 
             } catch (BadLocationException e) {
                 // Can't update
