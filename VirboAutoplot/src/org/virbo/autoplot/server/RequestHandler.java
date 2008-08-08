@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoPlotUI;
+import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.ScriptContext;
 
 /**
@@ -27,10 +28,7 @@ public class RequestHandler {
     public static void doIt(ApplicationModel model) {
         try {
 
-            PythonInterpreter interp = new PythonInterpreter();
-
-            interp.execfile(AutoPlotUI.class.getResource("imports.py").openStream(), "imports.py");
-
+            PythonInterpreter interp = JythonUtil.createInterpreter(true,false);
 
             InputStream in;
             String inIdentifier;
@@ -67,7 +65,7 @@ public class RequestHandler {
      */
     public String handleRequest( InputStream in, ApplicationModel model, OutputStream out ) {
         try {
-            PythonInterpreter interp = new PythonInterpreter();
+            PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
 
             interp.execfile(AutoPlotUI.class.getResource("imports.py").openStream(), "imports.py");
             interp.setOut( out );
@@ -75,16 +73,21 @@ public class RequestHandler {
             ScriptContext._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
             
             BufferedReader reader= new BufferedReader( new InputStreamReader(in) );
+            
+            boolean echo= true;
+            if ( echo ) out.write("autoplot> ".getBytes());
             String s= reader.readLine();
             while ( s!=null ) {
                 try {
+                    if ( s.trim().endsWith(";") ) echo= false; else echo=true;
                     interp.exec(s);
                 } catch ( RuntimeException ex ) {
                     ex.printStackTrace( new PrintStream( out ) );
                 }
+                if ( echo ) out.write("autoplot> ".getBytes());
                 s = reader.readLine();
             }
-            
+                        
             return null;
             
         } catch (IOException ex) {
