@@ -1,5 +1,7 @@
 package org.das2.jythoncompletion;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.python.core.PyClassPeeker;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -13,12 +15,13 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
 
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * This is the engine that does the Jython completions.  We figure out the
+ * context and the completable, then query a interpreter.
  */
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 import org.python.core.PyClass;
+import org.python.core.PyJavaClass;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyJavaInstancePeeker;
 import org.python.core.PyList;
@@ -38,12 +41,15 @@ import org.virbo.jythonsupport.JythonOps;
  */
 public class JythonCompletionTask implements CompletionTask {
 
+    public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
+    private static final String DOC_HOME = "http://www.autoplot.org/javadoc/javadoc/";
+    String context;
+    private JythonInterpreterProvider jythonInterpreterProvider;
 
-    private static final String DOC_HOME= "http://www.autoplot.org/javadoc/javadoc/";
-            
     public JythonCompletionTask(JTextComponent t) {
         this.editor = t;
+        jythonInterpreterProvider = (JythonInterpreterProvider) t.getClientProperty(CLIENT_PROPERTY_INTERPRETER_PROVIDER);
     }
 
     public void query(CompletionResultSet arg0) {
@@ -69,15 +75,17 @@ public class JythonCompletionTask implements CompletionTask {
         }
     }
 
-    private Method getJavaMethod( PyMethod m, int i) {
-        PyMethodPeeker mpeek= new PyMethodPeeker(m);
+    private Method getJavaMethod(PyMethod m, int i) {
+        PyMethodPeeker mpeek = new PyMethodPeeker(m);
         //PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
         return new PyReflectedFunctionPeeker(mpeek.getReflectedFunction()).getMethod(i);
-        
+
     }
 
     private void queryMethods(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
-        PythonInterpreter interp = getInterpreter();
+        PythonInterpreter interp;
+
+        interp = getInterpreter();
 
         String eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
 
@@ -90,48 +98,61 @@ public class JythonCompletionTask implements CompletionTask {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
             if (ss.startsWith(cc.completable)) {
-                
+                PyObject po = context.__getattr__(s);
                 String label = ss;
-                String signature= null;
-                if ( context instanceof PyClass ) {
-                    PyClassPeeker peek= new PyClassPeeker( (PyClass)context );
-                    Class dc= peek.getJavaClass();
-                    Field f=null;
+                String signature = null;
+                if (context instanceof PyJavaClass) {
+                    if (po instanceof PyReflectedFunction) {
+                        Method m = new PyReflectedFunctionPeeker((PyReflectedFunction) po).getMethod(0);
+                        signature = methodSignature(m);
+                    }
+                } else if (context instanceof PyClass) {
+                    PyClassPeeker peek = new PyClassPeeker((PyClass) context);
+                    Class dc = peek.getJavaClass();
+                    Field f = null;
                     try {
-                        f= dc.getField(label);
+                        f = dc.getField(label);
                     } catch (NoSuchFieldException ex) {
                     } catch (SecurityException ex) {
-                    }          
-                    if ( f==null ) continue;
-                    signature= fieldSignature( f );
-                } else if ( context instanceof PyJavaInstance ) {
-                    PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
-                    Class dc= peek.getInstanceClass();
-                    Field f=null;
-                    try {
-                        f= dc.getField(label);
-                    } catch (NoSuchFieldException ex) {
-                    } catch (SecurityException ex) {
-                    }                       
-                    if ( f==null ) continue;
-                    signature= fieldSignature( f );
-                    label= ss;
+                    }
+                    if (f == null) {
+                        continue;
+                    }
+                    signature = fieldSignature(f);
+                } else if (context instanceof PyJavaInstance) {
+
+                    if (po instanceof PyMethod) {
+                        PyMethod m = (PyMethod) po;
+                        Method jm = getJavaMethod(m, 0);
+                        signature = methodSignature(getJavaMethod(m, 0));
+                    } else {
+                        PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
+                        Class dc = peek.getInstanceClass();
+                        Field f = null;
+                        try {
+                            f = dc.getField(label);
+                        } catch (NoSuchFieldException ex) {
+                        } catch (SecurityException ex) {
+                        }
+                        if (f == null)
+                            continue;
+                        signature = fieldSignature(f);
+                        label = ss;
+                    }
                 } else {
-                    PyObject po = context.__getattr__(s);
-                
                     if (po instanceof PyReflectedFunction) {
                         label = ss + "() STATIC JAVA";
                     } else if (po.isCallable()) {
                         label = ss + "() " + (context instanceof PyJavaInstance ? "JAVA" : "");
                         PyMethod m = (PyMethod) po;
-                        Method jm= getJavaMethod(m,0);
-                        signature= methodSignature( getJavaMethod(m, 0) );
+                        Method jm = getJavaMethod(m, 0);
+                        signature = methodSignature(getJavaMethod(m, 0));
                     } else {
                         System.err.println("");
                     }
                 }
                 String link = null;
-                if ( signature!=null ) {
+                if (signature != null) {
                     link = DOC_HOME + signature;
                 }
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, label, link));
@@ -228,7 +249,7 @@ public class JythonCompletionTask implements CompletionTask {
                     PyReflectedFunction prf = (PyReflectedFunction) po;
                     PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
 
-                    signature = methodSignature( peek.getMethod(0) );
+                    signature = methodSignature(peek.getMethod(0));
 
                 } else if (po.isCallable()) {
                     label = ss + "() ";
@@ -247,7 +268,6 @@ public class JythonCompletionTask implements CompletionTask {
 
     }
 
-
     private String methodSignature(Method javaMethod) {
         String javadocPath = join(javaMethod.getDeclaringClass().getCanonicalName().split("\\."), "/") + ".html";
 
@@ -260,26 +280,26 @@ public class JythonCompletionTask implements CompletionTask {
 
         sig.append("#" + javaMethod.getName() + LPAREN);
         List<String> sargs = new ArrayList<String>();
-        
-        
-        for (Class arg : javaMethod.getParameterTypes() ) {
+
+
+        for (Class arg : javaMethod.getParameterTypes()) {
             sargs.add(arg.getCanonicalName());
         }
         sig.append(join(sargs, "," + SPACE));
         sig.append(RPAREN);
         return sig.toString();
     }
-    
-    private String fieldSignature( Field f ) {
+
+    private String fieldSignature(Field f) {
         String javadocPath = join(f.getDeclaringClass().getCanonicalName().split("\\."), "/") + ".html";
 
         StringBuffer sig = new StringBuffer(javadocPath);
 
-        sig.append("#" + f.getName() );
+        sig.append("#" + f.getName());
         return sig.toString();
 
     }
-    
+
     private void queryStringLiteralArgument(CompletionContext cc, CompletionResultSet arg0) {
         String method = cc.contextString;
         if (method.equals("getDataSet")) {
@@ -293,13 +313,16 @@ public class JythonCompletionTask implements CompletionTask {
      * @return
      */
     private PythonInterpreter getInterpreter() {
+        PythonInterpreter interp;
         try {
-            
-            PythonInterpreter interp = new PythonInterpreter();
+            if (jythonInterpreterProvider != null) {
+                interp = jythonInterpreterProvider.createInterpreter();
+            } else {
+                interp = new PythonInterpreter();
 
-            URL imports = JythonOps.class.getResource("imports.py");
-            interp.execfile(imports.openStream());
-
+                URL imports = JythonOps.class.getResource("imports.py");
+                interp.execfile(imports.openStream());
+            }
             return interp;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
