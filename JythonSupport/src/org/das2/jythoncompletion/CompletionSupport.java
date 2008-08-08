@@ -97,10 +97,10 @@ public class CompletionSupport {
             
             tokens.add(t);
             if ( myTokenIndex==-1 ) { // kludge for newline token
-                if ( pos < t.endColumn+1 ) {
+                if ( pos <= t.endColumn ) {
                     myTokenIndex= thisTokenIndex;
-                    if ( pos>(t.beginColumn-1) ) {
-                        completable= t.image.substring(0,pos-(t.beginColumn));
+                    if ( pos>=t.beginColumn && t.image.length()>=(pos+1)-t.beginColumn ) {
+                        completable= t.image.substring( 0,(pos+1)-t.beginColumn );
                     } else {
                         completable= "";
                     }
@@ -133,6 +133,9 @@ public class CompletionSupport {
                     if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT ) completable= "";
                     result= new CompletionContext( CompletionContext.PACKAGE_NAME, join(tokens,1,ti), completable );
                 }
+            } else if ( tokens.get(0).kind==PythonGrammarConstants.IMPORT ) {
+                result= new CompletionContext( CompletionContext.PACKAGE_NAME, join(tokens,1,myTokenIndex), completable );
+                
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.NAME ) {
                 return new CompletionContext( CompletionContext.METHOD_NAME, tokens.get(myTokenIndex-1).image, "" );
             } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
@@ -149,7 +152,7 @@ public class CompletionSupport {
         }
         
         if ( result==null ) {
-            System.err.println("here is null");
+            return new CompletionContext( CompletionContext.DEFAULT_NAME, null, completable );
         }
         return result;
     }
