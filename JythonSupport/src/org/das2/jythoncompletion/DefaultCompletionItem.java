@@ -13,13 +13,17 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.processing.Completion;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.Position;
 import org.das2.jythoncompletion.support.CompletionItem;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
+import org.das2.jythoncompletion.ui.CompletionImpl;
 
 /**
  *
@@ -66,7 +70,38 @@ public class DefaultCompletionItem implements CompletionItem  {
         //Completion.get().hideCompletion();
     }
     
+    protected void substituteText(JTextComponent c, int offset, int len, String toAdd) {
+        Document doc = (Document)c.getDocument();
+        String text = getInsertPrefix().toString().substring(offset);
+        if (text != null) {
+
+            try {
+                String textToReplace = doc.getText(offset, len);
+                if (text.equals(textToReplace)) {
+                    return;
+                }                
+                Position position = doc.createPosition(offset);
+                
+                doc.remove(offset, len);
+                doc.insertString(position.getOffset(), text, null);
+                
+            } catch (BadLocationException e) {
+                // Can't update
+            } finally {
+                
+            }
+        }
+    }
+
+    
     public void processKeyEvent(KeyEvent keyEvent) {
+            //JTextComponent component = (JTextComponent) keyEvent.getSource();
+            //int caretOffset = component.getSelectionEnd();
+            //substituteText(component, offset, caretOffset - offset, Character.toString(keyEvent.getKeyChar()));
+            //CompletionImpl.get().showCompletion();
+            //keyEvent.consume();
+            //System.err.println("here");
+
     }
     
     public int getPreferredWidth(Graphics graphics, Font font) {
