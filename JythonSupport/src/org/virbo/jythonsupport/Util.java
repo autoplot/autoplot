@@ -21,7 +21,8 @@ import org.virbo.datasource.DataSourceFactory;
 public class Util {
 
     /**
-     * load a dataset.
+     * load the dataset identified by the URL.  Execution will block until the data
+     * is loaded.
      * @param surl dataSource identifier
      * @param mon monitor for the loading, or null (None in jython).
      * @return QDataSet that is the data from the DataSource.
@@ -37,6 +38,13 @@ public class Util {
         return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
     }
 
+    /**
+     * load the dataset identified by the URL.  Execution will block until the data
+     * is loaded.
+     * @param surl dataSource identifier
+     * @return QDataSet that is the data from the DataSource.
+     * @throws java.lang.Exception, depending on the data source type.
+     */
     public static QDataSet getDataSet(String surl) throws Exception {
         return getDataSet(surl, null);
     }
