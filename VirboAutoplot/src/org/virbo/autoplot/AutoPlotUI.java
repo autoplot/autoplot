@@ -11,6 +11,7 @@ import edu.uiowa.physics.pw.das.dasml.DOMBuilder;
 import edu.uiowa.physics.pw.das.dasml.SerializeUtil;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import edu.uiowa.physics.pw.das.datum.InconvertibleUnitsException;
 import edu.uiowa.physics.pw.das.util.ArgumentList;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -73,7 +74,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     UndoRedoSupport undoRedoSupport;
     TickleTimer tickleTimer;
     GuiSupport support;
-    AutoLayoutListener autoLayout;
+    LayoutListener autoLayout;
     
     final String TABS_TOOLTIP = "right-click to undock";
     PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
@@ -147,7 +148,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        autoLayout= new AutoLayoutListener(model);
+        autoLayout= new LayoutListener(model);
         
         dataSetSelector.registerActionTrigger(".*\\.vap", new AbstractAction("load vap") {
 
@@ -951,15 +952,19 @@ private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 }
 
                 Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
-
                     public void uncaughtException(Thread t, Throwable e) {
 //                        Logger.getLogger("virbo.autoplot").severe("runtime exception: " + e);
                         Logger.getLogger("virbo.autoplot").log( Level.SEVERE, "runtime exception: " + e, e);
                         
                         app.setStatus("caught exception: " + e.toString());
+                        if ( e instanceof InconvertibleUnitsException ) {
+                            // do nothing!!!  this is associated with the state change
+                            return;
+                        } 
                         model.application.getExceptionHandler().handleUncaught(e);
                     }
                 });
+                
                 app.setVisible(true);
                 if (initialURL != null) {
                     app.dataSetSelector.setValue(initialURL);
