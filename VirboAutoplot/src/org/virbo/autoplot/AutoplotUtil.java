@@ -13,15 +13,8 @@ import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
 import edu.uiowa.physics.pw.das.datum.Units;
 import edu.uiowa.physics.pw.das.datum.UnitsUtil;
-import edu.uiowa.physics.pw.das.graph.DasCanvas;
-import edu.uiowa.physics.pw.das.graph.DasCanvasComponent;
-import edu.uiowa.physics.pw.das.graph.DasColumn;
-import edu.uiowa.physics.pw.das.graph.DasPlot;
-import edu.uiowa.physics.pw.das.graph.DasRow;
 import edu.uiowa.physics.pw.das.util.DasMath;
 import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
-import java.awt.Component;
-import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -41,7 +34,10 @@ import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.WritableDataSet;
+import org.virbo.dsops.Ops;
+import org.virbo.dsutil.BinAverage;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -53,7 +49,6 @@ import org.xml.sax.SAXException;
 public class AutoplotUtil {
 
     private final static Logger log = Logger.getLogger("virbo.autoplot.AutoRangeDescriptor.autoRange");
-
 
     public static class AutoRangeDescriptor {
 
@@ -69,7 +64,6 @@ public class AutoplotUtil {
             return "" + range + " " + (log ? "log" : "");
         }
     }
-
 
     /**
      * return the median of three numbers
@@ -150,7 +144,7 @@ public class AutoplotUtil {
         if ( units==null ) units= Units.dimensionless;
         return new DatumRange( min, max, units );
     }
-    
+
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties) {
 
         log.fine("enter autoRange");
@@ -180,9 +174,14 @@ public class AutoplotUtil {
         } else {
             // find min and max of three-point medians
             try {
-                MomentDescriptor moment = moment(ds);
-                dd = robustRange(ds, moment);
-            // dd = median3Range(ds);
+                if (ds.rank() == 1) {
+                    //dd = robustRange(ds);
+                    dd = simpleRange(ds);
+                } else {
+                    //MomentDescriptor moment = moment(ds);
+                    //dd = robustRange(ds, moment);
+                    dd = simpleRange(ds);
+                }   
             } catch (IllegalArgumentException ex) {
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
@@ -267,26 +266,26 @@ public class AutoplotUtil {
             if (log != null) {
                 result.log = log.equals("log");
             }
-            Double tmin= (Double) properties.get(QDataSet.TYPICAL_MIN);
-            Double tmax= (Double) properties.get(QDataSet.TYPICAL_MAX);
-            DatumRange range= getRange( 
-                    (Double)properties.get(QDataSet.TYPICAL_MIN), 
-                    (Double)properties.get(QDataSet.TYPICAL_MAX),
-                    (Units)properties.get(QDataSet.UNITS) );
+            Double tmin = (Double) properties.get(QDataSet.TYPICAL_MIN);
+            Double tmax = (Double) properties.get(QDataSet.TYPICAL_MAX);
+            DatumRange range = getRange(
+                    (Double) properties.get(QDataSet.TYPICAL_MIN),
+                    (Double) properties.get(QDataSet.TYPICAL_MAX),
+                    (Units) properties.get(QDataSet.UNITS));
             // see if the typical range is consistent with range seen.  If the
             // typical range won't hide the data's structure, then use it.
-            if ( ( tmin != null || tmax!=null ) ) {
+            if ((tmin != null || tmax != null)) {
                 double d1, d2;
                 if (result.log) {
-                    Datum dd1= result.range.min().ge( range.min() ) ? result.range.min() : range.min();
-                    Datum dd2= result.range.max().ge( range.min() ) ? result.range.max() : range.min();
-                    d1 = DatumRangeUtil.normalizeLog(range, dd1 );
-                    d2 = DatumRangeUtil.normalizeLog(range, dd2 );
+                    Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
+                    Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
+                    d1 = DatumRangeUtil.normalizeLog(range, dd1);
+                    d2 = DatumRangeUtil.normalizeLog(range, dd2);
                 } else {
                     d1 = DatumRangeUtil.normalize(range, result.range.min());
                     d2 = DatumRangeUtil.normalize(range, result.range.max());
                 }
-                if ( d2-d1 > 0.1 ) {
+                if (d2 - d1 > 0.1) {
                     result.range = range;
                 }
             }
@@ -302,7 +301,7 @@ public class AutoplotUtil {
      */
     public static void openBrowser(String url) {
         final String errMsg = "Error attempting to launch web browser";
-        String osName = System.getProperty("os.name");
+        String osName = AutoplotUtil.getProperty("os.name", "applet");
         try {
             if (osName.startsWith("Mac OS")) {
                 Class fileMgr = Class.forName("com.apple.eio.FileManager");
@@ -310,6 +309,9 @@ public class AutoplotUtil {
                 openURL.invoke(null, new Object[]{url});
             } else if (osName.startsWith("Windows")) {
                 Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+            } else if (osName.equals("applet")) {
+                throw new RuntimeException("applets can't start browser yet");
+
             } else { //assume Unix or Linux
                 String[] browsers = {"firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape"};
                 String browser = null;
@@ -338,11 +340,8 @@ public class AutoplotUtil {
         int validCount;
     }
 
-    /**
-     * performs the moment (mean,variance,etc) on the dataset.
-     * @returns MomentDescriptor
-     */
-    public static MomentDescriptor moment(QDataSet ds) {
+    
+    static MomentDescriptor moment(QDataSet ds) {
 
         MomentDescriptor result = new MomentDescriptor();
 
@@ -426,6 +425,61 @@ public class AutoplotUtil {
         return document;
     }
 
+    /**
+     * return simple range by only including points consistent with adjacent points.
+     * also considers delta_plus, delta_minus properties.
+     * @param ds rank N dataset
+     * @return double[min,max].
+     */
+    private static double[] simpleRange(QDataSet ds) {
+        QDataSet max = ds;
+        QDataSet min = ds;
+        QDataSet delta;
+        delta = (QDataSet) ds.property(QDataSet.DELTA_PLUS);
+        if (delta != null) {
+            max = Ops.add(ds, delta);
+        }
+
+        delta = (QDataSet) ds.property(QDataSet.DELTA_MINUS);
+        if (delta != null) {
+            min = Ops.subtract(ds, delta);
+        }
+
+        QDataSet w = DataSetUtil.weightsDataSet(ds);
+        QubeDataSetIterator it = new QubeDataSetIterator(ds);
+        double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+        while (it.hasNext()) {
+            it.next();
+            if (it.getValue(w) > 0. ) {
+                double d = it.getValue(ds);
+                result[0] = Math.min(result[0], it.getValue(min) );
+                result[1] = Math.max(result[1], it.getValue(max) );
+            }
+        }
+        return result;
+    }
+
+    /**
+     * return robust range by only including points consistent with adjacent points.
+     * @param ds, rank 1 dataset
+     * @return
+     */
+    private static double[] robustRange(QDataSet ds) {
+        QDataSet res = BinAverage.residuals(ds, 10);
+        QDataSet w = DataSetUtil.weightsDataSet(ds);
+        QubeDataSetIterator it = new QubeDataSetIterator(res);
+        double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+        while (it.hasNext()) {
+            it.next();
+            if (it.getValue(w) > 0. && it.getValue(res) < 2.) {
+                double d = it.getValue(ds);
+                result[0] = Math.min(result[0], d);
+                result[1] = Math.max(result[1], d);
+            }
+        }
+        return result;
+    }
+
     private static double[] robustRange(QDataSet ds, MomentDescriptor moment) throws IllegalArgumentException {
         double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
 
@@ -454,12 +508,12 @@ public class AutoplotUtil {
             return new double[]{min, max};
         }
     }
-    
+
     /**
      * rewrite the dataset so that fill values are set by the valid range and fill
      * controls.
      */
-    public static WritableDataSet applyFillValidRange( QDataSet ds, double vmin, double vmax, double fill ) {
+    public static WritableDataSet applyFillValidRange(QDataSet ds, double vmin, double vmax, double fill) {
         WritableDataSet result = DDataSet.copy(ds);
         Units u = (Units) ds.property(QDataSet.UNITS);
 
@@ -500,50 +554,51 @@ public class AutoplotUtil {
 
         return result;
     }
-    
+
     /**
      * extract the properties from the dataset into the same format as metadata model returns.
      * @param ds
      * @param spec
      * @return
      */
-    public static Map<String,Object> extractProperties( QDataSet ds ) {
-        
-        Map<String,Object> result= DataSetUtil.getProperties(ds);
+    public static Map<String, Object> extractProperties(QDataSet ds) {
+
+        Map<String, Object> result = DataSetUtil.getProperties(ds);
 
         Object v;
-        
-        for ( int i=0; i<4; i++  ) {
+
+        for (int i = 0; i < 4; i++) {
             final String key = "DEPEND_" + i;
             if ((v = ds.property(key)) != null) {
-                result.put( key, extractProperties( (QDataSet)v ) ) ;
-            }            
+                result.put(key, extractProperties((QDataSet) v));
+            }
         }
-        
-        for ( int i=0; i<QDataSet.MAX_PLANE_COUNT; i++ ) {
+
+        for (int i = 0; i < QDataSet.MAX_PLANE_COUNT; i++) {
             final String key = "PLANE_" + i;
             if ((v = ds.property(key)) != null) {
-                result.put( key, extractProperties( (QDataSet)v ) ) ;
-            }            
-            
+                result.put(key, extractProperties((QDataSet) v));
+            }
+
         }
-        
+
         return result;
-    }    
-    
+    }
+
     /**
      * combine the two properties trees, using values from the first when both contain the same property.
      * @param properties
      * @param deflt
      * @return
      */
-    public static Map<String,Object> mergeProperties( Map<String, Object> properties, Map<String,Object> deflt ) {
-        if ( deflt==null ) return properties;
-        HashMap<String,Object> result= new HashMap<String,Object>(deflt);
-        for ( String key: properties.keySet() ) {
-            Object val= properties.get(key);
-            if ( val instanceof Map ) {
-                result.put(key, mergeProperties( (Map<String,Object>)val, (Map<String,Object>)deflt.get(key) ) );
+    public static Map<String, Object> mergeProperties(Map<String, Object> properties, Map<String, Object> deflt) {
+        if (deflt == null)
+            return properties;
+        HashMap<String, Object> result = new HashMap<String, Object>(deflt);
+        for (String key : properties.keySet()) {
+            Object val = properties.get(key);
+            if (val instanceof Map) {
+                result.put(key, mergeProperties((Map<String, Object>) val, (Map<String, Object>) deflt.get(key)));
             } else {
                 result.put(key, val);
             }
@@ -551,8 +606,8 @@ public class AutoplotUtil {
         return result;
     }
 
-    public static PersistentStateSupport getPersistentStateSupport( final AutoPlotUI parent, final ApplicationModel applicationModel ) {
-        final PersistentStateSupport stateSupport= new PersistentStateSupport( parent, null, "vap") {
+    public static PersistentStateSupport getPersistentStateSupport(final AutoPlotUI parent, final ApplicationModel applicationModel) {
+        final PersistentStateSupport stateSupport = new PersistentStateSupport(parent, null, "vap") {
 
             protected void saveImpl(File f) throws IOException {
                 applicationModel.doSave(f);
@@ -565,7 +620,7 @@ public class AutoplotUtil {
                 parent.setStatus("opened " + file);
             }
         };
-        
+
         stateSupport.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent ev) {
@@ -576,7 +631,22 @@ public class AutoplotUtil {
                 }
             }
         });
-        
+
         return stateSupport;
+    }
+
+    /**
+     * support restricted security environment by checking permissions before 
+     * checking property.
+     * @param name
+     * @param deft
+     * @return
+     */
+    public static String getProperty(String name, String deft) {
+        try {
+            return System.getProperty(name, deft);
+        } catch (SecurityException ex) {
+            return deft;
+        }
     }
 }
