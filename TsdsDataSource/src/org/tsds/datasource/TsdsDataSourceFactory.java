@@ -46,6 +46,7 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "StartDate=", "YYYYMMDD start time"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "EndTime=", "YYYYMMDD end time"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "ppd=", "number of points per day"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "filter=", "data reduction filter"));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("dataset")) {
@@ -56,6 +57,10 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
                         result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds ) );
                     }
                 }
+            } else if ( paramName.equals("filter") ) {
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "numbervalid", "number of points in each bin" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "max", "maximum value in bin" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "min", "minimum value in bin" ) );
             }
         }
 
@@ -100,6 +105,10 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
     public boolean reject(String surl, ProgressMonitor mon) {
         DataSetURL.URLSplit split= DataSetURL.parse( surl );
         Map params= DataSetURL.parseParams(split.params);
-        return !( params.containsKey("StartDate") && params.containsKey("EndDate") && params.containsKey("param1") );
+        if ( params.equals("") ) {
+            return !( surl.contains("tf_") && surl.contains("to_") ); // looks like a redirect url.
+        } else {
+            return !( params.containsKey("StartDate") && params.containsKey("EndDate") && params.containsKey("param1") );
+        }
     }
 }
