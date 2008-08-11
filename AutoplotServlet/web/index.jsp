@@ -15,5 +15,7 @@
     </head>
     <body>
         <h2>Hello World!</h2>
+        <p><a href="simple.jsp"> simple.jsp </a></p>
+        <p><a href="script.jsp"> script.jsp </a></p>
     </body>
 </html>
