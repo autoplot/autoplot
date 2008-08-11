@@ -15,11 +15,11 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Autoplot Simple Servlet</title>
     </head>
     <body>
 
-    <h1>Autoplot Servlet</h1>
+    <h1>Autoplot Simple Servlet</h1>
     
     This demonstrates how Autoplot can be used within a web application
     container to provide static images.
@@ -30,6 +30,22 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         <input type="submit" value="Plot" />
     </form>
 
-    
+<br><br>
+    <form action="SimpleServlet">
+        <input name="url" value="http://www.sarahandjeremy.net/~jbf/1wire/data/2007/0B000800408DD710.%Y%m%d.d2s?timerange=20071210" size="80" type="text">
+        <input value="Plot" type="submit">
+        <input type="checkbox" name="autolayout" value="true" >autolayout</input>
+    </form>
+<br><br>
+    <form action="SimpleServlet">
+       <input name="url" value="tsds.http://timeseries.org/cgi-bin/get.cgi?StartDate=20010101&EndDate=20010101&ext=bin&ppd=24&param1=SourceAcronym_Subset-1-v0" size="80" type="text">
+        <input value="Plot" type="submit">
+    </form>
+<br><br>
+    <form action="SimpleServlet">
+    <input name="url" value="http://timeseries.org/cgi-bin/get.cgi?StartDate=20010101&EndDate=20010101&ext=bin&ppd=24&param1=SourceAcronym_Subset-1-v0" size="80" type="text">      
+        <input value="Plot" type="submit">
+
+    </form>
     </body>
 </html>
