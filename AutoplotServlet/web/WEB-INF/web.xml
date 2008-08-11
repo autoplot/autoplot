@@ -4,9 +4,17 @@
         <servlet-name>SimpleServlet</servlet-name>
         <servlet-class>org.virbo.autoplot.SimpleServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ScriptServlet</servlet-name>
+        <servlet-class>org.virbo.autoplot.ScriptServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SimpleServlet</servlet-name>
         <url-pattern>/SimpleServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ScriptServlet</servlet-name>
+        <url-pattern>/ScriptServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
