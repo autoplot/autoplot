@@ -374,18 +374,24 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="deps-ear-jar" unless="no.deps">
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init, deps-module-jar, deps-ear-jar" name="deps-jar" unless="no.deps"/>
     <target depends="init,deps-jar" name="-pre-pre-compile">
@@ -539,6 +545,12 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         <copy-ear-war file="${reference.ImageDataSource.jar}" propname="included.lib.reference.ImageDataSource.jar.X"/>
         <basename file="${reference.WavDataSource.jar}" property="included.lib.reference.WavDataSource.jar"/>
         <copy-ear-war file="${reference.WavDataSource.jar}" propname="included.lib.reference.WavDataSource.jar.X"/>
+        <basename file="${reference.dasCore.jar}" property="included.lib.reference.dasCore.jar"/>
+        <copy-ear-war file="${reference.dasCore.jar}" propname="included.lib.reference.dasCore.jar.X"/>
+        <basename file="${reference.TsdsDataSource.jar}" property="included.lib.reference.TsdsDataSource.jar"/>
+        <copy-ear-war file="${reference.TsdsDataSource.jar}" propname="included.lib.reference.TsdsDataSource.jar.X"/>
+        <basename file="${reference.JythonSupport.jar}" property="included.lib.reference.JythonSupport.jar"/>
+        <copy-ear-war file="${reference.JythonSupport.jar}" propname="included.lib.reference.JythonSupport.jar.X"/>
         <basename file="${file.reference.dasCore.jar}" property="included.lib.file.reference.dasCore.jar"/>
         <copy-ear-war file="${file.reference.dasCore.jar}" propname="included.lib.file.reference.dasCore.jar.X"/>
         <basename file="${file.reference.batik-awt-util.jar}" property="included.lib.file.reference.batik-awt-util.jar"/>
@@ -549,9 +561,17 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         <copy-ear-war file="${file.reference.batik-util.jar}" propname="included.lib.file.reference.batik-util.jar.X"/>
         <basename file="${file.reference.itext-1.2.jar}" property="included.lib.file.reference.itext-1.2.jar"/>
         <copy-ear-war file="${file.reference.itext-1.2.jar}" propname="included.lib.file.reference.itext-1.2.jar.X"/>
+        <basename file="${file.reference.jython.jar}" property="included.lib.file.reference.jython.jar"/>
+        <copy-ear-war file="${file.reference.jython.jar}" propname="included.lib.file.reference.jython.jar.X"/>
+        <basename file="${file.reference.beansbinding.jar}" property="included.lib.file.reference.beansbinding.jar"/>
+        <copy-ear-war file="${file.reference.beansbinding.jar}" propname="included.lib.file.reference.beansbinding.jar.X"/>
+        <basename file="${file.reference.cdfjava.jar}" property="included.lib.file.reference.cdfjava.jar"/>
+        <copy-ear-war file="${file.reference.cdfjava.jar}" propname="included.lib.file.reference.cdfjava.jar.X"/>
+        <basename file="${file.reference.jfits-0.93.jar}" property="included.lib.file.reference.jfits-0.93.jar"/>
+        <copy-ear-war file="${file.reference.jfits-0.93.jar}" propname="included.lib.file.reference.jfits-0.93.jar.X"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.reference.VirboAutoplot.jar} ${included.lib.reference.QDataSet.jar} ${included.lib.reference.DataSource.jar} ${included.lib.reference.DataSourcePack.jar} ${included.lib.reference.BinaryDataSource.jar} ${included.lib.reference.ImageDataSource.jar} ${included.lib.reference.WavDataSource.jar} ${included.lib.file.reference.dasCore.jar} ${included.lib.file.reference.batik-awt-util.jar} ${included.lib.file.reference.batik-svggen.jar} ${included.lib.file.reference.batik-util.jar} ${included.lib.file.reference.itext-1.2.jar} "/>
+            <attribute name="Class-Path" value="${included.lib.reference.VirboAutoplot.jar} ${included.lib.reference.QDataSet.jar} ${included.lib.reference.DataSource.jar} ${included.lib.reference.DataSourcePack.jar} ${included.lib.reference.BinaryDataSource.jar} ${included.lib.reference.ImageDataSource.jar} ${included.lib.reference.WavDataSource.jar} ${included.lib.reference.dasCore.jar} ${included.lib.reference.TsdsDataSource.jar} ${included.lib.reference.JythonSupport.jar} ${included.lib.file.reference.dasCore.jar} ${included.lib.file.reference.batik-awt-util.jar} ${included.lib.file.reference.batik-svggen.jar} ${included.lib.file.reference.batik-util.jar} ${included.lib.file.reference.itext-1.2.jar} ${included.lib.file.reference.jython.jar} ${included.lib.file.reference.beansbinding.jar} ${included.lib.file.reference.cdfjava.jar} ${included.lib.file.reference.jfits-0.93.jar} "/>
         </manifest>
         <delete dir="${dist.ear.dir}/temp"/>
     </target>
@@ -563,11 +583,18 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         <copy file="${reference.BinaryDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${reference.ImageDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${reference.WavDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.dasCore.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.TsdsDataSource.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${reference.JythonSupport.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.dasCore.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.batik-awt-util.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.batik-svggen.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.batik-util.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copy file="${file.reference.itext-1.2.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.jython.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.beansbinding.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.cdfjava.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copy file="${file.reference.jfits-0.93.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist,library-inclusion-in-manifest" name="do-ear-dist">
         <dirname file="${dist.ear.war}" property="dist.jar.dir"/>
@@ -855,9 +882,12 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="clean"/>
     </target>
     <target depends="init" name="do-clean">
         <condition property="build.dir.to.clean" value="${build.web.dir}">
