@@ -17,8 +17,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceRegistry;
 
 /**
  *
@@ -34,18 +37,25 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         
-        response.setContentType("image/png");
-        
         try {
-            OutputStream out = response.getOutputStream();
+            
             
             String arg0= request.getParameter("url");
             String vap= request.getParameter("vap");
             
+            OutputStream out = response.getOutputStream();
+            
+            if ( arg0.equals("about:plugins") ) {
+                response.setContentType("text/html");
+                out.write( DataSetSelectorSupport.getPluginsText().getBytes() );
+            } else {
+                response.setContentType("image/png");
+            }
+            
             System.setProperty("java.awt.headless","true");
             
             ApplicationModel appmodel= new ApplicationModel();
-            //appmodel.setAutolayout(true);
+            if ( "true".equals(request.getParameter("autolayout")) ) appmodel.setAutolayout(true);
             //appmodel.canvas.setFont( Font.decode("sans-6" ) );
             appmodel.canvas.setSize( 700, 400 );
             appmodel.canvas.revalidate();
@@ -53,7 +63,14 @@ public class SimpleServlet extends HttpServlet {
             
             if ( vap!=null ) appmodel.doOpen( new File(vap) );
             
-            DataSource dsource= DataSetURL.getDataSource( arg0 );
+            DataSource dsource;
+            try {
+                dsource= DataSetURL.getDataSource( arg0 );
+            } catch ( NullPointerException ex ) {
+                throw new RuntimeException( "No such data source: ", ex );
+            } catch ( Exception ex ) {
+                throw ex;
+            }
             
             appmodel.setDataSource(dsource);
             
