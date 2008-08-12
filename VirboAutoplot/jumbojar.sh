@@ -57,4 +57,4 @@ rm META-INF/build.txt
 rm META-INF/INDEX.LIST
 
 jar cmf ../MANIFEST.MF ../jumbojar.jar  *
-
+mv ../jumbojar.jar ../dist
