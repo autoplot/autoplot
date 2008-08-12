@@ -6,8 +6,14 @@
 package org.virbo.autoplot.scriptconsole;
 
 import java.io.File;
+import org.das2.jythoncompletion.JythonCompletionTask;
+import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.python.core.PyDictionary;
+import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.JythonUtil;
 import org.virbo.datasource.DataSetSelector;
 
 /**
@@ -21,18 +27,49 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     DataSetSelector selector;
     ScriptPanelSupport support;
     
+    static final int CONTEXT_DATA_SOURCE= 1;
+    static final int CONTEXT_APPLICATION= 0;
+    private int context=0;
+    
+    
     /** Creates new form JythonScriptPanel */
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector ) {
         initComponents();
+        setContext( CONTEXT_APPLICATION );
         
         support= new ScriptPanelSupport( this, model, selector );
-        //support.addCompletionKeys();
+        
         this.model = model;
         this.selector= selector;
 
         CompletionImpl impl= CompletionImpl.get();
         impl.startPopup(this.textArea);
         
+    }
+
+    int getContext() {
+	return context;
+    }
+
+    void setContext(int context ) {
+	this.context= context;
+	this.contextSelector.setSelectedIndex(context);
+        if ( context==CONTEXT_APPLICATION ) {
+            this.textArea.putClientProperty( JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+                public PythonInterpreter createInterpreter() throws java.io.IOException {
+                    return JythonUtil.createInterpreter(true, false);
+                }
+            } );
+        } else if ( context==CONTEXT_DATA_SOURCE ) {
+            this.textArea.putClientProperty( JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+                public PythonInterpreter createInterpreter() throws java.io.IOException {
+                    PythonInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(false);
+                    interp.set("monitor", new NullProgressMonitor() );
+                    interp.set("params", new PyDictionary() );
+                    return interp;
+                }
+            } );
+        }
     }
 
     /** This method is called from within the constructor to
@@ -48,9 +85,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         openButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         textArea = new javax.swing.JTextArea();
+        fileNameLabel = new javax.swing.JLabel();
+        contextSelector = new javax.swing.JComboBox();
 
         savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
-        savePlotButton.setText("save & plot");
+        savePlotButton.setText("execute");
         savePlotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 savePlotButtonActionPerformed(evt);
@@ -75,6 +114,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         textArea.setRows(5);
         jScrollPane1.setViewportView(textArea);
 
+        contextSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "application context", "data source context" }));
+        contextSelector.setToolTipText("select the context for the script: to create new datasets, or to control an application.");
+        contextSelector.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                contextSelectorActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -85,8 +132,10 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(saveAsButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(openButton)
-                .addContainerGap(217, Short.MAX_VALUE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 59, Short.MAX_VALUE)
+                .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
+            .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -94,16 +143,19 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(savePlotButton)
                     .add(saveAsButton)
-                    .add(openButton))
+                    .add(openButton)
+                    .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
 
         layout.linkSize(new java.awt.Component[] {openButton, saveAsButton, savePlotButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
     private void savePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePlotButtonActionPerformed
-        support.savePlot();
+        support.executeScript();
     }//GEN-LAST:event_savePlotButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
@@ -114,7 +166,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         support.open();      
 }//GEN-LAST:event_openButtonActionPerformed
 
+private void contextSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contextSelectorActionPerformed
+    setContext( contextSelector.getSelectedIndex() );
+    
+}//GEN-LAST:event_contextSelectorActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox contextSelector;
+    protected javax.swing.JLabel fileNameLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
