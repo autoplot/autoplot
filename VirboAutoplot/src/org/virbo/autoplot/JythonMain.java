@@ -12,9 +12,8 @@ package org.virbo.autoplot;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import org.python.core.Py;
 import org.python.util.PythonInterpreter;
-import org.virbo.jythonsupport.PyQDataSetAdapter;
+
 
 /**
  *
@@ -26,7 +25,7 @@ public class JythonMain {
     public JythonMain() {
     }
     
-    static PythonInterpreter interp =  new PythonInterpreter();
+    static PythonInterpreter interp = null;
     
     public static PythonInterpreter getInterpreter() {
         return interp;
@@ -34,11 +33,7 @@ public class JythonMain {
     
     public static void main(String[] args) throws Exception {
         
-        interp = new PythonInterpreter( );
-        
-        Py.getAdapter().addPostClass(new PyQDataSetAdapter());
-
-        interp.execfile( JythonMain.class.getResource("imports.py").openStream(), "imports.py" );
+        interp = JythonUtil.createInterpreter(true,false);
 
         InputStream in;
         String inIdentifier;
