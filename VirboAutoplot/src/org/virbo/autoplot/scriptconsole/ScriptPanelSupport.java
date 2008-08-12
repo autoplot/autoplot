@@ -23,6 +23,8 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
 import org.das2.util.filesystem.WebFileSystem;
+import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.JythonUtil;
 
 /**
  *
@@ -44,7 +46,8 @@ public class ScriptPanelSupport {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE)) {
                     try {
-                        String sfile = model.dataSource().getURL();
+                        String sfile = model.getDataSourceURL();
+                        if (sfile==null ) return;
                         DataSetURL.URLSplit split = DataSetURL.parse(sfile);
                         if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
                             return;
@@ -58,6 +61,8 @@ public class ScriptPanelSupport {
                             s = r.readLine();
                         }
                         panel.getEditorPanel().setText(buf.toString());
+                        panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
+                        panel.fileNameLabel.setText(sfile.toString());
                     } catch (IOException ex) {
                         Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -97,36 +102,60 @@ public class ScriptPanelSupport {
         return uri1.equals(uri2);
     }
 
-    protected void savePlot() {
-        try {
+    protected void executeScript() {
+
+        if (panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE) {
+
             boolean updateSurl = false;
-            if (file == null || file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
-                if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
-                    updateSurl = true;
-                } else {
-                    return;
+            try {
+                if (file == null || file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
+                    if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
+                        updateSurl = true;
+                    } else {
+                        return;
+                    }
                 }
-            }
-            if (file != null) {
-                try {
-                    if (!uriFilesEqual(selector.getValue(), file.toURI().toString())) {
+
+                if (file != null) {
+                    try {
+                        if (!uriFilesEqual(selector.getValue(), file.toURI().toString())) {
+                            updateSurl = true;
+                        }
+                    } catch (URISyntaxException ex) {
                         updateSurl = true;
                     }
-                } catch (URISyntaxException ex) {
-                    updateSurl = true;
+                    OutputStream out = new FileOutputStream(file);
+                    String text = panel.getEditorPanel().getText();
+                    out.write(text.getBytes());
+                    out.close();
+
+                    if (updateSurl) {
+                        selector.setValue(file.toURI().toString());
+                    }
+                    selector.maybePlot();
+
+                    panel.fileNameLabel.setText(file.toString());
                 }
-                OutputStream out = new FileOutputStream(file);
-                String text = panel.getEditorPanel().getText();
-                out.write(text.getBytes());
-                out.close();
-                if (updateSurl) {
-                    selector.setValue(file.toURI().toString());
-                }
-                selector.maybePlot();
+            } catch (IOException iOException) {
+                model.getCanvas().getApplication().getExceptionHandler().handle(iOException);
             }
-        } catch (IOException iOException) {
-            model.getCanvas().getApplication().getExceptionHandler().handle(iOException);
+        } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
+            Runnable run = new Runnable() {
+
+                public void run() {
+                    try {
+                        PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+                        interp.exec(panel.getEditorPanel().getText());
+                        
+                    } catch (IOException ex) {
+                        Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            new Thread(run).start();
         }
+
+
     }
 
     private FileFilter getFileFilter() {
@@ -148,7 +177,7 @@ public class ScriptPanelSupport {
         try {
             boolean updateSurl = false;
             if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
-                updateSurl = true;
+                updateSurl = panel.getContext()==JythonScriptPanel.CONTEXT_DATA_SOURCE;
                 OutputStream out = new FileOutputStream(file);
                 String text = panel.getEditorPanel().getText();
                 out.write(text.getBytes());
@@ -158,6 +187,7 @@ public class ScriptPanelSupport {
                 } else {
                     model.update(true);
                 }
+                panel.fileNameLabel.setText(file.toString());
             }
 
         } catch (IOException iOException) {
@@ -177,22 +207,25 @@ public class ScriptPanelSupport {
 
 
             JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter( getFileFilter() );
             if (file != null) {
                 chooser.setSelectedFile(file);
             }
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
                 file = chooser.getSelectedFile();
-            }
-            BufferedReader read = new BufferedReader(new FileReader(file));
-            StringBuffer buf = new StringBuffer();
-            String s = read.readLine();
-            while (s != null) {
-                buf.append(s).append("\n");
-                s = read.readLine();
-            }
 
-            panel.getEditorPanel().setText(buf.toString());
+                BufferedReader read = new BufferedReader(new FileReader(file));
+                StringBuffer buf = new StringBuffer();
+                String s = read.readLine();
+                while (s != null) {
+                    buf.append(s).append("\n");
+                    s = read.readLine();
+                }
+
+                panel.getEditorPanel().setText(buf.toString());
+                panel.fileNameLabel.setText(file.toString());
+            }
 
         } catch (IOException ex) {
             model.getCanvas().getApplication().getExceptionHandler().handle(ex);
