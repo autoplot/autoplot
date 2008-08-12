@@ -145,10 +145,17 @@ public class MetaDataPanel extends javax.swing.JPanel {
         map.put("Std Dev", s);
 
         QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
-        assert (dep0 != null);
-        Double cadence = (Double) dep0.property(QDataSet.CADENCE);
-
-        Units xunits = (Units) dep0.property(QDataSet.UNITS);
+        
+        Double cadence;
+        Units xunits;
+        
+        if ( dep0==null ) {
+            xunits= Units.dimensionless;
+            cadence= 1.;
+        } else {
+            cadence = (Double) dep0.property(QDataSet.CADENCE);
+            xunits = (Units) dep0.property(QDataSet.UNITS);
+        }
         if (xunits == null) {
             xunits = Units.dimensionless;
         }
