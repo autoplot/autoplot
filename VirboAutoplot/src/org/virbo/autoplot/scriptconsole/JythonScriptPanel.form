@@ -21,9 +21,11 @@
               <Component id="saveAsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="openButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="217" max="32767" attributes="0"/>
+              <EmptySpace pref="59" max="32767" attributes="0"/>
+              <Component id="contextSelector" min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="jScrollPane1" alignment="0" pref="482" max="32767" attributes="0"/>
+          <Component id="jScrollPane1" alignment="0" pref="489" max="32767" attributes="0"/>
+          <Component id="fileNameLabel" alignment="0" pref="489" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -33,9 +35,12 @@
                   <Component id="savePlotButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="saveAsButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="openButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="contextSelector" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="284" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="260" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="fileNameLabel" min="-2" pref="18" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -46,7 +51,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/org/virbo/autoplot/go.png"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="save &amp; plot"/>
+        <Property name="text" type="java.lang.String" value="execute"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="savePlotButtonActionPerformed"/>
@@ -83,5 +88,24 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="fileNameLabel">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="4"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="contextSelector">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="application context"/>
+            <StringItem index="1" value="data source context"/>
+          </StringArray>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" value="select the context for the script: to create new datasets, or to control an application."/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="contextSelectorActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>
