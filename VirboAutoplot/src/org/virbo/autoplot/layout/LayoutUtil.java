@@ -15,12 +15,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * utility methods for adjusting canvas layout.
  * @author jbf
  */
 public class LayoutUtil {
     /**
      * resets the layout on the canvas so that labels are not clipped (somewhat).
+     * Child row and columns are inspected as well, and it's assumed that adjusting
+     * this row and column, that everyone will be correctly adjuected.
+     * 
+     * We calculate bounds on each component dependent on the row and column, then
+     * the region outside the canvas determines how much the row and column should
+     * be brought in.
+     * 
      * @param canvas
      * @param c
      * @param r 
@@ -66,27 +73,33 @@ public class LayoutUtil {
         
         double MARGIN_LEFT_RIGHT_EM= 1;
         
+        boolean ALLOW_EXCESS_SPACE= true;
+        
         int old, need;
         old= c.getDMinimum();
         need= old - xmin;
+        if ( ALLOW_EXCESS_SPACE && need < 0 ) need= 0;
         c.setMinimum(0);
         c.setEmMinimum( need / em + MARGIN_LEFT_RIGHT_EM );
         c.setPtMinimum(0);
         
         old= c.getDMaximum();
         need= xmax - old;
+        if ( ALLOW_EXCESS_SPACE && need < 0 ) need= 0;
         c.setMaximum(1.0);
         c.setEmMaximum( -need / em - MARGIN_LEFT_RIGHT_EM );
         c.setPtMaximum(0);
         
         old= r.getDMinimum();
         need= old - ymin;
+        if ( ALLOW_EXCESS_SPACE && need < 0 ) need= 0;
         r.setMinimum(0);
         r.setEmMinimum( need / em );
         r.setPtMinimum(0);
         
         old= r.getDMaximum();
         need= ymax - old;
+        if ( ALLOW_EXCESS_SPACE && need < 0 ) need= 0;        
         r.setMaximum(1.0);
         r.setEmMaximum( -need / em );
         r.setPtMaximum(0);
