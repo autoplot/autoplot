@@ -239,7 +239,7 @@ public class ApplicationModel {
 
         DataSetURL.init();
 
-        headless = "true".equals(System.getProperty("java.awt.headless"));
+        headless = "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false"));
 
         options = new Options();
         canvas = new DasCanvas();
@@ -400,9 +400,6 @@ public class ApplicationModel {
         setSpecialEffects(false);
         canvas.revalidate();
 
-        if (!headless) {
-            doOverviewBindings();
-        }
 
     }
 
@@ -420,16 +417,16 @@ public class ApplicationModel {
 
     protected void setRenderer(Renderer rend, Renderer overRend) {
         Renderer[] rends = plot.getRenderers();
-        for (int i = 0; i <
-                rends.length; i++) {
-            rends[i].setActive(rends[i] == rend);
+        for (int i = 0; i < rends.length; i++) {
+            if ( rends[i]!=rend ) rends[i].setActive(false);
         }
-
+        rend.setActive(true);
+        
         rends = overviewPlot.getRenderers();
-        for (int i = 0; i <
-                rends.length; i++) {
-            rends[i].setActive(rends[i] == overRend);
+        for (int i = 0; i < rends.length; i++) {
+            if ( rends[i]!=overRend ) rends[i].setActive(false);
         }
+        overRend.setActive(true);
 
     }
 
@@ -440,47 +437,146 @@ public class ApplicationModel {
     TimeSeriesBrowse tsb = null;
     Caching caching = null;
 
+    /**
+     * just plot this dataset.  No capabilities, no urls.  Metadata is set to
+     * allow inspection of dataset.
+     * @param ds
+     */
+    void setDataSet(QDataSet ds) {
+        this.setDataSource(null);
+        this.setDataSourceURL(null);
+        if (timeSeriesBrowseListener != null) {
+            this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
+            timeSeriesBrowseListener = null;
+        }
+        setDataSetInternal(ds, true);
+    }
+
+    /**
+     * set the new dataset, do autoranging and autolabelling.
+     * 
+     * preconditions: autoplot is displaying any dataset.  A new DataSource has
+     *  been set, but the dataset is generally not from the DataSource.
+     *   
+     * postconditions: the dataset is set, labels are set, axes are set.  Labels
+     *  reset might have triggered a timer that will redo layout.
+     * 
+     * @param ds
+     * @param autorange if false, autoranging will not be done.  if false, autoranging
+     *   might be done.
+     */
+    private void setDataSetInternal(QDataSet ds, boolean autorange) {
+        this.dataset = ds;
+
+        if (dataset == null) {
+            seriesRend.setDataSet(null);
+            spectrogramRend.setDataSet(null);
+            return;
+        }
+
+        setStatus("apply fill and autorange");
+
+        int[] qube = DataSetUtil.qubeDims(dataset);
+        String[] depNames = new String[3];
+        for (int i = 0; i < dataset.rank(); i++) {
+            depNames[i] = "dim" + i;
+            QDataSet dep0 = (QDataSet) dataset.property("DEPEND_" + i);
+            if (dep0 != null) {
+                String dname = (String) dep0.property(QDataSet.NAME);
+                if (dname != null) {
+                    depNames[i] = dname + (qube != null ? "=" + qube[i] : "");
+                }
+            }
+        }
+
+        logger.fine("dep names: " + Arrays.asList(depNames));
+        setDepnames(Arrays.asList(depNames));
+
+        updateFill(autorange);
+
+        originalXRange = plot.getXAxis().getDatumRange();
+        originalYRange = plot.getYAxis().getDatumRange();
+        originalZRange = colorbar.getDatumRange();
+        if (autoOverview && !autoRangeSuppress) {
+            setShowContextOverview(false);
+        }
+        if (!autoRangeSuppress) {
+            allowAutoContext = true;
+        }
+
+        propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, null, null);
+        if (autoRangeSuppress) {
+            autoRangeSuppress = false;
+        }
+        setStatus("done, apply fill and autorange");
+
+    }
+
+    public void updateTsb() {
+        DatumRange newRange = ApplicationModel.this.plot.getXAxis().getDatumRange();
+        // don't waste time by chasing after 10% of a dataset.
+        newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
+        if (tsb == null) {
+            return;
+        }
+        if (UnitsUtil.isTimeLocation(newRange.getUnits())) {
+            QDataSet ds = dataset;
+            QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
+            CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
+            Datum newResolution = newRange.width().divide(ApplicationModel.this.plot.getXAxis().getDLength());
+            CacheTag newCacheTag = new CacheTag(newRange, newResolution);
+            if (tag == null || !tag.contains(newCacheTag)) {
+                tsb.setTimeRange(newRange);
+                tsb.setTimeResolution(newResolution);
+                String surl= tsb.getURL().toString();
+                if ( surl.equals(this.surl) ) {
+                    logger.fine("we do no better with tsb");
+                } else {
+                    update(false);
+                }
+            }
+        }
+    }
+
     public void setDataSource(DataSource ds) {
 
         DataSource oldSource = this.dataSource;
         this.dataSource = ds;
 
-        caching = ds.getCapability(Caching.class);
-
-        if ((tsb = ds.getCapability(TimeSeriesBrowse.class)) != null) {
-            timeSeriesBrowseListener = new PropertyChangeListener() {
-
-                public void propertyChange(PropertyChangeEvent e) {
-                    if (plot.getXAxis().valueIsAdjusting()) {
-                        return;
-                    }
-                    if (e.getPropertyName().equals("datumRange")) {
-                        DatumRange newRange = ApplicationModel.this.plot.getXAxis().getDatumRange();
-                        // don't waste time by chasing after 10% of a dataset.
-                        newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
-                        if (tsb == null) {
-                            return;
-                        }
-                        if (UnitsUtil.isTimeLocation(newRange.getUnits())) {
-                            QDataSet ds = (QDataSet) ApplicationModel.this.dataset;
-                            QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
-                            CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
-                            if (tag == null || !tag.getRange().contains(newRange)) {
-                                tsb.setTimeRange(newRange);
-                                tsb.setTimeResolution( newRange.width().divide(ApplicationModel.this.plot.getXAxis().getDLength() ) );
-                                update(false);
-                            }
-                        }
-                    }
-                }
-            };
-            this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);
-        } else {
+        if (ds == null) {
+            caching = null;
+            tsb = null;
             if (timeSeriesBrowseListener != null) {
                 this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
                 timeSeriesBrowseListener = null;
             }
+
+        } else {
+
+            caching = ds.getCapability(Caching.class);
+            tsb = ds.getCapability(TimeSeriesBrowse.class);
+
+            if (tsb != null) {                
+                timeSeriesBrowseListener = new PropertyChangeListener() {
+                    public void propertyChange(PropertyChangeEvent e) {
+                        if (plot.getXAxis().valueIsAdjusting()) {
+                            return;
+                        }
+                        if (e.getPropertyName().equals("datumRange")) {
+                            updateTsb();
+                        }
+                    }
+                };
+                this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);
+                
+            } else {
+                if (timeSeriesBrowseListener != null) {
+                    this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
+                    timeSeriesBrowseListener = null;
+                }
+            }
         }
+
         if (oldSource == null || !oldSource.equals(ds)) {
             update(true);
             propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, ds);
@@ -564,14 +660,11 @@ public class ApplicationModel {
         QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
         if (xds == null) {
             xds = DataSetUtil.indexGenDataSet(fillDs.length());
-            fillDs.putProperty(QDataSet.DEPEND_0, xds);
         }
 
         QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
         if (yds == null) {
             yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); // QUBE
-
-            fillDs.putProperty(QDataSet.DEPEND_1, yds);
         }
 
         double cadence = DataSetUtil.guessCadence(xds, null);
@@ -601,9 +694,10 @@ public class ApplicationModel {
         }
 
         setPlotRange(overviewPlot, xdesc, ydesc);
-
+         
         spectrogramRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
         overSpectrogramRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
+
     }
 
     private void updateFillSeries(WritableDataSet fillDs, boolean autoRange, Map props) {
@@ -616,7 +710,6 @@ public class ApplicationModel {
         QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
         if (xds == null) {
             xds = DataSetUtil.indexGenDataSet(fillDs.length());
-            fillDs.putProperty(QDataSet.DEPEND_0, xds);
         }
 
         double cadence = DataSetUtil.guessCadence(xds, fillDs);
@@ -643,7 +736,7 @@ public class ApplicationModel {
         AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs, props);
         AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
-        if (autoranging && !autoRangeSuppress) {
+        if (autoranging && autoRange && !autoRangeSuppress) {
             plot.getYAxis().setLog(desc.log);
             plot.getYAxis().resetRange(desc.range);
 
@@ -674,7 +767,6 @@ public class ApplicationModel {
 
         colorbar.setVisible(fillDs.property(QDataSet.PLANE_0) != null);
 
-        seriesRend.setActive(true);
         try {
             seriesRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
             overSeriesRend.setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
@@ -715,7 +807,7 @@ public class ApplicationModel {
      * This should not be run on the AWT event thread!
      * @param autorange if false, then no autoranging is done.
      */
-    protected void updateFill(boolean autorange) {
+    protected void updateFill( boolean autorange ) {
         if (dataset == null) {
             return;
         }
@@ -729,7 +821,7 @@ public class ApplicationModel {
         /* begin interpret metadata */
         if (interpretMetadata && !autoRangeSuppress && autorange) {
 
-            if ( autolabelling ) {
+            if (autolabelling) {
                 newState.setXLabel("");
                 newState.setYLabel("");
                 newState.setZLabel("");
@@ -740,7 +832,9 @@ public class ApplicationModel {
             newState.setFill("");
 
             properties = AutoplotUtil.extractProperties(dataset);
-            properties = AutoplotUtil.mergeProperties(dataSource.getProperties(), properties);
+            if (dataSource != null) {
+                properties = AutoplotUtil.mergeProperties(dataSource.getProperties(), properties);
+            }
             doInterpretMetadata(newState, properties, renderType);
 
             unitsCheck(properties, dataset);
@@ -806,7 +900,7 @@ public class ApplicationModel {
             updateFillSpec(fillDs, autorange, properties);
             seriesRend.setDataSet(null);
             setRenderer(spectrogramRend, overSpectrogramRend);
-
+            
         } else {
             updateFillSeries(fillDs, autorange, properties);
             if (fillDs.rank() == 2) {  // SeriesRenderer rank 3 must have solid lines.
@@ -843,7 +937,7 @@ public class ApplicationModel {
     private void doInterpretMetadata(ApplicationState state, Map properties, RenderType spec) {
 
         Object v;
-        if ( autolabelling && (v = properties.get(DDataSet.TITLE)) != null) {
+        if (autolabelling && (v = properties.get(DDataSet.TITLE)) != null) {
             state.setTitle((String) v);
         }
 
@@ -908,66 +1002,37 @@ public class ApplicationModel {
      * then inspecting the dataset to decide on axis settings.
      * @param autorange if false, then no autoranging is done, just the fill part.
      */
-    public void update(final boolean autorange) {
+    public synchronized void update(final boolean autorange) {
         dataset = null;
+
         Runnable run = new Runnable() {
 
             public void run() {
+
                 /*** here is the data load ***/
                 setStatus("loading dataset");
 
-                QDataSet dataset = loadDataSet(0);
+                if (dataSource != null) {
+                    QDataSet dataset = loadDataSet(0);
+                    setStatus("done loading dataset");
+                    setDataSetInternal(dataset, autorange);
+                } else {
+                    setDataSetInternal(null, autorange);
+                }
 
                 if (tsb != null) {
+                    //ApplicationModel.this.setDataSourceURL( tsb.getURL().toString() );
+                    String oldsurl= ApplicationModel.this.surl;
                     ApplicationModel.this.surl = tsb.getURL().toString();
-                }
-
-                setStatus("done loading dataset");
-                if (dataset == null) {
-                    seriesRend.setDataSet(null);
-                    spectrogramRend.setDataSet(null);
-                    return;
-                }
-
-                setStatus("apply fill and autorange");
-
-                int[] qube = DataSetUtil.qubeDims(dataset);
-                String[] depNames = new String[3];
-                for (int i = 0; i < dataset.rank(); i++) {
-                    depNames[i] = "dim" + i;
-                    QDataSet dep0 = (QDataSet) dataset.property("DEPEND_" + i);
-                    if (dep0 != null) {
-                        String dname = (String) dep0.property(QDataSet.NAME);
-                        if (dname != null) {
-                            depNames[i] = dname + (qube != null ? "=" + qube[i] : "");
-                        }
-                    }
-                }
-
-                logger.fine("dep names: " + Arrays.asList(depNames));
-                setDepnames(Arrays.asList(depNames));
-
-                updateFill(autorange);
-
-                originalXRange = plot.getXAxis().getDatumRange();
-                originalYRange = plot.getYAxis().getDatumRange();
-                originalZRange = colorbar.getDatumRange();
-                if (autoOverview && !autoRangeSuppress) {
-                    setShowContextOverview(false);
-                }
-                if (!autoRangeSuppress) {
-                    allowAutoContext = true;
+                    ApplicationModel.this.propertyChangeSupport.firePropertyChange( PROPERTY_DATASOURCE, oldsurl, ApplicationModel.this.surl );
                 }
 
                 setStatus("ready");
-                propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, null, null);
-                if (autoRangeSuppress) {
-                    autoRangeSuppress = false;
-                }
+
             }
         };
 
-        if (dataSource.asynchronousLoad() && !headless) {
+        if (dataSource != null && dataSource.asynchronousLoad() && !headless) {
             logger.info("invoke later do load");
             RequestProcessor.invokeLater(run);
         } else {
@@ -1012,7 +1077,18 @@ public class ApplicationModel {
     }
 
     /**
-     * TODO: document me
+     * Create a dataSource object and set autoplot to display this datasource.
+     * A dataSource object is created by DataSetURL.getDataSource, which looks
+     * at registered data sources to get a factory object, then the datasource is
+     * created with the factory object.
+     * 
+     * Preconditions: Any or no datasource is set.
+     * Postconditions: A dataSource object is created and autoplot is set to
+     *  plot the datasource.  A thread has been started that will load the dataset.
+     *  In headless mode, the dataset has been loaded sychronously.
+     * 
+     * @param surl the new data source URL.
+     * @param mon progress monitor which is just used to convey messages.
      */
     protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
         this.surl = surl;
@@ -1043,6 +1119,7 @@ public class ApplicationModel {
                         return;
                     }
                 }
+                
                 DataSource source = DataSetURL.getDataSource(surl);
                 setDataSource(source);
 
@@ -1122,7 +1199,7 @@ public class ApplicationModel {
         String srecent = prefs.get("recent", "");
 
         if (srecent.equals("") || !srecent.startsWith("<")) {
-            String srecenturl = System.getProperty("autoplot.default.recent", "http://www.cottagesystems.com/virbo/apps/autoplot/recent.xml");
+            String srecenturl = AutoplotUtil.getProperty("autoplot.default.recent", "http://www.cottagesystems.com/virbo/apps/autoplot/recent.xml");
             if (!srecenturl.equals("")) {
                 try {
                     URL url = new URL(srecenturl);
@@ -1165,7 +1242,7 @@ public class ApplicationModel {
         String sbookmark = prefs.get("bookmarks", "");
 
         if (sbookmark.equals("") || !sbookmark.startsWith("<")) {
-            String surl = System.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
+            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
             if (!surl.equals("")) {
                 try {
                     URL url = new URL(surl);
@@ -1663,11 +1740,14 @@ public class ApplicationModel {
     boolean clearCache() throws IllegalArgumentException {
         File local;
 
-        if (System.getProperty("user.name").equals("Web")) {
+        if (AutoplotUtil.getProperty("user.name", "applet").equals("Web")) {
             local = new File("/tmp");
         } else {
-            local = new File(System.getProperty("user.home"));
+            local = new File(System.getProperty("user.home", "applet"));
         }
+
+        if (local.equals("applet"))
+            return false;
 
         local = new File(local, ".das2/fsCache/wfs/");
 
@@ -1692,6 +1772,11 @@ public class ApplicationModel {
         this.showContextOverview = showContextOverview;
         DasRow row = plot.getRow();
         row.setMaximum(showContextOverview ? OVERVIEW_PERCENT : 1.00);
+        
+        if ( showContextOverview && !overviewBindingsDone) {
+            doOverviewBindings();
+        }
+        
         overviewPlot.setVisible(showContextOverview);
         overviewPlotConnector.setVisible(showContextOverview);
         allowAutoContext = false;
@@ -1743,7 +1828,8 @@ public class ApplicationModel {
 
     public void setAutolayout(boolean autolayout) {
         this.autolayout = autolayout;
-        if ( autolayout ) LayoutUtil.autolayout( this.canvas, this.plot.getRow(), this.plot.getColumn() );
+        if (autolayout)
+            LayoutUtil.autolayout(this.canvas, this.plot.getRow(), this.plot.getColumn());
     }
     /**
      * Holds value of property interpretMetadata.
@@ -1775,7 +1861,10 @@ public class ApplicationModel {
 
     }
 
-    private void doOverviewBindings() {
+    private boolean overviewBindingsDone= false;
+    
+    private synchronized void doOverviewBindings() {
+        overviewBindingsDone= true;
         BindingContext bc = new BindingContext();
         bc.addBinding(seriesRend, "${color}", overSeriesRend, "color");
         bc.addBinding(seriesRend, "${active}", overSeriesRend, "active");
@@ -1799,6 +1888,7 @@ public class ApplicationModel {
     }
 
     private void setStatus(String status) {
+        logger.info(status);
         String oldVal = this.status;
         this.status = status;
         propertyChangeSupport.firePropertyChange(PROPERTY_STATUS, oldVal, status);
