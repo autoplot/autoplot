@@ -6,11 +6,13 @@
 
 package org.virbo.autoplot;
 
+import edu.uiowa.physics.pw.das.DasApplication;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -328,6 +330,8 @@ public class BookmarksManager extends javax.swing.JDialog {
                 this.setList(book);
             } catch (SAXException ex) {
                 Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+	    } catch ( FileNotFoundException ex ) {
+		DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
             } catch (IOException ex) {
                 Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
             } catch (ParserConfigurationException ex) {
