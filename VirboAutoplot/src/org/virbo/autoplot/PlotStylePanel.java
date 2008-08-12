@@ -78,35 +78,25 @@ public class PlotStylePanel extends javax.swing.JPanel {
             }
         };
         
-        b = bc.addBinding( applicationModel.seriesRend, "${symSize}", symSizeSpinner, "value");
-        b.bind();
-        
+        b = bc.addBinding( applicationModel.seriesRend, "${symSize}", symSizeSpinner, "value");        
         b= bc.addBinding( applicationModel.seriesRend, "${psym}", psymEditor, "value");
-        b.bind();
-        
         b = bc.addBinding( applicationModel.seriesRend, "${lineWidth}", lineThickSpinner, "value");
-        b.bind();
-                
         b= bc.addBinding( applicationModel.seriesRend, "${psymConnector}", lineEditor, "value");
-        b.bind();
-
-        b= bc.addBinding( applicationModel.colorbar, "${type}", edit, "value" );
-        b.bind();
-
-        b= bc.addBinding( applicationModel.spectrogramRend, "${rebinner}", rebin, "value" );
-        b.bind();
 
         b= bc.addBinding( applicationModel.seriesRend, "${color}", colorEditor, "value" );
-        b.bind();
-
         b= bc.addBinding( applicationModel.seriesRend, "${fillToReference}", fillToReferenceCheckBox, "selected" );
-        b.bind();
-        
         b= bc.addBinding( applicationModel.seriesRend, "${fillColor}", fillColorEditor, "value" );
-        b.bind();
-                
         b= bc.addBinding( applicationModel.seriesRend, "${reference}", referenceEditor, "value" );
-        b.bind();
+
+        b= bc.addBinding( applicationModel.colorbar, "${type}", edit, "value" );
+
+        b= bc.addBinding( applicationModel.spectrogramRend, "${rebinner}", rebin, "value" );
+        
+        b= bc.addBinding( applicationModel.plot, "${drawGrid}", majorTicksCheckBox, "selected" );
+        b= bc.addBinding( applicationModel.plot, "${drawMinorGrid}", minorGridCheckBox, "selected" );
+        b= bc.addBinding( applicationModel.plot, "${gridOver}", gridOverCheckBox, "selected" );
+        
+        bc.bind();
     }
     
     /** This method is called from within the constructor to
@@ -141,6 +131,11 @@ public class PlotStylePanel extends javax.swing.JPanel {
         jLabel10 = new javax.swing.JLabel();
         lineStylePanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        majorTicksCheckBox = new javax.swing.JCheckBox();
+        jLabel11 = new javax.swing.JLabel();
+        minorGridCheckBox = new javax.swing.JCheckBox();
+        gridOverCheckBox = new javax.swing.JCheckBox();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("spectrogram"));
 
@@ -176,7 +171,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(rebinPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 142, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(colortableTypePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 141, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(68, Short.MAX_VALUE))
+                        .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                         .add(moreSprectrogramPropsButton)
                         .addContainerGap())))
@@ -276,7 +271,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                                 .add(symSizeSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .add(lineThickSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 61, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .add(fillColorPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 53, Short.MAX_VALUE))))
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 18, Short.MAX_VALUE))))
                 .addContainerGap())
         );
 
@@ -329,6 +324,47 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
         jLabel1.setText("Plot Style");
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("plot"));
+
+        majorTicksCheckBox.setText("major ticks");
+        majorTicksCheckBox.setToolTipText("draw grid lines at major ticks\n");
+
+        jLabel11.setText("grid:");
+
+        minorGridCheckBox.setText("minor ticks");
+        minorGridCheckBox.setToolTipText("draw grid lines at minor ticks\n");
+
+        gridOverCheckBox.setText("overlay");
+        gridOverCheckBox.setToolTipText("draw grid lines on top of data");
+
+        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jLabel11)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(gridOverCheckBox)
+                    .add(jPanel3Layout.createSequentialGroup()
+                        .add(majorTicksCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(minorGridCheckBox)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel3Layout.createSequentialGroup()
+                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(majorTicksCheckBox)
+                    .add(jLabel11)
+                    .add(minorGridCheckBox))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(gridOverCheckBox)
+                .addContainerGap(102, Short.MAX_VALUE))
+        );
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -339,21 +375,23 @@ public class PlotStylePanel extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(jPanel3, 0, 257, Short.MAX_VALUE)
+                            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .add(jLabel1))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        layout.linkSize(new java.awt.Component[] {jPanel1, jPanel2}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(layout.createSequentialGroup()
+                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -373,8 +411,10 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private javax.swing.JPanel colortableTypePanel;
     private javax.swing.JPanel fillColorPanel;
     private javax.swing.JCheckBox fillToReferenceCheckBox;
+    private javax.swing.JCheckBox gridOverCheckBox;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -385,8 +425,11 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel lineStylePanel;
     private javax.swing.JSpinner lineThickSpinner;
+    private javax.swing.JCheckBox majorTicksCheckBox;
+    private javax.swing.JCheckBox minorGridCheckBox;
     private javax.swing.JButton moreSeriesPropsButton;
     private javax.swing.JButton moreSprectrogramPropsButton;
     private javax.swing.JPanel psymPanel;
