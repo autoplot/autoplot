@@ -126,6 +126,11 @@
         <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
     </target>
     
+    <target name="applet-release" depends="jar" >
+        <copy file="${build.classes.dir}/AutoplotApplet.html" todir="${dist.dir}" />
+        <copy file="${build.classes.dir}/FORMDATA.JS" todir="${dist.dir}" />
+        <copy file="${build.classes.dir}/logo32x32.png" todir="${dist.dir}" />
+    </target>
     
     <target name="-pre-init" >
         <property name="org.das2.dotag" value="true" />
