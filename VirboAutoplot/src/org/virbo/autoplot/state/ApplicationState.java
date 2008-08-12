@@ -304,6 +304,7 @@ public class ApplicationState {
      * @return "..."+s.substring()
      */
     private static String abbreviateRight( String s, int len ) {
+        if ( s==null ) return "<null>";
         if ( s.length()>len ) {
             s= "..."+s.substring(s.length()-len);
         }
