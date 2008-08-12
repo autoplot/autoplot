@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  * from http://blogs.sun.com/nickstephen/entry/java_redirecting_system_out_and
  * An OutputStream that writes contents to a Logger upon each call to flush() 
  */
-class LoggingOutputStream extends ByteArrayOutputStream {
+public class LoggingOutputStream extends ByteArrayOutputStream {
 
     private String lineSeparator;
     private Logger logger;
@@ -25,7 +25,7 @@ class LoggingOutputStream extends ByteArrayOutputStream {
         super();
         this.logger = logger;
         this.level = level;
-        lineSeparator = System.getProperty("line.separator");
+        lineSeparator = System.getProperty("line.separator"); // applet okay    
     }
 
     /** 
