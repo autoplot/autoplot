@@ -74,6 +74,7 @@ public class CompletionContext {
         this.implicitName= implicitName;
         this.label= label==null ? completable : label;
         this.doc= doc;
+        this.maybePlot= maybePlot;
     }
     
     /**
