@@ -32,6 +32,7 @@ import org.virbo.dataset.IDataSet;
 import org.virbo.dataset.SDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
+import org.virbo.dsutil.TransposeRankNDataSet;
 
 /**
  * static methods supporting CdfFileDataSource
@@ -39,6 +40,121 @@ import org.virbo.datasource.DataSetURL;
  * @author jbf
  */
 public class CdfUtil {
+
+    private static void flatten(double[][] data, double[] back, int offset, int nx, int ny ) {
+        for (int i = 0; i < nx; i++) {
+            double[] dd = data[i];
+            for (int j = 0; j < ny; j++) {
+                back[ offset + i * ny + j] = dd[j];
+            }
+        }
+    }
+
+    private static void flatten(float[][] data, float[] back, int offset, int nx, int ny) {
+        for (int i = 0; i < nx; i++) {
+            float[] dd = data[i];
+            System.arraycopy(dd, 0, back, offset + i * ny, ny);
+            //for (int j = 0; j < ny; j++) {
+            //    back[ offset + i * ny + j] = dd[j];
+            //}
+        }
+    }
+
+    private static void flatten(short[][] data, short[] back, int offset, int nx, int ny) {
+        for (int i = 0; i < nx; i++) {
+            short[] dd = data[i];
+            for (int j = 0; j < ny; j++) {
+                back[ offset + i * ny + j] = dd[j];
+            }
+        }
+    }
+    
+    private static void flatten(byte[][] data, byte[] back, int offset, int nx, int ny) {
+        for (int i = 0; i < nx; i++) {
+            byte[] dd = data[i];
+            for (int j = 0; j < ny; j++) {
+                back[ offset + i * ny + j] = dd[j];
+            }
+        }
+    }    
+
+    private static void flatten( float[][][] data, float[] back, int offset, int nx, int ny, int nz ) {
+        offset=0;
+        for (int i = 0; i < nx; i++) {
+            float[][] ff= data[i];
+            try {
+                flatten( ff, back, offset, ny, nz );
+            } catch ( ArrayIndexOutOfBoundsException ex ) {
+                System.err.println("here2345");
+            }
+            offset+= ny*nz;
+        }
+    }
+    
+    private static WritableDataSet wrapRank2(long varType, Object odata, Variable variable) throws RuntimeException {
+        WritableDataSet result;
+        if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
+            float[][] data = (float[][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            float[] back = new float[nx * ny];
+            flatten( data, back, 0, nx, ny );
+            result = FDataSet.wrap(back, nx, ny);
+        } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE) {
+            double[][] data = (double[][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            double[] back = new double[nx * ny];
+            flatten( data, back, 0, nx, ny );
+            result = DDataSet.wrap(back, nx, ny);
+        } else if (varType == Variable.CDF_EPOCH) {
+            double[] data = (double[]) odata; // kludge for CAA, which returns [1,900]
+            result = DDataSet.wrap(data);
+        } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
+            short[][] data = (short[][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            short[] back = new short[nx * ny];
+            flatten(data, back, 0, nx, ny);
+            result = SDataSet.wrap(back, nx, ny);
+        } else if (varType == Variable.CDF_INT1) {
+            byte[][] data = (byte[][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            byte[] back = new byte[nx * ny];
+            flatten(data, back, 0, nx, ny);
+            result = BDataSet.wrap(back, nx, ny);
+        } else if (varType == Variable.CDF_CHAR) {
+            EnumerationUnits units = EnumerationUnits.create(variable.getName());
+            String[] sdata = (String[]) odata;
+            double[] back = new double[sdata.length];
+            for (int i = 0; i < sdata.length; i++) {
+                back[i] = units.createDatum(sdata[i]).doubleValue(units);
+            }
+            result = DDataSet.wrap(back);
+            result.putProperty(QDataSet.UNITS, units);
+        } else {
+            throw new RuntimeException("Unsupported Data Type " + variable.getDataType() + " java type " + odata.getClass());
+        }
+        return result;
+    }
+
+    private static WritableDataSet wrapRank3(long varType, Object odata, Variable variable) throws RuntimeException {
+        WritableDataSet result;
+        if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
+            float[][][] data = (float[][][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            int nz = data[0][0].length;
+            float[] back = new float[ nx * ny * nz ];
+            flatten( data, back, 0, nx, ny, nz );
+            result = FDataSet.wrap( back, nx, nz, ny );
+            
+        } else {
+            throw new RuntimeException("Unsupported Data Type " + variable.getDataType() + " java type " + odata.getClass());
+        }
+        return result;    
+    }
 
     /**
      * Creates a new instance of CdfUtil
@@ -138,12 +254,13 @@ public class CdfUtil {
         } else if (dims == 1) {
             dimCounts = new long[]{dimSizes[0]};
             dimIntervals = new long[]{1};
-//        } else if ( dims==2 ) {
-//            dimCounts= new long[] { dimSizes[0], dimSizes[1] };
-//            dimIntervals= new long[] { 1, 1 };
+        } else if (dims == 2) {
+            dimIndeces= new long[]{ 0, 0 };
+            dimCounts = new long[]{dimSizes[0], dimSizes[1]};
+            dimIntervals = new long[]{1, 1};
         } else {
             if (recCount != -1) {
-                throw new IllegalArgumentException("rank 3 not implemented");
+                throw new IllegalArgumentException("rank 4 not implemented");
             } else {
                 dimCounts = new long[]{dimSizes[0]};
                 dimIntervals = new long[]{1};
@@ -157,14 +274,19 @@ public class CdfUtil {
 
         int rank = 1;
         if (recCount == 1) {
-            if ( ! odata.getClass().isArray() ) {
+            if (!odata.getClass().isArray()) {
                 return wrapSingle(varType, variable.getName(), odata);
             }
         }
-        
+
         Object element = Array.get(odata, 0);
         if (element.getClass().isArray()) {
-            rank = 2;
+            Object element2 = Array.get(element, 0);
+            if (element2.getClass().isArray()) {
+                rank = 3;
+            } else {
+                rank = 2;
+            }
         }
 
         if (rank == 1) {
@@ -198,76 +320,10 @@ public class CdfUtil {
             }
 
         } else if (rank == 2) {
-            if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
-                float[][] data = (float[][]) odata;
-                int nx = data.length;
-                int ny = data[0].length;
-                float[] back = new float[nx * ny];
-                for (int i = 0; i < nx; i++) {
-                    for (int j = 0; j < ny; j++) {
-                        float[] dd = data[i];
-                        back[i * ny + j] = dd[j];
-                    }
-                }
-                result = FDataSet.wrap(back, nx, ny);
+            result = wrapRank2(varType, odata, variable);
 
-            } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE) {
-                double[][] data = (double[][]) odata;
-                int nx = data.length;
-                int ny = data[0].length;
-                double[] back = new double[nx * ny];
-                for (int i = 0; i < nx; i++) {
-                    for (int j = 0; j < ny; j++) {
-                        double[] dd = data[i];
-                        back[i * ny + j] = dd[j];
-                    }
-                }
-                result = DDataSet.wrap(back, nx, ny);
-
-            } else if (varType == Variable.CDF_EPOCH) {
-                double[] data = (double[]) odata;  // kludge for CAA, which returns [1,900]
-                result = DDataSet.wrap(data);
-
-            } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
-                short[][] data = (short[][]) odata;
-                int nx = data.length;
-                int ny = data[0].length;
-                short[] back = new short[nx * ny];
-                for (int i = 0; i < nx; i++) {
-                    for (int j = 0; j < ny; j++) {
-                        short[] dd = data[i];
-                        back[i * ny + j] = dd[j];
-                    }
-                }
-                result = SDataSet.wrap(back, nx, ny);
-
-            } else if (varType == Variable.CDF_INT1) {
-                byte[][] data = (byte[][]) odata;
-                int nx = data.length;
-                int ny = data[0].length;
-                byte[] back = new byte[nx * ny];
-                for (int i = 0; i < nx; i++) {
-                    for (int j = 0; j < ny; j++) {
-                        byte[] dd = data[i];
-                        back[i * ny + j] = dd[j];
-                    }
-                }
-                result = BDataSet.wrap(back, nx, ny);
-
-            } else if (varType == Variable.CDF_CHAR) {
-                EnumerationUnits units = EnumerationUnits.create(variable.getName());
-                String[] sdata = (String[]) odata;
-                double[] back = new double[sdata.length];
-                for (int i = 0; i < sdata.length; i++) {
-                    back[i] = units.createDatum(sdata[i]).doubleValue(units);
-                }
-                result = DDataSet.wrap(back);
-                result.putProperty(QDataSet.UNITS, units);
-            } else {
-                throw new RuntimeException("Unsupported Data Type " + variable.getDataType() + " java type " + odata.getClass());
-            }
         } else {
-            throw new IllegalArgumentException("rank 3 not implemented");
+            result = wrapRank3(varType, odata, variable);
 
         }
 
@@ -283,15 +339,15 @@ public class CdfUtil {
      * @param cdf
      * @param dataOnly
      * @param rankLimit
-     * @return
+     * @return map of parameter name to short description
      * @throws gsfc.nssdc.cdf.CDFException
      */
-    public static Map<String,String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws CDFException {
+    public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws CDFException {
 
-        Map<String,String> result = new LinkedHashMap<String, String>();
+        Map<String, String> result = new LinkedHashMap<String, String>();
         Vector v = cdf.getVariables();
 
-        Attribute aAttr = null, bAttr = null, cAttr = null;
+        Attribute aAttr = null,bAttr  = null, cAttr = null;
 
         try {
             aAttr = cdf.getAttribute("DEPEND_0");
@@ -325,66 +381,66 @@ public class CdfUtil {
             }
 
             if (!dataOnly) {
-                result.put( var.getName(), null );
+                result.put(var.getName(), null);
             } else {
 
                 Vector attr = var.getAttributes();
-                
-                Variable xDependVariable=null;
-                Variable yDependVariable=null;
-                Variable zDependVariable=null;
-                
+
+                Variable xDependVariable = null;
+                Variable yDependVariable = null;
+                Variable zDependVariable = null;
+
                 try {
                     if (aAttr != null) {  // check for metadata for DEPEND_1
                         Entry xEntry = aAttr.getEntry(var);
                         xDependVariable = cdf.getVariable((String) xEntry.getData());
                     }
-                } catch (CDFException e) {    
+                } catch (CDFException e) {
                 }
 
-                
+
                 try {
                     if (bAttr != null) {  // check for metadata for DEPEND_1
                         Entry yEntry = bAttr.getEntry(var);
                         yDependVariable = cdf.getVariable((String) yEntry.getData());
-                        Attribute varType = cdf.getAttribute("VAR_TYPE");
+                        /*Attribute varType = cdf.getAttribute("VAR_TYPE");
                         Entry e = varType.getEntry(yDependVariable);
                         if (e.getData().equals("metadata")) {
                             continue;
-                        }
-                    }
-                } catch (CDFException e) {    
-                }
-                
-                
-                try {
-                    if (cAttr != null) { // check for existence of DEPEND_2, dimensionality too high
-                        Entry zEntry = cAttr.getEntry(var);
-                        zDependVariable = cdf.getVariable((String) zEntry.getData());
-                        Attribute varType = cdf.getAttribute("VAR_TYPE");
-                        Entry e = varType.getEntry(zDependVariable);
-                        if (e.getData().equals("metadata")) {
-                            continue;
-                        }
+                        }*/
                     }
                 } catch (CDFException e) {
                 }
 
-                
-                String desc= "" + var.getName();
-                if ( xDependVariable!=null ) {
-                    desc+= "("+ xDependVariable.getName();
-                    if ( yDependVariable!=null ) {
-                        desc+= ","+ yDependVariable.getName();
-                        if ( zDependVariable!=null ) {
-                            desc+= ","+ zDependVariable.getName();
+
+                try {
+                    if (cAttr != null) { // check for existence of DEPEND_2, dimensionality too high
+                        Entry zEntry = cAttr.getEntry(var);
+                        zDependVariable = cdf.getVariable((String) zEntry.getData());
+                        /*Attribute varType = cdf.getAttribute("VAR_TYPE");
+                        Entry e = varType.getEntry(zDependVariable);
+                        if (e.getData().equals("metadata")) {
+                            continue;
+                        }*/
+                    }
+                } catch (CDFException e) {
+                }
+
+
+                String desc = "" + var.getName();
+                if (xDependVariable != null) {
+                    desc += "(" + xDependVariable.getName();
+                    if (yDependVariable != null) {
+                        desc += "," + yDependVariable.getName();
+                        if (zDependVariable != null) {
+                            desc += "," + zDependVariable.getName();
                         }
                     }
-                    desc+=")";
+                    desc += ")";
                 }
-                
-                        
-                result.put(var.getName(),desc);
+
+
+                result.put(var.getName(), desc);
 
             }
         } // for
