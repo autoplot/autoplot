@@ -250,7 +250,6 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
 
                 CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
-
                     public void itemSelected(CompletionResult s1) {
                         dataSetSelector.setSelectedItem(s1.completion);
                         if (s1.maybePlot) {
@@ -628,6 +627,7 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
      * @return Value of property recent.
      */
     public List<String> getRecent() {
+	if ( this.recent==null ) recent= new ArrayList<String>();
         return this.recent;
     }
 
