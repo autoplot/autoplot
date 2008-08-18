@@ -21,11 +21,16 @@
               <Component id="saveAsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="openButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="59" max="32767" attributes="0"/>
+              <EmptySpace pref="73" max="32767" attributes="0"/>
               <Component id="contextSelector" min="-2" max="-2" attributes="0"/>
           </Group>
-          <Component id="jScrollPane1" alignment="0" pref="489" max="32767" attributes="0"/>
-          <Component id="fileNameLabel" alignment="0" pref="489" max="32767" attributes="0"/>
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="fileNameLabel" pref="398" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="caretPositionLabel" min="-2" pref="87" max="-2" attributes="0"/>
+          </Group>
+          <Component id="jScrollPane1" alignment="0" pref="503" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -38,9 +43,12 @@
                   <Component id="contextSelector" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jScrollPane1" pref="260" max="32767" attributes="0"/>
+              <Component id="jScrollPane1" pref="270" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="fileNameLabel" min="-2" pref="18" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="caretPositionLabel" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="fileNameLabel" linkSize="2" alignment="3" min="-2" pref="18" max="-2" attributes="0"/>
+              </Group>
           </Group>
       </Group>
     </DimensionLayout>
@@ -106,6 +114,11 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="contextSelectorActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="caretPositionLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="1,1"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
