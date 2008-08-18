@@ -11,6 +11,7 @@ package org.virbo.autoplot;
 import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import edu.uiowa.physics.pw.das.datum.InconvertibleUnitsException;
 import edu.uiowa.physics.pw.das.datum.Units;
 import edu.uiowa.physics.pw.das.datum.UnitsUtil;
 import edu.uiowa.physics.pw.das.util.DasMath;
@@ -145,6 +146,13 @@ public class AutoplotUtil {
         return new DatumRange( min, max, units );
     }
 
+    private static DatumRange makeDimensionless(DatumRange dr) {
+        Units u = dr.getUnits();
+        return new DatumRange(dr.min().doubleValue(u),
+                dr.max().doubleValue(u),
+                Units.dimensionless);
+    }
+
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties) {
 
         log.fine("enter autoRange");
@@ -181,7 +189,7 @@ public class AutoplotUtil {
                     //MomentDescriptor moment = moment(ds);
                     //dd = robustRange(ds, moment);
                     dd = simpleRange(ds);
-                }   
+                }
             } catch (IllegalArgumentException ex) {
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
@@ -234,33 +242,34 @@ public class AutoplotUtil {
             result.robustMin = dd[0];
             result.robustMax = dd[1];
 
+            double nomMin, nomMax;
+            if (mono) {
+                nomMin = ds.value(0);
+                nomMax = ds.value(ds.length() - 1);
+            } else {
+                nomMin = dd[0];
+                nomMax = dd[1];
+            }
+
             // lin/log logic: in which space is ( median - min5 ) more equal to ( max5 - median )?  Also, max5 / min5 > 1e3
-            double clin = (result.robustMax - result.median) / (result.median - result.robustMin);
+            double clin = (nomMax - result.median) / (result.median - nomMin);
             if (clin > 1.0) {
                 clin = 1 / clin;
             }
-            double clog = (result.robustMax / result.median) / (result.median / result.robustMin);
+            double clog = (nomMax / result.median) / Math.abs(result.median / nomMin);
             if (clog > 1.0) {
                 clog = 1 / clog;
             }
 
-            if (clog > clin && result.robustMax / result.robustMin > 1e2) {
+            if (clog > clin && nomMax / nomMin > 1e2) {
                 result.log = true;
             }
 
-            if (UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u)) {
-                if (result.log) {
-                    result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
-                            DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
-                } else {
-                    result.range = DatumRangeUtil.rescale(DatumRange.newDatumRange(result.robustMin, result.robustMax, u), -0.05, 1.05);
-                }
-            } else {
-                result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
-            }
-
+            result.range= DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
+            
         }
 
+        // interpret properties, looking for hints about scale type and ranges.
         if (properties != null) {
             String log = (String) properties.get(QDataSet.SCALE_TYPE);
             if (log != null) {
@@ -277,18 +286,50 @@ public class AutoplotUtil {
             if ((tmin != null || tmax != null)) {
                 double d1, d2;
                 if (result.log) {
-                    Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
-                    Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
-                    d1 = DatumRangeUtil.normalizeLog(range, dd1);
-                    d2 = DatumRangeUtil.normalizeLog(range, dd2);
+                    try {
+                        Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
+                        Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
+                        d1 = DatumRangeUtil.normalizeLog(range, dd1);
+                        d2 = DatumRangeUtil.normalizeLog(range, dd2);
+                    } catch (InconvertibleUnitsException ex) {
+                        range = makeDimensionless(range);
+                        result.range = makeDimensionless(result.range);
+                        Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
+                        Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
+                        d1 = DatumRangeUtil.normalizeLog(range, dd1);
+                        d2 = DatumRangeUtil.normalizeLog(range, dd2);
+                    }
                 } else {
-                    d1 = DatumRangeUtil.normalize(range, result.range.min());
-                    d2 = DatumRangeUtil.normalize(range, result.range.max());
+                    try {
+                        d1 = DatumRangeUtil.normalize(range, result.range.min());
+                        d2 = DatumRangeUtil.normalize(range, result.range.max());
+                    } catch (InconvertibleUnitsException ex) {
+                        range = makeDimensionless(range);
+                        result.range = makeDimensionless(result.range);
+                        d1 = DatumRangeUtil.normalize(range, result.range.min());
+                        d2 = DatumRangeUtil.normalize(range, result.range.max());
+                    }
                 }
                 if (d2 - d1 > 0.1) {
                     result.range = range;
+                    // just use the metadata settings.
+                    return result; 
                 }
             }
+        }
+
+        // round out to frame the data with empty space, so that the data extent is known.
+        if (UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u)) {
+            if (result.log) {
+                if (result.robustMin <= 0.0)
+                    result.robustMin = result.robustMax / 1e3;
+                result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
+                        DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
+            } else {
+                result.range = DatumRangeUtil.rescale(DatumRange.newDatumRange(result.robustMin, result.robustMax, u), -0.05, 1.05);
+            }
+        } else {
+            result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
         }
 
         log.fine("exit autoRange");
@@ -340,7 +381,6 @@ public class AutoplotUtil {
         int validCount;
     }
 
-    
     static MomentDescriptor moment(QDataSet ds) {
 
         MomentDescriptor result = new MomentDescriptor();
@@ -450,11 +490,17 @@ public class AutoplotUtil {
         double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
         while (it.hasNext()) {
             it.next();
-            if (it.getValue(w) > 0. ) {
+            if (it.getValue(w) > 0.) {
                 double d = it.getValue(ds);
-                result[0] = Math.min(result[0], it.getValue(min) );
-                result[1] = Math.max(result[1], it.getValue(max) );
+                result[0] = Math.min(result[0], it.getValue(min));
+                result[1] = Math.max(result[1], it.getValue(max));
+            } else {
+                double d = it.getValue(ds);
             }
+        }
+        if (result[0] == Double.POSITIVE_INFINITY) {  // no valid data!
+            result[0] = 0.;
+            result[1] = 1.;
         }
         return result;
     }
@@ -512,9 +558,12 @@ public class AutoplotUtil {
     /**
      * rewrite the dataset so that fill values are set by the valid range and fill
      * controls.
+     * //TODO: use QubeDataSetIterator to reduce code.
+     * //TODO: simply set validmin, validmax, fill metadata.
      */
-    public static WritableDataSet applyFillValidRange(QDataSet ds, double vmin, double vmax, double fill) {
-        WritableDataSet result = DDataSet.copy(ds);
+    public static void applyFillValidRange(WritableDataSet result, double vmin, double vmax, double fill) {
+
+        QDataSet ds = result;
         Units u = (Units) ds.property(QDataSet.UNITS);
 
         if (u == null) {
@@ -552,7 +601,6 @@ public class AutoplotUtil {
 
         result.putProperty(QDataSet.UNITS, u);
 
-        return result;
     }
 
     /**
