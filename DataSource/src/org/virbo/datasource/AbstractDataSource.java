@@ -35,6 +35,23 @@ public abstract class AbstractDataSource implements DataSource {
     protected URL resourceURL;
     
     /**
+     * returns the url's extension for convenience.  This does not canonize
+     * the extension, case is preserved.  The extension does contain the initial
+     * period.  Returns an empty string if no extension is found.
+     * 
+     * @return extension with a period, or empty string.
+     */
+    protected String getExt( URL url ) {
+        String s= url.getFile();
+        int i= s.lastIndexOf(s);
+        if ( i==-1 ) {
+            return "";
+        } else {
+            return s.substring(i);
+        }
+    }
+    
+    /**
      * available to subclasses for convenience.  
      */
     protected Map<String,String> params;
