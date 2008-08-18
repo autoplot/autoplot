@@ -8,12 +8,16 @@ package org.virbo.autoplot;
 
 import edu.uiowa.physics.pw.das.components.DatumRangeEditor;
 import java.awt.BorderLayout;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
 import javax.beans.binding.BindingConverter;
+import javax.swing.AbstractSpinnerModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SpinnerNumberModel;
 
@@ -24,6 +28,7 @@ import javax.swing.SpinnerNumberModel;
 public class AxisPanel extends javax.swing.JPanel {
     
     ApplicationModel applicationModel;
+    private final static Logger logger= Logger.getLogger("virbo.autoplot");
     
     /** Creates new form PlotStylePanel */
     public AxisPanel( final ApplicationModel applicationModel ) {
@@ -44,6 +49,16 @@ public class AxisPanel extends javax.swing.JPanel {
         zAxisRangePanel.add( zredit, BorderLayout.CENTER );
                 
         sliceIndexSpinner.setModel( new SpinnerNumberModel( 0, 0, 100, 1 ) );
+        sliceIndexSpinner.addMouseWheelListener( new MouseWheelListener() {
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int pos= (Integer)sliceIndexSpinner.getValue();
+                pos-= e.getWheelRotation();
+                if ( pos<0 ) pos=0;
+                int maxpos= applicationModel.getMaxSliceIndex(applicationModel.getSliceDimension());
+                if ( pos>=maxpos) pos= maxpos-1;
+                sliceIndexSpinner.setValue(pos);
+            }
+        });
                 
         BindingContext bc= new BindingContext();
         Binding b;
@@ -84,7 +99,12 @@ public class AxisPanel extends javax.swing.JPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 zAxisPanel.setEnabled( applicationModel.colorbar.isVisible() );
                 if ( evt.getPropertyName().equals(applicationModel.PROP_DEPNAMES) ) {
-                    sliceTypeComboBox.setModel( new DefaultComboBoxModel( applicationModel.getDepnames().toArray() ) ); 
+                    String[] depNames= (String[]) applicationModel.getDepnames().toArray();
+                    for ( int i=0; i<depNames.length; i++ ) {
+                        depNames[i]= depNames[i]+"="+applicationModel.getMaxSliceIndex(i);
+                    }
+                    sliceTypeComboBox.setModel( new DefaultComboBoxModel( depNames ) ); 
+                    //sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
                 }
             }
         } );
@@ -461,11 +481,18 @@ public class AxisPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_fillValueComboBoxActionPerformed
 
     private void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
+        logger.fine( "set slice dimension "+sliceTypeComboBox.getSelectedIndex() );
+        System.err.println("set slice dimension");
         applicationModel.setSliceDimension( sliceTypeComboBox.getSelectedIndex() );
+        int max= applicationModel.getMaxSliceIndex(applicationModel.getSliceDimension());
+        if ( max>0 ) max--; // make inclusive, was exclusive.
+        this.sliceIndexSpinner.setModel( new SpinnerNumberModel( 0, 0, max, 1 ) );
+        applicationModel.updateFill(true,true);
     }//GEN-LAST:event_sliceTypeComboBoxActionPerformed
 
     private void transposeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transposeCheckBoxActionPerformed
-        // TODO add your handling code here:
+        //applicationModel.updateFill(true);
+        //beans binding triggers the update.
 }//GEN-LAST:event_transposeCheckBoxActionPerformed
     
     
