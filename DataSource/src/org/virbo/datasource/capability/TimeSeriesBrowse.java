@@ -36,9 +36,11 @@ public interface TimeSeriesBrowse {
      * set the resolution for the desired view of the timeseries.
      */
     void setTimeResolution( Datum d );
-    
+        
     /**
-     * return the URL for the current time range and resolution.
+     * return the URL for the current time range and resolution.  This is also
+     * used to identify the dataset, so the same urls returned from here must
+     * return the same dataset!
      */
     URL getURL( );
 }
