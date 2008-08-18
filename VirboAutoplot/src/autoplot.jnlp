@@ -3,11 +3,11 @@
 "http://www.cottagesystems.com/lib/dtd/jnlp-1.5.dtd">
 <jnlp 
     spec="1.0+" 
-    codebase="http://www.autoplot.org/jnlp-dev/"
+    codebase="http://www.autoplot.org/jnlp-#{tag}/"
     href="autoplot.jnlp"> 
     
     <information> 
-        <title>Autoplot(DEV)</title> 
+        <title>Autoplot(#{tag})</title> 
         <vendor>VxOware</vendor> 
         <description>plots data from various sources, such as opendap, cdf, and netcdf using das2</description> 
         <description kind="short">data plotter</description> 
@@ -55,7 +55,7 @@
         <package name="thredds" part="netcdf"  recursive="true" />
         <package name="ucar" part="netcdf"  recursive="true" />
         <jar href="lib/nlog4j-1.2.21.jar" />
-        <jar href="lib/poi-2.5.1-final-20040804.jar" />
+        <jar href="lib/poi-3.1-FINAL-20080629.jar" />
         <jar href="lib/prefsAll.jar" />
         <jar href="lib/resourcesOptional.jar" />
         <jar href="lib/visadNoDods.jar" />
