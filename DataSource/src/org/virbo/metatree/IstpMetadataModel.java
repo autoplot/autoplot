@@ -89,15 +89,20 @@ public class IstpMetadataModel extends MetadataModel {
 		min = doubleValue(attrs.get("VALIDMIN"), units, Double.NEGATIVE_INFINITY);
 	    }
 	}
-	if (getScaleType(attrs).equals("log") && min <= 0) {
+	if ("log".equals(getScaleType(attrs)) && min <= 0) {
 	    min = max / 10000;
 	}
 	range = new DatumRange(min, max, units);
 	return range;
     }
 
+    /**
+     * return null or the scale type if found.
+     * @param attrs
+     * @return
+     */
     private String getScaleType( Map attrs) {
-	String type = "linear";
+	String type = null;
 	if (attrs.containsKey("SCALETYP")) {
 	    type = (String) attrs.get("SCALETYP");
 	}
