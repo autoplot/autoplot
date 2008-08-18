@@ -12,6 +12,7 @@ import edu.uiowa.physics.pw.das.dataset.CacheTag;
 import edu.uiowa.physics.pw.das.datum.Datum;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import edu.uiowa.physics.pw.das.datum.TimeUtil;
 import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -29,6 +30,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
@@ -49,6 +51,11 @@ public class AggregatingDataSource extends AbstractDataSource {
     Map<String,Object> metadata;
     MetadataModel metadataModel;
 
+    private DatumRange quantize(DatumRange timeRange) {
+        timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
+        return timeRange;
+    }
+        
     /** Creates a new instance of AggregatingDataSource */
     public AggregatingDataSource(URL url) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(url);
@@ -57,7 +64,7 @@ public class AggregatingDataSource extends AbstractDataSource {
         addCability(TimeSeriesBrowse.class, new TimeSeriesBrowse() {
 
             public void setTimeRange(DatumRange dr) {
-                viewRange = dr;
+                viewRange = quantize(dr);
                 Logger.getLogger("virbo.datasource.agg").fine("set timerange="+viewRange );
             }
 
@@ -66,7 +73,12 @@ public class AggregatingDataSource extends AbstractDataSource {
 
             public URL getURL() {
                 try {
-                    return new URL(AggregatingDataSource.this.getURL());
+                    DataSetURL.URLSplit split= DataSetURL.parse( AggregatingDataSource.this.getURL() );
+                    Map params= DataSetURL.parseParams(split.params);
+                    params.put( "timerange", viewRange.toString() );
+                    split.params= DataSetURL.formatParams(params);
+                    return new URL( DataSetURL.format(split) );
+                    
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(AggregatingDataSource.class.getName()).log(Level.SEVERE, null, ex);
                     return null;
