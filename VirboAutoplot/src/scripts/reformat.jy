@@ -1,0 +1,2 @@
+ds= getDataSet('http://www.autoplot.org/data/image/Capture_00158.jpg?channel=value')
+formatDataSet( ds, 'bin.file://home/jbf/foo.bin' )
