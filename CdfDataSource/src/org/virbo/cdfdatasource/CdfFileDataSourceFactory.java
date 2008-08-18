@@ -31,12 +31,12 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     
     private static Logger logger = Logger.getLogger("virbo.cdfdatasource");
     
-    /** Creates a new instance of CdfFileDataSourceFactory */
-    public CdfFileDataSourceFactory() {
-    }
-    
     static {
         loadCdfLibraries();
+    }
+    /** Creates a new instance of CdfFileDataSourceFactory */
+    public CdfFileDataSourceFactory() {
+	
     }
     
     private static void loadCdfLibraries() {
@@ -98,14 +98,15 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             CDF cdf= CDF.open( fileName, CDF.READONLYon );
             
             logger.fine("inspect cdf for plottable parameters");
-            Map<String,String> result= CdfUtil.getPlottable( cdf, true , 2);
+            Map<String,String> result= CdfUtil.getPlottable( cdf, true , 3);
             
             logger.fine("close cdf");
             cdf.close();
             
             List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
             for ( String key:result.keySet() ) {
-                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, key, this, "arg_0", result.get(key) ,null );
+                CompletionContext cc1= new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, 
+                        key, this, "arg_0", result.get(key), null, true );
                 ccresult.add(cc1);
             }
             return ccresult;
@@ -120,7 +121,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
                 CDF cdf= CDF.open( fileName, CDF.READONLYon );
-                Map<String,String> result= CdfUtil.getPlottable( cdf, true , 2);
+                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 3);
                 cdf.close();
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
