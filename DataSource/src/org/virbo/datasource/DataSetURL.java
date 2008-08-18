@@ -15,7 +15,9 @@ import org.das2.util.filesystem.FileSystem;
 import ftpfs.FTPBeanFileSystemFactory;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -33,6 +35,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.das2.util.filesystem.FileSystemSettings;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -69,6 +72,8 @@ public class DataSetURL {
 
     static {
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
+        FileSystem.settings().setPersistence( FileSystemSettings.Persistence.EXPIRES );
+        FileSystem.settings().setLocalCacheDir( new File(System.getProperty("user.home"),"autoplot_data" ) );
     }
 
     public static class URLSplit {
@@ -434,12 +439,47 @@ public class DataSetURL {
         return (result.length() == 0) ? "" : result.substring(1);
     }
 
+    public static InputStream getInputStream( URL url, ProgressMonitor mon ) throws IOException {
+        URLSplit split = parse(url.toString());
+
+        String proto = url.getProtocol();
+        if (proto.equals("file")) {
+            String surl = url.toString();
+            int idx1 = surl.indexOf("?");
+            if (idx1 == -1) {
+                idx1 = surl.length();
+            }
+            surl = surl.substring(0, idx1);
+
+            String sfile;
+            int idx0 = surl.indexOf("file:///");
+            if (idx0 == -1) {
+                idx0 = surl.indexOf("file:/");
+                sfile = surl.substring(idx0 + 5);
+            } else {
+                sfile = surl.substring(idx0 + 7);
+            }
+            sfile = URLDecoder.decode(sfile, "US-ASCII");
+            return new FileInputStream( new File(sfile) );
+
+        } else {
+            try {
+                FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
+                FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
+                if (!fo.isLocal()) {
+                    Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
+                }
+                return fo.getInputStream(mon);
+                
+            } catch (URISyntaxException ex) {
+                throw new IOException("URI Syntax Exception: " + ex.getMessage() );
+            }
+        }        
+    }
+    
     /**
      * return a file reference for the url.  This is initially to fix the problem
      * for Windows where new URL( "file://c:/myfile.dat" ).getPath() -> "/myfile.dat".
-     * This may eventually be how remote files are downloaded as well, and
-     * may block until the file is downloaded.
-     * Linux: file:/home/jbf/fun/realEstate/to1960.latlon.xls?column=C[1:]&depend0=H[1:]
      *
      */
     public static File getFile(URL url, ProgressMonitor mon) throws IOException {
@@ -842,8 +882,9 @@ public class DataSetURL {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine().trim();
+                String s = reader.readLine();
                 while (s != null) {
+                    s= s.trim();
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
@@ -858,8 +899,9 @@ public class DataSetURL {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine().trim();
+                String s = reader.readLine();
                 while (s != null) {
+                    s= s.trim();
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
@@ -874,8 +916,9 @@ public class DataSetURL {
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-                String s = reader.readLine().trim();
+                String s = reader.readLine();
                 while (s != null) {
+                    s= s.trim();
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
