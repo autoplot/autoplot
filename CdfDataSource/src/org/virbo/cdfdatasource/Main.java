@@ -10,6 +10,8 @@
 package org.virbo.cdfdatasource;
 
 import gsfc.nssdc.cdf.CDF;
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -26,6 +28,11 @@ public class Main {
     private static boolean cdfLoaded= false;
     
     static {
+        System.err.println("java.library.path="+System.getProperty("java.library.path") );
+        try {
+            System.err.println("" + new File(".").getCanonicalPath());
+        } catch (IOException iOException) {
+        }
         dumpProperties();
         if ( ! cdfLoaded ) loadCdfLibraries();
     }
@@ -74,7 +81,7 @@ public class Main {
 
         String file;
         if ( args.length==0 ) {
-            file= "P:/cdf/ace/swe/2005/ac_k0_swe_20051017_v01.cdf";
+            file= "/net/spot3/mnt/data1/jbf_scratch/papco_data/cdf/ace/swe/2005/ac_k0_swe_20051017_v01.cdf";
         } else {
             file= args[0];
         }
