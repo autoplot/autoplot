@@ -119,7 +119,7 @@ public class NameValueTreeModel implements TreeModel {
         }
 
         public String toString() {
-            return "" + name + "= MAP with " + value.size()+ " pairs";
+            return "" + name ;
         }
 
         public int childCount() {
