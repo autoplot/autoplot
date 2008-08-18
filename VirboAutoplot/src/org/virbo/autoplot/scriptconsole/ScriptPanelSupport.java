@@ -185,7 +185,7 @@ public class ScriptPanelSupport {
                 if (updateSurl) {
                     model.setDataSourceURL(file.toString());
                 } else {
-                    model.update(true);
+                    model.update(true,true);
                 }
                 panel.fileNameLabel.setText(file.toString());
             }
@@ -222,7 +222,7 @@ public class ScriptPanelSupport {
                     buf.append(s).append("\n");
                     s = read.readLine();
                 }
-
+                        
                 panel.getEditorPanel().setText(buf.toString());
                 panel.fileNameLabel.setText(file.toString());
             }
