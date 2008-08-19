@@ -326,7 +326,9 @@ public class AutoplotUtil {
                 result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
                         DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
             } else {
-                result.range = DatumRangeUtil.rescale(DatumRange.newDatumRange(result.robustMin, result.robustMax, u), -0.05, 1.05);
+                result.range= DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
+                if ( result.robustMin < result.robustMax ) result.range = DatumRangeUtil.rescale( result.range, -0.05, 1.05);
+                if ( result.robustMin==0 && result.robustMax==0 ) result.range= DatumRange.newDatumRange( -0.1, 1.0, u);
             }
         } else {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
