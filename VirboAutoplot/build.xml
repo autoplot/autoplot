@@ -68,7 +68,7 @@
 
     -->
 
-    <target name="do-tag" depends="init" >
+    <target name="do-tag" depends="init"  unless="no.deps">
         <property name="das2.dotag" value="true" />
         <!-- copied from build-impl.xml.  This must be updated by hand. -->
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="do-tag"/>
@@ -102,28 +102,51 @@
         </propertyfile>
     </target>
     
-    <target name="jnlp-release" depends="jar">
-        <property name="jnlp.dir" location="${dist.dir}/jnlp"/>
+    <target name="jnlp-release-pre-jar" depends="compile">
+        <tstamp> 
+            <format property="default_release_tag" pattern="yyyyMMdd" locale="en,GMT+0:00"></format>
+        </tstamp>        
+        <input message="release tag:" defaultvalue="${default_release_tag}" addproperty="release_tag"  />
+        <propertyfile comment="Build Information"
+                      file="${build.classes.dir}/META-INF/build.txt">
+            <entry key="build.tag" value="${release_tag}"/>
+        </propertyfile>
+    </target>
+    
+    <target name="jnlp-release" depends="jnlp-release-pre-jar,jar">
+        <input message="storepass:" addproperty="storepass"></input>
+        <input message="keypass:" addproperty="keypass"></input>
+        
+        <property name="jnlp.dir" location="${dist.dir}/jnlp/"/>
         <mkdir dir="${jnlp.dir}"/>
         <copy file="${dist.jar}" todir="${jnlp.dir}"/>
         <copy todir="${jnlp.dir}/lib/">
             <fileset dir="${dist.dir}/lib" includes="**" />
         </copy>
         <signjar alias="virbo"
-                 storepass="dolphin"
-                 keypass="virbo1" 
+                 storepass="${storepass}"
+                 keypass="${keypass}" 
                  lazy="true">
             <fileset dir="${jnlp.dir}" includes="**.jar" />
         </signjar>
         <signjar alias="virbo"
-                 storepass="dolphin"
-                 keypass="virbo1" 
+                 storepass="${storepass}"
+                 keypass="${keypass}" 
                  lazy="true" >
             <fileset  dir="${jnlp.dir}/lib" includes="**.jar" />
         </signjar>
         <copy file="${build.classes.dir}/autoplot.jnlp" tofile="${jnlp.dir}/autoplot.jnlp" />
         <copy file="${build.classes.dir}/index.html" tofile="${jnlp.dir}/index.html" />
         <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
+        <copy file="${build.classes.dir}/screen.png" tofile="${jnlp.dir}/screen.png" />
+        
+        <replace file="${jnlp.dir}/autoplot.jnlp" >
+            <replacefilter token="#{tag}" value="${release_tag}" />
+        </replace>
+        <replace file="${jnlp.dir}/index.html" >
+            <replacefilter token="#{tag}" value="${release_tag}" />
+        </replace>
+        
     </target>
     
     <target name="applet-release" depends="jar" >
