@@ -28,6 +28,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.CompletionContext;
+import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
@@ -46,9 +47,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
     
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException {
         
-        File f= getFile( mon );
-        
-        InputStream in= new FileInputStream(f);
+        InputStream in = DataSetURL.getInputStream( url, mon );
         
         ReadableByteChannel channel = Channels.newChannel(in);
         
