@@ -11,7 +11,6 @@ import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFConstants;
 import gsfc.nssdc.cdf.CDFException;
-import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,8 +56,6 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     }
 
     public void formatData(File url, java.util.Map<String, String> params, QDataSet data, ProgressMonitor mon) throws IOException, CDFException {
-
-        FileOutputStream out = new FileOutputStream(url);
 
         url.delete();
         cdf = CDF.create(url.toString());
