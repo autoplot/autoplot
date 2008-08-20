@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot;
 
+import com.cottagesystems.jdiskhog.JDiskHogPanel;
 import edu.uiowa.physics.pw.das.components.DasProgressPanel;
 import edu.uiowa.physics.pw.das.components.TearoffTabbedPane;
 import edu.uiowa.physics.pw.das.dasml.DOMBuilder;
@@ -18,7 +19,6 @@ import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -35,11 +35,7 @@ import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
 import javax.beans.binding.BindingConverter;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ComponentInputMap;
 import javax.swing.ImageIcon;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -47,9 +43,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import org.virbo.autoplot.layout.LayoutUtil;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
@@ -438,12 +433,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 }
             }
         });
-        bookmarksMenu.add(new AbstractAction("Reset Cache") {
-
-            public void actionPerformed(ActionEvent e) {
-                clearCache();
-            }
-        });
 
         bookmarksMenu.add(new JSeparator());
 
@@ -500,6 +489,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
@@ -704,6 +696,26 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         jMenuBar1.add(optionsMenu);
 
+        jMenu3.setText("Cache");
+
+        jMenuItem3.setText("Manage Files");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem3);
+
+        jMenuItem4.setText("Clear Cache");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem4);
+
+        jMenuBar1.add(jMenu3);
+
         bookmarksMenu.setText("Bookmarks");
         jMenuBar1.add(bookmarksMenu);
 
@@ -893,6 +905,16 @@ private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     applicationModel.decreaseFontSize();
 }//GEN-LAST:event_jMenuItem2ActionPerformed
 
+private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    JDiskHogPanel panel= new JDiskHogPanel();
+    panel.scan(FileSystem.settings().getLocalCacheDir());
+    JOptionPane.showMessageDialog( this, panel, "Manage Cache", JOptionPane.DEFAULT_OPTION, null );
+}//GEN-LAST:event_jMenuItem3ActionPerformed
+
+private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+    clearCache();
+}//GEN-LAST:event_jMenuItem4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1038,9 +1060,12 @@ private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JMenu helpMenu;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;
