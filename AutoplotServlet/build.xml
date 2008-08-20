@@ -63,4 +63,17 @@
     nbproject/build-impl.xml file. 
 
     -->
+    
+    <target name="-post-dist">
+        <!-- remove beansbinding.jar from war file.  It conflicts with j2ee, and
+        isn't used for simple applications.  See javax.el.Expression.-->
+        <echo message="rejaring war file to remove beansbinding.jar" />
+        <unjar dest="rejar" src="${dist.war}" />
+        <move file="${dist.war}" tofile="${dist.war}.0" />
+        <delete file="rejar/WEB-INF/lib/beansbinding.jar" />
+        <jar destfile="${dist.war}"  >
+            <fileset dir="rejar"/>
+        </jar>
+    </target>
+        
 </project>
