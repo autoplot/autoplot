@@ -2051,6 +2051,10 @@ public class ApplicationModel {
         return this.overviewPlot;
     }
 
+    public DasColorBar getColorBar() {
+        return this.colorbar;
+    }
+    
     /**
      * wait for autoplot to settle.
      */
