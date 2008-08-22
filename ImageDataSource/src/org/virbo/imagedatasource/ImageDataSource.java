@@ -180,7 +180,7 @@ class ImageDataSource extends AbstractDataSource {
         
         String ext= getExt(resourceURL);
         
-        if ( ext.equals(".jpg") || ext.equals(".JPG") ) {
+        if ( ext.equals(".jpg") ) {
             return getJpegExifMetaData(mon);
             
         } else {
