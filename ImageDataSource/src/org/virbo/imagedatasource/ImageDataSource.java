@@ -111,6 +111,7 @@ class ImageDataSource extends AbstractDataSource {
         Color c = null;
         ImageDataSet.ColorOp op = null;
 
+        if ( channel==null ) throw new IllegalArgumentException("channel not specified");
         if (channel.equals("red")) {
             c = Color.red;
         } else if (channel.equals("green")) {
