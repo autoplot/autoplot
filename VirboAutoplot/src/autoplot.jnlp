@@ -35,36 +35,38 @@
         
         <jar href="VirboAutoplot.jar" />
         
-        <jar href="lib/batik-awt-util.jar" part="batik" />
-        <jar href="lib/batik-svggen.jar" part="batik"  download='lazy' />
-        <jar href="lib/batik-util.jar"  part="batik"  download='lazy' />
+        <jar href="http://www.autoplot.org/jnlp-lib/batik-awt-util.jar" part="batik" />
+        <jar href="http://www.autoplot.org/jnlp-lib/batik-svggen.jar" part="batik"  download='lazy' />
+        <jar href="http://www.autoplot.org/jnlp-lib/batik-util.jar"  part="batik"  download='lazy' />
         <package name="org.apache.batik" part="batik" recursive="true"  />
-        <jar href="lib/bufr.jar" />
-        <jar href="lib/commons-codec-1.3.jar" />
-        <jar href="lib/commons-httpclient-3.0.jar" />
-        <jar href="lib/commons-logging-1.0.4.jar" />
-        <jar href="lib/gnu-regexp-1.1.4.jar" />
-        <jar href="lib/grib-5.0.04.jar" />
-        <jar href="lib/itext-1.2.jar" />
-        <jar href="lib/jdom.jar" />
-        <jar href="lib/jpeg2000.jar" />
-        <jar href="lib/lucene.jar" />
-        <jar href="lib/netcdfUI-2.2.18.jar" part="netcdf"/>
+        <jar href="http://www.autoplot.org/jnlp-lib/bufr.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/commons-codec-1.3.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/commons-httpclient-3.0.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/commons-logging-1.0.4.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/gnu-regexp-1.1.4.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/grib-5.0.04.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/itext-1.2.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/jdom.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/jpeg2000.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/lucene.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/netcdfUI-2.2.18.jar" part="netcdf"/>
         <package name="dods" part="netcdf"  recursive="true" />
         <package name="resources" part="netcdf"  recursive="true" />
         <package name="thredds" part="netcdf"  recursive="true" />
         <package name="ucar" part="netcdf"  recursive="true" />
-        <jar href="lib/nlog4j-1.2.21.jar" />
-        <jar href="lib/poi-3.1-FINAL-20080629.jar" />
-        <jar href="lib/prefsAll.jar" />
-        <jar href="lib/resourcesOptional.jar" />
-        <jar href="lib/visadNoDods.jar" />
-        <jar href="lib/xercesImpl.jar" />
-        <jar href="lib/xml-apis.jar" />
-        <jar href="lib/swing-layout-1.0.3.jar" />
-        <jar href="lib/jython.jar" />
-        <jar href="lib/jfits-0.93.jar" />
-
+        <jar href="http://www.autoplot.org/jnlp-lib/nlog4j-1.2.21.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/poi-3.1-FINAL-20080629.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/prefsAll.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/resourcesOptional.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/visadNoDods.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/xercesImpl.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/xml-apis.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/swing-layout-1.0.3.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/jython.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/jfits-0.93.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/beansbinding.jar"/>
+        <jar href="http://www.autoplot.org/jnlp-lib/metadata-extractor-2.1.0.jar" />
+        
         <!-- cdf -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
         <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2-latest.jnlp" >  
@@ -76,7 +78,6 @@
         <jar href="lib/DataSource.jar" />
         <jar href="lib/DataSourcePack.jar" />
         <jar href="lib/JythonDataSource.jar" />
-        <jar href="lib/beansbinding.jar"/>
         <jar href="lib/JFontChooser.jar" />
         <jar href="lib/CdfDataSource.jar" />
         <jar href="lib/WavDataSource.jar" />
