@@ -252,6 +252,23 @@ public class ApplicationState {
         propertyChangeSupport.firePropertyChange(PROP_CANVASSIZE, oldcanvasSize, newcanvasSize);
     }
 
+    protected boolean canvasFitted = true;
+    
+    /**
+     * boolean property indicates that the canvas is resizable.
+     */
+    public static final String PROP_CANVASFITTED = "canvasFitted";
+
+    public boolean isCanvasFitted() {
+        return canvasFitted;
+    }
+
+    public void setCanvasFitted(boolean canvasFitted) {
+        boolean oldCanvasFitted = this.canvasFitted;
+        this.canvasFitted = canvasFitted;
+        propertyChangeSupport.firePropertyChange(PROP_CANVASFITTED, oldCanvasFitted, canvasFitted);
+    }
+
     private DatumRange round( DatumRange range ) {
         Datum w= range.width();
         String s;
