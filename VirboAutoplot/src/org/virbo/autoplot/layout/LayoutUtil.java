@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class LayoutUtil {
 
-    private static boolean ALLOW_EXCESS_SPACE= true;
+    private static boolean ALLOW_EXCESS_SPACE= false;
     
     private static void maybeSetMaximum( DasDevicePosition c, double need, double norm, double em, int pt ) {
        if ( ALLOW_EXCESS_SPACE && em < 0) return;
