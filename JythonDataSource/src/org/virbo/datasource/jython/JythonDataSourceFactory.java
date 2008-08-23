@@ -4,6 +4,7 @@
  */
 package org.virbo.datasource.jython;
 
+import java.beans.ExceptionListener;
 import java.io.BufferedReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,7 +40,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public DataSource getDataSource(URL url) throws Exception {
-        JythonDataSource result = new JythonDataSource(url);
+        JythonDataSource result = new JythonDataSource(url,this);
         return result;
     }
 
@@ -129,5 +130,12 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             }
         }
 
+    }
+    
+    
+    ExceptionListener listener;
+    
+    public void addExeceptionListener( ExceptionListener listener ) {
+        this.listener= listener;
     }
 }

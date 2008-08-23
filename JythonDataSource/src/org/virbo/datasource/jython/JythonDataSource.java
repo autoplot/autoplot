@@ -4,6 +4,7 @@
  */
 package org.virbo.datasource.jython;
 
+import java.beans.ExceptionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,9 +34,13 @@ import org.virbo.jythonsupport.JythonUtil;
  */
 public class JythonDataSource extends AbstractDataSource implements Caching {
 
-    public JythonDataSource(URL url) {
+    ExceptionListener listener;
+    
+    public JythonDataSource(URL url, JythonDataSourceFactory factory ) {
 	super(url);
 	addCability(Caching.class, this);
+        this.listener= factory.listener;
+              
     }
 
     @Override
@@ -59,7 +64,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 		}
 
 		try {
-		    boolean debug = false;
+		    boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
 		    if (debug) {
 			int i = 0;
 			BufferedReader reader = new BufferedReader(new FileReader(super.getFile(new NullProgressMonitor())));
@@ -77,7 +82,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 		} catch (PyException ex) {
 		    causedBy = ex;
 		    ex.printStackTrace();
-		}
+                    if ( listener!=null ) {
+                        listener.exceptionThrown(ex);
+                    }
+		} catch ( Exception ex ) {
+                    throw ex;
+                }
 
 		if (mon.isCancelled()) {
 		    throw new IllegalArgumentException("monitor cancel not supported");
@@ -114,6 +124,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 	    return res;
 
 	} catch (PyException ex) {
+            
 	    String msg = "PyException: " + ex;
 	    if (causedBy != null) {
 		msg += "\ncaused by:\n" + causedBy;
