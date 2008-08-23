@@ -108,7 +108,7 @@ public class DataSourceRegistry {
         dataSourcesByMime.put(mime.toLowerCase(), className);
     }
 
-    public DataSourceFactory getSource(String extension) {
+    public synchronized DataSourceFactory getSource(String extension) {
         extension= getExtension(extension);
         Object o = dataSourcesByExt.get(extension);
         if (o == null) {
@@ -121,6 +121,7 @@ public class DataSourceRegistry {
                 Class clas = Class.forName((String) o);
                 Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
                 result = (DataSourceFactory) constructor.newInstance(new Object[]{});
+                dataSourcesByExt.put( extension, result ); // always use the same factory object.
             } catch (ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             } catch (NoSuchMethodException ex) {
@@ -151,6 +152,14 @@ public class DataSourceRegistry {
         if ( name.indexOf('.') > 0 ) {
             int i= name.lastIndexOf('.');
             name= name.substring(i);
+        }
+        int i=name.indexOf("?");
+        if ( i!=-1 ) {
+            name = name.substring(0,i );
+        }
+        i=name.indexOf("&"); // this is a whoops, they meant ?
+        if ( i!=-1 ) {
+            name = name.substring(0,i );
         }
         name= name.toLowerCase();
         return name;
@@ -192,7 +201,7 @@ public class DataSourceRegistry {
         
     }
 
-    public DataSourceFactory getSourceByMime(String mime) {
+    public synchronized DataSourceFactory getSourceByMime(String mime) {
         Object o = dataSourcesByMime.get(mime.toLowerCase());
         if (o == null) {
             return null;
@@ -204,6 +213,7 @@ public class DataSourceRegistry {
                 Class clas = Class.forName((String) o);
                 Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
                 result = (DataSourceFactory) constructor.newInstance(new Object[]{});
+                dataSourcesByMime.put( mime.toLowerCase(), result );
             } catch (ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             } catch (NoSuchMethodException ex) {
