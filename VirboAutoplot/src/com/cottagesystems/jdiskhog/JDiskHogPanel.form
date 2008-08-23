@@ -26,8 +26,8 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" min="-2" pref="451" max="-2" attributes="0"/>
-              <EmptySpace max="32767" attributes="0"/>
+              <Component id="jScrollPane2" pref="451" max="32767" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="progressMonitorComponent1" min="-2" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -53,6 +53,7 @@
     </Container>
     <Component class="com.cottagesystems.jdiskhog.ProgressMonitorComponent" name="progressMonitorComponent1">
       <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="progress monitor" noResource="true"/>
         <Property name="name" type="java.lang.String" value="progressMonitorComponent1" noResource="true"/>
       </Properties>
     </Component>
