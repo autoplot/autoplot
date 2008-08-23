@@ -78,7 +78,6 @@ import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.Base64;
 import org.virbo.autoplot.layout.LayoutUtil;
@@ -124,6 +123,46 @@ public class ApplicationModel {
     TickleTimer tickleTimer;
     Options options;
 
+    /**
+     * guess the best dimension to slice by default, based on metadata.  Currently,
+     * this looks for the names lat, lon, and angle.
+     */
+    private void guessSliceDimension(  ) {
+        int lat=-1,lon=-1;
+        
+        int[] slicePref= new int[] { 1,1,1 };
+        for ( int i=0; i<depnames.size(); i++ ) {
+            String n= depnames.get(i);
+            if ( n.equals("lat") ) {
+                slicePref[i]= 0;
+                lat= i;
+            }
+            if ( n.equals("lon") ) {
+                slicePref[i]= 0;
+                lon= i;
+            }
+            if ( n.equals("angle") ) slicePref[i]= 2;
+            if ( n.equals("bundle") ) slicePref[i]= 2;
+        }
+        
+        int sliceIndex=0;
+        int bestSlice= 0;
+        for ( int i=0; i<3; i++ ) {
+            if ( slicePref[i]> bestSlice ) {
+                sliceIndex= i;
+                bestSlice= slicePref[i];
+            }
+        }
+        
+        if ( lat>-1 && lon>-1 && lat<lon ) {
+            this.transpose= true;
+        }
+        
+        int oldSliceDimension= this.sliceDimension;
+        this.sliceDimension= sliceIndex;
+        propertyChangeSupport.firePropertyChange(PROP_SLICEDIMENSION, -1, sliceDimension);
+    }
+
     @SuppressWarnings("unchecked")
     private Map sliceProperties(Map properties, int sliceDimension) {
         Map result = new LinkedHashMap(properties);
@@ -160,7 +199,7 @@ public class ApplicationModel {
         Units u0 = (Units) dataset.property(QDataSet.UNITS);
         Units u1 = (Units) properties.get(QDataSet.UNITS);
         if (u0 == null || u1 == null || !u0.isConvertableTo(u1)) {
-            properties.put(QDataSet.UNITS, u0);
+            properties.put( QDataSet.UNITS, u0 );
         }
         for (int i = 0; i < QDataSet.MAX_RANK; i++) {
             QDataSet dep = (QDataSet) dataset.property("DEPEND_" + i);
@@ -516,6 +555,7 @@ public class ApplicationModel {
 
         logger.fine("dep names: " + Arrays.asList(depNames));
         setDepnames(Arrays.asList(depNames));
+        if ( dataset.rank()>2 ) guessSliceDimension();
 
         updateFill(autorange,true);
 
@@ -868,7 +908,7 @@ public class ApplicationModel {
         String reduceRankString= null;
         
         if (dataset.rank() == 3) {
-
+            
             QDataSet ds;
             QDataSet dep;
             if (this.sliceDimension == 2) {
@@ -1490,7 +1530,8 @@ public class ApplicationModel {
         state.setZLabel(colorbar.getLabel());
 
         state.setCanvasSize(this.canvas.getSize());
-
+        state.setCanvasFitted(this.canvas.isFitted());
+        
         return state;
     }
 
@@ -1594,6 +1635,7 @@ public class ApplicationModel {
         plot.getYAxis().setLabel(state.getYLabel());
         colorbar.setLabel(state.getZLabel());
 
+        canvas.setFitted( state.isCanvasFitted() );
         canvas.setSize(state.getCanvasSize());
     }
 
