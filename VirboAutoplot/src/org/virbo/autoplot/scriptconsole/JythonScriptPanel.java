@@ -29,71 +29,72 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     ApplicationModel model;
     DataSetSelector selector;
     ScriptPanelSupport support;
-    
-    static final int CONTEXT_DATA_SOURCE= 1;
-    static final int CONTEXT_APPLICATION= 0;
-    private int context=0;
-    
-    
-    /** Creates new form JythonScriptPanel */
-    public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector ) {
-        initComponents();
-        setContext( CONTEXT_APPLICATION );
-        
-        support= new ScriptPanelSupport( this, model, selector );
-        
-        this.model = model;
-        this.selector= selector;
+    static final int CONTEXT_DATA_SOURCE = 1;
+    static final int CONTEXT_APPLICATION = 0;
+    private int context = 0;
 
-        this.textArea.addCaretListener( new CaretListener() {
+    /** Creates new form JythonScriptPanel */
+    public JythonScriptPanel(final ApplicationModel model, final DataSetSelector selector) {
+        initComponents();
+        setContext(CONTEXT_APPLICATION);
+
+        support = new ScriptPanelSupport(this, model, selector);
+
+        this.model = model;
+        this.selector = selector;
+
+        this.textArea.addCaretListener(new CaretListener() {
+
             public void caretUpdate(CaretEvent e) {
-                int pos= textArea.getCaretPosition();
+                int pos = textArea.getCaretPosition();
                 Element root = textArea.getDocument().getDefaultRootElement();
-                int irow= root.getElementIndex(pos);
-                int icol= pos - root.getElement(irow).getStartOffset();
-                String text= ""+(1+irow)+","+(1+icol);
-                int isel= textArea.getSelectionEnd()-textArea.getSelectionStart();
-                int iselRow0= root.getElementIndex(textArea.getSelectionStart());
-                int iselRow1= root.getElementIndex(textArea.getSelectionEnd());
-                if ( isel > 0 ) {
-                    if ( iselRow1>iselRow0) {
-                        text= "["+isel+"ch,"+(1+iselRow1-iselRow0)+"lines]";
+                int irow = root.getElementIndex(pos);
+                int icol = pos - root.getElement(irow).getStartOffset();
+                String text = "" + (1 + irow) + "," + (1 + icol);
+                int isel = textArea.getSelectionEnd() - textArea.getSelectionStart();
+                int iselRow0 = root.getElementIndex(textArea.getSelectionStart());
+                int iselRow1 = root.getElementIndex(textArea.getSelectionEnd());
+                if (isel > 0) {
+                    if (iselRow1 > iselRow0) {
+                        text = "[" + isel + "ch," + (1 + iselRow1 - iselRow0) + "lines]";
                     } else {
-                        text= "["+isel +"ch]";
+                        text = "[" + isel + "ch]";
                     }
                 }
-                        
+
                 caretPositionLabel.setText(text);
             }
         });
-        
-        CompletionImpl impl= CompletionImpl.get();
+
+        CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
-        
+
     }
 
     int getContext() {
-	return context;
+        return context;
     }
 
-    void setContext(int context ) {
-	this.context= context;
-	this.contextSelector.setSelectedIndex(context);
-        if ( context==CONTEXT_APPLICATION ) {
-            this.textArea.putClientProperty( JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+    void setContext(int context) {
+        this.context = context;
+        this.contextSelector.setSelectedIndex(context);
+        if (context == CONTEXT_APPLICATION) {
+            this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
                     return JythonUtil.createInterpreter(true, false);
                 }
-            } );
-        } else if ( context==CONTEXT_DATA_SOURCE ) {
-            this.textArea.putClientProperty( JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+            });
+        } else if (context == CONTEXT_DATA_SOURCE) {
+            this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
-                    PythonInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(false);
-                    interp.set("monitor", new NullProgressMonitor() );
-                    interp.set("params", new PyDictionary() );
+                    PythonInterpreter interp = org.virbo.jythonsupport.JythonUtil.createInterpreter(false);
+                    interp.set("monitor", new NullProgressMonitor());
+                    interp.set("params", new PyDictionary());
                     return interp;
                 }
-            } );
+            });
         }
     }
 
@@ -108,11 +109,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         savePlotButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
         openButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        textArea = new javax.swing.JTextArea();
         fileNameLabel = new javax.swing.JLabel();
         contextSelector = new javax.swing.JComboBox();
         caretPositionLabel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        textArea = new org.virbo.autoplot.scriptconsole.EditorTextPane();
 
         savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
         savePlotButton.setText("execute");
@@ -136,10 +137,6 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
-        textArea.setColumns(20);
-        textArea.setRows(5);
-        jScrollPane1.setViewportView(textArea);
-
         contextSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "application context", "data source context" }));
         contextSelector.setToolTipText("select the context for the script: to create new datasets, or to control an application.");
         contextSelector.addActionListener(new java.awt.event.ActionListener() {
@@ -149,6 +146,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         });
 
         caretPositionLabel.setText("1,1");
+
+        jScrollPane1.setViewportView(textArea);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -160,14 +159,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(saveAsButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(openButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 73, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 77, Short.MAX_VALUE)
                 .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 87, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 507, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -195,18 +194,17 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_savePlotButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
-        support.saveAs();    
+        support.saveAs();
 }//GEN-LAST:event_saveAsButtonActionPerformed
 
     private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
-        support.open();      
+        support.open();
 }//GEN-LAST:event_openButtonActionPerformed
 
 private void contextSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_contextSelectorActionPerformed
-    setContext( contextSelector.getSelectedIndex() );
-    
-}//GEN-LAST:event_contextSelectorActionPerformed
+    setContext(contextSelector.getSelectedIndex());
 
+}//GEN-LAST:event_contextSelectorActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel caretPositionLabel;
     private javax.swing.JComboBox contextSelector;
@@ -215,10 +213,10 @@ private void contextSelectorActionPerformed(java.awt.event.ActionEvent evt) {//G
     private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
     private javax.swing.JButton savePlotButton;
-    private javax.swing.JTextArea textArea;
+    private org.virbo.autoplot.scriptconsole.EditorTextPane textArea;
     // End of variables declaration//GEN-END:variables
 
-    public javax.swing.JTextArea getEditorPanel() {
+    public EditorTextPane getEditorPanel() {
         return textArea;
     }
 }
