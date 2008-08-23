@@ -69,4 +69,32 @@ public class JythonOps {
     public static QDataSet coerce( PyObject arg0 ) {
         return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
     }
+    
+    /**
+     * run the function on a different thread
+     * @param func a jython callable.
+     */
+    public static void invokeSometime( final PyObject func ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                func.__call__();
+            }
+        };
+        new Thread(run).start();
+    }
+
+    /**
+     * run the function on a different thread
+     * @param func a jython callable.
+     * @param arg an object to pass to the callable as an argument
+     */
+    public static void invokeSometime( final PyObject func, final PyObject arg ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                func.__call__(arg);
+            }
+        };
+        new Thread(run).start();
+    }
+        
 }
