@@ -135,10 +135,12 @@
                  lazy="true" >
             <fileset  dir="${jnlp.dir}/lib" includes="**.jar" />
         </signjar>
+        
         <copy file="${build.classes.dir}/autoplot.jnlp" tofile="${jnlp.dir}/autoplot.jnlp" />
         <copy file="${build.classes.dir}/index.html" tofile="${jnlp.dir}/index.html" />
         <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
         <copy file="${build.classes.dir}/screen.png" tofile="${jnlp.dir}/screen.png" />
+        <copy file="${build.classes.dir}/launch.png" tofile="${jnlp.dir}/launch.png" />
         
         <replace file="${jnlp.dir}/autoplot.jnlp" >
             <replacefilter token="#{tag}" value="${release_tag}" />
