@@ -27,14 +27,20 @@ public class FSTreeModel implements TreeModel {
 
         File parentFile;
         File f;
+        boolean abs;
 
         TreeNode(File f) {
-            this( f, null );
+            this(f, null);
         }
-        
-        TreeNode( File f, File parentFile ) {
-            this.f= f;
-            this.parentFile= parentFile;
+
+        TreeNode(File f, File parentFile) {
+            this(f, parentFile, false);
+        }
+
+        TreeNode(File f, File parentFile, boolean abs) {
+            this.f = f;
+            this.parentFile = parentFile;
+            this.abs = abs;
         }
 
         public File getFile() {
@@ -42,13 +48,17 @@ public class FSTreeModel implements TreeModel {
         }
 
         private String getName() {
-            if ( parentFile==null ) {
-                return f.getName();
+            if (abs) {
+                return f.toString();
             } else {
-                return f.toString().substring( parentFile.toString().length()+1 );
+                if (parentFile == null) {
+                    return f.getName();
+                } else {
+                    return f.toString().substring(parentFile.toString().length() + 1);
+                }
             }
         }
-        
+
         public String toString() {
             if (f.isFile()) {
                 return getName() + " " + nf.format(f.length() / 1000) + " KB";
@@ -72,27 +82,27 @@ public class FSTreeModel implements TreeModel {
     }
 
     public Object getRoot() {
-        return new TreeNode(root);
+        return new TreeNode(root, null, true);
     }
 
     public Object getChild(Object parent, int index) {
-        File fparent= ((TreeNode) parent).getFile();
+        File fparent = ((TreeNode) parent).getFile();
         File[] ff = listings.get(fparent);
 
-        File reportParent= null;
-        
+        File reportParent = null;
+
         File ff1 = ff[index];
-        while ( ff1.isDirectory() ) {
+        while (ff1.isDirectory()) {
             File[] ffs = ff1.listFiles();
             if (ffs.length == 1) {
                 ff1 = ffs[0];
             } else {
                 break;
             }
-            reportParent= fparent;
+            reportParent = fparent;
         }
 
-        return new TreeNode(ff1,fparent);
+        return new TreeNode(ff1, fparent);
     }
 
     public synchronized int getChildCount(Object parent) {

@@ -141,6 +141,8 @@ public class ProgressMonitorComponent extends javax.swing.JPanel implements Prog
         jPanel1.setOpaque(false);
         jPanel1.setLayout(new java.awt.BorderLayout());
 
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/cottagesystems/jdiskhog/resources/cancel14.png"))); // NOI18N
+        jButton1.setDisabledIcon(new javax.swing.ImageIcon(getClass().getResource("/com/cottagesystems/jdiskhog/resources/cancelGrey14.png"))); // NOI18N
         jButton1.setEnabled(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
