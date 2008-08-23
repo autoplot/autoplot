@@ -248,65 +248,6 @@ public class ScriptContext extends PyJavaInstance {
         bc.bind();
     }
 
-    /**
-     * load the data specified by URL into Autoplot's internal data model.  This will
-     * block until the load is complete, and a ProgressMonitor object can be used to
-     * monitor the load.
-     * TODO: combine this with dumpToDas2Stream, so that the stream can contain progress
-     * information for the consumer.
-     * @param ds
-     */
-    public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
-        URI url = DataSetURL.getURI(surl);
-        DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
-        DataSource result = factory.getDataSource(DataSetURL.getWebURL(url));
-        if (mon == null) {
-            mon = new NullProgressMonitor();
-        }
-        QDataSet ds= result.getDataSet(mon);
-        metadata= result.getMetaData( new NullProgressMonitor() );
-        metadataSurl= surl;
-        return ds;
-    }
-    
-    // cache the last metadata url.
-    private static Map<String, Object> metadata;
-    private static String metadataSurl;
-
-    /**
-     * load the metadata for the url.  This can be called independently from getDataSet,
-     * and data sources should not assume that getDataSet is called before getMetaData.
-     * Some may, in which case a bug report should be submitted.
-     * @param surl
-     * @param mon
-     * @return metadata tree created by the data source.
-     * @throws java.lang.Exception
-     */
-    public static Map<String, Object> getMetaData(String surl, ProgressMonitor mon) throws Exception {
-        if (surl.equals(metadataSurl)) {
-            return metadata;
-        } else {
-            URI url = DataSetURL.getURI(surl);
-            DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
-            DataSource result = factory.getDataSource(DataSetURL.getWebURL(url));
-            if (mon == null) {
-                mon = new NullProgressMonitor();
-            }
-            //result.getDataSet(mon);  some data sources may assume that getDataSet comes before getMetaData
-            return result.getMetaData(mon);
-        }
-    }
-
-    /**
-     * load the data specified by URL into Autoplot's internal data model.  This will
-     * block until the load is complete.
-     * @param surl
-     * @return data set for the URL.
-     * @throws Exception depending on data source.
-     */
-    public static QDataSet getDataSet(String surl) throws Exception {
-        return getDataSet(surl, null);
-    }
 
     /**
      * serializes the dataset to a das2stream, a well-documented, open, streaming
@@ -398,26 +339,4 @@ public class ScriptContext extends PyJavaInstance {
 
     }
 
-    /**
-     * returns a list of the files in the local or remote filesystem pointed to by surl.
-     * print list( 'http://www.papco.org/data/de/eics/*' )
-     *  --> '81355_eics_de_96s_v01.cdf', '81356_eics_de_96s_v01.cdf', '81357_eics_de_96s_v01.cdf', ...
-     * @param surl
-     * @return 
-     * @throws java.net.MalformedURLException
-     * @throws java.io.IOException
-     */
-    public static String[] list(String surl) throws MalformedURLException, IOException {
-        String[] ss = FileSystem.splitUrl(surl);
-        FileSystem fs = FileSystem.create(new URL(ss[2]));
-        String glob = ss[3].substring(ss[2].length());
-        String[] result;
-        if (glob.length() == 0) {
-            result = fs.listDirectory("/");
-        } else {
-            result = fs.listDirectory("/", Glob.getRegex(glob));
-        }
-        Arrays.sort(result);
-        return result;
-    }
 }
