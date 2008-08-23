@@ -23,8 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SortDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.MetadataModel;
@@ -79,16 +81,16 @@ public class CdfFileDataSource extends AbstractDataSource {
         cdfFile = getFile(mon);
 
         String fileName = cdfFile.toString();
-        if (System.getProperty("os.name").startsWith("Windows"))
+        if (System.getProperty("os.name").startsWith("Windows")) {
             fileName = CdfUtil.win95Name(cdfFile);
-
+        }
         Map map = getParams();
 
         CDF cdf = CDF.open(fileName, CDF.READONLYon);
         String svariable = (String) map.get("id");
-        if (svariable == null)
+        if (svariable == null) {
             svariable = (String) map.get("arg_0");
-
+        }
         Variable variable = cdf.getVariable(svariable);
         attributes = readAttributes(cdf, variable, 0);
 
@@ -102,15 +104,15 @@ public class CdfFileDataSource extends AbstractDataSource {
     /**
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      */
-    private WritableDataSet wrapDataSet(final CDF cdf, final String svariable, boolean reform) throws CDFException {
+    private WritableDataSet wrapDataSet( final CDF cdf, final String svariable, boolean reform ) throws CDFException {
         Variable variable = cdf.getVariable(svariable);
 
         long varType = variable.getDataType();
         long numRec = variable.getNumWrittenRecords();
 
-        if (numRec == 0)
+        if (numRec == 0) {
             throw new IllegalArgumentException("variable " + svariable + " contains no records!");
-
+        }
         WritableDataSet result;
         if (reform) {
             result = CdfUtil.wrapCdfHyperData(variable, 0, -1);
@@ -120,22 +122,30 @@ public class CdfFileDataSource extends AbstractDataSource {
         result.putProperty(QDataSet.NAME, svariable);
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
 
-        final boolean doUnits= true;
-        if ( doUnits && thisAttributes.containsKey("UNITS" ) ) {
-            Units mu= MetadataUtil.lookupUnits( (String)thisAttributes.get("UNITS") );
-            Units u= (Units) result.property(QDataSet.UNITS);
-            if ( u==null ) {
+        final boolean doUnits = true;
+        if (doUnits && thisAttributes.containsKey("UNITS")) {
+            Units mu = MetadataUtil.lookupUnits((String) thisAttributes.get("UNITS"));
+            Units u = (Units) result.property(QDataSet.UNITS);
+            if (u == null) {
                 result.putProperty(QDataSet.UNITS, mu);
             }
         }
-        
+
         for (int idep = 0; idep < 3; idep++) {
             Map dep = (Map) thisAttributes.get("DEPEND_" + idep);
             if (dep != null) {
                 try {
-                    WritableDataSet depDs = wrapDataSet( cdf, (String) dep.get("NAME"), idep>0 );
+                    WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep > 0);
                     if (DataSetUtil.isMonotonic(depDs)) {
                         depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
+                    } else {
+                        if (idep == 0) {
+                            System.err.println("sorting dep0 to make depend0 monotonic");
+                            QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
+                            result = DataSetOps.applyIndex( result, idep, sort, false );
+                            depDs= DataSetOps.applyIndex( depDs, 0, sort, false );
+                            depDs.putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
+                        }
                     }
                     result.putProperty("DEPEND_" + idep, depDs);
                 } catch (Exception e) {
@@ -145,7 +155,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 String s = (String) thisAttributes.get("LABL_PTR_" + idep);
                 if (s != null) {
                     try {
-                        WritableDataSet depDs = wrapDataSet( cdf, s, idep>0 );
+                        WritableDataSet depDs = wrapDataSet(cdf, s, idep > 0);
                         result.putProperty("DEPEND_" + idep, depDs);
                     } catch (Exception e) {
                         e.printStackTrace(); // to support lanl.
@@ -154,18 +164,18 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
         }
 
-        if ( result.rank()==3 ) { // need to swap for rank 3.
-            QDataSet dep1= (QDataSet) result.property(QDataSet.DEPEND_1);
-            QDataSet dep2= (QDataSet) result.property(QDataSet.DEPEND_2);
-            result.putProperty(QDataSet.DEPEND_2, dep1 );
-            result.putProperty(QDataSet.DEPEND_1, dep2 );
-            
-            Object att1= attributes.get( QDataSet.DEPEND_1 );
-            Object att2= attributes.get( QDataSet.DEPEND_2 );
-            attributes.put( QDataSet.DEPEND_1, att2 );
-            attributes.put( QDataSet.DEPEND_2, att1 );
+        if (result.rank() == 3) { // need to swap for rank 3.
+            QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
+            QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
+            result.putProperty(QDataSet.DEPEND_2, dep1);
+            result.putProperty(QDataSet.DEPEND_1, dep2);
+
+            Object att1 = attributes.get(QDataSet.DEPEND_1);
+            Object att2 = attributes.get(QDataSet.DEPEND_2);
+            attributes.put(QDataSet.DEPEND_1, att2);
+            attributes.put(QDataSet.DEPEND_2, att1);
         }
-        
+
         return result;
     }
 
@@ -181,9 +191,9 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     @Override
     public Map<String, Object> getMetaData(ProgressMonitor mon) {
-        if (attributes == null)
+        if (attributes == null) {
             return null; // transient state
-
+        }
         return attributes;
     }
 }
