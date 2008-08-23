@@ -1,7 +1,9 @@
+#logger= Logger.getLogger
 from org.virbo.dsops.Ops import *
 from org.virbo.jythonsupport.JythonOps import *
 from org.virbo.jythonsupport.Util import *
 from org.virbo.dataset import QDataSet
+from org.virbo.dsutil.BinAverage import *
 
 from edu.uiowa.physics.pw.das.datum import DatumRange, Units, DatumRangeUtil, TimeUtil
 from java.net import URL
