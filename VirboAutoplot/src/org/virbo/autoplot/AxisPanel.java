@@ -101,10 +101,13 @@ public class AxisPanel extends javax.swing.JPanel {
                 if ( evt.getPropertyName().equals(applicationModel.PROP_DEPNAMES) ) {
                     String[] depNames= (String[]) applicationModel.getDepnames().toArray();
                     for ( int i=0; i<depNames.length; i++ ) {
-                        depNames[i]= depNames[i]+"="+applicationModel.getMaxSliceIndex(i);
+                        depNames[i]= depNames[i]+" ("+applicationModel.getMaxSliceIndex(i)+" bins)";
                     }
                     sliceTypeComboBox.setModel( new DefaultComboBoxModel( depNames ) ); 
-                    //sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
+                    sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
+                }
+                if ( evt.getPropertyName().equals(applicationModel.PROP_SLICEDIMENSION ) ) {
+                    sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
                 }
             }
         } );
