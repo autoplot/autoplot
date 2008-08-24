@@ -13,11 +13,13 @@ import edu.uiowa.physics.pw.das.dasml.SerializeUtil;
 import edu.uiowa.physics.pw.das.datum.DatumRange;
 import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
 import edu.uiowa.physics.pw.das.datum.InconvertibleUnitsException;
+import edu.uiowa.physics.pw.das.util.AboutUtil;
 import edu.uiowa.physics.pw.das.util.ArgumentList;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
 import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -36,7 +38,9 @@ import javax.beans.binding.BindingContext;
 import javax.beans.binding.BindingConverter;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -70,7 +74,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
     TickleTimer tickleTimer;
     GuiSupport support;
     LayoutListener autoLayout;
-    
     final String TABS_TOOLTIP = "right-click to undock";
     PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
@@ -88,7 +91,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
     Options options;
     private Logger logger = Logger.getLogger("virbo.autoplot");
 
-
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
 
@@ -102,13 +104,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         initComponents();
 
-        support.addKeyBindings( (JPanel) getContentPane() );
-        
+        support.addKeyBindings((JPanel) getContentPane());
+
         dataSetSelector.setMonitorContext(applicationModel.plot);
 
         setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 
-        stateSupport = AutoplotUtil.getPersistentStateSupport( this, applicationModel );
+        stateSupport = AutoplotUtil.getPersistentStateSupport(this, applicationModel);
 
         fillFileMenu();
 
@@ -143,8 +145,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        autoLayout= new LayoutListener(model);
-        
+        autoLayout = new LayoutListener(model);
+
         dataSetSelector.registerActionTrigger(".*\\.vap", new AbstractAction("load vap") {
 
             public void actionPerformed(ActionEvent e) {
@@ -198,6 +200,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             initLogConsole();
         }
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
                 undoRedoSupport.pushState(evt);
                 stateSupport.markDirty();
@@ -209,9 +212,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 if (t != null) {
                     redoMenuItem.setText(t == null ? "Redo" : t);
                 }
-                SwingUtilities.invokeLater(new Runnable() { public void run() {
-                    undoRedoSupport.refreshUndoMultipleMenu( undoMultipleMenu );
-                } } );
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    public void run() {
+                        undoRedoSupport.refreshUndoMultipleMenu(undoMultipleMenu);
+                    }
+                });
             }
         });
 
@@ -344,14 +350,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private void initLogConsole() throws SecurityException {
         LogConsole lc = new LogConsole();
         lc.turnOffConsoleHandlers();
-        lc.logConsoleMessages( ); // stderr, stdout logged to Logger "console"
-        
+        lc.logConsoleMessages(); // stderr, stdout logged to Logger "console"
+
         Handler h = lc.getHandler();
         Logger.getLogger("virbo").setLevel(Level.ALL);
         Logger.getLogger("virbo").addHandler(h);
         Logger.getLogger("console").setLevel(Level.ALL);
         Logger.getLogger("console").addHandler(h); // stderr, stdout
-        
+
         setMessage("log console added");
         tabs.addTab("console", lc);
         applicationModel.options.setLogConsoleVisible(true);
@@ -360,11 +366,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }
 
     private void initServer() {
-        String result= JOptionPane.showInputDialog( this, "Select port for server.  This port will accept jython commands to control receive services from the application", 12345 );
+        String result = JOptionPane.showInputDialog(this, "Select port for server.  This port will accept jython commands to control receive services from the application", 12345);
         int iport = Integer.parseInt(result);
-        setupServer(iport, applicationModel );
+        setupServer(iport, applicationModel);
     }
-    
+
     private void plotUrl() {
         try {
             Logger.getLogger("ap").info("plotUrl()");
@@ -387,15 +393,17 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }
 
     private void clearCache() {
-        try {
-            if (applicationModel.clearCache()) {
-                setStatus("cache cleared");
-            } else {
-                setStatus("unable to clear cache");
-                JOptionPane.showMessageDialog(this, "unable to clear cache");
+        if (JOptionPane.showConfirmDialog(this, "delete all cached files?", "clear cache", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            try {
+                if (applicationModel.clearCache()) {
+                    setStatus("cache cleared");
+                } else {
+                    setStatus("unable to clear cache");
+                    JOptionPane.showMessageDialog(this, "unable to clear cache");
+                }
+            } catch (IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(this, "unable to clear cache: " + ex.getMessage());
             }
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, "unable to clear cache: " + ex.getMessage());
         }
     }
 
@@ -495,6 +503,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
+        jMenuItem5 = new javax.swing.JMenuItem();
         aboutDas2MenuItem = new javax.swing.JMenuItem();
         autoplotHomepageButton = new javax.swing.JMenuItem();
 
@@ -734,6 +743,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
         });
         helpMenu.add(aboutAutoplotMenuItem);
 
+        jMenuItem5.setText("Release Notes");
+        jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem5ActionPerformed(evt);
+            }
+        });
+        helpMenu.add(jMenuItem5);
+
         aboutDas2MenuItem.setText("Das2 Homepage");
         aboutDas2MenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -849,6 +866,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
             buffy.append("    <h2>Build Information:</h2>");
 
+            buffy.append("<li>release tag: " + AboutUtil.getReleaseTag() + "</li>");
+
             List<String> bi = Util.getBuildInfos();
             for (String ss : bi) {
                 buffy.append("    <li>" + ss + "");
@@ -906,14 +925,33 @@ private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_jMenuItem2ActionPerformed
 
 private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-    JDiskHogPanel panel= new JDiskHogPanel();
+    JDiskHogPanel panel = new JDiskHogPanel();
     panel.scan(FileSystem.settings().getLocalCacheDir());
-    JOptionPane.showMessageDialog( this, panel, "Manage Cache", JOptionPane.DEFAULT_OPTION, null );
+    JDialog dia = new JDialog(this, "Manage Cache", true);
+    dia.add(panel);
+    dia.pack();
+    dia.setVisible(true);
+
+//JOptionPane.showMessageDialog(this, panel, "Manage Cache", JOptionPane.DEFAULT_OPTION, null);
 }//GEN-LAST:event_jMenuItem3ActionPerformed
 
 private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
     clearCache();
 }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
+    try {
+        String release = AboutUtil.getReleaseTag();
+        if (release != null) {
+            String surl = "http://www.autoplot.org/autoplot/index.php/Autoplot_Change_Log#" + release;
+            AutoplotUtil.openBrowser(surl);
+        } else {
+            JOptionPane.showMessageDialog(this, "This is an untagged release.");
+        }
+    } catch (IOException ex) {
+        throw new RuntimeException(ex);
+    }
+}//GEN-LAST:event_jMenuItem5ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -974,19 +1012,20 @@ private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 }
 
                 Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+
                     public void uncaughtException(Thread t, Throwable e) {
 //                        Logger.getLogger("virbo.autoplot").severe("runtime exception: " + e);
-                        Logger.getLogger("virbo.autoplot").log( Level.SEVERE, "runtime exception: " + e, e);
-                        
+                        Logger.getLogger("virbo.autoplot").log(Level.SEVERE, "runtime exception: " + e, e);
+
                         app.setStatus("caught exception: " + e.toString());
-                        if ( e instanceof InconvertibleUnitsException ) {
+                        if (e instanceof InconvertibleUnitsException) {
                             // do nothing!!!  this is associated with the state change
                             return;
-                        } 
+                        }
                         model.application.getExceptionHandler().handleUncaught(e);
                     }
                 });
-                
+
                 app.setVisible(true);
                 if (initialURL != null) {
                     app.dataSetSelector.setValue(initialURL);
@@ -1066,6 +1105,7 @@ private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;
