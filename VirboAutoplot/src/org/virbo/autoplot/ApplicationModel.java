@@ -80,6 +80,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.Base64;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.layout.LayoutUtil;
 import org.virbo.autoplot.state.ApplicationState;
 import org.virbo.autoplot.state.Options;
@@ -1847,18 +1848,12 @@ public class ApplicationModel {
     boolean clearCache() throws IllegalArgumentException {
         File local;
 
-        if (AutoplotUtil.getProperty("user.name", "applet").equals("Web")) {
-            local = new File("/tmp");
+        local= FileSystem.settings().getLocalCacheDir();
+        if ( local!=null ) {
+            return Util.deleteFileTree(local);
         } else {
-            local = new File(System.getProperty("user.home", "applet"));
+            return true;
         }
-
-        if (local.equals("applet"))
-            return false;
-
-        local = new File(local, ".das2/fsCache/wfs/");
-
-        return Util.deleteFileTree(local);
     }
     /**
      * Holds value of property showContextOverview.
