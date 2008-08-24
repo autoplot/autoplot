@@ -15,6 +15,7 @@ import org.das2.util.filesystem.FileSystem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -529,7 +530,9 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_browseButtonActionPerformed
 
 private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dataSetSelectorItemStateChanged
-    //maybePlot();
+    if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+        maybePlot();
+    }
 }//GEN-LAST:event_dataSetSelectorItemStateChanged
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
