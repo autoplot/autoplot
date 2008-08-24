@@ -30,7 +30,6 @@ import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -310,7 +309,7 @@ public class AutoplotUtil {
                         d2 = DatumRangeUtil.normalize(range, result.range.max());
                     }
                 }
-                if (d2 - d1 > 0.1) {
+                if ( d2 - d1 > 0.1) {
                     result.range = range;
                     // just use the metadata settings.
                     return result; 
