@@ -63,11 +63,15 @@ public class FSTreeModel implements TreeModel {
             if (f.isFile()) {
                 return getName() + " " + nf.format(f.length() / 1000) + " KB";
             } else {
-                Long usages = model.usage(f);
-                if (usages == null) {
-                    return getName() + " ??? KB";
+                if ( f.exists() ) {
+                    Long usages = model.usage(f);
+                    if (usages == null) {
+                        return getName() + " ??? KB";
+                    } else {
+                        return getName() + " " + nf.format(model.usage(f)) + " KB";
+                    }
                 } else {
-                    return getName() + " " + nf.format(model.usage(f)) + " KB";
+                    return getName() + " 0 KB";
                 }
             }
         }
@@ -107,6 +111,7 @@ public class FSTreeModel implements TreeModel {
 
     public synchronized int getChildCount(Object parent) {
         final File f = ((TreeNode) parent).getFile();
+        if ( !f.exists() ) return 0;
         File[] ff = listings.get(f);
         if (ff == null) {
             ff = f.listFiles();
