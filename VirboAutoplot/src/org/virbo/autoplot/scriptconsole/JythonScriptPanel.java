@@ -66,6 +66,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        EditorContextMenu menu= new EditorContextMenu( this.textArea );
+        menu.setDataSetSelector(selector);
+        
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
 
