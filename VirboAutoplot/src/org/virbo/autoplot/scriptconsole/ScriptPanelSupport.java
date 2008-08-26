@@ -57,8 +57,9 @@ public class ScriptPanelSupport {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE)) {
                     try {
                         String sfile = model.getDataSourceURL();
-                        if (sfile == null)
+                        if (sfile == null) {
                             return;
+                        }
                         DataSetURL.URLSplit split = DataSetURL.parse(sfile);
                         if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
                             return;
@@ -81,7 +82,7 @@ public class ScriptPanelSupport {
                 }
             }
         });
-        
+
     }
 
     public int getSaveFile() throws IOException {
@@ -137,20 +138,22 @@ public class ScriptPanelSupport {
 
         try {
             if (panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE) {
+                if (file != null) {
+                    JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURL.getDataSourceFactory(file.toURI(), new NullProgressMonitor());
+                    if (factory != null) {
+                        factory.addExeceptionListener(new ExceptionListener() {
 
-                JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURL.getDataSourceFactory(file.toURI(), new NullProgressMonitor());
-                if (factory != null) {
-                    factory.addExeceptionListener(new ExceptionListener() {
-                        public void exceptionThrown(Exception e) {
-                            if ( e instanceof PyException ) {
-                                try {
-                                    annotateError((PyException) e);
-                                } catch (BadLocationException ex) {
-                                    Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                            public void exceptionThrown(Exception e) {
+                                if (e instanceof PyException) {
+                                    try {
+                                        annotateError((PyException) e);
+                                    } catch (BadLocationException ex) {
+                                        Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
                                 }
-                            } 
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
 
                 boolean updateSurl = false;
@@ -175,7 +178,7 @@ public class ScriptPanelSupport {
                     if (updateSurl) {
                         selector.setValue(file.toURI().toString());
                     }
-                    
+
                     annotationsSupport.clearAnnotations();
                     selector.maybePlot();
 
