@@ -1,7 +1,7 @@
 /*
  * JDiskHogPanel.java
  *
- * Created on August 20, 2008, 8:21 AM
+ * Created on August 26, 2008, 4:35 PM
  */
 
 package com.cottagesystems.jdiskhog;
@@ -27,7 +27,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     /** Creates new form JDiskHogPanel */
     public JDiskHogPanel() {
         initComponents();
-        jTree1.addMouseListener( createMouseListener(jTree1) );
+                jTree1.addMouseListener( createMouseListener(jTree1) );
         
     }
 
@@ -99,6 +99,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         jTree1.setModel(model);
     }
     
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -112,38 +113,31 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         jTree1 = new javax.swing.JTree();
         progressMonitorComponent1 = new com.cottagesystems.jdiskhog.ProgressMonitorComponent();
 
-        setName("Form"); // NOI18N
-
-        jScrollPane2.setName("jScrollPane2"); // NOI18N
-
-        jTree1.setName("jTree1"); // NOI18N
         jScrollPane2.setViewportView(jTree1);
 
         progressMonitorComponent1.setToolTipText("progress monitor"); // NOI18N
-        progressMonitorComponent1.setName("progressMonitorComponent1"); // NOI18N
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
-            .addComponent(progressMonitorComponent1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE)
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
+            .add(progressMonitorComponent1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 451, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(progressMonitorComponent1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(progressMonitorComponent1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTree jTree1;
-    private com.cottagesystems.jdiskhog.ProgressMonitorComponent progressMonitorComponent1;
+    public javax.swing.JScrollPane jScrollPane2;
+    public javax.swing.JTree jTree1;
+    public com.cottagesystems.jdiskhog.ProgressMonitorComponent progressMonitorComponent1;
     // End of variables declaration//GEN-END:variables
 
 }

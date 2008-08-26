@@ -1,9 +1,8 @@
 /*
  * ProgressMonitorComponent.java
  *
- * Created on August 20, 2008, 11:23 AM
+ * Created on August 26, 2008, 4:27 PM
  */
-
 package com.cottagesystems.jdiskhog;
 
 import java.awt.BorderLayout;
@@ -26,8 +25,7 @@ public class ProgressMonitorComponent extends javax.swing.JPanel implements Prog
     /** Creates new form ProgressMonitorComponent */
     public ProgressMonitorComponent() {
         initComponents();
-
-        jPanel1.add( new JComponent() {
+        jPanel1.add(new JComponent() {
 
             public static final int ROUNDNESS = 10;
 
@@ -100,7 +98,9 @@ public class ProgressMonitorComponent extends javax.swing.JPanel implements Prog
 
     public void setTaskMessage(String newtaskMessage) {
         this.taskMessage = newtaskMessage;
-        if ( newtaskMessage.length()>100 ) newtaskMessage= newtaskMessage.substring(0,100) + "...";
+        if (newtaskMessage.length() > 100) {
+            newtaskMessage = newtaskMessage.substring(0, 100) + "...";
+        }
         messageLabel.setText(newtaskMessage);
     }
     boolean finished = true;
@@ -124,7 +124,6 @@ public class ProgressMonitorComponent extends javax.swing.JPanel implements Prog
         return cancelled;
     }
 
-    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -150,38 +149,37 @@ public class ProgressMonitorComponent extends javax.swing.JPanel implements Prog
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(messageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 231, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(messageLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 15, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(messageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 26, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 10, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(messageLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jButton1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
 private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-cancelled = true;
-        this.jButton1.setEnabled(false);
-        jButton1.setText("*");
+    cancelled = true;
+    this.jButton1.setEnabled(false);
+    jButton1.setText("*");
 }//GEN-LAST:event_jButton1ActionPerformed
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel messageLabel;
+    public javax.swing.JButton jButton1;
+    public javax.swing.JPanel jPanel1;
+    public javax.swing.JLabel messageLabel;
     // End of variables declaration//GEN-END:variables
-
 }
