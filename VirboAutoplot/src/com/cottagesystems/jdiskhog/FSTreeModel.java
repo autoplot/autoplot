@@ -5,6 +5,7 @@
 package com.cottagesystems.jdiskhog;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,7 +99,7 @@ public class FSTreeModel implements TreeModel {
         File ff1 = ff[index];
         while (ff1.isDirectory()) {
             File[] ffs = ff1.listFiles();
-            if (ffs.length == 1) {
+            if ( ffs.length == 1 && ffs[0].isDirectory() ) {
                 ff1 = ffs[0];
             } else {
                 break;
@@ -181,12 +182,20 @@ public class FSTreeModel implements TreeModel {
         return ((TreeNode) node).getFile();
     }
 
+    private boolean isParentOf( File parent, File child ) {
+        try {
+            return child.getCanonicalPath().startsWith(parent.getCanonicalPath());
+        } catch ( IOException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     public int getIndexOfChild(Object parent, Object child) {
         File f = ((TreeNode) parent).getFile();
         File fchild = ((TreeNode) child).getFile();
         File[] ff = listings.get(f);
         for (int i = 0; i < ff.length; i++) {
-            if (ff[i].equals(fchild)) {
+            if ( ff[i].equals(fchild) || isParentOf(ff[i],fchild) ) {
                 return i;
             }
         }
