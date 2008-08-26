@@ -8,7 +8,9 @@ model = getApplicationModel()
 model.autoOverview= False
 
 contoursRenderer= ContoursRenderer()
-contoursRenderer.contours="1,3,10,30,50"
+contoursRenderer.contours="0.5,1,3,5,10,30,50"
+contoursRenderer.drawLabels=True
+contoursRenderer.color= Color.WHITE
 
 model.plot.addRenderer( contoursRenderer )
 
@@ -22,5 +24,26 @@ print specRend
 bind( specRend, "dataSet", contoursRenderer, "dataSet" )
 bind( specRend, "active", contoursRenderer, "active" )
 
-model.plot.drawGrid= True
-model.plot.drawMinorGrid= True
+model.plot.drawGrid= False
+model.plot.drawMinorGrid= False
+
+model.colorBar.setFlipLabel(True)
+model.colorBar.setFillColor(Color.BLACK)
+
+from edu.uiowa.physics.pw.das.event import AngleSelectionDragRenderer, BoxSelectorMouseModule
+from edu.uiowa.physics.pw.das.components import AngleSpectrogramSlicer
+
+plot= model.plot
+
+aSlicer= AngleSpectrogramSlicer.createSlicer(plot,  specRend);
+arend=  AngleSelectionDragRenderer();
+bsel=  BoxSelectorMouseModule( plot, plot.getXAxis(), plot.getYAxis(), specRend,
+                arend,
+                "Angle Slice" );
+bsel.setDragEvents(True);        
+bsel.addBoxSelectionListener( aSlicer );  
+
+model.plot.addMouseModule( bsel )
+
+print bsel
+
