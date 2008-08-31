@@ -148,9 +148,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException {
-        URL delegateURL = new URL(getDelegateDataSourceFactoryUrl(surl));
+        String delegateSurl = getDelegateDataSourceFactoryUrl(surl);
         try {
-            return DataSetURL.getDataSourceFactory(delegateURL.toURI(), new NullProgressMonitor());
+            return DataSetURL.getDataSourceFactory( DataSetURL.getURI(delegateSurl), new NullProgressMonitor());
         } catch (URISyntaxException ex) {
             Logger.getLogger(AggregatingDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
