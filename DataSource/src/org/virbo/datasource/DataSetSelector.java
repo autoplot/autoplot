@@ -530,7 +530,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_browseButtonActionPerformed
 
 private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dataSetSelectorItemStateChanged
-    if ( evt.getStateChange()==ItemEvent.SELECTED ) {
+    if ( doItemStateChange && evt.getStateChange()==ItemEvent.SELECTED ) {
         maybePlot();
     }
 }//GEN-LAST:event_dataSetSelectorItemStateChanged
@@ -547,13 +547,17 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         return (String) this.dataSetSelector.getSelectedItem();
     }
 
+    private boolean doItemStateChange= true;
+    
     /**
      * Setter for property value.
      * @param value New value of property value.
      */
     public void setValue(String value) {
+        doItemStateChange= false;
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
+        doItemStateChange= true;
     }
     /**
      * Holds value of property browseTypeExt.
