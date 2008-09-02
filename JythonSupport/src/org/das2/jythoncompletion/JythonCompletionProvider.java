@@ -15,7 +15,21 @@ import org.das2.jythoncompletion.support.CompletionTask;
  */
 public class JythonCompletionProvider implements CompletionProvider {
 
-    public JythonCompletionProvider() {
+    CompletionSettings settings;
+    
+    private JythonCompletionProvider() {
+        settings= new CompletionSettings();
+    }
+    
+    private static JythonCompletionProvider instance;
+    
+    public static synchronized JythonCompletionProvider getInstance() {
+        if ( instance==null ) instance= new JythonCompletionProvider();
+        return instance;
+    }
+    
+    public CompletionSettings settings() {
+        return settings;
     }
     
     public CompletionTask createTask( int arg0, JTextComponent arg1 ) {

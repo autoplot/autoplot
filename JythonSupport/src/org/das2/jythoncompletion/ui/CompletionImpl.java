@@ -407,7 +407,7 @@ CaretListener, KeyListener, FocusListener, ListSelectionListener, PropertyChange
         if (component == null)
             return null;
         
-        return new CompletionProvider[] { new JythonCompletionProvider() };
+        return new CompletionProvider[] { JythonCompletionProvider.getInstance() };
         
 /*        Object mimeTypeObj = component.getDocument().getProperty("mimeType");  //NOI18N
         String mimeType;

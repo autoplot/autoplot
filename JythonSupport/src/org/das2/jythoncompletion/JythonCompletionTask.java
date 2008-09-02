@@ -1,7 +1,5 @@
 package org.das2.jythoncompletion;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.python.core.PyClassPeeker;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -43,7 +41,7 @@ public class JythonCompletionTask implements CompletionTask {
 
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
-    private static final String DOC_HOME = "http://www.autoplot.org/javadoc/javadoc/";
+
     String context;
     private JythonInterpreterProvider jythonInterpreterProvider;
 
@@ -153,7 +151,7 @@ public class JythonCompletionTask implements CompletionTask {
                 }
                 String link = null;
                 if (signature != null) {
-                    link = DOC_HOME + signature;
+                    link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
                 }
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, label, link));
             }
@@ -260,7 +258,7 @@ public class JythonCompletionTask implements CompletionTask {
                 }
                 String link = null;
                 if (signature != null) {
-                    link = DOC_HOME + signature;
+                    link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
                 }
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss, label, link));
             }
