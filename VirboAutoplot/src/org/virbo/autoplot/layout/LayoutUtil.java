@@ -19,10 +19,10 @@ import java.util.List;
  */
 public class LayoutUtil {
 
-    private static boolean ALLOW_EXCESS_SPACE= false;
+    private static boolean ALLOW_EXCESS_SPACE= true;
     
     private static void maybeSetMaximum( DasDevicePosition c, double need, double norm, double em, int pt ) {
-       if ( ALLOW_EXCESS_SPACE && em < 0) return;
+       if ( ALLOW_EXCESS_SPACE && need < 0) return;
        if ( Math.abs(c.getEmMaximum()-em )<0.1 ) return;
         c.setMaximum(norm);
         c.setEmMaximum(em);
@@ -30,7 +30,7 @@ public class LayoutUtil {
     }
     
     private static void maybeSetMinimum( DasDevicePosition c, double need, double norm, double em, int pt ) {
-        if ( ALLOW_EXCESS_SPACE && em < 0 ) return;
+        if ( ALLOW_EXCESS_SPACE && need < 0 ) return;
         if ( Math.abs(c.getEmMinimum()-em)<0.1 ) return;
         c.setMinimum(norm);
         c.setEmMinimum(em);
