@@ -141,6 +141,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
                     setStatus(applicationModel.getStatus());
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
                     updateBookmarks();
+                } else if ( evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE_URL)) {
+                    dataSetSelector.setValue(applicationModel.getDataSourceURL());
                 }
             }
         });
