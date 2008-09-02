@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import edu.uiowa.physics.pw.das.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -13,6 +14,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.text.BadLocationException;
+import org.das2.jythoncompletion.CompletionSettings;
+import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.virbo.datasource.DataSetSelector;
 
 /**
@@ -54,6 +57,15 @@ public class EditorContextMenu {
                 }
             });
             menu.add( insertCodeMenu );
+            JMenu settingsMenu= new JMenu("Settings");
+            settingsMenu.add( new AbstractAction("Edit Settings") {
+                public void actionPerformed(ActionEvent e) {
+                    CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
+                    PropertyEditor p= new PropertyEditor(settings);
+                    p.showModalDialog(editor);
+                }
+            });
+            menu.add( settingsMenu );
         }
     }
     
