@@ -127,7 +127,7 @@ public class BinaryDataSource extends AbstractDataSource {
                     return offset + i * recSizeBytes;
                 }
             };
-            dep0ds.putProperty( QDataSet.CADENCE, recSizeBytes );
+            dep0ds.putProperty( QDataSet.CADENCE, (double)recSizeBytes );
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         }
 
