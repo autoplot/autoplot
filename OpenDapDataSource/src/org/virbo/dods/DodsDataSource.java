@@ -26,6 +26,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import dods.dap.Attribute;
+import edu.uiowa.physics.pw.das.CancelledOperationException;
 import edu.uiowa.physics.pw.das.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
@@ -137,8 +138,9 @@ public class DodsDataSource extends AbstractDataSource {
         return constraint1.toString();
     }
 
-    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException {
+    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException, CancelledOperationException {
         
+        System.err.println("Dods.getDataSet");
         mon.setTaskSize(-1);
         mon.started();
         
