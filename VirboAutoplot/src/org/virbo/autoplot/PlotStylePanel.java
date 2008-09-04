@@ -11,7 +11,6 @@ import edu.uiowa.physics.pw.das.components.propertyeditor.ColorEditor;
 import edu.uiowa.physics.pw.das.components.propertyeditor.EnumerationEditor;
 import edu.uiowa.physics.pw.das.components.propertyeditor.PropertyEditor;
 import java.awt.BorderLayout;
-import java.util.List;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
 import javax.beans.binding.BindingConverter;
@@ -62,7 +61,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         fillColorPanel.add( fillColorEditor.getSmallEditor(), BorderLayout.CENTER );
                 
         DatumEditor referenceEditor= new DatumEditor();
-        referenceValuePanel.add(referenceEditor);
+        referenceValuePanel.add(referenceEditor.getCustomEditor());
         
         validate();
         
@@ -171,7 +170,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                         .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(rebinPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 142, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(colortableTypePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 141, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap(16, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                         .add(moreSprectrogramPropsButton)
                         .addContainerGap())))
@@ -275,9 +274,9 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        jPanel2Layout.linkSize(new java.awt.Component[] {lineThickSpinner, symSizeSpinner}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
         jPanel2Layout.linkSize(new java.awt.Component[] {colorPanel, fillColorPanel, lineStylePanel, psymPanel}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
+        jPanel2Layout.linkSize(new java.awt.Component[] {lineThickSpinner, symSizeSpinner}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
 
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -376,7 +375,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                         .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(jPanel3, 0, 257, Short.MAX_VALUE)
+                            .add(jPanel3, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .add(jLabel1))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
