@@ -52,8 +52,23 @@ public class AggregatingDataSource extends AbstractDataSource {
     MetadataModel metadataModel;
 
     private DatumRange quantize(DatumRange timeRange) {
-        timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
-        return timeRange;
+        try {
+            //String s1= fsm.calculateNameFor(timeRange.min());
+            //String s2= fsm.calculateNameFor(timeRange.max());
+            
+            String[] ss = fsm.getNamesFor(timeRange);
+            if ( ss.length==0 ) return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
+            DatumRange result= fsm.getRangeFor(ss[0]);
+            for ( int i=0; i<ss.length; i++ ) {
+                DatumRange r1= fsm.getRangeFor(ss[i]);
+                result= result.include( r1.max() ).include(r1.min());
+            }
+            return result;
+        } catch (IOException ex) {
+            Logger.getLogger(AggregatingDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
+            return timeRange;
+        }
     }
         
     /** Creates a new instance of AggregatingDataSource */
