@@ -91,20 +91,25 @@ public class CdfFileDataSource extends AbstractDataSource {
         if (svariable == null) {
             svariable = (String) map.get("arg_0");
         }
-        Variable variable = cdf.getVariable(svariable);
-        attributes = readAttributes(cdf, variable, 0);
 
-        WritableDataSet result = wrapDataSet(cdf, svariable, false);
-        cdf.close();
+        try {
+            Variable variable = cdf.getVariable(svariable);
+            attributes = readAttributes(cdf, variable, 0);
 
-        return result;
+            WritableDataSet result = wrapDataSet(cdf, svariable, false);
+            cdf.close();
+
+            return result;
+        } catch (CDFException ex) {
+            throw new IllegalArgumentException("no such variable: "+svariable);
+        }
 
     }
 
     /**
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      */
-    private WritableDataSet wrapDataSet( final CDF cdf, final String svariable, boolean reform ) throws CDFException {
+    private WritableDataSet wrapDataSet(final CDF cdf, final String svariable, boolean reform) throws CDFException {
         Variable variable = cdf.getVariable(svariable);
 
         long varType = variable.getDataType();
@@ -142,9 +147,9 @@ public class CdfFileDataSource extends AbstractDataSource {
                         if (idep == 0) {
                             System.err.println("sorting dep0 to make depend0 monotonic");
                             QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
-                            result = DataSetOps.applyIndex( result, idep, sort, false );
-                            depDs= DataSetOps.applyIndex( depDs, 0, sort, false );
-                            depDs.putProperty( QDataSet.MONOTONIC, Boolean.TRUE );
+                            result = DataSetOps.applyIndex(result, idep, sort, false);
+                            depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
+                            depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                         }
                     }
                     result.putProperty("DEPEND_" + idep, depDs);
