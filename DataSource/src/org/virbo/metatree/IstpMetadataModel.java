@@ -46,6 +46,8 @@ public class IstpMetadataModel extends MetadataModel {
 	    return ((Double) o).doubleValue();
 	} else if (o instanceof Short) {
 	    return ((Short) o).doubleValue();
+        } else if (o instanceof Integer ) {
+            return ((Integer)o).doubleValue();
 	} else if (o instanceof String) {
 	    try {
 		return units.parse(DataSourceUtil.unquote((String) o)).doubleValue(units);
