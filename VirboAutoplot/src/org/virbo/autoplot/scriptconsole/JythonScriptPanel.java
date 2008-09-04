@@ -6,8 +6,12 @@
 package org.virbo.autoplot.scriptconsole;
 
 import java.io.File;
+import javax.beans.binding.Binding;
+import javax.beans.binding.BindingContext;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -66,12 +70,31 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             }
         });
 
+        this.textArea.getDocument().addDocumentListener(new DocumentListener() {
+
+            public void insertUpdate(DocumentEvent e) {
+                setDirty(true);
+            }
+
+            public void removeUpdate(DocumentEvent e) {
+                setDirty(true);
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+            }
+        });
+
         EditorContextMenu menu= new EditorContextMenu( this.textArea );
         menu.setDataSetSelector(selector);
         
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
 
+
+    }
+
+    protected void updateStatus() {
+        fileNameLabel.setText( ( filename==null ? "" : filename ) + ( dirty ? " *" : "" ) ) ;
     }
 
     int getContext() {
@@ -222,4 +245,36 @@ private void contextSelectorActionPerformed(java.awt.event.ActionEvent evt) {//G
     public EditorTextPane getEditorPanel() {
         return textArea;
     }
+    
+    
+    protected String filename = null;
+
+    public static final String PROP_FILENAME = "filename";
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        String oldFilename = this.filename;
+        this.filename = filename;
+        updateStatus();
+        firePropertyChange(PROP_FILENAME, oldFilename, filename);
+    }
+
+    protected boolean dirty = false;
+
+    public static final String PROP_DIRTY = "dirty";
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        boolean oldDirty = this.dirty;
+        this.dirty = dirty;
+        updateStatus();
+        firePropertyChange(PROP_DIRTY, oldDirty, dirty);
+    }
+
 }
