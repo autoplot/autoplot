@@ -524,14 +524,18 @@ public class DataSetURL {
     /**
      * canonical method for getting the URI.  If no protocol is specified, then file:// is
      * used.  Note URIs may contain prefix like bin.http://www.cdf.org/data.cdf.
+     * 
      */
     public static URI getURI(String surl) throws URISyntaxException {
         surl = maybeAddFile(surl);
         if (surl.endsWith("://")) {
             surl += "/";  // what strange case is this?
         }
-        surl = surl.replaceAll("%", "%25");
-        surl = surl.replaceAll(" ", "%20");
+        boolean isAlreadyEscaped= surl.contains("%20"); // TODO: cheesy
+        if ( !isAlreadyEscaped ) {
+            surl = surl.replaceAll("%", "%25");
+            surl = surl.replaceAll(" ", "%20");
+        }
         URI result = new URI(surl);
         return result;
     }
