@@ -19,8 +19,12 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.datasource.DataSetSelector;
@@ -64,17 +68,19 @@ public class ScriptPanelSupport {
                         if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
                             return;
                         }
-                        file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
-                        StringBuffer buf = new StringBuffer();
-                        BufferedReader r = new BufferedReader(new FileReader(file));
-                        String s = r.readLine();
-                        while (s != null) {
-                            buf.append(s + "\n");
-                            s = r.readLine();
+
+                        if (panel.isDirty()) {
+                            int result = JOptionPane.showConfirmDialog(panel, "save edits before loading " + file + "?", "Save work", JOptionPane.OK_CANCEL_OPTION);
+                            if (result == JOptionPane.OK_CANCEL_OPTION) {
+                                return;
+                            }
+                            saveAs();
                         }
-                        panel.getEditorPanel().setText(buf.toString());
+                        file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
+                        loadFile(file);
+
                         panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
-                        panel.fileNameLabel.setText(sfile.toString());
+                        panel.setFilename(sfile.toString());
                     } catch (IOException ex) {
                         Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -106,6 +112,26 @@ public class ScriptPanelSupport {
         String text = panel.getEditorPanel().getText();
         out.write(text.getBytes());
         out.close();
+        panel.setDirty(false);
+    }
+
+    private void loadFile(File file) throws IOException, FileNotFoundException {
+        try {
+            StringBuffer buf = new StringBuffer();
+            BufferedReader r = new BufferedReader(new FileReader(file));
+            String s = r.readLine();
+            while (s != null) {
+                buf.append(s + "\n");
+                s = r.readLine();
+            }
+            Document d = panel.getEditorPanel().getDocument();
+            d.remove(0, d.getLength());
+            d.insertString(0, buf.toString(), null);
+            panel.setFilename(file.toString());
+            panel.setDirty(false);
+        } catch (BadLocationException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private boolean uriFilesEqual(String surl1, String surl2) throws URISyntaxException {
@@ -182,7 +208,7 @@ public class ScriptPanelSupport {
                     annotationsSupport.clearAnnotations();
                     selector.maybePlot();
 
-                    panel.fileNameLabel.setText(file.toString());
+                    panel.setFilename(file.toString());
                 }
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
@@ -195,14 +221,16 @@ public class ScriptPanelSupport {
                             }
                             try {
                                 PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+                                boolean dirty0= panel.isDirty();
                                 annotationsSupport.clearAnnotations();
+                                panel.setDirty(dirty0);
                                 interp.exec(panel.getEditorPanel().getText());
                             } catch (IOException ex) {
                                 Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
 
                             } catch (PyException ex) {
                                 annotateError(ex);
-
+                                ex.printStackTrace();
                             }
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
@@ -245,12 +273,14 @@ public class ScriptPanelSupport {
                 String text = panel.getEditorPanel().getText();
                 out.write(text.getBytes());
                 out.close();
+                panel.setDirty(false);
+                panel.setFilename(file.toString());
                 if (updateSurl) {
                     model.setDataSourceURL(file.toString());
                 } else {
                     model.update(true, true);
                 }
-                panel.fileNameLabel.setText(file.toString());
+                
             }
 
         } catch (IOException iOException) {
@@ -277,17 +307,8 @@ public class ScriptPanelSupport {
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
                 file = chooser.getSelectedFile();
-
-                BufferedReader read = new BufferedReader(new FileReader(file));
-                StringBuffer buf = new StringBuffer();
-                String s = read.readLine();
-                while (s != null) {
-                    buf.append(s).append("\n");
-                    s = read.readLine();
-                }
-
-                panel.getEditorPanel().setText(buf.toString());
-                panel.fileNameLabel.setText(file.toString());
+                loadFile(file);
+                panel.setFilename(file.toString());
             }
 
         } catch (IOException ex) {
