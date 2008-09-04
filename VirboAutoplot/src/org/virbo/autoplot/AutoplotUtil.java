@@ -559,6 +559,7 @@ public class AutoplotUtil {
     /**
      * rewrite the dataset so that fill values are set by the valid range and fill
      * controls.
+     * 
      * //TODO: use QubeDataSetIterator to reduce code.
      * //TODO: simply set validmin, validmax, fill metadata.
      */
@@ -574,7 +575,7 @@ public class AutoplotUtil {
         if (ds.rank() == 1) {
             for (int i = 0; i < ds.length(); i++) {
                 double d = ds.value(i);
-                if (d == fill || d <= vmin || d >= vmax) {
+                if (d == fill || d < vmin || d > vmax) {
                     result.putValue(i, u.getFillDouble());
                 }
             }
@@ -582,7 +583,7 @@ public class AutoplotUtil {
             for (int i0 = 0; i0 < ds.length(); i0++) {
                 for (int i1 = 0; i1 < ds.length(i0); i1++) {
                     double d = ds.value(i0, i1);
-                    if (d == fill || d <= vmin || d >= vmax) {
+                    if (d == fill || d < vmin || d > vmax) {
                         result.putValue(i0, i1, u.getFillDouble());
                     }
                 }
@@ -592,7 +593,7 @@ public class AutoplotUtil {
                 for (int i1 = 0; i1 < ds.length(i0); i1++) {
                     for (int i2 = 0; i2 < ds.length(i0, i1); i2++) {
                         double d = ds.value(i0, i1, i2);
-                        if (d == fill || d <= vmin || d >= vmax) {
+                        if (d == fill || d < vmin || d > vmax) {
                             result.putValue(i0, i1, i2, u.getFillDouble());
                         }
                     }
