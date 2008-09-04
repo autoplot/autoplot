@@ -233,8 +233,10 @@ public class DocumentationScrollPane extends JScrollPane {
         } else if (url != null) {
             try {
                 view.setPage(url);
-
+            } catch ( java.net.UnknownHostException ioe ) {
+                view.setContent( ioe.toString(), null );
             } catch (IOException ioe) {
+                
                 throw new RuntimeException(ioe.toString());
             }
         }
