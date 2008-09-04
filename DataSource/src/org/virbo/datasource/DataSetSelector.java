@@ -317,9 +317,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                 CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
 
                     public void itemSelected(CompletionResult s1) {
-                        dataSetSelector.setSelectedItem(s1.completion);
-                        if (s1.maybePlot) {
-                            maybePlot();
+                        if ( s1.maybePlot ) {
+                            dataSetSelector.setSelectedItem(s1.completion);
+                        } else {
+                            dataSetSelector.getEditor().setItem(s1.completion);
                         }
                     }
                 };
