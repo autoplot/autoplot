@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<java version="1.6.0_03" class="java.beans.XMLDecoder"> 
+ <object class="org.virbo.autoplot.state.ApplicationState"> 
+  <void property="YLabel"> 
+   <string>Counts/cm!A2!n sec sr</string> 
+  </void> 
+  <void property="autoOverview"> 
+   <boolean>false</boolean> 
+  </void> 
+  <void property="backgroundColor"> 
+   <object class="java.awt.Color"> 
+    <int>255</int> 
+    <int>255</int> 
+    <int>255</int> 
+    <int>255</int> 
+   </object> 
+  </void> 
+  <void property="canvasSize"> 
+   <object class="java.awt.Dimension"> 
+    <int>684</int> 
+    <int>484</int> 
+   </object> 
+  </void> 
+  <void property="color"> 
+   <object class="java.awt.Color"> 
+    <int>201</int> 
+    <int>1</int> 
+    <int>1</int> 
+    <int>255</int> 
+   </object> 
+  </void> 
+  <void property="colortable"> 
+   <string>color_wedge</string> 
+  </void> 
+  <void property="fillColor"> 
+   <object class="java.awt.Color"> 
+    <int>192</int> 
+    <int>192</int> 
+    <int>192</int> 
+    <int>255</int> 
+   </object> 
+  </void> 
+  <void property="foregroundColor"> 
+   <object class="java.awt.Color"> 
+    <int>51</int> 
+    <int>51</int> 
+    <int>51</int> 
+    <int>255</int> 
+   </object> 
+  </void> 
+  <void property="lineWidth"> 
+   <double>1.0</double> 
+  </void> 
+  <void property="plotSymbol"> 
+   <string></string> 
+  </void> 
+  <void property="reference"> 
+   <string>0.0 </string> 
+  </void> 
+  <void property="surl"> 
+   <string>http://goes.ngdc.noaa.gov/data/avg/%Y/A105%y%m.TXT?skip=23&amp;timeFormat=%y%m%d %H%M&amp;column=E1&amp;time=YYMMDD&amp;timerange=Nov 2004 through Jan 2005</string> 
+  </void> 
+  <void property="symbolConnector"> 
+   <string>Solid</string> 
+  </void> 
+  <void property="symbolSize"> 
+   <double>1.0</double> 
+  </void> 
+  <void property="title"> 
+   <string>GOES-10 SPACE ENVIRONMENT MONITOR!c2 MeV Electrons</string> 
+  </void> 
+  <void property="validRange"> 
+   <string>0 to 32000</string> 
+  </void> 
+  <void property="xrange"> 
+   <object class="org.virbo.autoplot.state.DatumRangePersistenceDelegate" method="newDatumRange"> 
+    <double>1.5335173864541835E8</double> 
+    <double>1.5594373864541835E8</double> 
+    <string>t2000</string> 
+   </object> 
+  </void> 
+  <void property="ylog"> 
+   <boolean>true</boolean> 
+  </void> 
+  <void property="yrange"> 
+   <object class="org.virbo.autoplot.state.DatumRangePersistenceDelegate" method="newDatumRange"> 
+    <double>0.1</double> 
+    <double>100000.0</double> 
+    <string></string> 
+   </object> 
+  </void> 
+  <void property="zrange"> 
+   <object class="org.virbo.autoplot.state.DatumRangePersistenceDelegate" method="newDatumRange"> 
+    <double>0.0</double> 
+    <double>100.0</double> 
+    <string></string> 
+   </object> 
+  </void> 
+ </object> 
+</java> 
