@@ -121,16 +121,23 @@ public class EditorAnnotationsSupport {
      * @param text, annotation to display when hovering. Currently ignored.
      */
     public void annotateLine(int line, String name, String text) throws BadLocationException {
+        StyledDocument doc = editorPanel.getStyledDocument();
         Element root = editorPanel.getDocument().getDefaultRootElement();
         
-        if ( line<1 || line>root.getElementCount() ) {
+        if ( line<1 || line>root.getElementCount()+1 ) {
             throw new IllegalArgumentException( "no such line: "+line );
-        }
+        } 
         
-        int i0 = root.getElement(line - 1).getStartOffset();
-        int i1 = root.getElement(line - 1).getEndOffset();
+        int i0, i1;
+        
+        if ( line<=root.getElementCount() ) {
+            i0 = root.getElement(line - 1).getStartOffset();
+            i1 = root.getElement(line - 1).getEndOffset();
+        } else {
+            i0 = Math.max(0, doc.getLength()-2 );
+            i1 = doc.getLength();
+        }
 
-        StyledDocument doc = editorPanel.getStyledDocument();
         Style style = doc.getStyle(name);
         if (style == null) {
             addStyles(doc);
