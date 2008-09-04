@@ -332,7 +332,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     public void run() {
                         try {
                             double xpos;
-                            int n = editor.getCaretPosition();
+                            //int n = editor.getCaretPosition();
+                            int n= carotpos;
                             String t = editor.getText(0, n);
                             int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(t);
 
