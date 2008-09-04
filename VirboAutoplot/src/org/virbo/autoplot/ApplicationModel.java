@@ -342,9 +342,9 @@ public class ApplicationModel {
                 clearThreadRunning(TICKLE_TIMER_THREAD_RUNNING);
             }
         });
+        tickleTimer.setRepeats(false);
 
         updateTsbTimer = new Timer(100, new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
                 updateTsb();
             }
@@ -635,6 +635,8 @@ public class ApplicationModel {
         if (ds == null) {
             caching = null;
             tsb = null;
+            this.surl= null;
+
             if (timeSeriesBrowseListener != null) {
                 this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
                 timeSeriesBrowseListener = null;
@@ -644,7 +646,7 @@ public class ApplicationModel {
 
             caching = ds.getCapability(Caching.class);
             tsb = ds.getCapability(TimeSeriesBrowse.class);
-
+            
             if (tsb != null) {
                 timeSeriesBrowseListener = new PropertyChangeListener() {
 
@@ -922,6 +924,8 @@ public class ApplicationModel {
      * @param autorange if false, then no autoranging is done.
      */
     protected void updateFill(boolean autorange, boolean interpretMetadata) {
+        logger.fine("enter updateFill");
+        
         if (dataset == null) {
             return;
         }
@@ -1012,6 +1016,7 @@ public class ApplicationModel {
         } else {
             // kludge to support updating slice location report without autoranging.
             if (reduceRankString != null) {
+                newState.setTitle("");
                 doInterpretMetadata(newState, properties, renderType);
                 plot.setTitle(newState.getTitle() + "!c" + reduceRankString);
             }
@@ -2089,6 +2094,7 @@ public class ApplicationModel {
      * @return
      */
     public int getMaxSliceIndex(int sliceDimension) {
+        if (dataset==null ) return 0;
         int[] qube = DataSetUtil.qubeDims(dataset);
         if (qube == null || qube.length <= sliceDimension) {
             return 0;
