@@ -88,6 +88,31 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.divide( that, ds ) );
     }
 
+    @Override
+    public PyObject __floordiv__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.div(ds, that ) );
+    }
+
+    @Override
+    public PyObject __mod__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet( Ops.mod(ds, that ) );
+    }
+
+    @Override
+    public PyObject __rfloordiv__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet(Ops.div( that, ds ) );
+    }
+
+    @Override
+    public PyObject __rmod__(PyObject arg0) {
+        QDataSet that = coerce_ds(arg0);
+        return new PyQDataSet(Ops.mod( that, ds ) );
+    }
+
+    
     /* unary negate and plus operator */
     @Override
     public PyObject __pos__() {
