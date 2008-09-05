@@ -54,7 +54,11 @@ public class IstpMetadataModel extends MetadataModel {
             try {
                 return units.parse(DataSourceUtil.unquote((String) o)).doubleValue(units);
             } catch (ParseException ex) {
-                throw new IllegalArgumentException("unable to parse " + o);
+                try {
+                    return Double.parseDouble((String)o);
+                } catch ( NumberFormatException ex2 ) {
+                    throw new IllegalArgumentException("unable to parse " + o);
+                }
             }
         } else {
             Class c = o.getClass();
