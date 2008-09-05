@@ -8,7 +8,6 @@
  */
 package org.virbo.ascii;
 
-import edu.uiowa.physics.pw.das.datum.EnumerationUnits;
 import edu.uiowa.physics.pw.das.datum.TimeUtil;
 import edu.uiowa.physics.pw.das.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
@@ -49,6 +48,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
      * the number of columns to combine into time
      */
     int timeColumns = -1;
+    
+    /**
+     * time format of each digit
+     */
+    String[] timeFormats;
+    
     /**
      * the column containing times, or -1.
      */
@@ -75,10 +80,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (timeColumns > 1) {
             final Units u = Units.t2000;
             // replace the first column with the datum time
-            // timeParser knows the order of the digits.
             for (int i = 0; i < ds.length(); i++) {
                 for (int j = 0; j < timeColumns; j++) {
-                    timeParser.setDigit(j, (int) ds.value(i, timeColumn + j));
+                    //timeParser.setDigit(j, (int) ds.value(i, timeColumn + j));
+                    timeParser.setDigit(timeFormats[j], (int) ds.value(i, timeColumn + j) );
                 }
                 ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000));
             }
@@ -93,6 +98,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (icol == -1) {
                 if (Pattern.matches("field[0-9]+", column)) {
                     icol = Integer.parseInt(column.substring(5));
+                } else if ( Pattern.matches("[0-9]+", column) ) {
+                    icol = Integer.parseInt(column);
+                } else {
+                    throw new IllegalArgumentException("bad column parameter: "+column+", should be field1, or 1, or <name>");
                 }
             }
             vds = DDataSet.copy(DataSetOps.slice1(ds, icol));
@@ -179,6 +188,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             columnCount = p.fieldCount();
             delim = p.getDelim();
         } else {
+            if (delim.equals("+") ) delim= " ";
             columnCount = parser.setDelimParser(file.toString(), delim).fieldCount();
         }
         //parser.setPropertyPattern( Pattern.compile("^#\\s*(.+)\\s*\\:\\s*(.+)\\s*") );
@@ -235,11 +245,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
             this.validMax= Double.parseDouble((String) o);
         }
         
+        /* recognize the column as parsable times, parse with slow general purpose time parser */
         o = params.get("time");
         if (o != null) {
             int i = parser.getFieldIndex((String) o);
             if (i == -1) {
-                System.err.println("field not found for time parameter: " + o);
+                throw new IllegalArgumentException("field not found for time parameter: " + o);
             } else {
                 parser.setFieldParser(i, parser.UNITS_PARSER);
                 parser.setUnits(i, Units.t2000);
@@ -252,14 +263,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
         o = params.get("timeFormat");
         if (o != null) {
             String timeFormat = (String) o;
+            timeFormat= timeFormat.replaceAll("\\+", " ");
             timeParser = TimeParser.create((String) o);
             String timeColumnName = params.get("time");
             timeColumn = timeColumnName==null ? 0 : parser.getFieldIndex(timeColumnName);
 
             if (delim != null && timeFormat.split( delim,-2 ).length > 1) { 
                 // we've got a special case here: the time spans multiple columns, so we'll have to combine later.
-                
-                timeColumns = (timeFormat.split("%",-2).length) - 1;  //TODO: consider simply splitting on %, regardless of delim.
+                parser.setUnits(timeColumn,Units.dimensionless);
+                timeFormats= timeFormat.split(delim,-2);
+                timeColumns = timeFormats.length; 
                 int ib= timeFormat.indexOf("%b"); // real trouble: months are strings.  We can deal with this.
                 if ( ib!=-1 ) {
                     int monthColumn= timeFormat.substring(0,ib).split("%",-2).length -1;
