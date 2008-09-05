@@ -45,8 +45,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         ads.setFsm(fsm);
         DataSetURL.URLSplit split = DataSetURL.parse(surl);
         Map parms = DataSetURL.parseParams(split.params);
-        ads.setViewRange(DatumRangeUtil.parseTimeRange((String) parms.get("timerange")));
-
+        String stimeRange= (String) parms.get("timerange");
+        stimeRange= stimeRange.replaceAll("\\+", " ");
+        ads.setViewRange(DatumRangeUtil.parseTimeRange(stimeRange));
         parms.remove("timerange");
         if (parms.size() > 0) {
             ads.setParams(DataSetURL.formatParams(parms));
@@ -113,6 +114,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         delegatecc.surl = delegateUrl;
         delegatecc.surlpos = carotPos;
         delegatecc.context = cc.context;
+        delegatecc.resource= new URL( delegateFfile );
 
         return delegatecc;
     }
