@@ -35,39 +35,58 @@ public class NameValueTreeModel implements TreeModel {
     }
 
     static class StringPropertyNode implements TreeNode {
+        private static final int LINE_LEN = 133;
 
         String name;
         String value;
+        List<Integer> splits;
         boolean hasKids;
 
         StringPropertyNode(String name, String value) {
             this.name = name;
             this.value = value;
-            this.hasKids = value.length() > 50;
+            if ( value.length()>LINE_LEN || value.contains("\n") ) {
+                splits= new ArrayList<Integer>();
+                int ii=0;
+                while ( ii<value.length() ) {
+                    int i= value.indexOf("\n",ii);
+                    if ( (i-ii)>LINE_LEN || i==-1 ) {
+                        if ( value.length()-ii < LINE_LEN ) {
+                            ii= value.length();
+                        } else {
+                            i= value.lastIndexOf(" ",ii+LINE_LEN);
+                            if ( i==-1 ) ii= ii+LINE_LEN; else ii= i+1;
+                        }
+                    } else {
+                        ii= i+1;
+                    }
+                    if ( ii<value.length() ) splits.add(ii);
+                }
+            }
+            this.hasKids = splits != null;
         }
 
+        @Override
         public String toString() {
             if (!hasKids) {
                 return "" + name + "=" + value;
             } else {
-                return "" + name + "=" + value.substring(0, 50) + " ...";
+                return "" + name + "=" + value.substring(0, splits.get(0) ) + " ...";
             }
         }
 
         public int childCount() {
-            return hasKids ? value.length() / 50 + 1 : 0;
+            return hasKids ? splits.size() + 1 : 0;
         }
 
         public Object getChild(int i) {
-            int i0 = i * 50;
-            int i1 = Math.min((i + 1) * 50, value.length());
-            while (i0 > 0 && i0 < value.length() && !Character.isWhitespace(value.charAt(i0 - 1))) {
-                i0++;
+            if ( i==0 ) {
+                return value.substring( 0,splits.get(i) );
+            } else if ( i==splits.size() ) {
+                return value.substring(splits.get(i-1));
+            } else {
+                return value.substring( splits.get(i-1), splits.get(i) );
             }
-            while (i1 < value.length() && !Character.isWhitespace(value.charAt(i1))) {
-                i1++;
-            }
-            return value.substring(i0, i1);
         }
 
         public boolean isLeaf() {
