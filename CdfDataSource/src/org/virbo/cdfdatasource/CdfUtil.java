@@ -100,13 +100,14 @@ public class CdfUtil {
             short[] back = new short[nx * ny];
             flatten(data, back, 0, nx, ny);
             result = SDataSet.wrap(back, nx, ny);
-        } else if (varType == Variable.CDF_INT1) {
+        } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE ) {
             byte[][] data = (byte[][]) odata;
             int nx = data.length;
             int ny = data[0].length;
             byte[] back = new byte[nx * ny];
             flatten(data, back, 0, nx, ny);
             result = BDataSet.wrap(back, nx, ny);
+
         } else if (varType == Variable.CDF_CHAR) {
             EnumerationUnits units = EnumerationUnits.create(variable.getName());
             String[] sdata = (String[]) odata;
@@ -285,9 +286,9 @@ public class CdfUtil {
             } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
                 result = SDataSet.wrap((short[]) odata);
 
-            } else if (varType == Variable.CDF_INT1) {
+            } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE ) {
                 result = BDataSet.wrap((byte[]) odata);
-
+                    
             } else if (varType == Variable.CDF_CHAR) {
                 EnumerationUnits units = EnumerationUnits.create(variable.getName());
                 String[] sdata = (String[]) odata;
