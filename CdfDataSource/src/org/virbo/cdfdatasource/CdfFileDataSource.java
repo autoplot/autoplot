@@ -19,9 +19,11 @@ import gsfc.nssdc.cdf.Variable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -76,7 +78,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         return properties;
     }
 
-    public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException {
+    public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
         File cdfFile;
         cdfFile = getFile(mon);
 
@@ -92,11 +94,18 @@ public class CdfFileDataSource extends AbstractDataSource {
             svariable = (String) map.get("arg_0");
         }
 
+        String constraint= null;
+        int i= svariable.indexOf("[");
+        if ( i!=-1 ) {
+            constraint= svariable.substring(i);
+            svariable= svariable.substring(0,i);
+        }
+        
         try {
             Variable variable = cdf.getVariable(svariable);
             attributes = readAttributes(cdf, variable, 0);
 
-            WritableDataSet result = wrapDataSet(cdf, svariable, false);
+            WritableDataSet result = wrapDataSet(cdf, svariable, constraint, false);
             cdf.close();
 
             return result;
@@ -107,9 +116,29 @@ public class CdfFileDataSource extends AbstractDataSource {
     }
 
     /**
+     * returns [ start, stride, stop ]
+     * @param constraint
+     * @return
+     */
+    private long[] parseConstraint( String constraint, long recCount ) throws ParseException {
+        if ( constraint==null ) {
+            return new long[] { 0, 1, recCount };
+        } else {
+            Pattern p= Pattern.compile("\\[(\\d+):(\\d+)\\]");
+            Matcher m= p.matcher(constraint);
+            if ( m.matches() ) {
+                return new long[] { Integer.parseInt(m.group(1)), 1, Integer.parseInt(m.group(2)) };
+            } else {
+                throw new ParseException("no match!", 0);
+            }
+        }
+    }
+    
+    
+    /**
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      */
-    private WritableDataSet wrapDataSet(final CDF cdf, final String svariable, boolean reform) throws CDFException {
+    private WritableDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform) throws CDFException, ParseException {
         Variable variable = cdf.getVariable(svariable);
 
         long varType = variable.getDataType();
@@ -118,11 +147,14 @@ public class CdfFileDataSource extends AbstractDataSource {
         if (numRec == 0) {
             throw new IllegalArgumentException("variable " + svariable + " contains no records!");
         }
+        
+        long[] recs= parseConstraint( constraints, numRec );
+        
         WritableDataSet result;
         if (reform) {
             result = CdfUtil.wrapCdfHyperData(variable, 0, -1);
         } else {
-            result = CdfUtil.wrapCdfHyperData(variable, 0, numRec);
+            result = CdfUtil.wrapCdfHyperData(variable, recs[0], recs[2]-recs[0] );
         }
         result.putProperty(QDataSet.NAME, svariable);
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
@@ -140,7 +172,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             Map dep = (Map) thisAttributes.get("DEPEND_" + idep);
             if (dep != null) {
                 try {
-                    WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep > 0);
+                    WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep==0 ? constraints : null, idep > 0);
                     if (DataSetUtil.isMonotonic(depDs)) {
                         depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                     } else {
@@ -160,7 +192,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 String s = (String) thisAttributes.get("LABL_PTR_" + idep);
                 if (s != null) {
                     try {
-                        WritableDataSet depDs = wrapDataSet(cdf, s, idep > 0);
+                        WritableDataSet depDs = wrapDataSet(cdf, s, idep==0 ? constraints : null, idep > 0);
                         result.putProperty("DEPEND_" + idep, depDs);
                     } catch (Exception e) {
                         e.printStackTrace(); // to support lanl.
