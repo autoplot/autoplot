@@ -119,11 +119,11 @@ public class GuiSupport {
                 JFileChooser chooser = new JFileChooser();
 
                 List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
-
+                FileFilter deflt= null;
                 for (String ext : exts) {
                     final String ex= ext;
                     final String desc= "";
-                    chooser.addChoosableFileFilter(new FileFilter() {
+                    FileFilter ff= new FileFilter() {
                         @Override
                         public boolean accept(File f) {
                             return f.toString().endsWith(ex) || f.isDirectory();
@@ -133,8 +133,14 @@ public class GuiSupport {
                         public String getDescription() {
                             return "*"+ex;
                         }
-                    });
+                    };
+                    if ( ext.equals(".cdf") ) {
+                        deflt= ff;
+                    }
+                    chooser.addChoosableFileFilter(ff);
                 }
+                
+                chooser.setFileFilter(deflt);
                 
                 Preferences prefs = Preferences.userNodeForPackage(AutoPlotUI.class);
                 String currentFileString = prefs.get("DumpDataCurrentFile", "");
