@@ -28,10 +28,12 @@ import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.Slice1DataSet;
 import org.virbo.dataset.SortDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
 /**
@@ -173,6 +175,16 @@ public class CdfFileDataSource extends AbstractDataSource {
             if (dep != null) {
                 try {
                     WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep==0 ? constraints : null, idep > 0);
+                    //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
+                    if ( depDs.rank()==2 && depDs.length(0)==2 ) {
+                        WritableDataSet depDs1= (WritableDataSet) Ops.reduceMean(depDs, 1);
+                        QDataSet binmax= DataSetOps.slice1(depDs, 1) ;
+                        QDataSet binmin= DataSetOps.slice1(depDs, 0) ;
+                        depDs1.putProperty( QDataSet.DELTA_MINUS, Ops.subtract( depDs1, binmin ) );
+                        depDs1.putProperty( QDataSet.DELTA_PLUS, Ops.subtract( binmax, depDs1 ) );
+                        depDs= depDs1;
+                    }
+                    
                     if (DataSetUtil.isMonotonic(depDs)) {
                         depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                     } else {
