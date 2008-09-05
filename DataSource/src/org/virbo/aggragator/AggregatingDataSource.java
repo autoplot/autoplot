@@ -88,7 +88,9 @@ public class AggregatingDataSource extends AbstractDataSource {
                 try {
                     DataSetURL.URLSplit split= DataSetURL.parse( AggregatingDataSource.this.getURL() );
                     Map params= DataSetURL.parseParams(split.params);
-                    params.put( "timerange", viewRange.toString() );
+                    String stimeRange=  viewRange.toString();
+                    stimeRange= stimeRange.replaceAll(" ", "+");
+                    params.put( "timerange", stimeRange );
                     split.params= DataSetURL.formatParams(params);
                     return new URL( DataSetURL.format(split) );
                     
