@@ -114,7 +114,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         delegatecc.surl = delegateUrl;
         delegatecc.surlpos = carotPos;
         delegatecc.context = cc.context;
-        delegatecc.resource= new URL( delegateFfile );
+        delegatecc.resource= new URL( delegateFfile ); 
 
         return delegatecc;
     }
