@@ -131,8 +131,10 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         } else {
             Point p= e.getPoint();
             p= SwingUtilities.convertPoint( e.getComponent(), p, bottomPlot.getCanvas() );
-            boolean doHoriz= topPlot.getXAxis().getDatumRange().contains( bottomPlot.getXAxis().invTransform( p.getX() ) );
-            boolean doVert= topPlot.getYAxis().getDatumRange().contains( bottomPlot.getYAxis().invTransform( p.getY() ) );
+            boolean doHoriz= topPlot.getXAxis().getUnits().isConvertableTo( bottomPlot.getXAxis().getUnits() )
+                    && topPlot.getXAxis().getDatumRange().contains( bottomPlot.getXAxis().invTransform( p.getX() ) );
+            boolean doVert= topPlot.getYAxis().getUnits().isConvertableTo( bottomPlot.getYAxis().getUnits() )
+                    && topPlot.getYAxis().getDatumRange().contains( bottomPlot.getYAxis().invTransform( p.getY() ) );
             if ( doHoriz ) {
                 panAxis = topPlot.getXAxis();
                 oppositeAxis = bottomPlot.getXAxis();
@@ -154,4 +156,5 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         }
 
     }
+    
 }
