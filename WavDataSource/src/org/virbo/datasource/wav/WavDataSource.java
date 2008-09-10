@@ -4,7 +4,7 @@
  */
 package org.virbo.datasource.wav;
 
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
