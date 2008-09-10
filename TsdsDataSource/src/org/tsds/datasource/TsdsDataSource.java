@@ -4,14 +4,14 @@
  */
 package org.tsds.datasource;
 
-import edu.uiowa.physics.pw.das.dataset.CacheTag;
-import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
-import edu.uiowa.physics.pw.das.datum.TimeUtil;
-import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.datum.format.DatumFormatter;
-import edu.uiowa.physics.pw.das.datum.format.TimeDatumFormatter;
+import org.das2.dataset.CacheTag;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
+import org.das2.datum.format.DatumFormatter;
+import org.das2.datum.format.TimeDatumFormatter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
