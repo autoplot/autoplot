@@ -9,12 +9,12 @@
 
 package org.virbo.aggragator;
 
-import edu.uiowa.physics.pw.das.DasException;
-import edu.uiowa.physics.pw.das.dataset.DataSet;
-import edu.uiowa.physics.pw.das.dataset.DataSetDescriptor;
-import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.DasException;
+import org.das2.dataset.DataSet;
+import org.das2.dataset.DataSetDescriptor;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;

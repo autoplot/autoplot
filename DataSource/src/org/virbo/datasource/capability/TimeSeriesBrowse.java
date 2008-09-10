@@ -9,8 +9,8 @@
 
 package org.virbo.datasource.capability;
 
-import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.DatumRange;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
 import java.net.URL;
 
 /**

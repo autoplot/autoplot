@@ -5,8 +5,8 @@
 
 package org.virbo.metatree;
 
-import edu.uiowa.physics.pw.das.datum.NumberUnits;
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.NumberUnits;
+import org.das2.datum.Units;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.w3c.dom.Node;

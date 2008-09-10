@@ -8,7 +8,7 @@
  */
 package org.virbo.aggragator;
 
-import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
+import org.das2.datum.DatumRangeUtil;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

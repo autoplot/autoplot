@@ -5,9 +5,9 @@
  */
 package org.virbo.datasource;
 
-import edu.uiowa.physics.pw.das.DasApplication;
-import edu.uiowa.physics.pw.das.graph.DasCanvasComponent;
-import edu.uiowa.physics.pw.das.util.DasExceptionHandler;
+import org.das2.DasApplication;
+import org.das2.graph.DasCanvasComponent;
+import org.das2.util.DasExceptionHandler;
 import java.util.logging.Level;
 import javax.swing.text.BadLocationException;
 import org.das2.util.monitor.ProgressMonitor;
