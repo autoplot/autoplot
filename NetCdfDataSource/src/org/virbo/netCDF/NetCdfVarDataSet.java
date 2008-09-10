@@ -9,9 +9,9 @@
 
 package org.virbo.netCDF;
 
-import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.TimeUtil;
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.Datum;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;

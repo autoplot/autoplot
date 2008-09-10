@@ -8,7 +8,7 @@
  */
 package org.virbo.netCDF;
 
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
