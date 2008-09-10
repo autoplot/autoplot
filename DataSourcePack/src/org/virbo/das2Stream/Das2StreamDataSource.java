@@ -9,10 +9,10 @@
 
 package org.virbo.das2Stream;
 
-import edu.uiowa.physics.pw.das.client.DataSetStreamHandler;
-import edu.uiowa.physics.pw.das.stream.StreamException;
+import org.das2.client.DataSetStreamHandler;
+import org.das2.stream.StreamException;
 import org.das2.util.monitor.ProgressMonitor;
-import edu.uiowa.physics.pw.das.util.StreamTool;
+import org.das2.util.StreamTool;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

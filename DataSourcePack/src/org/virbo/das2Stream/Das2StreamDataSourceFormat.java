@@ -4,10 +4,10 @@
  */
 package org.virbo.das2Stream;
 
-import edu.uiowa.physics.pw.das.dataset.TableDataSet;
-import edu.uiowa.physics.pw.das.dataset.TableUtil;
-import edu.uiowa.physics.pw.das.dataset.VectorDataSet;
-import edu.uiowa.physics.pw.das.dataset.VectorUtil;
+import org.das2.dataset.TableDataSet;
+import org.das2.dataset.TableUtil;
+import org.das2.dataset.VectorDataSet;
+import org.das2.dataset.VectorUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import org.das2.util.monitor.ProgressMonitor;

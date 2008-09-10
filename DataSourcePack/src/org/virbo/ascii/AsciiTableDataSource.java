@@ -8,8 +8,8 @@
  */
 package org.virbo.ascii;
 
-import edu.uiowa.physics.pw.das.datum.TimeUtil;
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,7 +24,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.dsutil.AsciiParser;
-import edu.uiowa.physics.pw.das.util.TimeParser;
+import org.das2.util.TimeParser;
 import java.text.ParseException;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.metatree.MetadataUtil;
