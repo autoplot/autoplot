@@ -4,9 +4,9 @@
  */
 package org.virbo.excel;
 
-import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.datum.UnitsUtil;
+import org.das2.datum.Datum;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
