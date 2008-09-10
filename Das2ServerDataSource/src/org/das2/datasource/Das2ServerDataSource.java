@@ -4,16 +4,16 @@
  */
 package org.das2.datasource;
 
-import edu.uiowa.physics.pw.das.client.DataSetStreamHandler;
-import edu.uiowa.physics.pw.das.dataset.DataSet;
-import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
-import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.stream.StreamDescriptor;
-import edu.uiowa.physics.pw.das.stream.StreamException;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitorInputStream;
-import edu.uiowa.physics.pw.das.util.StreamTool;
+import org.das2.client.DataSetStreamHandler;
+import org.das2.dataset.DataSet;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
+import org.das2.stream.StreamDescriptor;
+import org.das2.stream.StreamException;
+import org.das2.util.DasProgressMonitorInputStream;
+import org.das2.util.StreamTool;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
