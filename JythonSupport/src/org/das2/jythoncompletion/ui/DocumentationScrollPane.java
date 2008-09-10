@@ -46,6 +46,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -235,9 +236,10 @@ public class DocumentationScrollPane extends JScrollPane {
                 view.setPage(url);
             } catch ( java.net.UnknownHostException ioe ) {
                 view.setContent( ioe.toString(), null );
+            } catch ( FileNotFoundException ex ) {
+                view.setContent( ex.toString(), null );
             } catch (IOException ioe) {
-                
-                throw new RuntimeException(ioe.toString());
+                view.setContent( ioe.toString(), null );
             }
         }
         if (bShowWeb != null) {

@@ -5,9 +5,9 @@ from org.virbo.jythonsupport.Util import *
 from org.virbo.dataset import QDataSet
 from org.virbo.dsutil.BinAverage import *
 
-from edu.uiowa.physics.pw.das.datum import DatumRange, Units, DatumRangeUtil, TimeUtil
+from org.das2.datum import DatumRange, Units, DatumRangeUtil, TimeUtil
 from java.net import URL
-from edu.uiowa.physics.pw.das.util import TimeParser
+from org.das2.util import TimeParser
 
 # security concerns
 from java.io import File
