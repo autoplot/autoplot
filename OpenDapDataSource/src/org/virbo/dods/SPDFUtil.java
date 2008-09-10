@@ -9,8 +9,8 @@
 
 package org.virbo.dods;
 
-import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.DatumRange;
+import org.das2.datum.Units;
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;

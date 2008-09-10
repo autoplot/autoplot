@@ -13,7 +13,7 @@ import dods.dap.BaseType;
 import dods.dap.DArray;
 import dods.dap.DArrayDimension;
 import dods.dap.DString;
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.Units;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;

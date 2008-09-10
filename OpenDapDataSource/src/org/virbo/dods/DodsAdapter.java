@@ -22,7 +22,7 @@ import dods.dap.NoSuchVariableException;
 import dods.dap.PrimitiveVector;
 import dods.dap.StatusUI;
 import dods.dap.parser.ParseException;
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -238,7 +238,7 @@ public class DodsAdapter {
     }
     
     
-    public edu.uiowa.physics.pw.das.dataset.DataSet getDas2DataSet() {
+    public org.das2.dataset.DataSet getDas2DataSet() {
         QDataSet ds= getDataSet();
         if ( ds.rank()==3 ) {
             QDataSet sliceDs= DataSetOps.slice0( ds, sliceIndex );
