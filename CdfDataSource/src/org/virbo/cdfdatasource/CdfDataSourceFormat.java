@@ -4,9 +4,9 @@
  */
 package org.virbo.cdfdatasource;
 
-import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.datum.UnitsConverter;
-import edu.uiowa.physics.pw.das.datum.UnitsUtil;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsConverter;
+import org.das2.datum.UnitsUtil;
 import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFException;

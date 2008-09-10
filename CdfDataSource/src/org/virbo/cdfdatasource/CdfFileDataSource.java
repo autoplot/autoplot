@@ -8,7 +8,7 @@
  */
 package org.virbo.cdfdatasource;
 
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.Units;
 import org.virbo.metatree.IstpMetadataModel;
 import org.das2.util.monitor.ProgressMonitor;
 import gsfc.nssdc.cdf.Attribute;
