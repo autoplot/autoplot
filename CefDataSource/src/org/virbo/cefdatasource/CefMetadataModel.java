@@ -7,9 +7,9 @@
  */
 package org.virbo.cefdatasource;
 
-import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.EnumerationUnits;
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.DatumRange;
+import org.das2.datum.EnumerationUnits;
+import org.das2.datum.Units;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;

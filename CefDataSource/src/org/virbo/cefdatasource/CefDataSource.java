@@ -4,9 +4,9 @@
  */
 package org.virbo.cefdatasource;
 
-import edu.uiowa.physics.pw.das.datum.Units;
+import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
-import edu.uiowa.physics.pw.das.util.DasProgressMonitorReadableByteChannel;
+import org.das2.util.DasProgressMonitorReadableByteChannel;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
