@@ -8,12 +8,12 @@
  */
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
-import edu.uiowa.physics.pw.das.event.MouseModule;
-import edu.uiowa.physics.pw.das.graph.DasAxis;
-import edu.uiowa.physics.pw.das.graph.DasPlot;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.event.MouseModule;
+import org.das2.graph.DasAxis;
+import org.das2.graph.DasPlot;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;

@@ -1,4 +1,4 @@
-from edu.uiowa.physics.pw.das.graph import ContoursRenderer, SpectrogramRenderer;
+from org.das2.graph import ContoursRenderer, SpectrogramRenderer;
 from javax.beans.binding import *;
 
 createGui()

@@ -4,9 +4,9 @@
  */
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.graph.DasAxis;
-import edu.uiowa.physics.pw.das.graph.DasColorBar;
-import edu.uiowa.physics.pw.das.graph.DasPlot;
+import org.das2.graph.DasAxis;
+import org.das2.graph.DasColorBar;
+import org.das2.graph.DasPlot;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

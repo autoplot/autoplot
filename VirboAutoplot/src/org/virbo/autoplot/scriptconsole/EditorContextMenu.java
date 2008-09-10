@@ -4,7 +4,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
-import edu.uiowa.physics.pw.das.components.propertyeditor.PropertyEditor;
+import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

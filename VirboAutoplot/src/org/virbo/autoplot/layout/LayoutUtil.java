@@ -4,11 +4,11 @@
  */
 package org.virbo.autoplot.layout;
 
-import edu.uiowa.physics.pw.das.graph.DasCanvas;
-import edu.uiowa.physics.pw.das.graph.DasCanvasComponent;
-import edu.uiowa.physics.pw.das.graph.DasColumn;
-import edu.uiowa.physics.pw.das.graph.DasDevicePosition;
-import edu.uiowa.physics.pw.das.graph.DasRow;
+import org.das2.graph.DasCanvas;
+import org.das2.graph.DasCanvasComponent;
+import org.das2.graph.DasColumn;
+import org.das2.graph.DasDevicePosition;
+import org.das2.graph.DasRow;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;

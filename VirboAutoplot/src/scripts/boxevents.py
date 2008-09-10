@@ -53,7 +53,7 @@ def showImages( showFiles ):
 ## add the box selector #########################
 plot= getApplicationModel().plot
 
-from edu.uiowa.physics.pw.das.event import BoxSelectorMouseModule
+from org.das2.event import BoxSelectorMouseModule
 
 mm= BoxSelectorMouseModule.create( plot, 'show images' )
 

@@ -6,10 +6,10 @@
 
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.components.DatumEditor;
-import edu.uiowa.physics.pw.das.components.propertyeditor.ColorEditor;
-import edu.uiowa.physics.pw.das.components.propertyeditor.EnumerationEditor;
-import edu.uiowa.physics.pw.das.components.propertyeditor.PropertyEditor;
+import org.das2.components.DatumEditor;
+import org.das2.components.propertyeditor.ColorEditor;
+import org.das2.components.propertyeditor.EnumerationEditor;
+import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.BorderLayout;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;

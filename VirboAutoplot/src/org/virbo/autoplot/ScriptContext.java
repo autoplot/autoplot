@@ -4,15 +4,15 @@
  */
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.dataset.DataSet;
-import edu.uiowa.physics.pw.das.dataset.TableDataSet;
-import edu.uiowa.physics.pw.das.dataset.VectorDataSet;
-import edu.uiowa.physics.pw.das.datum.DatumRange;
-import edu.uiowa.physics.pw.das.datum.DatumRangeUtil;
-import edu.uiowa.physics.pw.das.graph.DasCanvas;
-import edu.uiowa.physics.pw.das.util.DasPNGConstants;
-import edu.uiowa.physics.pw.das.util.DasPNGEncoder;
-import edu.uiowa.physics.pw.das.util.TimeParser;
+import org.das2.dataset.DataSet;
+import org.das2.dataset.TableDataSet;
+import org.das2.dataset.VectorDataSet;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.graph.DasCanvas;
+import org.das2.util.DasPNGConstants;
+import org.das2.util.DasPNGEncoder;
+import org.das2.util.TimeParser;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -263,15 +263,15 @@ public class ScriptContext extends PyJavaInstance {
             DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
             if (ascii) {
                 if (lds instanceof TableDataSet) {
-                    edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
+                    org.das2.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
                 } else {
-                    edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
+                    org.das2.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
                 }
             } else {
                 if (lds instanceof TableDataSet) {
-                    edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToBinaryStream((TableDataSet) lds, bufout);
+                    org.das2.dataset.TableUtil.dumpToBinaryStream((TableDataSet) lds, bufout);
                 } else {
-                    edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
+                    org.das2.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
                 }
 
             }
@@ -296,15 +296,15 @@ public class ScriptContext extends PyJavaInstance {
         DataSet lds = DataSetAdapter.createLegacyDataSet(ds);
         if (ascii) {
             if (lds instanceof TableDataSet) {
-                edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
+                org.das2.dataset.TableUtil.dumpToAsciiStream((TableDataSet) lds, bufout);
             } else {
-                edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
+                org.das2.dataset.VectorUtil.dumpToAsciiStream((VectorDataSet) lds, bufout);
             }
         } else {
             if (lds instanceof TableDataSet) {
-                edu.uiowa.physics.pw.das.dataset.TableUtil.dumpToBinaryStream((TableDataSet) lds, bufout);
+                org.das2.dataset.TableUtil.dumpToBinaryStream((TableDataSet) lds, bufout);
             } else {
-                edu.uiowa.physics.pw.das.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
+                org.das2.dataset.VectorUtil.dumpToBinaryStream((VectorDataSet) lds, bufout);
             }
         }
     }

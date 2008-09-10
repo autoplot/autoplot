@@ -5,10 +5,10 @@
  */
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.datum.Datum;
-import edu.uiowa.physics.pw.das.datum.DatumUtil;
-import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.util.CombinedTreeModel;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumUtil;
+import org.das2.datum.Units;
+import org.das2.util.CombinedTreeModel;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.beans.PropertyChangeEvent;

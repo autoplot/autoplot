@@ -8,9 +8,9 @@
  */
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.components.DasProgressPanel;
-import edu.uiowa.physics.pw.das.graph.DasCanvas;
-import edu.uiowa.physics.pw.das.graph.PsymConnector;
+import org.das2.components.DasProgressPanel;
+import org.das2.graph.DasCanvas;
+import org.das2.graph.PsymConnector;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;

@@ -6,8 +6,8 @@
 
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.datum.Units;
-import edu.uiowa.physics.pw.das.util.DasMath;
+import org.das2.datum.Units;
+import org.das2.util.DasMath;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;

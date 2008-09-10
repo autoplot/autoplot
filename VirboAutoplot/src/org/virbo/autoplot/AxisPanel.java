@@ -6,7 +6,7 @@
 
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.components.DatumRangeEditor;
+import org.das2.components.DatumRangeEditor;
 import java.awt.BorderLayout;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;

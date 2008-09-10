@@ -6,7 +6,7 @@
 package org.virbo.autoplot;
 
 import ZoeloeSoft.projects.JFontChooser.JFontChooser;
-import edu.uiowa.physics.pw.das.graph.DasCanvas;
+import org.das2.graph.DasCanvas;
 import java.awt.Color;
 import java.awt.Font;
 import javax.swing.DefaultComboBoxModel;

@@ -6,7 +6,7 @@
 
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.util.PersistentStateSupport;
+import org.das2.util.PersistentStateSupport;
 import java.io.File;
 import javax.swing.JFileChooser;
 

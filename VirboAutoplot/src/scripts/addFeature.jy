@@ -1,6 +1,6 @@
-from edu.uiowa.physics.pw.das.graph import ContoursRenderer, SpectrogramRenderer;
+from org.das2.graph import ContoursRenderer, SpectrogramRenderer;
 from javax.beans.binding import *;
-from edu.uiowa.physics.pw.das.event import AnnotatorMouseModule;
+from org.das2.event import AnnotatorMouseModule;
 createGui()
 
 model = getApplicationModel()

@@ -6,7 +6,7 @@
 
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.DasApplication;
+import org.das2.DasApplication;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

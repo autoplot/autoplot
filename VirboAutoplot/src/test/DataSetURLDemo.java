@@ -9,7 +9,7 @@
 
 package test;
 
-import edu.uiowa.physics.pw.das.components.DasProgressPanel;
+import org.das2.components.DasProgressPanel;
 import java.util.List;
 import org.virbo.datasource.DataSetURL;
 

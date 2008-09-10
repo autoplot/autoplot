@@ -1,4 +1,4 @@
-from edu.uiowa.physics.pw.das.graph import ContoursRenderer, SpectrogramRenderer;
+from org.das2.graph import ContoursRenderer, SpectrogramRenderer;
 from javax.beans.binding import *;
 
 createGui()
@@ -30,8 +30,8 @@ model.plot.drawMinorGrid= False
 model.colorBar.setFlipLabel(True)
 model.colorBar.setFillColor(Color.BLACK)
 
-from edu.uiowa.physics.pw.das.event import AngleSelectionDragRenderer, BoxSelectorMouseModule
-from edu.uiowa.physics.pw.das.components import AngleSpectrogramSlicer
+from org.das2.event import AngleSelectionDragRenderer, BoxSelectorMouseModule
+from org.das2.components import AngleSpectrogramSlicer
 
 plot= model.plot
 
