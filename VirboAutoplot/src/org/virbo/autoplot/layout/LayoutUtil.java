@@ -22,16 +22,20 @@ public class LayoutUtil {
     private static boolean ALLOW_EXCESS_SPACE= true;
     
     private static void maybeSetMaximum( DasDevicePosition c, double need, double norm, double em, int pt ) {
+       em= Math.floor(em);
        if ( ALLOW_EXCESS_SPACE && need < 0) return;
-       if ( Math.abs(c.getEmMaximum()-em )<0.1 ) return;
+       if ( Math.abs(c.getEmMaximum()-em )<0.1
+               && Math.abs( norm-c.getMaximum() )<0.001 ) return;
         c.setMaximum(norm);
         c.setEmMaximum(em);
         c.setPtMaximum(pt);
     }
     
     private static void maybeSetMinimum( DasDevicePosition c, double need, double norm, double em, int pt ) {
+        em= Math.ceil(em);
         if ( ALLOW_EXCESS_SPACE && need < 0 ) return;
-        if ( Math.abs(c.getEmMinimum()-em)<0.1 ) return;
+        if ( Math.abs(c.getEmMinimum()-em)<0.1 
+                && Math.abs( norm-c.getMinimum() )<0.001 ) return;
         c.setMinimum(norm);
         c.setEmMinimum(em);
         c.setPtMinimum(pt);
