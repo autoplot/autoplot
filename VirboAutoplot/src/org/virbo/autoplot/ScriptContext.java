@@ -38,6 +38,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyJavaInstance;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
@@ -125,9 +126,25 @@ public class ScriptContext extends PyJavaInstance {
         maybeInitModel();
         model.setDataSet(ds);
         model.waitUntilIdle(false);
-
     }
 
+    public static void plot( QDataSet x, QDataSet y ) throws InterruptedException {
+        maybeInitModel();
+        DDataSet yds= DDataSet.copy(y);
+        if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
+        model.setDataSet(yds);
+        model.waitUntilIdle(false);
+    }
+    
+    public static void plot( QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
+        maybeInitModel();
+        DDataSet zds= DDataSet.copy(z);
+        if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, x );
+        if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
+        model.setDataSet(zds);
+        model.waitUntilIdle(false);
+    }
+    
     /**
      * write out the current canvas to a png file.
      * @param filename
