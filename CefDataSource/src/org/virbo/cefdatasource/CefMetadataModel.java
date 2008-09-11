@@ -29,7 +29,8 @@ public class CefMetadataModel extends MetadataModel {
      * returns the Entry that is convertable to double as a double.
      * @throws IllegalArgumentException for strings
      */
-    private double doubleValue(Object o, Units units) {
+    private Double doubleValue(Object o, Units units) {
+        if ( o==null ) return null;
         if (o instanceof Float) {
             return ((Float) o).doubleValue();
         } else if (o instanceof Double) {
@@ -47,9 +48,16 @@ public class CefMetadataModel extends MetadataModel {
         }
     }
 
+    /**
+     * return the valid range found in the metadata, or null.
+     * @param attrs
+     * @param units
+     * @return
+     */
     private DatumRange getValidRange( Map attrs, Units units ) {
-        double max = doubleValue(attrs.get("VALIDMAX"), units);
-        double min = doubleValue(attrs.get("VALIDMIN"), units);
+        Double max = doubleValue(attrs.get("VALIDMAX"), units);
+        Double min = doubleValue(attrs.get("VALIDMIN"), units);
+        if ( max==null || min==null ) return null;
         return DatumRange.newDatumRange(min, max, units);
     }
 
@@ -113,29 +121,20 @@ public class CefMetadataModel extends MetadataModel {
             properties.put(QDataSet.RENDER_TYPE, type);
         }
 
-        if (attrs.containsKey("COORDINATE_SYSTEM")) {
-            String type = (String) attrs.get("COORDINATE_SYSTEM");
-            int size = 3; // this will be derived from sizes attr.
-            if (size == 3) {
-                EnumerationUnits units = EnumerationUnits.create(type);
-                WritableDataSet dep1 = DDataSet.createRank1(3);
-                dep1.putValue(0, units.createDatum("X").doubleValue(units));
-                dep1.putValue(1, units.createDatum("Y").doubleValue(units));
-                dep1.putValue(2, units.createDatum("Z").doubleValue(units));
-                dep1.putProperty(QDataSet.UNITS, units);
-                dep1.putProperty(QDataSet.COORDINATE_FRAME, type);
-                properties.put(QDataSet.DEPEND_1, dep1);
-            }
-        }
         Units units= Units.dimensionless;
         try {
             DatumRange range = getRange(attrs,units);
-	    properties.put(QDataSet.TYPICAL_MIN, range.min().doubleValue(units) );
-            properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units) );
+	    if ( range!=null ) {
+                properties.put(QDataSet.TYPICAL_MIN, range.min().doubleValue(units) );
+                properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units) );
+            }
             range= getValidRange(attrs,units);
-	    properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units) );
-            properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units) );
+            if ( range!=null ) {
+                properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units) );
+                properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units) );
+            }
             properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
+            
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
         }
