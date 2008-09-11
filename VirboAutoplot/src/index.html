@@ -16,20 +16,18 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-<li> numerous bugfixes: 
-<ol><li> 2087871: completion tries to plot when it's clearly not valid
-</li><li> 2089294: TimeSeriesBrowse posts worthless requests, multiple requests
-</li><li> 2071413: autoLayout can oscillate
-</li><li> 1994597: problems with files with percent (%) in name
-</li><li> 2087865: runtime errors with javadoc popup when not online.
-</li></ol>
-</li><li> NearestNeighbor rebinning for spectrogram bin averages, not subsamples
-</li><li> AsciiTable source can have timeFormats like "%y%m%d&nbsp;%H%M" (containing one delimiter)
+<li> improved export to cdf support
+</li><li> cdf reads in CDF_BYTE data
+</li><li> support for LANL cdf files
+</li><li> in ascii table reader, pluses in URLs supported to improve timeFormat
+</li><li> bugfix: loaded .vap file URL is displayed in dataset selector after loading
+</li><li> change of focus to plot replaces .vap file URL with dataset URL.
+</li><li> bugfix: more runtime exceptions in jython script panel handled.
+</li><li> bugfix: I/O exception in filesystem completions is handled with friendly dialog, not null pointer exception
 
-</li><li> TimeSeriesBrowse-able data sources update the URL.
-</li><li> improvements to OpenDAP support.  ISTP vector array quantities supported.  Improve cancel.
-</li>  
-
+</li><li> introduce plot( x,y ) and plot (x,y,z) to the application script context to avoid reliance on QDataSet.DEPEND_0, etc.
+</li><li> das2 library refactored so all packages are org.das2, not edu.uiowa.physics.pw.das
+</li>
 	<p>data is input from: 
 	<li>ascii files (.dat,.txt)</li>
         <li>binary files (.bin)</li>
