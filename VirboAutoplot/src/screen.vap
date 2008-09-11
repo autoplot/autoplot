@@ -2,7 +2,7 @@
 <java version="1.6.0_03" class="java.beans.XMLDecoder"> 
  <object class="org.virbo.autoplot.state.ApplicationState"> 
   <void property="YLabel"> 
-   <string>Counts/cm!A2!n sec sr</string> 
+   <string>p/(cm^2*s*sr)</string> 
   </void> 
   <void property="autoOverview"> 
    <boolean>false</boolean> 
@@ -17,15 +17,15 @@
   </void> 
   <void property="canvasSize"> 
    <object class="java.awt.Dimension"> 
-    <int>684</int> 
+    <int>725</int> 
     <int>484</int> 
    </object> 
   </void> 
   <void property="color"> 
    <object class="java.awt.Color"> 
-    <int>201</int> 
-    <int>1</int> 
-    <int>1</int> 
+    <int>0</int> 
+    <int>0</int> 
+    <int>0</int> 
     <int>255</int> 
    </object> 
   </void> 
@@ -49,7 +49,7 @@
    </object> 
   </void> 
   <void property="lineWidth"> 
-   <double>1.0</double> 
+   <double>2.000000002980232</double> 
   </void> 
   <void property="plotSymbol"> 
    <string></string> 
@@ -58,7 +58,7 @@
    <string>0.0 </string> 
   </void> 
   <void property="surl"> 
-   <string>http://goes.ngdc.noaa.gov/data/avg/%Y/A105%y%m.TXT?skip=23&amp;timeFormat=%y%m%d %H%M&amp;column=E1&amp;time=YYMMDD&amp;timerange=Nov 2004 through Jan 2005</string> 
+   <string>http://cdaweb.gsfc.nasa.gov/istp_public/data/noaa/noaa10/1989/noaa10_meped1min_sem_19890117_v01.cdf?Jperp_p</string> 
   </void> 
   <void property="symbolConnector"> 
    <string>Solid</string> 
@@ -67,26 +67,23 @@
    <double>1.0</double> 
   </void> 
   <void property="title"> 
-   <string>GOES-10 SPACE ENVIRONMENT MONITOR!c2 MeV Electrons</string> 
+   <string>MEPED calculated perpendicular proton flux, 5 energy bands (Jperp_p)</string> 
   </void> 
   <void property="validRange"> 
-   <string>0 to 32000</string> 
+   <string>9.999999747378752E-5 to 1.0E10</string> 
   </void> 
   <void property="xrange"> 
    <object class="org.virbo.autoplot.state.DatumRangePersistenceDelegate" method="newDatumRange"> 
-    <double>1.5335173864541835E8</double> 
-    <double>1.5594373864541835E8</double> 
-    <string>t2000</string> 
+    <double>6.27682464E13</double> 
+    <double>6.27682608E13</double> 
+    <string>cdfEpoch</string> 
    </object> 
-  </void> 
-  <void property="ylog"> 
-   <boolean>true</boolean> 
   </void> 
   <void property="yrange"> 
    <object class="org.virbo.autoplot.state.DatumRangePersistenceDelegate" method="newDatumRange"> 
-    <double>0.1</double> 
-    <double>100000.0</double> 
-    <string></string> 
+    <double>-727.532139825821</double> 
+    <double>15626.148944902421</double> 
+    <string>p/(cm^2*s*sr)</string> 
    </object> 
   </void> 
   <void property="zrange"> 
