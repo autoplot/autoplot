@@ -17,6 +17,7 @@ import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PsymConnector;
 import java.awt.Color;
+import org.das2.datum.UnitsUtil;
 
 /**
  *
@@ -301,7 +302,7 @@ public class ApplicationState {
         if ( init.getUnits().isConvertableTo( fin.getUnits() ) ) {
             String scaleString="";
             if ( UnitsUtil.isTimeLocation(fin.getUnits() ) ) {
-                Datum scale= DatumUtil.asOrderOneUnits( round(fin).width() );;
+                Datum scale= DatumUtil.asOrderOneUnits( round(fin).width() );
                 scaleString= " to "+scale;
             }
             
