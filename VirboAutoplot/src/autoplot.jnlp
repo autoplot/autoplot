@@ -72,7 +72,7 @@
         <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2-latest.jnlp" >  
         </extension>
         
-        <jar href="lib/dasCore.jar" />
+        <jar href="lib/dasCore-1.0.0.jar" />
         <jar href="lib/QDataSet.jar" />
         <jar href="lib/JythonSupport.jar" />
         <jar href="lib/DataSource.jar" />
