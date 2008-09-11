@@ -31,6 +31,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import org.das2.CancelledOperationException;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -125,7 +126,9 @@ public class DodsAdapter {
         }
     }
     
-    public void loadDataset( final ProgressMonitor mon ) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException {
+    public void loadDataset( final ProgressMonitor mon ) throws FileNotFoundException, MalformedURLException, 
+            IOException, ParseException, DDSException, DODSException,
+            CancelledOperationException  {
         if ( constraint==null ) {
             throw new IllegalArgumentException("constraint not set");
         }
@@ -153,7 +156,15 @@ public class DodsAdapter {
         };
         
         mon.started();
-        dds= url.getData( constraint, sui );
+        try {
+            dds= url.getData( constraint, sui );
+        } catch ( DODSException ex ) {
+            if ( mon.isCancelled() ) {
+                throw new CancelledOperationException("Dods load cancelled");
+            } else {
+                throw ex;
+            }
+        }
         
     }
     
