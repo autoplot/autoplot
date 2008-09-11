@@ -67,7 +67,7 @@
     nbproject/build-impl.xml file. 
 
     -->
-    <target name="do-tag" depends="init"  unless="no.deps">
+    <target name="do-tag" depends="init"  unless="no.deps" description="timetag the jar files">
         <property name="das2.dotag" value="true" />
         <!-- copied from build-impl.xml.  This must be updated by hand. -->
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="do-tag"/>
@@ -109,7 +109,7 @@
             <entry key="build.tag" value="${release_tag}"/>
         </propertyfile>
     </target>
-    <target name="jnlp-release" depends="jnlp-release-pre-jar,jar">
+    <target name="jnlp-release" depends="jnlp-release-pre-jar,jar" description="create a jnlp release and website">
         <input message="storepass:" addproperty="storepass" defaultvalue="dolphin">
         </input>
         <input message="keypass:" addproperty="keypass" defaultvalue="virbo1">
@@ -122,37 +122,37 @@
             <fileset dir="${dist.dir}/lib" includes="**/*.jar,**/dasCore.jar" excludes="**/[a-z]*.jar" />
         </copy>
         <!-- delete doesn't work for me!  rm i* l* p* b* c* v* n* g* j* m* x* s* -->
-        <!--<delete>
-            <fileset includesfile="${jnlp.dir}/lib/batik-awt-util.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/batik-svggen.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/batik-util.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/beansbinding.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/bufr.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/cdfjava.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/commons-codec-1.3.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/commons-httpclient-3.0.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/commons-logging-1.0.4.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/gnu-regexp-1.1.4.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/grib-5.0.04.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/itext-1.2.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/jdom.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/jfits-0.93.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/jpeg2000.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/jython.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/lucene.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/metadata-extractor-2.1.0.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/netcdfUI-2.2.18.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/nlog4j-1.2.21.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/poi-3.1-FINAL-20080629.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/poi-contrib-3.1-FINAL-20080629.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/poi-scratchpad-3.1-FINAL-20080629.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/prefsAll.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/resourcesOptional.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/swing-layout-1.0.3.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/visadNoDods.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/xercesImpl.jar" />
-            <fileset includesfile="${jnlp.dir}/lib/xml-apis.jar" />
-        </delete>-->
+        <delete>
+            <fileset file="${jnlp.dir}/lib/batik-awt-util.jar" />
+            <fileset file="${jnlp.dir}/lib/batik-svggen.jar" />
+            <fileset file="${jnlp.dir}/lib/batik-util.jar" />
+            <fileset file="${jnlp.dir}/lib/beansbinding.jar" />
+            <fileset file="${jnlp.dir}/lib/bufr.jar" />
+            <fileset file="${jnlp.dir}/lib/cdfjava.jar" />
+            <fileset file="${jnlp.dir}/lib/commons-codec-1.3.jar" />
+            <fileset file="${jnlp.dir}/lib/commons-httpclient-3.0.jar" />
+            <fileset file="${jnlp.dir}/lib/commons-logging-1.0.4.jar" />
+            <fileset file="${jnlp.dir}/lib/gnu-regexp-1.1.4.jar" />
+            <fileset file="${jnlp.dir}/lib/grib-5.0.04.jar" />
+            <fileset file="${jnlp.dir}/lib/itext-1.2.jar" />
+            <fileset file="${jnlp.dir}/lib/jdom.jar" />
+            <fileset file="${jnlp.dir}/lib/jfits-0.93.jar" />
+            <fileset file="${jnlp.dir}/lib/jpeg2000.jar" />
+            <fileset file="${jnlp.dir}/lib/jython.jar" />
+            <fileset file="${jnlp.dir}/lib/lucene.jar" />
+            <fileset file="${jnlp.dir}/lib/metadata-extractor-2.1.0.jar" />
+            <fileset file="${jnlp.dir}/lib/netcdfUI-2.2.18.jar" />
+            <fileset file="${jnlp.dir}/lib/nlog4j-1.2.21.jar" />
+            <fileset file="${jnlp.dir}/lib/poi-3.1-FINAL-20080629.jar" />
+            <fileset file="${jnlp.dir}/lib/poi-contrib-3.1-FINAL-20080629.jar" />
+            <fileset file="${jnlp.dir}/lib/poi-scratchpad-3.1-FINAL-20080629.jar" />
+            <fileset file="${jnlp.dir}/lib/prefsAll.jar" />
+            <fileset file="${jnlp.dir}/lib/resourcesOptional.jar" />
+            <fileset file="${jnlp.dir}/lib/swing-layout-1.0.3.jar" />
+            <fileset file="${jnlp.dir}/lib/visadNoDods.jar" />
+            <fileset file="${jnlp.dir}/lib/xercesImpl.jar" />
+            <fileset file="${jnlp.dir}/lib/xml-apis.jar" />
+        </delete>
         
         <signjar alias="virbo"
                  storepass="${storepass}"
@@ -170,6 +170,8 @@
         <copy file="${build.classes.dir}/index.html" tofile="${jnlp.dir}/index.html" />
         <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
         <copy file="${build.classes.dir}/screen.png" tofile="${jnlp.dir}/screen.png" />
+        <copy file="${build.classes.dir}/screen.vap" tofile="${jnlp.dir}/screen.vap" />
+        <copy file="${build.classes.dir}/splash.png" tofile="${jnlp.dir}/splash.png" />
         <copy file="${build.classes.dir}/launch.png" tofile="${jnlp.dir}/launch.png" />
         <replace file="${jnlp.dir}/autoplot.jnlp" >
             <replacefilter token="#{tag}" value="${release_tag}" />
