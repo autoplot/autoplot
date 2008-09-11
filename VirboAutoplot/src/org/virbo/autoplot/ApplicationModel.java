@@ -216,7 +216,6 @@ public class ApplicationModel {
     }
 
     enum RenderType {
-
         spectrogram, series, scatter
     }
     /**
