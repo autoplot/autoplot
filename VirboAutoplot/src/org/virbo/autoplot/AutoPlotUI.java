@@ -21,6 +21,8 @@ import org.das2.util.PersistentStateSupport;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -108,6 +110,25 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         dataSetSelector.setMonitorContext(applicationModel.plot);
 
+        applicationModel.plot.addFocusListener( new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                dataSetSelector.setValue(applicationModel.getDataSourceURL());
+                super.focusGained(e);
+            }
+            
+        });
+
+        applicationModel.canvas.addFocusListener( new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if ( stateSupport.getCurrentFile()!=null ) {
+                    dataSetSelector.setValue(stateSupport.getCurrentFile().toString());
+                }
+                super.focusGained(e);
+            }            
+        } );
+
         setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 
         stateSupport = AutoplotUtil.getPersistentStateSupport(this, applicationModel);
@@ -154,9 +175,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String vap = dataSetSelector.getValue();
-                    setStatus("opening .vap file...");
+                    setStatus("opening .vap file "+vap+"...");
                     applicationModel.doOpen(DataSetURL.getFile(DataSetURL.getURL(vap), new NullProgressMonitor()));
-                    setStatus("opening .vap file... done");
+                    dataSetSelector.setValue(vap);
+                    setStatus("opening .vap file "+vap+"... done");
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     setStatus(ex.getMessage());
@@ -229,7 +251,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_FILL)) {
                     mdp.update();
                 }
-                if (!stateSupport.isOpening()) {
+                if (!stateSupport.isOpening() && !stateSupport.isSaving() 
+                        && !evt.getPropertyName().equals("recent") 
+                        && !evt.getPropertyName().equals("status") 
+                        && !evt.getPropertyName().equals("ticks") ) { // only 
                     tickleTimer.tickle();
                 }
             }
