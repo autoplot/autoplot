@@ -299,10 +299,16 @@ public class ApplicationState {
     
     private String describe( DatumRange init, DatumRange fin ) {
         if ( init.getUnits().isConvertableTo( fin.getUnits() ) ) {
+            String scaleString="";
+            if ( UnitsUtil.isTimeLocation(fin.getUnits() ) ) {
+                Datum scale= DatumUtil.asOrderOneUnits( round(fin).width() );;
+                scaleString= " to "+scale;
+            }
+            
             if ( init.contains(fin) ) {
-                return "zoom in to "+ DatumUtil.asOrderOneUnits( round(fin).width() );
+                return "zoom in"+ scaleString;
             } else if ( fin.contains(init) ) {
-                return "zoom out to "+ DatumUtil.asOrderOneUnits( round(fin).width() );
+                return "zoom out"+ scaleString;
             } else if ( init.intersects(fin) ) {
                 return "pan"; //+ ( init.min().lt(fin.min() ) ? "right" : "left" ); duh--need to know axis orientation
             } else {
@@ -382,8 +388,7 @@ public class ApplicationState {
         if ( buf.length()==0 ) {
             return "";
         } else if ( buf.length()>50 ) {
-            int changes= 1 + buf.toString().split(",").length;
-            return ""+changes + " " + ( changes>1 ? "changes" : "change" );
+            return buf.substring(2,50)+"...";
         } else {
             return buf.substring(2);
         }
