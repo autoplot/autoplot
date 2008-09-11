@@ -56,7 +56,10 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 ProgressMonitor mon = new NullProgressMonitor();
                 Map<String,Object> meta= dsrc.getMetaData(mon);
                 MetadataModel model= dsrc.getMetadataModel();
-                String root= "Metadata ("+model.getLabel()+")";
+                if ( model==null ) {
+                    model= MetadataModel.createNullModel();
+                }
+                String root= "Metadata ("+ model.getLabel()+")";
                         
                 final TreeModel dsrcMeta = NameValueTreeModel.create( root, meta );
                 if (dsrcMeta != null) {
