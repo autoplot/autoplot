@@ -59,10 +59,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
      */
     int timeColumn = -1;
     DDataSet ds = null;
+    
     /**
      * non-null indicates the columns should be interpretted as rank2.  rank2[0] is first column, rank2[1] is last column exclusive.
      */
     int[] rank2 = null;
+    
+    /**
+     * limit the number of records.  Parsing will stop at this point.
+     */
+    int recCount= -1;
+    
     private double validMin= Double.NEGATIVE_INFINITY;
     private double validMax= Double.POSITIVE_INFINITY;
 
@@ -150,7 +157,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
      */
     private DDataSet doReadFile(final ProgressMonitor mon) throws NumberFormatException, IOException, FileNotFoundException {
 
-        Object o;
+        String o;
         file = DataSetURL.getFile(url, mon);
 
         parser = new AsciiParser();
@@ -167,19 +174,24 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         o = params.get("skip");
         if (o != null) {
-            parser.setSkipLines(Integer.parseInt((String) o));
+            parser.setSkipLines(Integer.parseInt(o));
+        }
+        
+        o= params.get("recCount");
+        if ( o!=null ) {
+            parser.setRecordCountLimit(Integer.parseInt(o));
         }
 
         parser.setKeepFileHeader(true);
 
         o = params.get("comment");
         if (o != null) {
-            parser.setCommentPrefix((String) o);
+            parser.setCommentPrefix(o);
         }
 
         o = params.get("delim");
         if (o != null) {
-            delim = (String) o;
+            delim = o;
         } else {
             delim = null;
         }
@@ -196,7 +208,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         o = params.get("fixedColumns");
         if (o != null) {
-            String s = (String) o;
+            String s = o;
             AsciiParser.RecordParser p = parser.setFixedColumnsParser(file.toString(), "\\s+");
             if (o.equals("")) {
                 columnCount = p.fieldCount();
@@ -214,7 +226,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 p = parser.setFixedColumnsParser(starts, widths, fparsers);
 
             } else {
-                columnCount = Integer.parseInt((String) o);
+                columnCount = Integer.parseInt(o);
             }
             parser.setPropertyPattern(null); // don't look for these for speed
             fixedColumns = true;
@@ -224,7 +236,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         o = params.get("columnCount");
         if (columnCount == 0) {
             if (o != null) {
-                columnCount = Integer.parseInt((String) o);
+                columnCount = Integer.parseInt(o);
             } else {
                 columnCount = AsciiParser.guessFieldCount(file.toString());
             }
@@ -232,39 +244,39 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         o = params.get("fill");
         if (o != null) {
-            parser.setFillValue(Double.parseDouble((String) o));
+            parser.setFillValue(Double.parseDouble(o));
         }
 
         o= params.get("validMin");
         if (o != null) {
-            this.validMin= Double.parseDouble((String) o);
+            this.validMin= Double.parseDouble(o);
         }
         
         o= params.get("validMax");
         if (o != null) {
-            this.validMax= Double.parseDouble((String) o);
+            this.validMax= Double.parseDouble(o);
         }
         
         /* recognize the column as parsable times, parse with slow general purpose time parser */
         o = params.get("time");
         if (o != null) {
-            int i = parser.getFieldIndex((String) o);
+            int i = parser.getFieldIndex(o);
             if (i == -1) {
                 throw new IllegalArgumentException("field not found for time parameter: " + o);
             } else {
                 parser.setFieldParser(i, parser.UNITS_PARSER);
                 parser.setUnits(i, Units.t2000);
                 
-                depend0 = (String) o;
+                depend0 = o;
                 timeColumn = i;
             }
         }
         
         o = params.get("timeFormat");
         if (o != null) {
-            String timeFormat = (String) o;
+            String timeFormat = o;
             timeFormat= timeFormat.replaceAll("\\+", " ");
-            timeParser = TimeParser.create((String) o);
+            timeParser = TimeParser.create(o);
             String timeColumnName = params.get("time");
             timeColumn = timeColumnName==null ? 0 : parser.getFieldIndex(timeColumnName);
 
@@ -303,17 +315,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         o = params.get("depend0");
         if (o != null) {
-            depend0 = (String) o;
+            depend0 = o;
         }
 
         o = params.get("column");
         if (o != null) {
-            column = (String) o;
+            column = o;
         }
 
         o = params.get("rank2");
         if (o != null) {
-            String s = (String) o;
+            String s = o;
             int first = 0;
             int last = columnCount;
             if (s.contains(":")) {
@@ -342,7 +354,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
 
         if (column == null && depend0 == null && rank2 == null) {
-            if (parser.getFieldNames().length > 1) {
+            if (parser.getFieldNames().length == 1) {
                 depend0 = parser.getFieldNames()[0];
                 column = parser.getFieldNames()[1];
             } else {
@@ -370,7 +382,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         
         o= params.get("units");
         if (o != null) {
-            String sunits= (String) o;
+            String sunits= o;
             Units u= MetadataUtil.lookupUnits(sunits);
             if ( column!=null ) {
                 int icol= parser.getFieldIndex(column);
