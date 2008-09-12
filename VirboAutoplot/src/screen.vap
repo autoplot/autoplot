@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <java version="1.6.0_03" class="java.beans.XMLDecoder"> 
  <object class="org.virbo.autoplot.state.ApplicationState"> 
-  <void property="YLabel"> 
-   <string>p/(cm^2*s*sr)</string> 
-  </void> 
   <void property="autoOverview"> 
    <boolean>false</boolean> 
   </void> 
@@ -17,7 +14,7 @@
   </void> 
   <void property="canvasSize"> 
    <object class="java.awt.Dimension"> 
-    <int>725</int> 
+    <int>684</int> 
     <int>484</int> 
    </object> 
   </void> 
@@ -49,7 +46,7 @@
    </object> 
   </void> 
   <void property="lineWidth"> 
-   <double>2.000000002980232</double> 
+   <double>1.0</double> 
   </void> 
   <void property="plotSymbol"> 
    <string></string> 
@@ -57,40 +54,37 @@
   <void property="reference"> 
    <string>0.0 </string> 
   </void> 
+  <void property="showContextOverview"> 
+   <boolean>true</boolean> 
+  </void> 
   <void property="surl"> 
-   <string>http://cdaweb.gsfc.nasa.gov/istp_public/data/noaa/noaa10/1989/noaa10_meped1min_sem_19890117_v01.cdf?Jperp_p</string> 
+   <string>http://cdaweb.gsfc.nasa.gov/istp_public/data/alouette2/snt/1966/025/alouette2_av_snt_1966025062403_v01.cdf?ampl</string> 
   </void> 
   <void property="symbolConnector"> 
    <string>Solid</string> 
   </void> 
   <void property="symbolSize"> 
-   <double>1.0</double> 
-  </void> 
-  <void property="title"> 
-   <string>MEPED calculated perpendicular proton flux, 5 energy bands (Jperp_p)</string> 
-  </void> 
-  <void property="validRange"> 
-   <string>9.999999747378752E-5 to 1.0E10</string> 
+   <double>3.0</double> 
   </void> 
   <void property="xrange"> 
    <object class="org.virbo.autoplot.state.DatumRangePersistenceDelegate" method="newDatumRange"> 
-    <double>6.27682464E13</double> 
-    <double>6.27682608E13</double> 
+    <double>6.204308545135897E13</double> 
+    <double>6.204308545435897E13</double> 
     <string>cdfEpoch</string> 
    </object> 
   </void> 
   <void property="yrange"> 
    <object class="org.virbo.autoplot.state.DatumRangePersistenceDelegate" method="newDatumRange"> 
-    <double>-727.532139825821</double> 
-    <double>15626.148944902421</double> 
-    <string>p/(cm^2*s*sr)</string> 
+    <double>-267.00000397861004</double> 
+    <double>5277.000078633428</double> 
+    <string>km</string> 
    </object> 
   </void> 
   <void property="zrange"> 
    <object class="org.virbo.autoplot.state.DatumRangePersistenceDelegate" method="newDatumRange"> 
-    <double>0.0</double> 
-    <double>100.0</double> 
-    <string></string> 
+    <double>-12.75</double> 
+    <double>267.75</double> 
+    <string> </string> 
    </object> 
   </void> 
  </object> 
