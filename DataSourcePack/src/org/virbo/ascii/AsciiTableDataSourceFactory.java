@@ -51,9 +51,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             List<CompletionContext> result= new ArrayList<CompletionContext>();
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "skip=" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "column=" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns=" ) );
-            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rank2" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "time=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "timeFormat=",
                     "template for parsing time digits, default is ISO8601.") );
@@ -73,8 +74,14 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
             if ( paramName.equals("skip") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>",  "the number of lines to skip before attempting to parse."  )  );
+            } else if ( paramName.equals("recCount") ) {
+                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>",  "limit number of records to parse."  )  );
             } else if ( paramName.equals("rank2" ) ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                String[] columns= getFieldNames( cc, mon );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1:"+columns.length, "column range, <start>:<end, non-inclusive>" ) );
+                return result;
             } else if ( paramName.equals("column") ) {
                 String[] columns= getFieldNames( cc, mon );
                 List<CompletionContext> result= new ArrayList<CompletionContext>();
