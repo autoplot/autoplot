@@ -150,7 +150,7 @@ public class CompletionContext {
             return cc.surl.substring(0,i);
             
         } else if ( context==CONTEXT_PARAMETER_NAME || context==CONTEXT_PARAMETER_VALUE ) {
-            int i0= cc.surl.lastIndexOf('&',cc.surlpos);
+            int i0= cc.surl.lastIndexOf('&',cc.surlpos-1);
             int i1= cc.surl.lastIndexOf('?',cc.surlpos);
             i0= Math.max( i0,i1 );
             if ( i0==-1 ) return null;
