@@ -246,8 +246,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     completions = DataSetURL.getFileSystemCompletions(surl, carotpos, mon);
                 } catch (IOException ex) {
                     setMessage(ex.toString());
-                    ex.printStackTrace();
-                    
+                    JOptionPane.showMessageDialog( DataSetSelector.this, "<html>I/O Exception occurred:<br>"+ex.getLocalizedMessage()+"</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE );
+                    return;
                 }
 
                 CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
