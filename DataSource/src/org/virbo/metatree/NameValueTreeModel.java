@@ -55,7 +55,13 @@ public class NameValueTreeModel implements TreeModel {
                             ii= value.length();
                         } else {
                             i= value.lastIndexOf(" ",ii+LINE_LEN);
-                            if ( i==-1 ) ii= ii+LINE_LEN; else ii= i+1;
+                            if ( i==-1 ) {
+                                ii= ii+LINE_LEN; 
+                            } else if ( i>ii ) {
+                                ii= i+1;
+                            } else {
+                                ii= value.length(); // couldn't find a break
+                            }
                         }
                     } else {
                         ii= i+1;
