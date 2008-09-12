@@ -125,7 +125,13 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (dep0 != null) {
                 ds.putProperty(QDataSet.DEPEND_0, dep0); // DANGER
             }
-            ds.putProperty(QDataSet.UNITS, parser.getUnits(rank2[0]));
+            Units u= parser.getUnits(rank2[0]);
+            for ( int i=rank2[0]; i<rank2[1]; i++ ) {
+                if ( u!=parser.getUnits(i) ) {
+                    u= null;
+                }
+            }
+            if ( u!=null ) ds.putProperty(QDataSet.UNITS, u );
             if (validMax != Double.POSITIVE_INFINITY) ds.putProperty(QDataSet.VALID_MAX, validMax);
             if (validMin != Double.NEGATIVE_INFINITY) ds.putProperty(QDataSet.VALID_MIN, validMin);
 
