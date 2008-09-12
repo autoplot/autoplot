@@ -238,8 +238,8 @@ class TsdsDataSource extends AbstractDataSource {
         while (bytesRead >= 0 && (bytesRead + totalBytesRead) < size) {
             totalBytesRead += bytesRead;
             bytesRead = bin.read(bbuf);
-            mon.setTaskProgress(totalBytesRead);
             if (mon.isCancelled()) break;
+            mon.setTaskProgress(totalBytesRead);
         }
 
         in.close();
@@ -376,12 +376,12 @@ class TsdsDataSource extends AbstractDataSource {
             boolean minMax = true;
             if (minMax && surl.contains("-filter_0-")) {
                 String sDataMax = surl.replace("-filter_0-", "-filter_2-");
-                System.err.println(sDataMax);
+                //System.err.println(sDataMax);
                 logger.fine( "loading "+sDataMax );
                 mon.setProgressMessage("loading max");
                 BufferDataSet dataMax = dataUrl(new URL(sDataMax).openStream(), size, points, mon);
                 String sDataMin = surl.replace("-filter_0-", "-filter_3-");
-                System.err.println(sDataMin);
+                //System.err.println(sDataMin);
                 mon.setProgressMessage("loading min");
                 BufferDataSet dataMin = dataUrl(new URL(sDataMin).openStream(), size, points, mon);
                 data.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(dataMax, data));
