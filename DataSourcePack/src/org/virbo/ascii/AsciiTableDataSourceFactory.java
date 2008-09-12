@@ -78,9 +78,10 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>",  "limit number of records to parse."  )  );
             } else if ( paramName.equals("rank2" ) ) {
                 List<CompletionContext> result= new ArrayList<CompletionContext>();
-                String[] columns= getFieldNames( cc, mon );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1:"+columns.length, "column range, <start>:<end, non-inclusive>" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns" ) );
+		result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns" ) );                
                 return result;
             } else if ( paramName.equals("column") ) {
                 String[] columns= getFieldNames( cc, mon );
@@ -115,14 +116,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             } else if ( paramName.equals("validMin") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
             } else if ( paramName.equals("validMax") ) {
-                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
-            } else if ( paramName.equals("rank2") ) {
-                List<CompletionContext> result= new ArrayList<CompletionContext>();
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column" ) );
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns" ) );
-		result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns" ) );
-                return result;
-		
+                return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );		
             } else {
                 return Collections.emptyList();
             }
