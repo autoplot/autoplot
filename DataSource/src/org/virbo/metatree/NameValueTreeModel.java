@@ -44,6 +44,7 @@ public class NameValueTreeModel implements TreeModel {
 
         StringPropertyNode(String name, String value) {
             this.name = name;
+            value= value.trim();
             this.value = value;
             if ( value.length()>LINE_LEN || value.contains("\n") ) {
                 splits= new ArrayList<Integer>();
