@@ -4,6 +4,7 @@
  */
 package org.virbo.jythonsupport;
 
+import java.util.ArrayList;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.IndexListDataSetIterator;
@@ -252,6 +253,7 @@ public class PyQDataSet extends PyJavaInstance {
             } else if (arg0.isSequenceType()) {
                 QubeDataSetIterator iter = new QubeDataSetIterator(ds);
                 PySequence slices = (PySequence) arg0;
+                boolean[] reform= new boolean[slices.__len__()];
                 for (int i = 0; i < slices.__len__(); i++) {
                     PyObject a = slices.__getitem__(i);
                     QubeDataSetIterator.DimensionIteratorFactory fit;
@@ -261,10 +263,12 @@ public class PyQDataSet extends PyJavaInstance {
                         Integer stop = (Integer) slice.stop.__tojava__(Integer.class);
                         Integer step = (Integer) slice.step.__tojava__(Integer.class);
                         fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
-
+                        
                     } else if (a.isNumberType()) {
                         int idx = (Integer) a.__tojava__(Integer.class);
                         fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
+                        reform[i]= true;
+                        
                     } else {
                         Object o2 = a.__tojava__(QDataSet.class);
                         QDataSet that = (QDataSet) o2;
@@ -274,11 +278,15 @@ public class PyQDataSet extends PyJavaInstance {
                     iter.setIndexIteratorFactory(i, fit);
                 }
 
-                int qube[] = new int[iter.rank()];
+                ArrayList<Integer> qqube= new ArrayList<Integer>();
                 for (int i = 0; i < iter.rank(); i++) {
-                    qube[i] = iter.length(i);
+                    if ( !reform[i] ) qqube.add( iter.length(i) );
                 }
-                DDataSet result = DDataSet.create(qube);
+                int qube[] = new int[qqube.size()];
+                for (int i = 0; i < qqube.size(); i++) qube[i]= qqube.get(i);
+                
+                DDataSet result = DDataSet.create( qube );
+                
                 QubeDataSetIterator resultIter= new QubeDataSetIterator(result);
                 while (iter.hasNext()) {
                     iter.next();
