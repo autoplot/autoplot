@@ -131,10 +131,10 @@ public class GuiSupport {
 
                         @Override
                         public String getDescription() {
-                            return "*"+ex;
+                            return "*"+ex; // DANGER: this is parsed below
                         }
                     };
-                    if ( ext.equals(".cdf") ) {
+                    if ( ext.equals(".qds") ) {
                         deflt= ff;
                     }
                     chooser.addChoosableFileFilter(ff);
@@ -150,6 +150,7 @@ public class GuiSupport {
                     chooser.setCurrentDirectory(folder);
                     //chooser.setSelectedFile(new File(currentFileString));
                 }
+                
                 int r = chooser.showSaveDialog(parent);
                 if (r == JFileChooser.APPROVE_OPTION) {
                     try {
@@ -157,12 +158,27 @@ public class GuiSupport {
                         
                         String s=  chooser.getSelectedFile().toString();
                         int i= s.lastIndexOf(".");
-                        String ext= s.substring(i);
+                        String ext;
+                        if ( i>-1 ) ext= s.substring(i); else ext= "";
                         
                         DataSourceFormat format= DataSourceRegistry.getInstance().getFormatByExt(ext);
-                        
-                        format.formatData( chooser.getSelectedFile(),new java.util.HashMap<String, String>(), 
-                                parent.applicationModel.fillDataset, new DasProgressPanel("formatting data")  );
+                        if ( format==null ) {
+                            if ( chooser.getFileFilter().getDescription().charAt(0)=='.') { 
+                                ext= chooser.getFileFilter().getDescription().substring(1);
+                                format= DataSourceRegistry.getInstance().getFormatByExt(ext);
+                                if ( format==null ) {
+                                    JOptionPane.showMessageDialog( parent, "No formatter for extension: "+ext );
+                                    return;
+                                } else {
+                                    s= s+ext;
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog( parent, "No formatter for extension: "+ext );
+                                return;
+                            }
+                        }
+                        format.formatData( new File(s),new java.util.HashMap<String, String>(), 
+                                parent.applicationModel.dataset, new DasProgressPanel("formatting data")  );
                         parent.setStatus("created file "+chooser.getSelectedFile());
 
                     } catch (IOException ex) {
