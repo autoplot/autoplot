@@ -92,6 +92,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
     };
     Options options;
     private Logger logger = Logger.getLogger("virbo.autoplot");
+    private JythonScriptPanel scriptPanel;
+    private LogConsole logConsole;
+    private RequestListener rlistener;
 
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
@@ -217,7 +220,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         if (model.options.isScriptVisible()) {
             tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector));
-            scriptPanelMenuItem.setEnabled(false);
             scriptPanelMenuItem.setSelected(true);
         }
         if (model.options.isLogConsoleVisible()) {
@@ -226,6 +228,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
+                
                 undoRedoSupport.pushState(evt);
                 stateSupport.markDirty();
                 String t = undoRedoSupport.getUndoLabel();
@@ -255,7 +258,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                         && !evt.getPropertyName().equals("recent") 
                         && !evt.getPropertyName().equals("status") 
                         && !evt.getPropertyName().equals("ticks") ) { // only 
-                    tickleTimer.tickle();
+                    tickleTimer.tickle( evt.getPropertyName() + " from " + evt.getSource() );
                 }
             }
         });
@@ -375,20 +378,20 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }
 
     private void initLogConsole() throws SecurityException {
-        LogConsole lc = new LogConsole();
-        lc.turnOffConsoleHandlers();
-        lc.logConsoleMessages(); // stderr, stdout logged to Logger "console"
+        logConsole = new LogConsole();
+        logConsole.turnOffConsoleHandlers();
+        logConsole.logConsoleMessages(); // stderr, stdout logged to Logger "console"
 
-        Handler h = lc.getHandler();
+        Handler h = logConsole.getHandler();
         Logger.getLogger("virbo").setLevel(Level.ALL);
         Logger.getLogger("virbo").addHandler(h);
         Logger.getLogger("console").setLevel(Level.ALL);
         Logger.getLogger("console").addHandler(h); // stderr, stdout
 
         setMessage("log console added");
-        tabs.addTab("console", lc);
+        tabs.addTab("console", logConsole);
         applicationModel.options.setLogConsoleVisible(true);
-        logConsoleMenuItem.setEnabled(false);
+        
         logConsoleMenuItem.setSelected(true);
     }
 
@@ -396,6 +399,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
         String result = JOptionPane.showInputDialog(this, "Select port for server.  This port will accept jython commands to control receive services from the application", 12345);
         int iport = Integer.parseInt(result);
         setupServer(iport, applicationModel);
+    }
+    
+    private void stopServer() {
+        rlistener.stopListening();
     }
 
     private void plotUrl() {
@@ -456,7 +463,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         });
 
         bookmarksMenu.add(new JSeparator());
-        bookmarksMenu.add(new AbstractAction("Make Aggregation From URL") {
+        JMenuItem item= new JMenuItem( new AbstractAction("Make Aggregation From URL") {
 
             public void actionPerformed(ActionEvent e) {
                 String s = dataSetSelector.getValue();
@@ -468,7 +475,18 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 }
             }
         });
-
+        item.setToolTipText("<html>create aggregation template from the URL to combine a time series spanning multiple files</html>");
+        bookmarksMenu.add(item);
+        
+        item= new JMenuItem(new AbstractAction("Decode URL") {
+            public void actionPerformed(ActionEvent e) {
+                String s = dataSetSelector.getValue();
+                s= org.virbo.datasource.DataSourceUtil.unescape(s);
+                dataSetSelector.setValue(s);
+            }
+        });
+        item.setToolTipText("<html>decode escapes to correct URL</html>");
+        bookmarksMenu.add(item);
         bookmarksMenu.add(new JSeparator());
 
         for (int i = 0; i < bookmarks.size(); i++) {
@@ -892,16 +910,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
             reader.close();
 
             buffy.append("    <h2>Build Information:</h2>");
-
+            buffy.append("<ul>");
             buffy.append("<li>release tag: " + AboutUtil.getReleaseTag() + "</li>");
 
             List<String> bi = Util.getBuildInfos();
             for (String ss : bi) {
                 buffy.append("    <li>" + ss + "");
             }
-            buffy.append("    </p></html>");
+            buffy.append("<ul>    </p></html>");
 
-            System.err.println(buffy.toString());
             JOptionPane.showMessageDialog(this, buffy.toString());
 
         } catch (IOException ex) {
@@ -922,25 +939,31 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_helpMenuActionPerformed
 
 private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scriptPanelMenuItemActionPerformed
-    if (!applicationModel.options.isScriptVisible()) {
-        tabs.insertTab("script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector), TABS_TOOLTIP, 4);
-        applicationModel.options.setScriptVisible(true);
+    applicationModel.options.setScriptVisible(scriptPanelMenuItem.isSelected());
+    if ( scriptPanelMenuItem.isSelected() && scriptPanel==null ) {
+        scriptPanel= new JythonScriptPanel(applicationModel, this.dataSetSelector);
+        tabs.insertTab("script", null, scriptPanel, TABS_TOOLTIP, 4);
+    } else {
+        JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
     }
-    scriptPanelMenuItem.setEnabled(false);
 }//GEN-LAST:event_scriptPanelMenuItemActionPerformed
 
 private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
-    if (!applicationModel.options.isLogConsoleVisible()) {
+    applicationModel.options.setLogConsoleVisible(logConsoleMenuItem.isSelected());
+    if ( applicationModel.options.isLogConsoleVisible() && logConsole==null ) {
         initLogConsole();
+    } else {
+        JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
     }
-    logConsoleMenuItem.setEnabled(false);
 }//GEN-LAST:event_logConsoleMenuItemActionPerformed
 
 private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverCheckBoxMenuItemActionPerformed
-    if (!applicationModel.options.isServerEnabled()) {
+    applicationModel.options.setServerEnabled(serverCheckBoxMenuItem.isSelected());
+    if (applicationModel.options.isServerEnabled()) {
         initServer();
+    } else {
+        stopServer();
     }
-    serverCheckBoxMenuItem.setEnabled(false);
 }//GEN-LAST:event_serverCheckBoxMenuItemActionPerformed
 
 private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -1091,7 +1114,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
      */
     private void setupServer(int port, final ApplicationModel model) {
 
-        final RequestListener rlistener = new RequestListener();
+        rlistener = new RequestListener();
         rlistener.setPort(port);
         final RequestHandler rhandler = new RequestHandler();
 
