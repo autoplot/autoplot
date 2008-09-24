@@ -21,17 +21,17 @@ import org.virbo.datasource.datasource.DataSourceFormat;
 public class DataSourceRegistry {
 
     private static DataSourceRegistry instance;
-    HashMap dataSourcesByExt;
-    HashMap dataSourcesByMime;
-    HashMap dataSourceFormatByExt;
-    HashMap extToDescription;
+    HashMap<String,Object> dataSourcesByExt;
+    HashMap<String,Object> dataSourcesByMime;
+    HashMap<String,Object> dataSourceFormatByExt;
+    HashMap<String,String> extToDescription;
 
     /** Creates a new instance of DataSourceRegistry */
     private DataSourceRegistry() {
-        dataSourcesByExt = new HashMap();
-        dataSourcesByMime = new HashMap();
-        dataSourceFormatByExt= new HashMap();
-        extToDescription= new HashMap();
+        dataSourcesByExt = new HashMap<String,Object>();
+        dataSourcesByMime = new HashMap<String,Object>();
+        dataSourceFormatByExt= new HashMap<String,Object>();
+        extToDescription= new HashMap<String,String>();
     }
 
     public static DataSourceRegistry getInstance() {
@@ -229,6 +229,18 @@ public class DataSourceRegistry {
             result = (DataSourceFactory) o;
         }
         return result;
+    }
+
+    /**
+     * return the extension for the factory.
+     * @param factory
+     * @return
+     */
+    String getExtensionFor(DataSourceFactory factory) {
+        for (  String ext: this.dataSourcesByExt.keySet() ) {
+            if ( dataSourcesByExt.get(ext)==factory ) return ext;
+        }
+        return null;
     }
     
 }
