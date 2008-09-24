@@ -9,8 +9,13 @@
 
 package org.virbo.datasource;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +30,20 @@ public class DataSourceUtil {
         try {
             FS_URL= new URL( "file:/" );
         } catch ( MalformedURLException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * remove escape sequences like %20 to create a human-editable string
+     * @param s
+     * @return
+     */
+    public static String unescape(String s) {
+        try {
+            s = URLDecoder.decode(s, "UTF-8");
+            return s;
+        } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
     }
