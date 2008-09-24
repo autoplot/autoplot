@@ -356,7 +356,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
 
         if (column == null && depend0 == null && rank2 == null) {
-            if (parser.getFieldNames().length == 1) {
+            if (parser.getFieldNames().length == 2) {
                 depend0 = parser.getFieldNames()[0];
                 column = parser.getFieldNames()[1];
             } else {
