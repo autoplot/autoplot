@@ -8,15 +8,17 @@
 package org.virbo.autoplot.util;
 
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Logger;
-import javax.swing.event.ChangeEvent;
 
 /**
  * TickleTimer is a timer that fires once it's been left alone for 
  * a while.  The idea is the keyboard can be pecked away and 
  * the change event will not be fired until the keyboard is idle.
  *
- * TODO: check relationship to java.util.Timer, which might subsume the functionality
+ * java.util.Timer performs very similar functionality.
  * @author Jeremy Faden
  */
 public class TickleTimer {
@@ -24,6 +26,7 @@ public class TickleTimer {
     long delay;
     PropertyChangeListener listener;
     boolean running;
+    List<String> messages;
     
     static final Logger log= Logger.getLogger("pvwave");
     
@@ -39,13 +42,16 @@ public class TickleTimer {
         this.delay= delay;
         addPropertyChangeListener( listener );
         this.running= false;
+        messages= new ArrayList<String>();
     }
+    
     private void startTimer() {
         running= true;
         if ( delay<=0 ) {
             newRunnable().run();
         } else {
             new Thread( newRunnable(), "tickleTimerThread" ).start();
+            messages.removeAll(messages);
         }
     }
     
@@ -65,6 +71,7 @@ public class TickleTimer {
                 log.finer("tickleTimer fire after "+(d));
                 propertyChangeSupport.firePropertyChange("running",true,false);
                 running= false;
+                messages= new ArrayList<String>();
             }
         };
     }
@@ -74,6 +81,11 @@ public class TickleTimer {
         if ( !running ) startTimer();
     }
 
+    public synchronized void tickle( String message ) {
+        tickle();
+        messages.add(message);
+    }
+    
     /**
      * Utility field used by bound properties.
      */
@@ -114,4 +126,9 @@ public class TickleTimer {
         this.running = running;
         propertyChangeSupport.firePropertyChange ("running", new Boolean (oldRunning), new Boolean (running));
     }
+    
+    public List<String> getMessages() {
+        return Collections.unmodifiableList(messages);
+    }
+    
 }
