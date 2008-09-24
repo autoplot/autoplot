@@ -33,9 +33,23 @@ public interface TimeSeriesBrowse {
     void setTimeRange( DatumRange dr );
     
     /**
+     * get the time range for the current view of the timeseries.  Note this 
+     * may not be the same as getTimeRange
+     * @return
+     */
+    DatumRange getTimeRange();
+    
+    /**
      * set the resolution for the desired view of the timeseries.
      */
     void setTimeResolution( Datum d );
+        
+    /**
+     * get the resolution for the current view of the timeseries.  Note this
+     * may not be the same as setTimeResolution.  Also, this may be null, indicating
+     * the native resolution is used.
+     */
+    Datum getTimeResolution();
         
     /**
      * return the URL for the current time range and resolution.  This is also
