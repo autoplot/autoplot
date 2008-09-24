@@ -67,7 +67,7 @@ public class RequestHandler {
         try {
             PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
 
-            interp.execfile(AutoPlotUI.class.getResource("imports.py").openStream(), "imports.py");
+            interp.execfile(AutoPlotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
             interp.setOut( out );
             
             ScriptContext._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
