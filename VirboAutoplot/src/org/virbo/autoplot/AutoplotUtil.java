@@ -232,7 +232,10 @@ public class AutoplotUtil {
         if (total < 3) {
             result.min = dd[0];
             result.max = dd[1];
+            result.median = median;
             result.range = DatumRange.newDatumRange(dd[0], dd[1], u);
+            result.robustMin = dd[0];
+            result.robustMax = dd[1];
 
         } else {
             result.min = dd[0];
