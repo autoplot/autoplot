@@ -307,16 +307,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
         fileMenu.add(dataSetSelector.getOpenLocalAction());
         fileMenu.add(dataSetSelector.getRecentMenu());
         fileMenu.add(stateSupport.createSaveAsAction());
-        /*new AbstractAction( "save as" ) {
-        public void actionPerformed( ActionEvent e ) {
-        JFileChooser chooser= new JFileChooser();
-        if ( chooser.showSaveDialog( AutoPlotMatisse.this )==JFileChooser.APPROVE_OPTION ) {
-        stateSupport.
-        }
-        new SaveAsDialog( AutoPlotMatisse.this, stateSupport,  applicationModel, true ).setVisible(true);
-        };
-        } );
-         */
 
         fileMenu.add(stateSupport.createSaveAction());
         fileMenu.add(new AbstractAction("Save With Data...") {
@@ -324,7 +314,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 applicationModel.setUseEmbeddedDataSet(true);
-                stateSupport.createSaveAction().actionPerformed(e);
+                stateSupport.saveAs();
             }
         });
         fileMenu.addSeparator();
