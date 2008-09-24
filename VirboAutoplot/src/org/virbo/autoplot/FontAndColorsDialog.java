@@ -36,7 +36,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         Font f = app.getCanvas().getFont();
         fontLabel.setText(getFontLabel(f));
         //guiFontLabel.setText( parent.getFont().toString());
-        int index = 0;
+        int index = 3; // custom
         for (int i = 0; i < fores.length; i++) {
             if (fores[i].equals(c.getForeground()) && backs[i].equals(c.getBackground())) {
                 index = i;
@@ -44,10 +44,12 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         }
 
         jComboBox1.setModel(new DefaultComboBoxModel(names));
-        jComboBox1.setSelectedIndex(index);
+        if ( index!=-1 ) jComboBox1.setSelectedIndex(index);
 
         foregroundColorButton.setBackground(c.getForeground());
+        foregroundColorButton.setForeground(c.getForeground());
         backgroundColorButton.setBackground(c.getBackground());
+        backgroundColorButton.setForeground(c.getBackground());
 
     }
 
@@ -192,6 +194,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
             app.getCanvas().setFont(chooser.getFont());
             Font f = app.getCanvas().getFont();
             fontLabel.setText(getFontLabel(f));
+            app.options.setCanvasFont(getFontLabel(f));
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -201,6 +204,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         backgroundColorButton.setForeground(c);
         backgroundColorButton.setBackground(c);
         app.getCanvas().setBackground(c);
+        app.options.setBackground(c);
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
@@ -210,7 +214,9 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
             app.seriesRend.setColor(c);
         }
         foregroundColorButton.setBackground(c);
+        foregroundColorButton.setForeground(c);
         app.getCanvas().setForeground(c);
+        app.options.setForeground(c);
     }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
@@ -223,6 +229,8 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
             }
             app.getCanvas().setForeground(fores[i]);
             app.getCanvas().setBackground(backs[i]);
+            app.options.setForeground(fores[i]);
+            app.options.setBackground(backs[i]);
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
