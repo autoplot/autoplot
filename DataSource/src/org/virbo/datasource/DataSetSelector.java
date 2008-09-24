@@ -266,9 +266,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                             int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
                             BoundedRangeModel model = editor.getHorizontalVisibility();
 
-                            final double xpos = xpos2 - model.getValue();
+                            int xpos = xpos2 - model.getValue();
+                            xpos= Math.min( model.getExtent(), xpos );                            
 
-                            completionsPopupMenu.show(dataSetSelector, (int) xpos, dataSetSelector.getHeight());
+                            completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
                             completionsRunnable = null;
                         } catch (NullPointerException ex) {
                             ex.printStackTrace(); // TODO: look into this
@@ -335,6 +336,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                             BoundedRangeModel model = editor.getHorizontalVisibility();
                             xpos = xpos2 - model.getValue();
+                            xpos= Math.min( model.getExtent(), xpos );
                             completionsPopupMenu.show(dataSetSelector, (int) xpos, dataSetSelector.getHeight());
                             completionsRunnable = null;
                         } catch (BadLocationException ex) {
