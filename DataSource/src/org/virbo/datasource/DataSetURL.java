@@ -8,6 +8,7 @@
  */
 package org.virbo.datasource;
 
+import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
@@ -34,6 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
@@ -49,22 +51,8 @@ import org.virbo.datasource.datasource.DataSourceFormat;
  */
 public class DataSetURL {
 
-    private static int MAX_POSITIONAL_ARGS = 10;
-    
-
     static {
         DataSourceRegistry registry = DataSourceRegistry.getInstance();
-        /*registry.register( new AsciiTableDataSourceFactory(), ".dat" );
-        registry.register( new AsciiTableDataSourceFactory(), ".txt" );
-        registry.register( ExcelSpreadsheetDataSource.getFactory(), ".xls" );
-        registry.register( Das2StreamDataSource.getFactory(), ".d2s", "application/x-das2stream" );
-        registry.register( Das2StreamDataSource.getFactory(), ".das2Stream", "application/x-das2stream" );
-        registry.register( "org.virbo.netCDF.NetCDFDataSourceFactory", ".nc" );  // cdaweb calls cdf files "application/x-netcdf"
-        registry.register( "org.virbo.netCDF.NetCDFDataSourceFactory", ".ncml" );  // cdaweb calls cdf files "application/x-netcdf"
-        registry.register( DodsDataSource.getFactory(), ".dds" );
-        registry.register( DodsDataSource.getFactory(), ".dods" );
-        registry.register( DodsDataSource.getFactory(), ".html" );
-        registry.register( "org.virbo.spase.SpaseRecordDataSourceFactory", ".xml" );*/
         discoverFactories(registry);
         discoverRegisteryEntries(registry);
     }
@@ -72,9 +60,10 @@ public class DataSetURL {
 
     static {
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
-        FileSystem.settings().setPersistence( FileSystemSettings.Persistence.EXPIRES );
-        FileSystem.settings().setLocalCacheDir( new File(System.getProperty("user.home"),"autoplot_data" ) );
+        FileSystem.settings().setPersistence(FileSystemSettings.Persistence.EXPIRES);
+        FileSystem.settings().setLocalCacheDir(new File(System.getProperty("user.home"), "autoplot_data"));
     }
+    static WeakHashMap<DataSource, DataSourceFactory> dsToFactory = new WeakHashMap<DataSource, DataSourceFactory>();
 
     public static class URLSplit {
         /*   path, the directory with http://www.example.com/data/
@@ -214,13 +203,45 @@ public class DataSetURL {
         DataSourceFactory factory = getDataSourceFactory(uri, new NullProgressMonitor());
         URL url = getWebURL(uri);
         DataSource result = factory.getDataSource(url);
-
+        dsToFactory.put(result, factory);
         return result;
 
     }
 
     public static DataSource getDataSource(String surl) throws Exception {
         return getDataSource(getURI(surl));
+    }
+
+    /**
+     * Prefix the URL with the datasource extension if necessary, so that
+     * the URL would resolve to the dataSource.  This is to support TimeSeriesBrowse,
+     * and any time a resouce URL must be understood out of context.
+     * 
+     * @param surl
+     * @param dataSource
+     * @return
+     */
+    public static String getDataSourceUri(DataSource ds) {
+        DataSourceFactory factory = dsToFactory.get(ds);
+        if (factory instanceof AggregatingDataSourceFactory) {
+            return ds.getURL();
+        }
+        if (factory == null) {
+            return ds.getURL();  // nothing we can do
+        } else {
+            DataSetURL.URLSplit split = DataSetURL.parse(ds.getURL());
+            String fext;
+            fext = DataSourceRegistry.getInstance().getExtensionFor(factory).substring(1);
+            if (DataSourceRegistry.getInstance().hasSourceByExt(split.ext)) {
+                DataSourceFactory f2 = DataSourceRegistry.getInstance().getSource(split.ext);
+                if (!factory.getClass().isInstance(f2)) {
+                    split.file = fext + "." + split.file;
+                }
+            } else {
+                split.file = fext + "." + split.file;
+            }
+            return DataSetURL.format(split);
+        }
     }
 
     private static boolean isAggregating(String surl) {
@@ -359,10 +380,10 @@ public class DataSetURL {
         }
 
 // maybe it was actually a directory
-        
-        
+
+
         if (factory == null) {
-            if ( ext.equals("") ) {
+            if (ext.equals("")) {
                 throw new NonResourceException("resource has no extension or mime type");
             } else {
                 factory = DataSourceRegistry.getInstance().getSource(ext);
@@ -405,7 +426,8 @@ public class DataSetURL {
 
         for (int i = 0; i < ss.length; i++) {
             int j = indexOf(ss[i], '=', '(', ')');
-            String name, value;
+            String name,
+                    value;
             if (j == -1) {
                 name = ss[i];
                 value = "";
@@ -439,7 +461,7 @@ public class DataSetURL {
         return (result.length() == 0) ? "" : result.substring(1);
     }
 
-    public static InputStream getInputStream( URL url, ProgressMonitor mon ) throws IOException {
+    public static InputStream getInputStream(URL url, ProgressMonitor mon) throws IOException {
         URLSplit split = parse(url.toString());
 
         String proto = url.getProtocol();
@@ -460,7 +482,7 @@ public class DataSetURL {
                 sfile = surl.substring(idx0 + 7);
             }
             sfile = URLDecoder.decode(sfile, "US-ASCII");
-            return new FileInputStream( new File(sfile) );
+            return new FileInputStream(new File(sfile));
 
         } else {
             try {
@@ -470,13 +492,13 @@ public class DataSetURL {
                     Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
                 }
                 return fo.getInputStream(mon);
-                
+
             } catch (URISyntaxException ex) {
-                throw new IOException("URI Syntax Exception: " + ex.getMessage() );
+                throw new IOException("URI Syntax Exception: " + ex.getMessage());
             }
-        }        
+        }
     }
-    
+
     /**
      * return a file reference for the url.  This is initially to fix the problem
      * for Windows where new URL( "file://c:/myfile.dat" ).getPath() -> "/myfile.dat".
@@ -516,7 +538,7 @@ public class DataSetURL {
                 File tfile = fo.getFile(mon);
                 return tfile;
             } catch (URISyntaxException ex) {
-                throw new IOException("URI Syntax Exception: " + ex.getMessage() );
+                throw new IOException("URI Syntax Exception: " + ex.getMessage());
             }
         }
     }
@@ -531,8 +553,8 @@ public class DataSetURL {
         if (surl.endsWith("://")) {
             surl += "/";  // what strange case is this?
         }
-        boolean isAlreadyEscaped= surl.contains("%20"); // TODO: cheesy
-        if ( !isAlreadyEscaped ) {
+        boolean isAlreadyEscaped = surl.contains("%20"); // TODO: cheesy
+        if (!isAlreadyEscaped) {
             surl = surl.replaceAll("%", "%25");
             surl = surl.replaceAll(" ", "%20");
         }
@@ -553,56 +575,37 @@ public class DataSetURL {
         }
     }
 
-    public static List getExamples() {
-        List result = new ArrayList();
-        result.add("L:/ct/virbo/sampexTimeL/sampex.dat?fixedColumns=90&rank2");
-        result.add("http://www.sarahandjeremy.net:8080/thredds/dodsC/testAll/poes_n15_20060111.nc.dds?proton_6_dome_16_MeV");
-        result.add("http://www.sarahandjeremy.net:8080/thredds/dodsC/test/poesaggLittle.nc.dds?proton_6_dome_16_MeV[0:10:400000]");
-        result.add("http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
-        result.add("file://C:/iowaCitySales2004-2006.latlong.xls?column=M[1:]");
-        result.add("file://c:/Documents and Settings/jbf/My Documents/xx.d2s");
-        result.add("L:/fun/realEstate/to1960.latlon.xls?column=C[1:]&depend0=H[1:]");
-        result.add("L:/fun/realEstate/to1960.latlon.xls?column=M[1:]&depend0=N[1:]&plane0=C[1:]");
-        result.add("L:/ct/virbo/autoplot/data/610008002FE00410.20060901.das2Stream");
-        result.add("P:/poes/poes_n15_20060212.nc?proton-6_dome_16_MeV");
-        result.add("L:/ct/virbo/autoplot/data/asciiTab.dat");
-        result.add("L:/ct/virbo/autoplot/data/2490lintest90005.dat");
-        result.add("http://www.sarahandjeremy.net:8080/thredds/dodsC/test/LanlGPSAgg.nc.dds?FEIO[0:1:1000][0:0]");
-        result.add("file://P:/cdf/fast/tms/1996/fa_k0_tms_19961021_v01.cdf?L");
-        return result;
-    }
-
-    
     public static class CompletionResult {
+
         public String completion;
         public String doc;
         public String completable;
         public String label;
         public boolean maybePlot;
 
-        protected CompletionResult( String completion, String doc ) {
-            this( completion, doc, null, false );
+        protected CompletionResult(String completion, String doc) {
+            this(completion, doc, null, false);
         }
 
-	protected CompletionResult( String completion, String doc, boolean maybePlot ) {
-	    this( completion, doc, null, false );
+        protected CompletionResult(String completion, String doc, boolean maybePlot) {
+            this(completion, doc, null, false);
         }
 
-        protected CompletionResult( String completion, String doc,  String completable, boolean maybePlot ) {
-            this( completion, null, doc, null, false );
+        protected CompletionResult(String completion, String doc, String completable, boolean maybePlot) {
+            this(completion, null, doc, null, false);
         }
 
-        protected CompletionResult( String completion, String label, String doc,  String completable, boolean maybePlot ) {
-            this.completion= completion;
-	    this.completable= completable;
-            this.label= label==null ? completable : label;
-            this.doc= doc;
-            this.maybePlot= maybePlot;
+        protected CompletionResult(String completion, String label, String doc, String completable, boolean maybePlot) {
+            this.completion = completion;
+            this.completable = completable;
+            this.label = label == null ? completable : label;
+            this.doc = doc;
+            this.maybePlot = maybePlot;
         }
     }
 
-    public static List<CompletionResult> getFileSystemCompletions( final String surl, final int carotpos, ProgressMonitor mon ) throws IOException {
-        DataSetURL.URLSplit split = DataSetURL.parse(surl.substring(0,carotpos));
+    public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
+        DataSetURL.URLSplit split = DataSetURL.parse(surl.substring(0, carotpos));
         String prefix = split.file.substring(split.path.length());
         String surlDir = split.path;
 
@@ -627,7 +630,7 @@ public class DataSetURL {
                 if (s[j].endsWith("contents.html")) {
                     s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
                 } // kludge for dods
-                completions.add( new DataSetURL.CompletionResult( surlDir + s[j], s[j], null, surl.substring(0,carotpos), true ) );
+                completions.add(new DataSetURL.CompletionResult(surlDir + s[j], s[j], null, surl.substring(0, carotpos), true));
             }
         }
 
@@ -747,7 +750,7 @@ public class DataSetURL {
                     if (dontYetHave == false) {
                         continue;  // skip it
                     }
-                    result.add( new CompletionResult( ss, cc1.label, cc1.doc, surl1.substring(0,carotPos), cc1.maybePlot ) );
+                    result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
                     i = i + 1;
                 }
 
@@ -771,7 +774,7 @@ public class DataSetURL {
             for (CompletionContext cc1 : completions) {
                 if (cc1.completable.startsWith(cc.completable)) {
                     String ss = CompletionContext.insert(cc, cc1);
-                    result.add( new CompletionResult( ss, cc1.label, cc1.doc,surl1.substring(0,carotPos),cc1.maybePlot) );
+                    result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
                     i = i + 1;
                 }
 
@@ -861,7 +864,7 @@ public class DataSetURL {
 
                         if (extensions != null) {
                             for (String e : extensions) {
-                                registry.registerExtension(factoryClassName, e, null );
+                                registry.registerExtension(factoryClassName, e, null);
                             }
                         }
 
@@ -888,7 +891,7 @@ public class DataSetURL {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String s = reader.readLine();
                 while (s != null) {
-                    s= s.trim();
+                    s = s.trim();
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
@@ -905,7 +908,7 @@ public class DataSetURL {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String s = reader.readLine();
                 while (s != null) {
-                    s= s.trim();
+                    s = s.trim();
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
@@ -922,7 +925,7 @@ public class DataSetURL {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
                 String s = reader.readLine();
                 while (s != null) {
-                    s= s.trim();
+                    s = s.trim();
                     if (s.length() > 0) {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
