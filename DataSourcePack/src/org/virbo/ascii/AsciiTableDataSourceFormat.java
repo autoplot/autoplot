@@ -38,9 +38,8 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
                 out.print(" " + (l == null ? "dep0" : l) + ", ");
             }
             Units u = (Units) dep1.property(QDataSet.UNITS);
-            if (u == null) {
-                u = Units.dimensionless;
-            }
+            if (u == null) u = Units.dimensionless;
+            
             int i;
             for (  i = 0; i < dep1.length()-1; i++) {
                 out.print(u == null ? "" + dep1.value(i) : u.createDatum(dep1.value(i)) + ", " );
@@ -51,13 +50,13 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         Units u0 = null;
         if (dep0 != null) {
             u0 = (Units) dep0.property(QDataSet.UNITS);
-            if (u0 == null) {
-                u0 = Units.dimensionless;
-            }
+            if (u0 == null) u0 = Units.dimensionless;
+            
         }
 
         Units u = (Units) data.property(QDataSet.UNITS);
-
+        if (u == null) u = Units.dimensionless;
+        
         mon.setTaskSize(data.length());
         mon.started();
         
@@ -102,6 +101,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
             }
         }
         Units u = (Units) data.property(QDataSet.UNITS);
+        if (u == null) u = Units.dimensionless;
         
         mon.setTaskSize(data.length());
         mon.started();
