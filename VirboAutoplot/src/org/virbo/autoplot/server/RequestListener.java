@@ -27,6 +27,11 @@ public class RequestListener {
         this.listening = true;
         new Thread(run).start();
     }
+    
+    public void stopListening() {
+        this.listening= false;
+    }
+    
     private boolean readData = false;
     public static final String PROP_READDATA = "readData";
 
@@ -143,6 +148,7 @@ public class RequestListener {
         this.listening = newlistening;
         propertyChangeSupport.firePropertyChange(PROP_LISTENING, oldlistening, newlistening);
     }
+    
     private int requestCount = 0;
     public static final String PROP_REQUESTCOUNT = "requestCount";
 
@@ -182,4 +188,5 @@ public class RequestListener {
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
+
 }
