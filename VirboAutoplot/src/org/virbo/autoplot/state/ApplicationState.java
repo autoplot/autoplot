@@ -673,53 +673,6 @@ public class ApplicationState {
         this.autoOverview = newautoOverview;
         //propertyChangeSupport.firePropertyChange(PROP_AUTOOVERVIEW, oldautoOverview, newautoOverview);
     }
-
-    /**
-     * Holds value of property backgroundColor.
-     */
-    private Color backgroundColor;
-
-    /**
-     * Getter for property backgroundColor.
-     * @return Value of property backgroundColor.
-     */
-    public Color getBackgroundColor() {
-        return this.backgroundColor;
-    }
-
-    /**
-     * Setter for property backgroundColor.
-     * @param backgroundColor New value of property backgroundColor.
-     */
-    public void setBackgroundColor(Color backgroundColor) {
-        Color oldBackgroundColor = this.backgroundColor;
-        this.backgroundColor = backgroundColor;
-        propertyChangeSupport.firePropertyChange ("backgroundColor", oldBackgroundColor, backgroundColor);
-    }
-
-    /**
-     * Holds value of property foregroundColor.
-     */
-    private Color foregroundColor;
-
-    /**
-     * Getter for property foregroundColor.
-     * @return Value of property foregroundColor.
-     */
-    public Color getForegroundColor() {
-        return this.foregroundColor;
-    }
-
-    /**
-     * Setter for property foregroundColor.
-     * @param foregroundColor New value of property foregroundColor.
-     */
-    public void setForegroundColor(Color foregroundColor) {
-        Color oldForegroundColor = this.foregroundColor;
-        this.foregroundColor = new Color( foregroundColor.getRGB() ); //otherwise can't serialize
-        propertyChangeSupport.firePropertyChange ("foregroundColor", oldForegroundColor, foregroundColor);
-    }
-
     
     private boolean autoranging = true;
 
