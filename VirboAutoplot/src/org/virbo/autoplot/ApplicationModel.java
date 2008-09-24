@@ -8,6 +8,7 @@
  */
 package org.virbo.autoplot;
 
+import java.util.logging.Level;
 import org.das2.CancelledOperationException;
 import org.das2.DasApplication;
 import org.das2.beans.BeansUtil;
@@ -60,6 +61,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
@@ -101,8 +103,11 @@ import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.qstream.QDataSetStreamHandler;
+import org.virbo.qstream.SimpleStreamFormatter;
 import org.xml.sax.SAXException;
 
 /**
@@ -318,8 +323,19 @@ public class ApplicationModel {
         headless = "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false"));
 
         options = new Options();
+        options.loadPreferences();
+        
         canvas = new DasCanvas();
-        canvas.setFont(canvas.getFont().deriveFont(Font.ITALIC, 18.f));
+        
+        if ( options.getCanvasFont().equals("") ) {
+            canvas.setFont(canvas.getFont().deriveFont(Font.ITALIC, 18.f));
+        } else {
+            canvas.setFont( Font.decode(options.getCanvasFont()) );
+        }
+        
+        canvas.setForeground(options.getForeground());
+        canvas.setBackground(options.getBackground());
+        
         canvas.setPrintingTag("");
 
         canvas.addPropertyChangeListener(listener);
@@ -412,8 +428,11 @@ public class ApplicationModel {
         seriesRend = new SeriesRenderer();
         seriesRend.setDataSetLoader(null);
 
-        overSeriesRend = new SeriesRenderer();
+        seriesRend.setColor(canvas.getForeground());
 
+        overSeriesRend = new SeriesRenderer();
+        overSeriesRend.setColor(canvas.getForeground());
+                
         plot.addRenderer(seriesRend);
         overviewPlot.addRenderer(overSeriesRend);
         overviewPlot.setPreviewEnabled(true);
@@ -550,7 +569,20 @@ public class ApplicationModel {
      *   might be done.
      */
     private void setDataSetInternal(QDataSet ds, boolean autorange) {
+        
+        List<String> problems= new ArrayList<String>();
+        
+        if ( ds!=null && ! DataSetUtil.validate( ds, problems ) ) {
+            StringBuffer message= new StringBuffer( "data set is invalid:\n" );
+            for ( String s: problems ) {
+                message.append(s+"\n");
+            }
+            JOptionPane.showMessageDialog( canvas, message );
+            return;
+        }
+        
         this.dataset = ds;
+        this.embedDsDirty= true;
 
         if (dataset == null) {
             seriesRend.setDataSet(null);
@@ -597,22 +629,35 @@ public class ApplicationModel {
     }
 
     public void updateTsb() {
-        DatumRange newRange = ApplicationModel.this.plot.getXAxis().getDatumRange();
-        // don't waste time by chasing after 10% of a dataset.
-        newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
         if (tsb == null) {
             return;
         }
-        if (UnitsUtil.isTimeLocation(newRange.getUnits())) {
+        if (UnitsUtil.isTimeLocation( ApplicationModel.this.plot.getXAxis().getUnits())) {
+            
+            // CacheTag "tag" identifies what we have already
             QDataSet ds = dataset;
             QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
             CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
-            Datum newResolution = newRange.width().divide(ApplicationModel.this.plot.getXAxis().getDLength());
+            
+            DatumRange visibleRange= ApplicationModel.this.plot.getXAxis().getDatumRange();
+            
+            Datum newResolution = visibleRange.width().divide(ApplicationModel.this.plot.getXAxis().getDLength());
+
+            // don't waste time by chasing after 10% of a dataset.
+            DatumRange newRange = visibleRange;
+            newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
+            
             CacheTag newCacheTag = new CacheTag(newRange, newResolution);
+            
             if (tag == null || !tag.contains(newCacheTag)) {
-                tsb.setTimeRange(newRange);
+                if ( plot.isOverSize() ) {
+                    visibleRange= DatumRangeUtil.rescale( visibleRange, -0.3, 1.3 );
+                }
+                tsb.setTimeRange(visibleRange);
                 tsb.setTimeResolution(newResolution);
-                String surl = tsb.getURL().toString();
+                String surl;
+                surl= DataSetURL.getDataSourceUri( dataSource );
+              // check the registry for URLs, compare to surl, append prefix if necessary.
                 if (surl.equals(this.surl)) {
                     logger.fine("we do no better with tsb");
                 } else {
@@ -625,12 +670,12 @@ public class ApplicationModel {
         }
     }
 
-    public void setDataSource(DataSource ds) {
+    public void setDataSource( DataSource dataSource ) {
 
         DataSource oldSource = this.dataSource;
-        this.dataSource = ds;
+        this.dataSource = dataSource;
 
-        if (ds == null) {
+        if (dataSource == null) {
             caching = null;
             tsb = null;
             this.surl= null;
@@ -642,12 +687,23 @@ public class ApplicationModel {
 
         } else {
 
-            caching = ds.getCapability(Caching.class);
-            tsb = ds.getCapability(TimeSeriesBrowse.class);
+            caching = dataSource.getCapability(Caching.class);
+            tsb = dataSource.getCapability(TimeSeriesBrowse.class);
             
             if (tsb != null) {
+                
+                if (timeSeriesBrowseListener != null) {
+                    this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
+                }
+                
+                boolean setTsbInitialResolution= true;
+                if ( setTsbInitialResolution ) {
+                    DatumRange timeRange= tsb.getTimeRange();
+                    this.plot.getXAxis().resetRange(timeRange);
+                    updateTsb();
+                }
+                
                 timeSeriesBrowseListener = new PropertyChangeListener() {
-
                     public void propertyChange(PropertyChangeEvent e) {
                         if (plot.getXAxis().valueIsAdjusting()) {
                             return;
@@ -657,8 +713,9 @@ public class ApplicationModel {
                         }
                     }
                 };
-                this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);
-
+                
+                this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);                
+                
             } else {
                 if (timeSeriesBrowseListener != null) {
                     this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
@@ -667,9 +724,9 @@ public class ApplicationModel {
             }
         }
 
-        if (oldSource == null || !oldSource.equals(ds)) {
+        if (oldSource == null || !oldSource.equals(dataSource)) {
             update(true, true);
-            propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, ds);
+            propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, dataSource);
         }
     }
 
@@ -1510,12 +1567,15 @@ public class ApplicationModel {
         Font f = this.canvas.getFont();
         f = f.deriveFont(f.getSize2D() * 1.1f);
         this.canvas.setFont(f);
+        this.options.setCanvasFont( f.toString() );
+        
     }
 
     void decreaseFontSize() {
         Font f = this.canvas.getFont();
         f = f.deriveFont(f.getSize2D() / 1.1f);
         this.canvas.setFont(f);
+        this.options.setCanvasFont( f.toString() );
     }
 
     DasAxis getXAxis() {
@@ -1550,8 +1610,8 @@ public class ApplicationModel {
         state.setValidRange(validRange);
         state.setFill(sfill);
 
-        state.setBackgroundColor(canvas.getBackground());
-        state.setForegroundColor(canvas.getForeground());
+        state.getOptions().setBackground(canvas.getBackground());
+        state.getOptions().setForeground(canvas.getForeground());
 
         state.setColor(seriesRend.getColor());
 
@@ -1638,12 +1698,12 @@ public class ApplicationModel {
 
         setFill(state.getFill());
 
-        if (state.getBackgroundColor() != null) {
-            canvas.setBackground(state.getBackgroundColor());
+        if (state.getOptions().getBackground() != null) {
+            canvas.setBackground(state.getOptions().getBackground());
         }
 
-        if (state.getForegroundColor() != null) {
-            canvas.setForeground(state.getForegroundColor());
+        if (state.getOptions().getForeground() != null) {
+            canvas.setForeground(state.getOptions().getForeground());
         }
 
         if (state.getColor() != null) {
@@ -1813,32 +1873,34 @@ public class ApplicationModel {
     }
 
     private void packEmbeddedDataSet() {
-        if (dataset == null) {
-            embedDs = "";
-            return;
+        try {
+            if (dataset == null) {
+                embedDs = "";
+                return;
+            }
 
+            org.das2.dataset.DataSet ds;
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream(10000);
+            //DeflaterOutputStream dos= new DeflaterOutputStream(out);
+            OutputStream dos= out;
+
+            SimpleStreamFormatter format = new SimpleStreamFormatter();
+            format.format(dataset, dos, false);
+
+            dos.close();
+            
+            byte[] data = Base64.encodeBytes(out.toByteArray()).getBytes();
+
+            embedDs = new String(data);
+            embedDsDirty = false;
+        } catch (StreamException ex) {
+            Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
-
-        org.das2.dataset.DataSet ds;
-        if (dataset.rank() == 1) {
-            ds = VectorDataSetAdapter.create(dataset);
-        } else {
-            ds = TableDataSetAdapter.create(dataset);
-        }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream(10000);
-        DataSetStreamProducer producer = new DataSetStreamProducer();
-        producer.setDataSet(ds);
-        producer.setCompressed(true);
-        producer.setAsciiTransferTypes(false);
-        producer.writeStream(out);
-
-        byte[] data = Base64.encodeBytes(out.toByteArray()).getBytes();
-
-        embedDs = new String(data);
-        embedDsDirty = false;
     }
 
     public void setEmbeddedDataSet(String dataset) {
@@ -1857,18 +1919,16 @@ public class ApplicationModel {
 
         byte[] data = Base64.decode(embedDs);
         InputStream in = new ByteArrayInputStream(data);
-
-        ReadableByteChannel channel = Channels.newChannel(in);
-
-        HashMap props = new HashMap();
-
-        DataSetStreamHandler handler = new DataSetStreamHandler(props, new NullProgressMonitor());
+        //InflaterChannel ich= new InflaterChannel( Channels.newChannel(in) );
+        ReadableByteChannel ich= Channels.newChannel(in);
+        
+        QDataSetStreamHandler handler = new QDataSetStreamHandler();
         try {
-            StreamTool.readStream(channel, handler);
-            this.dataset = DataSetAdapter.create(handler.getDataSet());
-            updateFill(true, true);
-        } catch (StreamException ex) {
-            ex.printStackTrace();
+            org.virbo.qstream.StreamTool.readStream(ich, handler);
+            setDataSetInternal( handler.getDataSet(), false );
+
+        } catch (org.virbo.qstream.StreamException ex) {
+            Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
