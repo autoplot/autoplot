@@ -46,20 +46,20 @@ public class AggregatingDataSource extends AbstractDataSource {
     /**
      * metadata from the last read.
      */
-    Map<String,Object> metadata;
+    Map<String, Object> metadata;
     MetadataModel metadataModel;
 
     private DatumRange quantize(DatumRange timeRange) {
         try {
             //String s1= fsm.calculateNameFor(timeRange.min());
             //String s2= fsm.calculateNameFor(timeRange.max());
-            
+
             String[] ss = fsm.getNamesFor(timeRange);
-            if ( ss.length==0 ) return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
-            DatumRange result= fsm.getRangeFor(ss[0]);
-            for ( int i=0; i<ss.length; i++ ) {
-                DatumRange r1= fsm.getRangeFor(ss[i]);
-                result= result.include( r1.max() ).include(r1.min());
+            if (ss.length == 0) return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
+            DatumRange result = fsm.getRangeFor(ss[0]);
+            for (int i = 0; i < ss.length; i++) {
+                DatumRange r1 = fsm.getRangeFor(ss[i]);
+                result = result.include(r1.max()).include(r1.min());
             }
             return result;
         } catch (IOException ex) {
@@ -68,17 +68,22 @@ public class AggregatingDataSource extends AbstractDataSource {
             return timeRange;
         }
     }
-        
+
     /** Creates a new instance of AggregatingDataSource */
     public AggregatingDataSource(URL url) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(url);
         String surl = url.toString();
         delegateDataSourceFactory = AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
-        addCability(TimeSeriesBrowse.class, new TimeSeriesBrowse() {
+        addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
+        viewRange= DatumRangeUtil.parseTimeRange( super.params.get("timerange") );
+    }
+
+    private TimeSeriesBrowse createTimeSeriesBrowse() {
+        return new TimeSeriesBrowse() {
 
             public void setTimeRange(DatumRange dr) {
                 viewRange = quantize(dr);
-                Logger.getLogger("virbo.datasource.agg").fine("set timerange="+viewRange );
+                Logger.getLogger("virbo.datasource.agg").fine("set timerange=" + viewRange);
             }
 
             public void setTimeResolution(Datum d) {
@@ -86,28 +91,28 @@ public class AggregatingDataSource extends AbstractDataSource {
 
             public URL getURL() {
                 try {
-                    DataSetURL.URLSplit split= DataSetURL.parse( AggregatingDataSource.this.getURL() );
-                    Map params= DataSetURL.parseParams(split.params);
-                    String stimeRange=  viewRange.toString();
-                    stimeRange= stimeRange.replaceAll(" ", "+");
-                    params.put( "timerange", stimeRange );
-                    split.params= DataSetURL.formatParams(params);
-                    return new URL( DataSetURL.format(split) );
-                    
+                    return new URL(AggregatingDataSource.this.getURL());
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(AggregatingDataSource.class.getName()).log(Level.SEVERE, null, ex);
                     return null;
                 }
             }
-            
-        });
-    }
 
+            public DatumRange getTimeRange() {
+                return viewRange;
+            }
+
+            public Datum getTimeResolution() {
+                return null;
+            }
+        };        
+    }
+    
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String[] ss = getFsm().getNamesFor(viewRange);
 
-        Logger.getLogger("virbo.datasource.agg").info("aggregating "+ss.length+" files for "+viewRange );
-        
+        Logger.getLogger("virbo.datasource.agg").info("aggregating " + ss.length + " files for " + viewRange);
+
         DDataSet result = null;
 
         if (ss.length > 1) {
@@ -119,8 +124,8 @@ public class AggregatingDataSource extends AbstractDataSource {
 
         for (int i = 0; i < ss.length; i++) {
             String scompUrl = getFsm().getFileSystem().getRootURL() + ss[i];
-            if (!params.equals("")) {
-                scompUrl += "?" + params;
+            if (!sparams.equals("")) {
+                scompUrl += "?" + sparams;
             }
             URL compUrl = new URL(scompUrl);
 
@@ -153,7 +158,7 @@ public class AggregatingDataSource extends AbstractDataSource {
                 }
             }
         }
-        cacheRange= cacheRange1;
+        cacheRange = cacheRange1;
 
         if (ss.length > 1) {
             mon.finished();
@@ -175,9 +180,9 @@ public class AggregatingDataSource extends AbstractDataSource {
     /**
      * returns the metadata provided by the first delegate dataset.
      */
-    public Map<String,Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
         if (metadata == null) {
-            Map<String,Object> retValue;
+            Map<String, Object> retValue;
             retValue = super.getMetaData(mon);
             return retValue;
         } else {
@@ -243,23 +248,31 @@ public class AggregatingDataSource extends AbstractDataSource {
     /**
      * Holds value of property params.
      */
-    private String params = "";
+    private String sparams = "";
 
     /**
      * Setter for property args.
      * @param args New value of property args.
      */
     public void setParams(String params) {
-        String oldParams = this.params;
-        this.params = params;
+        String oldParams = this.sparams;
+        this.sparams = params;
         propertyChangeSupport.firePropertyChange("args", oldParams, params);
     }
 
     @Override
     public String getURL() {
-        String surl = this.resourceURL.toString() + "?";
-        if ( params!=null ) surl+= params + "&";
-        surl+= "timerange=" + String.valueOf(cacheRange);
-        return surl;
+        String surl = this.resourceURL.toString() + "?" ;
+        if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
+        surl += "timerange=" + String.valueOf(viewRange);
+
+        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        Map<String,String> mparams = DataSetURL.parseParams(split.params);
+        String stimeRange = viewRange.toString();
+        stimeRange = stimeRange.replaceAll(" ", "+");
+        mparams.put("timerange", stimeRange);
+        split.params = DataSetURL.formatParams(mparams);
+
+        return DataSetURL.format(split);
     }
 }
