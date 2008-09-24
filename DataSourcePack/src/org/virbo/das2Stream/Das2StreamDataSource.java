@@ -6,7 +6,6 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-
 package org.virbo.das2Stream;
 
 import org.das2.client.DataSetStreamHandler;
@@ -32,60 +31,79 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.qstream.QDataSetStreamHandler;
 
 /**
  *
  * @author jbf
  */
 public class Das2StreamDataSource extends AbstractDataSource {
-    
+
     /** Creates a new instance of Das2StreamDataSource */
-    public Das2StreamDataSource( URL url ) throws IOException {
-        super( url );
+    public Das2StreamDataSource(URL url) throws IOException {
+        super(url);
     }
-    
-    
-    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException {
-        
-        InputStream in = DataSetURL.getInputStream( url, mon );
-        
+
+    public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException, org.virbo.qstream.StreamException {
+
+        InputStream in = DataSetURL.getInputStream(url, mon);
+
         ReadableByteChannel channel = Channels.newChannel(in);
+
+        DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
         
-        HashMap props= new HashMap();
-        props.put( "file", url.toString() );
-        
-        DataSetStreamHandler handler = new DataSetStreamHandler( props, mon );
-        
-        StreamTool.readStream(channel, handler);
-        
-        in.close();
-        
-        return DataSetAdapter.create( handler.getDataSet() );
-        
+        if (split.ext.equals(".qds")) {
+            QDataSetStreamHandler h= new QDataSetStreamHandler();
+            org.virbo.qstream.StreamTool.readStream(channel, h);
+            
+            if ( params.get("arg_0")!=null ) {
+                return h.getDataSet(params.get("arg_0"));
+            } else {
+                return h.getDataSet();
+            }
+            
+        } else {
+
+            HashMap props = new HashMap();
+            props.put("file", url.toString());
+
+            DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
+
+            StreamTool.readStream(channel, handler);
+
+            in.close();
+
+            return DataSetAdapter.create(handler.getDataSet());
+        }
+
     }
-    
+
     public boolean asynchronousLoad() {
         return true;
     }
-    
+
     public static DataSourceFactory getFactory() {
         return new DataSourceFactory() {
+
             public DataSource getDataSource(URL url) throws IOException {
-                return new Das2StreamDataSource( url );
+                return new Das2StreamDataSource(url);
             }
-            public List<CompletionContext> getCompletions( CompletionContext cc ,org.das2.util.monitor.ProgressMonitor mon ) {
+
+            public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) {
                 return Collections.emptyList();
             }
-            public MetadataModel getMetadataModel( URL url ) {
+
+            public MetadataModel getMetadataModel(URL url) {
                 return MetadataModel.createNullModel();
             }
-            public boolean reject( String surl ,ProgressMonitor mon ) {
+
+            public boolean reject(String surl, ProgressMonitor mon) {
                 return false;
             }
-            public String urlForServer( String surl ) {
+
+            public String urlForServer(String surl) {
                 return surl; // TODO
             }
         };
     }
-    
 }

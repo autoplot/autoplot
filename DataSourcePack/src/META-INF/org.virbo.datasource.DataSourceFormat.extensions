@@ -1,2 +1,2 @@
 org.virbo.ascii.AsciiTableDataSourceFormat dat
-org.virbo.das2Stream.Das2StreamDataSourceFormat d2s
+org.virbo.das2Stream.Das2StreamDataSourceFormat d2s qds
