@@ -221,7 +221,7 @@ public class ScriptPanelSupport {
                             }
                             try {
                                 PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
-                                boolean dirty0= panel.isDirty();
+                                boolean dirty0 = panel.isDirty();
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
                                 interp.exec(panel.getEditorPanel().getText());
@@ -280,7 +280,7 @@ public class ScriptPanelSupport {
                 } else {
                     model.update(true, true);
                 }
-                
+
             }
 
         } catch (IOException iOException) {
@@ -290,12 +290,17 @@ public class ScriptPanelSupport {
 
     protected void open() {
         try {
-            String sfile = selector.getValue();
-            DataSetURL.URLSplit split = DataSetURL.parse(sfile);
-            if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
-                file = null;
-            } else {
-                file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
+            if (this.file == null) {
+                String sfile = selector.getValue();
+                DataSetURL.URLSplit split = null;
+                if (sfile != null) {
+                    split = DataSetURL.parse(sfile);
+                }
+                if (split == null || !(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
+                    file = null;
+                } else {
+                    file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
+                }
             }
 
 
