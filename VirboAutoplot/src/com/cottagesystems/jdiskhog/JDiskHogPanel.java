@@ -3,7 +3,6 @@
  *
  * Created on August 26, 2008, 4:35 PM
  */
-
 package com.cottagesystems.jdiskhog;
 
 import java.awt.event.ActionEvent;
@@ -11,10 +10,16 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
@@ -27,8 +32,8 @@ public class JDiskHogPanel extends javax.swing.JPanel {
     /** Creates new form JDiskHogPanel */
     public JDiskHogPanel() {
         initComponents();
-                jTree1.addMouseListener( createMouseListener(jTree1) );
-        
+        jTree1.addMouseListener(createMouseListener(jTree1));
+
     }
 
     private MouseListener createMouseListener(final JTree jtree) {
@@ -38,7 +43,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                
+
                 if (e.isPopupTrigger()) {
                     context = jtree.getPathForLocation(e.getX(), e.getY());
                     jtree.getSelectionModel().addSelectionPath(context);
@@ -52,37 +57,70 @@ public class JDiskHogPanel extends javax.swing.JPanel {
             private void showPopup(MouseEvent e) {
                 if (popup == null) {
                     popup = new JPopupMenu();
-                    popup.add( new JMenuItem( new AbstractAction("Delete") {
+                    popup.add(new JMenuItem(new AbstractAction("Delete") {
 
                         public void actionPerformed(ActionEvent e) {
                             FSTreeModel model = (FSTreeModel) jtree.getModel();
-                            
-                            TreePath[] paths= jtree.getSelectionPaths();
-                            
-                            boolean okay= true;
-                            IllegalArgumentException ex=null;
-                            
-                            for ( int i=0; i<paths.length; i++ ) {
+
+                            TreePath[] paths = jtree.getSelectionPaths();
+
+                            boolean okay = true;
+                            IllegalArgumentException ex = null;
+
+                            for (int i = 0; i < paths.length; i++) {
                                 File f = model.getFile(paths[i]);
-                                
-                                if ( f.equals(model.root) ) continue;
+
+                                if (f.equals(model.root)) {
+                                    continue;
+                                }
                                 if (f.isFile()) {
                                     okay = f.delete();
                                 } else {
                                     try {
                                         okay = Util.deleteFileTree(f);
-                                    } catch ( IllegalArgumentException ex1 ) {
-                                        ex= ex1;
-                                        okay= false;
+                                    } catch (IllegalArgumentException ex1) {
+                                        ex = ex1;
+                                        okay = false;
                                     }
                                 }
                             }
-                            
+
                             if (!okay) {
-                                JOptionPane.showConfirmDialog(jtree, ex.getLocalizedMessage(),"unable to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE );
+                                JOptionPane.showConfirmDialog(jtree, ex.getLocalizedMessage(), "unable to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
                             }
 
                             scan(model.root);
+
+                        }
+                    }));
+                    
+                    //popup.add(new JSeparator());
+                    popup.add(new JMenuItem( new AbstractAction("Copy To...") {
+                        public void actionPerformed(ActionEvent e) {
+                            JFileChooser chooser = new JFileChooser();
+                            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                            if (chooser.showOpenDialog(JDiskHogPanel.this) == JFileChooser.APPROVE_OPTION) {
+                                File destdir= chooser.getSelectedFile();
+                                
+                                FSTreeModel model = (FSTreeModel) jtree.getModel();
+
+                                TreePath[] paths = jtree.getSelectionPaths();
+
+                                boolean okay = true;
+                                IllegalArgumentException ex = null;
+
+                                for (int i = 0; i < paths.length; i++) {
+                                    File f = model.getFile(paths[i]);
+                                    try {
+                                        Util.fileCopy(f, destdir);
+                                    } catch (FileNotFoundException ex1) {
+                                        Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                                    } catch (IOException ex1) {
+                                        Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                                    }
+                                }
+
+                            }
 
                         }
                     }));
@@ -92,13 +130,12 @@ public class JDiskHogPanel extends javax.swing.JPanel {
         };
     }
 
-    public void scan( File root ) {
+    public void scan(File root) {
         DiskUsageModel dumodel = new DiskUsageModel();
-        dumodel.search(root, 0, this.progressMonitorComponent1 );
+        dumodel.search(root, 0, this.progressMonitorComponent1);
         FSTreeModel model = new FSTreeModel(dumodel, root);
         jTree1.setModel(model);
     }
-    
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -132,12 +169,9 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                 .add(progressMonitorComponent1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTree jTree1;
     public com.cottagesystems.jdiskhog.ProgressMonitorComponent progressMonitorComponent1;
     // End of variables declaration//GEN-END:variables
-
 }
