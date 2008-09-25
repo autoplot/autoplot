@@ -38,6 +38,10 @@ class Das2ServerDataSource extends AbstractDataSource {
     public Das2ServerDataSource(URL url) {
         super(url);
         addCability( TimeSeriesBrowse.class, getTimeSeriesBrowse() );
+        HashMap params2 = new HashMap(params);
+        params2.put("server", "dataset");
+        timeRange= DatumRangeUtil.parseTimeRangeValid( params2.get("start_time") + " to "+ params2.get("end_time" ) );
+        resolution= null;
     }
     
     DatumRange timeRange;
@@ -102,6 +106,14 @@ class Das2ServerDataSource extends AbstractDataSource {
                 } catch (MalformedURLException ex) {
                     throw new RuntimeException(ex);
                 }
+            }
+
+            public DatumRange getTimeRange() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            public Datum getTimeResolution() {
+                throw new UnsupportedOperationException("Not supported yet.");
             }
         };
     }
