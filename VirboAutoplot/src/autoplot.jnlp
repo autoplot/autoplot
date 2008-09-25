@@ -74,6 +74,7 @@
         
         <jar href="lib/dasCore-1.0.0.jar" />
         <jar href="lib/QDataSet.jar" />
+        <jar href="lib/QStream.jar" />
         <jar href="lib/JythonSupport.jar" />
         <jar href="lib/DataSource.jar" />
         <jar href="lib/DataSourcePack.jar" />
