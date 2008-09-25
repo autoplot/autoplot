@@ -84,6 +84,7 @@
         <ant antfile="${project.NetCdfDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.OpenDapDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="do-tag"/>
+        <ant antfile="${project.QStream}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant target="jar" />
