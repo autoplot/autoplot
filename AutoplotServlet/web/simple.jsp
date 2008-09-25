@@ -34,7 +34,6 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
     <form action="SimpleServlet">
         <input name="url" value="http://www.sarahandjeremy.net/~jbf/1wire/data/2007/0B000800408DD710.%Y%m%d.d2s?timerange=20071210" size="80" type="text">
         <input value="Plot" type="submit">
-        <input type="checkbox" name="autolayout" value="true" >autolayout</input>
     </form>
 <br><br>
     <form action="SimpleServlet">
@@ -59,9 +58,11 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
             <option>application/x-pdf</option>
             <option>image/svg</option>
         </select><br>
-        width: <input name="width" value="700" >  horiz position: <input name="column" value="5em,100%-10em"><br>
-        height: <input name="height" value="400" >vert position: <input name="row" value="3em,100%-3em"><br>
-            
+        width: <input name="width" value="700" ><br>
+        height: <input name="height" value="400" > <br>
+        <input type="checkbox" name="autolayout" value="true" >autolayout</input><br>
+        layout horiz position: <input name="column" value="5em,100%-10em"><br> 
+        layout vert position: <input name="row" value="3em,100%-3em"><br>
         <input value="Plot" type="submit">
     </form>
     </body>
