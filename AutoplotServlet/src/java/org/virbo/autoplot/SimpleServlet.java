@@ -60,6 +60,8 @@ public class SimpleServlet extends HttpServlet {
             } else if (arg0.equals("about:autoplot")) {
                 response.setContentType("text/html");
                 String s = AboutUtil.getAboutHtml();
+                s= s.substring( 0, s.length()-7 );
+                s= s + "<br><br>servlet version=20080925_0728<br></html>";
                 out.write(s.getBytes());
                 out.close();
                 return;
