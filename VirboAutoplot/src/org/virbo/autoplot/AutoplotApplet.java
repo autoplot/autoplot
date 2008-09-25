@@ -40,6 +40,7 @@ public class AutoplotApplet extends JApplet {
     @Override
     public void init() {
         super.init();
+        
         model = new ApplicationModel();
 	setLayout( new BorderLayout() );
         add(model.getCanvas(), BorderLayout.CENTER );

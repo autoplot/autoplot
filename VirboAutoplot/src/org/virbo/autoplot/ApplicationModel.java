@@ -323,7 +323,7 @@ public class ApplicationModel {
         headless = "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false"));
 
         options = new Options();
-        options.loadPreferences();
+        if ( !headless && DasApplication.hasAllPermission() ) options.loadPreferences();
         
         canvas = new DasCanvas();
         

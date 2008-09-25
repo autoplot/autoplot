@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.prefs.Preferences;
+import org.das2.system.NullPreferences;
 
 /**
  * Bean for holding AP configuration options
@@ -16,17 +17,18 @@ import java.util.prefs.Preferences;
  */
 public class Options {
 
-    final Preferences prefs = Preferences.userNodeForPackage(Options.class);
+    Preferences prefs ;
 
     private String encodeColor( Color c ) {
         return "#" + Integer.toHexString( c.getRGB() & 0xFFFFFF );
     }
     
     public Options(  ) {
-        
+        prefs= new NullPreferences(); //applet support
     }
     
     public void loadPreferences() {
+        prefs = Preferences.userNodeForPackage(Options.class);        
         scriptVisible = prefs.getBoolean(PROP_SCRIPTVISIBLE, scriptVisible);
         logConsoleVisible = prefs.getBoolean(PROP_LOGCONSOLEVISIBLE, logConsoleVisible);
         serverEnabled = prefs.getBoolean(PROP_SERVERENABLED, serverEnabled);
