@@ -16,27 +16,23 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-<li> improved export to cdf support
-</li><li> cdf reads in CDF_BYTE data
-</li><li> support for LANL cdf files
-</li><li> in ascii table reader, pluses in URLs supported to improve timeFormat
-</li><li> bugfix: loaded .vap file URL is displayed in dataset selector after loading
-</li><li> change of focus to plot replaces .vap file URL with dataset URL.
-</li><li> bugfix: more runtime exceptions in jython script panel handled.
-</li><li> bugfix: I/O exception in filesystem completions is handled with friendly dialog, not null pointer exception
+        <li> bugfix: two-point timeaxis autorange bug fixed.
+</li><li> bugfix: IndexOutOfBounds exception when one column is found in an ascii file
+</li><li> bugfix: extraneous firings of plot button when recent list was updated.
+</li><li> TimeSeriesBrowse initial data plot will be based on axis resolution, rather than the URL resolution.  URL resolution limits TSB resolution.
+</li><li> parse/format QStreams (.qds), QDataSets embedded in a das2 stream.
+</li><li> bugfix: long titles would cause plots to be clipped.
+</li><li> QStreams are used to embedded data into .vap file.
+</li><li> foreground and background colors, font, enabled features are persistent between sessions.
 
-</li><li> introduce plot( x,y ) and plot (x,y,z) to the application script context to avoid reliance on QDataSet.DEPEND_0, etc.
-</li><li> das2 library refactored so all packages are org.das2, not edu.uiowa.physics.pw.das
-<li> bugfixes and minor features in the ascii parser.
-</li><li> improvements to completion documentation on ascii data source.
-</li><li> bugfix: infinite loop in string metadata fixed.  This would result in index out of bounds exception on metadata tab.
-</li>
+</li><li> manage cache has option for copying data out of the cache.
 </li>
 	<p>data is input from: 
 	<li>ascii files (.dat,.txt)</li>
         <li>binary files (.bin)</li>
 	<li>excel spread sheets (.xls)</li>
 	<li>das2Streams (.d2s or .das2Stream)</li>
+        <li>QStreams (.qds), QDataSet on a das2Stream
 	<li>netcdf files (.nc,.ncml)</li>
         <li>cdf files(.cdf)</li>
 	<li>dods servers (.dds)</li>
