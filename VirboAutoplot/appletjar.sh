@@ -4,7 +4,9 @@ rm -r temp
 mkdir temp; cd temp
 
 # BinaryDataSource is to support TSDS.  DataSourcePack is to provide das2stream.
-for i in ../dist/lib/QDataSet.jar ../dist/lib/dasCore.jar ../dist/lib/dasCoreUI.jar \
+for i in \
+  ../dist/lib/QDataSet.jar ../dist/lib/QStream.jar \
+  ../dist/lib/dasCore-1.0.0.jar ../dist/lib/dasCoreUI.jar \
   ../dist/lib/DataSource.jar ../dist/lib/BinaryDataSource.jar \
   ../dist/lib/DataSourcePack.jar \
   ../dist/lib/TsdsDataSource.jar ../dist/lib/swing-layout-1.0.3.jar \
@@ -33,21 +35,21 @@ done
 file=org.virbo.datasource.DataSourceFactory
 rm ../appletjar/META-INF/$file
 touch ../appletjar/META-INF/$file
-for i in `find . -name $file | xargs` ; do
+for i in `find . -name $file ` ; do
    cat $i >> ../appletjar/META-INF/$file
 done
 
 file=org.virbo.datasource.DataSourceFactory.extensions
 rm ../appletjar/META-INF/$file
 touch ../appletjar/META-INF/$file
-for i in `find . -name $file | xargs` ; do
+for i in `find . -name $file ` ; do
    cat $i >> ../appletjar/META-INF/$file
 done
 
 file=org.virbo.datasource.DataSourceFactory.mimeTypes
 rm ../appletjar/META-INF/$file
 touch ../appletjar/META-INF/$file
-for i in `find . -name $file | xargs` ; do
+for i in `find . -name $file ` ; do
    cat $i >> ../appletjar/META-INF/$file
 done
 
@@ -60,6 +62,10 @@ rm META-INF/*.RSA
 rm META-INF/*.SF
 rm META-INF/build.txt
 rm META-INF/INDEX.LIST
+
+# Preferences Object needs to be installed
+mkdir META-INF/services
+echo "org.das2.system.NullPreferencesFactory" > META-INF/services/java.util.prefs.PreferencesFactory 
 
 jar cf ../AutoplotApplet.jar  *
 mv ../AutoplotApplet.jar ../dist/
