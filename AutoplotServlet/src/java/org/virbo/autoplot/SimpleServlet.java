@@ -5,8 +5,8 @@
 
 package org.virbo.autoplot;
 
-import edu.uiowa.physics.pw.das.util.DasPNGConstants;
-import edu.uiowa.physics.pw.das.util.DasPNGEncoder;
+import org.das2.util.DasPNGConstants;
+import org.das2.util.DasPNGEncoder;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -17,11 +17,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.virbo.datasource.DataSetSelector;
+import org.das2.util.AboutUtil;
 import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceRegistry;
 
 /**
  *
@@ -48,6 +47,14 @@ public class SimpleServlet extends HttpServlet {
             if ( arg0.equals("about:plugins") ) {
                 response.setContentType("text/html");
                 out.write( DataSetSelectorSupport.getPluginsText().getBytes() );
+                out.close();
+                return;
+            } else if ( arg0.equals("about:autoplot") ) {
+                response.setContentType("text/html");
+                String s= AboutUtil.getAboutHtml();
+                out.write( s.getBytes() );
+                out.close();
+                return;
             } else {
                 response.setContentType("image/png");
             }
@@ -57,9 +64,9 @@ public class SimpleServlet extends HttpServlet {
             ApplicationModel appmodel= new ApplicationModel();
             if ( "true".equals(request.getParameter("autolayout")) ) appmodel.setAutolayout(true);
             //appmodel.canvas.setFont( Font.decode("sans-6" ) );
-            appmodel.canvas.setSize( 700, 400 );
-            appmodel.canvas.revalidate();
-            appmodel.canvas.setPrintingTag("");
+            appmodel.getCanvas().setSize( 700, 400 );
+            appmodel.getCanvas().revalidate();
+            appmodel.getCanvas().setPrintingTag("");
             
             if ( vap!=null ) appmodel.doOpen( new File(vap) );
             
