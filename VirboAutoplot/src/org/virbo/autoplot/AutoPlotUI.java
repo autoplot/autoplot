@@ -470,9 +470,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         
         item= new JMenuItem(new AbstractAction("Decode URL") {
             public void actionPerformed(ActionEvent e) {
-                String s = dataSetSelector.getValue();
+                String s = dataSetSelector.getEditor().getText();
                 s= org.virbo.datasource.DataSourceUtil.unescape(s);
-                dataSetSelector.setValue(s);
+                dataSetSelector.getEditor().setText(s);
             }
         });
         item.setToolTipText("<html>decode escapes to correct URL</html>");
