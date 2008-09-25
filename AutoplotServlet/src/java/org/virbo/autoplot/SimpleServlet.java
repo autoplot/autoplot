@@ -43,12 +43,12 @@ public class SimpleServlet extends HttpServlet {
 
             String arg0 = request.getParameter("url");
             String vap = request.getParameter("vap");
-            int width = Util.getIntParameter(request, "width", 700);
-            int height = Util.getIntParameter(request, "height", 700);
-            String format = Util.getStringParameter(request, "format", "image/png");
-            String font = Util.getStringParameter(request, "font", "sans-10");
-            String column= Util.getStringParameter(request, "column", "");
-            String row= Util.getStringParameter(request, "row", "");
+            int width = ServletUtil.getIntParameter(request, "width", 700);
+            int height = ServletUtil.getIntParameter(request, "height", 400);
+            String format = ServletUtil.getStringParameter(request, "format", "image/png");
+            String font = ServletUtil.getStringParameter(request, "font", "");
+            String column= ServletUtil.getStringParameter(request, "column", "");
+            String row= ServletUtil.getStringParameter(request, "row", "");
 
             OutputStream out = response.getOutputStream();
 
@@ -74,11 +74,12 @@ public class SimpleServlet extends HttpServlet {
             if ( "true".equals(request.getParameter("autolayout")) ) {
                 appmodel.setAutolayout(true);
             } else {
-                if ( !row.equals("") ) Util.setDevicePosition( appmodel.plot.getRow(), row );
-                if ( !column.equals("") ) Util.setDevicePosition( appmodel.plot.getColumn(), column );
+                if ( !row.equals("") ) ServletUtil.setDevicePosition( appmodel.plot.getRow(), row );
+                if ( !column.equals("") ) ServletUtil.setDevicePosition( appmodel.plot.getColumn(), column );
             }
 
-            appmodel.canvas.setFont(Font.decode(font));
+            if ( !font.equals("") ) appmodel.canvas.setFont(Font.decode(font));
+            
             appmodel.getCanvas().setSize(width, height);
             appmodel.getCanvas().revalidate();
             appmodel.getCanvas().setPrintingTag("");

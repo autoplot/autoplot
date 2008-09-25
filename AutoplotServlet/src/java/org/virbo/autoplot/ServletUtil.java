@@ -12,7 +12,7 @@ import org.das2.graph.DasDevicePosition;
  *
  * @author jbf
  */
-public class Util {
+public class ServletUtil {
 
     public static int getIntParameter(HttpServletRequest request, String name, int dval) {
         String s = request.getParameter(name);
