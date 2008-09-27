@@ -221,7 +221,7 @@ public class ApplicationModel {
     }
 
     enum RenderType {
-        spectrogram, series, scatter
+        spectrogram, series, scatter, histogram, fill_to_zero,
     }
     /**
      * the one and only displayed dataset
@@ -505,6 +505,74 @@ public class ApplicationModel {
 
     }
 
+    /**
+     * used to explicitly set the rendering type.
+     * @param renderType
+     */
+    public void setRenderType( RenderType renderType ) {
+        WritableDataSet fillDs= (WritableDataSet) this.fillDataset;
+        
+        if (renderType == RenderType.spectrogram) {
+            
+            setRenderer(spectrogramRend, overSpectrogramRend);
+
+        } else if ( renderType ==RenderType.series ) {
+
+            seriesRend.setPsymConnector(PsymConnector.SOLID);
+            seriesRend.setHistogram(false);
+            seriesRend.setFillToReference(false);
+            
+            setRenderer( seriesRend, overSeriesRend );
+
+        } else if ( renderType==RenderType.scatter ) {
+            seriesRend.setPsymConnector( PsymConnector.NONE );
+            seriesRend.setFillToReference(false);
+            
+            setRenderer( seriesRend, overSeriesRend );
+
+        } else if ( renderType==RenderType.histogram ) {
+            seriesRend.setPsymConnector( PsymConnector.SOLID );
+            seriesRend.setFillToReference(true);
+            seriesRend.setHistogram(true);
+            
+            setRenderer( seriesRend, overSeriesRend );
+            
+        } else if ( renderType==RenderType.fill_to_zero ) {
+            seriesRend.setPsymConnector( PsymConnector.SOLID );
+            seriesRend.setFillToReference(true);            
+            seriesRend.setHistogram(false);
+            
+            setRenderer(seriesRend, overSeriesRend);
+            
+        } else {
+            throw new IllegalArgumentException("not supported: "+renderType );
+            
+        }
+        
+        
+    }
+    
+    public void setRenderType( RenderType renderType, boolean autorange, boolean interpretMetadata, WritableDataSet fillDs, Map properties ) {
+        
+        if (renderType == RenderType.spectrogram) {
+            updateFillSpec(fillDs, autorange, interpretMetadata ? properties : Collections.EMPTY_MAP);
+            seriesRend.setDataSet(null);
+            setRenderer(spectrogramRend, overSpectrogramRend);
+
+        } else {
+            updateFillSeries(fillDs, autorange, interpretMetadata ? properties : Collections.EMPTY_MAP);
+            if (fillDs.rank() == 2) {  // SeriesRenderer rank 3 must have solid lines.
+                seriesRend.setPsymConnector(PsymConnector.SOLID);
+            }
+
+            spectrogramRend.setDataSet(null);
+
+            setRenderer(seriesRend, overSeriesRend);
+
+        }
+        
+    }
+    
     private RenderType getRenderType() {
         RenderType spec = dataset.rank() >= 2 ? RenderType.spectrogram : RenderType.series;
 
@@ -1091,26 +1159,7 @@ public class ApplicationModel {
         // check the dataset for fill data, inserting canonical fill values.
         AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
 
-        if (renderType == RenderType.spectrogram) {
-            updateFillSpec(fillDs, autorange, interpretMetadata ? properties : Collections.EMPTY_MAP);
-            seriesRend.setDataSet(null);
-            setRenderer(spectrogramRend, overSpectrogramRend);
-
-        } else {
-            updateFillSeries(fillDs, autorange, interpretMetadata ? properties : Collections.EMPTY_MAP);
-            if (fillDs.rank() == 2) {  // SeriesRenderer rank 3 must have solid lines.
-                seriesRend.setPsymConnector(PsymConnector.SOLID);
-            }
-
-            spectrogramRend.setDataSet(null);
-            if (fillDs.rank() == 2) {  // SeriesRenderer rank 3 must have solid lines.
-
-                seriesRend.setPsymConnector(PsymConnector.SOLID);
-            }
-
-            setRenderer(seriesRend, overSeriesRend);
-
-        }
+        setRenderType( renderType, autorange, interpretMetadata, fillDs, properties );
 
         if (autorange) {
             if (plot.getXAxis().getUnits().isConvertableTo(Units.us2000)) {
@@ -1567,7 +1616,7 @@ public class ApplicationModel {
         Font f = this.canvas.getFont();
         f = f.deriveFont(f.getSize2D() * 1.1f);
         this.canvas.setFont(f);
-        this.options.setCanvasFont( f.toString() );
+        this.options.setCanvasFont( Options.getFontLabel(f) );
         
     }
 
@@ -1575,7 +1624,7 @@ public class ApplicationModel {
         Font f = this.canvas.getFont();
         f = f.deriveFont(f.getSize2D() / 1.1f);
         this.canvas.setFont(f);
-        this.options.setCanvasFont( f.toString() );
+        this.options.setCanvasFont( Options.getFontLabel(f) );
     }
 
     DasAxis getXAxis() {
@@ -1612,10 +1661,10 @@ public class ApplicationModel {
 
         state.getOptions().setBackground(canvas.getBackground());
         state.getOptions().setForeground(canvas.getForeground());
+        state.getOptions().setColor(seriesRend.getColor());
+        state.getOptions().setFillColor(seriesRend.getFillColor());
+        state.getOptions().setCanvasFont( Options.getFontLabel(canvas.getFont()) );
 
-        state.setColor(seriesRend.getColor());
-
-        state.setFillColor(seriesRend.getFillColor());
         state.setFillToReference(seriesRend.isFillToReference());
         state.setReference(formatObject(seriesRend.getReference()));
 
@@ -1706,12 +1755,16 @@ public class ApplicationModel {
             canvas.setForeground(state.getOptions().getForeground());
         }
 
-        if (state.getColor() != null) {
-            seriesRend.setColor(state.getColor());
+        if (state.getOptions().getColor() != null) {
+            seriesRend.setColor(state.getOptions().getColor());
         }
 
-        if (state.getFillColor() != null) {
-            seriesRend.setFillColor(state.getFillColor());
+        if (state.getOptions().getFillColor() != null) {
+            seriesRend.setFillColor(state.getOptions().getFillColor());
+        }
+
+        if ( !state.getOptions().getCanvasFont().equals("") ) {
+            canvas.setFont( Font.decode(state.getOptions().getCanvasFont() ) );
         }
 
         seriesRend.setFillToReference(state.isFillToReference());
