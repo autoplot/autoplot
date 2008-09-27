@@ -70,6 +70,10 @@ public class DataSetSelector extends javax.swing.JPanel {
     Logger logger = Logger.getLogger("virbo.dataset.ui");
     DasCanvasComponent monitorContext = null;
 
+    public JTextField getEditor() {
+        return editor;
+    }
+
     private ProgressMonitor getMonitor() {
         return getMonitor("Please Wait", "unidentified task in progress");
     }
