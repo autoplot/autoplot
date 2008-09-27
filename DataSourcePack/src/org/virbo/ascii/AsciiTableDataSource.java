@@ -197,7 +197,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
             delim = null;
         }
         if (delim == null) {
-            AsciiParser.DelimParser p = parser.guessDelimParser(parser.readFirstRecord(file.toString()));
+            String line= parser.readFirstRecord(file.toString());
+            if ( line==null ) {
+                throw new IllegalArgumentException("no records found");
+            }
+            AsciiParser.DelimParser p = parser.guessDelimParser(line);
             columnCount = p.fieldCount();
             delim = p.getDelim();
         } else {
