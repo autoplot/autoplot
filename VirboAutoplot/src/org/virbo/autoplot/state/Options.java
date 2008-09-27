@@ -19,10 +19,14 @@ public class Options {
 
     Preferences prefs ;
 
-    private String encodeColor( Color c ) {
+    public static String encodeColor( Color c ) {
         return "#" + Integer.toHexString( c.getRGB() & 0xFFFFFF );
     }
     
+    public static String getFontLabel(Font f) {
+        return f.getFontName() + "-" + f.getSize();
+    }
+
     public Options(  ) {
         prefs= new NullPreferences(); //applet support
     }
@@ -50,6 +54,7 @@ public class Options {
 
         propertyChangeSupport.firePropertyChange(PROP_GUIFONT, oldGuiFont, guiFont);
     }
+
     protected boolean scriptVisible = false;
     public static final String PROP_SCRIPTVISIBLE = "scriptVisible";
 
@@ -131,7 +136,49 @@ public class Options {
         
     }
     
+    /**
+     * Holds value of property color.
+     */
+    private Color color;
     
+    /**
+     * Getter for property color.
+     * @return Value of property color.
+     */
+    public Color getColor() {
+        return this.color;
+    }
+    
+    /**
+     * Setter for property color.
+     * @param color New value of property color.
+     */
+    public void setColor(Color color) {
+        this.color = color;
+    }
+    
+    /**
+     * Holds value of property fillColor.
+     */
+    private Color fillColor;
+    
+    /**
+     * Getter for property fillColor.
+     * @return Value of property fillColor.
+     */
+    public Color getFillColor() {
+        return this.fillColor;
+    }
+    
+    /**
+     * Setter for property fillColor.
+     * @param fillColor New value of property fillColor.
+     */
+    public void setFillColor(Color fillColor) {
+        this.fillColor = fillColor;
+    }
+    
+
     
     //  - End of Properties -------------------------------------------------- ///
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
