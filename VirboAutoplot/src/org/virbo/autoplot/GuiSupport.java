@@ -163,7 +163,7 @@ public class GuiSupport {
                         
                         DataSourceFormat format= DataSourceRegistry.getInstance().getFormatByExt(ext);
                         if ( format==null ) {
-                            if ( chooser.getFileFilter().getDescription().charAt(0)=='.') { 
+                            if ( chooser.getFileFilter().getDescription().startsWith("*.") ) { 
                                 ext= chooser.getFileFilter().getDescription().substring(1);
                                 format= DataSourceRegistry.getInstance().getFormatByExt(ext);
                                 if ( format==null ) {
@@ -179,7 +179,7 @@ public class GuiSupport {
                         }
                         format.formatData( new File(s),new java.util.HashMap<String, String>(), 
                                 parent.applicationModel.dataset, new DasProgressPanel("formatting data")  );
-                        parent.setStatus("created file "+chooser.getSelectedFile());
+                        parent.setStatus("created file "+s);
 
                     } catch (IOException ex) {
                         parent.applicationModel.application.getExceptionHandler().handle(ex);
@@ -197,48 +197,35 @@ public class GuiSupport {
         result.add(new JMenuItem(new AbstractAction("scatter") {
 
             public void actionPerformed(ActionEvent e) {
-                model.seriesRend.setPsymConnector(PsymConnector.NONE);
-                model.seriesRend.setHistogram(false);
-                model.seriesRend.setFillToReference(false);
-                model.setRenderer(model.seriesRend, model.overSeriesRend);
+                model.setRenderType( ApplicationModel.RenderType.scatter );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("series") {
 
             public void actionPerformed(ActionEvent e) {
-                model.seriesRend.setPsymConnector(PsymConnector.SOLID);
-                model.seriesRend.setHistogram(false);
-                model.seriesRend.setFillToReference(false);
-                model.setRenderer(model.seriesRend, model.overSeriesRend);
+                model.setRenderType( ApplicationModel.RenderType.series );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("histogram") {
 
             public void actionPerformed(ActionEvent e) {
-                model.seriesRend.setPsymConnector(PsymConnector.SOLID);
-                model.seriesRend.setHistogram(true);
-                model.seriesRend.setFillToReference(false);
-                model.setRenderer(model.seriesRend, model.overSeriesRend);
+                model.setRenderType( ApplicationModel.RenderType.histogram );
             }
         }));
 
-        result.add(new JMenuItem(new AbstractAction("fill below") {
+        result.add(new JMenuItem(new AbstractAction("fill to zero") {
 
             public void actionPerformed(ActionEvent e) {
-                model.seriesRend.setPsymConnector(PsymConnector.SOLID);
-                model.seriesRend.setHistogram(true);
-
-                model.seriesRend.setFillToReference(true);
-                model.setRenderer(model.seriesRend, model.overSeriesRend);
+                model.setRenderType( ApplicationModel.RenderType.fill_to_zero );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("spectrogram") {
 
             public void actionPerformed(ActionEvent e) {
-                model.setRenderer(model.spectrogramRend, model.overSpectrogramRend);
+                model.setRenderType( ApplicationModel.RenderType.spectrogram );
             }
         }));
 
