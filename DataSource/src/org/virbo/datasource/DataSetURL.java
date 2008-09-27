@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
+import org.das2.DasApplication;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.datasource.datasource.DataSourceFormat;
@@ -61,8 +62,13 @@ public class DataSetURL {
     static {
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
         FileSystem.settings().setPersistence(FileSystemSettings.Persistence.EXPIRES);
-        FileSystem.settings().setLocalCacheDir(new File(System.getProperty("user.home"), "autoplot_data"));
+        
+        if ( DasApplication.hasAllPermission() ) {
+            File apDataHome= new File(System.getProperty("user.home"), "autoplot_data");
+            FileSystem.settings().setLocalCacheDir( apDataHome );
+        }
     }
+    
     static WeakHashMap<DataSource, DataSourceFactory> dsToFactory = new WeakHashMap<DataSource, DataSourceFactory>();
 
     public static class URLSplit {
