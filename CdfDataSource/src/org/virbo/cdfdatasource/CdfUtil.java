@@ -16,6 +16,7 @@ import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFException;
 import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
+import gsfc.nssdc.cdf.util.Epoch16;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.HashMap;
@@ -298,6 +299,23 @@ public class CdfUtil {
                 }
                 result = DDataSet.wrap(back);
                 result.putProperty(QDataSet.UNITS, units);
+            } else if ( varType== Variable.CDF_EPOCH ) {
+                result = DDataSet.wrap((double[]) odata);
+                result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
+                result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+            
+            } else if ( varType== Variable.CDF_EPOCH16 ) {
+                // adapt to das2 by translating to Units.us2000, which should be good enough.
+                // note when this is not good enough, new units types can be introduced, along with conversions.
+                double[] data= (double[])odata;
+                double[] dresult= new double[data.length/2];
+                for ( int i=0; i<dresult.length; i++ ) {
+                    double t2000= data[i*2] - 6.3113904e+10 ; // seconds since midnight 2000
+                    dresult[i]= t2000 * 1e6 + data[i*2+1] / 1000.;
+                }
+                result = DDataSet.wrap(dresult);
+                result.putProperty(QDataSet.UNITS, Units.us2000 );
+                
             } else {
 
                 throw new RuntimeException("Unsupported Data Type " + variable.getDataType() + " java type " + odata.getClass());
@@ -309,11 +327,6 @@ public class CdfUtil {
         } else {
             result = wrapRank3(varType, odata, variable);
 
-        }
-
-        if (varType == Variable.CDF_EPOCH || varType == Variable.CDF_EPOCH16) {
-            result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
-            result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
         }
 
         return result;
