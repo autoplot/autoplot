@@ -12,6 +12,8 @@ import java.awt.Font;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
+import org.das2.graph.GraphUtil;
+import org.virbo.autoplot.state.Options;
 
 /**
  *
@@ -34,7 +36,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         backs = new Color[]{Color.WHITE, Color.BLACK, Color.BLUE.darker()};
         String[] names = {"black on white", "white on black", "white on blue", "custom"};
         Font f = app.getCanvas().getFont();
-        fontLabel.setText(getFontLabel(f));
+        fontLabel.setText(Options.getFontLabel(f));
         //guiFontLabel.setText( parent.getFont().toString());
         int index = 3; // custom
         for (int i = 0; i < fores.length; i++) {
@@ -46,16 +48,12 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         jComboBox1.setModel(new DefaultComboBoxModel(names));
         if ( index!=-1 ) jComboBox1.setSelectedIndex(index);
 
-        foregroundColorButton.setBackground(c.getForeground());
-        foregroundColorButton.setForeground(c.getForeground());
-        backgroundColorButton.setBackground(c.getBackground());
-        backgroundColorButton.setForeground(c.getBackground());
+        foregroundColorButton.setIcon( GraphUtil.colorIcon( c.getForeground(), 10, 10 ) );
+        backgroundColorButton.setIcon( GraphUtil.colorIcon( c.getBackground(), 10, 10 ) );
+        
 
     }
 
-    private String getFontLabel(Font f) {
-        return f.getFontName() + "-" + f.getSize();
-    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -193,18 +191,18 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
             app.getCanvas().setFont(chooser.getFont());
             Font f = app.getCanvas().getFont();
-            fontLabel.setText(getFontLabel(f));
-            app.options.setCanvasFont(getFontLabel(f));
+            fontLabel.setText(Options.getFontLabel(f));
+            app.options.setCanvasFont(Options.getFontLabel(f));
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "background color", backgroundColorButton.getBackground());
         jComboBox1.setSelectedIndex(fores.length);
-        backgroundColorButton.setForeground(c);
-        backgroundColorButton.setBackground(c);
+        backgroundColorButton.setIcon( GraphUtil.colorIcon( c, 10, 10 ) );
         app.getCanvas().setBackground(c);
         app.options.setBackground(c);
+        
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
@@ -213,8 +211,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         if (app.seriesRend.getColor().equals(app.getCanvas().getForeground())) {
             app.seriesRend.setColor(c);
         }
-        foregroundColorButton.setBackground(c);
-        foregroundColorButton.setForeground(c);
+        foregroundColorButton.setIcon( GraphUtil.colorIcon( c, 10, 10 ) );
         app.getCanvas().setForeground(c);
         app.options.setForeground(c);
     }//GEN-LAST:event_foregroundColorButtonActionPerformed
@@ -222,13 +219,9 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         int i = jComboBox1.getSelectedIndex();
         if (i < fores.length) {
-            foregroundColorButton.setBackground(fores[i]);
-            backgroundColorButton.setBackground(backs[i]);
             if (app.seriesRend.getColor().equals(app.getCanvas().getForeground())) {
                 app.seriesRend.setColor(fores[i]);
             }
-            app.getCanvas().setForeground(fores[i]);
-            app.getCanvas().setBackground(backs[i]);
             app.options.setForeground(fores[i]);
             app.options.setBackground(backs[i]);
         }
