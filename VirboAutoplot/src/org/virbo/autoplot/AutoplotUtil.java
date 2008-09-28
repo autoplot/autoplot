@@ -283,8 +283,8 @@ public class AutoplotUtil {
                     (Double) properties.get(QDataSet.TYPICAL_MIN),
                     (Double) properties.get(QDataSet.TYPICAL_MAX),
                     (Units) properties.get(QDataSet.UNITS));
-            // see if the typical range is consistent with range seen.  If the
-            // typical range won't hide the data's structure, then use it.
+            // see if the typical extent is consistent with extent seen.  If the
+            // typical extent won't hide the data's structure, then use it.
             if ((tmin != null || tmax != null)) {
                 double d1, d2;
                 if (result.log) {
@@ -470,7 +470,7 @@ public class AutoplotUtil {
     }
 
     /**
-     * return simple range by only including points consistent with adjacent points.
+     * return simple extent by only including points consistent with adjacent points.
      * also considers delta_plus, delta_minus properties.
      * @param ds rank N dataset
      * @return double[min,max].
@@ -510,7 +510,7 @@ public class AutoplotUtil {
     }
 
     /**
-     * return robust range by only including points consistent with adjacent points.
+     * return robust extent by only including points consistent with adjacent points.
      * @param ds, rank 1 dataset
      * @return
      */
@@ -560,7 +560,7 @@ public class AutoplotUtil {
     }
 
     /**
-     * rewrite the dataset so that fill values are set by the valid range and fill
+     * rewrite the dataset so that fill values are set by the valid extent and fill
      * controls.
      * 
      * //TODO: use QubeDataSetIterator to reduce code.
