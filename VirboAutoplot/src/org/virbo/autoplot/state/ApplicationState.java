@@ -373,12 +373,7 @@ public class ApplicationState {
         if ( !b ) buf.append(", plotSymbol " + that.plotSymbol+ " to " +( this.plotSymbol ));
         b= that.symbolConnector.equals( this.symbolConnector ) ;
         if ( !b ) buf.append(", symbolConnector " + that.symbolConnector+ " to " +( this.symbolConnector ));
-        
-        b= that.color.equals( this.color );
-        if ( !b ) buf.append(", color " + that.color+ " to " +( this.color ));
-        b= that.fillColor.equals( this.fillColor );
-        if ( !b ) buf.append(", fillColor " + that.fillColor+ " to " +( this.fillColor ));
-        
+                
         b= that.fillToReference==this.fillToReference;
         if ( !b ) buf.append(", fillToReference " + that.fillToReference+ " to " +( this.fillToReference ));
         
@@ -466,48 +461,6 @@ public class ApplicationState {
      */
     public void setFillToReference(boolean fillToReference) {
         this.fillToReference = fillToReference;
-    }
-    
-    /**
-     * Holds value of property color.
-     */
-    private Color color;
-    
-    /**
-     * Getter for property color.
-     * @return Value of property color.
-     */
-    public Color getColor() {
-        return this.color;
-    }
-    
-    /**
-     * Setter for property color.
-     * @param color New value of property color.
-     */
-    public void setColor(Color color) {
-        this.color = color;
-    }
-    
-    /**
-     * Holds value of property fillColor.
-     */
-    private Color fillColor;
-    
-    /**
-     * Getter for property fillColor.
-     * @return Value of property fillColor.
-     */
-    public Color getFillColor() {
-        return this.fillColor;
-    }
-    
-    /**
-     * Setter for property fillColor.
-     * @param fillColor New value of property fillColor.
-     */
-    public void setFillColor(Color fillColor) {
-        this.fillColor = fillColor;
     }
     
     /**
