@@ -50,7 +50,12 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
     <br><br>
     <h1>This shows all the new controls:</h1>
     <form action="SimpleServlet">
-    <input name="url" value="tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="80" type="text">      
+        <input name="url" value="tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="100" type="text"><br>
+        <select name="process">
+            <option selected></option>
+            <option>histogram</option>
+            <option>magnitude(fft)</option>
+        </select>
         <br>
         font: <input name="font" value="sans-8" ><br>
         format: <select name="format">
@@ -60,9 +65,25 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         </select><br>
         width: <input name="width" value="700" ><br>
         height: <input name="height" value="400" > <br>
+        <br>
         <input type="checkbox" name="autolayout" value="true" >autolayout</input><br>
         layout horiz position: <input name="column" value="5em,100%-10em"><br> 
         layout vert position: <input name="row" value="3em,100%-3em"><br>
+        <br>
+        timerange: <input name="timeRange" value="2003-2008"><br>
+        <br>
+        plot style: <select name="renderType">
+            <option selected></option>
+            <option>spectrogram</option>
+            <option>series</option>
+            <option>scatter</option>
+            <option>histogram</option>
+            <option>fill_to_zero</option>
+        </select><br>
+        color: <input name="color" value="#0000ff"><br>
+        fillColor: <input name="fillColor" value="#aaaaff"><br>
+        foreground: <input name="foregroundColor" value="#ffffff"><br>
+        background: <input name="backgroundColor" value="#000000"><br>
         <input value="Plot" type="submit">
     </form>
     </body>
