@@ -25,22 +25,6 @@ import org.virbo.autoplot.ScriptContext;
  */
 public class RequestHandler {
 
-    public static void doIt(ApplicationModel model) {
-        try {
-
-            PythonInterpreter interp = JythonUtil.createInterpreter(true,false);
-
-            InputStream in;
-            String inIdentifier;
-
-            in = new ByteArrayInputStream("print getApplicationModel().getPlot()\n".getBytes());
-            inIdentifier = "";
-
-            interp.execfile(in, inIdentifier);
-        } catch (IOException ex) {
-            Logger.getLogger(RequestHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
 
     public void RequestHandler() {
     }
