@@ -46,6 +46,7 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.dsops.Ops;
 
 /**
  *
@@ -145,6 +146,14 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
     }
     
+    /**
+     * Set the style used to render the data using a string identifier:
+     *   spectrogram, series, scatter, histogram, fill_to_zero
+     * @param name string name of the plot style.
+     */
+    public static void setRenderStyle( String name ) {
+        model.setRenderType( ApplicationModel.RenderType.valueOf(name) );
+    }
     /**
      * write out the current canvas to a png file.
      * @param filename
