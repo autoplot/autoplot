@@ -1,0 +1,42 @@
+Sources for open-source software used by Autoplot:
+
+= batik-awt-util.jar =
+= batik-svggen.jar =
+= batik-util.jar =
+Batik SVG library.
+
+= beansbinding.jar =
+Beansbinding framework for connecting java beans.
+
+= cdfjava.jar =
+SPDF, Goddard, NASA.  http://cdf.gsfc.nasa.gov/
+
+= dasCore.jar =
+Plasma Wave Group at The University of Iowa.  http://www.das2.org
+
+= itext-1.2.jar =
+
+= JDiskHog.jar =
+Open-source java tool for finding big files.  http://code.google.com/p/jdiskhog/.
+
+= jfits-0.93.jar =
+
+= JFontChooser.jar =
+http://jfontchooser.sourceforge.net/
+
+= jython.jar =
+http://www.jython.org
+
+= metadata-extractor-2.1.0.jar =
+http://www.drewnoakes.com/code/exif/
+
+= poi-3.1-FINAL-20080629.jar =
+= poi-contrib-3.1-FINAL-20080629.jar =
+= poi-scratchpad-3.1-FINAL-20080629.jar =
+Jakarta POI.  http://poi.apache.org/
+
+= swing-layout-1.0.3.jar =
+https://swing-layout.dev.java.net/
+
+= netCDF/*.jar =
+http://www.unidata.ucar.edu/software/netcdf/
