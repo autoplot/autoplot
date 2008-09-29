@@ -16,16 +16,14 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <li> bugfix: two-point timeaxis autorange bug fixed.
-</li><li> bugfix: IndexOutOfBounds exception when one column is found in an ascii file
-</li><li> bugfix: extraneous firings of plot button when recent list was updated.
-</li><li> TimeSeriesBrowse initial data plot will be based on axis resolution, rather than the URL resolution.  URL resolution limits TSB resolution.
-</li><li> parse/format QStreams (.qds), QDataSets embedded in a das2 stream.
-</li><li> bugfix: long titles would cause plots to be clipped.
-</li><li> QStreams are used to embedded data into .vap file.
-</li><li> foreground and background colors, font, enabled features are persistent between sessions.
-
-</li><li> manage cache has option for copying data out of the cache.
+        <li> bugfixes in AsciiParser (no valid records)
+</li><li> Servlet has many controls, including render type and timerange
+</li><li> bugfix: limit rapid mousewheel events on macs with touchpad, which cause disorientation.
+</li><li> bugfix: symbol color is removed to options, since foreground and background color options should always go together.
+</li><li> bugfix: canvas font name is properly stored in options.
+</li><li> TODO: add row, column controls to vap.
+</li><li> support for epoch16 in CDF files.
+</li><li> SeriesRenderer supports histograms with log-spaced bins
 </li>
 	<p>data is input from: 
 	<li>ascii files (.dat,.txt)</li>
