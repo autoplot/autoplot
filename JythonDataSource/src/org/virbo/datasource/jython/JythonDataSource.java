@@ -35,155 +35,151 @@ import org.virbo.jythonsupport.JythonUtil;
 public class JythonDataSource extends AbstractDataSource implements Caching {
 
     ExceptionListener listener;
-    
-    public JythonDataSource(URL url, JythonDataSourceFactory factory ) {
-	super(url);
-	addCability(Caching.class, this);
-        this.listener= factory.listener;
-              
+
+    public JythonDataSource(URL url, JythonDataSourceFactory factory) {
+        super(url);
+        addCability(Caching.class, this);
+        this.listener = factory.listener;
+
     }
 
     @Override
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        
+
         mon.started();
-        
-	PyException causedBy = null;
-	try {
-	    if (interp == null) {
-		interp = JythonUtil.createInterpreter( false );
-		interp.set("monitor", mon);
 
-		// interp.exec("def getParam( x, def ):\n  return params.has_key(x) ? params[x] : def\n\n");
+        PyException causedBy = null;
+        try {
+            if (interp == null) {
+                interp = JythonUtil.createInterpreter(false);
+                interp.set("monitor", mon);
 
-		interp.exec("params=dict()");
-		for (String s : params.keySet()) {
-		    if (!s.equals("arg_0")) {
-			interp.exec("params['" + s + "']=" + params.get(s));
-		    }
-		}
+                // interp.exec("def getParam( x, def ):\n  return params.has_key(x) ? params[x] : def\n\n");
 
-		try {
-		    boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
-		    if (debug) {
-			int i = 0;
-			BufferedReader reader = new BufferedReader(new FileReader(super.getFile(new NullProgressMonitor())));
-			String s = reader.readLine();
-			i++;
-			while (s != null) {
-			    Logger.getLogger("virbo.jythondatasource").fine("" + i + ": " + s);
-			    interp.exec(s);
-			    s = reader.readLine();
-			    i++;
-			}
-		    } else {
-			interp.execfile(new FileInputStream(super.getFile(new NullProgressMonitor())));
-		    }
-		} catch (PyException ex) {
-		    causedBy = ex;
-		    ex.printStackTrace();
-                    if ( listener!=null ) {
+                interp.exec("params=dict()");
+                for (String s : params.keySet()) {
+                    if (!s.equals("arg_0")) {
+                        interp.exec("params['" + s + "']=" + params.get(s));
+                    }
+                }
+
+                try {
+                    boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
+                    if (debug) {
+                        int i = 0;
+                        BufferedReader reader = new BufferedReader(new FileReader(super.getFile(new NullProgressMonitor())));
+                        String s = reader.readLine();
+                        i++;
+                        while (s != null) {
+                            Logger.getLogger("virbo.jythondatasource").fine("" + i + ": " + s);
+                            interp.exec(s);
+                            s = reader.readLine();
+                            i++;
+                        }
+                    } else {
+                        interp.execfile(new FileInputStream(super.getFile(new NullProgressMonitor())));
+                    }
+                } catch (PyException ex) {
+                    causedBy = ex;
+                    ex.printStackTrace();
+                    if (listener != null) {
                         listener.exceptionThrown(ex);
                     }
-		} catch ( Exception ex ) {
+                } catch (Exception ex) {
                     throw ex;
                 }
 
-		if (mon.isCancelled()) {
-		    throw new IllegalArgumentException("monitor cancel not supported");
-		}
-		if (causedBy == null) {
-		    cacheDate = resourceDate(this.url);
-		    cacheUrl = cacheUrl(this.url);
-		}
-	    }
+                if (causedBy == null) {
+                    cacheDate = resourceDate(this.url);
+                    cacheUrl = cacheUrl(this.url);
+                }
+            }
 
-	    String expr = params.get("arg_0");
+            String expr = params.get("arg_0");
 
-	    if (expr == null) {
-		expr = "result";
-	    }
+            if (expr == null) {
+                expr = "result";
+            }
 
 
-	    PyObject result = interp.eval(expr);
+            PyObject result = interp.eval(expr);
 
-	    QDataSet res;
-	    if (result instanceof PyList) {
-		res = JythonOps.coerce((PyList) result);
-	    } else {
-		res = (QDataSet) result.__tojava__(QDataSet.class);
-	    }
+            QDataSet res;
+            if (result instanceof PyList) {
+                res = JythonOps.coerce((PyList) result);
+            } else {
+                res = (QDataSet) result.__tojava__(QDataSet.class);
+            }
 
-	    if (causedBy != null) {
-		interp = null;
-		cacheUrl = null;
-		cacheDate = null;
-		Logger.getLogger("virbo.jythonDataSouce").warning("exception in processing: " + causedBy);
-	    }
+            if (causedBy != null) {
+                interp = null;
+                cacheUrl = null;
+                cacheDate = null;
+                Logger.getLogger("virbo.jythonDataSouce").warning("exception in processing: " + causedBy);
+            }
 
-	    return res;
+            return res;
 
-	} catch (PyException ex) {
-            
-	    String msg = "PyException: " + ex;
-	    if (causedBy != null) {
-		msg += "\ncaused by:\n" + causedBy;
-	    }
-	    interp = null;
-	    cacheUrl = null;
-	    cacheDate = null;
+        } catch (PyException ex) {
 
-	    throw new RuntimeException(msg);
-	} finally {
+            String msg = "PyException: " + ex;
+            if (causedBy != null) {
+                msg += "\ncaused by:\n" + causedBy;
+            }
+            interp = null;
+            cacheUrl = null;
+            cacheDate = null;
+
+            throw new RuntimeException(msg);
+        } finally {
             mon.finished();
         }
     }
-            
     PythonInterpreter interp = null;
 
     private String cacheUrl(URL url) {
-	DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
-	Map<String, String> params = DataSetURL.parseParams(split.params);
-	params.remove("arg_0");
-	split.params = DataSetURL.formatParams(params);
-	return DataSetURL.format(split);
+        DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
+        Map<String, String> params = DataSetURL.parseParams(split.params);
+        params.remove("arg_0");
+        split.params = DataSetURL.formatParams(params);
+        return DataSetURL.format(split);
     }
 
     private Date resourceDate(URL url) throws IOException {
-	File src = DataSetURL.getFile(url, new NullProgressMonitor());
-	return new Date(src.lastModified());
+        File src = DataSetURL.getFile(url, new NullProgressMonitor());
+        return new Date(src.lastModified());
     }
     Date cacheDate = null;
     String cacheUrl = null;
 
     private boolean useCache(URL url) {
-	try {
-	    if ((cacheDate != null && !resourceDate(url).after(cacheDate)) && (cacheUrl != null && cacheUrl.equals(cacheUrl(url)))) {
-		return true;
-	    }
-	    return false;
-	} catch (IOException ex) {
-	    return false;
-	}
+        try {
+            if ((cacheDate != null && !resourceDate(url).after(cacheDate)) && (cacheUrl != null && cacheUrl.equals(cacheUrl(url)))) {
+                return true;
+            }
+            return false;
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     public boolean satisfies(String surl) {
-	try {
-	    return useCache(new URL(surl));
-	} catch (IOException ex) {
-	    return false;
-	}
+        try {
+            return useCache(new URL(surl));
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
     public void resetURL(String surl) {
-	try {
-	    this.url = new URL(surl);
-	    DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
-	    params = DataSetURL.parseParams(split.params);
-	    resourceURL = new URL(split.file);
-	} catch (MalformedURLException ex) {
-	    throw new RuntimeException(ex);
-	}
+        try {
+            this.url = new URL(surl);
+            DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
+            params = DataSetURL.parseParams(split.params);
+            resourceURL = new URL(split.file);
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        }
 
 
     }
