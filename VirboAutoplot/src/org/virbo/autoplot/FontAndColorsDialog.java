@@ -23,7 +23,8 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
 
     ApplicationModel app;
     Color[] fores, backs;
-
+    private final static int ICON_SIZE=16;
+    
     /** Creates new form FontAndColorsDialog */
     public FontAndColorsDialog( java.awt.Frame parent, boolean modal, ApplicationModel app) {
         super(parent, modal);
@@ -48,8 +49,8 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         jComboBox1.setModel(new DefaultComboBoxModel(names));
         if ( index!=-1 ) jComboBox1.setSelectedIndex(index);
 
-        foregroundColorButton.setIcon( GraphUtil.colorIcon( c.getForeground(), 10, 10 ) );
-        backgroundColorButton.setIcon( GraphUtil.colorIcon( c.getBackground(), 10, 10 ) );
+        foregroundColorButton.setIcon( GraphUtil.colorIcon( c.getForeground(), ICON_SIZE, ICON_SIZE ) );
+        backgroundColorButton.setIcon( GraphUtil.colorIcon( c.getBackground(), ICON_SIZE, ICON_SIZE ) );
         
 
     }
@@ -186,7 +187,8 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         JFontChooser chooser = new JFontChooser((JFrame) this.getOwner());
-        chooser.setExampleText("Electron Differential Energy Flux\n12:00\n2001-01-10");
+        String sci= "2 \u00d7 10E7";
+        chooser.setExampleText("Electron Differential Energy Flux\n12:00\n2001-01-10\n"+sci+"\n");
         chooser.setFont(app.getCanvas().getFont());
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
             app.getCanvas().setFont(chooser.getFont());
@@ -199,7 +201,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void backgroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backgroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "background color", backgroundColorButton.getBackground());
         jComboBox1.setSelectedIndex(fores.length);
-        backgroundColorButton.setIcon( GraphUtil.colorIcon( c, 10, 10 ) );
+        backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
         app.getCanvas().setBackground(c);
         app.options.setBackground(c);
         
@@ -211,7 +213,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         if (app.seriesRend.getColor().equals(app.getCanvas().getForeground())) {
             app.seriesRend.setColor(c);
         }
-        foregroundColorButton.setIcon( GraphUtil.colorIcon( c, 10, 10 ) );
+        foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
         app.getCanvas().setForeground(c);
         app.options.setForeground(c);
     }//GEN-LAST:event_foregroundColorButtonActionPerformed
@@ -219,9 +221,13 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         int i = jComboBox1.getSelectedIndex();
         if (i < fores.length) {
+            foregroundColorButton.setIcon( GraphUtil.colorIcon( fores[i], ICON_SIZE, ICON_SIZE ) );
+            backgroundColorButton.setIcon( GraphUtil.colorIcon( backs[i], ICON_SIZE, ICON_SIZE ) );
             if (app.seriesRend.getColor().equals(app.getCanvas().getForeground())) {
                 app.seriesRend.setColor(fores[i]);
             }
+            app.getCanvas().setForeground(fores[i]);
+            app.getCanvas().setBackground(backs[i]);
             app.options.setForeground(fores[i]);
             app.options.setBackground(backs[i]);
         }
