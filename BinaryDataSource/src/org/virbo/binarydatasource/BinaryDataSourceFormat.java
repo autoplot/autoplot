@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
+import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
@@ -30,26 +31,32 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
      * @param mon
      * @return byteBuffer view of the dataset.
      */
-    private ByteBuffer formatRank2( QDataSet data, ProgressMonitor mon) {
+    private ByteBuffer formatRank2( QDataSet data, ProgressMonitor mon, Map<String,String> params ) {
 
         QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
         
         //dep1 is ignored.
         
+        String type= params.get("type");
+        if ( type==null ) type= "double";
+        
         int dep0Len= ( dep0==null ? 0 : 1 );
-        int typeSize= 8;
+        int typeSize= BufferDataSet.byteCount(type);
+        
         int recSize=  typeSize * ( dep0Len + data.length(0) );
         int size= data.length() * recSize;
         
-        
         ByteBuffer result= ByteBuffer.allocate(size);
-        result.order( ByteOrder.LITTLE_ENDIAN );
+        result.order( "big".equals( params.get("byteOrder") ) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN );
         
-        Double ddata= new Double( 2, 
+        BufferDataSet ddata= BufferDataSet.makeDataSet( 2, recSize, dep0Len * typeSize, 
+                data.length(), data.length(0), 1, 
+                result, type );
+        /*Double ddata= new Double( 2, 
                 recSize, dep0Len * typeSize, 
                 data.length(), data.length(0), 1, 
-                result );
+                result );*/
         
         QubeDataSetIterator it= new QubeDataSetIterator(data);
         
@@ -59,10 +66,14 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         }
 
         if ( dep0!=null ) {
-            Double ddep0= new Double( 1,
+            BufferDataSet ddep0= BufferDataSet.makeDataSet( 1,
                 recSize, 0 * typeSize, 
                 data.length(), data.length(0), 1,
-                result );
+                result, type );
+          /*  Double ddep0= new Double( 1,
+                recSize, 0 * typeSize, 
+                data.length(), data.length(0), 1,
+                result ); */
             it= new QubeDataSetIterator(dep0);
         
             while ( it.hasNext() ) {
@@ -75,23 +86,25 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         
     }
 
-    private ByteBuffer formatRank1( QDataSet data, ProgressMonitor mon ) {
+    private ByteBuffer formatRank1( QDataSet data, ProgressMonitor mon, Map<String,String> params ) {
         
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
                 
+        String type= params.get("type");
+        if ( type==null ) type= "double";
+                
         int dep0Len= ( dep0==null ? 0 : 1 );
-        int typeSize= 8;
+        int typeSize= BufferDataSet.byteCount(type);
         int recSize=  typeSize * ( dep0Len + 1 );
         int size= data.length() * recSize ;
         
-        
         ByteBuffer result= ByteBuffer.allocate(size);
-        result.order( ByteOrder.LITTLE_ENDIAN );
+        result.order( "big".equals( params.get("byteOrder") ) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN );
         
-        Double ddata= new Double( 1, 
+        BufferDataSet ddata= BufferDataSet.makeDataSet( 1, 
                 recSize, dep0Len*typeSize, 
                 data.length(), 1, 1,
-                result );
+                result, type );
         
         QubeDataSetIterator it= new QubeDataSetIterator(data);
         
@@ -101,10 +114,10 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         }
 
         if ( dep0!=null ) {
-            Double ddep0= new Double( 1,
+            BufferDataSet ddep0= BufferDataSet.makeDataSet( 1,
                 recSize, 0*typeSize, 
                 data.length(), 1, 1, 
-                result );
+                result, type );
             it= new QubeDataSetIterator(dep0);
         
             while ( it.hasNext() ) {
@@ -120,9 +133,9 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         
         ByteBuffer result;
         if (data.rank() == 2) {
-            result= formatRank2( data, mon);
+            result= formatRank2( data, mon, params );
         } else if (data.rank() == 1) {
-            result= formatRank1( data, mon);
+            result= formatRank1( data, mon, params );
         } else {
             throw new IllegalArgumentException("rank not supported");
         }

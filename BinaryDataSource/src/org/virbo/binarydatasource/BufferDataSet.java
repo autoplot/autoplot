@@ -6,13 +6,14 @@ package org.virbo.binarydatasource;
 
 import java.nio.ByteBuffer;
 import org.virbo.dataset.AbstractDataSet;
+import org.virbo.dataset.WritableDataSet;
 
 /**
  * rank 1,2,or 3 dataset backed by double array. 
  *
  * @author jbf
  */
-public abstract class BufferDataSet extends AbstractDataSet {
+public abstract class BufferDataSet extends AbstractDataSet implements WritableDataSet {
 
     int rank;
     int len0;
@@ -49,6 +50,26 @@ public abstract class BufferDataSet extends AbstractDataSet {
     public final static String SHORT= "short";
     public final static String BYTE= "byte";
     public final static String UBYTE= "ubyte";
+    
+    public static int byteCount(String type) {
+        if (type.equals(DOUBLE)) {
+            return 8;
+        } else if (type.equals(FLOAT)) {
+            return 4;
+        } else if (type.equals(LONG)) {
+            return 8;
+        } else if (type.equals(INT)) {
+            return 4;
+        } else if (type.equals(SHORT)) {
+            return 2;
+        } else if (type.equals(BYTE)) {
+            return 1;
+        } else if (type.equals(UBYTE)) {
+            return 1;
+        } else {
+            throw new IllegalArgumentException("bad type: " + type);
+        }
+    }
     
     public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, String type ) {
         
@@ -159,4 +180,9 @@ public abstract class BufferDataSet extends AbstractDataSet {
     @Override
     public abstract double value(int i0, int i1, int i2);
     
+    /*public abstract double putValue(int i0, double d );
+
+    public abstract double putValue(int i0, int i1, double d );
+
+    public abstract double putValue(int i0, int i1, int i2, double d );     */
 }

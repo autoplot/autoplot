@@ -48,26 +48,6 @@ public class BinaryDataSource extends AbstractDataSource {
         return result;
     }
 
-    private int byteCount(String type) {
-        if (type.equals(DOUBLE)) {
-            return 8;
-        } else if (type.equals(FLOAT)) {
-            return 4;
-        } else if (type.equals(LONG)) {
-            return 8;
-        } else if (type.equals(INT)) {
-            return 4;
-        } else if (type.equals(SHORT)) {
-            return 2;
-        } else if (type.equals(BYTE)) {
-            return 1;
-        } else if (type.equals(UBYTE)) {
-            return 1;
-        } else {
-            throw new IllegalArgumentException("bad type: " + type);
-        }
-    }
-
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         File f = DataSetURL.getFile(url, mon);
@@ -100,7 +80,7 @@ public class BinaryDataSource extends AbstractDataSource {
 
         int col = getIntParameter("column", defltcol);
         int recOffset= getIntParameter( "recOffset", -1 );
-        if ( recOffset==-1 ) recOffset= col * byteCount(columnType);
+        if ( recOffset==-1 ) recOffset= col * BufferDataSet.byteCount(columnType);
 
         String encoding = getParameter("byteOrder", "little");
         if (encoding.equals("big")) {
@@ -110,14 +90,14 @@ public class BinaryDataSource extends AbstractDataSource {
         }
         
         int recSizeBytes= getIntParameter("recLength", -1 );
-        if ( recSizeBytes==-1 ) recSizeBytes= byteCount(columnType) * fieldCount;
+        if ( recSizeBytes==-1 ) recSizeBytes= BufferDataSet.byteCount(columnType) * fieldCount;
         
         final int recCount= length / recSizeBytes;
         MutablePropertyDataSet ds = BufferDataSet.makeDataSet( 1, recSizeBytes, recOffset, recCount, 1, 1, buf, columnType );
 
         if (dep0 > -1 || dep0Offset > -1 ) {
             String dep0Type = getParameter("depend0Type", columnType);
-            if ( dep0Offset==-1 ) dep0Offset= byteCount(dep0Type) * dep0;
+            if ( dep0Offset==-1 ) dep0Offset= BufferDataSet.byteCount(dep0Type) * dep0;
             QDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, recCount, 1, 1, buf, dep0Type );
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         } else {
