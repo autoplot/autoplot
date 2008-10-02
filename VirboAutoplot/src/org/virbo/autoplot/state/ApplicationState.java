@@ -16,7 +16,6 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PsymConnector;
-import java.awt.Color;
 import org.das2.datum.UnitsUtil;
 
 /**
@@ -25,249 +24,7 @@ import org.das2.datum.UnitsUtil;
  */
 public class ApplicationState {
     
-    /** Creates a new instance of ApplicationState */
     public ApplicationState() {
-    }
-    
-    /**
-     * Holds value of property surl.
-     */
-    private String surl;
-    
-    /**
-     * Getter for property surl.
-     * @return Value of property surl.
-     */
-    public String getSurl() {
-        return this.surl;
-    }
-    
-    /**
-     * Setter for property surl.
-     * @param surl New value of property surl.
-     */
-    public void setSurl(String surl) {
-        this.surl = surl;
-    }
-    
-    /**
-     * Holds value of property xrange.
-     */
-    private DatumRange xrange;
-    
-    /**
-     * Getter for property xrange.
-     * @return Value of property xrange.
-     */
-    public DatumRange getXrange() {
-        return this.xrange;
-    }
-    
-    /**
-     * Setter for property xrange.
-     * @param xrange New value of property xrange.
-     */
-    public void setXrange(DatumRange xrange) {
-        this.xrange = xrange;
-    }
-    
-    /**
-     * Holds value of property yrange.
-     */
-    private DatumRange yrange;
-    
-    /**
-     * Getter for property yrange.
-     * @return Value of property yrange.
-     */
-    public DatumRange getYrange() {
-        return this.yrange;
-    }
-    
-    /**
-     * Setter for property yrange.
-     * @param yrange New value of property yrange.
-     */
-    public void setYrange(DatumRange yrange) {
-        this.yrange = yrange;
-    }
-    
-    /**
-     * Holds value of property zrange.
-     */
-    private DatumRange zrange;
-    
-    /**
-     * Getter for property zrange.
-     * @return Value of property zrange.
-     */
-    public DatumRange getZrange() {
-        return this.zrange;
-    }
-    
-    /**
-     * Setter for property zrange.
-     * @param zrange New value of property zrange.
-     */
-    public void setZrange(DatumRange zrange) {
-        this.zrange = zrange;
-    }
-    
-    /**
-     * Holds value of property xlog.
-     */
-    private boolean xlog;
-    
-    /**
-     * Getter for property xlog.
-     * @return Value of property xlog.
-     */
-    public boolean isXlog() {
-        return this.xlog;
-    }
-    
-    /**
-     * Setter for property xlog.
-     * @param xlog New value of property xlog.
-     */
-    public void setXlog(boolean xlog) {
-        this.xlog = xlog;
-    }
-    
-    /**
-     * Holds value of property ylog.
-     */
-    private boolean ylog;
-    
-    /**
-     * Getter for property ylog.
-     * @return Value of property ylog.
-     */
-    public boolean isYlog() {
-        return this.ylog;
-    }
-    
-    /**
-     * Setter for property ylog.
-     * @param ylog New value of property ylog.
-     */
-    public void setYlog(boolean ylog) {
-        this.ylog = ylog;
-    }
-    
-    /**
-     * Holds value of property zlog.
-     */
-    private boolean zlog;
-    
-    /**
-     * Getter for property zlog.
-     * @return Value of property zlog.
-     */
-    public boolean isZlog() {
-        return this.zlog;
-    }
-    
-    /**
-     * Setter for property zlog.
-     * @param zlog New value of property zlog.
-     */
-    public void setZlog(boolean zlog) {
-        this.zlog = zlog;
-    }
-    
-    /**
-     * Holds value of property symbolSize.
-     */
-    private double symbolSize;
-    
-    /**
-     * Getter for property symbolSize.
-     * @return Value of property symbolSize.
-     */
-    public double getSymbolSize() {
-        return this.symbolSize;
-    }
-    
-    /**
-     * Setter for property symbolSize.
-     * @param symbolSize New value of property symbolSize.
-     */
-    public void setSymbolSize(double symbolSize) {
-        this.symbolSize = symbolSize;
-    }
-    
-    /**
-     * Holds value of property lineWidth.
-     */
-    private double lineWidth;
-    
-    /**
-     * Getter for property lineWidth.
-     * @return Value of property lineWidth.
-     */
-    public double getLineWidth() {
-        return this.lineWidth;
-    }
-    
-    /**
-     * Setter for property lineWidth.
-     * @param lineWidth New value of property lineWidth.
-     */
-    public void setLineWidth(double lineWidth) {
-        this.lineWidth = lineWidth;
-    }
-    
-    /**
-     * Holds value of property colortable.
-     */
-    private String colortable;
-    
-    /**
-     * Getter for property colortable.
-     * @return Value of property colortable.
-     */
-    public String getColortable() {
-        return this.colortable;
-    }
-    
-    /**
-     * Setter for property colortable.
-     * @param colortable New value of property colortable.
-     */
-    public void setColortable(String colortable) {
-        this.colortable = colortable;
-    }
-    
-    private java.awt.Dimension canvasSize = new java.awt.Dimension( 640, 480 );
-
-    public static final String PROP_CANVASSIZE = "canvasSize";
-
-    public java.awt.Dimension getCanvasSize() {
-        return this.canvasSize;
-    }
-
-    public void setCanvasSize(java.awt.Dimension newcanvasSize) {
-        java.awt.Dimension oldcanvasSize = canvasSize;
-        this.canvasSize = newcanvasSize;
-        propertyChangeSupport.firePropertyChange(PROP_CANVASSIZE, oldcanvasSize, newcanvasSize);
-    }
-
-    protected boolean canvasFitted = true;
-    
-    /**
-     * boolean property indicates that the canvas is resizable.
-     */
-    public static final String PROP_CANVASFITTED = "canvasFitted";
-
-    public boolean isCanvasFitted() {
-        return canvasFitted;
-    }
-
-    public void setCanvasFitted(boolean canvasFitted) {
-        boolean oldCanvasFitted = this.canvasFitted;
-        this.canvasFitted = canvasFitted;
-        propertyChangeSupport.firePropertyChange(PROP_CANVASFITTED, oldCanvasFitted, canvasFitted);
     }
 
     private DatumRange round( DatumRange range ) {
@@ -399,163 +156,213 @@ public class ApplicationState {
             return false;
         }
     }
+
+    
+    private String surl;
+    
+    public String getSurl() {
+        return this.surl;
+    }
+    
+    public void setSurl(String surl) {
+        this.surl = surl;
+    }
+    
+    private DatumRange xrange;
+    
+    public DatumRange getXrange() {
+        return this.xrange;
+    }
+    
+    public void setXrange(DatumRange xrange) {
+        this.xrange = xrange;
+    }
+    
+    private DatumRange yrange;
+
+    public DatumRange getYrange() {
+        return this.yrange;
+    }
+
+    public void setYrange(DatumRange yrange) {
+        this.yrange = yrange;
+    }
+
+    private DatumRange zrange;
+
+    public DatumRange getZrange() {
+        return this.zrange;
+    }
+
+    public void setZrange(DatumRange zrange) {
+        this.zrange = zrange;
+    }
+
+    private boolean xlog;
+
+    public boolean isXlog() {
+        return this.xlog;
+    }
+
+    public void setXlog(boolean xlog) {
+        this.xlog = xlog;
+    }
+    
+    private boolean ylog;
+    
+    public boolean isYlog() {
+        return this.ylog;
+    }
+
+    public void setYlog(boolean ylog) {
+        this.ylog = ylog;
+    }
+    
+    private boolean zlog;
+    
+    public boolean isZlog() {
+        return this.zlog;
+    }
+
+    public void setZlog(boolean zlog) {
+        this.zlog = zlog;
+    }
+    
+    private double symbolSize;
+    
+    public double getSymbolSize() {
+        return this.symbolSize;
+    }
+    
+    public void setSymbolSize(double symbolSize) {
+        this.symbolSize = symbolSize;
+    }
+    
+    private double lineWidth;
+
+    public double getLineWidth() {
+        return this.lineWidth;
+    }
+    
+    public void setLineWidth(double lineWidth) {
+        this.lineWidth = lineWidth;
+    }
+
+    private String colortable;
+    
+    public String getColortable() {
+        return this.colortable;
+    }
+    
+    public void setColortable(String colortable) {
+        this.colortable = colortable;
+    }
+    
+    private java.awt.Dimension canvasSize = new java.awt.Dimension( 640, 480 );
+
+    public static final String PROP_CANVASSIZE = "canvasSize";
+
+    public java.awt.Dimension getCanvasSize() {
+        return this.canvasSize;
+    }
+
+    public void setCanvasSize(java.awt.Dimension newcanvasSize) {
+        java.awt.Dimension oldcanvasSize = canvasSize;
+        this.canvasSize = newcanvasSize;
+        propertyChangeSupport.firePropertyChange(PROP_CANVASSIZE, oldcanvasSize, newcanvasSize);
+    }
+
+    protected boolean canvasFitted = true;
     
     /**
-     * Holds value of property validRange.
+     * boolean property indicates that the canvas is resizable.
      */
+    public static final String PROP_CANVASFITTED = "canvasFitted";
+
+    public boolean isCanvasFitted() {
+        return canvasFitted;
+    }
+
+    public void setCanvasFitted(boolean canvasFitted) {
+        boolean oldCanvasFitted = this.canvasFitted;
+        this.canvasFitted = canvasFitted;
+        propertyChangeSupport.firePropertyChange(PROP_CANVASFITTED, oldCanvasFitted, canvasFitted);
+    }
+    
     private String validRange="";
-    
-    /**
-     * Getter for property validRange.
-     * @return Value of property validRange.
-     */
+
     public String getValidRange() {
         return this.validRange;
     }
     
-    /**
-     * Setter for property validRange.
-     * @param validRange New value of property validRange.
-     */
     public void setValidRange(String validRange) {
         this.validRange = validRange;
     }
     
-    /**
-     * Holds value of property fill.
-     */
     private String fill="";
     
-    /**
-     * Getter for property fill.
-     * @return Value of property fill.
-     */
     public String getFill() {
         return this.fill;
     }
     
-    /**
-     * Setter for property fill.
-     * @param fill New value of property fill.
-     */
     public void setFill(String fill) {
         this.fill = fill;
     }
     
-    /**
-     * Holds value of property fillToReference.
-     */
     private boolean fillToReference;
     
-    /**
-     * Getter for property fillBelow.
-     * @return Value of property fillBelow.
-     */
     public boolean isFillToReference() {
         return this.fillToReference;
     }
     
-    /**
-     * Setter for property fillBelow.
-     * @param fillBelow New value of property fillBelow.
-     */
     public void setFillToReference(boolean fillToReference) {
         this.fillToReference = fillToReference;
     }
     
-    /**
-     * Holds value of property plotSymbol.
-     */
     private String plotSymbol= DefaultPlotSymbol.NONE.toString();
+
     
-    /**
-     * Getter for property plotSymbol.
-     * @return Value of property plotSymbol.
-     */
     public String getPlotSymbol() {
         return this.plotSymbol;
     }
     
-    /**
-     * Setter for property plotSymbol.
-     * @param plotSymbol New value of property plotSymbol.
-     */
+
     public void setPlotSymbol(String plotSymbol) {
         this.plotSymbol = plotSymbol;
     }
     
-    /**
-     * Holds value of property symbolConnector.
-     */
     private String symbolConnector= PsymConnector.NONE.toString();
     
-    /**
-     * Getter for property symbolConnector.
-     * @return Value of property symbolConnector.
-     */
     public String getSymbolConnector() {
         return this.symbolConnector;
     }
     
-    /**
-     * Setter for property symbolConnector.
-     * @param symbolConnector New value of property symbolConnector.
-     */
     public void setSymbolConnector(String symbolConnector) {
         this.symbolConnector = symbolConnector;
     }
     
-    /**
-     * Holds value of property reference.
-     */
     private String reference= "fill";
     
-    /**
-     * Getter for property reference.
-     * @return Value of property reference.
-     */
     public String getReference() {
         return this.reference;
     }
     
-    /**
-     * Setter for property reference.
-     * @param reference New value of property reference.
-     */
     public void setReference(String reference) {
         this.reference = reference;
     }
     
-    /**
-     * Holds value of property embeddedDataSet.
-     */
     private String embeddedDataSet;
     
-    /**
-     * Getter for property embeddedDataSet.
-     * @return Value of property embeddedDataSet.
-     */
     public String getEmbeddedDataSet() {
         return this.embeddedDataSet;
     }
     
-    /**
-     * Setter for property embeddedDataSet.
-     * @param embeddedDataSet New value of property embeddedDataSet.
-     */
     public void setEmbeddedDataSet(String embeddedDataSet) {
         this.embeddedDataSet = embeddedDataSet;
     }
     
-    /**
-     * Holds value of property useEmbeddedDataSet.
-     */
     private boolean useEmbeddedDataSet=false;
     
-    /**
-     * Getter for property useEmbeddedDataSet.
-     * @return Value of property useEmbeddedDataSet.
-     */
     public boolean isUseEmbeddedDataSet() {
         return this.useEmbeddedDataSet;
     }
@@ -594,20 +401,12 @@ public class ApplicationState {
         propertyChangeSupport.removePropertyChangeListener(l);
     }
     
-    /**
-     * Getter for property showContextOverview.
-     * @return Value of property showContextOverview.
-     */
     public boolean isShowContextOverview() {
         return this.showContextOverview;
     }
     
-    /**
-     * Setter for property showContextOverview.
-     * @param showContextOverview New value of property showContextOverview.
-     */
     public void setShowContextOverview(boolean showContextOverview) {
-        boolean oldShowContextOverview = this.showContextOverview;
+        //boolean oldShowContextOverview = this.showContextOverview;
         this.showContextOverview = showContextOverview;
         //propertyChangeSupport.firePropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
     }
@@ -622,7 +421,7 @@ public class ApplicationState {
     }
 
     public void setAutoOverview(boolean newautoOverview) {
-        boolean oldautoOverview = autoOverview;
+        //boolean oldautoOverview = autoOverview;
         this.autoOverview = newautoOverview;
         //propertyChangeSupport.firePropertyChange(PROP_AUTOOVERVIEW, oldautoOverview, newautoOverview);
     }
@@ -641,7 +440,33 @@ public class ApplicationState {
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
     }
 
+    protected boolean autolabelling = true;
+    public static final String PROP_AUTOLABELLING = "autolabelling";
+
+    public boolean isAutolabelling() {
+        return autolabelling;
+    }
+
+    public void setAutolabelling(boolean autolabelling) {
+        boolean oldAutolabelling = this.autolabelling;
+        this.autolabelling = autolabelling;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOLABELLING, oldAutolabelling, autolabelling);
+    }
+
+    protected boolean autolayout = true;
     
+    public static final String PROP_AUTOLAYOUT = "autolayout";
+
+    public boolean isAutolayout() {
+        return autolayout;
+    }
+
+    public void setAutolayout(boolean autolayout) {
+        boolean oldAutolayout = this.autolayout;
+        this.autolayout = autolayout;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOLAYOUT, oldAutolayout, autolayout);
+    }
+
     private String title = "";
 
     public static final String PROP_TITLE = "title";
