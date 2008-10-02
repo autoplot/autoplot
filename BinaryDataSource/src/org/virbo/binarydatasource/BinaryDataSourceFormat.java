@@ -10,7 +10,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.WritableByteChannel;
 import org.das2.util.monitor.ProgressMonitor;
@@ -39,19 +38,18 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         //dep1 is ignored.
         
         int dep0Len= ( dep0==null ? 0 : 1 );
-        int recSize=  dep0Len + data.length(0) ;
-        int size= data.length() * recSize;
         int typeSize= 8;
+        int recSize=  typeSize * ( dep0Len + data.length(0) );
+        int size= data.length() * recSize;
         
-        ByteBuffer result= ByteBuffer.allocate(size*typeSize);
+        
+        ByteBuffer result= ByteBuffer.allocate(size);
         result.order( ByteOrder.LITTLE_ENDIAN );
         
-        DoubleBuffer dbuf= result.asDoubleBuffer();
-        
         Double ddata= new Double( 2, 
-                data.length(), recSize, dep0Len, 
-                data.length(0), 1, 0,
-                dbuf );
+                recSize, dep0Len * typeSize, 
+                data.length(), data.length(0), 1, 
+                result );
         
         QubeDataSetIterator it= new QubeDataSetIterator(data);
         
@@ -62,8 +60,9 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
 
         if ( dep0!=null ) {
             Double ddep0= new Double( 1,
-                data.length(), recSize, 0, 
-                data.length(0), 1, 0, dbuf );
+                recSize, 0 * typeSize, 
+                data.length(), data.length(0), 1,
+                result );
             it= new QubeDataSetIterator(dep0);
         
             while ( it.hasNext() ) {
@@ -81,19 +80,18 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
                 
         int dep0Len= ( dep0==null ? 0 : 1 );
-        int recSize=  dep0Len + 1 ;
-        int size= data.length() * recSize;
         int typeSize= 8;
+        int recSize=  typeSize * ( dep0Len + 1 );
+        int size= data.length() * recSize ;
         
-        ByteBuffer result= ByteBuffer.allocate(size*typeSize);
+        
+        ByteBuffer result= ByteBuffer.allocate(size);
         result.order( ByteOrder.LITTLE_ENDIAN );
         
-        DoubleBuffer dbuf= result.asDoubleBuffer();
-        
-        Double ddata= new Double( 2, 
-                data.length(), recSize, dep0Len, 
-                1, 1, 0,
-                dbuf );
+        Double ddata= new Double( 1, 
+                recSize, dep0Len*typeSize, 
+                data.length(), 1, 1,
+                result );
         
         QubeDataSetIterator it= new QubeDataSetIterator(data);
         
@@ -104,8 +102,9 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
 
         if ( dep0!=null ) {
             Double ddep0= new Double( 1,
-                data.length(), recSize, 0, 
-                1, 1, 0, dbuf );
+                recSize, 0*typeSize, 
+                data.length(), 1, 1, 
+                result );
             it= new QubeDataSetIterator(dep0);
         
             while ( it.hasNext() ) {

@@ -4,31 +4,31 @@ import java.nio.ByteBuffer;
 
 public class Byte extends BufferDataSet {
 
-    ByteBuffer back;
-
-    public Byte(int rank, int len0, int reclen0, int recoffs0, int len1, int reclen1, int recoffs1, ByteBuffer back) {
-        super(rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1);
-        this.back = back;
+    public Byte(int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer back ) {
+        super(rank, reclen, recoffs, len0, len1, len2, 1, back );
     }
 
     public double value(int i0) {
-        if (RANGE_CHECK) {
-            rangeCheck(i0, 0, 0);
-        }
-        return back.get(offset(i0, 0, 0));
+        return back.get(offset(i0));
     }
 
     public double value(int i0, int i1) {
-        if (RANGE_CHECK) {
-            rangeCheck(i0, i1, 0);
-        }
-        return back.get(offset(i0, i1, 0));
+        return back.get(offset(i0, i1));
     }
 
     public double value(int i0, int i1, int i2) {
-        if (RANGE_CHECK) {
-            rangeCheck(i0, i1, i2);
-        }
         return back.get(offset(i0, i1, i2));
     }
+
+    public void putValue(int i0, double d) {
+        back.put( offset(i0), (byte)d );
+    }
+
+    public void putValue(int i0, int i1, double d) {
+        back.put( offset(i0, i1), (byte)d );
+    }
+
+    public void putValue(int i0, int i1, int i2, double d) {
+        back.put( offset(i0, i1, i2), (byte)d );
+    }    
 }

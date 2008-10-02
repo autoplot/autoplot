@@ -5,11 +5,6 @@
 package org.virbo.binarydatasource;
 
 import java.nio.ByteBuffer;
-import java.nio.DoubleBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.nio.LongBuffer;
-import java.nio.ShortBuffer;
 import org.virbo.dataset.AbstractDataSet;
 
 /**
@@ -23,13 +18,29 @@ public abstract class BufferDataSet extends AbstractDataSet {
     int len0;
     int len1;
     int len2;
-    int reclen0;
-    int reclen1;
-    int reclen2;
-    int recoffs0;
-    int recoffs1;
-    int recoffs2;
-    protected static final boolean RANGE_CHECK = true;
+    
+    
+    /**
+     * the number of bytes per record
+     */
+    int reclen;
+    
+    /**
+     * the byte offset into each record
+     */
+    int recoffset;
+    
+    /**
+     * the number of bytes of the field in each record
+     */
+    int fieldLen;
+    
+    /**
+     * the array backing the data
+     */
+    protected ByteBuffer back;
+    
+    private static final boolean RANGE_CHECK = true;
 
     public final static String DOUBLE= "double";
     public final static String FLOAT= "float";
@@ -37,41 +48,38 @@ public abstract class BufferDataSet extends AbstractDataSet {
     public final static String INT= "int";
     public final static String SHORT= "short";
     public final static String BYTE= "byte";
+    public final static String UBYTE= "ubyte";
     
-    public static BufferDataSet makeDataSet( int rank, int len0, int reclen0, int recoffs0, int len1, int reclen1, int recoffs1, ByteBuffer buf, String type ) {
+    public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, String type ) {
         
         if ( type.equals(DOUBLE) ) {
-            DoubleBuffer dbuf = buf.asDoubleBuffer();
-            return new Double( rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, dbuf );
+            return new Double( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(FLOAT) ) {
-            FloatBuffer fbuf= buf.asFloatBuffer();
-            return new Float( rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, fbuf );
+            return new  Float( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(LONG) ) {
-            LongBuffer fbuf= buf.asLongBuffer();
-            return new Long( rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, fbuf );
+            return new  Long( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(INT) ) {
-            IntBuffer fbuf= buf.asIntBuffer();
-            return new Int( rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, fbuf );
+            return new  Int( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(SHORT) ) {
-            ShortBuffer fbuf= buf.asShortBuffer();
-            return new Short( rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, fbuf );
+            return new  Short( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(BYTE) ) {
-            return new Byte( rank, len0, reclen0, recoffs0, len1, reclen1, recoffs1, buf );
+            return new  Byte( rank, reclen, recoffs, len0, len1, len2, buf );
+        } else if (type.equals(UBYTE) ) {
+            return new UByte( rank, reclen, recoffs, len0, len1, len2, buf );           
         } else {
             throw new IllegalArgumentException("bad data type: "+type);
         }
     }
 
-    public BufferDataSet(int rank, int len0, int reclen0, int recoffs0, int len1, int reclen1, int recoffs1) {
+    public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, int fieldLen, ByteBuffer back  ) {
+        this.back= back;
         this.rank = rank;
+        this.reclen= reclen;
+        this.recoffset= recoffs;
         this.len0 = len0;
         this.len1 = len1;
-        this.len2 = 1;
-        this.reclen0 = reclen0;
-        this.reclen1 = reclen1;
-        this.reclen2 = 1;
-        this.recoffs0 = recoffs0;
-        this.recoffs1 = recoffs1;
+        this.len2 = len2;
+        this.fieldLen= fieldLen;
     }
 
     public int rank() {
@@ -103,10 +111,45 @@ public abstract class BufferDataSet extends AbstractDataSet {
 
     }
     
+    /**
+     * return the offset, in bytes, of the element.
+     * @param i0
+     * @param i1
+     * @param i2
+     * @return the offset, in bytes, of the element.
+     */
     protected int offset(int i0, int i1, int i2) {
-        return recoffs0 + i0 * reclen0 * reclen1 * reclen2 + i1 * len2 + i2;
+        if (RANGE_CHECK) {
+            rangeCheck(i0, i1, i2);
+        }
+        return reclen * i0 + recoffset + i1 * fieldLen * len2  + i2 * fieldLen ;
     }
     
+    /**
+     * return the offset, in bytes, of the element.
+     * @param i0
+     * @param i1
+     * @return the offset, in bytes, of the element.
+     */
+    protected int offset(int i0, int i1 ) {
+        if (RANGE_CHECK) {
+            rangeCheck(i0, i1, 0);
+        }        
+        return reclen * i0 + recoffset + i1 * fieldLen ;
+    }
+
+    /**
+     * return the offset, in bytes, of the element.
+     * @param i0
+     * @return the offset, in bytes, of the element.
+     */
+    protected int offset(int i0 ) {
+        if (RANGE_CHECK) {
+            rangeCheck(i0, 0, 0);
+        }
+        return reclen * i0 + recoffset;
+    }
+
     @Override
     public abstract double value(int i0);
 
