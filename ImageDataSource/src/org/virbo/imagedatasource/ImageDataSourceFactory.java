@@ -52,8 +52,6 @@ public class ImageDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject(String surl, ProgressMonitor mon) {
-        DataSetURL.URLSplit split= DataSetURL.parse( surl );
-        Map params= DataSetURL.parseParams(split.params);
-        return !( params.containsKey("channel") );
+        return false;
     }
 }

@@ -19,6 +19,7 @@ public class ImageDataSet extends AbstractDataSet {
     BufferedImage image;
     ColorOp op;
     int w,h;
+    private int rank;
     
     public interface ColorOp {
         double value( int rgb );
@@ -44,8 +45,13 @@ public class ImageDataSet extends AbstractDataSet {
         this.image= image;
         this.h= image.getHeight();
         this.w= image.getWidth();
+        this.rank= 2;
         if ( mask==null ) {
-            this.op= op;
+            if ( op==null ) {
+                rank= 3;
+            } else {
+                this.op= op;
+            }
         } else {
             this.op= new ChannelColorOp( mask.getRGB() & 0xFFFFFF, (int)log2( Integer.lowestOneBit( mask.getRGB() ) ) );
         }
@@ -54,7 +60,7 @@ public class ImageDataSet extends AbstractDataSet {
     
     @Override
     public int rank() {
-        return 2;
+        return rank;
     }
 
     @Override
@@ -68,8 +74,25 @@ public class ImageDataSet extends AbstractDataSet {
     }
 
     @Override
+    public int length(int i, int j) {
+        return 3;
+    }
+
+    
+    @Override
     public double value(int i0, int i1) {
         return op.value( image.getRGB( i0, h-i1-1 ) );
+    }
+
+    @Override
+    public double value(int i0, int i1, int i2) {
+        int rgb= image.getRGB( i0, h-i1-1 );
+        switch (i2) {
+            case 0: return ( rgb & 0xff0000 ) >> 16; 
+            case 1: return ( rgb & 0x00ff00 ) >> 8; 
+            case 2: return ( rgb & 0x0000ff ); 
+            default: throw new IndexOutOfBoundsException( "i2=3" );
+        }
     }
     
     

@@ -111,44 +111,45 @@ class ImageDataSource extends AbstractDataSource {
         Color c = null;
         ImageDataSet.ColorOp op = null;
 
-        if ( channel==null ) throw new IllegalArgumentException("channel not specified");
-        if (channel.equals("red")) {
-            c = Color.red;
-        } else if (channel.equals("green")) {
-            c = Color.green;
-        } else if (channel.equals("blue")) {
-            c = Color.blue;
-        } else if (channel.equals("greyscale")) {
-            op = new ImageDataSet.ColorOp() {
+        if (channel != null) {
+            if (channel.equals("red")) {
+                c = Color.red;
+            } else if (channel.equals("green")) {
+                c = Color.green;
+            } else if (channel.equals("blue")) {
+                c = Color.blue;
+            } else if (channel.equals("greyscale")) {
+                op = new ImageDataSet.ColorOp() {
 
-                public double value(int rgb) {
-                    int r = rgb & 0xFF0000 >> 16;
-                    int g = rgb & 0x00FF00 >> 8;
-                    int b = rgb & 0x0000FF >> 0;
-                    return 0.3 * r + 0.59 * g + 0.11 * b;
-                }
-            };
-        } else if (channel.equals("hue")) {
-            op = new ImageDataSet.ColorOp() {
+                    public double value(int rgb) {
+                        int r = rgb & 0xFF0000 >> 16;
+                        int g = rgb & 0x00FF00 >> 8;
+                        int b = rgb & 0x0000FF >> 0;
+                        return 0.3 * r + 0.59 * g + 0.11 * b;
+                    }
+                };
+            } else if (channel.equals("hue")) {
+                op = new ImageDataSet.ColorOp() {
 
-                public double value(int rgb) {
-                    return toHSV(rgb, CHANNEL_HUE);
-                }
-            };
-        } else if (channel.equals("saturation")) {
-            op = new ImageDataSet.ColorOp() {
+                    public double value(int rgb) {
+                        return toHSV(rgb, CHANNEL_HUE);
+                    }
+                };
+            } else if (channel.equals("saturation")) {
+                op = new ImageDataSet.ColorOp() {
 
-                public double value(int rgb) {
-                    return toHSV(rgb, CHANNEL_SATURATION);
-                }
-            };
-        } else if (channel.equals("value")) {
-            op = new ImageDataSet.ColorOp() {
+                    public double value(int rgb) {
+                        return toHSV(rgb, CHANNEL_SATURATION);
+                    }
+                };
+            } else if (channel.equals("value")) {
+                op = new ImageDataSet.ColorOp() {
 
-                public double value(int rgb) {
-                    return toHSV(rgb, CHANNEL_VALUE);
-                }
-            };
+                    public double value(int rgb) {
+                        return toHSV(rgb, CHANNEL_VALUE);
+                    }
+                };
+            }
         }
 
         ImageDataSet result = new ImageDataSet(image, c, op);
@@ -159,8 +160,8 @@ class ImageDataSource extends AbstractDataSource {
 
     }
 
-    public Map<String, Object> getJpegExifMetaData( ProgressMonitor mon) throws Exception {
-        InputStream in= DataSetURL.getInputStream( url, mon );
+    public Map<String, Object> getJpegExifMetaData(ProgressMonitor mon) throws Exception {
+        InputStream in = DataSetURL.getInputStream(url, mon);
         Metadata metadata = JpegMetadataReader.readMetadata(in);
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -178,12 +179,12 @@ class ImageDataSource extends AbstractDataSource {
 
     @Override
     public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
-        
-        String ext= getExt(resourceURL);
-        
-        if ( ext.equals(".jpg") ) {
+
+        String ext = getExt(resourceURL);
+
+        if (ext.equals(".jpg")) {
             return getJpegExifMetaData(mon);
-            
+
         } else {
 
             File f = DataSetURL.getFile(url, new NullProgressMonitor());
