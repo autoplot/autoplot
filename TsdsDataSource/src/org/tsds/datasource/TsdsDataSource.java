@@ -61,7 +61,7 @@ class TsdsDataSource extends AbstractDataSource {
         try {
             addCability(TimeSeriesBrowse.class, getTimeSeriesBrowse());
 
-            setTSBParameters();  // we don't yet know the parameter resolution, but the time range is set.
+            setTSBParameters();  // we don't yet know the parameter resolution, but the time extent is set.
             
             ProgressMonitor mon = new NullProgressMonitor();
 
