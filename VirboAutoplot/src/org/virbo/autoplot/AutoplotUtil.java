@@ -631,6 +631,8 @@ public class AutoplotUtil {
             final String key = "PLANE_" + i;
             if ((v = ds.property(key)) != null) {
                 result.put(key, extractProperties((QDataSet) v));
+            } else {
+                break;
             }
 
         }
