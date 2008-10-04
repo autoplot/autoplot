@@ -92,8 +92,8 @@ public class SimpleServlet extends HttpServlet {
             if ("true".equals(request.getParameter("autolayout"))) {
                 appmodel.setAutolayout(true);
             } else {
-                if (!row.equals("")) ServletUtil.setDevicePosition(appmodel.plot.getRow(), row);
-                if (!column.equals("")) ServletUtil.setDevicePosition(appmodel.plot.getColumn(), column);
+                if (!row.equals("")) AutoplotUtil.setDevicePosition(appmodel.plot.getRow(), row);
+                if (!column.equals("")) AutoplotUtil.setDevicePosition(appmodel.plot.getColumn(), column);
             }
 
             if (!font.equals("")) appmodel.canvas.setFont(Font.decode(font));
