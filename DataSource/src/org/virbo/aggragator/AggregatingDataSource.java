@@ -75,7 +75,8 @@ public class AggregatingDataSource extends AbstractDataSource {
         String surl = url.toString();
         delegateDataSourceFactory = AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
-        viewRange= DatumRangeUtil.parseTimeRange( super.params.get("timerange") );
+        String stimeRange= super.params.get("timerange").replaceAll("\\+", " ");
+        viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
     }
 
     private TimeSeriesBrowse createTimeSeriesBrowse() {
