@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,8 +87,7 @@ public class BookmarksManagerModel {
             }
         }
     }
-    
-        protected List<Bookmark> list = null;
+    protected List<Bookmark> list = null;
     public static final String PROP_LIST = "list";
 
     public List<Bookmark> getList() {
@@ -109,58 +109,76 @@ public class BookmarksManagerModel {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
-
     public TreeModel getTreeModel() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Bookmarks");
         DefaultTreeModel model = new DefaultTreeModel(root);
-        if ( this.list!=null ) addChildNodes(root, this.list);
+        if (this.list != null) addChildNodes(root, this.list);
         return model;
     }
 
-    void addBookmark( Bookmark bookmark, Bookmark context ) {
-        ArrayList<Bookmark> newList= new ArrayList<Bookmark>( this.list.size() );
-        for ( Bookmark b: this.list ) newList.add( (Bookmark)b.copy() );
-        if ( context==null || ( bookmark instanceof Bookmark.Folder && context instanceof Bookmark.Folder ) ) { // only allow folders in the root node
-            newList.add( bookmark );
-        } else if ( context instanceof Bookmark.Folder ) {
-            Bookmark.Folder newFolder= (Bookmark.Folder) newList.get( newList.indexOf(context) );
-            newFolder.getBookmarks().add(bookmark);
+    void addBookmarks(List<Bookmark> bookmarks, Bookmark context) {
+        ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
+        for (Bookmark b : this.list) {
+            newList.add((Bookmark) b.copy());
+        }
+        boolean containsFolder = false;
+        for (Bookmark b : bookmarks) {
+            containsFolder = containsFolder || b instanceof Bookmark.Folder;
+        }
+        if (context == null || (containsFolder && context instanceof Bookmark.Folder)) { // only allow folders in the root node
+            newList.addAll(bookmarks);
+        } else if (context instanceof Bookmark.Folder) {
+            Bookmark.Folder newFolder = (Bookmark.Folder) newList.get(newList.indexOf(context));
+            newFolder.getBookmarks().addAll(bookmarks);
         } else {
-            if ( newList.contains(context) ) {
-                newList.add( newList.indexOf(context)+1, bookmark );
+            if (newList.contains(context)) {
+                newList.addAll(newList.indexOf(context) + 1, bookmarks);
             } else {
-                boolean isAdded= false;
-                for ( Bookmark b: newList ) {
-                    if ( b instanceof Bookmark.Folder ) {
-                        List<Bookmark> bs= ( (Bookmark.Folder)b).getBookmarks();
-                        if ( !isAdded && bs.contains(context) ) {
-                            bs.add( bs.indexOf(context)+1, bookmark );
-                            isAdded= true;
-                        } 
+                boolean isAdded = false;
+                for (Bookmark b : newList) {
+                    if (b instanceof Bookmark.Folder) {
+                        List<Bookmark> bs = ((Bookmark.Folder) b).getBookmarks();
+                        if (!isAdded && bs.contains(context)) {
+                            bs.addAll(bs.indexOf(context) + 1, bookmarks);
+                            isAdded = true;
+                        }
                     }
                 }
-                if ( isAdded==false ) newList.add( bookmark );
+                if (isAdded == false) newList.addAll(bookmarks);
+            }
+        }
+        setList(newList);
+
+    }
+
+    void addBookmark(Bookmark bookmark, Bookmark context) {
+        addBookmarks(Collections.singletonList(bookmark), context);
+    }
+
+    void removeBookmarks(List<Bookmark> bookmarks) {
+        ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
+        for (Bookmark b : this.list) {
+            newList.add((Bookmark) b.copy());
+        }
+        for (Bookmark bookmark : bookmarks) {
+            if (newList.contains(bookmark)) {
+                newList.remove(bookmark);
+            } else {
+                for (Bookmark b : newList) {
+                    if (b instanceof Bookmark.Folder) {
+                        List<Bookmark> bs = ((Bookmark.Folder) b).getBookmarks();
+                        if (bs.contains(bookmark)) {
+                            bs.remove(bookmark);
+                        }
+                    }
+                }
             }
         }
         setList(newList);
     }
 
     void removeBookmark(Bookmark bookmark) {
-        ArrayList<Bookmark> newList= new ArrayList<Bookmark>( this.list.size() );
-        for ( Bookmark b: this.list ) newList.add( (Bookmark)b.copy() );
-        if ( newList.contains(bookmark) ) {
-            newList.remove( bookmark );
-        } else {
-            for ( Bookmark b: newList ) {
-                if ( b instanceof Bookmark.Folder ) {
-                    List<Bookmark> bs= ( (Bookmark.Folder)b).getBookmarks();
-                    if ( bs.contains(bookmark) ) {
-                        bs.remove( bookmark );
-                    } 
-                }
-            }
-        }
-        setList(newList);
+        removeBookmarks( Collections.singletonList(bookmark) );
     }
 
     private void addChildNodes(MutableTreeNode parent, List<Bookmark> bookmarks) {
@@ -168,26 +186,26 @@ public class BookmarksManagerModel {
             MutableTreeNode child = new DefaultMutableTreeNode(b);
             parent.insert(child, parent.getChildCount());
             if (b instanceof Bookmark.Folder) {
-                List<Bookmark> kids= ((Bookmark.Folder) b).getBookmarks();
-                if ( kids.size()==0 ) {
-                    child.insert( new DefaultMutableTreeNode("(empty)"),0 );
+                List<Bookmark> kids = ((Bookmark.Folder) b).getBookmarks();
+                if (kids.size() == 0) {
+                    child.insert(new DefaultMutableTreeNode("(empty)"), 0);
                 } else {
-                    addChildNodes(child, kids );
+                    addChildNodes(child, kids);
                 }
             }
         }
     }
 
     protected Bookmark getSelectedBookmark(TreeModel model, TreePath path) {
-        if ( path==null || path.getPathCount()==1 ) return null;
-        Object sel= ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-        if ( sel.equals("(empty)" ) ) {
-            return getSelectedBookmark( model, path.getParentPath() );
-        } 
-        return (Bookmark)sel; 
+        if (path == null || path.getPathCount() == 1) return null;
+        Object sel = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+        if (sel.equals("(empty)")) {
+            return getSelectedBookmark(model, path.getParentPath());
+        }
+        return (Bookmark) sel;
     }
 
-    void doImportUrl( Component c ) {
+    void doImportUrl(Component c) {
         String ansr = null;  // it's likely they will mistype, preserve their work.
         URL url = null;
         boolean okay = false;
