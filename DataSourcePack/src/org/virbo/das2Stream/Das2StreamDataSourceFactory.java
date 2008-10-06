@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
@@ -19,7 +18,6 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.dsutil.AsciiParser;
 import org.virbo.qstream.QDataSetStreamHandler;
 import org.virbo.qstream.StreamException;
 
