@@ -13,9 +13,7 @@ import java.util.logging.Level;
 import org.das2.CancelledOperationException;
 import org.das2.DasApplication;
 import org.das2.beans.BeansUtil;
-import org.das2.client.DataSetStreamHandler;
 import org.das2.dataset.CacheTag;
-import org.das2.dataset.DataSetStreamProducer;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -44,11 +42,10 @@ import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
-import org.das2.stream.StreamException;
+import org.virbo.qstream.StreamException;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.StreamTool;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -73,7 +70,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -81,14 +77,11 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
-import javax.swing.Icon;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.xml.parsers.ParserConfigurationException;
-import org.das2.graph.DasDevicePosition;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.layout.LayoutUtil;
@@ -102,13 +95,10 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.TransposeRank2DataSet;
-import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.qstream.QDataSetStreamHandler;
@@ -1248,47 +1238,58 @@ public class ApplicationModel {
     }
 
     /**
+     * do update on this thread, ensuring that only one data load is occuring at a
+     * time.  Note if a dataSource doesn't check mon.isCancelled(), then processing
+     * will block until the old load is done.
+     * @param autorange
+     * @param interpretMeta
+     */
+    private synchronized void updateImmediately(final boolean autorange, boolean interpretMeta) {
+        /*** here is the data load ***/
+        setStatus("loading dataset");
+
+        if (dataSource != null) {
+
+            QDataSet dataset = loadDataSet(0);
+            setStatus("done loading dataset");
+            setDataSetInternal(dataset, autorange);
+        } else {
+            setDataSetInternal(null, autorange);
+        }
+
+        if (tsb != null) {
+            //ApplicationModel.this.setDataSourceURL( tsb.getURL().toString() );
+            String oldsurl = ApplicationModel.this.surl;
+            ApplicationModel.this.surl = tsb.getURL().toString();
+            ApplicationModel.this.propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldsurl, ApplicationModel.this.surl);
+        }
+
+        setStatus("ready");
+
+    }
+
+    /**
      * update the model and view using the new DataSource to create a new dataset,
      * then inspecting the dataset to decide on axis settings.
      * @param autorange if false, then no autoranging is done, just the fill part.
      */
-    public synchronized void update(final boolean autorange, boolean interpretMeta) {
+    public synchronized void update(final boolean autorange, final boolean interpretMeta) {
         dataset = null;
 
         Runnable run = new Runnable() {
 
             public void run() {
-
-                /*** here is the data load ***/
-                setStatus("loading dataset");
-
-                if (dataSource != null) {
-                    if (mon != null) {
-                        System.err.println("double load!");
-                        if (mon != null) mon.cancel();
-                    }
-
-                    QDataSet dataset = loadDataSet(0);
-                    setStatus("done loading dataset");
-                    setDataSetInternal(dataset, autorange);
-                } else {
-                    setDataSetInternal(null, autorange);
-                }
-
-                if (tsb != null) {
-                    //ApplicationModel.this.setDataSourceURL( tsb.getURL().toString() );
-                    String oldsurl = ApplicationModel.this.surl;
-                    ApplicationModel.this.surl = tsb.getURL().toString();
-                    ApplicationModel.this.propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldsurl, ApplicationModel.this.surl);
-                }
-
-                setStatus("ready");
+                updateImmediately(autorange, interpretMeta);
 
             }
         };
 
         if (dataSource != null && dataSource.asynchronousLoad() && !headless) {
             logger.info("invoke later do load");
+            if (mon != null) {
+                System.err.println("double load!");
+                if (mon != null) mon.cancel();
+            }
             RequestProcessor.invokeLater(run);
         } else {
             run.run();
@@ -1621,7 +1622,7 @@ public class ApplicationModel {
             }
         };
         //new Thread( run ).start();
-        new Thread( run ).run(); // if we are not going to make icons, then don't introduce new bugs with the extra thread.
+        new Thread(run).run(); // if we are not going to make icons, then don't introduce new bugs with the extra thread.
     }
 
     public void exit() {
@@ -2000,8 +2001,6 @@ public class ApplicationModel {
         } catch (StreamException ex) {
             Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
             Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
