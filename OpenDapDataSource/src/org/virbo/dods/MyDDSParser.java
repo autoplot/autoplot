@@ -6,7 +6,6 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-
 package org.virbo.dods;
 
 import dods.dap.BaseType;
@@ -14,6 +13,8 @@ import dods.dap.BaseTypeFactory;
 import dods.dap.DArray;
 import dods.dap.DDS;
 import dods.dap.DDSException;
+import dods.dap.DFloat64;
+import dods.dap.DSequence;
 import dods.dap.DefaultFactory;
 import dods.dap.NoSuchVariableException;
 import dods.dap.Server.InvalidParameterException;
@@ -28,46 +29,56 @@ import java.util.Enumeration;
  * @author jbf
  */
 public class MyDDSParser {
-         
+
     DDS myDDS;
-    
+
     /** Creates a new instance of DDSParser */
     public MyDDSParser() {
-        
     }
-    
-    public void parse( InputStream in ) throws ParseException, DDSException {
-        
-        DDSParser p= new DDSParser(in);
-        
-        myDDS= new DDS();
-        BaseTypeFactory factory= new DefaultFactory();
-        p.Dataset( myDDS, factory );
-        
+
+    public void parse(InputStream in) throws ParseException, DDSException {
+
+        DDSParser p = new DDSParser(in);
+
+        myDDS = new DDS();
+        BaseTypeFactory factory = new DefaultFactory();
+        p.Dataset(myDDS, factory);
+
     }
-    
-    public int[] getRecDims( String variable ) throws NoSuchVariableException {
-        BaseType t= myDDS.getVariable( variable );
-        DArray darray= (DArray)t;
-        int[] result= new int[ darray.numDimensions() ];
-        for ( int i=0; i<result.length; i++ ) {
-            try {
-                result[i]= darray.getDimension(i).getStop();
-            } catch (InvalidParameterException ex) {
-                ex.printStackTrace();
+
+    /**
+     * return the dimensions, or null for Sequences
+     * @param variable
+     * @return
+     * @throws dods.dap.NoSuchVariableException
+     */
+    public int[] getRecDims(String variable) throws NoSuchVariableException {
+        BaseType t = myDDS.getVariable(variable);
+        int[] result;
+        if (t instanceof DSequence) {
+            return null;
+            
+        } else {
+            DArray darray = (DArray) t;
+            result = new int[darray.numDimensions()];
+            for (int i = 0; i < result.length; i++) {
+                try {
+                    result[i] = darray.getDimension(i).getStop();
+                } catch (InvalidParameterException ex) {
+                    ex.printStackTrace();
+                }
             }
         }
-                
+
         return result;
     }
 
     String[] getVariableNames() {
-        Enumeration en= myDDS.getVariables();
-        ArrayList<String> result= new ArrayList<String>();
-        while ( en.hasMoreElements() ) {
-            result.add( ((BaseType)en.nextElement()).getName() );
+        Enumeration en = myDDS.getVariables();
+        ArrayList<String> result = new ArrayList<String>();
+        while (en.hasMoreElements()) {
+            result.add(((BaseType) en.nextElement()).getName());
         }
-        return result.toArray( new String[ result.size() ] );
+        return result.toArray(new String[result.size()]);
     }
-    
 }
