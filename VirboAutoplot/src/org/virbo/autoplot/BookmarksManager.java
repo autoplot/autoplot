@@ -1,31 +1,26 @@
 /*
  * BookmarksManager.java
  *
- * Created on October 12, 2007, 5:41 AM
+ * Created on October 1, 2008, 7:53 AM
  */
-
 package org.virbo.autoplot;
 
-import org.das2.DasApplication;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileInputStream;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DropTarget;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
+import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.tree.TreeModel;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.DasApplication;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -34,106 +29,74 @@ import org.xml.sax.SAXException;
  * @author  jbf
  */
 public class BookmarksManager extends javax.swing.JDialog {
-    
-    DefaultListModel model;
-    
+
     /** Creates new form BookmarksManager */
-    public BookmarksManager( java.awt.Frame parent, boolean modal ) {
+    public BookmarksManager(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        setList( Arrays.asList( new String[] { "one", "two", "three" } ) );
-        jList.addMouseListener( mouseListener );
-    }
-    
-    private MouseListener mouseListener= new MouseListener() {
-        public void mouseClicked(MouseEvent e) {
+        this.model = new BookmarksManagerModel();
+        this.jTree1.setModel(model.getTreeModel());
+        /*this.jTree1.setCellRenderer( new TreeCellRenderer() {
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        Object o= ((DefaultMutableTreeNode)value).getUserObject();
+        Icon icon;
+        if ( o instanceof Bookmark.Folder ) {
+        icon=  expanded ?  UIManager.getIcon( "Tree.expandedIcon") : UIManager.getIcon( "Tree.closedIcon");
+        } else if ( o instanceof Bookmark.Item ) {
+        icon= null;
         }
-        
-        public void mousePressed(MouseEvent e) {
-            if ( e.getButton()==MouseEvent.BUTTON3 ) {
-                Point p= SwingUtilities.convertPoint( jList, e.getPoint(), BookmarksManager.this );
-                itemActionsMenu.show( jList, jList.getX()+e.getX(), jList.getY()+e.getY() );
+        return new JLabel( String.valueOf(value), icon, JLabel.LEFT );
+        }
+        });*/
+
+        model.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                TreeModel mod = model.getTreeModel();
+                jTree1.setModel(mod);
             }
-        }
+        });
+
+        BookmarksManagerTransferrable trans= new BookmarksManagerTransferrable(model,jTree1);
         
-        public void mouseReleased(MouseEvent e) {
-        }
-        
-        public void mouseEntered(MouseEvent e) {
-        }
-        
-        public void mouseExited(MouseEvent e) {
-        }
-        
-    };
-    
-    public void setList( List list ) {
-        model= new DefaultListModel();
-        for ( int i=0; i<list.size(); i++ ) {
-            model.addElement( list.get(i) );
-        }
-        jList.setModel( model );
-    }
-    
-    public List getList() {
-        return Arrays.asList( model.toArray() );
-    }
-    
-    void doImportUrl() {
-        String ansr=null;  // it's likely they will mistype, preserve their work.
-        URL url= null;
-        boolean okay= false;
-        while ( okay==false ) {
-            String s;
-            if ( ansr==null ) {
-                s= JOptionPane.showInputDialog( this, "Enter the URL of a bookmarks file:", "" );
-            } else {
-                s= JOptionPane.showInputDialog( this, "Whoops, Enter the URL of a bookmarks file:", ansr );
-            }
-            
-            if ( s==null ) {
-                return;
-            } else {
-                try {
-                    url= new URL( s );
-                    okay= true;
-                } catch ( MalformedURLException ex ) {
-                }
-            }
-        }
+        DragSource dragSource = DragSource.getDefaultDragSource();
+        DropTarget dropTarget = trans.createDropTarget();
         try {
-            Document doc= AutoplotUtil.readDoc( url.openStream() );
-            List<Bookmark> book= Bookmark.parseBookmarks( doc );
-            this.setList(book);
-        } catch (SAXException ex) {
+            dropTarget.addDropTargetListener(trans.createDropTargetListener());
+        } catch (TooManyListenersException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);        
-        } 
+        }
+        jTree1.setDropTarget(dropTarget);
+        dragSource.createDefaultDragGestureRecognizer(jTree1, DnDConstants.ACTION_COPY_OR_MOVE, trans.createDragGestureListener());
     }
-    
+    BookmarksManagerModel model;
+
+    BookmarksManagerModel getModel() {
+        return model;
+    }
+
+
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        itemActionsMenu = new javax.swing.JPopupMenu();
-        deleteMenuItem = new javax.swing.JMenuItem();
+
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList = new javax.swing.JList();
-        jLabel1 = new javax.swing.JLabel();
-        dismissButton = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        titleTextField = new javax.swing.JTextField();
-        URLTextField = new javax.swing.JTextField();
+        jTree1 = new javax.swing.JTree();
         importButton = new javax.swing.JButton();
         importFromWebButton = new javax.swing.JButton();
         ExportButton = new javax.swing.JButton();
+        dismissButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        URLTextField = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        titleTextField = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importMenuItem = new javax.swing.JMenuItem();
@@ -141,54 +104,19 @@ public class BookmarksManager extends javax.swing.JDialog {
         resetToDefaultMenuItem = new javax.swing.JMenuItem();
         exportMenuItem = new javax.swing.JMenuItem();
         closeMenuItem = new javax.swing.JMenuItem();
-
-        deleteMenuItem.setText("delete");
-        deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteMenuItemActionPerformed(evt);
-            }
-        });
-
-        itemActionsMenu.add(deleteMenuItem);
+        editMenu = new javax.swing.JMenu();
+        newFolderMenuItem = new javax.swing.JMenuItem();
+        addItemMenuItem = new javax.swing.JMenuItem();
+        deleteMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        jList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
-        jList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jListValueChanged(evt);
+
+        jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                jTree1ValueChanged(evt);
             }
         });
-
-        jScrollPane1.setViewportView(jList);
-
-        jLabel1.setText("Bookmarks Manager");
-
-        dismissButton.setText("OK");
-        dismissButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dismissButtonActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setText("Title:");
-
-        jLabel3.setText("URL:");
-
-        titleTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                titleTextFieldFocusLost(evt);
-            }
-        });
-
-        URLTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                URLTextFieldFocusLost(evt);
-            }
-        });
+        jScrollPane1.setViewportView(jTree1);
 
         importButton.setText("Import...");
         importButton.addActionListener(new java.awt.event.ActionListener() {
@@ -211,14 +139,44 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
 
+        dismissButton.setText("OK");
+        dismissButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dismissButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("URL:");
+
+        URLTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                URLTextFieldFocusLost(evt);
+            }
+        });
+
+        jLabel2.setText("Title:");
+
+        titleTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                titleTextFieldActionPerformed(evt);
+            }
+        });
+        titleTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                titleTextFieldFocusLost(evt);
+            }
+        });
+
+        jLabel1.setText("Bookmarks Manager");
+
         jMenu1.setText("File");
+
         importMenuItem.setText("Import...");
         importMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 importMenuItemActionPerformed(evt);
             }
         });
-
         jMenu1.add(importMenuItem);
 
         importUrlMenuItem.setText("Import From Web...");
@@ -227,7 +185,6 @@ public class BookmarksManager extends javax.swing.JDialog {
                 importUrlMenuItemActionPerformed(evt);
             }
         });
-
         jMenu1.add(importUrlMenuItem);
 
         resetToDefaultMenuItem.setText("Reset to Default");
@@ -236,7 +193,6 @@ public class BookmarksManager extends javax.swing.JDialog {
                 resetToDefaultMenuItemActionPerformed(evt);
             }
         });
-
         jMenu1.add(resetToDefaultMenuItem);
 
         exportMenuItem.setText("Export...");
@@ -245,7 +201,6 @@ public class BookmarksManager extends javax.swing.JDialog {
                 exportMenuItemActionPerformed(evt);
             }
         });
-
         jMenu1.add(exportMenuItem);
 
         closeMenuItem.setText("Close");
@@ -254,10 +209,37 @@ public class BookmarksManager extends javax.swing.JDialog {
                 closeMenuItemActionPerformed(evt);
             }
         });
-
         jMenu1.add(closeMenuItem);
 
         jMenuBar1.add(jMenu1);
+
+        editMenu.setText("Edit");
+
+        newFolderMenuItem.setText("New Folder");
+        newFolderMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newFolderMenuItemActionPerformed(evt);
+            }
+        });
+        editMenu.add(newFolderMenuItem);
+
+        addItemMenuItem.setText("New Bookmark");
+        addItemMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addItemMenuItemActionPerformed(evt);
+            }
+        });
+        editMenu.add(addItemMenuItem);
+
+        deleteMenuItem.setText("Delete Bookmark");
+        deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteMenuItemActionPerformed(evt);
+            }
+        });
+        editMenu.add(deleteMenuItem);
+
+        jMenuBar1.add(editMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -268,14 +250,16 @@ public class BookmarksManager extends javax.swing.JDialog {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+                    .add(layout.createSequentialGroup()
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                        .addContainerGap())
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(importButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(importFromWebButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(ExportButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 30, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 69, Short.MAX_VALUE)
                         .add(dismissButton)
                         .addContainerGap())
                     .add(layout.createSequentialGroup()
@@ -287,11 +271,11 @@ public class BookmarksManager extends javax.swing.JDialog {
                             .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                                 .add(jLabel2)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)))
+                                .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)))
                         .add(26, 26, 26))
                     .add(layout.createSequentialGroup()
                         .add(jLabel1)
-                        .addContainerGap(294, Short.MAX_VALUE))))
+                        .addContainerGap(256, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -299,8 +283,8 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 216, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel2)
                     .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -308,179 +292,174 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel3)
                     .add(URLTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 28, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(dismissButton)
                     .add(importButton)
                     .add(importFromWebButton)
                     .add(ExportButton))
-                .addContainerGap())
+                .add(12, 12, 12))
         );
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
-    
-    private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetToDefaultMenuItemActionPerformed
-        String surl= AutoplotUtil.getProperty("autoplot.default.bookmarks","http://www.autoplot.org/data/demos.xml");
-        int r= JOptionPane.showConfirmDialog( this, "Reset your bookmarks to "+surl+"?" );
-        if ( r==JOptionPane.OK_OPTION ) {
-            try {
-                URL url= new URL( surl );
-                Document doc= AutoplotUtil.readDoc( url.openStream() );
-                List<Bookmark> book= Bookmark.parseBookmarks( doc );
-                this.setList(book);
-            } catch (SAXException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-	    } catch ( FileNotFoundException ex ) {
-		DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
-            } catch (IOException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParserConfigurationException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }//GEN-LAST:event_resetToDefaultMenuItemActionPerformed
 
-    private void ExportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExportButtonActionPerformed
-        doExport();
-    }//GEN-LAST:event_ExportButtonActionPerformed
-    
-    private void importFromWebButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importFromWebButtonActionPerformed
-        doImportUrl();
-    }//GEN-LAST:event_importFromWebButtonActionPerformed
-    
-    private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
-        doImport();
-    }//GEN-LAST:event_importButtonActionPerformed
-    
-    private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importUrlMenuItemActionPerformed
-        doImportUrl();
-    }//GEN-LAST:event_importUrlMenuItemActionPerformed
-    
-    private void closeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeMenuItemActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_closeMenuItemActionPerformed
-    
-    private void exportMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportMenuItemActionPerformed
-        doExport();
-    }//GEN-LAST:event_exportMenuItemActionPerformed
-    
-    private void importMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importMenuItemActionPerformed
-        doImport();
-    }//GEN-LAST:event_importMenuItemActionPerformed
-    
-    private void jListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jListValueChanged
-        Bookmark b= (Bookmark)jList.getSelectedValue();
-        if ( b!=null ) {
-            titleTextField.setText(b.getTitle());
-            URLTextField.setText(b.getUrl());
+private void importButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importButtonActionPerformed
+    model.doImport(this);
+}//GEN-LAST:event_importButtonActionPerformed
+
+private void importFromWebButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importFromWebButtonActionPerformed
+    model.doImportUrl(this);
+}//GEN-LAST:event_importFromWebButtonActionPerformed
+
+private void ExportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ExportButtonActionPerformed
+    model.doExport(this);
+}//GEN-LAST:event_ExportButtonActionPerformed
+
+private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
+    this.dispose();
+}//GEN-LAST:event_dismissButtonActionPerformed
+
+private void URLTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_URLTextFieldFocusLost
+    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+    if (b instanceof Bookmark.Item) {
+        ((Bookmark.Item) b).setUrl(URLTextField.getText());
+        jTree1.repaint();
+    }
+}//GEN-LAST:event_URLTextFieldFocusLost
+
+private void titleTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_titleTextFieldFocusLost
+    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+    b.setTitle(titleTextField.getText());
+    jTree1.repaint();
+}//GEN-LAST:event_titleTextFieldFocusLost
+
+private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
+    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+    if (b != null) {
+        titleTextField.setText(b.getTitle());
+        URLTextField.setEnabled(b instanceof Bookmark.Item);
+        if (b instanceof Bookmark.Item) {
+            URLTextField.setText(((Bookmark.Item) b).getUrl());
         } else {
-            titleTextField.setText("");
             URLTextField.setText("");
         }
-    }//GEN-LAST:event_jListValueChanged
-    
-    private void URLTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_URLTextFieldFocusLost
-        Bookmark b= (Bookmark)jList.getSelectedValue();
-        b.setUrl( URLTextField.getText() );
-        jList.repaint();
-    }//GEN-LAST:event_URLTextFieldFocusLost
-    
-    private void titleTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_titleTextFieldFocusLost
-        Bookmark b=  (Bookmark) jList.getSelectedValue();
-        b.setTitle(titleTextField.getText());
-        jList.repaint();
-    }//GEN-LAST:event_titleTextFieldFocusLost
-    
-    private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMenuItemActionPerformed
-        int[] remove= jList.getSelectedIndices();
-        for ( int i=remove.length-1; i>=0; i-- ) { this.model.remove( remove[i] ); }
-    }//GEN-LAST:event_deleteMenuItemActionPerformed
-    
-    private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dismissButtonActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_dismissButtonActionPerformed
-    
+    } else {
+        titleTextField.setText("");
+        URLTextField.setText("");
+    }
+}//GEN-LAST:event_jTree1ValueChanged
+
+private void importMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importMenuItemActionPerformed
+    model.doImport(this);
+}//GEN-LAST:event_importMenuItemActionPerformed
+
+private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importUrlMenuItemActionPerformed
+    model.doImportUrl(this);
+}//GEN-LAST:event_importUrlMenuItemActionPerformed
+
+private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetToDefaultMenuItemActionPerformed
+    String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
+    int r = JOptionPane.showConfirmDialog(this, "Reset your bookmarks to " + surl + "?");
+    if (r == JOptionPane.OK_OPTION) {
+        try {
+            URL url = new URL(surl);
+            Document doc = AutoplotUtil.readDoc(url.openStream());
+            List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement());
+            model.setList(book);
+        } catch (SAXException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+}//GEN-LAST:event_resetToDefaultMenuItemActionPerformed
+
+private void exportMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportMenuItemActionPerformed
+    model.doExport(this);
+}//GEN-LAST:event_exportMenuItemActionPerformed
+
+private void closeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_closeMenuItemActionPerformed
+    this.dispose();
+}//GEN-LAST:event_closeMenuItemActionPerformed
+
+private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newFolderMenuItemActionPerformed
+    String s = JOptionPane.showInputDialog("New Folder Name:");
+    if (s != null && !s.equals("")) {
+        model.addBookmark(new Bookmark.Folder(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
+    }
+}//GEN-LAST:event_newFolderMenuItemActionPerformed
+
+private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addItemMenuItemActionPerformed
+    String s = JOptionPane.showInputDialog("Bookmark URL:");
+    if (s != null && !s.equals("")) {
+        model.addBookmark(new Bookmark.Item(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
+    }
+}//GEN-LAST:event_addItemMenuItemActionPerformed
+
+private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMenuItemActionPerformed
+    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+    if (b != null) {
+        if (b instanceof Bookmark.Folder) {
+            if (JOptionPane.showConfirmDialog(this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                model.removeBookmark(b);
+            }
+        } else {
+            model.removeBookmark(b);
+        }
+    }
+}//GEN-LAST:event_deleteMenuItemActionPerformed
+
+private void titleTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_titleTextFieldActionPerformed
+    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+    b.setTitle(titleTextField.getText());
+    jTree1.repaint();
+}//GEN-LAST:event_titleTextFieldActionPerformed
+
     /**
-     * @param args the command line arguments
-     */
+    * @param args the command line arguments
+    */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new BookmarksManager(new javax.swing.JFrame(), true).setVisible(true);
+                BookmarksManager dialog = new BookmarksManager(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
             }
         });
     }
-    
-    private void doImport() {
-        JFileChooser chooser= new JFileChooser();
-        chooser.setFileFilter( new javax.swing.filechooser.FileFilter() {
-            public boolean accept(File f) {
-                return f.isDirectory() || f.getName().endsWith(".xml");
-            }
-            public String getDescription() {
-                return "bookmarks files (*.xml)";
-            }
-        } );
-        int r= chooser.showOpenDialog( this );
-        if ( r==JFileChooser.APPROVE_OPTION ) {
-            try {
-                List<Bookmark> recent= Bookmark.parseBookmarks( AutoplotUtil.readDoc( new FileInputStream( chooser.getSelectedFile()) ) );
-                setList( recent );
-            } catch (SAXException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParserConfigurationException ex) {
-                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    }
-    
-    private void doExport() {
-        JFileChooser chooser= new JFileChooser();
-        chooser.setFileFilter( new javax.swing.filechooser.FileFilter() {
-            public boolean accept(File f) {
-                return f.isDirectory() || f.getName().endsWith(".xml");
-            }
-            public String getDescription() {
-                return "bookmarks files (*.xml)";
-            }
-        } );
-        int r= chooser.showSaveDialog( this );
-        if ( r==JFileChooser.APPROVE_OPTION ) {
-            try {
-                String format= Bookmark.formatBooks( (List<Bookmark>)getList() );
-                FileOutputStream out= new FileOutputStream(chooser.getSelectedFile());
-                out.write( format.getBytes() );
-                out.close();
-            } catch ( IOException e ) {
-                e.printStackTrace();
-            }
-        }
-    }
-    
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ExportButton;
     private javax.swing.JTextField URLTextField;
+    private javax.swing.JMenuItem addItemMenuItem;
     private javax.swing.JMenuItem closeMenuItem;
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JButton dismissButton;
+    private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem exportMenuItem;
     private javax.swing.JButton importButton;
     private javax.swing.JButton importFromWebButton;
     private javax.swing.JMenuItem importMenuItem;
     private javax.swing.JMenuItem importUrlMenuItem;
-    private javax.swing.JPopupMenu itemActionsMenu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JList jList;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTree jTree1;
+    private javax.swing.JMenuItem newFolderMenuItem;
     private javax.swing.JMenuItem resetToDefaultMenuItem;
     private javax.swing.JTextField titleTextField;
     // End of variables declaration//GEN-END:variables
-    
+
 }
