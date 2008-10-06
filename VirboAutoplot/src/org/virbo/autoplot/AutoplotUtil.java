@@ -8,12 +8,19 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import javax.swing.Icon;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.graph.DasColumn;
 import org.das2.util.DasMath;
 import org.das2.util.PersistentStateSupport;
 import java.beans.PropertyChangeEvent;
@@ -23,13 +30,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.graph.DasCanvas;
+import org.das2.graph.DasDevicePosition;
+import org.das2.graph.DasPlot;
 import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -49,6 +62,18 @@ import org.xml.sax.SAXException;
 public class AutoplotUtil {
 
     private final static Logger log = Logger.getLogger("virbo.autoplot.AutoRangeDescriptor.autoRange");
+
+    static ImageIcon createIcon( ApplicationModel model, String surl ) {
+        Image image = model.canvas.getImage( model.canvas.getWidth(), model.canvas.getHeight() );
+        BufferedImage result= new BufferedImage( 64,64, BufferedImage.TYPE_INT_ARGB );
+        Graphics2D g2= (Graphics2D)result.getGraphics();
+        g2.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
+        g2.setTransform( AffineTransform.getScaleInstance( 64./model.canvas.getWidth(), 64./model.canvas.getHeight() ) );
+        g2.drawImage( image, 0, 0, null );
+        
+        return new ImageIcon( result );
+    }
+
 
     public static class AutoRangeDescriptor {
 
@@ -704,4 +729,25 @@ public class AutoplotUtil {
             return deft;
         }
     }
+    
+    /**
+     * set the device position, using spec string like "+5em,80%-5em"
+     */
+    public static void setDevicePosition( DasDevicePosition row, String spec ) throws ParseException {
+        int i= spec.indexOf(",");
+        if ( i==-1 ) throw new IllegalArgumentException("spec must contain one comma");
+        double[] ddmin= DasDevicePosition.parseFormatStr(spec.substring(0,i));
+        double[] ddmax= DasDevicePosition.parseFormatStr(spec.substring(i+1));
+        row.setMinimum(ddmin[0]);
+        row.setEmMinimum(ddmin[1]);
+        row.setPtMinimum((int)ddmin[2]);
+        row.setMaximum(ddmax[0]);
+        row.setEmMaximum(ddmax[1]);
+        row.setPtMaximum((int)ddmax[2]);        
+    }    
+    
+    public static String formatDevicePosition( DasDevicePosition pos ) {
+        return DasDevicePosition.formatLayoutStr( pos, true ) + ", "+DasDevicePosition.formatLayoutStr( pos, false );
+    }
+
 }
