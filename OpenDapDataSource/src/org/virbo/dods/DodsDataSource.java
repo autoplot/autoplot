@@ -50,7 +50,7 @@ public class DodsDataSource extends AbstractDataSource {
     /**
      * the metadata
      */
-    Map<String,Object> metadata;
+    Map<String, Object> metadata;
     DAS das;
 
     /**
@@ -106,30 +106,32 @@ public class DodsDataSource extends AbstractDataSource {
 
         int[] ii = parser.getRecDims(variable);
 
-        for (int i = 0; i < ii.length; i++) {
-            constraint1.append("[0:1:" + ii[i] + "]");
+        if (ii != null) {
+            for (int i = 0; i < ii.length; i++) {
+                constraint1.append("[0:1:" + ii[i] + "]");
+            }
         }
 
         for (int i = 0; i < 3; i++) {
             String dkey = "DEPEND_" + i;
             if (meta.containsKey(dkey)) {
-                Map val= (Map) meta.get(dkey);
+                Map val = (Map) meta.get(dkey);
                 String var = (String) val.get("NAME");
                 int[] ii2 = parser.getRecDims(var);
                 constraint1.append(",").append(var).append("[0:1:" + ii2[0] + "]");
                 da.setDependName(i, var);
 
-                Map<String,Object> depMeta= getMetaData(var);
-                
+                Map<String, Object> depMeta = getMetaData(var);
+
                 Map m = new IstpMetadataModel().properties(depMeta);
 
-                if ( m.containsKey(QDataSet.UNITS) ) {
-                    da.setDimUnits( i,  (Units) m.get(QDataSet.UNITS) );
+                if (m.containsKey(QDataSet.UNITS)) {
+                    da.setDimUnits(i, (Units) m.get(QDataSet.UNITS));
                 }
-                
 
-                da.setDimProperties( i, m );
-                
+
+                da.setDimProperties(i, m);
+
             }
         }
 
@@ -139,20 +141,20 @@ public class DodsDataSource extends AbstractDataSource {
     }
 
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException, CancelledOperationException {
-        
+
         System.err.println("Dods.getDataSet");
         mon.setTaskSize(-1);
         mon.started();
-        
+
         MyDDSParser parser = new MyDDSParser();
         parser.parse(new URL(adapter.getSource().toString() + ".dds").openStream());
 
-        getMetaData( mon );
+        getMetaData(mon);
 
         Map interpretedMetadata = null;
 
         boolean isIstp = adapter.getSource().toString().endsWith(".cdf");
-        if ( isIstp ) {
+        if (isIstp) {
             Map m = new IstpMetadataModel().properties(metadata);
             interpretedMetadata = m;
         }
@@ -168,8 +170,10 @@ public class DodsDataSource extends AbstractDataSource {
                 constraint1.append(adapter.getVariable());
                 if (!adapter.getVariable().contains("[")) {
                     int[] ii = parser.getRecDims(adapter.getVariable());
-                    for (int i = 0; i < ii.length; i++) {
-                        constraint1.append("[0:1:" + ii[i] + "]");
+                    if (ii != null) {
+                        for (int i = 0; i < ii.length; i++) {
+                            constraint1.append("[0:1:" + ii[i] + "]");
+                        }
                     }
                 }
                 adapter.setConstraint(constraint1.toString());
@@ -178,16 +182,16 @@ public class DodsDataSource extends AbstractDataSource {
 
         adapter.loadDataset(mon);
         WritableDataSet ds = (WritableDataSet) adapter.getDataSet();
-        
-        if ( isIstp ) {
+
+        if (isIstp) {
             interpretedMetadata.remove("DEPEND_0");
             interpretedMetadata.remove("DEPEND_1");
             interpretedMetadata.remove("DEPEND_2");
-            DataSetUtil.putProperties( interpretedMetadata, ds);
+            DataSetUtil.putProperties(interpretedMetadata, ds);
         }
-        
+
         mon.finished();
-        
+
         //ds.putProperty( QDataSet.UNITS, null );
         //ds.putProperty( QDataSet.DEPEND_0, null );
         return ds;
@@ -196,46 +200,45 @@ public class DodsDataSource extends AbstractDataSource {
 
     @Override
     public MetadataModel getMetadataModel() {
-        if ( url.toString().contains(".cdf.dds") ) {
+        if (url.toString().contains(".cdf.dds")) {
             return new IstpMetadataModel();
         } else {
             return super.getMetadataModel();
         }
     }
 
-
     /**
      * das must be loaded.
      * @param variable
      * @return
      */
-    private Map<String,Object> getMetaData(String variable) {
+    private Map<String, Object> getMetaData(String variable) {
 
         AttributeTable at = das.getAttributeTable(variable);
         if (at == null) {
-            return new HashMap<String,Object>();
+            return new HashMap<String, Object>();
         } else {
-            Pattern p= Pattern.compile("DEPEND_[0-9]");
-            
+            Pattern p = Pattern.compile("DEPEND_[0-9]");
+
             Enumeration n = at.getNames();
 
-            Map<String,Object> result= new HashMap<String,Object>();
-            
+            Map<String, Object> result = new HashMap<String, Object>();
+
             while (n.hasMoreElements()) {
                 Object key = n.nextElement();
                 Attribute att = at.getAttribute((String) key);
                 try {
-                    if ( p.matcher(att.getName()).matches() ) {
-                        Object val= att.getValueAt(0);
-                        String name= DataSourceUtil.unquote((String)val);
-                        Map<String,Object> newVal= getMetaData( name );
-                        newVal.put( "NAME", name ); // tuck it away, we'll need it later.
-                        result.put( att.getName(), newVal );
-                        
+                    if (p.matcher(att.getName()).matches()) {
+                        Object val = att.getValueAt(0);
+                        String name = DataSourceUtil.unquote((String) val);
+                        Map<String, Object> newVal = getMetaData(name);
+                        newVal.put("NAME", name); // tuck it away, we'll need it later.
+                        result.put(att.getName(), newVal);
+
                     } else {
                         result.put(att.getName(), att.getValueAt(0));
                     }
-                } catch ( Exception e ) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -244,18 +247,18 @@ public class DodsDataSource extends AbstractDataSource {
         }
     }
 
-    private Map<String,Object> getMetaData(ProgressMonitor mon, String variable) throws IOException, DASException, ParseException {
+    private Map<String, Object> getMetaData(ProgressMonitor mon, String variable) throws IOException, DASException, ParseException {
 
         MyDASParser parser = new MyDASParser();
         parser.parse(new URL(adapter.getSource().toString() + ".das").openStream());
 
         das = parser.getDAS();
-        
-        return getMetaData( variable );
+
+        return getMetaData(variable);
     }
 
     @Override
-    public synchronized Map<String,Object> getMetaData(ProgressMonitor mon) throws IOException, DASException, ParseException {
+    public synchronized Map<String, Object> getMetaData(ProgressMonitor mon) throws IOException, DASException, ParseException {
         if (metadata == null) {
             metadata = getMetaData(mon, adapter.getVariable());
         }
