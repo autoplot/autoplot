@@ -63,15 +63,46 @@ public class AutoplotUtil {
 
     private final static Logger log = Logger.getLogger("virbo.autoplot.AutoRangeDescriptor.autoRange");
 
+    /**
+     * creates an icon for the dataset.  Presently this just grabs the autoplot canvas image,
+     * but it should really create a small canvas and let das2 reduce the data before
+     * rendering it.
+     * @param model
+     * @param surl
+     * @return
+     */
     static ImageIcon createIcon( ApplicationModel model, String surl ) {
-        Image image = model.canvas.getImage( model.canvas.getWidth(), model.canvas.getHeight() );
-        BufferedImage result= new BufferedImage( 64,64, BufferedImage.TYPE_INT_ARGB );
+        BufferedImage image = (BufferedImage) model.canvas.getImage( model.canvas.getWidth(), model.canvas.getHeight() );       
+        double aspect= model.canvas.getHeight() / (double)model.canvas.getWidth();
+        return new ImageIcon( scaleImage( image, (int)(32/aspect), 32 ) );
+    }
+
+    /**
+     * create a new Icon that is a scaled instance of the first.  The image
+     * should be a BufferedImage.
+     * @param icon
+     * @param w
+     * @param h
+     * @return
+     */
+    public static Icon scaleIcon(ImageIcon icon, int w, int h ) {
+        double aspect= icon.getIconHeight() / (double)icon.getIconWidth();
+        if ( h==-1 ) {
+            h= (int)( w * aspect );
+        } else if ( w==-1 ) {
+            w= (int)( h / aspect );
+        }
+        BufferedImage image = (BufferedImage)icon.getImage();
+        return new ImageIcon( scaleImage( image, h, w ) );
+    }
+    
+    public static BufferedImage scaleImage( BufferedImage image, int w, int h ) {
+        BufferedImage result= new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
         Graphics2D g2= (Graphics2D)result.getGraphics();
         g2.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
-        g2.setTransform( AffineTransform.getScaleInstance( 64./model.canvas.getWidth(), 64./model.canvas.getHeight() ) );
-        g2.drawImage( image, 0, 0, null );
-        
-        return new ImageIcon( result );
+        g2.setTransform( AffineTransform.getScaleInstance( w/(double)image.getWidth(), h/(double)image.getHeight() ) );
+        g2.drawImage( image, 0, 0, null  );
+        return result;
     }
 
 
