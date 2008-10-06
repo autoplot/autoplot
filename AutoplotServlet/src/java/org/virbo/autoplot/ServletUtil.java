@@ -30,20 +30,5 @@ public class ServletUtil {
         return s;
 
     }
-    
-    /**
-     * set the device position, using spec string like "+5em,80%-5em"
-     */
-    public static void setDevicePosition( DasDevicePosition row, String spec ) throws ParseException {
-        int i= spec.indexOf(",");
-        if ( i==-1 ) throw new IllegalArgumentException("spec must contain one comma");
-        double[] ddmin= DasDevicePosition.parseFormatStr(spec.substring(0,i));
-        double[] ddmax= DasDevicePosition.parseFormatStr(spec.substring(i+1));
-        row.setMinimum(ddmin[0]);
-        row.setEmMinimum(ddmin[1]);
-        row.setPtMinimum((int)ddmin[2]);
-        row.setMaximum(ddmax[0]);
-        row.setEmMaximum(ddmax[1]);
-        row.setPtMaximum((int)ddmax[2]);        
-    }
+   
 }
