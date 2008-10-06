@@ -5,6 +5,8 @@
  */
 package org.virbo.autoplot;
 
+import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.bookmarks.BookmarksManager;
 import com.cottagesystems.jdiskhog.JDiskHogPanel;
 import org.das2.components.DasProgressPanel;
 import org.das2.components.TearoffTabbedPane;
@@ -42,7 +44,6 @@ import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -138,11 +139,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         fillFileMenu();
 
-        List<String> urls = new ArrayList();
+        List<String> urls = new ArrayList<String>();
         List<Bookmark> recent = applicationModel.getRecent();
 
         for (Bookmark b : recent) {
-            urls.add(b.getUrl());
+            urls.add(((Bookmark.Item)b).getUrl());
         }
 
         dataSetSelector.setRecent(urls);
@@ -155,10 +156,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_RECENT)) {
-                    List<String> urls = new ArrayList();
+                    List<String> urls = new ArrayList<String>();
                     List<Bookmark> recent = applicationModel.getRecent();
                     for (Bookmark b : recent) {
-                        urls.add(b.getUrl());
+                        urls.add(((Bookmark.Item)b).getUrl());
                     }
                     dataSetSelector.setRecent(urls);
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_STATUS)) {
@@ -300,6 +301,33 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         b.setConverter(conv);
         bc.bind();
+    }
+
+    private void addBookmarks(JMenu bookmarksMenu, List<Bookmark> bookmarks) {
+
+        for (int i = 0; i < bookmarks.size(); i++) {
+            final Bookmark book = bookmarks.get(i);
+            
+            if ( book instanceof Bookmark.Item ) {
+                JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
+                    public void actionPerformed(ActionEvent e) {
+                        dataSetSelector.setValue(((Bookmark.Item)book).getUrl());
+                        dataSetSelector.maybePlot();
+                    }
+                });
+                
+                mi.setToolTipText(((Bookmark.Item)book).getUrl());
+                if ( book.getIcon()!=null ) {
+                    mi.setIcon( AutoplotUtil.scaleIcon( book.getIcon(), -1, 16 ) );
+                }
+                bookmarksMenu.add(mi);
+            } else {
+                Bookmark.Folder folder= (Bookmark.Folder)book;
+                JMenu subMenu= new JMenu( book.getTitle() );
+                addBookmarks( subMenu, folder.getBookmarks() );
+                bookmarksMenu.add(subMenu);
+            }
+        }
     }
 
     private void fillFileMenu() {
@@ -446,9 +474,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 BookmarksManager man = new BookmarksManager(AutoPlotUI.this, true);
-                man.setList(applicationModel.getBookmarks());
+                man.getModel().setList(applicationModel.getBookmarks());
                 man.setVisible(true);
-                applicationModel.setBookmarks(man.getList());
+                applicationModel.setBookmarks(man.getModel().getList());
+                updateBookmarks();
             }
         });
 
@@ -479,18 +508,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bookmarksMenu.add(item);
         bookmarksMenu.add(new JSeparator());
 
-        for (int i = 0; i < bookmarks.size(); i++) {
-            final Bookmark book = bookmarks.get(i);
-            JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
-
-                public void actionPerformed(ActionEvent e) {
-                    dataSetSelector.setValue(book.getUrl());
-                    dataSetSelector.maybePlot();
-                }
-            });
-            mi.setToolTipText(book.getUrl());
-            bookmarksMenu.add(mi);
-        }
+        addBookmarks( bookmarksMenu, bookmarks );
     }
 
     /** This method is called from within the constructor to
