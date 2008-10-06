@@ -27,11 +27,11 @@
           </Group>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="fileNameLabel" pref="402" max="32767" attributes="0"/>
+              <Component id="fileNameLabel" pref="406" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="caretPositionLabel" min="-2" pref="87" max="-2" attributes="0"/>
           </Group>
-          <Component id="jScrollPane1" alignment="0" pref="507" max="32767" attributes="0"/>
+          <Component id="jScrollPane1" alignment="0" pref="511" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -114,6 +114,11 @@
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
         <Component class="org.virbo.autoplot.scriptconsole.EditorTextPane" name="textArea">
+          <Properties>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Monospaced" size="13" style="0"/>
+            </Property>
+          </Properties>
         </Component>
       </SubComponents>
     </Container>
