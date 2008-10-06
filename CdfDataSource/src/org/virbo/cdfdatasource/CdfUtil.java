@@ -16,7 +16,6 @@ import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFException;
 import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
-import gsfc.nssdc.cdf.util.Epoch16;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.HashMap;
@@ -278,7 +277,7 @@ public class CdfUtil {
             if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
                 result = FDataSet.wrap((float[]) odata);
 
-            } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE || varType == Variable.CDF_EPOCH) {
+            } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE ) {
                 result = DDataSet.wrap((double[]) odata);
 
             } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT4) {
@@ -299,6 +298,7 @@ public class CdfUtil {
                 }
                 result = DDataSet.wrap(back);
                 result.putProperty(QDataSet.UNITS, units);
+                
             } else if ( varType== Variable.CDF_EPOCH ) {
                 result = DDataSet.wrap((double[]) odata);
                 result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
