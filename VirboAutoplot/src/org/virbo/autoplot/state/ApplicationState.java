@@ -466,6 +466,59 @@ public class ApplicationState {
         this.autolayout = autolayout;
         propertyChangeSupport.firePropertyChange(PROP_AUTOLAYOUT, oldAutolayout, autolayout);
     }
+    
+    protected String column = null;
+    public static final String PROP_COLUMN = "column";
+
+    public String getColumn() {
+        return column;
+    }
+
+    public void setColumn(String column) {
+        String oldColumn = this.column;
+        this.column = column;
+        propertyChangeSupport.firePropertyChange(PROP_COLUMN, oldColumn, column);
+    }
+
+    protected String row1 = null;
+    public static final String PROP_ROW1 = "row1";
+
+    public String getRow1() {
+        return row1;
+    }
+
+    public void setRow1(String row1) {
+        String oldRow1 = this.row1;
+        this.row1 = row1;
+        propertyChangeSupport.firePropertyChange(PROP_ROW1, oldRow1, row1);
+    }
+
+    protected String row2 = null;
+    public static final String PROP_ROW2 = "row2";
+
+    public String getRow2() {
+        return row2;
+    }
+
+    public void setRow2(String row2) {
+        String oldRow2 = this.row2;
+        this.row2 = row2;
+        propertyChangeSupport.firePropertyChange(PROP_ROW2, oldRow2, row2);
+    }
+
+    protected boolean isotropic = false;
+    
+    public static final String PROP_ISOTROPIC = "isotropic";
+
+    public boolean isIsotropic() {
+        return isotropic;
+    }
+
+    public void setIsotropic(boolean isotropic) {
+        boolean oldIsotropic = this.isotropic;
+        this.isotropic = isotropic;
+        propertyChangeSupport.firePropertyChange(PROP_ISOTROPIC, oldIsotropic, isotropic);
+    }
 
     private String title = "";
 
