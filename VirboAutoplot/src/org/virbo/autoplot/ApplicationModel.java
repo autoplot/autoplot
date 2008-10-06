@@ -8,6 +8,7 @@
  */
 package org.virbo.autoplot;
 
+import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
 import org.das2.CancelledOperationException;
 import org.das2.DasApplication;
@@ -80,10 +81,14 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.graph.DasDevicePosition;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.layout.LayoutUtil;
@@ -131,7 +136,6 @@ public class ApplicationModel {
     Timer tickleTimer;
     Timer updateTsbTimer;
     Options options;
-    
 
     /**
      * guess the best dimension to slice by default, based on metadata.  Currently,
@@ -221,6 +225,7 @@ public class ApplicationModel {
     }
 
     enum RenderType {
+
         spectrogram, series, scatter, histogram, fill_to_zero,
     }
     /**
@@ -258,12 +263,10 @@ public class ApplicationModel {
      * data source has been requested
      */
     public static String PROPERTY_DATASOURCE = "dataSource";
-    
     /**
      * data source URL can change because of TSB without data source changing.
      */
-    public static String PROPERTY_DATASOURCE_URL= "dataSourceURL";
-    
+    public static String PROPERTY_DATASOURCE_URL = "dataSourceURL";
     /**
      * dataset with fill data has been recalculated
      */
@@ -323,19 +326,19 @@ public class ApplicationModel {
         headless = "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false"));
 
         options = new Options();
-        if ( !headless && DasApplication.hasAllPermission() ) options.loadPreferences();
-        
+        if (!headless && DasApplication.hasAllPermission()) options.loadPreferences();
+
         canvas = new DasCanvas();
-        
-        if ( options.getCanvasFont().equals("") ) {
+
+        if (options.getCanvasFont().equals("")) {
             canvas.setFont(canvas.getFont().deriveFont(Font.ITALIC, 18.f));
         } else {
-            canvas.setFont( Font.decode(options.getCanvasFont()) );
+            canvas.setFont(Font.decode(options.getCanvasFont()));
         }
-        
+
         canvas.setForeground(options.getForeground());
         canvas.setBackground(options.getBackground());
-        
+
         canvas.setPrintingTag("");
 
         canvas.addPropertyChangeListener(listener);
@@ -359,6 +362,7 @@ public class ApplicationModel {
         tickleTimer.setRepeats(false);
 
         updateTsbTimer = new Timer(100, new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 updateTsb();
             }
@@ -432,7 +436,7 @@ public class ApplicationModel {
 
         overSeriesRend = new SeriesRenderer();
         overSeriesRend.setColor(canvas.getForeground());
-                
+
         plot.addRenderer(seriesRend);
         overviewPlot.addRenderer(overSeriesRend);
         overviewPlot.setPreviewEnabled(true);
@@ -509,51 +513,51 @@ public class ApplicationModel {
      * used to explicitly set the rendering type.
      * @param renderType
      */
-    public void setRenderType( RenderType renderType ) {
-        WritableDataSet fillDs= (WritableDataSet) this.fillDataset;
-        
+    public void setRenderType(RenderType renderType) {
+        WritableDataSet fillDs = (WritableDataSet) this.fillDataset;
+
         if (renderType == RenderType.spectrogram) {
-            
+
             setRenderer(spectrogramRend, overSpectrogramRend);
 
-        } else if ( renderType ==RenderType.series ) {
+        } else if (renderType == RenderType.series) {
 
             seriesRend.setPsymConnector(PsymConnector.SOLID);
             seriesRend.setHistogram(false);
             seriesRend.setFillToReference(false);
-            
-            setRenderer( seriesRend, overSeriesRend );
 
-        } else if ( renderType==RenderType.scatter ) {
-            seriesRend.setPsymConnector( PsymConnector.NONE );
+            setRenderer(seriesRend, overSeriesRend);
+
+        } else if (renderType == RenderType.scatter) {
+            seriesRend.setPsymConnector(PsymConnector.NONE);
             seriesRend.setFillToReference(false);
-            
-            setRenderer( seriesRend, overSeriesRend );
 
-        } else if ( renderType==RenderType.histogram ) {
-            seriesRend.setPsymConnector( PsymConnector.SOLID );
+            setRenderer(seriesRend, overSeriesRend);
+
+        } else if (renderType == RenderType.histogram) {
+            seriesRend.setPsymConnector(PsymConnector.SOLID);
             seriesRend.setFillToReference(true);
             seriesRend.setHistogram(true);
-            
-            setRenderer( seriesRend, overSeriesRend );
-            
-        } else if ( renderType==RenderType.fill_to_zero ) {
-            seriesRend.setPsymConnector( PsymConnector.SOLID );
-            seriesRend.setFillToReference(true);            
-            seriesRend.setHistogram(false);
-            
+
             setRenderer(seriesRend, overSeriesRend);
-            
+
+        } else if (renderType == RenderType.fill_to_zero) {
+            seriesRend.setPsymConnector(PsymConnector.SOLID);
+            seriesRend.setFillToReference(true);
+            seriesRend.setHistogram(false);
+
+            setRenderer(seriesRend, overSeriesRend);
+
         } else {
-            throw new IllegalArgumentException("not supported: "+renderType );
-            
+            throw new IllegalArgumentException("not supported: " + renderType);
+
         }
-        
-        
+
+
     }
-    
-    public void setRenderType( RenderType renderType, boolean autorange, boolean interpretMetadata, WritableDataSet fillDs, Map properties ) {
-        
+
+    public void setRenderType(RenderType renderType, boolean autorange, boolean interpretMetadata, WritableDataSet fillDs, Map properties) {
+
         if (renderType == RenderType.spectrogram) {
             updateFillSpec(fillDs, autorange, interpretMetadata ? properties : Collections.EMPTY_MAP);
             seriesRend.setDataSet(null);
@@ -570,15 +574,15 @@ public class ApplicationModel {
             setRenderer(seriesRend, overSeriesRend);
 
         }
-        
+
     }
-    
-    private RenderType getRenderType() {
-        RenderType spec = dataset.rank() >= 2 ? RenderType.spectrogram : RenderType.series;
 
-        QDataSet dep1 = (QDataSet) dataset.property(QDataSet.DEPEND_1);
+    private RenderType getRenderType(QDataSet fillds) {
+        RenderType spec = fillds.rank() >= 2 ? RenderType.spectrogram : RenderType.series;
 
-        if (dataset.rank() == 2 && dep1 != null && isVectorOrBundleIndex(dep1)) {
+        QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
+
+        if (fillds.rank() == 2 && dep1 != null && isVectorOrBundleIndex(dep1)) {
             spec = RenderType.series;
         }
 
@@ -637,20 +641,20 @@ public class ApplicationModel {
      *   might be done.
      */
     private void setDataSetInternal(QDataSet ds, boolean autorange) {
-        
-        List<String> problems= new ArrayList<String>();
-        
-        if ( ds!=null && ! DataSetUtil.validate( ds, problems ) ) {
-            StringBuffer message= new StringBuffer( "data set is invalid:\n" );
-            for ( String s: problems ) {
-                message.append(s+"\n");
+
+        List<String> problems = new ArrayList<String>();
+
+        if (ds != null && !DataSetUtil.validate(ds, problems)) {
+            StringBuffer message = new StringBuffer("data set is invalid:\n");
+            for (String s : problems) {
+                message.append(s + "\n");
             }
-            JOptionPane.showMessageDialog( canvas, message );
+            JOptionPane.showMessageDialog(canvas, message);
             return;
         }
-        
+
         this.dataset = ds;
-        this.embedDsDirty= true;
+        this.embedDsDirty = true;
 
         if (dataset == null) {
             seriesRend.setDataSet(null);
@@ -676,7 +680,7 @@ public class ApplicationModel {
         setDepnames(Arrays.asList(depNames));
         if (dataset.rank() > 2) guessSliceDimension();
 
-        updateFill(autorange,true);
+        updateFill(autorange, true);
 
         originalXRange = plot.getXAxis().getDatumRange();
         originalYRange = plot.getYAxis().getDatumRange();
@@ -700,45 +704,45 @@ public class ApplicationModel {
         if (tsb == null) {
             return;
         }
-        if (UnitsUtil.isTimeLocation( ApplicationModel.this.plot.getXAxis().getUnits())) {
-            
+        if (UnitsUtil.isTimeLocation(ApplicationModel.this.plot.getXAxis().getUnits())) {
+
             // CacheTag "tag" identifies what we have already
             QDataSet ds = dataset;
             QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
             CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
-            
-            DatumRange visibleRange= ApplicationModel.this.plot.getXAxis().getDatumRange();
-            
+
+            DatumRange visibleRange = ApplicationModel.this.plot.getXAxis().getDatumRange();
+
             Datum newResolution = visibleRange.width().divide(ApplicationModel.this.plot.getXAxis().getDLength());
 
             // don't waste time by chasing after 10% of a dataset.
             DatumRange newRange = visibleRange;
             newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
-            
+
             CacheTag newCacheTag = new CacheTag(newRange, newResolution);
-            
+
             if (tag == null || !tag.contains(newCacheTag)) {
-                if ( plot.isOverSize() ) {
-                    visibleRange= DatumRangeUtil.rescale( visibleRange, -0.3, 1.3 );
+                if (plot.isOverSize()) {
+                    visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3);
                 }
                 tsb.setTimeRange(visibleRange);
                 tsb.setTimeResolution(newResolution);
                 String surl;
-                surl= DataSetURL.getDataSourceUri( dataSource );
-              // check the registry for URLs, compare to surl, append prefix if necessary.
+                surl = DataSetURL.getDataSourceUri(dataSource);
+                // check the registry for URLs, compare to surl, append prefix if necessary.
                 if (surl.equals(this.surl)) {
                     logger.fine("we do no better with tsb");
                 } else {
                     update(false, false);
-                    String oldVal= this.surl;
-                    this.surl= surl;
+                    String oldVal = this.surl;
+                    this.surl = surl;
                     propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE_URL, oldVal, surl);
                 }
-            } 
+            }
         }
     }
 
-    public void setDataSource( DataSource dataSource ) {
+    public void setDataSource(DataSource dataSource) {
 
         DataSource oldSource = this.dataSource;
         this.dataSource = dataSource;
@@ -746,7 +750,7 @@ public class ApplicationModel {
         if (dataSource == null) {
             caching = null;
             tsb = null;
-            this.surl= null;
+            this.surl = null;
 
             if (timeSeriesBrowseListener != null) {
                 this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
@@ -757,21 +761,22 @@ public class ApplicationModel {
 
             caching = dataSource.getCapability(Caching.class);
             tsb = dataSource.getCapability(TimeSeriesBrowse.class);
-            
+
             if (tsb != null) {
-                
+
                 if (timeSeriesBrowseListener != null) {
                     this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
                 }
-                
-                boolean setTsbInitialResolution= true;
-                if ( setTsbInitialResolution ) {
-                    DatumRange timeRange= tsb.getTimeRange();
+
+                boolean setTsbInitialResolution = true;
+                if (setTsbInitialResolution) {
+                    DatumRange timeRange = tsb.getTimeRange();
                     this.plot.getXAxis().resetRange(timeRange);
                     updateTsb();
                 }
-                
+
                 timeSeriesBrowseListener = new PropertyChangeListener() {
+
                     public void propertyChange(PropertyChangeEvent e) {
                         if (plot.getXAxis().valueIsAdjusting()) {
                             return;
@@ -781,9 +786,9 @@ public class ApplicationModel {
                         }
                     }
                 };
-                
-                this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);                
-                
+
+                this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);
+
             } else {
                 if (timeSeriesBrowseListener != null) {
                     this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
@@ -1048,7 +1053,7 @@ public class ApplicationModel {
      */
     protected void updateFill(boolean autorange, boolean interpretMetadata) {
         logger.fine("enter updateFill");
-        
+
         if (dataset == null) {
             return;
         }
@@ -1105,7 +1110,7 @@ public class ApplicationModel {
 
         }
 
-        RenderType renderType = getRenderType();
+        RenderType renderType = getRenderType(fillDs);
 
         ApplicationState newState = this.createState(false);
 
@@ -1159,7 +1164,7 @@ public class ApplicationModel {
         // check the dataset for fill data, inserting canonical fill values.
         AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
 
-        setRenderType( renderType, autorange, interpretMetadata, fillDs, properties );
+        setRenderType(renderType, autorange, interpretMetadata, fillDs, properties);
 
         if (autorange) {
             if (plot.getXAxis().getUnits().isConvertableTo(Units.us2000)) {
@@ -1260,7 +1265,7 @@ public class ApplicationModel {
                 if (dataSource != null) {
                     if (mon != null) {
                         System.err.println("double load!");
-                        mon.cancel();
+                        if (mon != null) mon.cancel();
                     }
 
                     QDataSet dataset = loadDataSet(0);
@@ -1319,7 +1324,11 @@ public class ApplicationModel {
             } finally {
                 // don't trust the data sources to call finished when an exception occurs.
                 mymon.finished();
-                if (mymon == this.mon) this.mon = null;
+                if (mymon == this.mon) {
+                    this.mon = null;
+                } else {
+                    System.err.println("not my mon, somebody better delete it!");
+                }
             }
         }
         return dataset;
@@ -1448,10 +1457,11 @@ public class ApplicationModel {
 
         propertyChangeSupport.firePropertyChange(PROPERTY_FILL, null, null);
     }
-    protected List<Bookmark> recent = new LinkedList<Bookmark>();
-    protected List<Bookmark> bookmarks = new ArrayList<Bookmark>();
+    protected List<Bookmark> recent = null;
+    protected List<Bookmark> bookmarks = null;
 
     public List<Bookmark> getRecent() {
+        if (recent != null) return recent;
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
         String srecent = prefs.get("recent", "");
 
@@ -1495,6 +1505,7 @@ public class ApplicationModel {
     }
 
     public List<Bookmark> getBookmarks() {
+        if (bookmarks != null) return bookmarks;
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
         String sbookmark = prefs.get("bookmarks", "");
 
@@ -1547,10 +1558,9 @@ public class ApplicationModel {
 
     public void addRecent(String surl) {
         List oldValue = Collections.unmodifiableList(recent);
-        ArrayList newValue = new ArrayList(recent);
-        Bookmark book = new Bookmark(surl);
+        ArrayList<Bookmark> newValue = new ArrayList<Bookmark>(recent);
+        Bookmark book = new Bookmark.Item(surl);
         if (newValue.contains(book)) { // move it to the front of the list
-
             newValue.remove(book);
         }
 
@@ -1560,7 +1570,12 @@ public class ApplicationModel {
         }
 
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put("recent", Bookmark.formatBooks(newValue));
+        String s = Bookmark.formatBooks(newValue);
+        while (s.length() > Preferences.MAX_VALUE_LENGTH) {
+            newValue.remove(0);
+            s = Bookmark.formatBooks(newValue);
+        }
+        prefs.put("recent", s);
 
         try {
             prefs.flush();
@@ -1571,26 +1586,42 @@ public class ApplicationModel {
         propertyChangeSupport.firePropertyChange(PROPERTY_RECENT, oldValue, recent);
     }
 
-    public void addBookmark(String surl) {
-        List oldValue = Collections.unmodifiableList(new ArrayList());
-        List newValue = new ArrayList(bookmarks);
-        if (newValue.contains(surl)) { // move it to the front of the list
+    public void addBookmark(final String surl) {
 
-            newValue.remove(surl);
-        }
+        Runnable run = new Runnable() {
 
-        newValue.add(new Bookmark(surl));
+            public void run() {
+                ImageIcon icon = null;
 
-        Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put("bookmarks", Bookmark.formatBooks(newValue));
+                if (surl.equals(ApplicationModel.this.surl)) {
+                    //disable icons for now, because they fill up the preferences, which can only be 8K.
+                    //icon = AutoplotUtil.createIcon(ApplicationModel.this, surl);
+                }
 
-        try {
-            prefs.flush();
-        } catch (BackingStoreException ex) {
-            ex.printStackTrace();
-        }
-        this.bookmarks = newValue;
-        propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
+                List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
+                List<Bookmark> newValue = new ArrayList<Bookmark>(bookmarks);
+                if (newValue.contains(surl)) { // move it to the front of the list
+                    newValue.remove(surl);
+                }
+
+                Bookmark.Item item = new Bookmark.Item(surl);
+                if (icon != null) item.setIcon(icon);
+                newValue.add(item);
+
+                Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+                prefs.put("bookmarks", Bookmark.formatBooks(newValue));
+
+                try {
+                    prefs.flush();
+                } catch (BackingStoreException ex) {
+                    ex.printStackTrace();
+                }
+                ApplicationModel.this.bookmarks = newValue;
+                propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
+            }
+        };
+        //new Thread( run ).start();
+        new Thread( run ).run(); // if we are not going to make icons, then don't introduce new bugs with the extra thread.
     }
 
     public void exit() {
@@ -1616,15 +1647,15 @@ public class ApplicationModel {
         Font f = this.canvas.getFont();
         f = f.deriveFont(f.getSize2D() * 1.1f);
         this.canvas.setFont(f);
-        this.options.setCanvasFont( Options.getFontLabel(f) );
-        
+        this.options.setCanvasFont(Options.getFontLabel(f));
+
     }
 
     void decreaseFontSize() {
         Font f = this.canvas.getFont();
         f = f.deriveFont(f.getSize2D() / 1.1f);
         this.canvas.setFont(f);
-        this.options.setCanvasFont( Options.getFontLabel(f) );
+        this.options.setCanvasFont(Options.getFontLabel(f));
     }
 
     DasAxis getXAxis() {
@@ -1663,7 +1694,7 @@ public class ApplicationModel {
         state.getOptions().setForeground(canvas.getForeground());
         state.getOptions().setColor(seriesRend.getColor());
         state.getOptions().setFillColor(seriesRend.getFillColor());
-        state.getOptions().setCanvasFont( Options.getFontLabel(canvas.getFont()) );
+        state.getOptions().setCanvasFont(Options.getFontLabel(canvas.getFont()));
 
         state.setFillToReference(seriesRend.isFillToReference());
         state.setReference(formatObject(seriesRend.getReference()));
@@ -1675,6 +1706,14 @@ public class ApplicationModel {
         state.setAutoOverview(isAutoOverview());
 
         state.setAutoranging(isAutoranging());
+        state.setAutolabelling(isAutolabelling());
+        state.setAutolayout(isAutolayout());
+        state.setIsotropic(isIsotropic());
+
+        state.setColumn(AutoplotUtil.formatDevicePosition(plot.getColumn()));
+        state.setRow1(AutoplotUtil.formatDevicePosition(plot.getRow()));
+        state.setRow2(AutoplotUtil.formatDevicePosition(overviewPlot.getRow()));
+
         state.setUseEmbeddedDataSet(isUseEmbeddedDataSet());
 
         if (deep && isUseEmbeddedDataSet()) {
@@ -1763,8 +1802,8 @@ public class ApplicationModel {
             seriesRend.setFillColor(state.getOptions().getFillColor());
         }
 
-        if ( !state.getOptions().getCanvasFont().equals("") ) {
-            canvas.setFont( Font.decode(state.getOptions().getCanvasFont() ) );
+        if (!state.getOptions().getCanvasFont().equals("")) {
+            canvas.setFont(Font.decode(state.getOptions().getCanvasFont()));
         }
 
         seriesRend.setFillToReference(state.isFillToReference());
@@ -1783,6 +1822,17 @@ public class ApplicationModel {
         setShowContextOverview(state.isShowContextOverview());
         setAutoOverview(state.isAutoOverview());
         setAutoranging(state.isAutoranging());
+        setAutolabelling(state.isAutolabelling());
+        setAutolayout(state.isAutolayout());
+        setIsotropic(state.isIsotropic());
+
+        try {
+            if (state.getColumn() != null) AutoplotUtil.setDevicePosition(plot.getColumn(), state.getColumn());
+            if (state.getRow1() != null) AutoplotUtil.setDevicePosition(plot.getRow(), state.getRow1());
+            if (state.getRow2() != null) AutoplotUtil.setDevicePosition(overviewPlot.getRow(), state.getRow2());
+        } catch (ParseException ex) {
+            throw new RuntimeException(ex);
+        }
 
         setUseEmbeddedDataSet(state.isUseEmbeddedDataSet());
 
@@ -1936,13 +1986,13 @@ public class ApplicationModel {
 
             ByteArrayOutputStream out = new ByteArrayOutputStream(10000);
             //DeflaterOutputStream dos= new DeflaterOutputStream(out);
-            OutputStream dos= out;
+            OutputStream dos = out;
 
             SimpleStreamFormatter format = new SimpleStreamFormatter();
             format.format(dataset, dos, false);
 
             dos.close();
-            
+
             byte[] data = Base64.encodeBytes(out.toByteArray()).getBytes();
 
             embedDs = new String(data);
@@ -1973,12 +2023,12 @@ public class ApplicationModel {
         byte[] data = Base64.decode(embedDs);
         InputStream in = new ByteArrayInputStream(data);
         //InflaterChannel ich= new InflaterChannel( Channels.newChannel(in) );
-        ReadableByteChannel ich= Channels.newChannel(in);
-        
+        ReadableByteChannel ich = Channels.newChannel(in);
+
         QDataSetStreamHandler handler = new QDataSetStreamHandler();
         try {
             org.virbo.qstream.StreamTool.readStream(ich, handler);
-            setDataSetInternal( handler.getDataSet(), false );
+            setDataSetInternal(handler.getDataSet(), false);
 
         } catch (org.virbo.qstream.StreamException ex) {
             Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
@@ -2205,7 +2255,8 @@ public class ApplicationModel {
      * @return
      */
     public int getMaxSliceIndex(int sliceDimension) {
-        if (dataset==null ) return 0;
+        if (dataset == null) return 0;
+        if (sliceDimension == 0) return dataset.length();
         int[] qube = DataSetUtil.qubeDims(dataset);
         if (qube == null || qube.length <= sliceDimension) {
             return 0;
