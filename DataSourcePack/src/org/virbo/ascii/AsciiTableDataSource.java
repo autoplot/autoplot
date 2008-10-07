@@ -95,6 +95,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
         DDataSet vds = null;
         DDataSet dep0 = null;
 
+        if ( ( column==null ) && ( timeColumn!=-1 ) ) {
+            column= parser.getFieldNames()[timeColumn];
+        }
+        
         if (column != null) {
             int icol = parser.getFieldIndex(column);
             if (icol == -1) {
@@ -108,8 +112,12 @@ public class AsciiTableDataSource extends AbstractDataSource {
             }
             vds = DDataSet.copy(DataSetOps.slice1(ds, icol));
             vds.putProperty(QDataSet.UNITS, parser.getUnits(icol));
-            if (validMax != Double.POSITIVE_INFINITY) vds.putProperty(QDataSet.VALID_MAX, validMax);
-            if (validMin != Double.NEGATIVE_INFINITY) vds.putProperty(QDataSet.VALID_MIN, validMin);
+            if (validMax != Double.POSITIVE_INFINITY) {
+                vds.putProperty(QDataSet.VALID_MAX, validMax);
+            }
+            if (validMin != Double.NEGATIVE_INFINITY) {
+                vds.putProperty(QDataSet.VALID_MIN, validMin);
+            }
         }
 
         if (depend0 != null) {
@@ -125,16 +133,21 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (dep0 != null) {
                 ds.putProperty(QDataSet.DEPEND_0, dep0); // DANGER
             }
-            Units u= parser.getUnits(rank2[0]);
-            for ( int i=rank2[0]; i<rank2[1]; i++ ) {
-                if ( u!=parser.getUnits(i) ) {
-                    u= null;
+            Units u = parser.getUnits(rank2[0]);
+            for (int i = rank2[0]; i < rank2[1]; i++) {
+                if (u != parser.getUnits(i)) {
+                    u = null;
                 }
             }
-            if ( u!=null ) ds.putProperty(QDataSet.UNITS, u );
-            if (validMax != Double.POSITIVE_INFINITY) ds.putProperty(QDataSet.VALID_MAX, validMax);
-            if (validMin != Double.NEGATIVE_INFINITY) ds.putProperty(QDataSet.VALID_MIN, validMin);
-
+            if (u != null) {
+                ds.putProperty(QDataSet.UNITS, u);
+            }
+            if (validMax != Double.POSITIVE_INFINITY) {
+                ds.putProperty(QDataSet.VALID_MAX, validMax);
+            }
+            if (validMin != Double.NEGATIVE_INFINITY) {
+                ds.putProperty(QDataSet.VALID_MIN, validMin);
+            }
             return DataSetOps.leafTrim(ds, rank2[0], rank2[1]);
         } else {
             if (vds == null) {
@@ -197,15 +210,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
             delim = null;
         }
         if (delim == null) {
-            String line= parser.readFirstRecord(file.toString());
-            if ( line==null ) {
+            String line = parser.readFirstRecord(file.toString());
+            if (line == null) {
                 throw new IllegalArgumentException("no records found");
             }
             AsciiParser.DelimParser p = parser.guessDelimParser(line);
             columnCount = p.fieldCount();
             delim = p.getDelim();
         } else {
-            if (delim.equals("+")) delim = " ";
+            if (delim.equals("+")) {
+                delim = " ";
+            }
             columnCount = parser.setDelimParser(file.toString(), delim).fieldCount();
         }
         //parser.setPropertyPattern( Pattern.compile("^#\\s*(.+)\\s*\\:\\s*(.+)\\s*") );
@@ -281,11 +296,30 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (o != null) {
             String timeFormat = o;
             timeFormat = timeFormat.replaceAll("\\+", " ");
-            timeParser = TimeParser.create(o);
             String timeColumnName = params.get("time");
             timeColumn = timeColumnName == null ? 0 : parser.getFieldIndex(timeColumnName);
 
-            if (delim != null && timeFormat.split(delim, -2).length > 1) {
+            if (timeFormat.equals("ISO8601")) {
+                String line = parser.readFirstParseableRecord(file.toString());
+                String[] ss = parser.getRecordParser().fields(line);
+                int i = parser.getFieldIndex(timeColumnName);
+                if (i == -1) {
+                    i = 0;
+                }
+                String atime = ss[i];
+                timeFormat = TimeParser.iso8601String(atime);
+                timeParser = TimeParser.create((String) timeFormat);
+                final Units u = Units.t2000;
+                parser.setUnits(i, u);
+                AsciiParser.FieldParser timeFieldParser = new AsciiParser.FieldParser() {
+                    public double parseField(String field, int fieldIndex) throws ParseException {
+                        return timeParser.parse(field).getTime(u);
+                    }
+                };
+                parser.setFieldParser(i, timeFieldParser);
+
+            } else if (delim != null && timeFormat.split(delim, -2).length > 1) {
+                timeParser = TimeParser.create(timeFormat);
                 // we've got a special case here: the time spans multiple columns, so we'll have to combine later.
                 parser.setUnits(timeColumn, Units.dimensionless);
                 timeFormats = timeFormat.split(delim, -2);
@@ -294,7 +328,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if (ib != -1) {
                     int monthColumn = timeFormat.substring(0, ib).split("%", -2).length - 1;
                     AsciiParser.FieldParser monthNameFieldParser = new AsciiParser.FieldParser() {
-
                         public double parseField(String field, int columnIndex) throws ParseException {
                             return TimeUtil.monthNumber(field);
                         }
@@ -303,11 +336,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
 
             } else {
-
+                timeParser = TimeParser.create(timeFormat);
                 final Units u = Units.t2000;
                 parser.setUnits(timeColumn, u);
                 AsciiParser.FieldParser timeFieldParser = new AsciiParser.FieldParser() {
-
                     public double parseField(String field, int fieldIndex) throws ParseException {
                         return timeParser.parse(field).getTime(u);
                     }
@@ -408,18 +440,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (ds == null) {
             return new HashMap<String, Object>();
         }
-
         @SuppressWarnings("unchecked")
         Map<String, Object> props = (Map<String, Object>) ds.property(QDataSet.USER_PROPERTIES);
-        String header= (String) props.get("fileHeader");
-        if ( header!=null ) {
-             header = header.replaceAll("\t", "\\\\t");
-             props.put( "fileHeader", header );
+        String header = (String) props.get("fileHeader");
+        if (header != null) {
+            header = header.replaceAll("\t", "\\\\t");
+            props.put("fileHeader", header);
         }
-        String firstRecord= (String) props.get("firstRecord");
-        if ( firstRecord!=null ) {
+        String firstRecord = (String) props.get("firstRecord");
+        if (firstRecord != null) {
             firstRecord = firstRecord.replaceAll("\t", "\\\\t");
-            props.put("firstRecord",firstRecord);
+            props.put("firstRecord", firstRecord);
         }
 
         return props;
