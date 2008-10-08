@@ -122,7 +122,7 @@
         <copy todir="${jnlp.dir}/lib/">
             <fileset dir="${dist.dir}/lib" includes="**/*.jar,**/dasCore.jar" excludes="**/[a-z]*.jar" />
         </copy>
-        <!-- delete doesn't work for me!  rm i* l* p* b* c* v* n* g* j* m* x* s* -->
+        
         <delete>
             <fileset file="${jnlp.dir}/lib/batik-awt-util.jar" />
             <fileset file="${jnlp.dir}/lib/batik-svggen.jar" />
