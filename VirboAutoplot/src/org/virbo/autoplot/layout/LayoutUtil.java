@@ -23,7 +23,8 @@ public class LayoutUtil {
     
     private static void maybeSetMaximum( DasDevicePosition c, double need, double norm, double em, int pt ) {
        em= Math.floor(em);
-       if ( ALLOW_EXCESS_SPACE && need < 0) return;
+       double excess= -1 * ( c.getEmMaximum() - em );
+       if ( ALLOW_EXCESS_SPACE && c.getMaximum()==norm && excess>=0 && excess<4  ) return;
        if ( Math.abs(c.getEmMaximum()-em )<0.1
                && Math.abs( norm-c.getMaximum() )<0.001 ) return;
         c.setMaximum(norm);
@@ -33,7 +34,8 @@ public class LayoutUtil {
     
     private static void maybeSetMinimum( DasDevicePosition c, double need, double norm, double em, int pt ) {
         em= Math.ceil(em);
-        if ( ALLOW_EXCESS_SPACE && need < 0 ) return;
+        double excess=  c.getEmMaximum() - em ;
+        if ( ALLOW_EXCESS_SPACE && c.getMinimum()==norm && excess>=0 && excess<4  ) return;
         if ( Math.abs(c.getEmMinimum()-em)<0.1 
                 && Math.abs( norm-c.getMinimum() )<0.001 ) return;
         c.setMinimum(norm);
