@@ -9,6 +9,9 @@
 
 package org.virbo.spase;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.io.BufferedReader;
@@ -20,10 +23,11 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import javax.swing.tree.TreeModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.apache.xerces.parsers.DOMParser;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
@@ -126,14 +130,14 @@ public class SpaseRecordDataSource implements DataSource {
     }
     
     private void readXML() throws IOException, SAXException {
-        DOMParser parser = new org.apache.xerces.parsers.DOMParser();
-        
-        Reader in = new BufferedReader( new InputStreamReader( url.openStream() ) );
-        InputSource input = new org.xml.sax.InputSource(in);
-        
-        parser.parse(input);
-        
-        document = parser.getDocument();
+        DocumentBuilder builder= null;
+        try {
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException ex) {
+            throw new RuntimeException(ex);
+        }
+        InputSource source = new InputSource( url.openStream() );
+        document = builder.parse(source);
         
     }
     

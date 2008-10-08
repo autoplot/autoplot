@@ -3,14 +3,16 @@
  */
 package org.virbo.spase;
 
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.*;                // Core DOM classes
 import org.w3c.dom.traversal.*;      // TreeWalker and related DOM classes
-import org.apache.xerces.parsers.*;  // Apache Xerces parser classes
 import org.xml.sax.*;                // Xerces DOM parser uses some SAX classes
 import javax.swing.*;                // Swing classes 
 import javax.swing.tree.*;           // TreeModel and related classes
 import javax.swing.event.*;          // Tree-related event classes
 import java.io.*;                    // For reading the input XML file
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 
 /**
@@ -121,25 +123,13 @@ public class DOMTreeWalkerTreeModel implements TreeModel {
      * This main() method demonstrates the use of this class, the use of the
      * Xerces DOM parser, and the creation of a DOM Level 2 TreeWalker object.
      **/
-    public static void main(String[] args) throws IOException, SAXException {
-        // Obtain an instance of a Xerces parser to build a DOM tree.
-        // Note that we are not using the JAXP API here, so this
-        // code uses Apache Xerces APIs that are not standards
-        DOMParser parser = new org.apache.xerces.parsers.DOMParser();
+    public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 
-        // Get a java.io.Reader for the input XML file and 
-        // wrap the input file in a SAX input source
-        Reader in = new BufferedReader(new FileReader(args[0]));
-        InputSource input = new org.xml.sax.InputSource(in);
-
-        // Tell the Xerces parser to parse the input source
-        parser.parse(input);
-
-        // Ask the parser to give us our DOM Document.  Once we've got the DOM
-        // tree, we don't have to use the Apache Xerces APIs any more; from
-        // here on, we use the standard DOM APIs
-        Document document = parser.getDocument();
-
+        DocumentBuilder builder;
+        builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        InputSource source = new InputSource(new FileReader(args[0]));
+        Document document = builder.parse(source);
+            
         // If we're using a DOM Level 2 implementation, then our Document
         // object ought to implement DocumentTraversal 
         DocumentTraversal traversal = (DocumentTraversal)document;
