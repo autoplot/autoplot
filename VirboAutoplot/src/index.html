@@ -16,15 +16,22 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <li> bugfixes in AsciiParser (no valid records)
-</li><li> Servlet has many controls, including render type and timerange
-</li><li> bugfix: limit rapid mousewheel events on macs with touchpad, which cause disorientation.
-</li><li> bugfix: symbol color is removed to options, since foreground and background color options should always go together.
-</li><li> bugfix: canvas font name is properly stored in options.
-</li><li> TODO: add row, column controls to vap.
-</li><li> support for epoch16 in CDF files.
-</li><li> SeriesRenderer supports histograms with log-spaced bins
-</li>
+        <li> BinaryDataSource can have record lengths that are not multiples of the data type.
+</li><li> BinaryDataSource format accepts type and byteOrder parameters.
+</li><li> ImageDataSource will return a rank 3 image when channel is not specified
+</li><li> autolayout, autolabelling, layout, isotropic info persist in vap.
+</li><li> QStream can handle non-qubes that slice to qubes. ("QubeSet")
+</li><li> Improvements to QStream ascii formatting.
+</li><li> OpenDAP DSequence of DFloat64 support, remove extraneous quotes from CDAWeb server.
+</li><li> runtime bugfixes in CDF, aggregation.
+
+</li><li> New Bookmarks features including Folders, Drag and Drop, and prep for icons
+</li><li> Ascii tables ISO8601 support restored.
+</li><li> Tweak autolayout logic to remove jitter.
+</li></ol>
+<p>Known Issues:
+</p>
+<ol><li> repaint can cause font change to be undone.
 	<p>data is input from: 
 	<li>ascii files (.dat,.txt)</li>
         <li>binary files (.bin)</li>
