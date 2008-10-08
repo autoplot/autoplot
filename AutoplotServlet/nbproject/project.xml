@@ -15,6 +15,10 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library files="1">
+                    <file>${reference.QStream.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library files="1">
                     <file>${reference.DataSource.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -76,10 +80,6 @@
                 </library>
                 <library files="1">
                     <file>${file.reference.jfits-0.93.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library files="1">
-                    <file>${reference.QStream.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>
