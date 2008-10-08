@@ -19,11 +19,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.DoubleBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -311,11 +309,10 @@ class TsdsDataSource extends AbstractDataSource {
 
         bbuf.flip();
         bbuf.order(ByteOrder.LITTLE_ENDIAN);
-
-        DoubleBuffer dbuf = bbuf.asDoubleBuffer();
-
-        points = dbuf.limit();
-        return new org.virbo.binarydatasource.Double(1, points, 1, 0, 1, 1, 0, dbuf);
+        
+        points = bbuf.limit() / SIZE_DOUBLE;
+        
+        return new org.virbo.binarydatasource.Double( 1, SIZE_DOUBLE, 0, points, 1, 1, bbuf );
     }
 
     private QDataSet ttags(String sStartTime, int ppd, int points, String sTimePos) {
