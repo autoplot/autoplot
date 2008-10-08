@@ -137,7 +137,10 @@ public class ApplicationState {
         b= that.reference.equals( this.reference );
         if ( !b ) buf.append(", reference " + that.reference+ " to " +( this.reference ));
         
-            
+        b= that.options.canvasFont.equals( this.options.canvasFont );
+        if ( !b ) buf.append(", font " + that.options.canvasFont+ " to " +( this.options.canvasFont ));
+
+        
         if ( buf.length()==0 ) {
             return "";
         } else if ( buf.length()>50 ) {
