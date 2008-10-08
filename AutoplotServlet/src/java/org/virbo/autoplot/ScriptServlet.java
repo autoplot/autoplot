@@ -59,7 +59,8 @@ public class ScriptServlet extends HttpServlet {
             
             ScriptContext._setOutputStream( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) ); 
             
-            interp.exec(script);            
+            throw new IllegalArgumentException("server-side scripting disabled");
+            //interp.exec(script);            
             
         } finally { 
             
