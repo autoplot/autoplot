@@ -344,6 +344,7 @@ is divided into following sections:
         <ant antfile="${project.NetCdfDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.OpenDapDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.QStream}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
     </target>
@@ -667,6 +668,7 @@ is divided into following sections:
         <ant antfile="${project.NetCdfDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.OpenDapDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.QStream}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="clean"/>
     </target>
