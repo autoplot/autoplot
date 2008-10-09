@@ -192,9 +192,17 @@ public class CdfUtil {
 
     private static WritableDataSet wrapSingle(long varType, String name, Object o) {
         WritableDataSet result;
-        if (o instanceof Number) {
+        
+        if ( varType== Variable.CDF_EPOCH ) {
+                result = DDataSet.wrap( new double[] { (Double) o } );
+                result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
+                result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+            
+        } else if ( varType== Variable.CDF_EPOCH16 ) {
+            throw new UnsupportedOperationException("single Epoch16 not supported, send us the file");
+            
+        } else if (o instanceof Number) {
             result = DDataSet.wrap(new double[]{((Number) o).doubleValue()});
-
         } else if (varType == Variable.CDF_CHAR) {
             EnumerationUnits units = EnumerationUnits.create(name);
             String sdata = (String) o;
