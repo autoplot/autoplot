@@ -89,6 +89,12 @@ public class BookmarksManagerModel {
     }
     protected List<Bookmark> list = null;
     public static final String PROP_LIST = "list";
+    
+    /**
+     * the contents of a bookmark changed, like the title or URL.
+     */
+    public static final String PROP_BOOKMARK = "bookmark";
+    
 
     public List<Bookmark> getList() {
         return list;
@@ -105,6 +111,15 @@ public class BookmarksManagerModel {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
@@ -126,7 +141,11 @@ public class BookmarksManagerModel {
             containsFolder = containsFolder || b instanceof Bookmark.Folder;
         }
         if (context == null || (containsFolder && context instanceof Bookmark.Folder)) { // only allow folders in the root node
-            newList.addAll(bookmarks);
+            if (newList.contains(context)) {
+                newList.addAll(newList.indexOf(context) + 1, bookmarks);
+            } else {
+                newList.addAll(bookmarks);
+            }
         } else if (context instanceof Bookmark.Folder) {
             Bookmark.Folder newFolder = (Bookmark.Folder) newList.get(newList.indexOf(context));
             newFolder.getBookmarks().addAll(bookmarks);
@@ -153,6 +172,13 @@ public class BookmarksManagerModel {
 
     void addBookmark(Bookmark bookmark, Bookmark context) {
         addBookmarks(Collections.singletonList(bookmark), context);
+    }
+
+    /**
+     * kludge to trigger list change when a title is changed.
+     */
+    void fireBookmarkChange(Bookmark book) {
+        propertyChangeSupport.firePropertyChange(PROP_BOOKMARK,null,book);
     }
 
     void removeBookmarks(List<Bookmark> bookmarks) {
