@@ -65,7 +65,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             }
         }
         
-        Map attributes= new HashMap();
+        Map<String,Object> attributes= new HashMap();
         
         List attrs= v.getAttributes();
         for ( Iterator i= attrs.iterator(); i.hasNext(); ) {
@@ -88,13 +88,10 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 
                 String[] ss= unitsString.split(" since ");
                 
-                Units offsetUnits;
                 double scale; // multiply by this to convert to seconds
-                if ( ss[0].equals("seconds" ) ) {
-                    offsetUnits= Units.seconds;
+                if ( ss[0].trim().equals("seconds" ) ) {
                     scale= 1.;
-                } else if ( ss[0].equals("days") ) {
-                    offsetUnits= Units.days;
+                } else if ( ss[0].trim().equals("days") ) {
                     scale= 86400.;
                 } else {
                     throw new IllegalArgumentException("units not supported: "+ss[0]+" in "+ unitsString );
@@ -108,7 +105,6 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 properties.put( QDataSet.UNITS, out );
                 properties.put( QDataSet.MONOTONIC, Boolean.TRUE );
             }
-            //result.put( QDataSet.UNITS, Units.us2000 );
         }
         
         if ( attributes.containsKey("_FillValue" ) ) {
@@ -116,7 +112,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             for ( int i=0; i<data.length; i++ ) {
                 if ( data[i]==fill ) data[i]= -1e31;
             }
-        };
+        }
         
         if ( isCoordinateVariable ) {
             properties.put( QDataSet.CADENCE, DataSetUtil.guessCadence(this) );
