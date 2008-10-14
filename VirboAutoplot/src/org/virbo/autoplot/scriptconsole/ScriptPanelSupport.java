@@ -35,6 +35,7 @@ import org.python.core.PyInteger;
 import org.python.core.PySyntaxError;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.JythonUtil;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
 
 /**
@@ -64,7 +65,7 @@ public class ScriptPanelSupport {
                         if (sfile == null) {
                             return;
                         }
-                        DataSetURL.URLSplit split = DataSetURL.parse(sfile);
+                        URLSplit split = DataSetURL.parse(sfile);
                         if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
                             return;
                         }
@@ -292,7 +293,7 @@ public class ScriptPanelSupport {
         try {
             if (this.file == null) {
                 String sfile = selector.getValue();
-                DataSetURL.URLSplit split = null;
+                URLSplit split = null;
                 if (sfile != null) {
                     split = DataSetURL.parse(sfile);
                 }
