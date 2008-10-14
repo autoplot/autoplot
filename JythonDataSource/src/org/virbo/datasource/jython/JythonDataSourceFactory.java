@@ -30,6 +30,7 @@ import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.URLSplit;
 import org.virbo.jythonsupport.JythonOps;
 
 /**
@@ -63,7 +64,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
         File src = DataSetURL.getFile(url, new NullProgressMonitor());
 
-        DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
+        URLSplit split = DataSetURL.parse(url.toString());
         Map<String, String> params = DataSetURL.parseParams(split.params);
         try {
             interp.exec("params=dict()");
