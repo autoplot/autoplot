@@ -21,6 +21,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.URLSplit;
 
 /**
  *
@@ -97,7 +98,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject(String surl, ProgressMonitor mon) {
-        DataSetURL.URLSplit split= DataSetURL.parse( surl );
+        URLSplit split= DataSetURL.parse( surl );
         Map params= DataSetURL.parseParams(split.params);
         return !( params.containsKey("start_time") && params.containsKey("end_time") && params.containsKey("dataset") );
     }
