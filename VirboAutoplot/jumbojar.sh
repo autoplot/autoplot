@@ -28,25 +28,26 @@ done
 file=org.virbo.datasource.DataSourceFactory
 rm ../jumbojar/META-INF/$file
 touch ../jumbojar/META-INF/$file
-for i in `find . -name $file | xargs` ; do
+for i in `find . -name $file` ; do
    cat $i >> ../jumbojar/META-INF/$file
 done
 
 file=org.virbo.datasource.DataSourceFactory.extensions
 rm ../jumbojar/META-INF/$file
 touch ../jumbojar/META-INF/$file
-for i in `find . -name $file | xargs` ; do
+for i in `find . -name $file` ; do
    cat $i >> ../jumbojar/META-INF/$file
 done
 
 file=org.virbo.datasource.DataSourceFactory.mimeTypes
 rm ../jumbojar/META-INF/$file
 touch ../jumbojar/META-INF/$file
-for i in `find . -name $file | xargs` ; do
+for i in `find . -name $file` ; do
    cat $i >> ../jumbojar/META-INF/$file
 done
 
 # VirboAutoplot is the application, copy it last so it's META-INF stuff is used.
+rm ../dist/jumbojar.jar
 unzip -o -d ../jumbojar ../dist/*.jar
 
 cd ../jumbojar
