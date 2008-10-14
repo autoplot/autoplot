@@ -77,7 +77,7 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType("text/html");
                 String s = AboutUtil.getAboutHtml();
                 s = s.substring(0, s.length() - 7);
-                s = s + "<br><br>servlet version=20080925_0728<br></html>";
+                s = s + "<br><br>servlet version=20081013_1655<br></html>";
                 out.write(s.getBytes());
                 out.close();
                 return;
@@ -191,14 +191,14 @@ public class SimpleServlet extends HttpServlet {
                         throw new RuntimeException(ioe);
                     }
                 }
-            } else if (format.equals("application/x-pdf")) {
+            } else if (format.equals("application/pdf")) {
                 appmodel.canvas.prepareForOutput(width, height);
 
                 GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
 
                 appmodel.canvas.writeToGraphicsOutput(out, go);
 
-            } else if (format.equals("image/svg")) {
+            } else if (format.equals("image/svg+xml")) {
                 appmodel.canvas.prepareForOutput(width, height);
 
                 GraphicsOutput go = new org.das2.util.awt.SvgGraphicsOutput();
@@ -206,7 +206,7 @@ public class SimpleServlet extends HttpServlet {
                 appmodel.canvas.writeToGraphicsOutput(out, go);
 
             } else {
-                throw new IllegalArgumentException("format must be image/png, application/x-pdf, or image/svg");
+                throw new IllegalArgumentException("format must be image/png, application/pdf, or image/svg+xml");
 
             }
 
