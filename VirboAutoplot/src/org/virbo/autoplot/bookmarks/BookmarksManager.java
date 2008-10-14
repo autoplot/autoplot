@@ -50,8 +50,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         }
         });*/
 
-        model.addPropertyChangeListener(new PropertyChangeListener() {
-
+        model.addPropertyChangeListener( model.PROP_LIST, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 TreeModel mod = model.getTreeModel();
                 jTree1.setModel(mod);
@@ -339,6 +338,7 @@ private void URLTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:e
     if (b instanceof Bookmark.Item) {
         ((Bookmark.Item) b).setUrl(URLTextField.getText());
         jTree1.repaint();
+        model.fireBookmarkChange(b);
     }
 }//GEN-LAST:event_URLTextFieldFocusLost
 
@@ -346,6 +346,7 @@ private void titleTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
     b.setTitle(titleTextField.getText());
     jTree1.repaint();
+    model.fireBookmarkChange(b);
 }//GEN-LAST:event_titleTextFieldFocusLost
 
 private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
@@ -439,6 +440,7 @@ private void titleTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GE
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
     b.setTitle(titleTextField.getText());
     jTree1.repaint();
+    model.fireBookmarkChange(b);
 }//GEN-LAST:event_titleTextFieldActionPerformed
 
     /**
