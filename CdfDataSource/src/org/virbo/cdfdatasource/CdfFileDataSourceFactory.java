@@ -22,6 +22,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.URLSplit;
 
 /**
  *
@@ -77,7 +78,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     
     
     public DataSource getDataSource(URL url) throws Exception {
-        DataSetURL.URLSplit split= DataSetURL.parse( url.toString() );
+        URLSplit split= DataSetURL.parse( url.toString() );
         return new CdfFileDataSource( url );
     }
     
