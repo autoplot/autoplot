@@ -24,6 +24,7 @@ import org.python.util.PythonInterpreter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
@@ -138,7 +139,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     PythonInterpreter interp = null;
 
     private String cacheUrl(URL url) {
-        DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
+        URLSplit split = DataSetURL.parse(url.toString());
         Map<String, String> params = DataSetURL.parseParams(split.params);
         params.remove("arg_0");
         split.params = DataSetURL.formatParams(params);
@@ -174,7 +175,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     public void resetURL(String surl) {
         try {
             this.url = new URL(surl);
-            DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
+            URLSplit split = DataSetURL.parse(url.toString());
             params = DataSetURL.parseParams(split.params);
             resourceURL = new URL(split.file);
         } catch (MalformedURLException ex) {
