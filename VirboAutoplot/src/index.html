@@ -16,18 +16,11 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <li> BinaryDataSource can have record lengths that are not multiples of the data type.
-</li><li> BinaryDataSource format accepts type and byteOrder parameters.
-</li><li> ImageDataSource will return a rank 3 image when channel is not specified
-</li><li> autolayout, autolabelling, layout, isotropic info persist in vap.
-</li><li> QStream can handle non-qubes that slice to qubes. ("QubeSet")
-</li><li> Improvements to QStream ascii formatting.
-</li><li> OpenDAP DSequence of DFloat64 support, remove extraneous quotes from CDAWeb server.
-</li><li> runtime bugfixes in CDF, aggregation.
-
-</li><li> New Bookmarks features including Folders, Drag and Drop, and prep for icons
-</li><li> Ascii tables ISO8601 support restored.
-</li><li> Tweak autolayout logic to remove jitter.
+        <li> bugfix: single-element cdf epoch values aren't rendered properly.
+</li><li> getDataSet( surl ) in IDL via IDL-Java Bridge
+</li><li> minor refactorings to support IDL-Java Bridge
+</li><li> minor fixes in jumbojar script.
+</li><li> more controls for servlet.
 </li></ol>
 <p>Known Issues:
 </p>
