@@ -228,15 +228,16 @@ public class DodsDataSource extends AbstractDataSource {
                 Object key = n.nextElement();
                 Attribute att = at.getAttribute((String) key);
                 try {
+                    String val = att.getValueAt(0);
+                    val= DataSourceUtil.unquote(val);
                     if (p.matcher(att.getName()).matches()) {
-                        Object val = att.getValueAt(0);
-                        String name = DataSourceUtil.unquote((String) val);
+                        String name = val;
                         Map<String, Object> newVal = getMetaData(name);
                         newVal.put("NAME", name); // tuck it away, we'll need it later.
                         result.put(att.getName(), newVal);
 
                     } else {
-                        result.put(att.getName(), att.getValueAt(0));
+                        result.put(att.getName(), val );
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
