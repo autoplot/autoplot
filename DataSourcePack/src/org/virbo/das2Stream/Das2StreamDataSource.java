@@ -31,6 +31,7 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URLSplit;
 import org.virbo.qstream.QDataSetStreamHandler;
 
 /**
@@ -50,7 +51,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
         ReadableByteChannel channel = Channels.newChannel(in);
 
-        DataSetURL.URLSplit split = DataSetURL.parse(url.toString());
+        URLSplit split = DataSetURL.parse(url.toString());
         
         if (split.ext.equals(".qds")) {
             QDataSetStreamHandler h= new QDataSetStreamHandler();

@@ -15,6 +15,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -24,7 +25,7 @@ import org.virbo.datasource.datasource.DataSourceFormat;
 public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
     public void formatData(File url, java.util.Map<String, String> params, QDataSet data, ProgressMonitor mon) throws Exception {
-        DataSetURL.URLSplit split = DataSetURL.parse(url.toURI().toString());
+        URLSplit split = DataSetURL.parse(url.toURI().toString());
         if (split.ext.equals(".qds")) {
             new org.virbo.qstream.SimpleStreamFormatter().format( data, new FileOutputStream(url), true );
         } else {
