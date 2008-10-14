@@ -20,6 +20,7 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URLSplit;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -77,7 +78,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
     
     public boolean reject( String surl, ProgressMonitor mon ) {
         try {
-            DataSetURL.URLSplit split = DataSetURL.parse( surl );
+            URLSplit split = DataSetURL.parse( surl );
             Map params= DataSetURL.parseParams( split.params );
             
             NetcdfDataset dataset= getDataSet( split.file );
@@ -112,13 +113,5 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
         }
     }
     
-    public String urlForServer(String surl) {
-        DataSetURL.URLSplit split= DataSetURL.parse( surl );
-        Map params= DataSetURL.parseParams( split.params );
-        params.remove( "variable" );
-        String sparms= DataSetURL.formatParams( params );
-        split.params= sparms;
-        return DataSetURL.format(split);
-    }
     
 }
