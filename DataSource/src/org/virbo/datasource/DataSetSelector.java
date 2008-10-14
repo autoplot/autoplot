@@ -116,7 +116,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
 
                 try {
-                    DataSetURL.URLSplit split = DataSetURL.parse(surl);
+                    URLSplit split = DataSetURL.parse(surl);
                     if (surl.endsWith("/")) {
                         int carotpos = surl.length();
                         setMessage("ends with /, filesystem completions");
@@ -137,7 +137,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                                throw new RuntimeException("unable to identify data source for URL, try \"about:plugins\""); 
                             }
                             setMessage("check to see if uri looks acceptable");
-                            if (f.reject(surl, getMonitor())) {
+                            String surl1= DataSetURL.getURL(surl).toString();
+                            if (f.reject(surl1, getMonitor())) {
                                 if (!surl.contains("?")) {
                                     surl += "?";
                                 }
@@ -210,7 +211,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void showCompletions(final String surl, final int carotpos) {
-        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        URLSplit split = DataSetURL.parse(surl);
         if (surl.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.containsKey(split.ext)) {
             showFactoryCompletions(surl, carotpos);
 
@@ -237,7 +238,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                 List<CompletionResult> completions=null;
                 
-                DataSetURL.URLSplit split = DataSetURL.parse(surl);
+                URLSplit split = DataSetURL.parse(surl);
                 String surlDir = split.path;
                 
                 final String labelPrefix = surlDir;
@@ -334,7 +335,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         try {
                             double xpos;
                             //int n = editor.getCaretPosition();
-                            int n= carotpos;
+                            int n= Math.min( carotpos, editor.getText().length() );
                             String t = editor.getText(0, n);
                             int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(t);
 
@@ -509,7 +510,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         String context = (String) dataSetSelector.getSelectedItem();
 
-        DataSetURL.URLSplit split = DataSetURL.parse(context);
+        URLSplit split = DataSetURL.parse(context);
 
 
         if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(split.ext) != null) {

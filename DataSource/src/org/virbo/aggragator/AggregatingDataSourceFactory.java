@@ -27,6 +27,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.URLSplit;
 
 /**
  * ftp://cdaweb.gsfc.nasa.gov/pub/istp/noaa/noaa14/%Y/noaa14_meped1min_sem_%Y%m%d_v01.cdf?timerange=2000-01-01
@@ -43,7 +44,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         AggregatingDataSource ads = new AggregatingDataSource(url);
         FileStorageModel fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
-        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        URLSplit split = DataSetURL.parse(surl);
         Map parms = DataSetURL.parseParams(split.params);
         String stimeRange= (String) parms.get("timerange");
         stimeRange= stimeRange.replaceAll("\\+", " ");
@@ -88,7 +89,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             throw new IllegalArgumentException("unable to find any files");
         }
 
-        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        URLSplit split = DataSetURL.parse(surl);
 
         String delegateFfile = new URL(fsm.getFileSystem().getRootURL(), delegateFile).toString();
         urlLen += delegateFfile.length();
@@ -131,7 +132,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             throw new IllegalArgumentException("unable to find any files");
         }
 
-        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        URLSplit split = DataSetURL.parse(surl);
 
         Map parms = DataSetURL.parseParams(split.params);
         parms.remove("timerange");
@@ -187,7 +188,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject( String surl, ProgressMonitor mon) {
-        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        URLSplit split = DataSetURL.parse(surl);
         Map map = DataSetURL.parseParams(split.params);
 
         try {

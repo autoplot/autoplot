@@ -71,39 +71,6 @@ public class DataSetURL {
     
     static WeakHashMap<DataSource, DataSourceFactory> dsToFactory = new WeakHashMap<DataSource, DataSourceFactory>();
 
-    public static class URLSplit {
-        /*   path, the directory with http://www.example.com/data/
-         *   file, the file, http://www.example.com/data/myfile.nc
-         *   ext, the extenion, .nc
-         *   params, myVariable
-         */
-
-        /**
-         * the URL scheme, http, ftp, bin-http, etc.
-         */
-        public String scheme;
-        /**
-         * the directory with http://www.example.com/data/
-         */
-        public String path;
-        /**
-         * the file, http://www.example.com/data/myfile.nc
-         */
-        public String file;
-        /**
-         * the extenion, .nc
-         */
-        public String ext;
-        /**
-         * the params, myVariable&plot=0
-         */
-        public String params;
-
-        public String toString() {
-            return path + "\n" + file + "\n" + ext + "\n" + params;
-        }
-    }
-
     public static String maybeAddFile(String surl) {
         if (surl.length() == 0) {
             return "file:/";
@@ -235,7 +202,7 @@ public class DataSetURL {
         if (factory == null) {
             return ds.getURL();  // nothing we can do
         } else {
-            DataSetURL.URLSplit split = DataSetURL.parse(ds.getURL());
+            URLSplit split = DataSetURL.parse(ds.getURL());
             String fext;
             fext = DataSourceRegistry.getInstance().getExtensionFor(factory).substring(1);
             if (DataSourceRegistry.getInstance().hasSourceByExt(split.ext)) {
@@ -611,7 +578,7 @@ public class DataSetURL {
     }
 
     public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
-        DataSetURL.URLSplit split = DataSetURL.parse(surl.substring(0, carotpos));
+        URLSplit split = DataSetURL.parse(surl.substring(0, carotpos));
         String prefix = split.file.substring(split.path.length());
         String surlDir = split.path;
 
@@ -696,7 +663,7 @@ public class DataSetURL {
             cc.completablepos = carotPos;
         }
 
-        DataSetURL.URLSplit split = DataSetURL.parse(surl1);
+        URLSplit split = DataSetURL.parse(surl1);
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
 
@@ -833,7 +800,13 @@ public class DataSetURL {
 
         // discover Factories on the path
         try {
-            Enumeration<URL> urls = DataSetURL.class.getClassLoader().getResources("META-INF/org.virbo.datasource.DataSourceFactory");
+            ClassLoader loader= DataSetURL.class.getClassLoader();
+            Enumeration<URL> urls;
+            if ( loader==null ) {
+                urls= ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory");
+            } else {
+                urls= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory");
+            }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -891,7 +864,13 @@ public class DataSetURL {
 
     private static void discoverRegisteryEntries(DataSourceRegistry registry) {
         try {
-            Enumeration<URL> urls = DataSetURL.class.getClassLoader().getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+            ClassLoader loader= DataSetURL.class.getClassLoader();
+            Enumeration<URL> urls;
+            if ( loader==null ) {
+                urls= ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+            } else {
+                urls= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+            }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -908,7 +887,11 @@ public class DataSetURL {
                 }
                 reader.close();
             }
-            urls = DataSetURL.class.getClassLoader().getResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+            if ( loader==null ) {
+                urls= ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+            } else {
+                urls= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+            }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -925,7 +908,11 @@ public class DataSetURL {
                 }
                 reader.close();
             }
-            urls = DataSetURL.class.getClassLoader().getResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+            if ( loader==null ) {
+                urls= ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+            } else {
+                urls= loader.getResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+            }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
@@ -951,55 +938,5 @@ public class DataSetURL {
     /** call this to trigger initialization */
     public static void init() {
     }
-    /*    public static String[] getCompletions( String surl , ProgressMonitor mon) throws Exception {
-    String[] result;
-    try {
-    
-    URLSplit split= parse( surl );
-    if ( surl.contains("?") ) {
-    int i= surl.indexOf("?");
-    DataSourceFactory factory= getDataSourceFactory( Util.newURL( Util.FS_URL, surl ) , new NullProgressMonitor());
-    mon.setProgressMessage("getting completions for "+factory);
-    mon.started();
-    
-    result = factory.getCompletions(surl.substring(0,i+1));
-    
-    } else {
-    try {
-    mon.setProgressMessage("listing directory");
-    mon.started();
-    int i= surl.lastIndexOf("/");
-    String surlDir;
-    if ( i<=0 || surl.charAt(i-1)=='/' ) {
-    surlDir=surl;
-    } else {
-    surlDir= surl.substring(0,i);
-    }
-    URL url= getURL(surlDir);
-    String prefix= surl.substring(i+1);
-    FileSystem fs= FileSystem.create(url);
-    String[] s= fs.listDirectory("/");
-    List<String> result1= new ArrayList<String>(s.length);
-    for ( int j=0; j<s.length; j++ ) {
-    if ( s[j].startsWith(prefix) ) {
-    result1.add(surlDir+"/"+s[j]);
-    }
-    }
-    result= result1.toArray( new String[result1.size()] );
-    } catch ( MalformedURLException ex ) {
-    result= new String[] { "Malformed URL" };
-    } catch ( FileSystem.FileSystemOfflineException ex) {
-    result= new String[] {"FileSystem offline" };
-    }
-    }
-    } catch ( Exception e ) {
-    e.printStackTrace();
-    result= new String[] { e.getMessage() };
-    } finally {
-    mon.finished();
-    }
-    return result;
-    }
-     */
 }
 

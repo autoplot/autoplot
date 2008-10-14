@@ -32,6 +32,7 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -267,7 +268,7 @@ public class AggregatingDataSource extends AbstractDataSource {
         if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
         surl += "timerange=" + String.valueOf(viewRange);
 
-        DataSetURL.URLSplit split = DataSetURL.parse(surl);
+        URLSplit split = DataSetURL.parse(surl);
         Map<String,String> mparams = DataSetURL.parseParams(split.params);
         String stimeRange = viewRange.toString();
         stimeRange = stimeRange.replaceAll(" ", "+");

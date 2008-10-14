@@ -188,7 +188,7 @@ public class CompletionContext {
             //    surl= surl.substring( surl.indexOf('.')+1 );
             //    isURI= true;
             //}
-            DataSetURL.URLSplit split= DataSetURL.parse( surl );
+            URLSplit split= DataSetURL.parse( surl );
             split.file= ccnew.completable;
             return DataSetURL.format( split );
             
