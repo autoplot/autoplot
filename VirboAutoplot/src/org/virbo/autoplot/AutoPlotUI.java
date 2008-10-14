@@ -52,6 +52,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import org.das2.util.filesystem.FileSystem;
+import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
@@ -96,6 +97,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private JythonScriptPanel scriptPanel;
     private LogConsole logConsole;
     private RequestListener rlistener;
+    private JDialog fontAndColorsDialog= null;
+    private BookmarksManager bookmarksManager=null;
 
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
@@ -165,7 +168,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_STATUS)) {
                     setStatus(applicationModel.getStatus());
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
-                    updateBookmarks();
+                    updateBookmarks(); 
                 } else if ( evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE_URL)) {
                     dataSetSelector.setValue(applicationModel.getDataSourceURL());
                 }
@@ -229,7 +232,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                
+                //tickleTimer.getMessages();
                 undoRedoSupport.pushState(evt);
                 stateSupport.markDirty();
                 String t = undoRedoSupport.getUndoLabel();
@@ -258,7 +261,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 if (!stateSupport.isOpening() && !stateSupport.isSaving() 
                         && !evt.getPropertyName().equals("recent") 
                         && !evt.getPropertyName().equals("status") 
-                        && !evt.getPropertyName().equals("ticks") ) { // only 
+                        && !evt.getPropertyName().equals("ticks") 
+                        && !evt.getPropertyName().contains("PerMillisecond") ) { // TODO: list the props we want!
                     tickleTimer.tickle( evt.getPropertyName() + " from " + evt.getSource() );
                 }
             }
@@ -473,11 +477,19 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bookmarksMenu.add(new AbstractAction("Manage Bookmarks") {
 
             public void actionPerformed(ActionEvent e) {
-                BookmarksManager man = new BookmarksManager(AutoPlotUI.this, true);
-                man.getModel().setList(applicationModel.getBookmarks());
-                man.setVisible(true);
-                applicationModel.setBookmarks(man.getModel().getList());
-                updateBookmarks();
+                if ( bookmarksManager==null ) {
+                    bookmarksManager = new BookmarksManager(AutoPlotUI.this, false );
+                    BindingContext bc= new BindingContext();
+                    bc.addBinding( applicationModel, "${bookmarks}", bookmarksManager.getModel(), "list" );
+                    bc.bind();
+                    bookmarksManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            updateBookmarks();
+                        }
+                    });
+                }
+                bookmarksManager.setVisible(true);
+                
             }
         });
 
@@ -889,7 +901,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_resetZoomMenuItemActionPerformed
 
     private void fontsAndColorsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontsAndColorsMenuItemActionPerformed
-        new FontAndColorsDialog(this, true, applicationModel).setVisible(true);
+        if ( fontAndColorsDialog==null ) fontAndColorsDialog= new FontAndColorsDialog(this, false, applicationModel);
+        fontAndColorsDialog.setVisible(true);
     }//GEN-LAST:event_fontsAndColorsMenuItemActionPerformed
 
     private void specialEffectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_specialEffectsMenuItemActionPerformed
