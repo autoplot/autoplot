@@ -51,7 +51,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
     <h1>This shows all the new controls:</h1>
     <form action="SimpleServlet">
         <input name="url" value="tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="100" type="text"><br>
-        <select name="process">
+        Apply a process to the dataset after loading: <select name="process">
             <option selected></option>
             <option>histogram</option>
             <option>magnitude(fft)</option>
@@ -60,15 +60,15 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         font: <input name="font" value="sans-8" ><br>
         format: <select name="format">
             <option>image/png</option>
-            <option>application/x-pdf</option>
-            <option>image/svg</option>
+            <option>application/pdf</option>
+            <option>image/svg+xml</option>
         </select><br>
         width: <input name="width" value="700" ><br>
         height: <input name="height" value="400" > <br>
         <br>
         <input type="checkbox" name="autolayout" value="true" >autolayout</input><br>
-        layout horiz position: <input name="column" value="5em,100%-10em"><br> 
-        layout vert position: <input name="row" value="3em,100%-3em"><br>
+        layout horiz position: <input name="column" value="5em,100%-10em"> (<a href="http://www.autoplot.org/autoplot/index.php/Discussion#Layout_Specification">help</a>)<br> 
+        layout vert position: <input name="row" value="3em,100%-3em">  (<a href="http://www.autoplot.org/autoplot/index.php/Discussion#Layout_Specification">help</a>)<br> 
         <br>
         timerange: <input name="timeRange" value="2003-2008"><br>
         <br>
