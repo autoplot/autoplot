@@ -17,6 +17,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSetURL.CompletionResult;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.URLSplit;
 
 /**
  *
@@ -54,7 +55,7 @@ class DataSetUrlCompletionTask implements CompletionTask {
             
             List<CompletionResult> rs;
              
-            DataSetURL.URLSplit split = DataSetURL.parse(surl1);            
+            URLSplit split = DataSetURL.parse(surl1);            
             if ( surl1.contains("?") || DataSourceRegistry.getInstance().hasSourceByExt(split.ext) ) {
                 rs= DataSetURL.getCompletions3( surl1, carotPos,  new NullProgressMonitor() );
             } else {
