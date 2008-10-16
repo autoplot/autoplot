@@ -222,11 +222,15 @@ public class CdfUtil {
     /**
      * wraps response from CDFVariable.getHyperData() into QDataSet.  The object
      * should be float[], float[][], double[], double[][], etc.
+     * @deprecated use 4 argument wrapCdfHyperData that takes interval.
      * @param reccount reccount -1 indicates read the one and only record and do a reform.
      */
     public static WritableDataSet wrapCdfHyperData(Variable variable, long recStart, long recCount) throws CDFException {
+        return wrapCdfHyperData( variable, recStart, recCount, 1 );
+    }
+    
+    public static WritableDataSet wrapCdfHyperData(Variable variable, long recStart, long recCount, long recInterval ) throws CDFException {
         long varType = variable.getDataType();
-        long recInterval = 1;
         long[] dimIndeces = new long[]{0};
 
         long[] dimSizes = variable.getDimSizes();

@@ -123,13 +123,19 @@ public class CdfFileDataSource extends AbstractDataSource {
      * @return
      */
     private long[] parseConstraint( String constraint, long recCount ) throws ParseException {
+        long[] result= new long[] { 0, recCount, 1 };
         if ( constraint==null ) {
-            return new long[] { 0, 1, recCount };
+            return result;
         } else {
-            Pattern p= Pattern.compile("\\[(\\d+):(\\d+)\\]");
+            Pattern p= Pattern.compile("\\[(\\d*):(\\d*)(:(\\d*))?]");
             Matcher m= p.matcher(constraint);
             if ( m.matches() ) {
-                return new long[] { Integer.parseInt(m.group(1)), 1, Integer.parseInt(m.group(2)) };
+                if ( m.group(1).length()>0 ) result[0]= Integer.parseInt(m.group(1));
+                if ( m.group(2).length()>0 ) result[1]= Integer.parseInt(m.group(2));
+                if ( m.groupCount()==4 ) {
+                    if ( m.group(4).length()>0 ) result[2]= Integer.parseInt(m.group(4));
+                } 
+                return result;
             } else {
                 throw new ParseException("no match!", 0);
             }
@@ -156,7 +162,8 @@ public class CdfFileDataSource extends AbstractDataSource {
         if (reform) {
             result = CdfUtil.wrapCdfHyperData(variable, 0, -1);
         } else {
-            result = CdfUtil.wrapCdfHyperData(variable, recs[0], recs[2]-recs[0] );
+            long recCount= ( recs[1]-recs[0] ) / recs[2] ;
+            result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2] );
         }
         result.putProperty(QDataSet.NAME, svariable);
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
