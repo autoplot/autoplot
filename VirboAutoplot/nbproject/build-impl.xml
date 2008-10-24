@@ -338,6 +338,7 @@ is divided into following sections:
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.ExcelDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.IdlMatlabSupport}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="jar"/>
@@ -662,6 +663,7 @@ is divided into following sections:
         <ant antfile="${project.DataSourcePack}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.ExcelDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.IdlMatlabSupport}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="clean"/>
