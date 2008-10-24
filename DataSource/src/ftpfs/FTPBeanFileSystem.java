@@ -7,8 +7,10 @@
  */
 package ftpfs;
 
+import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.*;
 import ftpfs.ftp.FtpBean;
 import ftpfs.ftp.FtpException;
@@ -24,9 +26,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.net.URL;
-import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
 
 /**
  *
@@ -70,7 +80,42 @@ public class FTPBeanFileSystem extends WebFileSystem {
         }
     }
 
-    private String[] parseLsl(String dir, File listing) throws IOException {
+    private boolean copyFile(File partFile, File targetFile) throws IOException {
+        WritableByteChannel dest = Channels.newChannel(new FileOutputStream(targetFile));
+        ReadableByteChannel src = Channels.newChannel(new FileInputStream(partFile));
+        final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
+        while (src.read(buffer) != -1) {
+            // prepare the buffer to be drained
+            buffer.flip();
+            // write to the channel, may block
+            dest.write(buffer);
+            // If partial transfer, shift remainder down
+            // If buffer is empty, same as doing clear()
+            buffer.compact();
+        }
+        // EOF will leave buffer in fill state
+        buffer.flip();
+        // make sure the buffer is fully drained.
+        while (buffer.hasRemaining()) {
+            dest.write(buffer);
+        }
+        return true;
+
+    }
+
+    private long parseTime1970(String time, Calendar context) {
+        try {
+            return (long) TimeUtil.toDatum(TimeUtil.parseTime(time)).doubleValue(Units.t1970);
+        } catch (ParseException ex) {
+            try {
+                return (long) TimeUtil.toDatum(TimeUtil.parseTime("" + context.get(Calendar.YEAR) + " " + time)).doubleValue(Units.t1970);
+            } catch (ParseException ex1) {
+                return -1;
+            }
+        }
+    }
+
+    public DirectoryEntry[] parseLsl(String dir, File listing) throws IOException {
         InputStream in = new FileInputStream(listing);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -85,7 +130,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         //long totalSize;
         //long sumSize=0;
 
-        List result = new ArrayList(20);
+        List<DirectoryEntry> result = new ArrayList<DirectoryEntry>(20);
         int lineNum = 1;
 
         while (!done) {
@@ -116,7 +161,13 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                     boolean isFolder = type == 'd';
 
-                    result.add(name + (isFolder ? "/" : ""));
+                    DirectoryEntry item = new DirectoryEntry();
+                    item.name = aline.substring(i + 1);
+                    item.size = Long.parseLong(aline.substring(31, 31 + 11).trim());
+                    item.type = type == 'd' ? 'd' : 'f';
+                    item.modified = parseTime1970(aline.substring(42, 54), Calendar.getInstance());
+
+                    result.add(item);
 
                 //sumSize= sumSize + size;
 
@@ -134,7 +185,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         reader.close();
         //TODO: finally clause
 
-        return (String[]) result.toArray(new String[result.size()]);
+        return (DirectoryEntry[]) result.toArray(new DirectoryEntry[result.size()]);
     }
 
     public String[] listDirectory(String directory) {
@@ -148,8 +199,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 FtpBean bean = new FtpBean();
                 try {
                     bean.ftpConnect(getRootURL().getHost(), "ftp");
-                } catch ( NullPointerException ex ) {
-                    throw new IOException( "Unable to make connection to "+ getRootURL().getHost() );
+                } catch (NullPointerException ex) {
+                    throw new IOException("Unable to make connection to " + getRootURL().getHost());
                 }
                 bean.setDirectory(getRootURL().getPath() + directory.substring(1));
 
@@ -175,7 +226,13 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
             }
             listing.deleteOnExit();
-            return parseLsl(directory, listing);
+
+            DirectoryEntry[] des = parseLsl(directory, listing);
+            String[] result = new String[des.length];
+            for (int i = 0; i < des.length; i++) {
+                result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
+            }
+            return result;
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -227,7 +284,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
     }
 
-    protected void downloadFile(String filename, java.io.File targetFile, File partFile, final ProgressMonitor mon) throws java.io.IOException {
+    protected synchronized void downloadFile(String filename, java.io.File targetFile, File partFile, final ProgressMonitor mon) throws java.io.IOException {
         FileOutputStream out = null;
         InputStream is = null;
         try {
@@ -241,10 +298,17 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 bean.ftpConnect(url.getHost(), "ftp");
                 bean.setDirectory(ss[2].substring(ss[1].length()));
 
-                // TODO: list directories with getDirectoryContent() iterator.  cache the results of the listing by formatting
-                //    .listing file.
-                //this.getFileObject(filename).getSize();
-                mon.setTaskSize(-1);
+
+                File listingFile = new File(targetFile.getParentFile(), ".listing");
+                if (!listingFile.exists()) {
+                    String listing = bean.getDirectoryContentAsString();
+                    FileOutputStream out2 = new FileOutputStream(listingFile);
+                    out2.write(listing.getBytes());
+                    out2.close();
+                }
+
+                long size = this.getFileObject(filename).getSize();
+                mon.setTaskSize(size);
                 mon.started();
                 final long t0 = System.currentTimeMillis();
 
@@ -255,11 +319,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     public void byteRead(int bytes) {
                         totalBytes += bytes;
                         if (mon.isCancelled()) {
-                            throw new RuntimeException( new InterruptedIOException("transfer cancelled by user") );
+                            throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
                         }
                         long dt = System.currentTimeMillis() - t0;
                         mon.setTaskProgress(totalBytes);
                         mon.setProgressMessage(totalBytes / 1000 + "KB read at " + (totalBytes / dt) + " KB/sec");
+                        System.err.println(totalBytes);
                     }
 
                     public void byteWrite(int bytes) {
@@ -268,11 +333,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     }
                 };
                 bean.getBinaryFile(ss[3].substring(ss[2].length()), partFile.toString(), observer);
+                bean.close();
                 mon.finished();
             } catch (RuntimeException ex) {
                 ex.printStackTrace();
-                if ( ex.getCause() instanceof IOException ) {
-                    throw (IOException)ex.getCause();
+                if (ex.getCause() instanceof IOException) {
+                    throw (IOException) ex.getCause();
                 } else {
                     throw new IOException(ex.getMessage());
                 }
@@ -280,7 +346,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 throw new IOException(ex.getMessage());
 
             }
-            partFile.renameTo(targetFile);
+            if (copyFile(partFile, targetFile)) {
+                partFile.delete();
+            }
+
         } catch (IOException e) {
             if (out != null) {
                 out.close();
@@ -292,5 +361,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
             throw e;
         }
 
+    }
+
+    @Override
+    public FileObject getFileObject(String filename) {
+        return new FtpFileObject(this, filename, new Date(System.currentTimeMillis()));
     }
 }
