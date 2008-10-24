@@ -64,7 +64,7 @@ public class DataSetURLDemo {
                 throw new IllegalArgumentException("bad test number");
         }
         
-        List<DataSetURL.CompletionResult> ccs= DataSetURL.getCompletions3( context, carotPos, new DasProgressPanel("completions" ) );
+        List<DataSetURL.CompletionResult> ccs= DataSetURL.getFactoryCompletions( context, carotPos, new DasProgressPanel("completions" ) );
        
         System.err.println(context);
         System.err.println(spaces.substring(0,carotPos)+"L" );
