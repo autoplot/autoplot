@@ -16,21 +16,25 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <ol><li> legend bubble for Vector plots
+        <ul><li> legend bubble for Vector plots
 </li><li> openDAP fixes
 <ol><li> fix support for Vector plots
 </li><li> name variables
 </li></ol>
 </li><li> Export data derives default name from DataSet name.
 </li><li> TSDS fixes
-</li><li> Ascii labels dataset in rank2.
-</li><li> stride supported in CDF.
 
-</li><li> bugfix font reverted to original on resize, now the canvas base font is used.
+</li><li> Ascii labels dataset in rank2.
+</li><li> bugfix: repaint can cause font change to be undone.  (Resize caused baseFont to be used.)
 </li><li> openDAP supports labels quantities when "LABL_PTR" is used.
 </li><li> servlet doesn't set xaxis timerange if it's not a time axis.
 </li><li> example form in servlet doesn't lead giant data reads
-</li></ol>
+</li><li> stride supported in CDF.
+</li><li> CDF supports rank 2 CDF_INT4 to support PB5-encoded times.
+</li><li> FTP filesystem provides determinate progress feedback.
+</li><li> FTP filesystem bug on windows fixed, where .part file could not be renamed after download.
+
+</li></ul>
 
 <p>Known Issues:
 </p>
