@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColumn;
 import org.das2.util.AboutUtil;
 import org.das2.util.awt.GraphicsOutput;
@@ -135,10 +136,11 @@ public class SimpleServlet extends HttpServlet {
                     appmodel.setDataSource(dsource);
                 }
                 
-                if (!stimeRange.equals("")) {
+                if (!stimeRange.equals("") ) {
                     appmodel.waitUntilIdle(true);
-                    appmodel.getPlot().getXAxis().setDatumRange(timeRange);
-
+                    if ( UnitsUtil.isTimeLocation( appmodel.getPlot().getXAxis().getUnits() ) ) {
+                        appmodel.getPlot().getXAxis().setDatumRange(timeRange);
+                    }
                 }
 
             }
