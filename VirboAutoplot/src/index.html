@@ -16,12 +16,22 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <li> bugfix: single-element cdf epoch values aren't rendered properly.
-</li><li> getDataSet( surl ) in IDL via IDL-Java Bridge
-</li><li> minor refactorings to support IDL-Java Bridge
-</li><li> minor fixes in jumbojar script.
-</li><li> more controls for servlet.
+        <ol><li> legend bubble for Vector plots
+</li><li> openDAP fixes
+<ol><li> fix support for Vector plots
+</li><li> name variables
 </li></ol>
+</li><li> Export data derives default name from DataSet name.
+</li><li> TSDS fixes
+</li><li> Ascii labels dataset in rank2.
+</li><li> stride supported in CDF.
+
+</li><li> bugfix font reverted to original on resize, now the canvas base font is used.
+</li><li> openDAP supports labels quantities when "LABL_PTR" is used.
+</li><li> servlet doesn't set xaxis timerange if it's not a time axis.
+</li><li> example form in servlet doesn't lead giant data reads
+</li></ol>
+
 <p>Known Issues:
 </p>
 <li> repaint can cause font change to be undone.</li>
