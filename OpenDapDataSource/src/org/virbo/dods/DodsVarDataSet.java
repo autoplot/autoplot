@@ -41,6 +41,8 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
         rank = array.numDimensions();
         properties = new HashMap();
+        if ( rank>1 ) properties.put( QDataSet.QUBE, Boolean.TRUE );
+        properties.put( QDataSet.NAME, array.getName() );
     }
 
     public String toString() {
@@ -83,6 +85,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         return property(name);
     }
 
+    @SuppressWarnings("unchecked")
     public void putProperty(String name, Object value) {
         properties.put(name, value);
     }
@@ -137,7 +140,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
                 validMin = Double.parseDouble(ss[0]);
                 validMax = Double.parseDouble(ss[1]);
             }
-            this.properties = properties;
+            this.properties.putAll( properties );
         }
 
         private final double doubleValue(int val) {
@@ -192,7 +195,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
                 validMin = Double.parseDouble(ss[0]);
                 validMax = Double.parseDouble(ss[1]);
             }
-            this.properties = properties;
+            this.properties.putAll( properties );
         }
 
         private final double doubleValue(short val) {
@@ -238,7 +241,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
                 validMin = Double.parseDouble(ss[0]);
                 validMax = Double.parseDouble(ss[1]);
             }
-            this.properties = properties;
+            this.properties.putAll(properties);
         }
         double validMin, validMax;
 
@@ -272,7 +275,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public DoubleArray(DArray array, HashMap properties) {
             super(array);
             back = (double[]) array.getPrimitiveVector().getInternalStorage();
-            this.properties = properties;
+            this.properties.putAll(properties);
         }
 
         public double value(int i) {
@@ -300,13 +303,13 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public NominalStringArray(DArray array, HashMap properties) {
             super(array);
             back = (BaseType[]) array.getPrimitiveVector().getInternalStorage();
-            this.properties = properties;
+            this.properties.putAll(properties);
             u = new EnumerationUnits("dods");
             for (int i = 0; i < back.length; i++) {
-                DString bt1 = (DString) back[0];
+                DString bt1 = (DString) back[i];
                 u.createDatum(bt1.getValue());
             }
-            properties.put(QDataSet.UNITS, u);
+            this.properties.put(QDataSet.UNITS, u);
         }
 
         public double value(int i) {
@@ -334,9 +337,9 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public EpochStringArray(DArray array, HashMap properties) {
             super(array);
             back = (BaseType[]) array.getPrimitiveVector().getInternalStorage();
-            this.properties = properties;
+            this.properties.putAll( properties );
             u = Units.us2000;
-            properties.put(QDataSet.UNITS, u);
+            this.properties.put(QDataSet.UNITS, u);
         }
 
         public double value(int i) {
