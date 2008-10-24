@@ -63,12 +63,25 @@ class TsdsDataSource extends AbstractDataSource {
             
             ProgressMonitor mon = new NullProgressMonitor();
 
+            URL url0= new URL( "" + this.resourceURL + "?" +DataSetURL.formatParams(params) );
+            logger.fine( "tsds url= "+url0 );
+            
+            if ( params.get("out")==null ) {
+                exceptionFromConstruct= new IllegalArgumentException("url must contain out=");
+                return; 
+            }
+            
             mon.setProgressMessage("loading parameter metadata");
             LinkedHashMap<String, String> params3 = new LinkedHashMap<String, String>(params);
+            
             params3.put("out", "tsml");
             params3.remove("ppd");
 
-            URL url3 = new URL("" + this.resourceURL + "?" + DataSetURL.formatParams(params3));
+            String sparams= DataSetURL.formatParams(params3);
+            sparams= sparams.replace( "out=tsml", "out=tsml&ext="+params.get("out") );
+                    
+            URL url3 = new URL("" + this.resourceURL + "?" + sparams );
+            logger.fine( "opening "+url3 );
             initialTsml(url3.openStream());
 
             haveInitialTsml = true;
@@ -81,6 +94,7 @@ class TsdsDataSource extends AbstractDataSource {
             Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            exceptionFromConstruct= ex;
         } catch (SAXException ex) {
             Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -104,6 +118,8 @@ class TsdsDataSource extends AbstractDataSource {
     int parameterPpd = -1; // max resolution of the parameter.
     boolean haveInitialTsml = false;
 
+    Exception exceptionFromConstruct=null;
+    
     private DatumRange quantize(DatumRange timeRange) {
         timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
         return timeRange;
@@ -198,11 +214,13 @@ class TsdsDataSource extends AbstractDataSource {
         mon.started();
 
         if (!haveInitialTsml) {
+            if ( exceptionFromConstruct!=null ) throw exceptionFromConstruct;
             mon.setProgressMessage("loading parameter metadata");
             LinkedHashMap params3 = new LinkedHashMap(params2);
             params3.remove("ppd");
             params3.put("out", "tsml");
             URL url3 = new URL("" + this.resourceURL + "?" + DataSetURL.formatParams(params3));
+            logger.fine( "opening "+url3 );
             initialTsml(url3.openStream());
             haveInitialTsml = true;
         }
@@ -440,10 +458,12 @@ class TsdsDataSource extends AbstractDataSource {
                 logger.fine("loading " + sDataMax);
                 mon.setProgressMessage("loading max");
                 BufferDataSet dataMax = dataUrl(new URL(sDataMax).openStream(), size, points, mon);
+                dataMax.putProperty( QDataSet.NAME, "binmax" );
                 String sDataMin = surl.replace("-filter_0-", "-filter_3-");
                 //System.err.println(sDataMin);
                 mon.setProgressMessage("loading min");
                 BufferDataSet dataMin = dataUrl(new URL(sDataMin).openStream(), size, points, mon);
+                dataMin.putProperty( QDataSet.NAME, "binmin" );
                 data.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(dataMax, data));
                 data.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(data, dataMin));
             }
@@ -469,10 +489,13 @@ class TsdsDataSource extends AbstractDataSource {
     public String getURL() {
         TimeParser tp = TimeParser.create("%Y%m%d");
 
-        String sparams = "param1=" + params.get("param1") 
-                + "&StartDate=" + tp.format(timeRange.min(), null) 
+        String sparams = 
+                "StartDate=" + tp.format(timeRange.min(), null) 
                 + "&EndDate=" + tp.format(timeRange.max(), null) +
-                "&ppd=" + currentPpd;
+                "&ppd=" + currentPpd +
+                "&ext=" + params.get("ext") +
+                "&out=" + params.get("out") + 
+                "&param1=" + params.get("param1");
         
         return this.resourceURL.toString() + "?" + sparams;
        
