@@ -38,6 +38,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import org.virbo.autoplot.transferrable.ImageSelection;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -117,10 +118,10 @@ public class GuiSupport {
                 }
                 
                 JFileChooser chooser = new JFileChooser();
-
+                                
                 List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
                 FileFilter deflt= null;
-                for (String ext : exts) {
+                for ( String ext : exts ) {
                     final String ex= ext;
                     final String desc= "";
                     FileFilter ff= new FileFilter() {
@@ -145,6 +146,11 @@ public class GuiSupport {
                 Preferences prefs = Preferences.userNodeForPackage(AutoPlotUI.class);
                 String currentFileString = prefs.get("DumpDataCurrentFile", "");
                 
+                if ( parent.applicationModel.dataset!=null ) {
+                    String name= (String) parent.applicationModel.dataset.property( QDataSet.NAME );
+                    if ( name!=null ) chooser.setSelectedFile(new File(name.toLowerCase())); 
+                }
+
                 if (!currentFileString.equals("") && new File( currentFileString ).exists() ) {
                     File folder= new File( currentFileString ).getParentFile();
                     chooser.setCurrentDirectory(folder);
