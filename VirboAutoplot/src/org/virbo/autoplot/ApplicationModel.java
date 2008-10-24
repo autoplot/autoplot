@@ -321,9 +321,9 @@ public class ApplicationModel {
         canvas = new DasCanvas();
 
         if (options.getCanvasFont().equals("")) {
-            canvas.setFont(canvas.getFont().deriveFont(Font.ITALIC, 18.f));
+            canvas.setBaseFont(canvas.getBaseFont().deriveFont(Font.ITALIC, 18.f));
         } else {
-            canvas.setFont(Font.decode(options.getCanvasFont()));
+            canvas.setBaseFont(Font.decode(options.getCanvasFont()));
         }
 
         canvas.setForeground(options.getForeground());
@@ -1261,6 +1261,8 @@ public class ApplicationModel {
             //ApplicationModel.this.setDataSourceURL( tsb.getURL().toString() );
             String oldsurl = ApplicationModel.this.surl;
             ApplicationModel.this.surl = tsb.getURL().toString();
+            String eext= DataSetURL.getExplicitExt(oldsurl);
+            if ( eext!=null ) ApplicationModel.this.surl= eext + "." + ApplicationModel.this.surl;
             ApplicationModel.this.propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldsurl, ApplicationModel.this.surl);
         }
 
@@ -1645,17 +1647,17 @@ public class ApplicationModel {
     }
 
     void increaseFontSize() {
-        Font f = this.canvas.getFont();
+        Font f = this.canvas.getBaseFont();
         f = f.deriveFont(f.getSize2D() * 1.1f);
-        this.canvas.setFont(f);
+        this.canvas.setBaseFont(f);
         this.options.setCanvasFont(Options.getFontLabel(f));
 
     }
 
     void decreaseFontSize() {
-        Font f = this.canvas.getFont();
+        Font f = this.canvas.getBaseFont();
         f = f.deriveFont(f.getSize2D() / 1.1f);
-        this.canvas.setFont(f);
+        this.canvas.setBaseFont(f);
         this.options.setCanvasFont(Options.getFontLabel(f));
     }
 
@@ -1965,6 +1967,22 @@ public class ApplicationModel {
     public void setAutoRangeSuppress(boolean autoRangeSuppress) {
         this.autoRangeSuppress = autoRangeSuppress;
     }
+    
+    
+    /**
+     * when true, we are in the process of restoring a state.  Changes should not
+     * be pushed to the undo stack.
+     */
+    private boolean restoringState= false;
+    
+    public boolean isRestoringState() {
+        return restoringState;
+    }
+    
+    public void setRestoringState(boolean b) {
+        this.restoringState= b;
+    }
+    
     String embedDs = "";
     boolean embedDsDirty = false;
 
