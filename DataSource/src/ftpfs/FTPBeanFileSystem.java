@@ -323,7 +323,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                         long dt = System.currentTimeMillis() - t0;
                         mon.setTaskProgress(totalBytes);
                         mon.setProgressMessage(totalBytes / 1000 + "KB read at " + (totalBytes / dt) + " KB/sec");
-                        System.err.println(totalBytes);
+                        
                     }
 
                     public void byteWrite(int bytes) {
