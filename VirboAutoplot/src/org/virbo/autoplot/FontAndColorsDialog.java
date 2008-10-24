@@ -189,9 +189,9 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         JFontChooser chooser = new JFontChooser((JFrame) this.getOwner());
         String sci= "2 \u00d7 10E7";
         chooser.setExampleText("Electron Differential Energy Flux\n12:00\n2001-01-10\n"+sci+"\n");
-        chooser.setFont(app.getCanvas().getFont());
+        chooser.setFont(app.getCanvas().getBaseFont());
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
-            app.getCanvas().setFont(chooser.getFont());
+            app.getCanvas().setBaseFont(chooser.getFont());
             Font f = app.getCanvas().getFont();
             fontLabel.setText(Options.getFontLabel(f));
             app.options.setCanvasFont(Options.getFontLabel(f));
