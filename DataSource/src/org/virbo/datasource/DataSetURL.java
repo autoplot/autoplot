@@ -71,6 +71,32 @@ public class DataSetURL {
     
     static WeakHashMap<DataSource, DataSourceFactory> dsToFactory = new WeakHashMap<DataSource, DataSourceFactory>();
 
+    /**
+     * return the extension prefix of the URI, if specified.  
+     * @param surl
+     * @return null or an extension like "tsds"
+     */
+    public static String getExplicitExt(String surl) {
+        if ( surl.length()==0 ) {
+            return null;
+        }
+        String scheme;  // identify the scheme, if any.
+        int i0 = surl.indexOf(":");
+        if (i0 == -1) {
+            scheme = "";
+        } else if (i0 == 1) { // one letter scheme is assumed to be windows drive letter.
+            scheme = "";
+        } else {
+            scheme = surl.substring(0, i0);
+        }
+        int i= scheme.indexOf(".");
+        if ( i!=-1 ) {
+            return scheme.substring(0,i);
+        } else {
+            return null;
+        }
+    }
+
     public static String maybeAddFile(String surl) {
         if (surl.length() == 0) {
             return "file:/";
@@ -617,7 +643,7 @@ public class DataSetURL {
         return completions;
     }
 
-    public static List<CompletionResult> getCompletions3(String surl1, int carotPos, ProgressMonitor mon) throws Exception {
+    public static List<CompletionResult> getFactoryCompletions(String surl1, int carotPos, ProgressMonitor mon) throws Exception {
         CompletionContext cc = new CompletionContext();
         int qpos = surl1.lastIndexOf('?', carotPos);
 
