@@ -51,6 +51,13 @@ public class CdfUtil {
         }
     }
 
+    private static void flatten(int[][] data, int[] back, int offset, int nx, int ny) {
+        for (int i = 0; i < nx; i++) {
+            int[] dd = data[i];
+            System.arraycopy(dd, 0, back, offset + i * ny, ny);
+        }
+    }
+    
     private static void flatten(short[][] data, short[] back, int offset, int nx, int ny) {
         for (int i = 0; i < nx; i++) {
             short[] dd = data[i];
@@ -93,6 +100,13 @@ public class CdfUtil {
         } else if (varType == Variable.CDF_EPOCH) {
             double[] data = (double[]) odata; // kludge for CAA, which returns [1,900]
             result = DDataSet.wrap(data);
+        } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT4 ) {
+            int[][] data = (int[][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            int[] back = new int[nx * ny];
+            flatten(data, back, 0, nx, ny);
+            result = IDataSet.wrap(back, nx, ny);
         } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
             short[][] data = (short[][]) odata;
             int nx = data.length;
