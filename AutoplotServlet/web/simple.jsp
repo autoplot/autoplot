@@ -70,7 +70,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
         layout horiz position: <input name="column" value="5em,100%-10em"> (<a href="http://www.autoplot.org/autoplot/index.php/Discussion#Layout_Specification">help</a>)<br> 
         layout vert position: <input name="row" value="3em,100%-3em">  (<a href="http://www.autoplot.org/autoplot/index.php/Discussion#Layout_Specification">help</a>)<br> 
         <br>
-        timerange: <input name="timeRange" value="2003-2008"><br>
+        timerange: <input name="timeRange" value="2003-mar"><br>
         <br>
         plot style: <select name="renderType">
             <option selected></option>
