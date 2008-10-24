@@ -60,12 +60,13 @@ public class ScriptPanelSupport {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE)) {
+                    URLSplit split;
                     try {
                         String sfile = model.getDataSourceURL();
                         if (sfile == null) {
                             return;
                         }
-                        URLSplit split = DataSetURL.parse(sfile);
+                        split= DataSetURL.parse(sfile);
                         if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
                             return;
                         }
@@ -82,6 +83,8 @@ public class ScriptPanelSupport {
 
                         panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
                         panel.setFilename(sfile.toString());
+                    } catch ( NullPointerException ex ) {
+                        throw ex;
                     } catch (IOException ex) {
                         Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
