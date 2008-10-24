@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
 import javax.beans.binding.BindingConverter;
@@ -97,8 +99,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private JythonScriptPanel scriptPanel;
     private LogConsole logConsole;
     private RequestListener rlistener;
-    private JDialog fontAndColorsDialog= null;
-    private BookmarksManager bookmarksManager=null;
+    private JDialog fontAndColorsDialog = null;
+    private BookmarksManager bookmarksManager = null;
 
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
@@ -117,24 +119,25 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         dataSetSelector.setMonitorContext(applicationModel.plot);
 
-        applicationModel.plot.addFocusListener( new FocusAdapter() {
+        applicationModel.plot.addFocusListener(new FocusAdapter() {
+
             @Override
             public void focusGained(FocusEvent e) {
                 dataSetSelector.setValue(applicationModel.getDataSourceURL());
                 super.focusGained(e);
             }
-            
         });
 
-        applicationModel.canvas.addFocusListener( new FocusAdapter() {
+        applicationModel.canvas.addFocusListener(new FocusAdapter() {
+
             @Override
             public void focusGained(FocusEvent e) {
-                if ( stateSupport.getCurrentFile()!=null ) {
+                if (stateSupport.getCurrentFile() != null) {
                     dataSetSelector.setValue(stateSupport.getCurrentFile().toString());
                 }
                 super.focusGained(e);
-            }            
-        } );
+            }
+        });
 
         setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 
@@ -146,7 +149,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         List<Bookmark> recent = applicationModel.getRecent();
 
         for (Bookmark b : recent) {
-            urls.add(((Bookmark.Item)b).getUrl());
+            urls.add(((Bookmark.Item) b).getUrl());
         }
 
         dataSetSelector.setRecent(urls);
@@ -162,14 +165,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
                     List<String> urls = new ArrayList<String>();
                     List<Bookmark> recent = applicationModel.getRecent();
                     for (Bookmark b : recent) {
-                        urls.add(((Bookmark.Item)b).getUrl());
+                        urls.add(((Bookmark.Item) b).getUrl());
                     }
                     dataSetSelector.setRecent(urls);
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_STATUS)) {
                     setStatus(applicationModel.getStatus());
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
-                    updateBookmarks(); 
-                } else if ( evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE_URL)) {
+                    updateBookmarks();
+                } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE_URL)) {
                     dataSetSelector.setValue(applicationModel.getDataSourceURL());
                 }
             }
@@ -182,10 +185,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String vap = dataSetSelector.getValue();
-                    setStatus("opening .vap file "+vap+"...");
+                    setStatus("opening .vap file " + vap + "...");
                     applicationModel.doOpen(DataSetURL.getFile(DataSetURL.getURL(vap), new NullProgressMonitor()));
                     dataSetSelector.setValue(vap);
-                    setStatus("opening .vap file "+vap+"... done");
+                    setStatus("opening .vap file " + vap + "... done");
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     setStatus(ex.getMessage());
@@ -258,12 +261,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_FILL)) {
                     mdp.update();
                 }
-                if (!stateSupport.isOpening() && !stateSupport.isSaving() 
-                        && !evt.getPropertyName().equals("recent") 
-                        && !evt.getPropertyName().equals("status") 
-                        && !evt.getPropertyName().equals("ticks") 
-                        && !evt.getPropertyName().contains("PerMillisecond") ) { // TODO: list the props we want!
-                    tickleTimer.tickle( evt.getPropertyName() + " from " + evt.getSource() );
+                String propName= evt.getPropertyName();
+                if ( propName.equals("bounds") 
+                        || propName.equals("pendingChanges")
+                        ||propName.equals("recent")
+                        || propName.equals("status") 
+                        || propName.equals("ticks")
+                        || propName.contains("PerMillisecond") ) return;
+                if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState() ) { // TODO: list the props we want!
+                    tickleTimer.tickle(evt.getPropertyName() + " from " + evt.getSource());
                 }
             }
         });
@@ -311,24 +317,25 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         for (int i = 0; i < bookmarks.size(); i++) {
             final Bookmark book = bookmarks.get(i);
-            
-            if ( book instanceof Bookmark.Item ) {
+
+            if (book instanceof Bookmark.Item) {
                 JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
                     public void actionPerformed(ActionEvent e) {
-                        dataSetSelector.setValue(((Bookmark.Item)book).getUrl());
+                        dataSetSelector.getEditor().setText(((Bookmark.Item) book).getUrl());
+                        dataSetSelector.setValue(((Bookmark.Item) book).getUrl());
                         dataSetSelector.maybePlot();
                     }
                 });
-                
-                mi.setToolTipText(((Bookmark.Item)book).getUrl());
-                if ( book.getIcon()!=null ) {
-                    mi.setIcon( AutoplotUtil.scaleIcon( book.getIcon(), -1, 16 ) );
+
+                mi.setToolTipText(((Bookmark.Item) book).getUrl());
+                if (book.getIcon() != null) {
+                    mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
                 }
                 bookmarksMenu.add(mi);
             } else {
-                Bookmark.Folder folder= (Bookmark.Folder)book;
-                JMenu subMenu= new JMenu( book.getTitle() );
-                addBookmarks( subMenu, folder.getBookmarks() );
+                Bookmark.Folder folder = (Bookmark.Folder) book;
+                JMenu subMenu = new JMenu(book.getTitle());
+                addBookmarks(subMenu, folder.getBookmarks());
                 bookmarksMenu.add(subMenu);
             }
         }
@@ -413,7 +420,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         setMessage("log console added");
         tabs.addTab("console", logConsole);
         applicationModel.options.setLogConsoleVisible(true);
-        
+
         logConsoleMenuItem.setSelected(true);
     }
 
@@ -422,7 +429,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         int iport = Integer.parseInt(result);
         setupServer(iport, applicationModel);
     }
-    
+
     private void stopServer() {
         rlistener.stopListening();
     }
@@ -470,31 +477,38 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bookmarksMenu.add(new AbstractAction("Add Bookmark") {
 
             public void actionPerformed(ActionEvent e) {
-                applicationModel.addBookmark(dataSetSelector.getValue());
+                applicationModel.addBookmark(dataSetSelector.getEditor().getText());
             }
         });
 
         bookmarksMenu.add(new AbstractAction("Manage Bookmarks") {
 
             public void actionPerformed(ActionEvent e) {
-                if ( bookmarksManager==null ) {
-                    bookmarksManager = new BookmarksManager(AutoPlotUI.this, false );
-                    BindingContext bc= new BindingContext();
-                    bc.addBinding( applicationModel, "${bookmarks}", bookmarksManager.getModel(), "list" );
+                if (bookmarksManager == null) {
+                    bookmarksManager = new BookmarksManager(AutoPlotUI.this, false);
+                    BindingContext bc = new BindingContext();
+                    bc.addBinding(applicationModel, "${bookmarks}", bookmarksManager.getModel(), "list");
                     bc.bind();
-                    bookmarksManager.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
+                    bookmarksManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
                         public void propertyChange(PropertyChangeEvent evt) {
                             updateBookmarks();
+                            Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+                            prefs.put("bookmarks", Bookmark.formatBooks(bookmarksManager.getModel().getList()));
+                            try {
+                                prefs.flush();
+                            } catch (BackingStoreException ex) {
+                                ex.printStackTrace();
+                            }
                         }
                     });
                 }
                 bookmarksManager.setVisible(true);
-                
+
             }
         });
 
         bookmarksMenu.add(new JSeparator());
-        JMenuItem item= new JMenuItem( new AbstractAction("Make Aggregation From URL") {
+        JMenuItem item = new JMenuItem(new AbstractAction("Make Aggregation From URL") {
 
             public void actionPerformed(ActionEvent e) {
                 String s = dataSetSelector.getValue();
@@ -508,11 +522,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
         });
         item.setToolTipText("<html>create aggregation template from the URL to combine a time series spanning multiple files</html>");
         bookmarksMenu.add(item);
-        
-        item= new JMenuItem(new AbstractAction("Decode URL") {
+
+        item = new JMenuItem(new AbstractAction("Decode URL") {
+
             public void actionPerformed(ActionEvent e) {
                 String s = dataSetSelector.getEditor().getText();
-                s= org.virbo.datasource.DataSourceUtil.unescape(s);
+                s = org.virbo.datasource.DataSourceUtil.unescape(s);
                 dataSetSelector.getEditor().setText(s);
             }
         });
@@ -520,7 +535,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bookmarksMenu.add(item);
         bookmarksMenu.add(new JSeparator());
 
-        addBookmarks( bookmarksMenu, bookmarks );
+        addBookmarks(bookmarksMenu, bookmarks);
     }
 
     /** This method is called from within the constructor to
@@ -901,7 +916,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_resetZoomMenuItemActionPerformed
 
     private void fontsAndColorsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontsAndColorsMenuItemActionPerformed
-        if ( fontAndColorsDialog==null ) fontAndColorsDialog= new FontAndColorsDialog(this, false, applicationModel);
+        if (fontAndColorsDialog == null) fontAndColorsDialog = new FontAndColorsDialog(this, false, applicationModel);
         fontAndColorsDialog.setVisible(true);
     }//GEN-LAST:event_fontsAndColorsMenuItemActionPerformed
 
@@ -961,8 +976,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
 private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scriptPanelMenuItemActionPerformed
     applicationModel.options.setScriptVisible(scriptPanelMenuItem.isSelected());
-    if ( scriptPanelMenuItem.isSelected() && scriptPanel==null ) {
-        scriptPanel= new JythonScriptPanel(applicationModel, this.dataSetSelector);
+    if (scriptPanelMenuItem.isSelected() && scriptPanel == null) {
+        scriptPanel = new JythonScriptPanel(applicationModel, this.dataSetSelector);
         tabs.insertTab("script", null, scriptPanel, TABS_TOOLTIP, 4);
     } else {
         JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
@@ -971,7 +986,7 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 
 private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
     applicationModel.options.setLogConsoleVisible(logConsoleMenuItem.isSelected());
-    if ( applicationModel.options.isLogConsoleVisible() && logConsole==null ) {
+    if (applicationModel.options.isLogConsoleVisible() && logConsole == null) {
         initLogConsole();
     } else {
         JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
