@@ -8,8 +8,6 @@
 package ftpfs;
 
 import java.text.ParseException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.filesystem.*;
 import ftpfs.ftp.FtpBean;
@@ -30,7 +28,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -99,6 +96,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
         while (buffer.hasRemaining()) {
             dest.write(buffer);
         }
+        dest.close();
+        src.close();
         return true;
 
     }
