@@ -127,13 +127,13 @@ public class CdfFileDataSource extends AbstractDataSource {
         if ( constraint==null ) {
             return result;
         } else {
-            Pattern p= Pattern.compile("\\[(\\d*):(\\d*)(:(\\d*))?]");
+            Pattern p= Pattern.compile("\\[(\\d*)[:](\\d*)(?:[:](\\d*))?\\]");
             Matcher m= p.matcher(constraint);
             if ( m.matches() ) {
                 if ( m.group(1).length()>0 ) result[0]= Integer.parseInt(m.group(1));
                 if ( m.group(2).length()>0 ) result[1]= Integer.parseInt(m.group(2));
-                if ( m.groupCount()==4 ) {
-                    if ( m.group(4).length()>0 ) result[2]= Integer.parseInt(m.group(4));
+                if ( m.group(3)!=null ) {
+                    if ( m.group(3).length()>0 ) result[2]= Integer.parseInt(m.group(3));
                 } 
                 return result;
             } else {
