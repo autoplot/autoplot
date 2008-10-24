@@ -30,6 +30,7 @@ import org.das2.CancelledOperationException;
 import org.das2.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.DataSourceUtil;
@@ -219,7 +220,7 @@ public class DodsDataSource extends AbstractDataSource {
             return new HashMap<String, Object>();
         } else {
             Pattern p = Pattern.compile("DEPEND_[0-9]");
-
+            Pattern p2= Pattern.compile("LABL_PTR_([0-9])");
             Enumeration n = at.getNames();
 
             Map<String, Object> result = new HashMap<String, Object>();
@@ -227,6 +228,7 @@ public class DodsDataSource extends AbstractDataSource {
             while (n.hasMoreElements()) {
                 Object key = n.nextElement();
                 Attribute att = at.getAttribute((String) key);
+                Matcher m=null;
                 try {
                     String val = att.getValueAt(0);
                     val= DataSourceUtil.unquote(val);
@@ -235,7 +237,12 @@ public class DodsDataSource extends AbstractDataSource {
                         Map<String, Object> newVal = getMetaData(name);
                         newVal.put("NAME", name); // tuck it away, we'll need it later.
                         result.put(att.getName(), newVal);
-
+                    } else if ( (m=p2.matcher(att.getName())).matches() ) {
+                        String name = val;
+                        Map<String, Object> newVal = getMetaData(name);
+                        newVal.put("NAME", name); // tuck it away, we'll need it later.
+                        result.put("DEPEND_"+m.group(1), newVal);
+                        
                     } else {
                         result.put(att.getName(), val );
                     }
