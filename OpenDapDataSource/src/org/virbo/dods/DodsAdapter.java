@@ -186,7 +186,7 @@ public class DodsAdapter {
                 DArray z = (DArray) zgrid.getVar(0);
 
                 zds = DodsVarDataSet.newDataSet(z, properties);
-                zds.putProperty(QDataSet.UNITS, units);
+                if ( zds.property(QDataSet.UNITS)==null ) zds.putProperty(QDataSet.UNITS, units);
 
                 for (int idim = 0; idim < z.numDimensions(); idim++) {
                     DArray t = (DArray) zgrid.getVar(idim + 1);
@@ -201,7 +201,7 @@ public class DodsAdapter {
                 DArray z = (DArray) btvar;
 
                 zds = DodsVarDataSet.newDataSet(z, properties);
-                zds.putProperty(QDataSet.UNITS, units);
+                if ( zds.property(QDataSet.UNITS)==null ) zds.putProperty(QDataSet.UNITS, units);
 
                 for (int idim = 0; idim < z.numDimensions(); idim++) {
                     if (dependName[idim] != null) {
