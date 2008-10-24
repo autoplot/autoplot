@@ -337,7 +337,7 @@ public class CdfUtil {
                 double[] dresult= new double[data.length/2];
                 for ( int i=0; i<dresult.length; i++ ) {
                     double t2000= data[i*2] - 6.3113904e+10 ; // seconds since midnight 2000
-                    dresult[i]= t2000 * 1e6 + data[i*2+1] / 1000.;
+                    dresult[i]= t2000 * 1e6 + data[i*2+1] / 1000000.;
                 }
                 result = DDataSet.wrap(dresult);
                 result.putProperty(QDataSet.UNITS, Units.us2000 );
