@@ -57,7 +57,7 @@ class DataSetUrlCompletionTask implements CompletionTask {
              
             URLSplit split = DataSetURL.parse(surl1);            
             if ( surl1.contains("?") || DataSourceRegistry.getInstance().hasSourceByExt(split.ext) ) {
-                rs= DataSetURL.getCompletions3( surl1, carotPos,  new NullProgressMonitor() );
+                rs= DataSetURL.getFactoryCompletions( surl1, carotPos,  new NullProgressMonitor() );
             } else {
                 rs= DataSetURL.getFileSystemCompletions(surl1, carotPos, new NullProgressMonitor() );
             }
