@@ -305,7 +305,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                 List<DataSetURL.CompletionResult> completions2;
                 try {
-                    completions2 = DataSetURL.getCompletions3(surl, carotpos, completionsMonitor);
+                    completions2 = DataSetURL.getFactoryCompletions(surl, carotpos, completionsMonitor);
                     setMessage("done getting completions");
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -367,14 +367,14 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         ActionMap map = dataSetSelector.getActionMap();
         map.put("complete", new AbstractAction("completionsPopup") {
-
             public void actionPerformed(ActionEvent ev) {
                 showCompletions();
             }
         });
+        
         map.put("plot", new AbstractAction("plotUrl") {
-
             public void actionPerformed(ActionEvent ev) {
+                setValue( getEditor().getText() );
                 maybePlot();
             }
         });
@@ -382,9 +382,8 @@ public class DataSetSelector extends javax.swing.JPanel {
         dataSetSelector.setActionMap(map);
         final JTextField tf = (JTextField) dataSetSelector.getEditor().getEditorComponent();
         tf.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent e) {
-                dataSetSelector.setSelectedItem(tf.getText());
+                dataSetSelector.setSelectedItem( tf.getText() );
                 maybePlot();
             }
         });
@@ -504,6 +503,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void plotItButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotItButtonActionPerformed
+        setValue( getEditor().getText() );
         maybePlot();
     }//GEN-LAST:event_plotItButtonActionPerformed
 
