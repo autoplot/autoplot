@@ -442,7 +442,8 @@ class TsdsDataSource extends AbstractDataSource {
             }
 
             String title = xpath.evaluate("//TSML/Name/text()", document);
-            String name = xpath.evaluate("//TSML/NameShort/text()", document);
+            String name = xpath.evaluate("//TSML/DataKey/text()", document);
+            name= name.replaceAll("-", "_"); // make c/java style identifier
 
             System.err.println(surl);
             URL dataUrl = new URL(surl);
@@ -454,13 +455,11 @@ class TsdsDataSource extends AbstractDataSource {
             boolean minMax = true;
             if (minMax && surl.contains("-filter_0-")) {
                 String sDataMax = surl.replace("-filter_0-", "-filter_2-");
-                //System.err.println(sDataMax);
                 logger.fine("loading " + sDataMax);
                 mon.setProgressMessage("loading max");
                 BufferDataSet dataMax = dataUrl(new URL(sDataMax).openStream(), size, points, mon);
                 dataMax.putProperty( QDataSet.NAME, "binmax" );
                 String sDataMin = surl.replace("-filter_0-", "-filter_3-");
-                //System.err.println(sDataMin);
                 mon.setProgressMessage("loading min");
                 BufferDataSet dataMin = dataUrl(new URL(sDataMin).openStream(), size, points, mon);
                 dataMin.putProperty( QDataSet.NAME, "binmin" );
