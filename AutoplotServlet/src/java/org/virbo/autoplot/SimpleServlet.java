@@ -97,7 +97,7 @@ public class SimpleServlet extends HttpServlet {
                 if (!column.equals("")) AutoplotUtil.setDevicePosition(appmodel.plot.getColumn(), column);
             }
 
-            if (!font.equals("")) appmodel.canvas.setFont(Font.decode(font));
+            if (!font.equals("")) appmodel.canvas.setBaseFont(Font.decode(font));
 
             appmodel.getCanvas().setSize(width, height);
             appmodel.getCanvas().revalidate();
