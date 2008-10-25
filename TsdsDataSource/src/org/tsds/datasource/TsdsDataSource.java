@@ -126,7 +126,7 @@ class TsdsDataSource extends AbstractDataSource {
     }
 
     private int quantizePpd(Datum resolution) {
-        int[] ppds = new int[]{1, 12, 144, 1440, 17280, 86400, 864000};
+        int[] ppds = new int[]{1,8,24,96,144,4320,17280,86400, 864000};
         if (resolution == null) return 1;
         double resdays = resolution.doubleValue(Units.days);
         double dppd = 1 / resdays;
