@@ -18,9 +18,9 @@ be applied to the data, for example, specifying valid range and fill data.
         <p>Recent changes include:</p>
         <ul><li> legend bubble for Vector plots
 </li><li> openDAP fixes
-<ol><li> fix support for Vector plots
+<ul><li> fix support for Vector plots
 </li><li> name variables
-</li></ol>
+</li></ul>
 </li><li> Export data derives default name from DataSet name.
 </li><li> TSDS fixes
 
@@ -34,7 +34,12 @@ be applied to the data, for example, specifying valid range and fill data.
 </li><li> FTP filesystem provides determinate progress feedback.
 </li><li> FTP filesystem bug on windows fixed, where .part file could not be renamed after download.
 
-</li></ul>
+</li>
+<li> bugfix: mistake in CDF epoch16 unpacking corrected.
+</li><li> bugfix: servlet properly sets font.
+</li><li> bugfix: runtime exception in servlet plotting TimeSeriesBrowse (TSDS source) corrected
+
+</li><li> bugfix: SeriesRenderer, auto-ranging properly handle fill data in DELTA_PLUS, DELTA_MINUS.</ul>
 
 <p>Known Issues:
 </p>
