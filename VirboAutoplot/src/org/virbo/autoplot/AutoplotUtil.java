@@ -545,19 +545,16 @@ public class AutoplotUtil {
             min = Ops.subtract(ds, delta);
         }
 
-        QDataSet w = DataSetUtil.weightsDataSet(ds);
+        QDataSet wmin = DataSetUtil.weightsDataSet(min);
+        QDataSet wmax = DataSetUtil.weightsDataSet(max);
         QubeDataSetIterator it = new QubeDataSetIterator(ds);
         double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
         while (it.hasNext()) {
             it.next();
-            if (it.getValue(w) > 0.) {
-                double d = it.getValue(ds);
-                result[0] = Math.min(result[0], it.getValue(min));
-                result[1] = Math.max(result[1], it.getValue(max));
-            } else {
-                double d = it.getValue(ds);
-            }
+            if (it.getValue(wmin) > 0.) result[0] = Math.min(result[0], it.getValue(min));
+            if (it.getValue(wmax) > 0.) result[1] = Math.max(result[1], it.getValue(max));
         }
+        
         if (result[0] == Double.POSITIVE_INFINITY) {  // no valid data!
             result[0] = 0.;
             result[1] = 1.;
