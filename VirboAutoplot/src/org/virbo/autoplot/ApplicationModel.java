@@ -1261,8 +1261,10 @@ public class ApplicationModel {
             //ApplicationModel.this.setDataSourceURL( tsb.getURL().toString() );
             String oldsurl = ApplicationModel.this.surl;
             ApplicationModel.this.surl = tsb.getURL().toString();
-            String eext= DataSetURL.getExplicitExt(oldsurl);
-            if ( eext!=null ) ApplicationModel.this.surl= eext + "." + ApplicationModel.this.surl;
+            if ( oldsurl!=null ) {
+                String eext= DataSetURL.getExplicitExt(oldsurl);
+                if ( eext!=null ) ApplicationModel.this.surl= eext + "." + ApplicationModel.this.surl;
+            }
             ApplicationModel.this.propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldsurl, ApplicationModel.this.surl);
         }
 
