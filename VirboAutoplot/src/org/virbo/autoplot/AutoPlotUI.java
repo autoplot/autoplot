@@ -21,7 +21,6 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.PersistentStateSupport;
 import java.awt.BorderLayout;
-import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
