@@ -354,7 +354,7 @@ public class ApplicationModel {
         updateTsbTimer = new Timer(100, new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                updateTsb();
+                updateTsb(false);
             }
         });
         updateTsbTimer.setRepeats(false);
@@ -690,7 +690,7 @@ public class ApplicationModel {
 
     }
 
-    public void updateTsb() {
+    public void updateTsb(boolean autorange) {
         if (tsb == null) {
             return;
         }
@@ -723,7 +723,7 @@ public class ApplicationModel {
                 if (surl.equals(this.surl)) {
                     logger.fine("we do no better with tsb");
                 } else {
-                    update(false, false);
+                    update(autorange,autorange);
                     String oldVal = this.surl;
                     this.surl = surl;
                     propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE_URL, oldVal, surl);
@@ -762,7 +762,7 @@ public class ApplicationModel {
                 if (setTsbInitialResolution) {
                     DatumRange timeRange = tsb.getTimeRange();
                     this.plot.getXAxis().resetRange(timeRange);
-                    updateTsb();
+                    updateTsb(true);
                 }
 
                 timeSeriesBrowseListener = new PropertyChangeListener() {
@@ -778,19 +778,26 @@ public class ApplicationModel {
                 };
 
                 this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);
-
+                
+                if (oldSource == null || !oldSource.equals(dataSource)) {
+                    propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, dataSource);
+                }
+                
+                return;
+                
             } else {
                 if (timeSeriesBrowseListener != null) {
                     this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
                     timeSeriesBrowseListener = null;
                 }
+                if (oldSource == null || !oldSource.equals(dataSource)) {
+                    update(true, true);
+                    propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, dataSource);
+                }
             }
         }
 
-        if (oldSource == null || !oldSource.equals(dataSource)) {
-            update(true, true);
-            propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, dataSource);
-        }
+        
     }
 
     public DataSource dataSource() {
