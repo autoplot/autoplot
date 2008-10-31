@@ -1,0 +1,27 @@
+# find beginning of java class, save out shell script and java class separately.
+
+ds= getDataSet('bin.file:///home/jbf/Linux/Download/netbeans-6.5rc2-ml-linux.sh?byteLength=100000' )
+
+r= where( ds == 0xCA )
+
+r2= where( ds[r+1] == 0xFE )
+r= r[r2]
+
+r3= where( ds[r+2] == 0xBA )
+r= r[r3]
+
+r4= where( ds[r+3] == 0xBE )
+r= r[r4]
+
+index= int(r.value(0))
+
+print 'Index is at ', index
+
+ds.putProperty( QDataSet.DEPEND_0, None )
+formatDataSet( ds[0:index], 'bin.file:///home/jbf/Linux/Download/installer.sh?type=ubyte' )
+
+ds= getDataSet('bin.file:///home/jbf/Linux/Download/netbeans-6.5rc2-ml-linux.sh?byteOffset='+index )
+ds.putProperty( QDataSet.DEPEND_0, None )
+formatDataSet( ds, 'bin.file:///home/jbf/Linux/Download/installer.class?type=ubyte' )
+
+print 'done'
