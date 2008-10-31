@@ -16,34 +16,20 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <ul><li> legend bubble for Vector plots
-</li><li> openDAP fixes
-<ul><li> fix support for Vector plots
-</li><li> name variables
+        <ul><li> bugfix: TSDS and aggregation had extra initial data load.
+</li><li> hostname completion based on local cache of files.
+</li><li> CDF supports rank 3 int, short, and byte data.
+</li><li> cadence calculation improved by quality checks.
 </li></ul>
-</li><li> Export data derives default name from DataSet name.
-</li><li> TSDS fixes
-
-</li><li> Ascii labels dataset in rank2.
-</li><li> bugfix: repaint can cause font change to be undone.  (Resize caused baseFont to be used.)
-</li><li> openDAP supports labels quantities when "LABL_PTR" is used.
-</li><li> servlet doesn't set xaxis timerange if it's not a time axis.
-</li><li> example form in servlet doesn't lead giant data reads
-</li><li> stride supported in CDF.
-</li><li> CDF supports rank 2 CDF_INT4 to support PB5-encoded times.
-</li><li> FTP filesystem provides determinate progress feedback.
-</li><li> FTP filesystem bug on windows fixed, where .part file could not be renamed after download.
-
-</li>
-<li> bugfix: mistake in CDF epoch16 unpacking corrected.
-</li><li> bugfix: servlet properly sets font.
-</li><li> bugfix: runtime exception in servlet plotting TimeSeriesBrowse (TSDS source) corrected
-
-</li><li> bugfix: SeriesRenderer, auto-ranging properly handle fill data in DELTA_PLUS, DELTA_MINUS.</ul>
 
 <p>Known Issues:
 </p>
-<li> repaint can cause font change to be undone.</li>
+<ul>
+<li> Cadence algorithm still has issues, now it's too permissive.
+<li> CDAWeb team is still seeing crashes on Windows for some CDF files.
+<li> Isotropic mode appears to be broken.
+</ul>
+
 	<p>data is input from: 
 	<li>ascii files (.dat,.txt)</li>
         <li>binary files (.bin)</li>
