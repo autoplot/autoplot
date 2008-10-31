@@ -81,6 +81,33 @@ public class CdfUtil {
         }
     }
 
+    private static void flatten(int[][][] data, int[] back, int offset, int nx, int ny, int nz) {
+        offset = 0;
+        for (int i = 0; i < nx; i++) {
+            int[][] ff = data[i];
+            flatten(ff, back, offset, ny, nz);
+            offset += ny * nz;
+        }
+    }
+
+    private static void flatten(short[][][] data, short[] back, int offset, int nx, int ny, int nz) {
+        offset = 0;
+        for (int i = 0; i < nx; i++) {
+            short[][] ff = data[i];
+            flatten(ff, back, offset, ny, nz);
+            offset += ny * nz;
+        }
+    }
+
+    private static void flatten(byte[][][] data, byte[] back, int offset, int nx, int ny, int nz) {
+        offset = 0;
+        for (int i = 0; i < nx; i++) {
+            byte[][] ff = data[i];
+            flatten(ff, back, offset, ny, nz);
+            offset += ny * nz;
+        }
+    }
+    
     private static WritableDataSet wrapRank2(long varType, Object odata, Variable variable) throws RuntimeException {
         WritableDataSet result;
         if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
@@ -146,8 +173,32 @@ public class CdfUtil {
             int nz = data[0][0].length;
             float[] back = new float[nx * ny * nz];
             flatten(data, back, 0, nx, ny, nz);
-            result = FDataSet.wrap(back, nx, nz, ny);
-
+            result = FDataSet.wrap(back, nx, ny, nz);  
+        } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT4 ) {
+            int[][][] data = (int[][][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            int nz = data[0][0].length;
+            int[] back = new int[nx * ny * nz];
+            flatten(data, back, 0, nx, ny, nz);
+            result = IDataSet.wrap(back, nx, ny, nz );
+        } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
+            short[][][] data = (short[][][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            int nz = data[0][0].length;
+            short[] back = new short[nx * ny * nz ];
+            flatten(data, back, 0, nx, ny, nz);
+            result = SDataSet.wrap(back, nx, ny, nz);
+        } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE ) {
+            byte[][][] data = (byte[][][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            int nz = data[0][0].length;
+            byte[] back = new byte[nx * ny* nz];
+            flatten(data, back, 0, nx, ny,nz);
+            result = BDataSet.wrap(back, nx, ny, nz);
+            
         } else {
             throw new RuntimeException("Unsupported Data Type " + variable.getDataType() + " java type " + odata.getClass());
         }
