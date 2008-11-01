@@ -10,13 +10,14 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.logging.Logger;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -46,7 +47,12 @@ public class Util {
         
         metadata= result.getMetaData( new NullProgressMonitor() );
         metadataSurl= surl;
-        return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
+
+        if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
+            return rds;
+        } else {
+            return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
+        }
     }
     
     // cache the last metadata url.
