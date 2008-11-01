@@ -97,27 +97,11 @@ public class DataSetURL {
         }
     }
 
+    /**
+     * @deprecated use URLSplit.maybeAddFile(surl);
+     */    
     public static String maybeAddFile(String surl) {
-        if (surl.length() == 0) {
-            return "file:/";
-        }
-        String scheme;  // identify the scheme, if any.
-        int i0 = surl.indexOf(":");
-        if (i0 == -1) {
-            scheme = "";
-        } else if (i0 == 1) { // one letter scheme is assumed to be windows drive letter.
-            scheme = "";
-        } else {
-            scheme = surl.substring(0, i0);
-        }
-
-        if (scheme.equals("")) {
-            surl = "file://" + ((surl.charAt(0) == '/') ? surl : ('/' + surl)); // Windows c:
-            surl = surl.replaceAll("\\\\", "/");
-            surl = surl.replaceAll(" ", "%20");
-        }
-
-        return surl;
+        return URLSplit.maybeAddFile(surl);
     }
 
     /**
@@ -126,72 +110,17 @@ public class DataSetURL {
      *   file, the file, http://www.example.com/data/myfile.nc
      *   ext, the extenion, .nc
      *   params, myVariable or null
+     * @deprecated use URLSplit.parse(surl);
      */
     public static URLSplit parse(String surl) {
-        URI uri;
-
-        surl = maybeAddFile(surl);
-
-        int h = surl.indexOf(":/");
-        String scheme = surl.substring(0, h);
-
-        URL url = null;
-        try {
-            if (scheme.contains(".")) {
-                int j = scheme.indexOf(".");
-
-                url = new URL(surl.substring(j + 1));
-            } else {
-                url = new URL(surl);
-            }
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-
-        String file = url.getPath();
-        int i = file.lastIndexOf(".");
-        String ext = i == -1 ? "" : file.substring(i);
-
-        String params = null;
-
-        int fileEnd;
-        // check for just one ?
-        i = surl.indexOf("?");
-        if (i != -1) {
-            fileEnd = i;
-            params = surl.substring(i + 1);
-            i = surl.indexOf("?", i + 1);
-            if (i != -1) {
-                throw new IllegalArgumentException("too many ??'s!");
-            }
-        } else {
-            fileEnd = surl.length();
-        }
-
-        i = surl.lastIndexOf("/");
-        String surlDir = surl.substring(0, i);
-
-        int i2 = surl.indexOf("://");
-
-        URLSplit result = new URLSplit();
-        result.scheme = scheme;
-        result.path = surlDir + "/";
-        result.file = surl.substring(0, fileEnd);
-        result.ext = ext;
-        result.params = params;
-
-        return result;
-
-
+        return URLSplit.parse(surl);
     }
-
-    public static String format(URLSplit split) {
-        String result = split.file;
-        if (split.params != null) {
-            result += "?" + split.params;
-        }
-        return result;
+    
+    /**
+     * @deprecated use URLSplit.format(split);
+     */
+    public static String format( URLSplit split ) {
+        return URLSplit.format(split);
     }
 
     /**
@@ -603,6 +532,47 @@ public class DataSetURL {
         }
     }
 
+    public static List<CompletionResult> getHostCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
+        URLSplit split = URLSplit.parse(surl.substring(0, carotpos));
+        String prefix = split.file.substring(split.path.length());
+        String surlDir = split.path;
+
+        mon.setLabel("getting list of cache hosts");
+
+        File cacheF= new File( FileSystem.settings().getLocalCacheDir() , split.scheme );
+
+        String[] s = cacheF.list();
+
+        boolean foldCase = true;
+        if (foldCase) {
+            prefix = prefix.toLowerCase();
+        }
+
+        List<DataSetURL.CompletionResult> completions = new ArrayList<DataSetURL.CompletionResult>(s.length);
+        for (int j = 0; j < s.length; j++) {
+            String scomp = foldCase ? s[j].toLowerCase() : s[j];
+            if (scomp.startsWith(prefix)) {
+                String result1= s[j] + "/";
+                // drill down single entries, since often the root doesn't provide a list.
+                String[] s2= new File( cacheF, result1 ).list();
+                while ( s2.length==1 && new File( cacheF, result1+"/"+s2[0] ).isDirectory() ) {
+                    result1+= s2[0]+"/";
+                    s2= new File( cacheF, result1 ).list();
+                }
+                completions.add(new DataSetURL.CompletionResult( surlDir + result1, result1, null, surl.substring(0, carotpos), true));
+            }
+        }
+
+        // check for single completion that is just a folder name with /.
+        if (completions.size() == 1) {
+            if ((completions.get(0)).equals(surlDir + prefix + "/")) {
+                // maybe we should do something special.
+            }
+        }
+
+        return completions;
+    }
+    
     public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
         URLSplit split = DataSetURL.parse(surl.substring(0, carotpos));
         String prefix = split.file.substring(split.path.length());
