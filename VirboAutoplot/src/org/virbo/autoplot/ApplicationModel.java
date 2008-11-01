@@ -852,11 +852,11 @@ public class ApplicationModel {
             double expand = (ratio.divide(otherRatio).doubleValue(Units.dimensionless) - 1) / 2;
             if (Math.abs(expand) > 0.0001) {
                 DatumRange newOtherRange = DatumRangeUtil.rescale(otherRange, 0 - expand, 1 + expand);
-                otherAxis.setDatumRange(newOtherRange);
+                otherAxis.resetRange(newOtherRange);
             } else {
-                otherAxis.setDatumRange(otherRange);
+                otherAxis.resetRange(otherRange);
             }
-            axis.setDatumRange(desc.range);
+            axis.resetRange(desc.range);
             lock.unlock();
         } else {
             plot.getXAxis().setLog(xdesc.log);
