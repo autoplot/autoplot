@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dsops.Ops;
 
 /**
  *
@@ -49,6 +50,7 @@ public class ImageDataSet extends AbstractDataSet {
         if ( mask==null ) {
             if ( op==null ) {
                 rank= 3;
+                putProperty( QDataSet.DEPEND_2, Ops.labels( new String[] { "red", "green", "blue" } ) );
             } else {
                 this.op= op;
             }
