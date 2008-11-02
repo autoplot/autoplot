@@ -13,12 +13,12 @@ public class UByte extends BufferDataSet {
     }
 
     public double value(int i0) {
-        byte b= back.get(offset(i0, 0, 0));
+        byte b= back.get(offset(i0));
         return b < 0 ? b + 256 : b;
     }
 
     public double value(int i0, int i1) {
-        byte b= back.get(offset(i0, i1, 0)); 
+        byte b= back.get(offset(i0, i1)); 
         return b < 0 ? b + 256 : b;
     }
 

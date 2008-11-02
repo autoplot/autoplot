@@ -10,11 +10,11 @@ public class Int extends BufferDataSet implements WritableDataSet {
     }
 
     public double value(int i0) {
-        return back.getInt(offset(i0, 0, 0));
+        return back.getInt(offset(i0));
     }
 
     public double value(int i0, int i1) {
-        return back.getInt(offset(i0, i1, 0));
+        return back.getInt(offset(i0, i1));
     }
 
     public double value(int i0, int i1, int i2) {
@@ -22,11 +22,11 @@ public class Int extends BufferDataSet implements WritableDataSet {
     }
     
     public void putValue(int i0, double d) {
-        back.putInt( offset(i0, 0, 0), (int)d );
+        back.putInt( offset(i0), (int)d );
     }
 
     public void putValue(int i0, int i1, double d) {
-        back.putInt( offset(i0, i1, 0), (int)d );
+        back.putInt( offset(i0, i1), (int)d );
     }
 
     public void putValue(int i0, int i1, int i2, double d) {
