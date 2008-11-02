@@ -42,6 +42,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.DataSetURL.CompletionResult;
 
 /**
@@ -211,17 +212,95 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void showCompletions(final String surl, final int carotpos) {
-        URLSplit split = DataSetURL.parse(surl);
-        if (surl.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.containsKey(split.ext)) {
+        URLSplit split = URLSplit.parse(surl);
+        if ( carotpos > split.file.length() && DataSourceRegistry.getInstance().dataSourcesByExt.containsKey(split.ext) ) {
             showFactoryCompletions(surl, carotpos);
 
         } else {
-            showFileSystemCompletions(surl, carotpos);
+            
+            int firstSlashAfterHost= split.authority==null ? 0 : split.authority.length() ;
+            if ( carotpos<firstSlashAfterHost ) {
+                showHostCompletions(surl, carotpos);
+            } else {
+                showFileSystemCompletions(surl, carotpos);
+            }
 
         }
 
     }
 
+    /**
+     * create completions on hostnames based on cached resources.
+     * @param surl
+     * @param carotpos
+     */
+    private void showHostCompletions(final String surl, final int carotpos) {
+
+        if (completionsRunnable != null) {
+            completionsMonitor.cancel();
+            completionsRunnable = null;
+        }
+
+        completionsMonitor = getMonitor();
+        completionsMonitor.setLabel("getting completions");
+        completionsRunnable = new Runnable() {
+
+            public void run() {
+                ProgressMonitor mon = getMonitor();
+
+                List<CompletionResult> completions=null;
+                
+                URLSplit split = DataSetURL.parse(surl);
+                String surlDir = split.path;
+                
+                final String labelPrefix = surlDir;
+                
+                try {
+                    completions = DataSetURL.getHostCompletions(surl, carotpos, mon);
+                } catch (IOException ex) {
+                    setMessage(ex.toString());
+                    JOptionPane.showMessageDialog( DataSetSelector.this, "<html>I/O Exception occurred:<br>"+ex.getLocalizedMessage()+"</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE );
+                    return;
+                }
+
+                CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
+                    public void itemSelected(CompletionResult s1) {
+                        dataSetSelector.setSelectedItem(s1.completion);
+                        if (s1.maybePlot) {
+                            maybePlot();
+                        }
+                    }
+                };
+                
+                completionsPopupMenu = CompletionsList.fillPopupNew( completions, labelPrefix, new JPopupMenu(), listener);
+
+                setMessage("done getting completions");
+
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    public void run() {
+                        try {
+                            int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
+                            BoundedRangeModel model = editor.getHorizontalVisibility();
+
+                            int xpos = xpos2 - model.getValue();
+                            xpos= Math.min( model.getExtent(), xpos );                            
+
+                            completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
+                            completionsRunnable = null;
+                        } catch (NullPointerException ex) {
+                            ex.printStackTrace(); // TODO: look into this
+
+                        }
+                    }
+                } );
+
+            }
+        };
+
+        new Thread(completionsRunnable, "completionsThread").start();
+    }
+    
     private void showFileSystemCompletions(final String surl, final int carotpos) {
 
         if (completionsRunnable != null) {
