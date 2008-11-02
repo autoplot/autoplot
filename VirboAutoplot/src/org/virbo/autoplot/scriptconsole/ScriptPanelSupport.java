@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -49,6 +50,7 @@ public class ScriptPanelSupport {
     final DataSetSelector selector;
     final JythonScriptPanel panel;
     final EditorAnnotationsSupport annotationsSupport;
+    private String PREFERENCE_OPEN_FILE= "openFile";
 
     ScriptPanelSupport(final JythonScriptPanel panel, final ApplicationModel model, final DataSetSelector selector) {
         this.model = model;
@@ -307,8 +309,13 @@ public class ScriptPanelSupport {
                 }
             }
 
-
+            Preferences prefs= Preferences.userNodeForPackage(ScriptPanelSupport.class);
+            String openFile= prefs.get( PREFERENCE_OPEN_FILE, "" );
+            
             JFileChooser chooser = new JFileChooser();
+            if ( openFile.length()>0 ) {
+                chooser.setSelectedFile( new File(openFile) );
+            }
             chooser.setFileFilter(getFileFilter());
             if (file != null) {
                 chooser.setSelectedFile(file);
@@ -316,6 +323,7 @@ public class ScriptPanelSupport {
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
                 file = chooser.getSelectedFile();
+                prefs.put( PREFERENCE_OPEN_FILE, file.toString() );
                 loadFile(file);
                 panel.setFilename(file.toString());
             }
