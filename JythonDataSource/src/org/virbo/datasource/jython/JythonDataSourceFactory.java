@@ -64,8 +64,8 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
         File src = DataSetURL.getFile(url, new NullProgressMonitor());
 
-        URLSplit split = DataSetURL.parse(url.toString());
-        Map<String, String> params = DataSetURL.parseParams(split.params);
+        URLSplit split = URLSplit.parse(url.toString());
+        Map<String, String> params = URLSplit.parseParams(split.params);
         try {
             interp.exec("params=dict()");
             for (String s : params.keySet()) {

@@ -176,8 +176,8 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
     public void setUrl(String url) {
         try {
-            URLSplit split = DataSetURL.parse(url);
-            Map<String, String> params = DataSetURL.parseParams(split.params);
+            URLSplit split = URLSplit.parse(url);
+            Map<String, String> params = URLSplit.parseParams(split.params);
 
             File f = DataSetURL.getFile(new URL(url), new NullProgressMonitor());
             setFile(f);

@@ -23,6 +23,7 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URLSplit;
 import org.virbo.dsutil.AsciiParser;
 
 /**
@@ -135,7 +136,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
 
     private String[] getFieldNames(CompletionContext cc, ProgressMonitor mon ) throws IOException {
         
-        Map params= DataSetURL.parseParams( cc.params );
+        Map params= URLSplit.parseParams( cc.params );
         Object o;
         File file= DataSetURL.getFile( cc.resource, mon  );
         

@@ -188,9 +188,9 @@ public class CompletionContext {
             //    surl= surl.substring( surl.indexOf('.')+1 );
             //    isURI= true;
             //}
-            URLSplit split= DataSetURL.parse( surl );
+            URLSplit split= URLSplit.parse( surl );
             split.file= ccnew.completable;
-            return DataSetURL.format( split );
+            return URLSplit.format( split );
             
         } else if ( context==CONTEXT_PARAMETER_NAME || context==CONTEXT_PARAMETER_VALUE ) {
             

@@ -2,6 +2,9 @@ package org.virbo.datasource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class URLSplit {
 
@@ -118,7 +121,72 @@ public class URLSplit {
 
 
     }
+    
+    private static int indexOf(String s, char ch, char ignoreBegin, char ignoreEnd) {
+        int i = s.indexOf(ch);
+        int i0 = s.indexOf(ignoreBegin);
+        int i1 = s.indexOf(ignoreEnd);
+        if (i != -1 && i0 < i && i < i1) {
+            i = -1;
+        }
+        return i;
+    }    
 
+    /**
+     *
+     * split the parameters into name,value pairs.
+     *
+     * items without equals (=) are inserted as "arg_N"=name.
+     */
+    public static LinkedHashMap<String, String> parseParams(String params) {
+        LinkedHashMap<String,String> result = new LinkedHashMap<String,String>();
+        if (params == null) {
+            return result;
+        }
+        if (params.trim().equals("")) {
+            return result;
+        }
+        String[] ss = params.split("&");
+
+        int argc = 0;
+
+        for (int i = 0; i < ss.length; i++) {
+            int j = indexOf(ss[i], '=', '(', ')');
+            String name, value;
+            if (j == -1) {
+                name = ss[i];
+                value = "";
+                result.put("arg_" + (argc++), name);
+            } else {
+                name = ss[i].substring(0, j);
+                value = ss[i].substring(j + 1); // URLDecoder
+                result.put(name, value);
+            }
+        }
+        return result;
+    }
+
+    public static String formatParams(Map parms) {
+        StringBuffer result = new StringBuffer("");
+        for (Iterator i = parms.keySet().iterator(); i.hasNext();) {
+            String key = (String) i.next();
+            if (key.startsWith("arg_")) {
+                if (!parms.get(key).equals("")) {
+                    result.append("&" + parms.get(key));
+                }
+            } else {
+                String value = (String) parms.get(key);
+                if (value != null) {
+                    result.append("&" + key + "=" + value);
+                } else {
+                    result.append("&" + key);
+                }
+            }
+        }
+        return (result.length() == 0) ? "" : result.substring(1);
+    }
+
+    
     public static String format(URLSplit split) {
         String result = split.file;
         if (split.params != null) {

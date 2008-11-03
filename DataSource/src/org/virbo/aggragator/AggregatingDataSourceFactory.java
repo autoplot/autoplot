@@ -44,14 +44,14 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         AggregatingDataSource ads = new AggregatingDataSource(url);
         FileStorageModel fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
-        URLSplit split = DataSetURL.parse(surl);
-        Map parms = DataSetURL.parseParams(split.params);
+        URLSplit split = URLSplit.parse(surl);
+        Map parms = URLSplit.parseParams(split.params);
         String stimeRange= (String) parms.get("timerange");
         stimeRange= stimeRange.replaceAll("\\+", " ");
         ads.setViewRange(DatumRangeUtil.parseTimeRange(stimeRange));
         parms.remove("timerange");
         if (parms.size() > 0) {
-            ads.setParams(DataSetURL.formatParams(parms));
+            ads.setParams(URLSplit.formatParams(parms));
         }
 
         return ads;
@@ -89,7 +89,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             throw new IllegalArgumentException("unable to find any files");
         }
 
-        URLSplit split = DataSetURL.parse(surl);
+        URLSplit split = URLSplit.parse(surl);
 
         String delegateFfile = new URL(fsm.getFileSystem().getRootURL(), delegateFile).toString();
         urlLen += delegateFfile.length();
@@ -103,13 +103,13 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             carotPos -= (i1 - i);
         }
 
-        Map parms = DataSetURL.parseParams(split.params);
+        Map parms = URLSplit.parseParams(split.params);
 
         Object value = parms.remove("timerange");
 
-        split.params = DataSetURL.formatParams(parms);
+        split.params = URLSplit.formatParams(parms);
 
-        String delegateUrl = DataSetURL.format(split);
+        String delegateUrl = URLSplit.format(split);
 
         CompletionContext delegatecc = new CompletionContext();
         delegatecc.surl = delegateUrl;
@@ -132,11 +132,11 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             throw new IllegalArgumentException("unable to find any files");
         }
 
-        URLSplit split = DataSetURL.parse(surl);
+        URLSplit split = URLSplit.parse(surl);
 
-        Map parms = DataSetURL.parseParams(split.params);
+        Map parms = URLSplit.parseParams(split.params);
         parms.remove("timerange");
-        split.params = DataSetURL.formatParams(parms);
+        split.params = URLSplit.formatParams(parms);
 
         try {
             String scompUrl = fsm.getFileSystem().getRootURL() + file;
@@ -188,8 +188,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject( String surl, ProgressMonitor mon) {
-        URLSplit split = DataSetURL.parse(surl);
-        Map map = DataSetURL.parseParams(split.params);
+        URLSplit split = URLSplit.parse(surl);
+        Map map = URLSplit.parseParams(split.params);
 
         try {
             if (!map.containsKey("timerange")) {

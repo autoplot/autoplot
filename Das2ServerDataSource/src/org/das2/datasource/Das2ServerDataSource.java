@@ -27,6 +27,7 @@ import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -63,7 +64,7 @@ class Das2ServerDataSource extends AbstractDataSource {
             params2.put("resolution", ""+resolution.doubleValue(Units.seconds) );
         }
 
-        URL url2 = new URL("" + this.resourceURL + "?" + DataSetURL.formatParams(params2));
+        URL url2 = new URL("" + this.resourceURL + "?" + URLSplit.formatParams(params2));
 
         InputStream in = url2.openStream();
 

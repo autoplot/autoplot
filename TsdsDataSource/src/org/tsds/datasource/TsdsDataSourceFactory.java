@@ -104,8 +104,8 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject(String surl, ProgressMonitor mon) {
-        URLSplit split= DataSetURL.parse( surl );
-        Map params= DataSetURL.parseParams(split.params);
+        URLSplit split= URLSplit.parse( surl );
+        Map params= URLSplit.parseParams(split.params);
         if ( params.equals("") ) {
             return !( surl.contains("tf_") && surl.contains("to_") ); // looks like a redirect url.
         } else {

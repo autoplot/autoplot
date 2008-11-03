@@ -51,7 +51,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
         ReadableByteChannel channel = Channels.newChannel(in);
 
-        URLSplit split = DataSetURL.parse(url.toString());
+        URLSplit split = URLSplit.parse(url.toString());
         
         if (split.ext.equals(".qds")) {
             QDataSetStreamHandler h= new QDataSetStreamHandler();

@@ -78,8 +78,8 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
     
     public boolean reject( String surl, ProgressMonitor mon ) {
         try {
-            URLSplit split = DataSetURL.parse( surl );
-            Map params= DataSetURL.parseParams( split.params );
+            URLSplit split = URLSplit.parse( surl );
+            Map params= URLSplit.parseParams( split.params );
             
             NetcdfDataset dataset= getDataSet( split.file );
             

@@ -78,7 +78,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     
     
     public DataSource getDataSource(URL url) throws Exception {
-        URLSplit split= DataSetURL.parse( url.toString() );
+        URLSplit split= URLSplit.parse( url.toString() );
         return new CdfFileDataSource( url );
     }
     

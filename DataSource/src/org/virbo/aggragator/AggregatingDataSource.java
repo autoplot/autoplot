@@ -268,13 +268,13 @@ public class AggregatingDataSource extends AbstractDataSource {
         if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
         surl += "timerange=" + String.valueOf(viewRange);
 
-        URLSplit split = DataSetURL.parse(surl);
-        Map<String,String> mparams = DataSetURL.parseParams(split.params);
+        URLSplit split = URLSplit.parse(surl);
+        Map<String,String> mparams = URLSplit.parseParams(split.params);
         String stimeRange = viewRange.toString();
         stimeRange = stimeRange.replaceAll(" ", "+");
         mparams.put("timerange", stimeRange);
-        split.params = DataSetURL.formatParams(mparams);
+        split.params = URLSplit.formatParams(mparams);
 
-        return DataSetURL.format(split);
+        return URLSplit.format(split);
     }
 }

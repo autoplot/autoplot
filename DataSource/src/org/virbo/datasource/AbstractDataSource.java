@@ -60,9 +60,9 @@ public abstract class AbstractDataSource implements DataSource {
         try {
             this.url = url;
             String s= url.toString();
-            URLSplit split = DataSetURL.parse(s);
+            URLSplit split = URLSplit.parse(s);
             
-            params = DataSetURL.parseParams(split.params);
+            params = URLSplit.parseParams(split.params);
             resourceURL = new URL(split.file);
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);

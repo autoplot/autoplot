@@ -18,6 +18,7 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URLSplit;
 import org.virbo.qstream.QDataSetStreamHandler;
 import org.virbo.qstream.StreamException;
 
@@ -55,7 +56,7 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
     
     private List<String> getNames( CompletionContext cc, ProgressMonitor mon ) throws IOException, StreamException {
         
-        Map params= DataSetURL.parseParams( cc.params );
+        Map params= URLSplit.parseParams( cc.params );
         Object o;
         File file= DataSetURL.getFile( cc.resource, mon  );
         

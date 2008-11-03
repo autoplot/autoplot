@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -28,6 +29,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -157,7 +159,7 @@ public class DataSetURL {
         if (factory == null) {
             return ds.getURL();  // nothing we can do
         } else {
-            URLSplit split = DataSetURL.parse(ds.getURL());
+            URLSplit split = URLSplit.parse(ds.getURL());
             String fext;
             fext = DataSourceRegistry.getInstance().getExtensionFor(factory).substring(1);
             if (DataSourceRegistry.getInstance().hasSourceByExt(split.ext)) {
@@ -168,7 +170,7 @@ public class DataSetURL {
             } else {
                 split.file = fext + "." + split.file;
             }
-            return DataSetURL.format(split);
+            return URLSplit.format(split);
         }
     }
 
@@ -324,69 +326,23 @@ public class DataSetURL {
         return factory;
     }
 
-    private static int indexOf(String s, char ch, char ignoreBegin, char ignoreEnd) {
-        int i = s.indexOf(ch);
-        int i0 = s.indexOf(ignoreBegin);
-        int i1 = s.indexOf(ignoreEnd);
-        if (i != -1 && i0 < i && i < i1) {
-            i = -1;
-        }
-        return i;
-    }
 
     /**
      *
      * split the parameters into name,value pairs.
      *
      * items without equals (=) are inserted as "arg_N"=name.
+     * @deprecated use URLSplit.parseParams
      */
     public static LinkedHashMap<String, String> parseParams(String params) {
-        LinkedHashMap result = new LinkedHashMap();
-        if (params == null) {
-            return result;
-        }
-        if (params.trim().equals("")) {
-            return result;
-        }
-        String[] ss = params.split("&");
-
-        int argc = 0;
-
-        for (int i = 0; i < ss.length; i++) {
-            int j = indexOf(ss[i], '=', '(', ')');
-            String name,
-                    value;
-            if (j == -1) {
-                name = ss[i];
-                value = "";
-                result.put("arg_" + (argc++), name);
-            } else {
-                name = ss[i].substring(0, j);
-                value = ss[i].substring(j + 1);
-                result.put(name, value);
-            }
-        }
-        return result;
+        return URLSplit.parseParams(params);
     }
 
+    /**
+     * @deprecated use URLSplit.parseParams
+     */
     public static String formatParams(Map parms) {
-        StringBuffer result = new StringBuffer("");
-        for (Iterator i = parms.keySet().iterator(); i.hasNext();) {
-            String key = (String) i.next();
-            if (key.startsWith("arg_")) {
-                if (!parms.get(key).equals("")) {
-                    result.append("&" + parms.get(key));
-                }
-            } else {
-                String value = (String) parms.get(key);
-                if (value != null) {
-                    result.append("&" + key + "=" + value);
-                } else {
-                    result.append("&" + key);
-                }
-            }
-        }
-        return (result.length() == 0) ? "" : result.substring(1);
+        return URLSplit.formatParams(parms);
     }
 
     public static InputStream getInputStream(URL url, ProgressMonitor mon) throws IOException {
@@ -491,6 +447,32 @@ public class DataSetURL {
     }
 
     /**
+     * convert " " to "%20", etc by using URLEncoder, maybe catching the UnsupportedEncodingException.
+     * @param s
+     * @return
+     */
+    public static String urlEncode( String s ) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
+     * convert "%20" to " ", etc by using URLDecoder, maybe catching the UnsupportedEncodingException.
+     * @param s
+     * @return
+     */
+    public static String urlDecode( String s ) {
+        try {
+            return URLDecoder.decode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
      * canonical method for getting the URL.  These will always be web-downloadable 
      * URLs.
      */
@@ -573,8 +555,8 @@ public class DataSetURL {
         return completions;
     }
     
-    public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
-        URLSplit split = DataSetURL.parse(surl.substring(0, carotpos));
+    public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException, URISyntaxException {
+        URLSplit split = URLSplit.parse(surl.substring(0, carotpos));
         String prefix = split.file.substring(split.path.length());
         String surlDir = split.path;
 
@@ -582,8 +564,9 @@ public class DataSetURL {
 
         FileSystem fs = null;
         String[] s;
-
-        fs = FileSystem.create(DataSetURL.getWebURL(URI.create(split.path)));
+        
+        fs = FileSystem.create(DataSetURL.getWebURL(DataSetURL.getURI(split.path)));
+        
 
         s = fs.listDirectory("/");
 
@@ -659,7 +642,7 @@ public class DataSetURL {
             cc.completablepos = carotPos;
         }
 
-        URLSplit split = DataSetURL.parse(surl1);
+        URLSplit split = URLSplit.parse(surl1);
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
 
@@ -676,7 +659,7 @@ public class DataSetURL {
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
 
             // identify the implicit parameter names
-            Map params = DataSetURL.parseParams(split.params);
+            Map params = URLSplit.parseParams(split.params);
             boolean hasImplicit = false;
             for (int i = 0; i < 3; i++) {
                 String arg = (String) params.get("arg_" + i);
@@ -714,7 +697,7 @@ public class DataSetURL {
                         paramsCopy.put(cc1.completable, null);
                     }
 
-                    String ss = split.file + "?" + DataSetURL.formatParams(paramsCopy);
+                    String ss = split.file + "?" + URLSplit.formatParams(paramsCopy);
                     //String ss= CompletionContext.insert( cc, cc1 );
                     if (dontYetHave == false) {
                         continue;  // skip it

@@ -42,7 +42,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import org.das2.util.filesystem.FileSystem;
+import javax.swing.Timer;
+import org.das2.system.RequestProcessor;
 import org.virbo.datasource.DataSetURL.CompletionResult;
 
 /**
@@ -57,7 +58,20 @@ public class DataSetSelector extends javax.swing.JPanel {
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());
         addCompletionKeys();
         addAbouts();
+        maybePlotTimer = new Timer(100, new ActionListener() {
+            public void actionPerformed(ActionEvent ev) {
+                // some DataSource constructors do not return in interactive time, so create a new thread for now.
+                Runnable run= new Runnable() { 
+                    public void run() {
+                       maybePlotImmediately();
+                    }
+                };
+                RequestProcessor.invokeLater(run);
+            }
+        });
+        maybePlotTimer.setRepeats(false);
     }
+    
     boolean needToAddKeys = true;
     /**
      * current completions task
@@ -70,6 +84,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     public static final String PROPERTY_MESSAGE = "message";
     Logger logger = Logger.getLogger("virbo.dataset.ui");
     DasCanvasComponent monitorContext = null;
+    Timer maybePlotTimer;
 
     public JTextField getEditor() {
         return editor;
@@ -91,87 +106,84 @@ public class DataSetSelector extends javax.swing.JPanel {
         this.monitorContext = c;
     }
 
+    private void maybePlotImmediately() {
+        String surl = getValue();
+        if (surl.equals("")) {
+            logger.finest("empty value, returning");
+            return;
+        }
+
+        for (String actionTriggerRegex : actionTriggers.keySet()) {
+            if (Pattern.matches(actionTriggerRegex, surl)) {
+                logger.finest("matches action trigger");
+                Action action = actionTriggers.get(actionTriggerRegex);
+                action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
+                return;
+            }
+        }
+
+        try {
+            if (surl.endsWith("/")) {
+                int carotpos = surl.length();
+                setMessage("ends with /, filesystem completions");
+                showCompletions(surl, carotpos);
+
+            } else if (surl.endsWith("/..")) { // pop up one directory
+                int carotpos = surl.lastIndexOf("/..");
+                carotpos = surl.lastIndexOf("/", carotpos - 1);
+                if (carotpos != -1) {
+                    setValue(surl.substring(0, carotpos + 1));
+                    dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
+                    maybePlot();
+                }
+            } else {
+                try {
+                    DataSourceFactory f = DataSetURL.getDataSourceFactory(DataSetURL.getURI(surl), getMonitor());
+                    if (f == null) {
+                        throw new RuntimeException("unable to identify data source for URL, try \"about:plugins\"");
+                    }
+                    setMessage("check to see if uri looks acceptable");
+                    String surl1 = DataSetURL.getURL(surl).toString();
+                    if (f.reject(surl1, getMonitor())) {
+                        if (!surl.contains("?")) {
+                            surl += "?";
+                        }
+                        setValue(surl);
+                        int carotpos = surl.indexOf("?") + 1;
+                        setMessage("url ambiguous, inspecting resource for parameters");
+                        showCompletions(surl, carotpos);
+                    } else {
+                        firePlotDataSetURL();
+                    }
+                } catch (DataSetURL.NonResourceException ex) { // see if it's a folder.
+                    int carotpos = surl.length();
+                    setMessage("no extension or mime type, try filesystem completions");
+                    showCompletions(surl, carotpos);
+                } catch (IllegalArgumentException ex) {
+                    setMessage(ex.getMessage());
+                    firePlotDataSetURL();
+                } catch (URISyntaxException ex) {
+                    setMessage(ex.getMessage());
+                    firePlotDataSetURL();
+                }
+            }
+        } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+            setMessage(ex.getMessage());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            setMessage(ex.getMessage());
+        }
+
+    }
+
     /**
      * if the dataset requires parameters that aren't provided, then
      * show completion list.  Otherwise, fire off event.
      */
     public void maybePlot() {
         logger.fine("go " + getValue() + "");
-        Runnable run = new Runnable() {
-
-            public void run() {
-
-                String surl = getValue();
-                if (surl.equals("")) {
-                    logger.finest("empty value, returning");
-                    return;
-                }
-
-                for (String actionTriggerRegex : actionTriggers.keySet()) {
-                    if (Pattern.matches(actionTriggerRegex, surl)) {
-                        logger.finest("matches action trigger");
-                        Action action = actionTriggers.get(actionTriggerRegex);
-                        action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
-                        return;
-                    }
-                }
-
-                try {
-                    URLSplit split = DataSetURL.parse(surl);
-                    if (surl.endsWith("/")) {
-                        int carotpos = surl.length();
-                        setMessage("ends with /, filesystem completions");
-                        showCompletions(surl, carotpos);
-
-                    } else if (surl.endsWith("/..")) { // pop up one directory
-                        int carotpos = surl.lastIndexOf("/..");
-                        carotpos = surl.lastIndexOf("/", carotpos - 1);
-                        if (carotpos != -1) {
-                            setValue(surl.substring(0, carotpos + 1));
-                            dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
-                            maybePlot();
-                        }
-                    } else {
-                        try {
-                            DataSourceFactory f = DataSetURL.getDataSourceFactory(DataSetURL.getURI(surl), getMonitor());
-                            if ( f==null ) {
-                               throw new RuntimeException("unable to identify data source for URL, try \"about:plugins\""); 
-                            }
-                            setMessage("check to see if uri looks acceptable");
-                            String surl1= DataSetURL.getURL(surl).toString();
-                            if (f.reject(surl1, getMonitor())) {
-                                if (!surl.contains("?")) {
-                                    surl += "?";
-                                }
-                                setValue(surl);
-                                int carotpos = surl.indexOf("?") + 1;
-                                setMessage("url ambiguous, inspecting resource for parameters");
-                                showCompletions(surl, carotpos);
-                            } else {
-                                firePlotDataSetURL();
-                            }
-                        } catch (DataSetURL.NonResourceException ex) { // see if it's a folder.
-                            int carotpos = surl.length();
-                            setMessage("no extension or mime type, try filesystem completions");
-                            showCompletions(surl, carotpos);
-                        } catch (IllegalArgumentException ex) {
-                            setMessage(ex.getMessage());
-                            firePlotDataSetURL();
-                        } catch (URISyntaxException ex) {
-                            setMessage(ex.getMessage());
-                            firePlotDataSetURL();
-                        }
-                    }
-                } catch (IllegalArgumentException ex) {
-                    ex.printStackTrace();
-                    setMessage(ex.getMessage());
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    setMessage(ex.getMessage());
-                }
-            }
-        };
-        new Thread(run, "maybePlot").start();
+        maybePlotTimer.restart();
     }
 
     private void firePlotDataSetURL() {
@@ -213,13 +225,13 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     private void showCompletions(final String surl, final int carotpos) {
         URLSplit split = URLSplit.parse(surl);
-        if ( carotpos > split.file.length() && DataSourceRegistry.getInstance().dataSourcesByExt.containsKey(split.ext) ) {
+        if (carotpos > split.file.length() && DataSourceRegistry.getInstance().dataSourcesByExt.containsKey(split.ext)) {
             showFactoryCompletions(surl, carotpos);
 
         } else {
-            
-            int firstSlashAfterHost= split.authority==null ? 0 : split.authority.length() ;
-            if ( carotpos<firstSlashAfterHost ) {
+
+            int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
+            if (carotpos < firstSlashAfterHost) {
                 showHostCompletions(surl, carotpos);
             } else {
                 showFileSystemCompletions(surl, carotpos);
@@ -248,22 +260,23 @@ public class DataSetSelector extends javax.swing.JPanel {
             public void run() {
                 ProgressMonitor mon = getMonitor();
 
-                List<CompletionResult> completions=null;
-                
+                List<CompletionResult> completions = null;
+
                 URLSplit split = DataSetURL.parse(surl);
                 String surlDir = split.path;
-                
+
                 final String labelPrefix = surlDir;
-                
+
                 try {
                     completions = DataSetURL.getHostCompletions(surl, carotpos, mon);
                 } catch (IOException ex) {
                     setMessage(ex.toString());
-                    JOptionPane.showMessageDialog( DataSetSelector.this, "<html>I/O Exception occurred:<br>"+ex.getLocalizedMessage()+"</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE );
+                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
                 CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
+
                     public void itemSelected(CompletionResult s1) {
                         dataSetSelector.setSelectedItem(s1.completion);
                         if (s1.maybePlot) {
@@ -271,8 +284,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                         }
                     }
                 };
-                
-                completionsPopupMenu = CompletionsList.fillPopupNew( completions, labelPrefix, new JPopupMenu(), listener);
+
+                completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JPopupMenu(), listener);
 
                 setMessage("done getting completions");
 
@@ -284,7 +297,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             BoundedRangeModel model = editor.getHorizontalVisibility();
 
                             int xpos = xpos2 - model.getValue();
-                            xpos= Math.min( model.getExtent(), xpos );                            
+                            xpos = Math.min(model.getExtent(), xpos);
 
                             completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
                             completionsRunnable = null;
@@ -293,14 +306,14 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                         }
                     }
-                } );
+                });
 
             }
         };
 
         new Thread(completionsRunnable, "completionsThread").start();
     }
-    
+
     private void showFileSystemCompletions(final String surl, final int carotpos) {
 
         if (completionsRunnable != null) {
@@ -315,22 +328,27 @@ public class DataSetSelector extends javax.swing.JPanel {
             public void run() {
                 ProgressMonitor mon = getMonitor();
 
-                List<CompletionResult> completions=null;
-                
+                List<CompletionResult> completions = null;
+
                 URLSplit split = DataSetURL.parse(surl);
                 String surlDir = split.path;
-                
+
                 final String labelPrefix = surlDir;
-                
+
                 try {
                     completions = DataSetURL.getFileSystemCompletions(surl, carotpos, mon);
                 } catch (IOException ex) {
                     setMessage(ex.toString());
-                    JOptionPane.showMessageDialog( DataSetSelector.this, "<html>I/O Exception occurred:<br>"+ex.getLocalizedMessage()+"</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE );
+                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
+                    return;
+                } catch ( URISyntaxException ex ) {
+                    setMessage(ex.toString());
+                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
 
                 CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
+
                     public void itemSelected(CompletionResult s1) {
                         dataSetSelector.setSelectedItem(s1.completion);
                         if (s1.maybePlot) {
@@ -338,8 +356,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                         }
                     }
                 };
-                
-                completionsPopupMenu = CompletionsList.fillPopupNew( completions, labelPrefix, new JPopupMenu(), listener);
+
+                completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JPopupMenu(), listener);
 
                 setMessage("done getting completions");
 
@@ -351,7 +369,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             BoundedRangeModel model = editor.getHorizontalVisibility();
 
                             int xpos = xpos2 - model.getValue();
-                            xpos= Math.min( model.getExtent(), xpos );                            
+                            xpos = Math.min(model.getExtent(), xpos);
 
                             completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
                             completionsRunnable = null;
@@ -360,7 +378,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                         }
                     }
-                } );
+                });
 
             }
         };
@@ -398,7 +416,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
 
                     public void itemSelected(CompletionResult s1) {
-                        if ( s1.maybePlot ) {
+                        if (s1.maybePlot) {
                             dataSetSelector.setSelectedItem(s1.completion);
                         } else {
                             dataSetSelector.getEditor().setItem(s1.completion);
@@ -414,13 +432,13 @@ public class DataSetSelector extends javax.swing.JPanel {
                         try {
                             double xpos;
                             //int n = editor.getCaretPosition();
-                            int n= Math.min( carotpos, editor.getText().length() );
+                            int n = Math.min(carotpos, editor.getText().length());
                             String t = editor.getText(0, n);
                             int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(t);
 
                             BoundedRangeModel model = editor.getHorizontalVisibility();
                             xpos = xpos2 - model.getValue();
-                            xpos= Math.min( model.getExtent(), xpos );
+                            xpos = Math.min(model.getExtent(), xpos);
                             completionsPopupMenu.show(dataSetSelector, (int) xpos, dataSetSelector.getHeight());
                             completionsRunnable = null;
                         } catch (BadLocationException ex) {
@@ -446,14 +464,16 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         ActionMap map = dataSetSelector.getActionMap();
         map.put("complete", new AbstractAction("completionsPopup") {
+
             public void actionPerformed(ActionEvent ev) {
                 showCompletions();
             }
         });
-        
+
         map.put("plot", new AbstractAction("plotUrl") {
+
             public void actionPerformed(ActionEvent ev) {
-                setValue( getEditor().getText() );
+                setValue(getEditor().getText());
                 maybePlot();
             }
         });
@@ -461,8 +481,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         dataSetSelector.setActionMap(map);
         final JTextField tf = (JTextField) dataSetSelector.getEditor().getEditorComponent();
         tf.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                dataSetSelector.setSelectedItem( tf.getText() );
+                dataSetSelector.setSelectedItem(tf.getText());
                 maybePlot();
             }
         });
@@ -476,7 +497,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
 
         public void actionPerformed(ActionEvent e) {
-            String about= support.getPluginsText();
+            String about = support.getPluginsText();
 
             JOptionPane.showMessageDialog(DataSetSelector.this, about);
         }
@@ -582,7 +603,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void plotItButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotItButtonActionPerformed
-        setValue( getEditor().getText() );
+        setValue(getEditor().getText());
         maybePlot();
     }//GEN-LAST:event_plotItButtonActionPerformed
 
@@ -614,7 +635,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_browseButtonActionPerformed
 
 private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dataSetSelectorItemStateChanged
-    if ( doItemStateChange && evt.getStateChange()==ItemEvent.SELECTED ) {
+    if (doItemStateChange && evt.getStateChange() == ItemEvent.SELECTED) {
         maybePlot();
     }
 }//GEN-LAST:event_dataSetSelectorItemStateChanged
@@ -630,18 +651,17 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     public String getValue() {
         return (String) this.dataSetSelector.getSelectedItem();
     }
+    private boolean doItemStateChange = true;
 
-    private boolean doItemStateChange= true;
-    
     /**
      * Setter for property value.
      * @param value New value of property value.
      */
     public void setValue(String value) {
-        doItemStateChange= false;
+        doItemStateChange = false;
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
-        doItemStateChange= true;
+        doItemStateChange = true;
     }
     /**
      * Holds value of property browseTypeExt.
@@ -718,7 +738,7 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
      * @return Value of property recent.
      */
     public List<String> getRecent() {
-	if ( this.recent==null ) recent= new ArrayList<String>();
+        if (this.recent == null) recent = new ArrayList<String>();
         return this.recent;
     }
 

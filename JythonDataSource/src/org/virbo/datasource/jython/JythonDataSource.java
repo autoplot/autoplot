@@ -139,11 +139,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     PythonInterpreter interp = null;
 
     private String cacheUrl(URL url) {
-        URLSplit split = DataSetURL.parse(url.toString());
-        Map<String, String> params = DataSetURL.parseParams(split.params);
+        URLSplit split = URLSplit.parse(url.toString());
+        Map<String, String> params = URLSplit.parseParams(split.params);
         params.remove("arg_0");
-        split.params = DataSetURL.formatParams(params);
-        return DataSetURL.format(split);
+        split.params = URLSplit.formatParams(params);
+        return URLSplit.format(split);
     }
 
     private Date resourceDate(URL url) throws IOException {
@@ -175,8 +175,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     public void resetURL(String surl) {
         try {
             this.url = new URL(surl);
-            URLSplit split = DataSetURL.parse(url.toString());
-            params = DataSetURL.parseParams(split.params);
+            URLSplit split = URLSplit.parse(url.toString());
+            params = URLSplit.parseParams(split.params);
             resourceURL = new URL(split.file);
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
