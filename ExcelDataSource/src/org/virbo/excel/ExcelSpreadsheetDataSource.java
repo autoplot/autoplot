@@ -31,6 +31,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.URLSplit;
 
 /**
  *
@@ -60,7 +61,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         HSSFWorkbook wb = new HSSFWorkbook(fs);
 
         String query = url.getQuery(); // the part after the ?
-        Map m = DataSetURL.parseParams(query);
+        Map m = URLSplit.parseParams(query);
 
         String ssheet = (String) m.get("sheet");
         if (ssheet == null) {

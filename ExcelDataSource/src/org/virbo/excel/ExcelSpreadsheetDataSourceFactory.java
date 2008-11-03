@@ -8,10 +8,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -24,6 +29,7 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URLSplit;
 
 /**
  *
@@ -60,11 +66,12 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
 	}
 	return result;
     }
+   
     
     List<CompletionContext> toCC( Object context, List<String> results, String doc ) {
 	List<CompletionContext> result= new ArrayList<CompletionContext>();
 	for ( String s: results ) {
-	    result.add( new CompletionContext( context, s, doc ) );
+	    result.add( new CompletionContext( context, DataSetURL.urlEncode(s), s, doc ) );
 	}
 	return result;
     }
@@ -97,21 +104,30 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
      */
     private List<String> getColumns( CompletionContext cc, ProgressMonitor mon) throws IOException {
 	HSSFWorkbook wb= getWorkbook(cc.resource, mon);
-	Map params= DataSetURL.parseParams(cc.params);
+	Map params= URLSplit.parseParams(cc.params);
 	List<String> result= new ArrayList<String>();
 	HSSFSheet sheet;
 	String ssheet= (String) params.get("sheet");
 	if ( ssheet==null ) {
 	    sheet= wb.getSheetAt(0);
+            ssheet= wb.getSheetName(0);
 	} else {
 	    sheet= wb.getSheet(ssheet);
 	}
 	
+        if ( sheet==null ) {
+            throw new IllegalArgumentException( "no such sheet \""+ssheet+"\"" );
+        }
+        
 	String firstRowString= (String) params.get("firstRow");
 	int firstRow= firstRowString==null ? 0 : Integer.parseInt(firstRowString)-1;
 	HSSFRow row= sheet.getRow(firstRow);
 	HSSFRow nextRow= sheet.getRow(firstRow+1);
 	
+        if ( row==null ) {
+            throw new IllegalArgumentException( "(sheet \""+ssheet+"\" contains no records)" );
+        }
+        
 	row.getLastCellNum();
 	for ( int i=row.getFirstCellNum(); i<row.getLastCellNum(); i++ ) {
 	    HSSFCell cell= row.getCell((short)i);
