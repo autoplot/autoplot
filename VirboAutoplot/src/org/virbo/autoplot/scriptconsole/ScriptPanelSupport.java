@@ -68,7 +68,7 @@ public class ScriptPanelSupport {
                         if (sfile == null) {
                             return;
                         }
-                        split= DataSetURL.parse(sfile);
+                        split= URLSplit.parse(sfile);
                         if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
                             return;
                         }
@@ -300,7 +300,7 @@ public class ScriptPanelSupport {
                 String sfile = selector.getValue();
                 URLSplit split = null;
                 if (sfile != null) {
-                    split = DataSetURL.parse(sfile);
+                    split = URLSplit.parse(sfile);
                 }
                 if (split == null || !(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
                     file = null;
