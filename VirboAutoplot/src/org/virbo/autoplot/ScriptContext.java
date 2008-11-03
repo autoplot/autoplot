@@ -45,6 +45,7 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 import org.virbo.dsops.Ops;
 
@@ -359,7 +360,7 @@ public class ScriptContext extends PyJavaInstance {
 
         File f = DataSetURL.getFile(url, new NullProgressMonitor());
         String sparams = url.getQuery();
-        HashMap<String, String> params = sparams == null ? new HashMap<String, String>() : DataSetURL.parseParams(sparams);
+        HashMap<String, String> params = sparams == null ? new HashMap<String, String>() : URLSplit.parseParams(sparams);
 
         format.formatData(f, params, ds, new NullProgressMonitor());
 
