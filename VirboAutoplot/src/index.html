@@ -16,18 +16,14 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <ul><li> bugfix: TSDS and aggregation had extra initial data load.
-</li><li> hostname completion based on local cache of files.
-</li><li> CDF supports rank 3 int, short, and byte data.
-</li><li> cadence calculation improved by quality checks.
-</li></ul>
-
-<p>Known Issues:
-</p>
-<ul>
-<li> Cadence algorithm still has issues, now it's too permissive.
-<li> CDAWeb team is still seeing crashes on Windows for some CDF files.
-<li> Isotropic mode appears to be broken.
+        <ul><li> speed improvements to binary data source for rank 1 and rank 2 uint and int data.
+</li><li> Util.getDataSet for jython scripting doesn't copy the QDataSet if is already writable.
+</li><li> ImageDataSource identifies color channel names in rank 3 result.
+</li><li> bugfix in filesystem completions.  Sloppy check caused NullPointerException.
+</li><li> improvements to Excel reader to support spaces in sheet names, multiple lines between label and data rows.
+</li><li> use last version of CDF libraries to get around crash on Windows, webstart.
+</li><li> bugfix 2212435: FileNotFoundException first time completion on cdf file.  (double firing of "go" button)
+</li>
 </ul>
 
 	<p>data is input from: 
