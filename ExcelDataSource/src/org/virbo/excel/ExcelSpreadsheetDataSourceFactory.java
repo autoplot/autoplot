@@ -36,64 +36,64 @@ import org.virbo.datasource.URLSplit;
  * @author jbf
  */
 public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
+
     private static final String FIRST_ROW_DOC = "the row that contains the either the first record of data, or data column headings.  1 is the first row.";
 
     public DataSource getDataSource(URL url) throws IOException {
-	return new ExcelSpreadsheetDataSource(url);
+        return new ExcelSpreadsheetDataSource(url);
     }
 
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws IOException {
-	List<CompletionContext> result = new ArrayList<CompletionContext>();
-	if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
-	    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
-	    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend0="));
-	    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "plane0="));
-	    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "sheet="));
-	    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "firstRow=",FIRST_ROW_DOC));
-	} else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
-	    String param = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
-	    if (param.equals("column")) {
-		result.addAll( toCC( CompletionContext.CONTEXT_PARAMETER_VALUE, getColumns(cc, mon), null ));
-	    } else if (param.equals("depend0")) {
-		result.addAll( toCC( CompletionContext.CONTEXT_PARAMETER_VALUE, getColumns(cc, mon), null ));
-	    } else if (param.equals("plane0")) {
-		result.addAll( toCC( CompletionContext.CONTEXT_PARAMETER_VALUE, getColumns(cc, mon), null ));
-	    } else if (param.equals("sheet")) {
-		result.addAll( toCC( CompletionContext.CONTEXT_PARAMETER_VALUE, getSheets(cc, mon), "worksheet source" ) );
-	    } else if ( param.equals("firstRow") ) {
-		result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", FIRST_ROW_DOC));
-	    }
-	}
-	return result;
-    }
-   
-    
-    List<CompletionContext> toCC( Object context, List<String> results, String doc ) {
-	List<CompletionContext> result= new ArrayList<CompletionContext>();
-	for ( String s: results ) {
-	    result.add( new CompletionContext( context, DataSetURL.urlEncode(s), s, doc ) );
-	}
-	return result;
+        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend0="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "plane0="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "sheet="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "firstRow=", FIRST_ROW_DOC));
+        } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
+            String param = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
+            if (param.equals("column")) {
+                result.addAll(toCC(CompletionContext.CONTEXT_PARAMETER_VALUE, getColumns(cc, mon), null));
+            } else if (param.equals("depend0")) {
+                result.addAll(toCC(CompletionContext.CONTEXT_PARAMETER_VALUE, getColumns(cc, mon), null));
+            } else if (param.equals("plane0")) {
+                result.addAll(toCC(CompletionContext.CONTEXT_PARAMETER_VALUE, getColumns(cc, mon), null));
+            } else if (param.equals("sheet")) {
+                result.addAll(toCC(CompletionContext.CONTEXT_PARAMETER_VALUE, getSheets(cc, mon), "worksheet source"));
+            } else if (param.equals("firstRow")) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", FIRST_ROW_DOC));
+            }
+        }
+        return result;
     }
 
-    private HSSFWorkbook getWorkbook( URL url, ProgressMonitor mon ) throws IOException {
-	File file = DataSetURL.getFile(url, mon);
-	InputStream in = new FileInputStream(file);
-	POIFSFileSystem fs = new POIFSFileSystem(in);
-	HSSFWorkbook wb = new HSSFWorkbook(fs);
-	return wb;
+    List<CompletionContext> toCC(Object context, List<String> results, String doc) {
+        List<CompletionContext> result = new ArrayList<CompletionContext>();
+        for (String s : results) {
+            result.add(new CompletionContext(context, URLSplit.urlEncode(s), s, doc));
+        }
+        return result;
+    }
+
+    private HSSFWorkbook getWorkbook(URL url, ProgressMonitor mon) throws IOException {
+        File file = DataSetURL.getFile(url, mon);
+        InputStream in = new FileInputStream(file);
+        POIFSFileSystem fs = new POIFSFileSystem(in);
+        HSSFWorkbook wb = new HSSFWorkbook(fs);
+        return wb;
     }
 
     private List<String> getSheets(CompletionContext cc, ProgressMonitor mon) throws IOException {
-	HSSFWorkbook wb= getWorkbook(cc.resource, mon);
-	List<String> result= new ArrayList<String>();
-	for ( int i=0; i<wb.getNumberOfSheets(); i++ ) {
-	    String s= wb.getSheetName(i);
-	    result.add( s );
-	}
-	return result;
+        HSSFWorkbook wb = getWorkbook(cc.resource, mon);
+        List<String> result = new ArrayList<String>();
+        for (int i = 0; i < wb.getNumberOfSheets(); i++) {
+            String s = wb.getSheetName(i);
+            result.add(s);
+        }
+        return result;
     }
-	    
+
     /**
      * inspect the first row for columns.  Strings may be picked up as labels if the
      * next row contains values.
@@ -102,58 +102,70 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
      * @return
      * @throws java.io.IOException
      */
-    private List<String> getColumns( CompletionContext cc, ProgressMonitor mon) throws IOException {
-	HSSFWorkbook wb= getWorkbook(cc.resource, mon);
-	Map params= URLSplit.parseParams(cc.params);
-	List<String> result= new ArrayList<String>();
-	HSSFSheet sheet;
-	String ssheet= (String) params.get("sheet");
-	if ( ssheet==null ) {
-	    sheet= wb.getSheetAt(0);
-            ssheet= wb.getSheetName(0);
-	} else {
-	    sheet= wb.getSheet(ssheet);
-	}
-	
-        if ( sheet==null ) {
-            throw new IllegalArgumentException( "no such sheet \""+ssheet+"\"" );
+    private List<String> getColumns(CompletionContext cc, ProgressMonitor mon) throws IOException {
+        HSSFWorkbook wb = getWorkbook(cc.resource, mon);
+        Map params = URLSplit.parseParams(cc.params);
+        List<String> result = new ArrayList<String>();
+        HSSFSheet sheet;
+        String ssheet = (String) params.get("sheet");
+        if (ssheet == null) {
+            sheet = wb.getSheetAt(0);
+            ssheet = wb.getSheetName(0);
+        } else {
+            sheet = wb.getSheet(ssheet);
         }
-        
-	String firstRowString= (String) params.get("firstRow");
-	int firstRow= firstRowString==null ? 0 : Integer.parseInt(firstRowString)-1;
-	HSSFRow row= sheet.getRow(firstRow);
-	HSSFRow nextRow= sheet.getRow(firstRow+1);
-	
-        if ( row==null ) {
-            throw new IllegalArgumentException( "(sheet \""+ssheet+"\" contains no records)" );
+
+        if (sheet == null) {
+            throw new IllegalArgumentException("no such sheet \"" + ssheet + "\"");
         }
+
+        String firstRowString = (String) params.get("firstRow");
+        int firstRow = firstRowString == null ? 0 : Integer.parseInt(firstRowString) - 1;
+        HSSFRow row = sheet.getRow(firstRow);
+
+        if (row == null) {
+            if ( firstRow==0 ) {
+                throw new IllegalArgumentException("(sheet \"" + ssheet + "\" contains no records)");
+            } else {
+                throw new IllegalArgumentException("(sheet \"" + ssheet + "\" doesn't have a row at "+(firstRow+1)+")");
+            }
+        }
+
+        int inextRow = ExcelSpreadsheetDataSource.findFirstRow(sheet, firstRow);
+        HSSFRow nextRow;        // first row of data        
+        nextRow = sheet.getRow(inextRow);
         
-	row.getLastCellNum();
-	for ( int i=row.getFirstCellNum(); i<row.getLastCellNum(); i++ ) {
-	    HSSFCell cell= row.getCell((short)i);
-	    HSSFCell nextCell= nextRow.getCell((short)i);
-	    if ( cell!=null && cell.getCellType()==0 ) { // 1=String
-		result.add( ""+(char)(i+'A') );
-	    } else if ( nextCell!=null && nextCell.getCellType()==0 ) { // 1=String
-		if ( cell.getCellType()==1 ) {
-		    result.add( DataSourceUtil.toJavaIdentifier(cell.getStringCellValue()) );
-		} else {
-		    result.add( ""+(char)(i+'A') );
-		}
-	    }
-	}
-	return result; 
+        if (nextRow != null) {
+            int n = nextRow.getLastCellNum();
+            for (int i = nextRow.getFirstCellNum(); i < n; i++) {
+                HSSFCell nextCell = nextRow.getCell((short) i);
+                if (nextCell != null && nextCell.getCellType() == 0) {
+                    HSSFCell cell = row.getCell((short) i);
+                    if (cell == null) {
+                        result.add("" + (char) (i + 'A'));
+                    } else {
+                        if (cell.getCellType() == 0) { // 1=String
+                            result.add("" + (char) (i + 'A'));
+                        } else {
+                            result.add(DataSourceUtil.toJavaIdentifier(cell.getRichStringCellValue().toString()));
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
     }
-		
+
     public MetadataModel getMetadataModel(URL url) {
-	return MetadataModel.createNullModel();
+        return MetadataModel.createNullModel();
     }
 
     public boolean reject(String surl, ProgressMonitor mon) {
-	return !surl.contains("column=");
+        return !surl.contains("column=");
     }
 
     public String urlForServer(String surl) {
-	return surl; // TODO
+        return surl; // TODO
     }
 }

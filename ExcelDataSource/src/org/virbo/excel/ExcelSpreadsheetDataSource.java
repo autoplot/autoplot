@@ -85,8 +85,9 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         
         boolean labels=true;
         HSSFRow row= sheet.getRow(firstRow);
-        for ( short i=0; i<row.getLastCellNum(); i++ ) {
+        for ( short i=0; labels && i<row.getLastCellNum(); i++ ) {
             HSSFCell cell= row.getCell(i);
+            if ( cell==null ) continue;
             if ( cell.getCellType() == 0 ) {
                 labels= false;
             }
@@ -177,6 +178,31 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         }
     }
 
+    protected static int findFirstRow( HSSFSheet sheet, int firstRow ) {
+        int ilastRow= sheet.getPhysicalNumberOfRows();
+        int inextRow = firstRow;
+        HSSFRow nextRow;        // first row of data        
+
+        int dataCellCount = 0;
+        while (inextRow < ilastRow && inextRow < firstRow + 4) {
+            nextRow = sheet.getRow(inextRow);
+            if (nextRow != null) {
+                int n = nextRow.getLastCellNum();
+                for (int i = nextRow.getFirstCellNum(); i < n; i++) {
+                    HSSFCell nextCell = nextRow.getCell((short) i);
+                    if (nextCell != null && nextCell.getCellType() == 0) {
+                        dataCellCount++;
+                    }
+                }
+            }
+            if (dataCellCount == 0) {
+                inextRow++;
+            } else {
+                break;
+            }
+        }
+        return inextRow;
+    }
 
     class ExcelSpreadsheetDataSet implements QDataSet {
 
@@ -191,11 +217,20 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
          * @param lastRow is the last row number, exclusive.
          */
         ExcelSpreadsheetDataSet( short columnNumber, int firstRow, int lastRow, boolean firstRowIsLabels ) {
-            if ( firstRowIsLabels ) firstRow++;
+            if ( firstRowIsLabels ) {
+                firstRow= findFirstRow(sheet, firstRow);
+            }
+            
             this.columnNumber = columnNumber;
             this.firstRow = firstRow;
             this.length = lastRow - firstRow;
-            HSSFCell cell = sheet.getRow(firstRow).getCell(columnNumber);
+            HSSFRow row= sheet.getRow(this.firstRow);
+            while ( row==null && firstRow<lastRow ) {
+                firstRow++;
+                row= sheet.getRow(firstRow);
+            }
+            this.firstRow= firstRow;
+            HSSFCell cell = row.getCell(columnNumber);
             isDate = HSSFDateUtil.isCellDateFormatted(cell);
             if (isDate) {
                 properties.put(QDataSet.UNITS, Units.t1970);
