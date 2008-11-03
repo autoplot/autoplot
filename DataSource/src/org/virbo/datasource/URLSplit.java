@@ -1,11 +1,19 @@
 package org.virbo.datasource;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Class for containing the elemental parts of a URI, and utility
+ * routines for working with URIs.
+ * @author jbf
+ */
 public class URLSplit {
 
     public String scheme;
@@ -134,7 +142,7 @@ public class URLSplit {
 
     /**
      *
-     * split the parameters into name,value pairs.
+     * split the parameters into name,value pairs.  URLEncoded parameters are decoded.
      *
      * items without equals (=) are inserted as "arg_N"=name.
      */
@@ -159,13 +167,18 @@ public class URLSplit {
                 result.put("arg_" + (argc++), name);
             } else {
                 name = ss[i].substring(0, j);
-                value = ss[i].substring(j + 1); // URLDecoder
+                value = URLSplit.urlDecode(ss[i].substring(j + 1)); // URLDecoder
                 result.put(name, value);
             }
         }
         return result;
     }
 
+    /**
+     * spaces and other URI syntax elements are URL-encoded.
+     * @param parms
+     * @return
+     */
     public static String formatParams(Map parms) {
         StringBuffer result = new StringBuffer("");
         for (Iterator i = parms.keySet().iterator(); i.hasNext();) {
@@ -177,7 +190,7 @@ public class URLSplit {
             } else {
                 String value = (String) parms.get(key);
                 if (value != null) {
-                    result.append("&" + key + "=" + value);
+                    result.append("&" + key + "=" + urlEncode(value) );
                 } else {
                     result.append("&" + key);
                 }
@@ -193,6 +206,32 @@ public class URLSplit {
             result += "?" + split.params;
         }
         return result;
+    }
+    
+    /**
+     * convert " " to "%20", etc by using URLEncoder, maybe catching the UnsupportedEncodingException.
+     * @param s
+     * @return
+     */
+    public static String urlEncode( String s ) {
+        try {
+            return URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    /**
+     * convert "%20" to " ", etc by using URLDecoder, maybe catching the UnsupportedEncodingException.
+     * @param s
+     * @return
+     */
+    public static String urlDecode( String s ) {
+        try {
+            return URLDecoder.decode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
     public String toString() {

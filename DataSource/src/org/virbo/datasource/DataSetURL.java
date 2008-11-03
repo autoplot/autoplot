@@ -445,32 +445,6 @@ public class DataSetURL {
         URI result = new URI(surl);
         return result;
     }
-
-    /**
-     * convert " " to "%20", etc by using URLEncoder, maybe catching the UnsupportedEncodingException.
-     * @param s
-     * @return
-     */
-    public static String urlEncode( String s ) {
-        try {
-            return URLEncoder.encode(s, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-    
-    /**
-     * convert "%20" to " ", etc by using URLDecoder, maybe catching the UnsupportedEncodingException.
-     * @param s
-     * @return
-     */
-    public static String urlDecode( String s ) {
-        try {
-            return URLDecoder.decode(s, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
     
     /**
      * canonical method for getting the URL.  These will always be web-downloadable 
