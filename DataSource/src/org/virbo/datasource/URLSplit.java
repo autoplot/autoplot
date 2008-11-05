@@ -142,7 +142,8 @@ public class URLSplit {
 
     /**
      *
-     * split the parameters into name,value pairs.  URLEncoded parameters are decoded.
+     * split the parameters into name,value pairs. URLEncoded parameters are decoded, but the string may be decoded 
+     * already.
      *
      * items without equals (=) are inserted as "arg_N"=name.
      */
@@ -154,6 +155,9 @@ public class URLSplit {
         if (params.trim().equals("")) {
             return result;
         }
+        
+        params= URLSplit.urlDecode(params);
+        
         String[] ss = params.split("&");
 
         int argc = 0;
@@ -167,7 +171,7 @@ public class URLSplit {
                 result.put("arg_" + (argc++), name);
             } else {
                 name = ss[i].substring(0, j);
-                value = URLSplit.urlDecode(ss[i].substring(j + 1)); // URLDecoder
+                value = ss[i].substring(j + 1);
                 result.put(name, value);
             }
         }
@@ -223,12 +227,17 @@ public class URLSplit {
     
     /**
      * convert "%20" to " ", etc by using URLDecoder, maybe catching the UnsupportedEncodingException.
+     * Kludge to check for and
+     * decode pluses (+) in an otherwise unencoded string, also we have to be careful for elements like %Y than are
+     * not to be decoded.
      * @param s
      * @return
      */
     public static String urlDecode( String s ) {
         try {
             return URLDecoder.decode(s, "UTF-8");
+        } catch ( IllegalArgumentException ex ) {
+            return s.replaceAll("\\+"," ");
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }

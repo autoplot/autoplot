@@ -556,7 +556,8 @@ public class DataSetURL {
                 if (s[j].endsWith("contents.html")) {
                     s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
                 } // kludge for dods
-                completions.add(new DataSetURL.CompletionResult(surlDir + s[j], s[j], null, surl.substring(0, carotpos), true));
+                String uriSafe= s[j].replaceAll(" ", "%20");
+                completions.add(new DataSetURL.CompletionResult( surlDir + uriSafe, s[j], null, surl.substring(0, carotpos), true));
             }
         }
 
