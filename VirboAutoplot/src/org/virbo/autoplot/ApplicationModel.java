@@ -8,6 +8,8 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Color;
+import org.das2.dataset.DataSet;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
 import org.das2.CancelledOperationException;
@@ -95,10 +97,13 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.TransposeRank2DataSet;
+import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.qstream.QDataSetStreamHandler;
@@ -567,7 +572,7 @@ public class ApplicationModel {
 
     }
 
-    private RenderType getRenderType(QDataSet fillds) {
+    protected static RenderType getRenderType(QDataSet fillds) {
         RenderType spec = fillds.rank() >= 2 ? RenderType.spectrogram : RenderType.series;
 
         QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
@@ -577,6 +582,82 @@ public class ApplicationModel {
         }
 
         return spec;
+    }
+
+    /**
+     * return the renderers that should be used to render the data.  More than one renderer can be returned 
+     * to support plotting vector components.
+     * @param ds
+     * @param type
+     * @param recyclable Reuse these if possible to reduce jitter.  May be null.
+     * @return
+     */
+    protected static List<Renderer> getRenderers(QDataSet ds, RenderType renderType, List<Renderer> recyclable, DasColorBar colorbar) {
+        if (recyclable == null) recyclable = Collections.emptyList();
+        if (renderType == RenderType.spectrogram) {
+            if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SpectrogramRenderer) {
+                recyclable.get(0).setDataSet(TableDataSetAdapter.create(ds));
+                return recyclable;
+            } else {
+                Renderer result = new SpectrogramRenderer(null, colorbar);
+                result.setDataSet(TableDataSetAdapter.create(ds));
+                return Collections.singletonList(result);
+            }
+        } else {
+            List<Renderer> result;
+            if (ds.rank() == 1) {
+                if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SeriesRenderer) {
+                    result = recyclable;
+                } else {
+                    result = Collections.singletonList((Renderer) new SeriesRenderer());
+                }
+                result.get(0).setDataSet(VectorDataSetAdapter.create(ds));
+            } else {
+                int dim = ds.length(0);
+                Color color = Color.black; // TODO: this will change.
+                result = new ArrayList<Renderer>();
+                for (int i = 0; i < dim; i++) {
+                    SeriesRenderer rend1 = new SeriesRenderer();
+                    float[] colorHSV = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+                    if (colorHSV[2] < 0.7f) {
+                        colorHSV[2] = 0.7f;
+                    }
+                    if (colorHSV[1] < 0.7f) {
+                        colorHSV[1] = 0.7f;
+                    }
+                    rend1.setColor(Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]));
+                    rend1.setFillColor(Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]));
+                    rend1.setDataSet(VectorDataSetAdapter.create(DataSetOps.slice1(ds, i)));
+                    result.add(rend1);
+                }
+            }
+
+            for (Renderer rend1 : result) {
+                SeriesRenderer seriesRend = (SeriesRenderer) rend1;
+                if (renderType == RenderType.series) {
+
+                    seriesRend.setPsymConnector(PsymConnector.SOLID);
+                    seriesRend.setHistogram(false);
+                    seriesRend.setFillToReference(false);
+
+                } else if (renderType == RenderType.scatter) {
+                    seriesRend.setPsymConnector(PsymConnector.NONE);
+                    seriesRend.setFillToReference(false);
+
+                } else if (renderType == RenderType.histogram) {
+                    seriesRend.setPsymConnector(PsymConnector.SOLID);
+                    seriesRend.setFillToReference(true);
+                    seriesRend.setHistogram(true);
+
+                } else if (renderType == RenderType.fill_to_zero) {
+                    seriesRend.setPsymConnector(PsymConnector.SOLID);
+                    seriesRend.setFillToReference(true);
+                    seriesRend.setHistogram(false);
+
+                }
+            }
+            return result;
+        }
     }
 
     protected void setRenderer(Renderer rend, Renderer overRend) {
@@ -723,7 +804,7 @@ public class ApplicationModel {
                 if (surl.equals(this.surl)) {
                     logger.fine("we do no better with tsb");
                 } else {
-                    update(autorange,autorange);
+                    update(autorange, autorange);
                     String oldVal = this.surl;
                     this.surl = surl;
                     propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE_URL, oldVal, surl);
@@ -778,13 +859,13 @@ public class ApplicationModel {
                 };
 
                 this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);
-                
+
                 if (oldSource == null || !oldSource.equals(dataSource)) {
                     propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldSource, dataSource);
                 }
-                
+
                 return;
-                
+
             } else {
                 if (timeSeriesBrowseListener != null) {
                     this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
@@ -797,7 +878,7 @@ public class ApplicationModel {
             }
         }
 
-        
+
     }
 
     public DataSource dataSource() {
@@ -1011,7 +1092,7 @@ public class ApplicationModel {
         new Thread(run, "updateFillThread").start();
     }
 
-    private boolean isVectorOrBundleIndex(QDataSet dep1) {
+    private static boolean isVectorOrBundleIndex(QDataSet dep1) {
         boolean result = false;
         Units dep1Units = (Units) dep1.property(QDataSet.UNITS);
         if (dep1Units != null && dep1Units instanceof EnumerationUnits) {
@@ -1268,9 +1349,9 @@ public class ApplicationModel {
             //ApplicationModel.this.setDataSourceURL( tsb.getURL().toString() );
             String oldsurl = ApplicationModel.this.surl;
             ApplicationModel.this.surl = tsb.getURL().toString();
-            if ( oldsurl!=null ) {
-                String eext= DataSetURL.getExplicitExt(oldsurl);
-                if ( eext!=null ) ApplicationModel.this.surl= eext + "." + ApplicationModel.this.surl;
+            if (oldsurl != null) {
+                String eext = DataSetURL.getExplicitExt(oldsurl);
+                if (eext != null) ApplicationModel.this.surl = eext + "." + ApplicationModel.this.surl;
             }
             ApplicationModel.this.propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldsurl, ApplicationModel.this.surl);
         }
@@ -1598,42 +1679,34 @@ public class ApplicationModel {
         propertyChangeSupport.firePropertyChange(PROPERTY_RECENT, oldValue, recent);
     }
 
-    public void addBookmark(final String surl) {
+    public Bookmark addBookmark(final String surl) {
 
-        Runnable run = new Runnable() {
+        Bookmark.Item item = new Bookmark.Item(surl);
+        URLSplit split= URLSplit.parse(surl);
+        String autoTitle= split.file.substring( split.path.length() ) ;
+        if ( autoTitle.length()==0 ) autoTitle= surl;
+        item.setTitle( autoTitle );
+        
+        List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
+        List<Bookmark> newValue = new ArrayList<Bookmark>(bookmarks);
+        if (newValue.contains(surl)) { // move it to the front of the list
+            newValue.remove(surl);
+        }
 
-            public void run() {
-                ImageIcon icon = null;
+        newValue.add(item);
 
-                if (surl.equals(ApplicationModel.this.surl)) {
-                    //disable icons for now, because they fill up the preferences, which can only be 8K.
-                    //icon = AutoplotUtil.createIcon(ApplicationModel.this, surl);
-                }
+        Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+        prefs.put("bookmarks", Bookmark.formatBooks(newValue));
 
-                List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
-                List<Bookmark> newValue = new ArrayList<Bookmark>(bookmarks);
-                if (newValue.contains(surl)) { // move it to the front of the list
-                    newValue.remove(surl);
-                }
+        try {
+            prefs.flush();
+        } catch (BackingStoreException ex) {
+            ex.printStackTrace();
+        }
+        ApplicationModel.this.bookmarks = newValue;
+        propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
 
-                Bookmark.Item item = new Bookmark.Item(surl);
-                if (icon != null) item.setIcon(icon);
-                newValue.add(item);
-
-                Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-                prefs.put("bookmarks", Bookmark.formatBooks(newValue));
-
-                try {
-                    prefs.flush();
-                } catch (BackingStoreException ex) {
-                    ex.printStackTrace();
-                }
-                ApplicationModel.this.bookmarks = newValue;
-                propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
-            }
-        };
-        //new Thread( run ).start();
-        new Thread(run).run(); // if we are not going to make icons, then don't introduce new bugs with the extra thread.
+        return item;
     }
 
     public void exit() {
@@ -1976,22 +2049,19 @@ public class ApplicationModel {
     public void setAutoRangeSuppress(boolean autoRangeSuppress) {
         this.autoRangeSuppress = autoRangeSuppress;
     }
-    
-    
     /**
      * when true, we are in the process of restoring a state.  Changes should not
      * be pushed to the undo stack.
      */
-    private boolean restoringState= false;
-    
+    private boolean restoringState = false;
+
     public boolean isRestoringState() {
         return restoringState;
     }
-    
+
     public void setRestoringState(boolean b) {
-        this.restoringState= b;
+        this.restoringState = b;
     }
-    
     String embedDs = "";
     boolean embedDsDirty = false;
 
