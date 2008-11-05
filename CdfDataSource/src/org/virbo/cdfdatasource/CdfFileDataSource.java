@@ -85,12 +85,12 @@ public class CdfFileDataSource extends AbstractDataSource {
         cdfFile = getFile(mon);
 
         String fileName = cdfFile.toString();
-        if (System.getProperty("os.name").startsWith("Windows")) {
-            fileName = CdfUtil.win95Name(cdfFile);
-        }
+        //if (System.getProperty("os.name").startsWith("Windows")) {
+        //    fileName = CdfUtil.win95Name(cdfFile);
+        //}
         Map map = getParams();
 
-        CDF cdf = CDF.open(fileName, CDF.READONLYon);
+        CDF cdf = CDF.open(fileName, CDF.READONLYoff);
         String svariable = (String) map.get("id");
         if (svariable == null) {
             svariable = (String) map.get("arg_0");

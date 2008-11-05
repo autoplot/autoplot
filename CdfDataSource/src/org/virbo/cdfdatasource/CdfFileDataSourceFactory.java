@@ -93,10 +93,10 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             
             File cdfFile= DataSetURL.getFile( DataSetURL.getURL(file), mon );
             String fileName= cdfFile.toString();
-            if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
+            //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
             logger.fine("opening cdf file "+fileName);
-            CDF cdf= CDF.open( fileName, CDF.READONLYon );
+            CDF cdf= CDF.open( fileName, CDF.READONLYoff );
             
             logger.fine("inspect cdf for plottable parameters");
             Map<String,String> result= CdfUtil.getPlottable( cdf, true , 3);
@@ -119,9 +119,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 
                 File cdfFile= DataSetURL.getFile( DataSetURL.getURL(file), mon );
                 String fileName= cdfFile.toString();
-                if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
+                //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
-                CDF cdf= CDF.open( fileName, CDF.READONLYon );
+                CDF cdf= CDF.open( fileName, CDF.READONLYoff );
                 Map<String,String> result= CdfUtil.getPlottable( cdf, true, 3);
                 cdf.close();
                 
