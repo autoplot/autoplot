@@ -13,6 +13,7 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
 import javax.swing.Icon;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -32,17 +33,24 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.graph.DasCanvas;
+import org.das2.graph.DasColorBar;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
+import org.das2.graph.DasRow;
+import org.das2.graph.Renderer;
 import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -63,6 +71,34 @@ public class AutoplotUtil {
 
     private final static Logger log = Logger.getLogger("virbo.autoplot.AutoRangeDescriptor.autoRange");
 
+    static DasPlot createPlot( DasCanvas c, QDataSet ds, DasPlot recyclable, DasColorBar cb ) {
+        DasRow row= DasRow.create(c);            
+        DasColumn col= DasColumn.create(c);
+        DasPlot result;
+        if ( recyclable!=null ) {
+            result= recyclable;
+        } else {
+            result= DasPlot.createDummyPlot();
+        }
+        List<Renderer> recycleRends= Arrays.asList( result.getRenderers() );
+        
+        ApplicationModel.RenderType type= ApplicationModel.getRenderType(ds);
+        List<Renderer> rends= ApplicationModel.getRenderers( ds, type, recycleRends, cb);
+        
+        for ( Renderer rend1: rends ) {
+            result.addRenderer( rend1 );
+        }
+        
+        c.add( result, row, col );
+        c.revalidate();
+        c.validate();
+        System.err.println(c.getBounds());
+        System.err.println(row);
+        result.resize();
+        System.err.println(result.getBounds());
+        return result;
+    }
+    
     /**
      * creates an icon for the dataset.  Presently this just grabs the autoplot canvas image,
      * but it should really create a small canvas and let das2 reduce the data before
@@ -71,10 +107,30 @@ public class AutoplotUtil {
      * @param surl
      * @return
      */
-    static ImageIcon createIcon( ApplicationModel model, String surl ) {
-        BufferedImage image = (BufferedImage) model.canvas.getImage( model.canvas.getWidth(), model.canvas.getHeight() );       
-        double aspect= model.canvas.getHeight() / (double)model.canvas.getWidth();
-        return new ImageIcon( scaleImage( image, (int)(32/aspect), 32 ) );
+    public static ImageIcon createIcon( ApplicationModel model, String surl ) {
+        try {
+            QDataSet ds= org.virbo.jythonsupport.Util.getDataSet(surl);
+            DasCanvas c= new DasCanvas( 320, 320 );
+            c.setSize(320,320);
+            DasPlot p= AutoplotUtil.createPlot( c, ds, null, null );
+            p.getRow().setMinimum(0);
+            p.getRow().setMaximum(1);
+            p.getColumn().setMinimum(0);
+            p.getColumn().setMaximum(1);
+            JFrame f= new JFrame();
+            f.getContentPane().add(c);
+            BufferedImage image = (BufferedImage) c.getImage( 320, 320 );
+            return scaleIcon( new ImageIcon( image ), 64, 48 );
+        } catch ( Exception e ) {
+            BufferedImage image;
+            try {
+                image = ImageIO.read(AutoplotUtil.class.getResource("/org/virbo/autoplot/resources/error-icon.png"));
+            } catch (IOException ex) {
+                Logger.getLogger(AutoplotUtil.class.getName()).log(Level.SEVERE, null, ex);
+                throw new RuntimeException(ex);
+            }
+            return new ImageIcon( image );
+        }
     }
 
     /**
@@ -85,7 +141,7 @@ public class AutoplotUtil {
      * @param h
      * @return
      */
-    public static Icon scaleIcon(ImageIcon icon, int w, int h ) {
+    public static ImageIcon scaleIcon(ImageIcon icon, int w, int h ) {
         double aspect= icon.getIconHeight() / (double)icon.getIconWidth();
         if ( h==-1 ) {
             h= (int)( w * aspect );
@@ -93,7 +149,7 @@ public class AutoplotUtil {
             w= (int)( h / aspect );
         }
         BufferedImage image = (BufferedImage)icon.getImage();
-        return new ImageIcon( scaleImage( image, h, w ) );
+        return new ImageIcon( scaleImage( image, w, h ) );
     }
     
     public static BufferedImage scaleImage( BufferedImage image, int w, int h ) {
