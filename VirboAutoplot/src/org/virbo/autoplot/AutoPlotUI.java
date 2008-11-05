@@ -260,14 +260,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_FILL)) {
                     mdp.update();
                 }
-                String propName= evt.getPropertyName();
-                if ( propName.equals("bounds") 
-                        || propName.equals("pendingChanges")
-                        ||propName.equals("recent")
-                        || propName.equals("status") 
-                        || propName.equals("ticks")
-                        || propName.contains("PerMillisecond") ) return;
-                if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState() ) { // TODO: list the props we want!
+                String propName = evt.getPropertyName();
+                if (propName.equals("bounds") || propName.equals("pendingChanges") || propName.equals("recent") || propName.equals("status") || propName.equals("ticks") || propName.contains("PerMillisecond")) return;
+                if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState()) { // TODO: list the props we want!
                     tickleTimer.tickle(evt.getPropertyName() + " from " + evt.getSource());
                 }
             }
@@ -319,6 +314,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
             if (book instanceof Bookmark.Item) {
                 JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
+
                     public void actionPerformed(ActionEvent e) {
                         dataSetSelector.getEditor().setText(((Bookmark.Item) book).getUrl());
                         dataSetSelector.setValue(((Bookmark.Item) book).getUrl());
@@ -469,38 +465,46 @@ public class AutoPlotUI extends javax.swing.JFrame {
         }
     }
 
+    private void maybeCreateBookmarksManager() {
+        if (bookmarksManager == null) {
+            bookmarksManager = new BookmarksManager(AutoPlotUI.this, false);
+            BindingContext bc = new BindingContext();
+            bc.addBinding(applicationModel, "${bookmarks}", bookmarksManager.getModel(), "list");
+            bc.bind();
+            bookmarksManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
+
+                public void propertyChange(PropertyChangeEvent evt) {
+                    updateBookmarks();
+                    Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+                    prefs.put("bookmarks", Bookmark.formatBooks(bookmarksManager.getModel().getList()));
+                    try {
+                        prefs.flush();
+                    } catch (BackingStoreException ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
     private void updateBookmarks() {
         List<Bookmark> bookmarks = applicationModel.getBookmarks();
         bookmarksMenu.removeAll();
 
-        bookmarksMenu.add(new AbstractAction("Add Bookmark") {
+        bookmarksMenu.add(new AbstractAction("Add Bookmark...") {
 
             public void actionPerformed(ActionEvent e) {
-                applicationModel.addBookmark(dataSetSelector.getEditor().getText());
+                Bookmark bookmark = applicationModel.addBookmark(dataSetSelector.getEditor().getText());
+                maybeCreateBookmarksManager();
+                bookmarksManager.setAddBookmark(bookmark);
+                bookmarksManager.setVisible(true);
             }
         });
 
         bookmarksMenu.add(new AbstractAction("Manage Bookmarks") {
 
             public void actionPerformed(ActionEvent e) {
-                if (bookmarksManager == null) {
-                    bookmarksManager = new BookmarksManager(AutoPlotUI.this, false);
-                    BindingContext bc = new BindingContext();
-                    bc.addBinding(applicationModel, "${bookmarks}", bookmarksManager.getModel(), "list");
-                    bc.bind();
-                    bookmarksManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            updateBookmarks();
-                            Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-                            prefs.put("bookmarks", Bookmark.formatBooks(bookmarksManager.getModel().getList()));
-                            try {
-                                prefs.flush();
-                            } catch (BackingStoreException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    });
-                }
+                maybeCreateBookmarksManager();
                 bookmarksManager.setVisible(true);
 
             }
