@@ -21,8 +21,11 @@ be applied to the data, for example, specifying valid range and fill data.
 </li><li> ImageDataSource identifies color channel names in rank 3 result.
 </li><li> bugfix in filesystem completions.  Sloppy check caused NullPointerException.
 </li><li> improvements to Excel reader to support spaces in sheet names, multiple lines between label and data rows.
-</li><li> use last version of CDF libraries to get around crash on Windows, webstart.
 </li><li> bugfix 2212435: FileNotFoundException first time completion on cdf file.  (double firing of "go" button)
+</li><li> use newest version of cdf library, opening files with r/w permission to work around crash.
+</li><li> add bookmark... improved to encourage use of titled bookmarks.
+</li><li> bugfix in CDF on Windows, with 9-character folder names.
+</li><li> bugfix percents in un-encoded URLs, e.g. timeformat=%Y-%j, work again.
 </li>
 </ul>
 
