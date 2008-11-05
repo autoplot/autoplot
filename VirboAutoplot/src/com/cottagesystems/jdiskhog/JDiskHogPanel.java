@@ -22,6 +22,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  *
@@ -132,7 +133,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
     public void scan(File root) {
         DiskUsageModel dumodel = new DiskUsageModel();
-        dumodel.search(root, 0, this.progressMonitorComponent1);
+        dumodel.search(root, 0, new NullProgressMonitor() );
         FSTreeModel model = new FSTreeModel(dumodel, root);
         jTree1.setModel(model);
     }
@@ -148,30 +149,22 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
-        progressMonitorComponent1 = new com.cottagesystems.jdiskhog.ProgressMonitorComponent();
 
         jScrollPane2.setViewportView(jTree1);
-
-        progressMonitorComponent1.setToolTipText("progress monitor"); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
-            .add(progressMonitorComponent1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(progressMonitorComponent1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTree jTree1;
-    public com.cottagesystems.jdiskhog.ProgressMonitorComponent progressMonitorComponent1;
     // End of variables declaration//GEN-END:variables
 }

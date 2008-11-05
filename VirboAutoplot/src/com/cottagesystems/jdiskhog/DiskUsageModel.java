@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.das2.util.monitor.ProgressMonitor;
 
 /**
  *
@@ -44,7 +45,7 @@ public class DiskUsageModel {
             if (depth == 0) {
                 mon.setTaskProgress(i);
             }
-            mon.setTaskMessage("" + kids[i]);
+            mon.setProgressMessage("" + kids[i]);
             if (mon.isCancelled()) {
                 dirUsage.remove(f);
                 return;
