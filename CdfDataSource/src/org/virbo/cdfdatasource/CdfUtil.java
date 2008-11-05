@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Logger;
 import org.virbo.dataset.BDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
@@ -37,6 +38,8 @@ import org.virbo.dataset.WritableDataSet;
  */
 public class CdfUtil {
 
+    private final static Logger logger= Logger.getLogger("virbo.cdfdatasource");
+    
     private static void flatten(double[][] data, double[] back, int offset, int nx, int ny) {
         for (int i = 0; i < nx; i++) {
             double[] dd = data[i];
@@ -420,10 +423,14 @@ public class CdfUtil {
     public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws CDFException {
 
         Map<String, String> result = new LinkedHashMap<String, String>();
+        
+        logger.fine("getting CDF variables");
         Vector v = cdf.getVariables();
-
+        logger.fine("got "+v.size()+" variables");
+        
         Attribute aAttr = null, bAttr = null, cAttr = null;
 
+        logger.fine("getting CDF attributes");
         try {
             aAttr = cdf.getAttribute("DEPEND_0");
         } catch (CDFException ex) {
@@ -467,15 +474,18 @@ public class CdfUtil {
 
                 try {
                     if (aAttr != null) {  // check for metadata for DEPEND_1
+                        logger.fine("get attribute "+aAttr.getName()+" entry for "+var.getName());
                         Entry xEntry = aAttr.getEntry(var);
                         xDependVariable = cdf.getVariable((String) xEntry.getData());
                     }
                 } catch (CDFException e) {
+                    //e.printStackTrace();
                 }
 
 
                 try {
                     if (bAttr != null) {  // check for metadata for DEPEND_1
+                        logger.fine("get attribute "+bAttr.getName()+" entry for "+var.getName());
                         Entry yEntry = bAttr.getEntry(var);
                         yDependVariable = cdf.getVariable((String) yEntry.getData());
                     /*Attribute varType = cdf.getAttribute("VAR_TYPE");
@@ -485,11 +495,13 @@ public class CdfUtil {
                     }*/
                     }
                 } catch (CDFException e) {
+                    //e.printStackTrace();
                 }
 
 
                 try {
                     if (cAttr != null) { // check for existence of DEPEND_2, dimensionality too high
+                        logger.fine("get attribute "+cAttr.getName()+" entry for "+var.getName());
                         Entry zEntry = cAttr.getEntry(var);
                         zDependVariable = cdf.getVariable((String) zEntry.getData());
                     /*Attribute varType = cdf.getAttribute("VAR_TYPE");
@@ -499,6 +511,7 @@ public class CdfUtil {
                     }*/
                     }
                 } catch (CDFException e) {
+                    //e.printStackTrace();
                 }
 
 
@@ -520,6 +533,7 @@ public class CdfUtil {
             }
         } // for
 
+        logger.fine("done, get plottable ");
         return result;
     }
 
