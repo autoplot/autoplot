@@ -18,8 +18,11 @@ import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.DasApplication;
 import org.w3c.dom.Document;
@@ -50,15 +53,16 @@ public class BookmarksManager extends javax.swing.JDialog {
         }
         });*/
 
-        model.addPropertyChangeListener( model.PROP_LIST, new PropertyChangeListener() {
+        model.addPropertyChangeListener(model.PROP_LIST, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
                 TreeModel mod = model.getTreeModel();
                 jTree1.setModel(mod);
             }
         });
 
-        BookmarksManagerTransferrable trans= new BookmarksManagerTransferrable(model,jTree1);
-        
+        BookmarksManagerTransferrable trans = new BookmarksManagerTransferrable(model, jTree1);
+
         DragSource dragSource = DragSource.getDefaultDragSource();
         DropTarget dropTarget = trans.createDropTarget();
         try {
@@ -71,13 +75,37 @@ public class BookmarksManager extends javax.swing.JDialog {
     }
     
     BookmarksManagerModel model;
+    Bookmark dirtyBookmark;
 
     public BookmarksManagerModel getModel() {
         return model;
     }
 
+    private void addIcon() {
+        Runnable run = new Runnable() {
 
+            public void run() {
+                Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+                ImageIcon icon = AutoplotUtil.createIcon(null, ((Bookmark.Item) b).getUrl());
+                b.setIcon(icon);
+                //iconButton.setIcon(icon);
+                model.fireBookmarkChange(b);
+            }
+        };
+        new Thread(run).start();
+    }
 
+    public void setAddBookmark( Bookmark b ) {
+        TreePath tp= model.getPathFor( b, jTree1.getModel(), new TreePath(jTree1.getModel().getRoot()) );
+        jTree1.setSelectionPath(tp);
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                titleTextField.requestFocusInWindow();
+                titleTextField.selectAll();
+            }
+        } );
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -98,7 +126,6 @@ public class BookmarksManager extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         titleTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        iconButton = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         importMenuItem = new javax.swing.JMenuItem();
@@ -155,6 +182,11 @@ public class BookmarksManager extends javax.swing.JDialog {
                 URLTextFieldFocusLost(evt);
             }
         });
+        URLTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                URLTextFieldKeyTyped(evt);
+            }
+        });
 
         jLabel2.setText("Title:");
 
@@ -168,10 +200,18 @@ public class BookmarksManager extends javax.swing.JDialog {
                 titleTextFieldFocusLost(evt);
             }
         });
+        titleTextField.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                titleTextFieldPropertyChange(evt);
+            }
+        });
+        titleTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                titleTextFieldKeyTyped(evt);
+            }
+        });
 
         jLabel1.setText("Bookmarks Manager");
-
-        iconButton.setText("icon");
 
         jMenu1.setText("File");
 
@@ -254,36 +294,29 @@ public class BookmarksManager extends javax.swing.JDialog {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE)
+                    .add(jLabel1)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(importButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(importFromWebButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(ExportButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 318, Short.MAX_VALUE)
+                        .add(dismissButton))
                     .add(layout.createSequentialGroup()
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 625, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel1)
-                        .addContainerGap(505, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                                .add(importButton)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                .add(jLabel3)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(importFromWebButton)
+                                .add(URLTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)
+                                .add(1, 1, 1))
+                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
+                                .add(jLabel2)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(ExportButton)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 318, Short.MAX_VALUE)
-                                .add(dismissButton))
-                            .add(layout.createSequentialGroup()
-                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                        .add(jLabel3)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(URLTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)
-                                        .add(1, 1, 1))
-                                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                        .add(jLabel2)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(iconButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 78, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())))
+                                .add(titleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)))
+                        .add(84, 84, 84)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -293,17 +326,14 @@ public class BookmarksManager extends javax.swing.JDialog {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 286, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(jLabel2)
-                            .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(jLabel3)
-                            .add(URLTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                    .add(iconButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 62, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(14, 14, 14)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel2)
+                    .add(titleTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel3)
+                    .add(URLTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(16, 16, 16)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(dismissButton)
                     .add(importButton)
@@ -335,7 +365,7 @@ private void dismissButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 
 private void URLTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_URLTextFieldFocusLost
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
-    if (b instanceof Bookmark.Item) {
+    if ( b!=null && b instanceof Bookmark.Item) {
         ((Bookmark.Item) b).setUrl(URLTextField.getText());
         jTree1.repaint();
         model.fireBookmarkChange(b);
@@ -344,22 +374,32 @@ private void URLTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:e
 
 private void titleTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_titleTextFieldFocusLost
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
-    b.setTitle(titleTextField.getText());
-    jTree1.repaint();
-    model.fireBookmarkChange(b);
+    if ( b!=null ) {
+        b.setTitle(titleTextField.getText());
+        jTree1.repaint();
+        model.fireBookmarkChange(b);
+    }
 }//GEN-LAST:event_titleTextFieldFocusLost
 
 private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
+    if ( dirtyBookmark!=null ) {
+        dirtyBookmark.setTitle(titleTextField.getText());
+        if ( dirtyBookmark instanceof Bookmark.Item ) {
+            ((Bookmark.Item)dirtyBookmark).setUrl(URLTextField.getText());
+        }
+        model.fireBookmarkChange(dirtyBookmark);
+        dirtyBookmark=null;
+    }
     Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
     if (b != null) {
         titleTextField.setText(b.getTitle());
-        if ( iconButton!=null ) {
-           iconButton.setText("");
-           iconButton.setIcon( b.getIcon() );
+        /*if (iconButton != null) {
+            iconButton.setText("");
+            iconButton.setIcon(b.getIcon());
         } else {
-            iconButton.setIcon( null );
+            iconButton.setIcon(null);
             iconButton.setText("(no icon)");
-        }
+        }*/
         URLTextField.setEnabled(b instanceof Bookmark.Item);
         if (b instanceof Bookmark.Item) {
             URLTextField.setText(((Bookmark.Item) b).getUrl());
@@ -424,10 +464,15 @@ private void addItemMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
 }//GEN-LAST:event_addItemMenuItemActionPerformed
 
 private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMenuItemActionPerformed
-    Bookmark b = model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
-    if (b != null) {
+    boolean confirm = false; // the user has confirmed
+    List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
+    if (bs.size() > 1 && JOptionPane.showConfirmDialog(this, "Delete "+bs.size()+" bookmarks?", "Delete Bookmarks", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+        confirm = true;
+    }
+
+    for (Bookmark b : bs) {
         if (b instanceof Bookmark.Folder) {
-            if (JOptionPane.showConfirmDialog(this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+            if (confirm || JOptionPane.showConfirmDialog(this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 model.removeBookmark(b);
             }
         } else {
@@ -442,6 +487,18 @@ private void titleTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GE
     jTree1.repaint();
     model.fireBookmarkChange(b);
 }//GEN-LAST:event_titleTextFieldActionPerformed
+
+private void titleTextFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_titleTextFieldPropertyChange
+
+}//GEN-LAST:event_titleTextFieldPropertyChange
+
+private void titleTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_titleTextFieldKeyTyped
+    dirtyBookmark= model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+}//GEN-LAST:event_titleTextFieldKeyTyped
+
+private void URLTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_URLTextFieldKeyTyped
+    dirtyBookmark= model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
+}//GEN-LAST:event_URLTextFieldKeyTyped
 
     /**
     * @param args the command line arguments
@@ -469,7 +526,6 @@ private void titleTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GE
     private javax.swing.JButton dismissButton;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenuItem exportMenuItem;
-    private javax.swing.JButton iconButton;
     private javax.swing.JButton importButton;
     private javax.swing.JButton importFromWebButton;
     private javax.swing.JMenuItem importMenuItem;

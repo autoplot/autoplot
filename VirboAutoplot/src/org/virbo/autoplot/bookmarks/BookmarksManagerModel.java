@@ -181,6 +181,23 @@ public class BookmarksManagerModel {
         propertyChangeSupport.firePropertyChange(PROP_BOOKMARK,null,book);
     }
 
+    TreePath getPathFor(Bookmark b, TreeModel model, TreePath root ) {
+        final Object parent = root.getLastPathComponent();
+        final int childCount = model.getChildCount(parent);
+        for ( int ii=0; ii<childCount; ii++ ) {
+            final Object child = model.getChild(parent, ii);
+            if ( b.equals(( (DefaultMutableTreeNode)child).getUserObject()  ) ) {
+                b.equals(( (DefaultMutableTreeNode)child).getUserObject()  );
+                return root.pathByAddingChild(child);
+            }
+            if ( model.getChildCount(child)>0 ) {
+                TreePath childResult= getPathFor( b, model, root.pathByAddingChild(child) );
+                if ( childResult!=null ) return childResult;
+            }
+        }
+        return null;
+    }
+
     void removeBookmarks(List<Bookmark> bookmarks) {
         ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
         for (Bookmark b : this.list) {
@@ -229,6 +246,22 @@ public class BookmarksManagerModel {
             return getSelectedBookmark(model, path.getParentPath());
         }
         return (Bookmark) sel;
+    }
+
+    protected List<Bookmark> getSelectedBookmarks(TreeModel model, TreePath[] paths) {
+        List<Bookmark> result= new ArrayList<Bookmark>();
+        for ( TreePath path: paths ) {
+            if (path == null || path.getPathCount() == 1) return null;
+            Object sel = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+            Bookmark b;
+            if (sel.equals("(empty)")) {
+                b= getSelectedBookmark(model, path.getParentPath());
+            } else {
+                b= (Bookmark)sel;
+            }
+            if ( b!=null ) result.add( b );
+        }
+        return result;
     }
 
     void doImportUrl(Component c) {
