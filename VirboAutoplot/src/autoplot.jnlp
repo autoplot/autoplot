@@ -69,10 +69,10 @@
         
         <!-- cdf -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
-        <!--<extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2-latest.jnlp" >  
-        </extension>-->
-        <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2.1a.jnlp" >  
+        <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2-latest.jnlp" >  
         </extension>
+        <!--<extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2.1a.jnlp" >  
+        </extension>-->
         
         <jar href="lib/dasCore-1.0.0.jar" />
         <jar href="lib/QDataSet.jar" />
