@@ -225,7 +225,8 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     private void showCompletions(final String surl, final int carotpos) {
         URLSplit split = URLSplit.parse(surl);
-        if (carotpos > split.file.length() && DataSourceRegistry.getInstance().dataSourcesByExt.containsKey(split.ext)) {
+        if (carotpos > split.file.length()
+                && DataSourceRegistry.getInstance().hasSourceByExt( DataSetURL.getExt(surl) ) ) {
             showFactoryCompletions(surl, carotpos);
 
         } else {
