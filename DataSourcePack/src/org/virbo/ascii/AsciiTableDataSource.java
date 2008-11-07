@@ -301,6 +301,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
             if (timeFormat.equals("ISO8601")) {
                 String line = parser.readFirstParseableRecord(file.toString());
+                if ( line==null ) throw new IllegalArgumentException("file contains no parseable records.");
                 String[] ss = parser.getRecordParser().fields(line);
                 int i = parser.getFieldIndex(timeColumnName);
                 if (i == -1) {
