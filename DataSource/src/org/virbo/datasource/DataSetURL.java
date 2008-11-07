@@ -74,6 +74,28 @@ public class DataSetURL {
     static WeakHashMap<DataSource, DataSourceFactory> dsToFactory = new WeakHashMap<DataSource, DataSourceFactory>();
 
     /**
+     * returns the explicit extension, or the file extension if found, or null.
+     * The extension will not contain a period.
+     * @param surl
+     * @return the extension found, or null if no period is found in the filename.
+     */
+    public static String getExt( String surl ) {
+        String explicitExt= getExplicitExt(surl);
+        if ( explicitExt!=null ) {
+            return explicitExt;
+        } else {
+            int i0= surl.lastIndexOf('/');
+            if ( i0==-1 ) return null;
+            int i1= surl.lastIndexOf('.',i0);
+            if ( i1>i0 ) {
+                return surl.substring(i0+1);
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
      * return the extension prefix of the URI, if specified.  
      * @param surl
      * @return null or an extension like "tsds"
