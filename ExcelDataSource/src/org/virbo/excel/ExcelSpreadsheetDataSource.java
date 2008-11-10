@@ -256,7 +256,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                 }
             } catch (RuntimeException e) {
                 String cellID = String.valueOf((char) ('A' + columnNumber)) + (firstRow + i);
-                return -1e31;
+                return Double.NaN;
             }
         }
 
