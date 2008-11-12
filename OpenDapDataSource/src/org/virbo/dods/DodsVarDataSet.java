@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import org.das2.datum.EnumerationUnits;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 
@@ -147,6 +148,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             double r = val * scaleFactor + addOffset;
             return r >= validMin && r <= validMax ? r : Units.dimensionless.getFillDouble();
         }
+        
 
         public double value(int i) {
             return doubleValue(back[i]);
@@ -162,6 +164,22 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
         public double value(int i0, int i1, int i2, int i3) {
             return doubleValue(back[i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[1] * dimSizes[2] + i2 * dimSizes[2] + i3]);
+        }
+        
+        private final int putIntValue( double val ) {
+            return (int)( ( val - addOffset ) / scaleFactor );
+        }
+
+        public void putValue(int i0, double d) {
+            back[i0]= putIntValue(d);
+        }
+
+        public void putValue(int i0, int i1, double d) {
+            back[i0 * dimSizes[1] + i1]= putIntValue(d);
+        }
+
+        public void putValue(int i0, int i1, int i2, double d) {
+            back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putIntValue(d);
         }
     }
 
@@ -218,6 +236,22 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public double value(int i0, int i1, int i2, int i3) {
             return doubleValue(back[i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[1] * dimSizes[2] + i2 * dimSizes[2] + i3]);
         }
+         
+        private final short putIntValue( double val ) {
+            return (short)( ( val - addOffset ) / scaleFactor );
+        }
+
+        public void putValue(int i0, double d) {
+            back[i0]= putIntValue(d);
+        }
+
+        public void putValue(int i0, int i1, double d) {
+            back[i0 * dimSizes[1] + i1]= putIntValue(d);;
+        }
+
+        public void putValue(int i0, int i1, int i2, double d) {
+            back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putIntValue(d);
+        }
     }
 
     public static class FloatArray extends DodsVarDataSet {
@@ -249,7 +283,11 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             double r = (double) val;
             return r >= validMin && r <= validMax ? r : Units.dimensionless.getFillDouble();
         }
-
+        
+        private final float putFloatValue( double val ) {
+            return (float)val;
+        }
+        
         public double value(int i) {
             return doubleValue(back[i]);
         }
@@ -265,6 +303,18 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public double value(int i0, int i1, int i2, int i3) {
             int index = i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[2] * dimSizes[3] + i2 * dimSizes[3] + i3;
             return doubleValue(back[index]);
+        }
+
+        public void putValue(int i0, double d) {
+            back[i0]= putFloatValue(d);
+        }
+
+        public void putValue(int i0, int i1, double d) {
+            back[i0 * dimSizes[1] + i1]= putFloatValue(d);
+        }
+
+        public void putValue(int i0, int i1, int i2, double d) {
+            back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putFloatValue(d);
         }
     }
 
@@ -292,6 +342,18 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
         public double value(int i0, int i1, int i2, int i3) {
             return back[i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[1] * dimSizes[2] + i2 * dimSizes[2] + i3];
+        }
+
+        public void putValue(int i0, double d) {
+            back[i0]= d;
+        }
+
+        public void putValue(int i0, int i1, double d) {
+            back[i0 * dimSizes[1] + i1]= d;
+        }
+
+        public void putValue(int i0, int i1, int i2, double d) {
+            back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= d;
         }
     }
 
@@ -327,6 +389,18 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public double value(int i0, int i1, int i2, int i3) {
             throw new IllegalArgumentException("not supported");
         }
+
+        public void putValue(int i0, double d) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void putValue(int i0, int i1, double d) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        public void putValue(int i0, int i1, int i2, double d) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     public static class EpochStringArray extends DodsVarDataSet {
@@ -361,15 +435,18 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public double value(int i0, int i1, int i2, int i3) {
             throw new IllegalArgumentException("not supported");
         }
-    }
 
-    public void putValue(int i, double d) {
-    }
+        public void putValue(int i0, double d) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
 
-    public void putValue(int i0, int i1, double d) {
-    }
+        public void putValue(int i0, int i1, double d) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
 
-    public void putValue(int i0, int i1, int i2, double d) {
+        public void putValue(int i0, int i1, int i2, double d) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
     }
 
     static DodsVarDataSet newDataSet(DArray z, HashMap properties) {
