@@ -232,7 +232,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         } else {
 
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
-            if (carotpos < firstSlashAfterHost) {
+            if (carotpos <= firstSlashAfterHost) {
                 showHostCompletions(surl, carotpos);
             } else {
                 showFileSystemCompletions(surl, carotpos);
