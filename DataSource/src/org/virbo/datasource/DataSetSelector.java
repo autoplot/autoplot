@@ -5,6 +5,8 @@
  */
 package org.virbo.datasource;
 
+import java.awt.Component;
+import javax.swing.JList;
 import org.das2.DasApplication;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.util.DasExceptionHandler;
@@ -36,11 +38,13 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.system.RequestProcessor;
@@ -55,7 +59,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
         initComponents();
-        editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());
+        editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
         addCompletionKeys();
         addAbouts();
         maybePlotTimer = new Timer(100, new ActionListener() {
@@ -134,7 +138,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 if (carotpos != -1) {
                     setValue(surl.substring(0, carotpos + 1));
                     dataSetSelector.getEditor().setItem(surl.substring(0, carotpos + 1));
-                    maybePlot();
+                    maybePlotImmediately();
                 }
             } else {
                 try {
@@ -224,18 +228,18 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void showCompletions(final String surl, final int carotpos) {
-        URLSplit split = URLSplit.parse(surl);
-        if (carotpos > split.file.length()
+        URLSplit split = URLSplit.parse(surl,carotpos);
+        if (split.carotPos > split.file.length()
                 && DataSourceRegistry.getInstance().hasSourceByExt( DataSetURL.getExt(surl) ) ) {
-            showFactoryCompletions(surl, carotpos);
+            showFactoryCompletions(split.surl, split.carotPos);
 
         } else {
 
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
-            if (carotpos <= firstSlashAfterHost) {
-                showHostCompletions(surl, carotpos);
+            if (split.carotPos <= firstSlashAfterHost) {
+                showHostCompletions(split.surl, split.carotPos);
             } else {
-                showFileSystemCompletions(surl, carotpos);
+                showFileSystemCompletions(split.surl, split.carotPos);
             }
 
         }
@@ -559,6 +563,21 @@ public class DataSetSelector extends javax.swing.JPanel {
         dataSetSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(application will put recent items here)" }));
         dataSetSelector.setToolTipText("enter data source URL");
         dataSetSelector.setMinimumSize(new java.awt.Dimension(20, 20));
+        dataSetSelector.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                dataSetSelectorMouseClicked(evt);
+            }
+        });
+        dataSetSelector.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+                dataSetSelectorPopupMenuCanceled(evt);
+            }
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+                dataSetSelectorPopupMenuWillBecomeInvisible(evt);
+            }
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+            }
+        });
         dataSetSelector.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 dataSetSelectorItemStateChanged(evt);
@@ -640,6 +659,26 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         maybePlot();
     }
 }//GEN-LAST:event_dataSetSelectorItemStateChanged
+
+private boolean popupCancelled= false;
+
+private void dataSetSelectorPopupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuWillBecomeInvisible
+    System.err.println("here become invisible");
+    if ( popupCancelled==false ) {
+        maybePlot();
+    }
+    popupCancelled= false;
+}//GEN-LAST:event_dataSetSelectorPopupMenuWillBecomeInvisible
+
+private void dataSetSelectorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_dataSetSelectorMouseClicked
+    System.err.println("here mouse clicked");
+}//GEN-LAST:event_dataSetSelectorMouseClicked
+
+private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuCanceled
+    System.err.println("popup cancelled");
+    popupCancelled= true;
+}//GEN-LAST:event_dataSetSelectorPopupMenuCanceled
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
     private javax.swing.JComboBox dataSetSelector;
@@ -652,7 +691,7 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     public String getValue() {
         return (String) this.dataSetSelector.getSelectedItem();
     }
-    private boolean doItemStateChange = true;
+    private boolean doItemStateChange = false;
 
     /**
      * Setter for property value.
@@ -662,7 +701,7 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         doItemStateChange = false;
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
-        doItemStateChange = true;
+        //doItemStateChange = true;
     }
     /**
      * Holds value of property browseTypeExt.
@@ -751,7 +790,7 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         List<String> oldRecent = this.recent;
         this.recent = recent;
         Object value = getValue();
-        ArrayList r = new ArrayList(recent);
+        ArrayList<String> r = new ArrayList<String>(recent);
         Collections.reverse(r);
         dataSetSelector.setModel(new DefaultComboBoxModel(r.toArray()));
         if (recent.contains(value)) {
