@@ -50,10 +50,12 @@ public class DataSourceRegistry {
     }
 
     public boolean hasSourceByExt(String ext) {
+        if ( ext==null ) return false;
         return dataSourcesByExt.get(getExtension(ext))!=null;
     }
 
     public boolean hasSourceByMime(String mime) {
+        if ( mime==null ) return false;
         return dataSourcesByMime.get(mime)!=null;
     }
 
