@@ -47,7 +47,6 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         URLSplit split = URLSplit.parse(surl);
         Map parms = URLSplit.parseParams(split.params);
         String stimeRange= (String) parms.get("timerange");
-        stimeRange= stimeRange.replaceAll("\\+", " ");
         ads.setViewRange(DatumRangeUtil.parseTimeRange(stimeRange));
         parms.remove("timerange");
         if (parms.size() > 0) {
@@ -58,7 +57,10 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     private static int splitIndex(String surl) {
-        int i = surl.indexOf('%');
+        int i = surl.indexOf("%Y");
+        if ( i==-1 ) {
+            i = surl.indexOf("$Y");
+        }
         i = surl.lastIndexOf('/', i);
         return i;
     }
@@ -70,7 +72,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         i = splitIndex(sansArgs);
         FileSystem fs = FileSystem.create( new URL(sansArgs.substring(0, i)) );
-        FileStorageModel fsm = FileStorageModel.create(fs, sansArgs.substring(i));
+        String spec= sansArgs.substring(i).replaceAll("\\$", "%");
+        FileStorageModel fsm = FileStorageModel.create(fs, spec );
 
         return fsm;
     }
