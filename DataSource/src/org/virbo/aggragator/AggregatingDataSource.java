@@ -28,7 +28,6 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
@@ -76,7 +75,7 @@ public class AggregatingDataSource extends AbstractDataSource {
         String surl = url.toString();
         delegateDataSourceFactory = AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
-        String stimeRange= super.params.get("timerange").replaceAll("\\+", " ");
+        String stimeRange= super.params.get("timerange");
         viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
     }
 
@@ -271,7 +270,6 @@ public class AggregatingDataSource extends AbstractDataSource {
         URLSplit split = URLSplit.parse(surl);
         Map<String,String> mparams = URLSplit.parseParams(split.params);
         String stimeRange = viewRange.toString();
-        stimeRange = stimeRange.replaceAll(" ", "+");
         mparams.put("timerange", stimeRange);
         split.params = URLSplit.formatParams(mparams);
 
