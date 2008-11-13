@@ -115,8 +115,8 @@ public class DataSourceUtil {
             return null;
         }
 
-        result= result.replaceFirst(yyyy, "/%Y/");               
-        result= result.replaceFirst(yyyymmdd, "%Y%m%d");
+        result= result.replaceFirst(yyyy, "/\\$Y/");               
+        result= result.replaceFirst(yyyymmdd, "\\$Y\\$m\\$d");
                 
         result= result.replaceFirst(version, "$1..");
         
