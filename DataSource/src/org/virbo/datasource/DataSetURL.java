@@ -84,11 +84,12 @@ public class DataSetURL {
         if ( explicitExt!=null ) {
             return explicitExt;
         } else {
-            int i0= surl.lastIndexOf('/');
+            URLSplit split= URLSplit.parse(surl);
+            int i0= split.file.lastIndexOf('/');
             if ( i0==-1 ) return null;
-            int i1= surl.lastIndexOf('.',i0);
+            int i1= split.file.indexOf('.',i0);
             if ( i1>i0 ) {
-                return surl.substring(i0+1);
+                return split.file.substring(i1+1);
             } else {
                 return null;
             }
@@ -201,6 +202,9 @@ public class DataSetURL {
         int ipercy = surl.indexOf("%Y");
         if (ipercy == -1) {
             ipercy = surl.indexOf("%25");
+        }
+        if ( ipercy==-1 ) {
+            ipercy = surl.indexOf("$Y");
         }
         if (ipercy != -1 && (iquest == -1 || ipercy < iquest)) {
             return true;
