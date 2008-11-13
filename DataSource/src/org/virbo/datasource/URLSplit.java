@@ -16,12 +16,34 @@ import java.util.Map;
  */
 public class URLSplit {
 
+    /**
+     * scheme for Autoplot, if provided.  e.g.  vap+cdf
+     */
+    public String vapScheme;
+    
+    /**
+     * scheme for resource, e.g. jdbc.mysql
+     */
     public String scheme;
+    
+    /**
+     * the complete, modified surl.   file:///home/jbf/mydata.qds
+     */
+    public String surl;
+    
+    /**
+     * the uri up to the authority, e.g.  jbdc:mysql://192.168.0.203:3306
+     */
     public String authority;
     public String path;
     public String file;
     public String ext;
     public String params;
+    
+    /**
+     * position of the carot after modifications to the surl are made.
+     */
+    public int carotPos;
 
     /**
      * add "file:/" to a resource string that appears to reference the local filesystem.
@@ -30,9 +52,18 @@ public class URLSplit {
      * @return surl, maybe with "file:/" prepended.
      */
     public static String maybeAddFile(String surl) {
+        URLSplit result= maybeAddFile( surl, 0 );
+        return result.surl;
+    }
+    
+    public static URLSplit maybeAddFile( String surl, int carotPos ) {
+        URLSplit result = new URLSplit();
+        
         if (surl.length() == 0) {
-            return "file:/";
+            result.surl= "file:///";
+            result.carotPos+= result.file.length();
         }
+        
         String scheme;  // identify the scheme, if any.
         int i0 = surl.indexOf(":");
         if (i0 == -1) {
@@ -43,26 +74,60 @@ public class URLSplit {
             scheme = surl.substring(0, i0);
         }
 
+        result.surl= surl;
+        result.carotPos= carotPos;
+        
         if (scheme.equals("")) {
-            surl = "file://" + ((surl.charAt(0) == '/') ? surl : ('/' + surl)); // Windows c:
-            surl = surl.replaceAll("\\\\", "/");
-            surl = surl.replaceAll(" ", "%20");
+            result.surl = "file://" ;
+            result.carotPos+=7;
+            if ((surl.charAt(0) == '/') ) {
+                result.surl+= surl;
+            } else {
+                result.surl+= ('/' + surl); // Windows c:
+                result.carotPos+= 1;
+            }
+            result.surl = result.surl.replaceAll("\\\\", "/");                    
+            result.surl = result.surl.replaceAll(" ", "+");
         }
 
-        return surl;
+        return result;
     }
     
     /**
-     * split the url string (http://www.example.com/data/myfile.nc?myVariable) into:
+     * split the url string into components.  This does not try to identify
+     * the vap scheme, since that might require interaction with the server to
+     * get mime type.  This inserts the scheme "file://" when the scheme is 
+     * absent.
+     * The string http://www.example.com/data/myfile.nc?myVariable is split into:
+     *   scheme, http
+     *   authority, http://www.example.com
      *   path, the directory with http://www.example.com/data/
      *   file, the file, http://www.example.com/data/myfile.nc
      *   ext, the extenion, .nc
      *   params, myVariable or null
      */
     public static URLSplit parse(String surl) {
-
-        surl = maybeAddFile(surl);
-
+        return parse(surl,0);
+    }
+    
+    /**
+     * split the url string into components, keeping track of the carot position
+     * when characters are inserted.  This does not try to identify
+     * the vap scheme, since that might require interaction with the server to
+     * get mime type.  This inserts the scheme "file://" when the scheme is 
+     * absent.
+     * The string http://www.example.com/data/myfile.nc?myVariable is split into:
+     *   scheme, http
+     *   authority, http://www.example.com
+     *   path, the directory with http://www.example.com/data/
+     *   file, the file, http://www.example.com/data/myfile.nc
+     *   ext, the extenion, .nc
+     *   params, myVariable or null
+     */
+    public static URLSplit parse(String surl, int carotPos ) {
+        URLSplit result= maybeAddFile(surl,carotPos);
+        surl= result.surl;
+        
         int h = surl.indexOf(":/");
         String scheme = surl.substring(0, h);
 
@@ -117,7 +182,6 @@ public class URLSplit {
 
         int i2 = surl.indexOf("://");
 
-        URLSplit result = new URLSplit();
         result.scheme = scheme;
         result.authority= authority;
         result.path = surlDir + "/";
@@ -156,7 +220,7 @@ public class URLSplit {
             return result;
         }
         
-        params= URLSplit.urlDecode(params);
+        params= URLSplit.uriDecode(params);
         
         String[] ss = params.split("&");
 
@@ -194,7 +258,7 @@ public class URLSplit {
             } else {
                 String value = (String) parms.get(key);
                 if (value != null) {
-                    result.append("&" + key + "=" + urlEncode(value) );
+                    result.append("&" + key + "=" + uriEncode(value) );
                 } else {
                     result.append("&" + key);
                 }
@@ -213,27 +277,28 @@ public class URLSplit {
     }
     
     /**
-     * convert " " to "%20", etc by using URLEncoder, maybe catching the UnsupportedEncodingException.
+     * convert " " to "+", etc, by using URLEncoder and hiding the UnsupportedEncodingException that will never occur.
      * @param s
      * @return
      */
-    public static String urlEncode( String s ) {
+    public static String uriEncode( String s ) {
         try {
-            return URLEncoder.encode(s, "UTF-8");
+            String r= URLEncoder.encode(s, "UTF-8");
+            return r.replaceAll("\\%24", "\\$");
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
     }
     
     /**
-     * convert "%20" to " ", etc by using URLDecoder, maybe catching the UnsupportedEncodingException.
+     * convert "+" to " ", etc, by using URLDecoder and catching the UnsupportedEncodingException that will never occur.
      * Kludge to check for and
      * decode pluses (+) in an otherwise unencoded string, also we have to be careful for elements like %Y than are
      * not to be decoded.
      * @param s
      * @return
      */
-    public static String urlDecode( String s ) {
+    public static String uriDecode( String s ) {
         try {
             return URLDecoder.decode(s, "UTF-8");
         } catch ( IllegalArgumentException ex ) {
