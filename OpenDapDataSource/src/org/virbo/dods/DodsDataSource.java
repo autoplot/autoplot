@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -99,7 +100,7 @@ public class DodsDataSource extends AbstractDataSource {
         }
     }
 
-    private String getConstraint(DodsAdapter da, Map meta, MyDDSParser parser, String variable) throws DDSException {
+    private String getIstpConstraint(DodsAdapter da, Map meta, MyDDSParser parser, String variable) throws DDSException {
 
         StringBuffer constraint1 = new StringBuffer("?");
 
@@ -152,16 +153,16 @@ public class DodsDataSource extends AbstractDataSource {
 
         getMetaData(mon);
 
-        Map interpretedMetadata = null;
+        Map<String,Object> interpretedMetadata = null;
 
         boolean isIstp = adapter.getSource().toString().endsWith(".cdf");
         if (isIstp) {
-            Map m = new IstpMetadataModel().properties(metadata);
+            Map<String,Object> m = new IstpMetadataModel().properties(metadata);
             interpretedMetadata = m;
         }
 
         if (isIstp) {
-            String constraint1 = getConstraint(adapter, metadata, parser, variable);
+            String constraint1 = getIstpConstraint(adapter, metadata, parser, variable);
             adapter.setConstraint(constraint1);
 
         } else {
@@ -182,7 +183,7 @@ public class DodsDataSource extends AbstractDataSource {
         }
 
         adapter.loadDataset(mon);
-        WritableDataSet ds = (WritableDataSet) adapter.getDataSet();
+        MutablePropertyDataSet ds = (MutablePropertyDataSet) adapter.getDataSet(metadata);
 
         if (isIstp) {
             interpretedMetadata.remove("DEPEND_0");
@@ -214,13 +215,17 @@ public class DodsDataSource extends AbstractDataSource {
      * @return
      */
     private Map<String, Object> getMetaData(String variable) {
-
         AttributeTable at = das.getAttributeTable(variable);
+        return getMetaData(at);
+    }
+     
+    private Map<String,Object> getMetaData( AttributeTable at ) {
+        
         if (at == null) {
             return new HashMap<String, Object>();
         } else {
             Pattern p = Pattern.compile("DEPEND_[0-9]");
-            Pattern p2= Pattern.compile("LABL_PTR_([0-9])");
+            Pattern p2 = Pattern.compile("LABL_PTR_([0-9])");
             Enumeration n = at.getNames();
 
             Map<String, Object> result = new HashMap<String, Object>();
@@ -228,23 +233,29 @@ public class DodsDataSource extends AbstractDataSource {
             while (n.hasMoreElements()) {
                 Object key = n.nextElement();
                 Attribute att = at.getAttribute((String) key);
-                Matcher m=null;
+                Matcher m = null;
                 try {
-                    String val = att.getValueAt(0);
-                    val= DataSourceUtil.unquote(val);
-                    if (p.matcher(att.getName()).matches()) {
-                        String name = val;
-                        Map<String, Object> newVal = getMetaData(name);
-                        newVal.put("NAME", name); // tuck it away, we'll need it later.
-                        result.put(att.getName(), newVal);
-                    } else if ( (m=p2.matcher(att.getName())).matches() ) {
-                        String name = val;
-                        Map<String, Object> newVal = getMetaData(name);
-                        newVal.put("NAME", name); // tuck it away, we'll need it later.
-                        result.put("DEPEND_"+m.group(1), newVal);
-                        
+                    int type = att.getType();
+                    if (type == Attribute.CONTAINER) {
+                        Object val= getMetaData( att.getContainer() );
+                        result.put( att.getName(), val );
                     } else {
-                        result.put(att.getName(), val );
+                        String val = att.getValueAt(0);
+                        val = DataSourceUtil.unquote(val);
+                        if (p.matcher(att.getName()).matches()) {
+                            String name = val;
+                            Map<String, Object> newVal = getMetaData(name);
+                            newVal.put("NAME", name); // tuck it away, we'll need it later.
+                            result.put(att.getName(), newVal);
+                        } else if ((m = p2.matcher(att.getName())).matches()) {
+                            String name = val;
+                            Map<String, Object> newVal = getMetaData(name);
+                            newVal.put("NAME", name); // tuck it away, we'll need it later.
+                            result.put("DEPEND_" + m.group(1), newVal);
+
+                        } else {
+                            result.put(att.getName(), val);
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -258,7 +269,8 @@ public class DodsDataSource extends AbstractDataSource {
     private Map<String, Object> getMetaData(ProgressMonitor mon, String variable) throws IOException, DASException, ParseException {
 
         MyDASParser parser = new MyDASParser();
-        parser.parse(new URL(adapter.getSource().toString() + ".das").openStream());
+        URL url = new URL(adapter.getSource().toString() + ".das");
+        parser.parse(url.openStream());
 
         das = parser.getDAS();
 
