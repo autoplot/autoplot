@@ -18,11 +18,14 @@ import dods.dap.DFloat64;
 import dods.dap.DGrid;
 import dods.dap.DODSException;
 import dods.dap.DSequence;
+import dods.dap.DStructure;
 import dods.dap.Float32PrimitiveVector;
 import dods.dap.NoSuchVariableException;
 import dods.dap.PrimitiveVector;
 import dods.dap.StatusUI;
 import dods.dap.parser.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.FileNotFoundException;
@@ -34,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import org.das2.CancelledOperationException;
+import org.das2.datum.UnitsUtil;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -41,7 +45,8 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
-import org.virbo.dods.DodsVarDataSet;
+import org.virbo.dsops.Ops;
+import org.virbo.metatree.MetadataUtil;
 
 /**
  *
@@ -87,7 +92,9 @@ public class DodsAdapter {
     }
 
     public void setConstraint(String c) {
-        if (!c.startsWith("?")) throw new IllegalArgumentException("constraint must start with question mark(?)");
+        if (!c.startsWith("?")) {
+            throw new IllegalArgumentException("constraint must start with question mark(?)");
+        }
         this.constraint = c;
     }
 
@@ -97,6 +104,14 @@ public class DodsAdapter {
             return 4;
         } else {
             return 1;
+        }
+    }
+
+    private long getSizeForType(BaseType v) {
+        if ( v instanceof DFloat64 ) {
+            return 8;
+        } else {
+            throw new IllegalArgumentException("not supported");
         }
     }
 
@@ -110,16 +125,40 @@ public class DodsAdapter {
             long size = -1;
             while (variables.hasMoreElements()) {
                 Object o = variables.nextElement();
-                if (o instanceof DSequence) return -1;
-                DArray v = (DArray) o;
-                Enumeration dimensions = v.getDimensions();
-                long s1 = getSizeForType(v);
-                s1 *= 2;   // not sure why
-                while (dimensions.hasMoreElements()) {
-                    DArrayDimension d = (DArrayDimension) dimensions.nextElement();
-                    s1 *= d.getSize();
+                if (o instanceof DSequence) {
+                    Enumeration enume1 = ((DSequence)o).getVariables();
+                    int j = 0;
+                    while (enume1.hasMoreElements()) {
+                        Object ele= enume1.nextElement();
+                        if (ele instanceof DStructure) {
+                            DStructure ds = (DStructure) ele;
+
+                            Enumeration enume2 = ds.getVariables();
+                            int jj = 0;
+                            while (enume2.hasMoreElements()) {
+                                Object k = enume2.nextElement();
+                                j+= getSizeForType( (BaseType)k );
+                            }
+                            
+                        } else if (ele instanceof BaseType) {
+                            j+= getSizeForType( (BaseType)ele );
+                            
+                        } else {
+                            throw new IllegalArgumentException("huh");
+                        }
+                    }
+                    size= -1; // we don't know number of records.
+                } else {
+                    DArray v = (DArray) o;
+                    Enumeration dimensions = v.getDimensions();
+                    long s1 = getSizeForType(v);
+                    s1 *= 2;   // not sure why
+                    while (dimensions.hasMoreElements()) {
+                        DArrayDimension d = (DArrayDimension) dimensions.nextElement();
+                        s1 *= d.getSize();
+                    }
+                    size += s1;
                 }
-                size += s1;
             }
             return size;
         } catch (DDSException e) {
@@ -174,9 +213,10 @@ public class DodsAdapter {
         this.sliceIndex = index;
     }
 
-    public QDataSet getDataSet() {
+    public QDataSet getDataSet(Map<String,Object> attributes) {
         DodsVarDataSet zds;
 
+        if ( attributes==null ) attributes= new HashMap<String,Object>();
         BaseType btvar;
         try {
             btvar = dds.getVariable(variable);
@@ -186,13 +226,16 @@ public class DodsAdapter {
                 DArray z = (DArray) zgrid.getVar(0);
 
                 zds = DodsVarDataSet.newDataSet(z, properties);
-                if ( zds.property(QDataSet.UNITS)==null ) zds.putProperty(QDataSet.UNITS, units);
-
+                if (zds.property(QDataSet.UNITS) == null) {
+                    zds.putProperty(QDataSet.UNITS, units);
+                }
                 for (int idim = 0; idim < z.numDimensions(); idim++) {
                     DArray t = (DArray) zgrid.getVar(idim + 1);
                     HashMap tprops = new HashMap();
                     tprops.put(QDataSet.UNITS, dimUnits[idim]);
-                    if (dimProperties[idim] != null) tprops.putAll(dimProperties[idim]);
+                    if (dimProperties[idim] != null) {
+                        tprops.putAll(dimProperties[idim]);
+                    }
                     DodsVarDataSet tds = DodsVarDataSet.newDataSet(t, tprops);
                     zds.putProperty("DEPEND_" + idim, tds);
                 }
@@ -201,8 +244,9 @@ public class DodsAdapter {
                 DArray z = (DArray) btvar;
 
                 zds = DodsVarDataSet.newDataSet(z, properties);
-                if ( zds.property(QDataSet.UNITS)==null ) zds.putProperty(QDataSet.UNITS, units);
-
+                if (zds.property(QDataSet.UNITS) == null) {
+                    zds.putProperty(QDataSet.UNITS, units);
+                }
                 for (int idim = 0; idim < z.numDimensions(); idim++) {
                     if (dependName[idim] != null) {
                         DArray t = (DArray) dds.getVariable(dependName[idim]);
@@ -221,18 +265,60 @@ public class DodsAdapter {
                 int cols = dseq.elementCount(true);
                 int rows = dseq.getRowCount();
 
-                DDataSet dep0 = DDataSet.createRank1(rows);
-                DDataSet result = DDataSet.createRank1(rows);
+                DDataSet result = DDataSet.createRank2(rows, cols);
+
+                String[] labels = new String[cols];
 
                 for (int i = 0; i < rows; i++) {
                     Vector v = dseq.getRow(i);
-                    putValue(result, i, (BaseType)v.get(cols - 1) );
-                    putValue(dep0, i, (BaseType)v.get(0) );
+                    int j = 0;
+                    for (Object ele : v) {
+                        if (ele instanceof DStructure) {
+                            DStructure ds = (DStructure) ele;
+                            Enumeration enume = ds.getVariables();
+                            while (enume.hasMoreElements()) {
+                                Object k = enume.nextElement();
+                                putValue(result, i, j, (BaseType) k);
+                                if ( i==0 ) labels[j]= ((BaseType) k).getName();
+                                j++;
+                            }
+                        } else if (ele instanceof BaseType) {
+                            putValue(result, i, j, (BaseType) ele);
+                            if ( i==0 ) labels[j]= ((BaseType) ele).getName();
+                            j++;
+                        } else {
+                            throw new IllegalArgumentException("huh");
+                        }
+                    }
+                }
+                
+                result.putProperty( QDataSet.DEPEND_1, Ops.labels(labels) );
+                MutablePropertyDataSet dep0 = DataSetOps.slice1(result, 0);
+                dep0.putProperty(QDataSet.NAME, labels[0] );
+                String sunits= (String)MetadataUtil.getNode( attributes, new String[] { labels[0], "units" } );
+                if ( sunits!=null ) {
+                    if ( sunits.contains("since") ) {
+                        Units u;
+                        try {
+                            u = MetadataUtil.lookupTimeUnits(sunits);
+                            dep0.putProperty(QDataSet.UNITS, u);
+                        } catch (java.text.ParseException ex) {
+                            Logger.getLogger(DodsAdapter.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
                 }
 
-                result.putProperty(QDataSet.DEPEND_0, dep0);
+                MutablePropertyDataSet zresult;
+                if (cols == 2) {
+                    zresult = DataSetOps.slice1(result, 1);
+                    zresult.putProperty( QDataSet.NAME, labels[1] );
+                } else {
+                    zresult = DataSetOps.leafTrim(result, 1, cols);
+                }
 
-                return result;
+                zresult.putProperty(QDataSet.DEPEND_0, dep0);
+
+                return zresult;
 
             } else {
 
@@ -266,7 +352,7 @@ public class DodsAdapter {
     }
 
     public org.das2.dataset.DataSet getDas2DataSet() {
-        QDataSet ds = getDataSet();
+        QDataSet ds = getDataSet(null);
         if (ds.rank() == 3) {
             QDataSet sliceDs = DataSetOps.slice0(ds, sliceIndex);
             return TableDataSetAdapter.create(sliceDs);
@@ -450,10 +536,18 @@ public class DodsAdapter {
     }
 
     private void putValue(DDataSet result, int i, BaseType value) {
-        if ( value instanceof DFloat64 ) {
-            result.putValue( i, ((DFloat64)value).getValue() );
+        if (value instanceof DFloat64) {
+            result.putValue(i, ((DFloat64) value).getValue());
         } else {
-            throw new IllegalArgumentException("not supported: "+value);
+            throw new IllegalArgumentException("not supported: " + value);
+        }
+    }
+
+    private void putValue(DDataSet result, int i, int j, BaseType value) {
+        if (value instanceof DFloat64) {
+            result.putValue(i, j, ((DFloat64) value).getValue());
+        } else {
+            throw new IllegalArgumentException("not supported: " + value);
         }
     }
 }
