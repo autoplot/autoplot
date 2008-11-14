@@ -110,12 +110,21 @@ class Das2ServerDataSource extends AbstractDataSource {
             }
 
             public DatumRange getTimeRange() {
-                throw new UnsupportedOperationException("Not supported yet.");
+                return timeRange;
             }
 
             public Datum getTimeResolution() {
-                throw new UnsupportedOperationException("Not supported yet.");
+                return resolution;
             }
         };
     }
+
+    @Override
+    public String getURL() {
+        // TODO: Cheesy.  ApplicationModel shouldn't call getURL when TimeSeriesBrowse exists.
+        return getCapability( TimeSeriesBrowse.class ).getURL().toString();
+    }
+
+
+
 }
