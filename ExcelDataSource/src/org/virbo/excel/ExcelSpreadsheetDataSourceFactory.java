@@ -71,7 +71,7 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
     List<CompletionContext> toCC(Object context, List<String> results, String doc) {
         List<CompletionContext> result = new ArrayList<CompletionContext>();
         for (String s : results) {
-            result.add(new CompletionContext(context, URLSplit.urlEncode(s), s, doc));
+            result.add(new CompletionContext(context, URLSplit.uriEncode(s), s, doc));
         }
         return result;
     }
