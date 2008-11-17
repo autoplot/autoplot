@@ -5,8 +5,14 @@
 
 package org.das2.jythoncompletion;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
+import org.das2.jythoncompletion.support.AsyncCompletionQuery;
+import org.das2.jythoncompletion.support.AsyncCompletionTask;
 import org.das2.jythoncompletion.support.CompletionProvider;
+import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 
 /**
@@ -33,11 +39,48 @@ public class JythonCompletionProvider implements CompletionProvider {
     }
     
     public CompletionTask createTask( int arg0, JTextComponent arg1 ) {
-        return new JythonCompletionTask( arg1 );
+        final CompletionTask syncTask= new JythonCompletionTask( arg1 );
+        return new AsyncCompletionTask( new AsyncCompletionQuery() {
+            @Override
+            protected void query(CompletionResultSet resultSet, Document doc, int caretOffset) {
+                syncTask.query(resultSet);
+            }
+        });
     }
 
     public int getAutoQueryTypes( JTextComponent arg0, String arg1 ) {
         return 0;
+    }
+
+    protected String message = null;
+    public static final String PROP_MESSAGE = "message";
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        String oldMessage = this.message;
+        this.message = message;
+        propertyChangeSupport.firePropertyChange(PROP_MESSAGE, oldMessage, message);
+    }
+    
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
 

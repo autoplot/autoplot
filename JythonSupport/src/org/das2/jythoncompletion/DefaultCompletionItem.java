@@ -33,6 +33,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     String complete;
     String label;
     String link;
+    int sortPriority;
     
     final static Logger logger= Logger.getLogger( "pvwave" );
     
@@ -43,13 +44,18 @@ public class DefaultCompletionItem implements CompletionItem  {
      * @param label  the human readable presentation of this, maybe with html.
      * @param link  handed over to DefaultDocumentationItem, if non null.
      */
-    public DefaultCompletionItem( String text, int offset, String complete, String label, String link ) {
+    public DefaultCompletionItem( String text, int offset, String complete, String label, String link, int sortPriority ) {
         this.text= text;
         this.offset= offset;
         this.complete= complete;
         if ( label==null ) label= complete;
         this.label= label;
         this.link= link;
+        this.sortPriority= sortPriority;
+    }
+
+    public DefaultCompletionItem( String text, int offset, String complete, String label, String link ) {
+        this(text, offset, complete, label, link, 1);
     }
     
     public static DefaultCompletionItem error( String message ) {
@@ -138,7 +144,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     }
     
     public int getSortPriority() {
-        return 1;
+        return sortPriority;
     }
     
     public CharSequence getSortText() {
