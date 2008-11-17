@@ -150,7 +150,7 @@ public class AggregatingDataSource extends AbstractDataSource {
                 this.metadata = delegateDataSource.getMetaData(new NullProgressMonitor());
                 cacheRange1 = dr1;
             } else {
-                result.join(DDataSet.copy(ds1));
+                result.append(DDataSet.copy(ds1));
                 cacheRange1 = new DatumRange(cacheRange1.min(), dr1.max());
             }
             if (ss.length > 1) {
