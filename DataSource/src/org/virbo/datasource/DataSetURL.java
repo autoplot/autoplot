@@ -199,14 +199,13 @@ public class DataSetURL {
 
     private static boolean isAggregating(String surl) {
         int iquest = surl.indexOf("?");
-        int ipercy = surl.indexOf("%Y");
-        if (ipercy == -1) {
-            ipercy = surl.indexOf("%25");
-        }
-        if ( ipercy==-1 ) {
-            ipercy = surl.indexOf("$Y");
-        }
-        if (ipercy != -1 && (iquest == -1 || ipercy < iquest)) {
+        if ( iquest==-1 ) iquest= surl.length();
+        int ipercy = surl.lastIndexOf("%Y",iquest);
+        if (ipercy == -1) ipercy = surl.lastIndexOf("%25",iquest);
+        if ( ipercy==-1 ) ipercy = surl.lastIndexOf("$Y",iquest);
+        if ( ipercy==-1 ) ipercy = surl.lastIndexOf("%y",iquest);
+        if ( ipercy==-1 ) ipercy = surl.lastIndexOf("$y",iquest);
+        if (ipercy != -1 ) {
             return true;
         } else {
             return false;
