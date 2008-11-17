@@ -20,6 +20,7 @@ import javax.beans.binding.BindingConverter;
 import javax.swing.AbstractSpinnerModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -99,15 +100,23 @@ public class AxisPanel extends javax.swing.JPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 zAxisPanel.setEnabled( applicationModel.colorbar.isVisible() );
                 if ( evt.getPropertyName().equals(applicationModel.PROP_DEPNAMES) ) {
-                    String[] depNames= (String[]) applicationModel.getDepnames().toArray();
+                    final String[] depNames= (String[]) applicationModel.getDepnames().toArray();
                     for ( int i=0; i<depNames.length; i++ ) {
                         depNames[i]= depNames[i]+" ("+applicationModel.getMaxSliceIndex(i)+" bins)";
                     }
-                    sliceTypeComboBox.setModel( new DefaultComboBoxModel( depNames ) ); 
-                    sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            sliceTypeComboBox.setModel( new DefaultComboBoxModel( depNames ) ); 
+                            sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
+                        }            
+                    } );
                 }
                 if ( evt.getPropertyName().equals(applicationModel.PROP_SLICEDIMENSION ) ) {
-                    sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
+                        }
+                    } );
                 }
             }
         } );
@@ -488,7 +497,6 @@ public class AxisPanel extends javax.swing.JPanel {
 
     private void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
         logger.fine( "set slice dimension "+sliceTypeComboBox.getSelectedIndex() );
-        System.err.println("set slice dimension");
         applicationModel.setSliceDimension( sliceTypeComboBox.getSelectedIndex() );
         int max= applicationModel.getMaxSliceIndex(applicationModel.getSliceDimension());
         if ( max>0 ) max--; // make inclusive, was exclusive.
