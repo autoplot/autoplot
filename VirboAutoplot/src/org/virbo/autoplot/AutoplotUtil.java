@@ -9,12 +9,10 @@
 package org.virbo.autoplot;
 
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
-import javax.swing.Icon;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -31,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,8 +52,8 @@ import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.BinAverage;
 import org.w3c.dom.Document;
@@ -71,6 +68,11 @@ public class AutoplotUtil {
 
     private final static Logger log = Logger.getLogger("virbo.autoplot.AutoRangeDescriptor.autoRange");
 
+    /**
+     * absolute length limit for plots.  This is used to limit the elements used in autoranging, etc.
+     */
+    public final static int DS_LENGTH_LIMIT= 10000000;
+    
     static DasPlot createPlot( DasCanvas c, QDataSet ds, DasPlot recyclable, DasColorBar cb ) {
         DasRow row= DasRow.create(c);            
         DasColumn col= DasColumn.create(c);
@@ -514,8 +516,10 @@ public class AutoplotUtil {
         double approxMean = 0.;
 
         OldDataSetIterator iter = OldDataSetIterator.create(ds);
-        while (iter.hasNext()) {
+        int climit=0;
+        while ( climit<DS_LENGTH_LIMIT && iter.hasNext()) {
             double d = iter.next();
+            climit++;
             if (!u.isValid(d)) {
                 invalidCount++;
             } else {
@@ -536,8 +540,10 @@ public class AutoplotUtil {
 
         if (validCount > 0) {
             iter = OldDataSetIterator.create(ds);
-            while (iter.hasNext()) {
+            climit=0;
+            while ( climit<DS_LENGTH_LIMIT && iter.hasNext()) {
                 double d = iter.next();
+                climit++;
                 if (u.isValid(d)) {
                     mean += (d - approxMean);
                     stddev += Math.pow(d - approxMean, 2);
@@ -605,8 +611,10 @@ public class AutoplotUtil {
         QDataSet wmax = DataSetUtil.weightsDataSet(max);
         QubeDataSetIterator it = new QubeDataSetIterator(ds);
         double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
-        while (it.hasNext()) {
+        int i=0;
+        while ( i<DS_LENGTH_LIMIT && it.hasNext()) {
             it.next();
+            i++;
             if (it.getValue(wmin) > 0.) result[0] = Math.min(result[0], it.getValue(min));
             if (it.getValue(wmax) > 0.) result[1] = Math.max(result[1], it.getValue(max));
         }
@@ -628,8 +636,10 @@ public class AutoplotUtil {
         QDataSet w = DataSetUtil.weightsDataSet(ds);
         QubeDataSetIterator it = new QubeDataSetIterator(res);
         double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
-        while (it.hasNext()) {
+        int i=0;
+        while ( i< DS_LENGTH_LIMIT && it.hasNext()) {
             it.next();
+            i++;
             if (it.getValue(w) > 0. && it.getValue(res) < 2.) {
                 double d = it.getValue(ds);
                 result[0] = Math.min(result[0], d);
@@ -669,52 +679,53 @@ public class AutoplotUtil {
     }
 
     /**
-     * rewrite the dataset so that fill values are set by the valid extent and fill
-     * controls.
+     * Rewrite the dataset so that fill values are set by the valid extent and fill
+     * controls.  The user can override these values, so make sure the values that came
+     * with the dataset are observed as well.
+     *
+     * Old values of vmin, vmax, and fill are ignored.
      * 
-     * //TODO: use QubeDataSetIterator to reduce code.
-     * //TODO: simply set validmin, validmax, fill metadata.
      */
-    public static void applyFillValidRange(WritableDataSet result, double vmin, double vmax, double fill) {
-
-        QDataSet ds = result;
-        Units u = (Units) ds.property(QDataSet.UNITS);
-
-        if (u == null) {
-            u = Units.dimensionless;
-        }
-
-        if (ds.rank() == 1) {
-            for (int i = 0; i < ds.length(); i++) {
-                double d = ds.value(i);
-                if (d == fill || d < vmin || d > vmax) {
-                    result.putValue(i, u.getFillDouble());
-                }
-            }
-        } else if (ds.rank() == 2) {
-            for (int i0 = 0; i0 < ds.length(); i0++) {
-                for (int i1 = 0; i1 < ds.length(i0); i1++) {
-                    double d = ds.value(i0, i1);
-                    if (d == fill || d < vmin || d > vmax) {
-                        result.putValue(i0, i1, u.getFillDouble());
-                    }
-                }
-            }
+    public static void applyFillValidRange( MutablePropertyDataSet ds, double vmin, double vmax, double fill) {
+        
+        Double ovmin= (Double) ds.property( QDataSet.VALID_MIN );
+        Double ovmax= (Double) ds.property( QDataSet.VALID_MAX );
+        
+        boolean needToCopy= false;
+        // if the old valid range contains the new range, then we simply reset the range.
+        if ( ovmax!=null && ovmax<vmax ) needToCopy= true;
+        if ( ovmin!=null && ovmin>vmin ) needToCopy= true;
+        
+        Double oldFill= (Double) ds.property( QDataSet.FILL_VALUE );
+        
+        if ( oldFill!=null && Double.isNaN(fill)==false && oldFill!=fill ) needToCopy= true;
+                
+        // always clobber old fill values.  This allows for fill data itself to be plotted.
+        needToCopy= false;
+        
+        if ( needToCopy==false ) {
+            if ( vmin>(-1*Double.MAX_VALUE) ) ds.putProperty(QDataSet.VALID_MIN, vmin );
+            if ( vmax<Double.MAX_VALUE ) ds.putProperty(QDataSet.VALID_MAX, vmax );
+            if ( !Double.isNaN(fill) ) ds.putProperty(QDataSet.FILL_VALUE, fill );
+            
         } else {
-            for (int i0 = 0; i0 < ds.length(); i0++) {
-                for (int i1 = 0; i1 < ds.length(i0); i1++) {
-                    for (int i2 = 0; i2 < ds.length(i0, i1); i2++) {
-                        double d = ds.value(i0, i1, i2);
-                        if (d == fill || d < vmin || d > vmax) {
-                            result.putValue(i0, i1, i2, u.getFillDouble());
-                        }
-                    }
+            /*Units u = (Units) ds.property(QDataSet.UNITS);
+
+            if (u == null) {
+                u = Units.dimensionless;
+            }
+
+            QubeDataSetIterator it= new QubeDataSetIterator(ds);
+            while ( it.hasNext() ) {
+                it.next();
+                double d = it.getValue(ds);
+                if (d == fill || d < vmin || d > vmax) {
+                    it.putValue(ds, u.getFillDouble());
                 }
             }
+
+            ds.putProperty(QDataSet.UNITS, u);*/
         }
-
-        result.putProperty(QDataSet.UNITS, u);
-
     }
 
     /**
