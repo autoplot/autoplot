@@ -170,10 +170,13 @@ public class MetaDataPanel extends javax.swing.JPanel {
             xunits = Units.dimensionless;
         }
 
-        Datum d = DatumUtil.asOrderOneUnits(xunits.getOffsetUnits().createDatum(cadence));
-        Units u = d.getUnits();
-
-        map.put("Cadence", format(d.doubleValue(u)) + " " + u);
+        if ( cadence!=null ) {
+            Datum d = DatumUtil.asOrderOneUnits(xunits.getOffsetUnits().createDatum(cadence));
+            Units u = d.getUnits();
+            map.put("Cadence", format(d.doubleValue(u)) + " " + u);
+        } else {
+            map.put("Cadence", "null" );
+        }
 
         SwingUtilities.invokeLater( new Runnable() {
             public void run( ) {
