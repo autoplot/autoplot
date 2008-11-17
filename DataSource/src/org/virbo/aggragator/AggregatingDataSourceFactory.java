@@ -57,9 +57,14 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     private static int splitIndex(String surl) {
-        int i = surl.indexOf("%Y");
-        if ( i==-1 ) i = surl.indexOf("$Y");
-        if ( i==-1 ) i = surl.indexOf("$y");
+        int i0 = surl.indexOf("%Y");
+        if ( i0==-1 ) i0 = surl.indexOf("$Y");
+        int i1;
+        i1 = surl.indexOf("%y");
+        if ( i1==-1 ) i1 = surl.indexOf("$y");
+        if ( i0==-1 ) i0= Integer.MAX_VALUE;
+        if ( i1==-1 ) i1= Integer.MAX_VALUE;
+        int i= Math.min(i0,i1);
         i = surl.lastIndexOf('/', i);
         return i;
     }
