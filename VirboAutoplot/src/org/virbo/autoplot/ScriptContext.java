@@ -20,34 +20,23 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import javax.beans.binding.BindingContext;
+import javax.swing.JComponent;
 import org.das2.fsm.FileStorageModel;
-import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyJavaInstance;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.DataSource;
-import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
-import org.virbo.dsops.Ops;
 
 /**
  *
@@ -140,11 +129,41 @@ public class ScriptContext extends PyJavaInstance {
     
     public static void plot( QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
         maybeInitModel();
-        DDataSet zds= DDataSet.copy(z);
-        if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, x );
-        if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
-        model.setDataSet(zds);
+
+        if ( z.rank()==1 ) {
+            DDataSet yds= DDataSet.copy(y);
+            yds.putProperty( QDataSet.DEPEND_0, x );
+            yds.putProperty( QDataSet.PLANE_0, z );
+            model.setDataSet(yds);
+        } else {
+            DDataSet zds= DDataSet.copy(z);
+            if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, x );
+            if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
+            model.setDataSet(zds);
+        }
+        
         model.waitUntilIdle(false);
+    }
+
+    /**
+     * set the autoplot status ber string.  Use the prefixes "busy:", "warning:"
+     * and "error:" to set icons.
+     * @param message
+     */
+    public static void setStatus( String message ) {
+        model.setStatus(message);
+    }
+    
+    public static void addTab( String label, JComponent c  ) {
+        int n= view.getTabs().getComponentCount();
+        for ( int i=0; i<n; i++ ) {
+            final String titleAt = view.getTabs().getTitleAt(i);
+            if ( titleAt.equals(label) || titleAt.equals("("+label+")") ) { //DANGER view is model
+                view.getTabs().remove( i );
+                break;
+            }
+        }
+        view.getTabs().add(label,c);
     }
     
     /**
