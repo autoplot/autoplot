@@ -46,6 +46,8 @@ public class LogConsole extends javax.swing.JPanel {
     int level = Level.ALL.intValue();
     NumberFormat nf = new DecimalFormat("00.000");
     private Timer timer2;
+    PrintStream oldStdOut;
+    PrintStream oldStdErr;
 
     /** Creates new form LogConsole */
     public LogConsole() {
@@ -81,6 +83,9 @@ public class LogConsole extends javax.swing.JPanel {
                         }
                     }
                 }
+                if ( rec.getLevel().intValue() >= Level.WARNING.intValue() ) {
+                    LogConsole.this.oldStdErr.println(rec.getMessage());
+                }
             }
 
             @Override
@@ -106,13 +111,20 @@ public class LogConsole extends javax.swing.JPanel {
                                                                                
         logger = Logger.getLogger("console.stdout");                                   
         los = new LoggingOutputStream(logger, Level.INFO );          
+        oldStdOut= System.out;
         System.setOut(new PrintStream(los, true));                             
-                                                                               
+                            
         logger = Logger.getLogger("console.stderr");                                   
         los= new LoggingOutputStream(logger, Level.WARNING );
+        oldStdErr= System.err;
         System.setErr(new PrintStream(los, true));       
     }
 
+    public void undoLogConsoleMessages() {
+        System.setOut(oldStdOut);
+        System.setErr(oldStdErr);
+    }
+    
     /**
      * iterate through the Handlers, looking for ConsoleHandlers, and turning
      * them off.
