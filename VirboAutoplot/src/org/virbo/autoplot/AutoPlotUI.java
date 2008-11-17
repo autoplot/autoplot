@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot;
 
+import javax.swing.Icon;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import com.cottagesystems.jdiskhog.JDiskHogPanel;
@@ -51,6 +52,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
@@ -100,7 +102,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
     private BookmarksManager bookmarksManager = null;
-
+    
+    private static String RESOURCES= "/org/virbo/autoplot/resources/";
+    public static final Icon WARNING_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"warning-icon.png") );
+    public static final Icon ERROR_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"error-icon.png") );
+    public static final Icon BUSY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"indProgress.gif") );
+    public static final Icon READY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"indProgress0.png") );
+    public static final Icon IDLE_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"idle-icon.png") );
+        
+    
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
 
@@ -114,6 +124,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         initComponents();
 
+        statusLabel.setIcon(IDLE_ICON);
         support.addKeyBindings((JPanel) getContentPane());
 
         dataSetSelector.setMonitorContext(applicationModel.plot);
@@ -184,13 +195,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String vap = dataSetSelector.getValue();
-                    setStatus("opening .vap file " + vap + "...");
+                    setStatus(BUSY_ICON,"opening .vap file " + vap + "...");
                     applicationModel.doOpen(DataSetURL.getFile(DataSetURL.getURL(vap), new NullProgressMonitor()));
                     dataSetSelector.setValue(vap);
                     setStatus("opening .vap file " + vap + "... done");
                 } catch (IOException ex) {
                     ex.printStackTrace();
-                    setStatus(ex.getMessage());
+                    setStatus(ERROR_ICON,ex.getMessage());
                 }
             }
         });
@@ -276,6 +287,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         pack();
 
+    }
+
+    /** 
+     * provide access to the tabs so that component can be added
+     * @return TabbedPane.
+     */
+    public TearoffTabbedPane getTabs() {
+        return this.tabs;
     }
 
     private void addBindings() {
@@ -432,22 +451,51 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private void plotUrl() {
         try {
             Logger.getLogger("ap").info("plotUrl()");
-            String surl = (String) dataSetSelector.getValue();
+            final String surl = (String) dataSetSelector.getValue();
             applicationModel.addRecent(surl);
             applicationModel.resetDataSetSourceURL(surl, new NullProgressMonitor() {
-
                 public void setProgressMessage(String message) {
-                    setStatus(message);
+                    setStatus(BUSY_ICON,message);
                 }
+                @Override
+                public void finished() {
+                    setStatus(IDLE_ICON,"finished "+surl);
+                }
+                
             });
         } catch (RuntimeException ex) {
             applicationModel.application.getExceptionHandler().handle(ex);
+            setStatus(ERROR_ICON,ex.getMessage());
         }
     }
 
     public void setStatus(String message) {
-        logger.info(message);
-        setMessage(message);
+
+        if ( message.startsWith("busy:" ) ) {
+            setMessage( BUSY_ICON, message.substring(5).trim() );
+            logger.info(message);
+        } else if ( message.startsWith("warning:" ) ) {
+            setMessage( WARNING_ICON, message.substring(8).trim() );
+            logger.warning(message);
+        } else if ( message.startsWith("error:" ) ) {
+            setMessage( ERROR_ICON, message.substring(6).trim() );
+            logger.severe(message);
+        } else {
+            logger.info(message);
+            setMessage(message);
+        }
+        
+    }
+    
+    public void setStatus( Icon icon, String message ) {
+        if ( this.ERROR_ICON==icon ) {
+            logger.severe(message);
+        } else if ( this.WARNING_ICON==icon ) {
+            logger.warning(message);
+        } else {
+            logger.info(message);
+        }
+        setMessage(icon,message);
     }
 
     private void clearCache() {
@@ -456,7 +504,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 if (applicationModel.clearCache()) {
                     setStatus("cache cleared");
                 } else {
-                    setStatus("unable to clear cache");
+                    setStatus(ERROR_ICON,"unable to clear cache");
                     JOptionPane.showMessageDialog(this, "unable to clear cache");
                 }
             } catch (IllegalArgumentException ex) {
@@ -862,10 +910,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
                 .addContainerGap())
+            .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 513, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(181, Short.MAX_VALUE))
-            .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -992,6 +1040,9 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     if (applicationModel.options.isLogConsoleVisible() && logConsole == null) {
         initLogConsole();
     } else {
+        if ( logConsole!=null ) {
+            logConsole.undoLogConsoleMessages();
+        }
         JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
     }
 }//GEN-LAST:event_logConsoleMenuItemActionPerformed
@@ -1106,7 +1157,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 //                        Logger.getLogger("virbo.autoplot").severe("runtime exception: " + e);
                         Logger.getLogger("virbo.autoplot").log(Level.SEVERE, "runtime exception: " + e, e);
 
-                        app.setStatus("caught exception: " + e.toString());
+                        app.setStatus(ERROR_ICON,"caught exception: " + e.toString());
                         if (e instanceof InconvertibleUnitsException) {
                             // do nothing!!!  this is associated with the state change
                             return;
@@ -1171,8 +1222,15 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     }
 
     public void setMessage(String message) {
+        this.statusLabel.setIcon( IDLE_ICON );
         this.statusLabel.setText(message);
     }
+    
+    public void setMessage( Icon icon, String message ) {
+        this.statusLabel.setIcon( icon );
+        this.statusLabel.setText(message);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
