@@ -328,11 +328,11 @@
               <Component id="dataSetSelector" pref="670" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
+          <Component id="tabbedPanelContainer" alignment="0" pref="694" max="32767" attributes="2"/>
           <Group type="102" alignment="0" attributes="0">
               <Component id="statusLabel" min="-2" pref="513" max="-2" attributes="0"/>
-              <EmptySpace pref="181" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="tabbedPanelContainer" alignment="0" pref="694" max="32767" attributes="2"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
