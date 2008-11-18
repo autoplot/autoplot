@@ -21,8 +21,6 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -218,6 +216,7 @@ public class ScriptPanelSupport {
                 }
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
+                model.setStatus("busy: executing application script");
                 Runnable run = new Runnable() {
 
                     public void run() {
@@ -231,12 +230,14 @@ public class ScriptPanelSupport {
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
                                 interp.exec(panel.getEditorPanel().getText());
+                                model.setStatus( "done executing script");
                             } catch (IOException ex) {
                                 Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-
+                                model.setStatus( "error: I/O exception: "+ex.toString() );
                             } catch (PyException ex) {
                                 annotateError(ex);
                                 ex.printStackTrace();
+                                model.setStatus( "error: "+ex.toString() );
                             }
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
