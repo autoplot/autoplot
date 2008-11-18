@@ -53,6 +53,19 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                     }
                 }
             }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    context = jtree.getPathForLocation(e.getX(), e.getY());
+                    jtree.getSelectionModel().addSelectionPath(context);
+                    if (context != null) {
+                        showPopup(e);
+                    }
+                }
+            }
+            
+            
             JPopupMenu popup;
 
             private void showPopup(MouseEvent e) {
