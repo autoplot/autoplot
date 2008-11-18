@@ -5,6 +5,8 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
@@ -13,6 +15,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
+import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
@@ -86,10 +89,15 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         EditorContextMenu menu= new EditorContextMenu( this.textArea );
         menu.setDataSetSelector(selector);
+
+        JythonCompletionProvider.getInstance().addPropertyChangeListener( JythonCompletionProvider.PROP_MESSAGE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                model.setStatus(JythonCompletionProvider.getInstance().getMessage());
+            }
+        });
         
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
-
 
     }
 
