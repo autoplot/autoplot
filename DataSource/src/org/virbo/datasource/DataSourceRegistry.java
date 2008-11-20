@@ -111,6 +111,7 @@ public class DataSourceRegistry {
     }
 
     public synchronized DataSourceFactory getSource(String extension) {
+        if ( extension==null ) return null;
         extension= getExtension(extension);
         Object o = dataSourcesByExt.get(extension);
         if (o == null) {
@@ -173,6 +174,7 @@ public class DataSourceRegistry {
      * @return
      */
     public DataSourceFormat getFormatByExt( String extension ) {
+        if ( extension==null ) return null;
         extension= getExtension(extension);
         Object o = dataSourceFormatByExt.get(extension);
         if (o == null) {
@@ -204,6 +206,7 @@ public class DataSourceRegistry {
     }
 
     public synchronized DataSourceFactory getSourceByMime(String mime) {
+        if ( mime==null ) return null;
         Object o = dataSourcesByMime.get(mime.toLowerCase());
         if (o == null) {
             return null;
