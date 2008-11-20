@@ -16,17 +16,17 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <ul><li> speed improvements to binary data source for rank 1 and rank 2 uint and int data.
-</li><li> Util.getDataSet for jython scripting doesn't copy the QDataSet if is already writable.
-</li><li> ImageDataSource identifies color channel names in rank 3 result.
-</li><li> bugfix in filesystem completions.  Sloppy check caused NullPointerException.
-</li><li> improvements to Excel reader to support spaces in sheet names, multiple lines between label and data rows.
-</li><li> bugfix 2212435: FileNotFoundException first time completion on cdf file.  (double firing of "go" button)
-</li><li> use newest version of cdf library, opening files with r/w permission to work around crash.
-</li><li> add bookmark... improved to encourage use of titled bookmarks.
-</li><li> bugfix in CDF on Windows, with 9-character folder names.
-</li><li> bugfix percents in un-encoded URLs, e.g. timeformat=%Y-%j, work again.
-</li>
+        <ul><li> bugfix: prefixed URIs, such as dat.<a href="http://www.autoplot.org/data/autoplot.csv" class="external free" title="http://www.autoplot.org/data/autoplot.csv" rel="nofollow">http://www.autoplot.org/data/autoplot.csv</a>, support factory completions
+</li><li> over size rendering supported in spectrograms, improving appearance of zoom/pan.
+</li><li> bugfix: runtime errors in ascii table parser fixed when no records are found.
+</li><li> status messages have busy, warning and error icons to improve feedback
+</li><li> status messages can be set in jython scripts with setStatus()
+</li><li> bugfix: jython completion is done off the event thread, so the app doesn't hang when jython hangs.
+</li><li> plot(x,y,z) supports rank 1 z, color-coded psyms.
+
+</li><li> bugfix: keyboard can be used to select item from dataset selector droplist.
+</li><li> bugfix: datasource completions work on uris without the file://.
+</li><li> templates use dollar signs instead of percents. ($Y rather than&nbsp;%Y).
 </ul>
 
 	<p>data is input from: 
