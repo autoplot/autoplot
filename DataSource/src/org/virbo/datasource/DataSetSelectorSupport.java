@@ -40,25 +40,6 @@ public class DataSetSelectorSupport {
         return new File(System.getProperty("user.home"));
     }
 
-    /**
-     * return the extension for the filename or url string.
-     * @param surl URL string or filename.  
-     * @return the extension, with the period. E.g. ".cdf",
-     *    or null if an extension is not found.
-     */
-    private static String getExt(String surl) throws IllegalArgumentException {
-        int i = surl.lastIndexOf("?");
-        if (i == -1) {
-            i = surl.length();
-        }
-        i = surl.lastIndexOf(".", i);
-        if (i == -1) {
-            return null;
-        } else {
-            return surl.substring(i);
-        }
-    }
-
     public Action openLocalAction() {
         return new AbstractAction("Open File...") {
 
@@ -79,7 +60,7 @@ public class DataSetSelectorSupport {
                             return true;
                         }
                         String t = f.toString();
-                        String ext = getExt(t);
+                        String ext = DataSetURL.getExt(t);
                         return t.endsWith(".vap") || (ext != null && exts.containsKey(ext));
                     }
 
@@ -103,7 +84,7 @@ public class DataSetSelectorSupport {
                                 return true;
                             }
                             String t = f.toString();
-                            String ext = getExt(t);
+                            String ext = DataSetURL.getExt(t);
                             return (ext != null && extf.equals(ext));
                         }
 
