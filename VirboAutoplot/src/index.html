@@ -16,17 +16,11 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <ul><li> bugfix: prefixed URIs, such as dat.<a href="http://www.autoplot.org/data/autoplot.csv" class="external free" title="http://www.autoplot.org/data/autoplot.csv" rel="nofollow">http://www.autoplot.org/data/autoplot.csv</a>, support factory completions
-</li><li> over size rendering supported in spectrograms, improving appearance of zoom/pan.
-</li><li> bugfix: runtime errors in ascii table parser fixed when no records are found.
-</li><li> status messages have busy, warning and error icons to improve feedback
-</li><li> status messages can be set in jython scripts with setStatus()
-</li><li> bugfix: jython completion is done off the event thread, so the app doesn't hang when jython hangs.
-</li><li> plot(x,y,z) supports rank 1 z, color-coded psyms.
-
-</li><li> bugfix: keyboard can be used to select item from dataset selector droplist.
-</li><li> bugfix: datasource completions work on uris without the file://.
-</li><li> templates use dollar signs instead of percents. ($Y rather than&nbsp;%Y).
+        <ul><li> new URI specification implemented.  So Autoplot URLs are now URIs like: vap+dat:/home/jbf/data.asc?rank=2
+</li><li> bugfix: file cache manager actions popup on Windows.
+</li><li> bugfix: init plot clipped by autolayout fixed.
+</li><li> bugfix: completions with uris with aggregation and explicit datasource. e.g. vap+dat:/home/jbf/data_$Y.asc?rank=2
+</li>
 </ul>
 
 	<p>data is input from: 
