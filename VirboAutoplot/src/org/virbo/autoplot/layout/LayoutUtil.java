@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.layout;
 
+import java.util.logging.Level;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColumn;
@@ -12,6 +13,7 @@ import org.das2.graph.DasRow;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * utility methods for adjusting canvas layout.
@@ -19,30 +21,33 @@ import java.util.List;
  */
 public class LayoutUtil {
 
-    private static boolean ALLOW_EXCESS_SPACE= true;
-    
-    private static void maybeSetMaximum( DasDevicePosition c, double need, double norm, double em, int pt ) {
-       em= Math.floor(em);
-       double excess= -1 * ( c.getEmMaximum() - em );
-       if ( ALLOW_EXCESS_SPACE && c.getMaximum()==norm && excess>=0 && excess<4  ) return;
-       if ( Math.abs(c.getEmMaximum()-em )<0.1
-               && Math.abs( norm-c.getMaximum() )<0.001 ) return;
+    private static final Logger logger = Logger.getLogger("virbo.autoplot.autolayout");
+    private static boolean ALLOW_EXCESS_SPACE = true;
+
+    private static boolean maybeSetMaximum(DasDevicePosition c, double need, double norm, double em, int pt) {
+        em = Math.floor(em);
+        double excess = -1 * (c.getEmMaximum() - em);
+        if (ALLOW_EXCESS_SPACE && c.getMaximum() == norm && excess >= 0 && excess < 4) return false;
+        if (Math.abs(c.getEmMaximum() - em) < 0.1 && Math.abs(norm - c.getMaximum()) < 0.001) return false;
         c.setMaximum(norm);
         c.setEmMaximum(em);
         c.setPtMaximum(pt);
+        logger.fine("reset maximum: " + c);
+        return true;
     }
-    
-    private static void maybeSetMinimum( DasDevicePosition c, double need, double norm, double em, int pt ) {
-        em= Math.ceil(em);
-        double excess=  c.getEmMaximum() - em ;
-        if ( ALLOW_EXCESS_SPACE && c.getMinimum()==norm && excess>=0 && excess<4  ) return;
-        if ( Math.abs(c.getEmMinimum()-em)<0.1 
-                && Math.abs( norm-c.getMinimum() )<0.001 ) return;
+
+    private static boolean maybeSetMinimum(final DasDevicePosition c, double need, double norm, double em, int pt) {
+        em = Math.ceil(em);
+        double excess = c.getEmMaximum() - em;
+        if (ALLOW_EXCESS_SPACE && c.getMinimum() == norm && excess >= 0 && excess < 4) return false;
+        if (Math.abs(c.getEmMinimum() - em) < 0.1 && Math.abs(norm - c.getMinimum()) < 0.001) return false;
         c.setMinimum(norm);
         c.setEmMinimum(em);
         c.setPtMinimum(pt);
+        logger.fine("reset minimum: " + c);
+        return true;
     }
-    
+
     /**
      * resets the layout on the canvas so that labels are not clipped (somewhat).
      * Child row and columns are inspected as well, and it's assumed that adjusting
@@ -97,23 +102,42 @@ public class LayoutUtil {
 
         double MARGIN_LEFT_RIGHT_EM = 1;
 
+        boolean changed = false;
+
         int old, need;
         old = c.getDMinimum();
         need = old - xmin;
-        maybeSetMinimum( c, need, 0, need / em + MARGIN_LEFT_RIGHT_EM, 0 );
+        changed = changed | maybeSetMinimum(c, need, 0, need / em + MARGIN_LEFT_RIGHT_EM, 0);
 
         old = c.getDMaximum();
         need = xmax - old;
-        maybeSetMaximum(c,need, 1.0, -need / em - MARGIN_LEFT_RIGHT_EM,0);
+        changed = changed | maybeSetMaximum(c, need, 1.0, -need / em - MARGIN_LEFT_RIGHT_EM, 0);
 
         old = r.getDMinimum();
         need = old - ymin;
-        maybeSetMinimum(r, need, 0, need / em, 0);
+        changed = changed | maybeSetMinimum(r, need, 0, need / em, 0);
 
         old = r.getDMaximum();
         need = ymax - old;
-        maybeSetMaximum(r, need, 1.0, -need/em,0);
-        
+        changed = changed | maybeSetMaximum(r, need, 1.0, -need / em, 0);
+
+        if (changed) {
+            /*Runnable run = new Runnable() {
+            public void run() {
+            while (true) {
+            try {
+            Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+            Logger.getLogger(LayoutUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            c.getParent().repaint();
+            }
+            }
+            };
+            new Thread(run).start();*/
+            c.getParent().resizeAllComponents();
+        }
+
     }
 
     /**
