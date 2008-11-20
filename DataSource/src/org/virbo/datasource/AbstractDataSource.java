@@ -39,11 +39,14 @@ public abstract class AbstractDataSource implements DataSource {
      * The extension does contain the initial period and is folded to lower case.  
      * Returns an empty string if no extension is found.
      * 
+     * Note that this is not necessarily the extension associated with the DataSource.  For example,
+     * ImageDataSource has a canonical extension of ".jpg", but for a png file this will return .png.
+     * 
      * @return lower-case extension with a period, or empty string.
      */
     protected String getExt( URL url ) {
         String s= url.getFile();
-        int i= s.lastIndexOf(".");
+        int i= s.lastIndexOf("."); // URI okay
         if ( i==-1 ) {
             return "";
         } else {
