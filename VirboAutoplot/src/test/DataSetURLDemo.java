@@ -9,6 +9,8 @@
 
 package test;
 
+import java.net.URI;
+import java.net.URL;
 import org.das2.components.DasProgressPanel;
 import java.util.List;
 import org.virbo.datasource.DataSetURL;
@@ -76,6 +78,11 @@ public class DataSetURLDemo {
     }
     
     public static void main(String[] args) throws Exception {
+        URI uri= new URI( "file:///home/jbf/foo_%25Y.txt");
+        System.err.println(uri.toURL());
+        URL url= new URL( "file:///home/jbf/foo_%Y.txt"); // java doesn't complain about percents like this, but they are not allowed.
+        System.err.println(url);
+        System.err.println(url.toURI());
         demoGetCompletions();
     }
     
