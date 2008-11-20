@@ -40,6 +40,7 @@ import javax.swing.Timer;
  * @author  jbf
  */
 public class LogConsole extends javax.swing.JPanel {
+    public static final int RECORD_SIZE_LIMIT = 1000;
 
     List<LogRecord> records = new LinkedList<LogRecord>();
     int eventThreadId = -1;
@@ -181,7 +182,7 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
         
-        while (records.size() > 100) {
+        while (records.size() > RECORD_SIZE_LIMIT ) {
             records.remove(0);
         }
     }
