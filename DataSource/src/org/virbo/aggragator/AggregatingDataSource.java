@@ -28,6 +28,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
@@ -73,6 +74,7 @@ public class AggregatingDataSource extends AbstractDataSource {
     public AggregatingDataSource(URL url) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(url);
         String surl = url.toString();
+        surl= surl.replaceAll( "%25", "%");
         delegateDataSourceFactory = AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
         String stimeRange= super.params.get("timerange");
@@ -92,7 +94,7 @@ public class AggregatingDataSource extends AbstractDataSource {
 
             public URL getURL() {
                 try {
-                    return new URL(AggregatingDataSource.this.getURL());
+                    return DataSetURL.getURL( AggregatingDataSource.this.getURL() ) ;
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(AggregatingDataSource.class.getName()).log(Level.SEVERE, null, ex);
                     return null;
