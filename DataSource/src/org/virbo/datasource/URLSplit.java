@@ -1,13 +1,15 @@
 package org.virbo.datasource;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class for containing the elemental parts of a URI, and utility
@@ -17,33 +19,51 @@ import java.util.Map;
 public class URLSplit {
 
     /**
-     * scheme for Autoplot, if provided.  e.g.  vap+cdf
+     * scheme for Autoplot, if provided.  e.g.  vap+cdf.  If not provided,
+     * then "vap:" is implicit.
      */
     public String vapScheme;
-    
     /**
      * scheme for resource, e.g. jdbc.mysql
      */
     public String scheme;
-    
     /**
      * the complete, modified surl.   file:///home/jbf/mydata.qds
+     * this is the resource name, and doesn't contain the vapScheme.
      */
     public String surl;
-    
     /**
-     * the uri up to the authority, e.g.  jbdc:mysql://192.168.0.203:3306
+     * the resource that is handled by the DataSource.  This may be null if surl doesn't form a valid uri.
+     * 
+     */
+    public URI resourceUri;
+    /**
+     * the resource uri up to the authority, e.g.  jbdc:mysql://192.168.0.203:3306
      */
     public String authority;
+    /**
+     * the resource uri including the path part.
+     */
     public String path;
+    /**
+     * contains the resource string up to the query part.
+     */
     public String file;
     public String ext;
-    public String params;
-    
     /**
-     * position of the carot after modifications to the surl are made.
+     * contains the parameters part, a ampersand-delimited set of parameters. For example, column=field2&rank2.
+     */
+    public String params;
+    /**
+     * position of the carot after modifications to the surl are made.  This
+     * is with respect to surl, the URI for the datasource, without the "vap" scheme.
      */
     public int carotPos;
+    /**
+     * position of the carot after modifications to the surl are made.  This
+     * is with respect to formatted uri, which probably includes the explcit "vap:" scheme.
+     */
+    public int formatCarotPos;
 
     /**
      * add "file:/" to a resource string that appears to reference the local filesystem.
@@ -52,18 +72,22 @@ public class URLSplit {
      * @return surl, maybe with "file:/" prepended.
      */
     public static String maybeAddFile(String surl) {
-        URLSplit result= maybeAddFile( surl, 0 );
+        URLSplit result = maybeAddFile(surl, 0);
         return result.surl;
     }
-    
-    public static URLSplit maybeAddFile( String surl, int carotPos ) {
+
+    public static URLSplit maybeAddFile(String surl, int carotPos) {
         URLSplit result = new URLSplit();
-        
+
         if (surl.length() == 0) {
-            result.surl= "file:///";
-            result.carotPos+= result.file.length();
+            surl = "file:///";
+            carotPos = surl.length();
+            result.surl = surl;
+            result.vapScheme = "vap";
+            result.carotPos = carotPos;
+            result.formatCarotPos = carotPos + 4;
         }
-        
+
         String scheme;  // identify the scheme, if any.
         int i0 = surl.indexOf(":");
         if (i0 == -1) {
@@ -74,25 +98,35 @@ public class URLSplit {
             scheme = surl.substring(0, i0);
         }
 
-        result.surl= surl;
-        result.carotPos= carotPos;
-        
+        if (scheme.startsWith("vap")) {
+            String resourcePart = surl.substring(i0 + 1);
+            URLSplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));
+            result.surl = resourceSplit.surl;
+            result.vapScheme = scheme;
+            result.formatCarotPos = (carotPos > i0) ? resourceSplit.carotPos + (i0 + 1) : carotPos;
+            result.carotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
+
+        } else {
+            result.surl = surl;
+            result.carotPos = carotPos;
+        }
+
         if (scheme.equals("")) {
-            result.surl = "file://" ;
-            result.carotPos+=7;
-            if ((surl.charAt(0) == '/') ) {
-                result.surl+= surl;
+            result.surl = "file://";
+            result.carotPos += 7;
+            if ((surl.charAt(0) == '/')) {
+                result.surl += surl;
             } else {
-                result.surl+= ('/' + surl); // Windows c:
-                result.carotPos+= 1;
+                result.surl += ('/' + surl); // Windows c:
+                result.carotPos += 1;
             }
-            result.surl = result.surl.replaceAll("\\\\", "/");                    
+            result.surl = result.surl.replaceAll("\\\\", "/");
             result.surl = result.surl.replaceAll(" ", "+");
         }
 
         return result;
     }
-    
+
     /**
      * split the url string into components.  This does not try to identify
      * the vap scheme, since that might require interaction with the server to
@@ -107,9 +141,78 @@ public class URLSplit {
      *   params, myVariable or null
      */
     public static URLSplit parse(String surl) {
-        return parse(surl,0);
+        return parse(surl, 0);
     }
-    
+
+    /**
+     * returns group 1 if there was a match, null otherwise.
+     * @param s
+     * @param regex
+     * @return
+     */
+    private static String magikPop(String s, String regex) {
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(s);
+        if (m.matches()) {
+            return m.group(1);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * interpret the scheme part to vapScheme and scheme.  If the resource URI is
+     * valid, then this will be set as well.  surl maybe modified.
+     * @param result
+     */
+    private static void parseScheme(URLSplit result) throws URISyntaxException {
+        String surl = result.surl;
+        int h = surl.indexOf(":"); // "c:" should be "file:///c:"
+
+        String scheme = surl.substring(0, h);
+
+        if (scheme.startsWith("vap")) {
+            result.vapScheme = scheme;
+            result.formatCarotPos = result.carotPos + scheme.length() + 1;
+            result.surl = surl.substring(h + 1);
+            result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
+            try {
+                result.resourceUri = new URI(result.surl);
+                result.scheme = result.resourceUri.getScheme();
+            } catch (URISyntaxException ex) {
+                // do nothing, this field may be null.
+            }
+        } else {
+            if (scheme.contains(".")) {
+                int j = scheme.indexOf(".");
+                result.vapScheme = "vap+" + scheme.substring(0, j);
+                result.surl = result.surl.substring(j + 1);
+                if (result.carotPos > j) result.carotPos -= (j + 1);
+                result.formatCarotPos = result.carotPos + result.vapScheme.length() + 1;
+                result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
+                try {
+                    result.resourceUri = new URI(result.surl);
+                    result.scheme = result.resourceUri.getScheme();
+                } catch (URISyntaxException ex) {
+                    // do nothing, this field may be null.
+                }
+            } else {
+                if (result.vapScheme == null) {
+                    result.vapScheme = "vap";
+                    result.formatCarotPos = result.carotPos + 4;
+                }
+                result.surl = surl;
+                result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
+                try {
+                    result.resourceUri = new URI(uriEncode(surl));
+                    result.scheme = result.resourceUri.getScheme();
+                } catch (URISyntaxException ex) {
+                    // do nothing, this field may be null.
+                }
+            }
+        }
+    }
+
     /**
      * split the url string into components, keeping track of the carot position
      * when characters are inserted.  This does not try to identify
@@ -124,76 +227,88 @@ public class URLSplit {
      *   ext, the extenion, .nc
      *   params, myVariable or null
      */
-    public static URLSplit parse(String surl, int carotPos ) {
-        URLSplit result= maybeAddFile(surl,carotPos);
-        surl= result.surl;
-        
-        int h = surl.indexOf(":/");
-        String scheme = surl.substring(0, h);
+    public static URLSplit parse(String surl, int carotPos) {
+        URLSplit result = maybeAddFile(surl, carotPos);
 
-        URL url = null;
         try {
-            if (scheme.contains(".")) {
-                int j = scheme.indexOf(".");
-
-                url = new URL(surl.substring(j + 1));
-            } else {
-                url = new URL(surl);
+            parseScheme(result);
+        } catch (URISyntaxException ex) {
+            result.surl = uriEncode(result.surl); //TODO: move carotPos
+            try {
+                parseScheme(result);
+            } catch (URISyntaxException ex1) {
+                throw new RuntimeException(ex1);
             }
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-            return null;
         }
 
         int i;
-        
-        String authority;
-        if ( scheme.endsWith("file") ) {
-            authority= null;
-        } else {
-            i= scheme.length()+":/".length();
-            while ( i<surl.length() && surl.charAt(i)=='/' ) i++;
-            i= surl.indexOf("/",i);
-            authority= i==-1 ? surl : surl.substring(0,i);
+
+        String rsurl = result.surl;
+
+        int iquery;
+        // check for just one ?
+        iquery = rsurl.indexOf("?");
+
+        String file;
+
+        file = result.resourceUri == null ? null : result.resourceUri.getPath();
+        if (file == null) {
+            if (iquery == -1) file = rsurl;
+            else file = rsurl.substring(0, iquery);
         }
-        
-        String file = url.getPath();
-        i = file.lastIndexOf(".");
-        String ext = i == -1 ? "" : file.substring(i);
+
+        String ext = null;
+        if (file != null) {
+            i = file.lastIndexOf(".");
+            ext = i == -1 ? "" : file.substring(i);
+        }
 
         String params = null;
-
         int fileEnd;
-        // check for just one ?
-        i = surl.indexOf("?");
-        if (i != -1) {
-            fileEnd = i;
-            params = surl.substring(i + 1);
-            i = surl.indexOf("?", i + 1);
-            if (i != -1) {
+
+        if (file != null && iquery != -1) {
+            fileEnd = iquery;
+            params = rsurl.substring(iquery + 1);
+            int iquery2 = rsurl.indexOf("?", iquery + 1);
+            if (iquery2 != -1) {
                 throw new IllegalArgumentException("too many ??'s!");
             }
         } else {
-            fileEnd = surl.length();
+            iquery = rsurl.length();
+            fileEnd = rsurl.length();
         }
 
-        i = surl.lastIndexOf("/");
-        String surlDir = surl.substring(0, i);
+        if (result.scheme != null) {
+            int iauth = result.scheme.length() + 1;
+            while (iauth < rsurl.length() && rsurl.charAt(iauth) == '/') {
+                iauth++;
+            }
+            iauth = rsurl.indexOf('/', iauth);
+            if (iauth == -1) iauth = rsurl.length();
 
-        int i2 = surl.indexOf("://");
+            result.authority = rsurl.substring(0, iauth);
+        }
 
-        result.scheme = scheme;
-        result.authority= authority;
-        result.path = surlDir + "/";
-        result.file = surl.substring(0, fileEnd);
-        result.ext = ext;
+        if (file != null) {
+            i = rsurl.lastIndexOf("/", iquery);
+            if (i == -1) {
+                result.path = rsurl.substring(0, iquery);
+                result.file = rsurl.substring(0, iquery);
+                result.ext = ext;
+            } else {
+                String surlDir = rsurl.substring(0, i);
+                result.path = surlDir + "/";
+                result.file = rsurl.substring(0, fileEnd);
+                result.ext = ext;
+            }
+        }
         result.params = params;
 
         return result;
 
 
     }
-    
+
     private static int indexOf(String s, char ch, char ignoreBegin, char ignoreEnd) {
         int i = s.indexOf(ch);
         int i0 = s.indexOf(ignoreBegin);
@@ -202,7 +317,7 @@ public class URLSplit {
             i = -1;
         }
         return i;
-    }    
+    }
 
     /**
      *
@@ -212,16 +327,16 @@ public class URLSplit {
      * items without equals (=) are inserted as "arg_N"=name.
      */
     public static LinkedHashMap<String, String> parseParams(String params) {
-        LinkedHashMap<String,String> result = new LinkedHashMap<String,String>();
+        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
         if (params == null) {
             return result;
         }
         if (params.trim().equals("")) {
             return result;
         }
-        
-        params= URLSplit.uriDecode(params);
-        
+
+        params = URLSplit.uriDecode(params);
+
         String[] ss = params.split("&");
 
         int argc = 0;
@@ -258,7 +373,7 @@ public class URLSplit {
             } else {
                 String value = (String) parms.get(key);
                 if (value != null) {
-                    result.append("&" + key + "=" + uriEncode(value) );
+                    result.append("&" + key + "=" + uriEncode(value));
                 } else {
                     result.append("&" + key);
                 }
@@ -267,29 +382,33 @@ public class URLSplit {
         return (result.length() == 0) ? "" : result.substring(1);
     }
 
-    
     public static String format(URLSplit split) {
-        String result = split.file;
+        String surl;
+        String result = split.vapScheme + ":" + split.file;
         if (split.params != null) {
             result += "?" + split.params;
         }
         return result;
     }
-    
+
     /**
-     * convert " " to "+", etc, by using URLEncoder and hiding the UnsupportedEncodingException that will never occur.
+     * convert " " to "+", etc, by looking for and encoding illegal characters.  Some characters, such as percents,
+     * are allowed in URLs but not URIs.
      * @param s
      * @return
      */
-    public static String uriEncode( String s ) {
-        try {
-            String r= URLEncoder.encode(s, "UTF-8");
-            return r.replaceAll("\\%24", "\\$");
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
+    public static String uriEncode(String s) {
+        boolean isEncoded= s.contains("%25");
+        if ( isEncoded ) {
+            return s;
+        } else {
+            String r = s.replaceAll("%", "%25");
+            r = r.replaceAll(" ", "+");
+            r= r.replaceAll("\\%24", "\\$");
+            return r;
+        } 
     }
-    
+
     /**
      * convert "+" to " ", etc, by using URLDecoder and catching the UnsupportedEncodingException that will never occur.
      * Kludge to check for and
@@ -298,17 +417,17 @@ public class URLSplit {
      * @param s
      * @return
      */
-    public static String uriDecode( String s ) {
+    public static String uriDecode(String s) {
         try {
             return URLDecoder.decode(s, "UTF-8");
-        } catch ( IllegalArgumentException ex ) {
-            return s.replaceAll("\\+"," ");
+        } catch (IllegalArgumentException ex) {
+            return s.replaceAll("\\+", " ");
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
+
     public String toString() {
-        return path + "\n" + file + "\n" + ext + "\n" + params;
+        return "\nvapScheme: " + vapScheme + "\nscheme: " + scheme + "\nresourceUri: " + resourceUri + "\npath: " + path + "\nfile: " + file + "\next: " + ext + "\nparams: " + params + "\nsurl: " + surl + "\ncarotPos: " + carotPos + "\nformatCarotPos: " + formatCarotPos;
     }
 }
