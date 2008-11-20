@@ -9,7 +9,6 @@
 package org.virbo.autoplot;
 
 import java.awt.Color;
-import org.das2.dataset.DataSet;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
 import org.das2.CancelledOperationException;
@@ -79,7 +78,6 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
@@ -100,7 +98,6 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.TransposeRank2DataSet;
 import org.virbo.dataset.VectorDataSetAdapter;
-import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URLSplit;
@@ -375,12 +372,10 @@ public class ApplicationModel {
         plot = new DasPlot(xaxis, yaxis);
         canvas.add(plot, row, col);
 
-        //plot.getRow().setPosition( 0, .50 );
         overviewPlot =
                 DasPlot.createPlot(DatumRange.newDatumRange(0, 10, Units.dimensionless),
                 DatumRange.newDatumRange(0, 1000, Units.dimensionless));
         canvas.add(overviewPlot, DasRow.create(null, plot.getRow(), "100%+5em", "100%+8em"), plot.getColumn());
-        //overviewPlot.setVisible(false);
 
         BoxSelectorMouseModule overviewZoom = new BoxSelectorMouseModule(overviewPlot,
                 overviewPlot.getXAxis(),
@@ -1346,11 +1341,13 @@ public class ApplicationModel {
         if (tsb != null) {
             //ApplicationModel.this.setDataSourceURL( tsb.getURL().toString() );
             String oldsurl = ApplicationModel.this.surl;
-            ApplicationModel.this.surl = tsb.getURL().toString();
-            if (oldsurl != null) {
-                String eext = DataSetURL.getExplicitExt(oldsurl);
-                if (eext != null) ApplicationModel.this.surl = eext + "." + ApplicationModel.this.surl;
+            String newsurl = tsb.getURL().toString();
+            URLSplit split= URLSplit.parse(newsurl);
+            if ( oldsurl!=null ) {
+                URLSplit oldSplit= URLSplit.parse(oldsurl);
+                split.vapScheme= oldSplit.vapScheme;
             }
+            newsurl= URLSplit.format( split );
             ApplicationModel.this.propertyChangeSupport.firePropertyChange(PROPERTY_DATASOURCE, oldsurl, ApplicationModel.this.surl);
         }
 
@@ -1454,12 +1451,13 @@ public class ApplicationModel {
             return;
         }  // not really supported
 
-        surl = DataSetURL.maybeAddFile(surl);
+        surl= URLSplit.format( URLSplit.parse(surl) );
+        //surl = DataSetURL.maybeAddFile(surl);
 
         try {
             if (surl.endsWith(".vap")) {
                 try {
-                    URL url = new URL(surl);
+                    URL url = DataSetURL.getURL(surl);
                     mon.started();
                     mon.setProgressMessage("loading vap file");
                     File openable = DataSetURL.getFile(url, application.getMonitorFactory().getMonitor(plot, "loading vap", ""));
