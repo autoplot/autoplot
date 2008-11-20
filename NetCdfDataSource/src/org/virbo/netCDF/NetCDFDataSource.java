@@ -25,6 +25,7 @@ import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.URLSplit;
 import org.virbo.dsutil.TransposeRankNDataSet;
 import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFile;
@@ -124,7 +125,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         NetcdfDataset dataset=null;
         
         if ( sMyUrl.endsWith(".ncml" ) ) {
-            String kl= DataSetURL.maybeAddFile( file.toString() ); // kludge for readNcML, which doesn't like drive letters.
+            String kl= URLSplit.maybeAddFile( file.toString() ); // kludge for readNcML, which doesn't like drive letters.
             dataset= NcMLReader.readNcML( kl, null );
         } else {
             NetcdfFile f= NetcdfFile.open( file.toString() );
