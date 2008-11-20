@@ -39,7 +39,9 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -163,9 +165,9 @@ public class GuiSupport {
                         prefs.put("DumpDataCurrentFile", chooser.getSelectedFile().toString());
                         
                         String s=  chooser.getSelectedFile().toString();
-                        int i= s.lastIndexOf(".");
-                        String ext;
-                        if ( i>-1 ) ext= s.substring(i); else ext= "";
+                        
+                        String ext= DataSetURL.getExt(s);
+                        if ( ext==null ) ext= "";
                         
                         DataSourceFormat format= DataSourceRegistry.getInstance().getFormatByExt(ext);
                         if ( format==null ) {
