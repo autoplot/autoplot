@@ -17,8 +17,8 @@ import org.das2.fsm.FileStorageModel;
 import org.das2.util.filesystem.FileSystem;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +40,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public DataSource getDataSource(URL url) throws Exception {
-        String surl = url.toString();
         AggregatingDataSource ads = new AggregatingDataSource(url);
+        String surl = url.toString();
+        surl= surl.replaceAll("%25","%");
         FileStorageModel fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
         URLSplit split = URLSplit.parse(surl);
@@ -69,7 +70,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return i;
     }
 
-    public static FileStorageModel getFileStorageModel(String surl) throws IOException {
+    public static FileStorageModel getFileStorageModel(String suri) throws IOException {
+        URLSplit split= URLSplit.parse(suri);
+        String surl= split.surl; // support cases where resource URI is not yet valid.
         int i = surl.indexOf('?');
 
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
@@ -159,8 +162,12 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
     public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException {
         String delegateSurl = getDelegateDataSourceFactoryUrl(surl);
+        URLSplit split= URLSplit.parse(surl);
+        URLSplit delegateSplit= URLSplit.parse(delegateSurl);
         try {
-            return DataSetURL.getDataSourceFactory( DataSetURL.getURI(delegateSurl), new NullProgressMonitor());
+            delegateSplit.vapScheme= split.vapScheme;
+            URI uri= new URI( URLSplit.format(delegateSplit) );
+            return DataSetURL.getDataSourceFactory( uri, new NullProgressMonitor());
         } catch (URISyntaxException ex) {
             Logger.getLogger(AggregatingDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
