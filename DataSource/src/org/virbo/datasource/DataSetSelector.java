@@ -5,8 +5,6 @@
  */
 package org.virbo.datasource;
 
-import java.awt.Component;
-import javax.swing.JList;
 import org.das2.DasApplication;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.util.DasExceptionHandler;
@@ -38,13 +36,11 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
-import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.system.RequestProcessor;
@@ -147,7 +143,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         throw new RuntimeException("unable to identify data source for URL, try \"about:plugins\"");
                     }
                     setMessage("check to see if uri looks acceptable");
-                    String surl1 = DataSetURL.getURL(surl).toString();
+                    String surl1 = URLSplit.uriDecode( DataSetURL.getResourceURI(surl).toString() );
                     if (f.reject(surl1, getMonitor())) {
                         if (!surl.contains("?")) {
                             surl += "?";
@@ -229,17 +225,17 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     private void showCompletions(final String surl, final int carotpos) {
         URLSplit split = URLSplit.parse(surl,carotpos);
-        if (split.carotPos > split.file.length()
+        if (split.carotPos > split.file.length() 
                 && DataSourceRegistry.getInstance().hasSourceByExt( DataSetURL.getExt(surl) ) ) {
-            showFactoryCompletions(split.surl, split.carotPos);
+            showFactoryCompletions(URLSplit.format(split), split.formatCarotPos);
 
         } else {
 
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
-            if (split.carotPos <= firstSlashAfterHost) {
-                showHostCompletions(split.surl, split.carotPos);
+            if ( split.carotPos <= firstSlashAfterHost) {
+                showHostCompletions(URLSplit.format(split), split.formatCarotPos);
             } else {
-                showFileSystemCompletions(split.surl, split.carotPos);
+                showFileSystemCompletions(URLSplit.format(split), split.formatCarotPos);
             }
 
         }
@@ -421,10 +417,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                 CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
 
                     public void itemSelected(CompletionResult s1) {
+                        dataSetSelector.setSelectedItem(s1.completion);
                         if (s1.maybePlot) {
-                            dataSetSelector.setSelectedItem(s1.completion);
-                        } else {
-                            dataSetSelector.getEditor().setItem(s1.completion);
+                            maybePlot();
                         }
                     }
                 };
