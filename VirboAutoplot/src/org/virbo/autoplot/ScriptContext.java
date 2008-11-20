@@ -367,7 +367,7 @@ public class ScriptContext extends PyJavaInstance {
             file = new File(file).toString();
         }
         URI uri = DataSetURL.getURI(file);
-        URL url = DataSetURL.getWebURL(uri);
+        URL url = DataSetURL.getResourceURI(uri).toURL(); //TODO: prevents jdbc:mysql:...
 
         DataSourceFormat format = DataSetURL.getDataSourceFormat(uri);
         if (!url.getProtocol().equals("file")) {
