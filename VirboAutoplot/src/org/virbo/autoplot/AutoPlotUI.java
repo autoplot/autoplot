@@ -426,6 +426,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         logConsole.logConsoleMessages(); // stderr, stdout logged to Logger "console"
 
         Handler h = logConsole.getHandler();
+        Logger.getLogger("das2").setLevel(Level.ALL);
+        Logger.getLogger("das2").addHandler(h);
         Logger.getLogger("virbo").setLevel(Level.ALL);
         Logger.getLogger("virbo").addHandler(h);
         Logger.getLogger("console").setLevel(Level.ALL);
@@ -1189,7 +1191,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                     new Thread(run, "LoadBookmarksThread").start();
 
                 }
-
+                
                 app.setStatus("ready");
 
             }
