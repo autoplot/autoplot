@@ -64,13 +64,12 @@ public class DataSetURL {
     static {
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
         FileSystem.settings().setPersistence(FileSystemSettings.Persistence.EXPIRES);
-        
-        if ( DasApplication.hasAllPermission() ) {
-            File apDataHome= new File(System.getProperty("user.home"), "autoplot_data");
-            FileSystem.settings().setLocalCacheDir( apDataHome );
+
+        if (DasApplication.hasAllPermission()) {
+            File apDataHome = new File(System.getProperty("user.home"), "autoplot_data");
+            FileSystem.settings().setLocalCacheDir(apDataHome);
         }
     }
-    
     static WeakHashMap<DataSource, DataSourceFactory> dsToFactory = new WeakHashMap<DataSource, DataSourceFactory>();
 
     /**
@@ -79,17 +78,22 @@ public class DataSetURL {
      * @param surl
      * @return the extension found, or null if no period is found in the filename.
      */
-    public static String getExt( String surl ) {
-        String explicitExt= getExplicitExt(surl);
-        if ( explicitExt!=null ) {
+    public static String getExt(String surl) {
+        String explicitExt = getExplicitExt(surl);
+        if (explicitExt != null) {
             return explicitExt;
         } else {
-            URLSplit split= URLSplit.parse(surl);
-            int i0= split.file.lastIndexOf('/');
-            if ( i0==-1 ) return null;
-            int i1= split.file.indexOf('.',i0);
-            if ( i1>i0 ) {
-                return split.file.substring(i1+1);
+            URLSplit split = URLSplit.parse(surl);
+            if (split.file != null) {
+
+                int i0 = split.file.lastIndexOf('/');
+                if (i0 == -1) return null;
+                int i1 = split.file.indexOf('.', i0);
+                if (i1 > i0) {
+                    return split.file.substring(i1 + 1);
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }
@@ -102,31 +106,13 @@ public class DataSetURL {
      * @return null or an extension like "tsds"
      */
     public static String getExplicitExt(String surl) {
-        if ( surl.length()==0 ) {
-            return null;
-        }
-        String scheme;  // identify the scheme, if any.
-        int i0 = surl.indexOf(":");
-        if (i0 == -1) {
-            scheme = "";
-        } else if (i0 == 1) { // one letter scheme is assumed to be windows drive letter.
-            scheme = "";
-        } else {
-            scheme = surl.substring(0, i0);
-        }
-        int i= scheme.indexOf(".");
-        if ( i!=-1 ) {
-            return scheme.substring(0,i);
+        URLSplit split = URLSplit.parse(surl);
+        int i = split.vapScheme.indexOf("+");
+        if (i != -1) {
+            return split.vapScheme.substring(i + 1);
         } else {
             return null;
         }
-    }
-
-    /**
-     * @deprecated use URLSplit.maybeAddFile(surl);
-     */    
-    public static String maybeAddFile(String surl) {
-        return URLSplit.maybeAddFile(surl);
     }
 
     /**
@@ -140,11 +126,11 @@ public class DataSetURL {
     public static URLSplit parse(String surl) {
         return URLSplit.parse(surl);
     }
-    
+
     /**
      * @deprecated use URLSplit.format(split);
      */
-    public static String format( URLSplit split ) {
+    public static String format(URLSplit split) {
         return URLSplit.format(split);
     }
 
@@ -154,8 +140,8 @@ public class DataSetURL {
      */
     public static DataSource getDataSource(URI uri) throws Exception {
         DataSourceFactory factory = getDataSourceFactory(uri, new NullProgressMonitor());
-        URL url = getWebURL(uri);
-        DataSource result = factory.getDataSource(url);
+        URI ruri = getResourceURI(uri);
+        DataSource result = factory.getDataSource(ruri.toURL());  // TODO: this doesn't support jdbc:mysql:...
         dsToFactory.put(result, factory);
         return result;
 
@@ -188,10 +174,10 @@ public class DataSetURL {
             if (DataSourceRegistry.getInstance().hasSourceByExt(split.ext)) {
                 DataSourceFactory f2 = DataSourceRegistry.getInstance().getSource(split.ext);
                 if (!factory.getClass().isInstance(f2)) {
-                    split.file = fext + "." + split.file;
+                    split.vapScheme = "vap+"+fext;
                 }
             } else {
-                split.file = fext + "." + split.file;
+                split.vapScheme = "vap+"+fext;
             }
             return URLSplit.format(split);
         }
@@ -199,13 +185,13 @@ public class DataSetURL {
 
     private static boolean isAggregating(String surl) {
         int iquest = surl.indexOf("?");
-        if ( iquest==-1 ) iquest= surl.length();
-        int ipercy = surl.lastIndexOf("%Y",iquest);
-        if (ipercy == -1) ipercy = surl.lastIndexOf("%25",iquest);
-        if ( ipercy==-1 ) ipercy = surl.lastIndexOf("$Y",iquest);
-        if ( ipercy==-1 ) ipercy = surl.lastIndexOf("%y",iquest);
-        if ( ipercy==-1 ) ipercy = surl.lastIndexOf("$y",iquest);
-        if (ipercy != -1 ) {
+        if (iquest == -1) iquest = surl.length();
+        int ipercy = surl.lastIndexOf("%Y", iquest);
+        if (ipercy == -1) ipercy = surl.lastIndexOf("%25", iquest);
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$Y", iquest);
+        if (ipercy == -1) ipercy = surl.lastIndexOf("%y", iquest);
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$y", iquest);
+        if (ipercy != -1) {
             return true;
         } else {
             return false;
@@ -213,30 +199,40 @@ public class DataSetURL {
     }
 
     /**
+     * returns the URI to be interpretted by the DataSource.
+     * @param uri, the URI understood in the context of all datasources.  This should contain "vap" or "vap+" for the scheme.
+     * @return the URI for the datasource resource, or null if it is not valid.
+     */
+    public static URI getResourceURI(URI uri) {
+        URLSplit split = URLSplit.parse(uri.toString());
+        return split.resourceUri;
+    }
+
+    /**
+     * returns the URI to be interpretted by the DataSource.
+     * @param uri, the URI understood in the context of all datasources.  This should contain "vap" or "vap+" for the scheme.
+     * @return the URI for the datasource resource, or null if it is not valid.
+     */
+    public static URI getResourceURI(String surl) {
+        URLSplit split = URLSplit.parse(surl);
+        return split.resourceUri;
+    }
+
+    /**
      * returns a downloadable URL from the surl, perhaps popping off the 
-     * data source specifier.
+     * data source specifier.  This assumes that the resource is a URL,
+     * and getResourceURI().toURL() should be used to handle all cases.
      * 
      * @param surl
      * @return
      */
     public static URL getWebURL(URI url) {
         try {
-            int i = url.getScheme().indexOf(".");
-            String surl;
-            if (i == -1) {
-                try {
-                    surl = url.toURL().toString();
-                } catch (MalformedURLException ex) {
-                    throw new RuntimeException(ex);
-                }
-            } else {
-                String s = url.toString();
-                surl = s.substring(i + 1);
-            }
-            surl = surl.replaceAll("%25", "%");
-            surl = surl.replaceAll("%20", " ");
-            //surl = URLDecoder.decode(surl, "US-ASCII");
+            URL rurl = getResourceURI(url).toURL();
+            String surl = rurl.toString();
+            surl = surl.replaceAll("%20", "+");
             return new URL(surl);
+
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
         }
@@ -284,34 +280,29 @@ public class DataSetURL {
             return new AggregatingDataSourceFactory();
         }
 
-        int i = uri.getScheme().indexOf(".");
-        if (i != -1) {
-            String ext = uri.getScheme().substring(0, i);
+        String ext = DataSetURL.getExplicitExt(uri.toString());
+        if (ext != null) {
             return DataSourceRegistry.getInstance().getSource(ext);
         }
 
-        URL url = uri.toURL();
-
-        String file = url.getPath();
-        i = file.lastIndexOf(".");
-        String ext = i == -1 ? "" : file.substring(i);
-
-        // check for just one ?
-        String surl = url.toString();
-        i = surl.indexOf("?");
-        if (i != -1) {
-            i = surl.indexOf("?", i + 1);
-            if (i != -1) {
-                throw new IllegalArgumentException("too many ??'s!");
-            }
+        URI resourceUri;
+        try {
+            String resourceSuri= uri.getSchemeSpecificPart();
+            resourceSuri= resourceSuri.replaceAll("%", "%25");
+            resourceUri = new URI( resourceSuri );
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException(ex);
         }
-
+        ext = DataSetURL.getExt(uri.toASCIIString());
+        if ( ext==null ) ext= "";
+        
         DataSourceFactory factory = null;
 
         // see if we can identify it by ext, to avoid the head request.
         factory = DataSourceRegistry.getInstance().getSource(ext);
 
-        if (factory == null && url.getProtocol().equals("http")) { // get the mime type
+        if ( factory == null && (resourceUri.getScheme().equals("http") || resourceUri.getScheme().equals("https")) ) { // get the mime type
+            URL url= resourceUri.toURL();
             mon.setTaskSize(-1);
             mon.started();
             mon.setProgressMessage("doing HEAD request to find dataset type");
@@ -350,7 +341,6 @@ public class DataSetURL {
         }
         return factory;
     }
-
 
     /**
      *
@@ -458,19 +448,22 @@ public class DataSetURL {
      * 
      */
     public static URI getURI(String surl) throws URISyntaxException {
-        surl = maybeAddFile(surl);
+        URLSplit split = URLSplit.maybeAddFile(surl,0);
+        surl= split.surl;
+        if ( split.vapScheme!=null ) surl= split.vapScheme+":"+surl;
         if (surl.endsWith("://")) {
             surl += "/";  // what strange case is this?
         }
-        boolean isAlreadyEscaped = surl.contains("%20"); // TODO: cheesy
+        boolean isAlreadyEscaped = split.surl.contains("%25") || split.surl.contains("%20") || split.surl.contains("+"); // TODO: cheesy
         if (!isAlreadyEscaped) {
             surl = surl.replaceAll("%", "%25");
-            surl = surl.replaceAll(" ", "%20");
+            surl = surl.replaceAll(" ", "+");
         }
+        surl= URLSplit.format( URLSplit.parse(surl) ); // add "vap:" if it's not there
         URI result = new URI(surl);
         return result;
     }
-    
+
     /**
      * canonical method for getting the URL.  These will always be web-downloadable 
      * URLs.
@@ -513,15 +506,40 @@ public class DataSetURL {
         }
     }
 
+    public static List<CompletionResult> getCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws Exception {
+        URLSplit split = URLSplit.parse(surl,carotpos);
+        if ( split.file==null || ( split.carotPos > split.file.length() )
+                && DataSourceRegistry.getInstance().hasSourceByExt( DataSetURL.getExt(surl) ) ) {
+            return getFactoryCompletions(URLSplit.format(split), split.formatCarotPos, mon );
+        } else {
+            int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
+            if ( split.carotPos <= firstSlashAfterHost) {
+                return getHostCompletions(URLSplit.format(split), split.formatCarotPos, mon );
+            } else {
+                return getFileSystemCompletions(URLSplit.format(split), split.formatCarotPos, mon );
+            }
+
+        }
+    }
+            
     public static List<CompletionResult> getHostCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException {
         URLSplit split = URLSplit.parse(surl.substring(0, carotpos));
-        String prefix = split.file.substring(split.path.length());
-        String surlDir = split.path;
+        
+        String prefix;
+        String surlDir;
+        if ( split.path==null ) {
+            prefix = "";
+            surlDir = "";
+        } else {
+            prefix = split.file.substring(split.path.length());
+            surlDir = split.path;
+        }
 
         mon.setLabel("getting list of cache hosts");
 
-        File cacheF= new File( FileSystem.settings().getLocalCacheDir() , split.scheme );
+        File cacheF = new File(FileSystem.settings().getLocalCacheDir(), split.scheme);
 
+        if ( !cacheF.exists() ) return Collections.emptyList();
         String[] s = cacheF.list();
 
         boolean foldCase = true;
@@ -533,14 +551,14 @@ public class DataSetURL {
         for (int j = 0; j < s.length; j++) {
             String scomp = foldCase ? s[j].toLowerCase() : s[j];
             if (scomp.startsWith(prefix)) {
-                String result1= s[j] + "/";
+                String result1 = s[j] + "/";
                 // drill down single entries, since often the root doesn't provide a list.
-                String[] s2= new File( cacheF, result1 ).list();
-                while ( s2.length==1 && new File( cacheF, result1+"/"+s2[0] ).isDirectory() ) {
-                    result1+= s2[0]+"/";
-                    s2= new File( cacheF, result1 ).list();
+                String[] s2 = new File(cacheF, result1).list();
+                while (s2.length == 1 && new File(cacheF, result1 + "/" + s2[0]).isDirectory()) {
+                    result1 += s2[0] + "/";
+                    s2 = new File(cacheF, result1).list();
                 }
-                completions.add(new DataSetURL.CompletionResult( surlDir + result1, result1, null, surl.substring(0, carotpos), true));
+                completions.add(new DataSetURL.CompletionResult(surlDir + result1, result1, null, surl.substring(0, carotpos), true));
             }
         }
 
@@ -553,19 +571,18 @@ public class DataSetURL {
 
         return completions;
     }
-    
+
     public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException, URISyntaxException {
         URLSplit split = URLSplit.parse(surl.substring(0, carotpos));
-        String prefix = split.file.substring(split.path.length());
-        String surlDir = split.path;
+        String prefix = URLSplit.uriDecode( split.file.substring(split.path.length()) );
+        String surlDir = URLSplit.uriDecode(split.path);
 
         mon.setLabel("getting remote listing");
 
         FileSystem fs = null;
         String[] s;
-        
-        fs = FileSystem.create(DataSetURL.getWebURL(DataSetURL.getURI(split.path)));
-        
+
+        fs = FileSystem.create(new URL( surlDir ) );
 
         s = fs.listDirectory("/");
 
@@ -581,8 +598,8 @@ public class DataSetURL {
                 if (s[j].endsWith("contents.html")) {
                     s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
                 } // kludge for dods
-                String uriSafe= s[j].replaceAll(" ", "%20");
-                completions.add(new DataSetURL.CompletionResult( surlDir + uriSafe, s[j], null, surl.substring(0, carotpos), true));
+                String uriSafe = s[j].replaceAll(" ", "%20");
+                completions.add(new DataSetURL.CompletionResult(surlDir + uriSafe, s[j], null, surl.substring(0, carotpos), true));
             }
         }
 
@@ -601,7 +618,7 @@ public class DataSetURL {
         int qpos = surl1.lastIndexOf('?', carotPos);
 
         cc.surl = surl1;
-        cc.surlpos = carotPos;
+        cc.surlpos = carotPos; //carotPos
 
 
         List<CompletionResult> result = new ArrayList<CompletionResult>();
@@ -711,7 +728,7 @@ public class DataSetURL {
 
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             URI uri = DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
-            DataSourceFactory factory = getDataSourceFactory(uri, mon);
+            DataSourceFactory factory = getDataSourceFactory( getURI(surl1), mon);
 
             cc.resource = DataSetURL.getWebURL(uri);
             cc.params = split.params;
@@ -779,12 +796,12 @@ public class DataSetURL {
 
         // discover Factories on the path
         try {
-            ClassLoader loader= DataSetURL.class.getClassLoader();
+            ClassLoader loader = DataSetURL.class.getClassLoader();
             Enumeration<URL> urls;
-            if ( loader==null ) {
-                urls= ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory");
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory");
             } else {
-                urls= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory");
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -843,12 +860,12 @@ public class DataSetURL {
 
     private static void discoverRegisteryEntries(DataSourceRegistry registry) {
         try {
-            ClassLoader loader= DataSetURL.class.getClassLoader();
+            ClassLoader loader = DataSetURL.class.getClassLoader();
             Enumeration<URL> urls;
-            if ( loader==null ) {
-                urls= ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
             } else {
-                urls= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -866,10 +883,10 @@ public class DataSetURL {
                 }
                 reader.close();
             }
-            if ( loader==null ) {
-                urls= ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
             } else {
-                urls= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
@@ -887,10 +904,10 @@ public class DataSetURL {
                 }
                 reader.close();
             }
-            if ( loader==null ) {
-                urls= ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
             } else {
-                urls= loader.getResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
             }
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
