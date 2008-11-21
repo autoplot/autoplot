@@ -331,10 +331,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                 List<CompletionResult> completions = null;
 
-                URLSplit split = DataSetURL.parse(surl);
-                String surlDir = split.path;
-
-                final String labelPrefix = surlDir;
+                final String labelPrefix = surl.substring(0,carotpos);
 
                 try {
                     completions = DataSetURL.getFileSystemCompletions(surl, carotpos, mon);
@@ -366,6 +363,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                     public void run() {
                         try {
+                            
                             int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
                             BoundedRangeModel model = editor.getHorizontalVisibility();
 

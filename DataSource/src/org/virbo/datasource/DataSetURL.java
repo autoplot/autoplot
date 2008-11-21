@@ -443,8 +443,9 @@ public class DataSetURL {
     }
 
     /**
-     * canonical method for getting the URI.  If no protocol is specified, then file:// is
-     * used.  Note URIs may contain prefix like bin.http://www.cdf.org/data.cdf.
+     * canonical method for getting the Autoplot URI.  If no protocol is specified, then file:// is
+     * used.  Note URIs may contain prefix like bin.http://www.cdf.org/data.cdf.  The
+     * result will start with an Autoplot sceme like "vap:" or "vap+cdf:"
      * 
      */
     public static URI getURI(String surl) throws URISyntaxException {

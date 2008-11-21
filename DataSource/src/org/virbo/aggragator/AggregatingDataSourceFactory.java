@@ -91,6 +91,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         int carotPos = cc.surlpos;
         int urlLen = 0; //this is the position as we parse and process surl.
 
+        surl= surl.replaceAll("%25","%");
         FileStorageModel fsm = getFileStorageModel(surl);
 
         String delegateFile = fsm.getRepresentativeFile(new NullProgressMonitor());
@@ -134,6 +135,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
      * @throws IllegalArgumentException if it is not able to find any data files.
      */
     public static String getDelegateDataSourceFactoryUrl(String surl) throws IOException, IllegalArgumentException {
+        surl= surl.replaceAll("%25","%");
         FileStorageModel fsm = getFileStorageModel(surl);
 
         String file = fsm.getRepresentativeFile(new NullProgressMonitor());

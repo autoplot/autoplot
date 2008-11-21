@@ -12,7 +12,7 @@ package org.virbo.datasource;
 import java.net.URL;
 
 /**
- * models a part of a dataset's URL.  This class is used to serve as both the
+ * models a part of a dataset's URI.  This class is used to serve as both the
  * input and output of completion engines.  An incomplete completion context is
  * passed in, and the engine returns a set of more complete contexts.  This 
  * process could be repeated to define a tree, where the leaf nodes are valid 
@@ -21,8 +21,15 @@ import java.net.URL;
  */
 public class CompletionContext {
     
-    public final static Object CONTEXT_FILESYSTEM="fs";
-    public final static Object CONTEXT_FILE="file";  // file and filesystem seem to be the same for now.
+    public final static Object CONTEXT_AUTOPLOT_SCHEME="vap";
+    /**
+     * file resource, which is a URL and doesn't include AP Scheme.
+     */
+    public final static Object CONTEXT_FILESYSTEM="fs"; 
+    /**
+     * file resource, which is a URL and doesn't include AP Scheme.
+     */
+    public final static Object CONTEXT_FILE="file"; 
     public final static Object CONTEXT_PARAMETER_NAME="paramName";
     public final static Object CONTEXT_PARAMETER_VALUE="paramValue";
     
@@ -138,16 +145,16 @@ public class CompletionContext {
     /**
      * returns the value for the context
      * cc= new CompletionContext();
-     * cc.surl= http://www.autoplot.org/data/myfile.dat?param1=aaa&param2=bbb
+     * cc.surl= vap:http://www.autoplot.org/data/myfile.dat?param1=aaa&param2=bbb
      * cc.completable= b
-     * cc.surlpos= 59
-     * get( COMPLETION_PARAMETER_NAME, cc ) ->  param2
+     * cc.surlpos= 63
+     * get( CONTEXT_PARAMETER_NAME, cc ) ->  param2
+     * get( CONTEXT_FILE, cc ) ->  http://www.autoplot.org/data/myfile.dat
      */
     public static String get( Object context, CompletionContext cc ) {
         if ( context==CONTEXT_FILESYSTEM || context==CONTEXT_FILE ) {
-            int i=cc.surl.indexOf('?');
-            if (i==-1 ) i=cc.surl.length();
-            return cc.surl.substring(0,i);
+            URLSplit split= URLSplit.parse(cc.surl);
+            return split.file;
             
         } else if ( context==CONTEXT_PARAMETER_NAME || context==CONTEXT_PARAMETER_VALUE ) {
             int i0= cc.surl.lastIndexOf('&',cc.surlpos-1);

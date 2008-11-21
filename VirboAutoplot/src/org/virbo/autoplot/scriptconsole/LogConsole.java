@@ -333,7 +333,7 @@ private void verbositySelectActionPerformed(java.awt.event.ActionEvent evt) {//G
     } else if (o.equals("informational")) {
         level = Level.INFO.intValue();
     } else if (o.equals("debug")) {
-        level = Level.FINEST.intValue();
+        level = Level.FINER.intValue();
     } else if (o.equals("all")) {
         level = Level.ALL.intValue();
     } else {

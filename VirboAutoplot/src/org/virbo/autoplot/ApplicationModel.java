@@ -830,7 +830,8 @@ public class ApplicationModel {
             tsb = dataSource.getCapability(TimeSeriesBrowse.class);
 
             if (tsb != null) {
-
+                dataset= null;
+                
                 if (timeSeriesBrowseListener != null) {
                     this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
                 }
