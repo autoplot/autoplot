@@ -89,9 +89,8 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
-            String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
             
-            File cdfFile= DataSetURL.getFile( DataSetURL.getURL(file), mon );
+            File cdfFile= DataSetURL.getFile( cc.resource, mon );
             String fileName= cdfFile.toString();
             //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
