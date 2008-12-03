@@ -80,7 +80,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         return properties;
     }
 
-    public org.virbo.dataset.QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
+    public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
         File cdfFile;
         cdfFile = getFile(mon);
 
@@ -220,7 +220,8 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
         }
 
-        if (result.rank() == 3) { // need to swap for rank 3.
+        boolean swapHack= false; // TODO: figure out where this was needed.
+        if ( swapHack && result.rank() == 3) { // need to swap for rank 3.
             QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
             QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
             result.putProperty(QDataSet.DEPEND_2, dep1);
@@ -246,7 +247,7 @@ public class CdfFileDataSource extends AbstractDataSource {
     }
 
     @Override
-    public Map<String, Object> getMetaData(ProgressMonitor mon) {
+    public synchronized Map<String, Object> getMetaData(ProgressMonitor mon) {
         if (attributes == null) {
             return null; // transient state
         }
