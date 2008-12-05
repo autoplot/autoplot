@@ -23,18 +23,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import dods.dap.Attribute;
 import org.das2.CancelledOperationException;
 import org.das2.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.URLSplit;
 
 /**
  *
@@ -67,7 +68,31 @@ public class DodsDataSource extends AbstractDataSource {
 
         super(url);
 
-        parseUrl();
+        // remove the .dds (or .html) extension.
+        String surl = url.toString();
+        int k= surl.lastIndexOf("?");
+        int i = k==-1 ? surl.lastIndexOf('.')  : surl.lastIndexOf('.',k);
+        sMyUrl = surl.substring(0, i);
+
+        // get the variable
+        i = surl.indexOf('?');
+        String variableConstraint= null;
+        if ( i!=-1 ) {
+            variableConstraint = URLSplit.uriDecode(surl.substring(i + 1));
+            StringTokenizer tok= new StringTokenizer(variableConstraint,"[<>",true);
+            String name= tok.nextToken();
+            
+            if ( tok.hasMoreTokens() ) { // get the variable name from the constraint if it's like name[0:100], but not for name>1e7.
+                String delim= tok.nextToken();
+                if ( delim.equals("[") ) {
+                    variable=name;
+                } 
+                constraint= "?" + variableConstraint;
+            } else {
+                variable= name;
+            }
+
+        }
 
         URL myUrl;
         try {
@@ -80,24 +105,6 @@ public class DodsDataSource extends AbstractDataSource {
             throw new RuntimeException(ex);
         }
 
-    }
-
-    private void parseUrl() {
-        // remove the .dds (or .html) extension.
-        String surl = url.toString();
-        int i = surl.lastIndexOf('.');
-        URL myUrl;
-        sMyUrl = surl.substring(0, i);
-
-        // get the variable
-        i = surl.indexOf('?');
-        variable = surl.substring(i + 1);
-
-        final int ib = variable.indexOf('[');
-        if (ib != -1) {
-            constraint = "?" + variable;
-            variable = variable.substring(0, ib);
-        }
     }
 
     private String getIstpConstraint(DodsAdapter da, Map meta, MyDDSParser parser, String variable) throws DDSException {
@@ -144,12 +151,11 @@ public class DodsDataSource extends AbstractDataSource {
 
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, MalformedURLException, IOException, ParseException, DDSException, DODSException, CancelledOperationException {
 
-        System.err.println("Dods.getDataSet");
         mon.setTaskSize(-1);
         mon.started();
 
         MyDDSParser parser = new MyDDSParser();
-        parser.parse(new URL(adapter.getSource().toString() + ".dds").openStream());
+        parser.parse( new URL(adapter.getSource().toString() + ".dds").openStream());
 
         getMetaData(mon);
 
@@ -167,7 +173,7 @@ public class DodsDataSource extends AbstractDataSource {
 
         } else {
 
-            if (this.constraint == null) {
+            if (this.constraint == null && adapter.getVariable()!=null ) {
                 StringBuffer constraint1 = new StringBuffer("?");
                 constraint1.append(adapter.getVariable());
                 if (!adapter.getVariable().contains("[")) {
@@ -182,7 +188,7 @@ public class DodsDataSource extends AbstractDataSource {
             }
         }
 
-        adapter.loadDataset(mon);
+        adapter.loadDataset( mon, metadata );
         MutablePropertyDataSet ds = (MutablePropertyDataSet) adapter.getDataSet(metadata);
 
         if (isIstp) {
@@ -266,21 +272,20 @@ public class DodsDataSource extends AbstractDataSource {
         }
     }
 
-    private Map<String, Object> getMetaData(ProgressMonitor mon, String variable) throws IOException, DASException, ParseException {
-
-        MyDASParser parser = new MyDASParser();
-        URL url = new URL(adapter.getSource().toString() + ".das");
-        parser.parse(url.openStream());
-
-        das = parser.getDAS();
-
-        return getMetaData(variable);
-    }
 
     @Override
     public synchronized Map<String, Object> getMetaData(ProgressMonitor mon) throws IOException, DASException, ParseException {
         if (metadata == null) {
-            metadata = getMetaData(mon, adapter.getVariable());
+            MyDASParser parser = new MyDASParser();
+            URL url = new URL(adapter.getSource().toString() + ".das");
+            parser.parse(url.openStream());
+
+            das = parser.getDAS();
+            if ( variable==null ) {
+                variable= (String) das.getNames().nextElement();
+                adapter.setVariable(variable);
+            }
+            metadata = getMetaData(variable);  
         }
 
         return metadata;

@@ -9,16 +9,23 @@
 
 package org.virbo.dods;
 
+import dods.dap.DDSException;
+import dods.dap.parser.ParseException;
+import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.virbo.metatree.IstpMetadataModel;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URLSplit;
 
 /**
  *
@@ -35,27 +42,13 @@ public class DodsDataSourceFactory implements DataSourceFactory {
     }
     
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
-        List<CompletionContext> result= new ArrayList<CompletionContext>();
         
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
             String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
-            int i= file.lastIndexOf('.');
-            String sMyUrl= file.substring(0,i);
-            URL url;
-            
-            url = new URL(sMyUrl + ".dds");
-            
-            MyDDSParser parser= new MyDDSParser();
-            parser.parse( url.openStream() );
-            
-            String[] vars= parser.getVariableNames();
-            for ( int j=0; j<vars.length;j++ ) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, vars[j], this, "arg_0" ,null ,null, true )    );
-            }
-            
-        }
+            return getVars(file);
+        } 
         
-        return result;
+        return Collections.emptyList();
     }
     
     public MetadataModel getMetadataModel(URL url) {
@@ -67,10 +60,36 @@ public class DodsDataSourceFactory implements DataSourceFactory {
     }
     
     public boolean reject( String surl, ProgressMonitor mon) {
-        return ! surl.contains("?");
+        if ( surl.contains("?") ) {
+            return false;
+        } else {
+            try {
+                URLSplit split= URLSplit.parse(surl);
+                List<CompletionContext> cc = getVars(split.file);
+                return cc.size() > 1;
+            } catch ( Exception ex ) {
+                return false; // let someone else indicate the error.
+            }
+        }
+        
     }
 
-    public String urlForServer(String surl) {
-        return surl; // TODO
+    private List<CompletionContext> getVars( String file ) throws DDSException, IOException, MalformedURLException, ParseException {
+        List<CompletionContext> result= new ArrayList<CompletionContext>();
+        
+        int i = file.lastIndexOf('.');
+        String sMyUrl = file.substring(0, i);
+        URL url;
+
+        url = new URL(sMyUrl + ".dds");
+
+        MyDDSParser parser = new MyDDSParser();
+        parser.parse(url.openStream());
+
+        String[] vars = parser.getVariableNames();
+        for (int j = 0; j < vars.length; j++) {
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, vars[j], this, "arg_0", null, null, true));
+        }
+        return result;
     }
 }

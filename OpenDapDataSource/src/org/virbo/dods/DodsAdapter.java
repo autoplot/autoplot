@@ -14,12 +14,14 @@ import dods.dap.DArrayDimension;
 import dods.dap.DConnect;
 import dods.dap.DDS;
 import dods.dap.DDSException;
+import dods.dap.DFloat32;
 import dods.dap.DFloat64;
 import dods.dap.DGrid;
 import dods.dap.DODSException;
 import dods.dap.DSequence;
 import dods.dap.DStructure;
 import dods.dap.Float32PrimitiveVector;
+import dods.dap.Float64PrimitiveVector;
 import dods.dap.NoSuchVariableException;
 import dods.dap.PrimitiveVector;
 import dods.dap.StatusUI;
@@ -39,12 +41,15 @@ import java.util.Vector;
 import org.das2.CancelledOperationException;
 import org.das2.datum.UnitsUtil;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
@@ -77,6 +82,10 @@ public class DodsAdapter {
         properties = new HashMap();
     }
 
+    void setVariable(String variable) {
+        this.variable= variable;
+    }
+
     private String doEscapes(String s) {
         StringBuffer result = new StringBuffer();
         for (int i = 0; i < s.length(); i++) {
@@ -98,38 +107,44 @@ public class DodsAdapter {
         this.constraint = c;
     }
 
-    private long getSizeForType(DArray v) {
+    private long getSizeForType( DArray v, boolean streaming ) {
         PrimitiveVector pv = v.getPrimitiveVector();
         if (pv instanceof Float32PrimitiveVector) {
-            return 4;
+            return 4 * ( streaming ? v.getFirstDimension().getSize() : 1 );
+        } else if (pv instanceof Float64PrimitiveVector) {
+            return 8 * ( streaming ? v.getFirstDimension().getSize() : 1 );
         } else {
             return 1;
         }
     }
 
-    private long getSizeForType(BaseType v) {
-        if ( v instanceof DFloat64 ) {
+    private long getSizeForType(BaseType v, boolean streaming ) {
+        if (v instanceof DFloat64) {
             return 8;
+        } else if (v instanceof DFloat32 ) {
+            return 4;
+        } else if (v instanceof DArray) {
+            return getSizeForType((DArray) v, streaming );
         } else {
             throw new IllegalArgumentException("not supported");
         }
     }
 
-    private long calcSize() throws MalformedURLException, IOException, ParseException {
+    private long calcSize( Map<String,Object> attr ) throws MalformedURLException, IOException, ParseException {
         try {
             DDS dds = new DDS();
             dds.parse(new URL(this.getSource().toString() + ".dds" + constraint).openStream());
 
             // calculate size
             Enumeration variables = dds.getVariables();
-            long size = -1;
+            long size = 0;
             while (variables.hasMoreElements()) {
                 Object o = variables.nextElement();
                 if (o instanceof DSequence) {
-                    Enumeration enume1 = ((DSequence)o).getVariables();
+                    Enumeration enume1 = ((DSequence) o).getVariables();
                     int j = 0;
                     while (enume1.hasMoreElements()) {
-                        Object ele= enume1.nextElement();
+                        Object ele = enume1.nextElement();
                         if (ele instanceof DStructure) {
                             DStructure ds = (DStructure) ele;
 
@@ -137,21 +152,26 @@ public class DodsAdapter {
                             int jj = 0;
                             while (enume2.hasMoreElements()) {
                                 Object k = enume2.nextElement();
-                                j+= getSizeForType( (BaseType)k );
+                                j += getSizeForType((BaseType) k,true);
                             }
-                            
+
                         } else if (ele instanceof BaseType) {
-                            j+= getSizeForType( (BaseType)ele );
-                            
+                            j += getSizeForType((BaseType) ele,true);
+
                         } else {
                             throw new IllegalArgumentException("huh");
                         }
                     }
-                    size= -1; // we don't know number of records.
+                    String srecCount= (String) attr.get("recCount" );
+                    if ( srecCount!=null ) {
+                        size= j * Long.parseLong(srecCount);
+                    } else {
+                        size = -1; // we don't know number of records.
+                    }
                 } else {
                     DArray v = (DArray) o;
                     Enumeration dimensions = v.getDimensions();
-                    long s1 = getSizeForType(v);
+                    long s1 = getSizeForType(v, false);
                     s1 *= 2;   // not sure why
                     while (dimensions.hasMoreElements()) {
                         DArrayDimension d = (DArrayDimension) dimensions.nextElement();
@@ -166,14 +186,27 @@ public class DodsAdapter {
         }
     }
 
-    public void loadDataset(final ProgressMonitor mon) throws FileNotFoundException, MalformedURLException,
+    /**
+     * Load the dataset.  
+     * @param mon
+     * @param attr look for hints in attr about the length of the load.  Virbo/TSDS put a recCount for sequences.
+     * @throws java.io.FileNotFoundException
+     * @throws java.net.MalformedURLException
+     * @throws java.io.IOException
+     * @throws dods.dap.parser.ParseException
+     * @throws dods.dap.DDSException
+     * @throws dods.dap.DODSException
+     * @throws org.das2.CancelledOperationException
+     */
+    public void loadDataset(final ProgressMonitor mon, Map<String,Object> attr ) throws FileNotFoundException, MalformedURLException,
             IOException, ParseException, DDSException, DODSException,
             CancelledOperationException {
-        if (constraint == null) {
-            throw new IllegalArgumentException("constraint not set");
-        }
 
-        long size = calcSize();
+        if ( constraint==null ) {
+            constraint="";
+        }
+        
+        long size = calcSize(  attr );
         mon.setTaskSize(size);
 
         DConnect url = new DConnect(source.toString(), true);
@@ -213,10 +246,12 @@ public class DodsAdapter {
         this.sliceIndex = index;
     }
 
-    public QDataSet getDataSet(Map<String,Object> attributes) {
+    private enum Type { spectrogram, vectors, scalars };
+                    
+    public QDataSet getDataSet(Map<String, Object> attributes) {
         DodsVarDataSet zds;
 
-        if ( attributes==null ) attributes= new HashMap<String,Object>();
+        if (attributes == null) attributes = new HashMap<String, Object>();
         BaseType btvar;
         try {
             btvar = dds.getVariable(variable);
@@ -265,10 +300,11 @@ public class DodsAdapter {
                 int cols = dseq.elementCount(true);
                 int rows = dseq.getRowCount();
 
-                DDataSet result = DDataSet.createRank2(rows, cols);
-
+                //DDataSet result = DDataSet.createRank2(rows, cols);
+                WritableDataSet[] dss = new WritableDataSet[cols];
                 String[] labels = new String[cols];
-
+                
+                Type t= Type.scalars;
                 for (int i = 0; i < rows; i++) {
                     Vector v = dseq.getRow(i);
                     int j = 0;
@@ -278,13 +314,31 @@ public class DodsAdapter {
                             Enumeration enume = ds.getVariables();
                             while (enume.hasMoreElements()) {
                                 Object k = enume.nextElement();
-                                putValue(result, i, j, (BaseType) k);
-                                if ( i==0 ) labels[j]= ((BaseType) k).getName();
+                                if (i == 0) {
+                                    if (((BaseType) k) instanceof DArray) {
+                                        dss[j] = DDataSet.createRank2(rows, ((DArray) k).getLength());
+                                        t= Type.spectrogram;
+                                    } else {
+                                        dss[j] = DDataSet.createRank1(rows);
+                                    }
+                                    labels[j] = ((BaseType) k).getName();
+                                    dss[j].putProperty( QDataSet.NAME, labels[j] );
+                                }
+                                putValue(dss[j], i, (BaseType) k);
                                 j++;
                             }
                         } else if (ele instanceof BaseType) {
-                            putValue(result, i, j, (BaseType) ele);
-                            if ( i==0 ) labels[j]= ((BaseType) ele).getName();
+                            if (i == 0) {
+                                if (((BaseType) ele) instanceof DArray) {
+                                    dss[j] = DDataSet.createRank2(rows, ((DArray) ele).getLength());
+                                    t= Type.spectrogram;
+                                } else {
+                                    dss[j] = DDataSet.createRank1(rows);
+                                }
+                                labels[j] = ((BaseType) ele).getName();
+                                dss[j].putProperty( QDataSet.NAME, labels[j] );
+                            }
+                            putValue( dss[j], i, (BaseType) ele);
                             j++;
                         } else {
                             throw new IllegalArgumentException("huh");
@@ -292,12 +346,34 @@ public class DodsAdapter {
                     }
                 }
                 
-                result.putProperty( QDataSet.DEPEND_1, Ops.labels(labels) );
-                MutablePropertyDataSet dep0 = DataSetOps.slice1(result, 0);
-                dep0.putProperty(QDataSet.NAME, labels[0] );
-                String sunits= (String)MetadataUtil.getNode( attributes, new String[] { labels[0], "units" } );
-                if ( sunits!=null ) {
-                    if ( sunits.contains("since") ) {
+                if ( cols>2 && t==Type.scalars ) {
+                    t= Type.vectors;
+                }
+                
+                MutablePropertyDataSet zresult=null;
+                
+                if ( t==Type.spectrogram || t==Type.scalars ) {
+                    dss[cols-1].putProperty( QDataSet.DEPEND_0, dss[0] );
+                    zresult= dss[cols-1];
+                    if ( t==Type.spectrogram ) dss[cols-1].putProperty( QDataSet.DEPEND_1, DataSetOps.slice0(dss[1], 0) );
+                } else if ( t==Type.vectors ) {
+                    DDataSet rresult= DDataSet.createRank2(rows, cols-1 );
+                    for ( int j=0; j<cols-1; j++ ) {
+                        QDataSet ds= dss[j+1];
+                        for ( int i=0; i<rows; i++ ) {
+                            rresult.putValue( i, j, ds.value(i) );
+                        }
+                    }
+                    rresult.putProperty(QDataSet.DEPEND_1, DataSetOps.trim( Ops.labels(labels), 1, cols-1 ) );
+                    rresult.putProperty(QDataSet.DEPEND_0, dss[0] );
+                    zresult= rresult;
+                }
+                
+                MutablePropertyDataSet dep0 = (MutablePropertyDataSet) zresult.property( QDataSet.DEPEND_0 );
+                
+                String sunits = (String) MetadataUtil.getNode(attributes, new String[]{labels[0], "units"});
+                if (sunits != null) {
+                    if (sunits.contains("since")) {
                         Units u;
                         try {
                             u = MetadataUtil.lookupTimeUnits(sunits);
@@ -307,16 +383,6 @@ public class DodsAdapter {
                         }
                     }
                 }
-
-                MutablePropertyDataSet zresult;
-                if (cols == 2) {
-                    zresult = DataSetOps.slice1(result, 1);
-                    zresult.putProperty( QDataSet.NAME, labels[1] );
-                } else {
-                    zresult = DataSetOps.leafTrim(result, 1, cols);
-                }
-
-                zresult.putProperty(QDataSet.DEPEND_0, dep0);
 
                 return zresult;
 
@@ -351,18 +417,6 @@ public class DodsAdapter {
         return ds;
     }
 
-    public org.das2.dataset.DataSet getDas2DataSet() {
-        QDataSet ds = getDataSet(null);
-        if (ds.rank() == 3) {
-            QDataSet sliceDs = DataSetOps.slice0(ds, sliceIndex);
-            return TableDataSetAdapter.create(sliceDs);
-        } else if (ds.rank() == 2) {
-            return TableDataSetAdapter.create(ds);
-        } else {
-            return VectorDataSetAdapter.create(ds);
-        }
-
-    }
     /**
      * Holds value of property depend0Name.
      */
@@ -535,17 +589,25 @@ public class DodsAdapter {
         return this.variable;
     }
 
-    private void putValue(DDataSet result, int i, BaseType value) {
+    private void putValue(WritableDataSet result, int i, BaseType value) {
         if (value instanceof DFloat64) {
             result.putValue(i, ((DFloat64) value).getValue());
+        } else if ( value instanceof DFloat32 ) {
+            result.putValue(i, ((DFloat32) value).getValue());
+        } else if (value instanceof DArray) {
+            ArrayUtil.putValues(result, i, ((DArray) value).getPrimitiveVector().getInternalStorage());
         } else {
             throw new IllegalArgumentException("not supported: " + value);
         }
     }
 
-    private void putValue(DDataSet result, int i, int j, BaseType value) {
+    private void putValue(WritableDataSet result, int i, int j, BaseType value) {
         if (value instanceof DFloat64) {
             result.putValue(i, j, ((DFloat64) value).getValue());
+        } else if ( value instanceof DFloat32 ) {
+            result.putValue(i, j, ((DFloat32) value).getValue());
+        } else if (value instanceof DArray) {
+            ArrayUtil.putValues(result, i, j, ((DArray) value).getPrimitiveVector().getInternalStorage());
         } else {
             throw new IllegalArgumentException("not supported: " + value);
         }
