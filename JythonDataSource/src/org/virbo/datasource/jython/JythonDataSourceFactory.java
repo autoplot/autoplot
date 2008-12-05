@@ -98,7 +98,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
-        Map<String, Object> po = getNames(DataSetURL.getURL(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)), mon);
+        Map<String, Object> po = getNames( cc.resource, mon);
         List<CompletionContext> result = new ArrayList<CompletionContext>();
         for (String n : po.keySet()) {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
