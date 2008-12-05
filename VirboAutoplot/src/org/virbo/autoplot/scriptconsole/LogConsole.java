@@ -44,7 +44,7 @@ public class LogConsole extends javax.swing.JPanel {
 
     List<LogRecord> records = new LinkedList<LogRecord>();
     int eventThreadId = -1;
-    int level = Level.ALL.intValue();
+    int level = Level.INFO.intValue();
     NumberFormat nf = new DecimalFormat("00.000");
     private Timer timer2;
     PrintStream oldStdOut;
@@ -75,14 +75,14 @@ public class LogConsole extends javax.swing.JPanel {
         Handler h = new Handler() {
             public synchronized void publish(LogRecord rec) {
                 synchronized (LogConsole.this) {
-                    if (!records.contains(rec)) {
+                    //if ( !records.get(records.size()-1).equals(rec)) {
                         records.add(rec);
                         timer2.restart();
                         //timer.tickle();
                         if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
                             eventThreadId = rec.getThreadID();
                         }
-                    }
+                    //}
                 }
                 if ( rec.getLevel().intValue() >= Level.WARNING.intValue() ) {
                     LogConsole.this.oldStdErr.println(rec.getMessage());
@@ -198,14 +198,16 @@ public class LogConsole extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         logTextArea = new javax.swing.JTextArea();
+        actionsPanel = new javax.swing.JPanel();
         clearButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        verbositySelect = new javax.swing.JComboBox();
-        timeStampsCheckBox = new javax.swing.JCheckBox();
-        logLevelCheckBox = new javax.swing.JCheckBox();
-        loggerIDCheckBox = new javax.swing.JCheckBox();
         saveButton = new javax.swing.JButton();
         copyButton = new javax.swing.JButton();
+        verbosityPanel = new javax.swing.JPanel();
+        loggerIDCheckBox = new javax.swing.JCheckBox();
+        logLevelCheckBox = new javax.swing.JCheckBox();
+        timeStampsCheckBox = new javax.swing.JCheckBox();
+        verbositySelect = new javax.swing.JComboBox();
+        jLabel1 = new javax.swing.JLabel();
 
         jScrollPane1.setAutoscrolls(true);
 
@@ -218,41 +220,6 @@ public class LogConsole extends javax.swing.JPanel {
         clearButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 clearButtonActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setText("verbosity:");
-
-        verbositySelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "warnings", "informational", "debug", "all" }));
-        verbositySelect.setSelectedIndex(3);
-        verbositySelect.setToolTipText("filter messages by verbosity.");
-        verbositySelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                verbositySelectActionPerformed(evt);
-            }
-        });
-
-        timeStampsCheckBox.setText("timing");
-        timeStampsCheckBox.setToolTipText("Show time of the message, in seconds before the most recent message.");
-        timeStampsCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                timeStampsCheckBoxActionPerformed(evt);
-            }
-        });
-
-        logLevelCheckBox.setText("log levels");
-        logLevelCheckBox.setToolTipText("show the log level (verbosity) of the messages.");
-        logLevelCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                logLevelCheckBoxActionPerformed(evt);
-            }
-        });
-
-        loggerIDCheckBox.setText("logger ID");
-        loggerIDCheckBox.setToolTipText("identifies the logger posting the message");
-        loggerIDCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loggerIDCheckBoxActionPerformed(evt);
             }
         });
 
@@ -272,51 +239,112 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(layout.createSequentialGroup()
-                        .add(clearButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(saveButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(copyButton)
-                        .add(152, 152, 152)
+        org.jdesktop.layout.GroupLayout actionsPanelLayout = new org.jdesktop.layout.GroupLayout(actionsPanel);
+        actionsPanel.setLayout(actionsPanelLayout);
+        actionsPanelLayout.setHorizontalGroup(
+            actionsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(actionsPanelLayout.createSequentialGroup()
+                .add(12, 12, 12)
+                .add(clearButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(saveButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(copyButton)
+                .addContainerGap(18, Short.MAX_VALUE))
+        );
+        actionsPanelLayout.setVerticalGroup(
+            actionsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(actionsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                .add(clearButton)
+                .add(saveButton)
+                .add(copyButton))
+        );
+
+        loggerIDCheckBox.setText("logger ID");
+        loggerIDCheckBox.setToolTipText("identifies the logger posting the message");
+        loggerIDCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loggerIDCheckBoxActionPerformed(evt);
+            }
+        });
+
+        logLevelCheckBox.setText("log levels");
+        logLevelCheckBox.setToolTipText("show the log level (verbosity) of the messages.");
+        logLevelCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                logLevelCheckBoxActionPerformed(evt);
+            }
+        });
+
+        timeStampsCheckBox.setText("timing");
+        timeStampsCheckBox.setToolTipText("Show time of the message, in seconds before the most recent message.");
+        timeStampsCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                timeStampsCheckBoxActionPerformed(evt);
+            }
+        });
+
+        verbositySelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "warnings", "informational", "debug", "all" }));
+        verbositySelect.setSelectedIndex(1);
+        verbositySelect.setToolTipText("filter messages by verbosity.");
+        verbositySelect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verbositySelectActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("verbosity:");
+
+        org.jdesktop.layout.GroupLayout verbosityPanelLayout = new org.jdesktop.layout.GroupLayout(verbosityPanel);
+        verbosityPanel.setLayout(verbosityPanelLayout);
+        verbosityPanelLayout.setHorizontalGroup(
+            verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(verbosityPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
                         .add(loggerIDCheckBox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(timeStampsCheckBox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(logLevelCheckBox))
-                    .add(layout.createSequentialGroup()
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 147, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 555, Short.MAX_VALUE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        verbosityPanelLayout.setVerticalGroup(
+            verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(verbosityPanelLayout.createSequentialGroup()
+                .add(verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel1))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(timeStampsCheckBox)
+                    .add(logLevelCheckBox)
+                    .add(loggerIDCheckBox)))
+        );
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 191, Short.MAX_VALUE)
+                .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(jLabel1)
-                            .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(timeStampsCheckBox)
-                            .add(logLevelCheckBox)
-                            .add(loggerIDCheckBox))
-                        .add(1, 1, 1))
-                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                        .add(clearButton)
-                        .add(saveButton)
-                        .add(copyButton))))
+                    .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -393,6 +421,7 @@ private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_copyButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel actionsPanel;
     private javax.swing.JButton clearButton;
     private javax.swing.JButton copyButton;
     private javax.swing.JLabel jLabel1;
@@ -402,6 +431,7 @@ private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JCheckBox loggerIDCheckBox;
     private javax.swing.JButton saveButton;
     private javax.swing.JCheckBox timeStampsCheckBox;
+    private javax.swing.JPanel verbosityPanel;
     private javax.swing.JComboBox verbositySelect;
     // End of variables declaration//GEN-END:variables
 }
