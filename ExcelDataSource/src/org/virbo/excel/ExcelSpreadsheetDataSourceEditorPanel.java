@@ -5,6 +5,7 @@
  */
 package org.virbo.excel;
 
+import java.awt.Rectangle;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -41,16 +43,29 @@ import org.virbo.datasource.URLSplit;
  */
 public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
+    HSSFWorkbook wb;
+    Map<Integer,String> columns;
+    
     /** Creates new form AsciiDataSourceEditorPanel */
     public ExcelSpreadsheetDataSourceEditorPanel() {
         initComponents();
         jTable1.setCellSelectionEnabled(true);
+
         jTable1.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
-                System.err.println("Columns: " + e);
+                if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
+                    int col = jTable1.getColumnModel().getSelectedColumns()[0];
+                    String name= columns.get(col);
+                    if ( name!=null ) {
+                        setColumn( name );
+                    } else {
+                        setColumn( "" + (char) (col + 'A') );
+                    }
+                }
             }
         });
+
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
@@ -58,10 +73,13 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
             }
         });
 
-        BindingContext bc= new BindingContext();
-        
-        bc.addBinding( this, "${firstRow}", this.firstRowTextField, "value"  );
-         
+        BindingContext bc = new BindingContext();
+
+        bc.addBinding(this, "${firstRow}", this.firstRowTextField, "value");
+        bc.addBinding(this, "${column}", this.columnsComboBox, "selectedItem");
+        bc.addBinding(this, "${dep0}", this.dep0Columns, "selectedItem");
+        bc.addBinding(this, "${sheet}", this.sheetComboBox, "selectedItem");
+
         bc.bind();
     }
 
@@ -81,6 +99,10 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         jLabel2 = new javax.swing.JLabel();
         sheetComboBox = new javax.swing.JComboBox();
         firstRowTextField = new javax.swing.JFormattedTextField();
+        jLabel3 = new javax.swing.JLabel();
+        columnsComboBox = new javax.swing.JComboBox();
+        jLabel4 = new javax.swing.JLabel();
+        dep0Columns = new javax.swing.JComboBox();
 
         org.jdesktop.layout.GroupLayout sViewer1Layout = new org.jdesktop.layout.GroupLayout(sViewer1.getContentPane());
         sViewer1.getContentPane().setLayout(sViewer1Layout);
@@ -108,21 +130,49 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 
         firstRowTextField.setText("11");
 
+        jLabel3.setText("Column:");
+
+        columnsComboBox.setEditable(true);
+        columnsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        columnsComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                columnsComboBoxItemStateChanged(evt);
+            }
+        });
+
+        jLabel4.setText("Depends On:");
+
+        dep0Columns.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        dep0Columns.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                dep0ColumnsItemStateChanged(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 819, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jLabel4)
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(firstRowTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(18, 18, 18)
+                        .add(jLabel3)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(firstRowTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(dep0Columns, 0, 170, Short.MAX_VALUE)
+                    .add(columnsComboBox, 0, 170, Short.MAX_VALUE))
+                .add(245, 245, 245)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(sheetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(144, Short.MAX_VALUE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
+                .add(sheetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 119, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -131,19 +181,34 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(firstRowTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel3)
                     .add(jLabel2)
-                    .add(sheetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(8, 8, 8)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                    .add(sheetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(columnsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel4)
+                    .add(dep0Columns, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 370, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void setSheet(String string) {
-        try {
+    private synchronized void maybeInitializeWorkBook() throws IOException, FileNotFoundException {
+        if ( wb==null ) {
             InputStream in = new FileInputStream(file);
             POIFSFileSystem fs = new POIFSFileSystem(in);
-            HSSFWorkbook wb = new HSSFWorkbook(fs);
+            wb = new HSSFWorkbook(fs);
+        }
+
+    }
+    
+    private void resetSheet(String string) {
+        try {
+            if (file == null) return;
+            
+            maybeInitializeWorkBook();
 
             List<String> result = new ArrayList<String>();
             for (int i = 0; i < wb.getNumberOfSheets(); i++) {
@@ -153,6 +218,12 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 
             HSSFSheet sheet = wb.getSheet(string);
             this.jTable1.setModel(new SVTableModel(sheet));
+
+            Rectangle rect = jTable1.getCellRect(getFirstRow(), 0, true);
+            jTable1.scrollRectToVisible(rect);
+
+
+
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -161,6 +232,14 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 private void sheetComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_sheetComboBoxItemStateChanged
     setSheet((String) sheetComboBox.getSelectedItem());
 }//GEN-LAST:event_sheetComboBoxItemStateChanged
+
+private void columnsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_columnsComboBoxItemStateChanged
+    setColumn((String) columnsComboBox.getSelectedItem());
+}//GEN-LAST:event_columnsComboBoxItemStateChanged
+
+private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
+    setDep0( (String)dep0Columns.getSelectedItem() );
+}//GEN-LAST:event_dep0ColumnsItemStateChanged
 
     protected File file = null;
     public static final String PROP_FILE = "file";
@@ -172,9 +251,7 @@ private void sheetComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-
     public void setFile(File file) throws IOException {
         this.file= file;
         
-        InputStream in = new FileInputStream(file);
-        POIFSFileSystem fs = new POIFSFileSystem(in);
-        HSSFWorkbook wb = new HSSFWorkbook(fs);
+        maybeInitializeWorkBook();
 
         List<String> result = new ArrayList<String>();
         for (int i = 0; i < wb.getNumberOfSheets(); i++) {
@@ -184,12 +261,29 @@ private void sheetComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-
         
         sheetComboBox.setModel( new DefaultComboBoxModel(result.toArray() ) );
         
-        HSSFSheet sheet= wb.getSheet(result.get(0) );
-        this.jTable1.setModel( new SVTableModel(sheet) );
+        if ( !result.contains( getSheet() ) ) {
+            setSheet( result.get(0) );
+        } else {
+            resetSheet( getSheet() );
+        }
         
     }
 
-    protected int firstRow = 0;
+        protected String sheet;
+    public static final String PROP_SHEET = "sheet";
+
+    public String getSheet() {
+        return sheet;
+    }
+
+    public void setSheet(String sheet) {
+        String oldSheet = this.sheet;
+        this.sheet = sheet;
+        resetSheet(this.sheet);
+        firePropertyChange(PROP_SHEET, oldSheet, sheet);
+    }
+
+    protected int firstRow = 1;
     public static final String PROP_FIRST_ROW = "firstRow";
 
     public int getFirstRow() {
@@ -197,19 +291,47 @@ private void sheetComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-
     }
 
     public void setFirstRow(int row) {
-        int oldRow = this.firstRow;
-        this.firstRow = row;
-        propertyChangeSupport.firePropertyChange(PROP_FIRST_ROW, oldRow, row);
+        try {
+            int oldRow = this.firstRow;
+            this.firstRow = row;
+            Rectangle rect = jTable1.getCellRect(getFirstRow() - 1, 0, true);
+            columns= ExcelUtil.getColumns( wb, getSheet(), "" + getFirstRow(), new NullProgressMonitor() );
+            columnsComboBox.setModel( new DefaultComboBoxModel( columns.values().toArray() ) );
+            List<String> dep0Values= new ArrayList<String>( columns.values() );
+            dep0Values.add(0,"");
+            dep0Columns.setModel( new DefaultComboBoxModel( dep0Values.toArray() ) );
+            jTable1.scrollRectToVisible(rect);
+            firePropertyChange(PROP_FIRST_ROW, oldRow, row);
+        } catch (IOException ex) {
+            Logger.getLogger(ExcelSpreadsheetDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    
+    protected String column="A";
+    public static final String PROP_COLUMN = "column";
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
+    public String getColumn() {
+        return column;
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
+    public void setColumn(String column) {
+        String oldColumn = this.column;
+        this.column = column;
+        firePropertyChange(PROP_COLUMN, oldColumn, column);
+    }
+
+    protected String dep0="";
+    public static final String PROP_DEP0 = "dep0";
+
+    public String getDep0() {
+        return dep0;
+    }
+
+    public void setDep0(String dep0) {
+        String oldDep0 = this.dep0;
+        this.dep0 = dep0;
+        firePropertyChange(PROP_DEP0, oldDep0, dep0);
     }
 
     public JPanel getPanel() {
@@ -221,13 +343,25 @@ private void sheetComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-
             URLSplit split = URLSplit.parse(url);
             Map<String, String> params = URLSplit.parseParams(split.params);
 
-            File f = DataSetURL.getFile(new URL(url), new NullProgressMonitor());
+            File f = DataSetURL.getFile( new URL(split.file), new NullProgressMonitor());
             setFile(f);
             
-            if ( params.containsKey("skip") ) {
-                setFirstRow( Integer.parseInt(params.get("skip") ) );
+            if ( params.containsKey("sheet") ) {
+                setSheet(params.get("sheet"));
             }
             
+            if ( params.containsKey("firstRow") ) {
+                setFirstRow( Integer.parseInt(params.get("firstRow") ) );
+            }
+            
+            if ( params.containsKey("column" ) ) {
+                setColumn(params.get("column"));   
+            }
+            
+            if ( params.containsKey("depend0" ) ) {
+                setDep0(params.get("depend0"));   
+            }
+
         } catch (IOException ex) {
             Logger.getLogger(ExcelSpreadsheetDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -235,12 +369,22 @@ private void sheetComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-
     }
 
     public String getUrl() {
-        String surl=  this.file.toURI().toString();
+        String surl=  URLSplit.uriDecode( this.file.toURI().toString() );
         String args="";
-        if ( firstRow>0 ) {
-            args+= "&firstRow="+firstRow
-                     + ( sheetComboBox.isEnabled() ? "&sheet="+sheetComboBox.getSelectedItem() : "" );
+        if ( firstRow>1 ) {
+            args+= "&firstRow="+firstRow;
         }
+        
+        if ( sheetComboBox.isEnabled() && this.sheetComboBox.getSelectedIndex()>0 ) {
+            args+= "&sheet="+ this.getSheet() ;
+        }
+        
+        if ( !this.getDep0().equals("") ) {
+            args+= "&depend0="+this.getDep0();
+        }
+         
+        args+= "&column=" + getColumn();
+        
         if ( args.length()>0 ) {
             surl+= "?" + args.substring(1);
         }
@@ -249,9 +393,13 @@ private void sheetComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JComboBox columnsComboBox;
+    public javax.swing.JComboBox dep0Columns;
     public javax.swing.JFormattedTextField firstRowTextField;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
+    public javax.swing.JLabel jLabel3;
+    public javax.swing.JLabel jLabel4;
     public javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JTable jTable1;
     public org.apache.poi.hssf.contrib.view.SViewer sViewer1;

@@ -96,12 +96,19 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             }
         }
         
+        String recCountString= (String) m.get("recCount" ) ;
+        if ( recCountString!=null ) {
+            int recCount= Integer.parseInt(recCountString);
+            spec[2]= Math.min( spec[2], spec[1]+recCount );
+        }
+        
         data = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );        
         if ( d.length()>1 ) data.putProperty( QDataSet.NAME, d );
 
         d = (String) m.get("depend0");
         if (d != null) {
-            spec = parseDataSetSpec(d, firstRow, -1);
+            int[] spec2 = parseDataSetSpec(d, firstRow, -1);
+            spec[0]= spec2[0];
             ExcelSpreadsheetDataSet depend0 = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );
             if ( d.length()>1 ) depend0.putProperty( QDataSet.NAME, d );        
             data.putProperty(QDataSet.DEPEND_0, depend0);
@@ -109,7 +116,8 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
 
         d = (String) m.get("plane0");
         if (d != null) {
-            spec = parseDataSetSpec(d, firstRow, -1);
+            int[] spec2 = parseDataSetSpec(d, firstRow, -1);
+            spec[0]= spec2[0];
             ExcelSpreadsheetDataSet p0 = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );
             if ( d.length()>1 ) p0.putProperty( QDataSet.NAME, d );        
             data.putProperty(QDataSet.PLANE_0, p0);
@@ -155,28 +163,10 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
     }
 
     private short getColumnNumber(String id, int firstRow) {
-        HSSFRow row = sheet.getRow(firstRow);
-        for (short i = 0; i < row.getLastCellNum(); i++) {
-            HSSFCell cell = row.getCell(i);
-            if (cell != null && cell.getCellType() == 1) {
-                String label = cell.getStringCellValue();
-                String id1 = null;
-                if (label.charAt(0) == id.charAt(0)) {
-                    id1 = DataSourceUtil.toJavaIdentifier(label);
-                }
-                if (id.equals(id1)) {
-                    return i;
-                }
-            }
-        }
-        if (id.length() == 1) {
-            return (short) (id.charAt(0) - 'A');
-        } else if (id.length() == 2) {
-            throw new IllegalArgumentException("unable to find column " + id + ", two-digits implicit IDs not supported");
-        } else {
-            throw new IllegalArgumentException("unable to find column " + id);
-        }
+        return ExcelUtil.getColumnNumber( sheet, id, firstRow);
     }
+    
+
 
     protected static int findFirstRow( HSSFSheet sheet, int firstRow ) {
         int ilastRow= sheet.getPhysicalNumberOfRows();

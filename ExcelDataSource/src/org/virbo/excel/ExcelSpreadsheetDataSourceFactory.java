@@ -13,6 +13,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -51,6 +52,7 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "plane0="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "sheet="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "firstRow=", FIRST_ROW_DOC));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "limit number of records to read"));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String param = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (param.equals("column")) {
@@ -62,6 +64,8 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
             } else if (param.equals("sheet")) {
                 result.addAll(toCC(CompletionContext.CONTEXT_PARAMETER_VALUE, getSheets(cc, mon), "worksheet source"));
             } else if (param.equals("firstRow")) {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", FIRST_ROW_DOC));
+            } else if (param.equals("recCount")) {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", FIRST_ROW_DOC));
             }
         }
@@ -84,15 +88,12 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
         return wb;
     }
 
+    
     private List<String> getSheets(CompletionContext cc, ProgressMonitor mon) throws IOException {
         HSSFWorkbook wb = getWorkbook(cc.resource, mon);
-        List<String> result = new ArrayList<String>();
-        for (int i = 0; i < wb.getNumberOfSheets(); i++) {
-            String s = wb.getSheetName(i);
-            result.add(s);
-        }
-        return result;
-    }
+        return ExcelUtil.getSheets(wb,cc, mon);
+    } 
+    
 
     /**
      * inspect the first row for columns.  Strings may be picked up as labels if the
@@ -102,60 +103,13 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
      * @return
      * @throws java.io.IOException
      */
-    private List<String> getColumns(CompletionContext cc, ProgressMonitor mon) throws IOException {
+    private List<String> getColumns( CompletionContext cc, ProgressMonitor mon) throws IOException {
         HSSFWorkbook wb = getWorkbook(cc.resource, mon);
         Map params = URLSplit.parseParams(cc.params);
-        List<String> result = new ArrayList<String>();
-        HSSFSheet sheet;
-        String ssheet = (String) params.get("sheet");
-        if (ssheet == null) {
-            sheet = wb.getSheetAt(0);
-            ssheet = wb.getSheetName(0);
-        } else {
-            sheet = wb.getSheet(ssheet);
-        }
-
-        if (sheet == null) {
-            throw new IllegalArgumentException("no such sheet \"" + ssheet + "\"");
-        }
-
-        String firstRowString = (String) params.get("firstRow");
-        int firstRow = firstRowString == null ? 0 : Integer.parseInt(firstRowString) - 1;
-        HSSFRow row = sheet.getRow(firstRow);
-
-        if (row == null) {
-            if ( firstRow==0 ) {
-                throw new IllegalArgumentException("(sheet \"" + ssheet + "\" contains no records)");
-            } else {
-                throw new IllegalArgumentException("(sheet \"" + ssheet + "\" doesn't have a row at "+(firstRow+1)+")");
-            }
-        }
-
-        int inextRow = ExcelSpreadsheetDataSource.findFirstRow(sheet, firstRow);
-        HSSFRow nextRow;        // first row of data        
-        nextRow = sheet.getRow(inextRow);
-        
-        if (nextRow != null) {
-            int n = nextRow.getLastCellNum();
-            for (int i = nextRow.getFirstCellNum(); i < n; i++) {
-                HSSFCell nextCell = nextRow.getCell((short) i);
-                if (nextCell != null && nextCell.getCellType() == 0) {
-                    HSSFCell cell = row.getCell((short) i);
-                    if (cell == null) {
-                        result.add("" + (char) (i + 'A'));
-                    } else {
-                        if (cell.getCellType() == 0) { // 1=String
-                            result.add("" + (char) (i + 'A'));
-                        } else {
-                            result.add(DataSourceUtil.toJavaIdentifier(cell.getRichStringCellValue().toString()));
-                        }
-                    }
-                }
-            }
-        }
-
-        return result;
+        return new LinkedList<String>( ExcelUtil.getColumns(wb,  (String) params.get("sheet"),  (String) params.get("firstRow"), mon).values() );
     }
+
+    
 
     public MetadataModel getMetadataModel(URL url) {
         return MetadataModel.createNullModel();
