@@ -52,10 +52,11 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         PyException causedBy = null;
         try {
             if (interp == null) {
+                mon.started();
+                mon.setProgressMessage( "initialize Jython interpreter...");
                 interp = JythonUtil.createInterpreter(false);
+                mon.setProgressMessage( "done initializing Jython interpreter");
                 interp.set("monitor", mon);
-
-                // interp.exec("def getParam( x, def ):\n  return params.has_key(x) ? params[x] : def\n\n");
 
                 interp.exec("params=dict()");
                 for (String s : params.keySet()) {
@@ -64,6 +65,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     }
                 }
 
+                interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
+
+                mon.setProgressMessage( "executing script");
                 try {
                     boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
@@ -80,6 +84,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     } else {
                         interp.execfile(new FileInputStream(super.getFile(new NullProgressMonitor())));
                     }
+                    mon.setProgressMessage( "done executing script");
                 } catch (PyException ex) {
                     causedBy = ex;
                     ex.printStackTrace();
