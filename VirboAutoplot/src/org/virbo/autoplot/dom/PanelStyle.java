@@ -1,0 +1,229 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.virbo.autoplot.dom;
+
+import java.awt.Color;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.das2.datum.Datum;
+import org.das2.datum.Units;
+import org.das2.graph.DasColorBar;
+import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.PlotSymbol;
+import org.das2.graph.PsymConnector;
+import org.das2.graph.SpectrogramRenderer.RebinnerEnum;
+
+/**
+ *
+ * @author jbf
+ */
+public class PanelStyle extends DomNode {
+
+    public PanelStyle() {
+        
+    }
+    
+    private double symbolSize= 1.0;
+    public final static String PROP_FILL_TO_REFERENCE= "fillToReference";
+    public final static String PROP_SYMBOL_SIZE= "symbolSize";
+    public final static String PROP_LINE_WIDTH= "lineWidth";
+    
+    
+    public double getSymbolSize() {
+        return this.symbolSize;
+    }
+    
+    public void setSymbolSize(double symbolSize) {
+        Object oldVal= this.symbolSize;
+        this.symbolSize = symbolSize;
+        propertyChangeSupport.firePropertyChange(PROP_SYMBOL_SIZE, oldVal, symbolSize );
+    }
+    
+    private double lineWidth= 1.0;
+
+    public double getLineWidth() {
+        return this.lineWidth;
+    }
+    
+    public void setLineWidth(double lineWidth) {
+        Object oldVal= this.lineWidth;
+        this.lineWidth = lineWidth;
+        propertyChangeSupport.firePropertyChange( PROP_LINE_WIDTH, oldVal, lineWidth );
+    }
+
+    
+    protected Color color = Color.BLACK;
+    public static final String PROP_COLOR = "color";
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        Color oldColor = this.color;
+        this.color = color;
+        propertyChangeSupport.firePropertyChange(PROP_COLOR, oldColor, color);
+    }
+
+    protected Color fillColor = Color.GRAY;
+    public static final String PROP_FILLCOLOR = "fillColor";
+
+    public Color getFillColor() {
+        return fillColor;
+    }
+
+    public void setFillColor(Color fillColor) {
+        Color oldFillColor = this.fillColor;
+        this.fillColor = fillColor;
+        propertyChangeSupport.firePropertyChange(PROP_FILLCOLOR, oldFillColor, fillColor);
+    }
+
+    public final static String PROP_COLORTABLE= "colortable";
+    
+    private DasColorBar.Type colortable= DasColorBar.Type.COLOR_WEDGE;
+    
+    public DasColorBar.Type getColortable() {
+        return this.colortable;
+    }
+    
+    public void setColortable(DasColorBar.Type colortable) {
+        Object oldVal= this.colortable;
+        this.colortable = colortable;
+        propertyChangeSupport.firePropertyChange( PROP_COLORTABLE, oldVal, this.colortable );
+    }
+
+    public final static String PROP_PLOT_SYMBOL= "plotSymbol";
+    
+    private PlotSymbol plotSymbol= DefaultPlotSymbol.NONE;
+
+    public PlotSymbol getPlotSymbol() {
+        return this.plotSymbol;
+    }
+    
+
+    public void setPlotSymbol(PlotSymbol plotSymbol) {
+        Object oldVal= this.plotSymbol;
+        this.plotSymbol = plotSymbol;
+        propertyChangeSupport.firePropertyChange(PROP_PLOT_SYMBOL, oldVal, plotSymbol );
+    }
+    
+    public final static String PROP_SYMBOL_CONNECTOR= "symbolConnector" ;
+    
+    private PsymConnector symbolConnector= PsymConnector.NONE;
+    
+    public PsymConnector getSymbolConnector() {
+        return this.symbolConnector;
+    }
+    
+    public void setSymbolConnector(PsymConnector symbolConnector) {
+        Object oldVal= this.symbolConnector;
+        this.symbolConnector = symbolConnector;
+        propertyChangeSupport.firePropertyChange(PROP_SYMBOL_CONNECTOR, oldVal, symbolConnector );
+    }
+    
+    
+    public final static String PROP_REFERENCE= "reference";
+    
+    private Datum reference= Units.dimensionless.createDatum(0);
+    
+    public Datum getReference() {
+        return this.reference;
+    }
+    
+    public void setReference(Datum reference) {
+        Object oldVal= this.reference;
+        this.reference = reference;
+        propertyChangeSupport.firePropertyChange(PROP_REFERENCE, oldVal, reference );
+    }
+    
+    private boolean fillToReference= false;
+    
+    public boolean isFillToReference() {
+        return this.fillToReference;
+    }
+    
+    public void setFillToReference(boolean fillToReference) {
+        boolean oldVal= this.fillToReference;
+        this.fillToReference = fillToReference;
+        propertyChangeSupport.firePropertyChange( PROP_FILL_TO_REFERENCE, oldVal, fillToReference );
+    }
+
+    
+    protected RebinnerEnum rebinMethod = RebinnerEnum.binAverage;
+    public static final String PROP_REBINMETHOD = "rebinMethod";
+
+    public RebinnerEnum getRebinMethod() {
+        return rebinMethod;
+    }
+
+    public void setRebinMethod(RebinnerEnum rebinMethod) {
+        RebinnerEnum oldRebinMethod = this.rebinMethod;
+        this.rebinMethod = rebinMethod;
+        propertyChangeSupport.firePropertyChange(PROP_REBINMETHOD, oldRebinMethod, rebinMethod);
+    }
+
+    
+    protected boolean antiAliased = true;
+    public static final String PROP_ANTIALIASED = "antiAliased";
+
+    public boolean isAntiAliased() {
+        return antiAliased;
+    }
+
+    public void setAntiAliased(boolean antiAliased) {
+        boolean oldAntiAliased = this.antiAliased;
+        this.antiAliased = antiAliased;
+        propertyChangeSupport.firePropertyChange(PROP_ANTIALIASED, oldAntiAliased, antiAliased);
+    }
+    
+    /*  DomNode Stuff ******************/
+
+    public void syncTo( DomNode node ) {
+        PanelStyle that= ( PanelStyle )node;
+        this.setColortable( that.colortable );
+        this.setFillToReference( that.fillToReference );
+        this.setColor( that.getColor() );
+        this.setFillColor( that.getFillColor() );
+        this.setReference( that.getReference() );
+        this.setLineWidth( that.getLineWidth() );
+        this.setPlotSymbol( that.getPlotSymbol() );
+        this.setSymbolSize( that.getSymbolSize() );
+        this.setSymbolConnector( that.getSymbolConnector() );
+    }
+
+    public Map<String, String> diffs(DomNode node) {
+        PanelStyle that= (PanelStyle)node;
+        LinkedHashMap<String,String> result= new  LinkedHashMap<String,String>();
+
+        boolean b;
+        b=  that.color.equals(this.color) ;
+        if ( !b ) result.put( "color", that.color + " to "+ this.color );
+        b=  that.fillColor.equals(this.fillColor) ;
+        if ( !b ) result.put( "fillColor", that.fillColor + " to "+ this.fillColor );
+        
+        b=  that.colortable.equals(this.colortable) ;
+        if ( !b ) result.put( "colortable", that.colortable + " to "+ this.colortable );
+        b=  that.lineWidth==this.lineWidth ;
+        if ( !b ) result.put( "lineWidth", that.lineWidth+ " to " +this.lineWidth);
+        b=  that.symbolSize==this.symbolSize ;
+        if ( !b ) result.put( "symbolSize", that.symbolSize+ " to " +this.symbolSize);
+
+        b= that.plotSymbol.equals( this.plotSymbol ) ;
+        if ( !b ) result.put("plotSymbol", that.plotSymbol+ " to " +( this.plotSymbol ));
+        b= that.symbolConnector.equals( this.symbolConnector ) ;
+        if ( !b ) result.put("symbolConnector", that.symbolConnector+ " to " +( this.symbolConnector ));
+
+        b= that.fillToReference==this.fillToReference;
+        if ( !b ) result.put("fillToReference", that.fillToReference+ " to " +( this.fillToReference ));
+
+        b= that.reference.equals( this.reference );
+        if ( !b ) result.put("reference",  that.reference+ " to " +( this.reference ));
+
+        return result;
+    }
+
+    
+}
