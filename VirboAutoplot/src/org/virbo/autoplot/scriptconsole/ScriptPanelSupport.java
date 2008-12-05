@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.HeadlessException;
 import java.beans.ExceptionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -34,6 +35,7 @@ import org.python.core.PyInteger;
 import org.python.core.PySyntaxError;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.JythonUtil;
+import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
 
@@ -45,54 +47,63 @@ public class ScriptPanelSupport {
 
     File file;
     final ApplicationModel model;
+    final ApplicationController applicationController;
     final DataSetSelector selector;
     final JythonScriptPanel panel;
     final EditorAnnotationsSupport annotationsSupport;
-    private String PREFERENCE_OPEN_FILE= "openFile";
+    private String PREFERENCE_OPEN_FILE = "openFile";
 
     ScriptPanelSupport(final JythonScriptPanel panel, final ApplicationModel model, final DataSetSelector selector) {
         this.model = model;
+        this.applicationController= model.getDocumentModel().getController();
         this.selector = selector;
         this.panel = panel;
         this.annotationsSupport = panel.getEditorPanel().getEditorAnnotationsSupport();
-
-        model.addPropertyChangeListener(new PropertyChangeListener() {
-
+        
+        applicationController.addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE)) {
-                    URLSplit split;
-                    try {
-                        String sfile = model.getDataSourceURL();
-                        if (sfile == null) {
-                            return;
-                        }
-                        split= URLSplit.parse(sfile);
-                        if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
-                            return;
-                        }
-
-                        if (panel.isDirty()) {
-                            int result = JOptionPane.showConfirmDialog(panel, "save edits before loading " + file + "?", "Save work", JOptionPane.OK_CANCEL_OPTION);
-                            if (result == JOptionPane.OK_CANCEL_OPTION) {
-                                return;
-                            }
-                            saveAs();
-                        }
-                        file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
-                        loadFile(file);
-
-                        panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
-                        panel.setFilename(sfile.toString());
-                    } catch ( NullPointerException ex ) {
-                        throw ex;
-                    } catch (IOException ex) {
-                        Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                }
+                maybeDisplayDataSourceScript();
             }
         });
 
+    }
+
+    /**
+     * @return true if the source was displayed.
+     * @throws java.awt.HeadlessException
+     * @throws java.lang.NullPointerException
+     */
+    private boolean maybeDisplayDataSourceScript() throws HeadlessException, NullPointerException {
+        URLSplit split;
+        try {
+            String sfile = applicationController.getFocusUri();
+            if (sfile == null) {
+                return false;
+            }
+            split = URLSplit.parse(sfile);
+            if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
+                return false;
+            }
+            if (panel.isDirty()) {
+                int result = JOptionPane.showConfirmDialog(panel, "save edits before loading " + file + "?", "Save work", JOptionPane.OK_CANCEL_OPTION);
+                if (result == JOptionPane.OK_CANCEL_OPTION) {
+                    return false;
+                }
+                saveAs();
+            }
+            file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
+            loadFile(file);
+
+            panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
+            panel.setFilename(sfile.toString());
+        } catch (NullPointerException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+
+        return true;
     }
 
     public int getSaveFile() throws IOException {
@@ -210,13 +221,13 @@ public class ScriptPanelSupport {
                     }
 
                     annotationsSupport.clearAnnotations();
-                    selector.maybePlot();
+                    selector.maybePlot(false);
 
                     panel.setFilename(file.toString());
                 }
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
-                model.setStatus("busy: executing application script");
+                applicationController.setStatus("busy: executing application script");
                 Runnable run = new Runnable() {
 
                     public void run() {
@@ -230,14 +241,14 @@ public class ScriptPanelSupport {
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
                                 interp.exec(panel.getEditorPanel().getText());
-                                model.setStatus( "done executing script");
+                                applicationController.setStatus("done executing script");
                             } catch (IOException ex) {
                                 Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-                                model.setStatus( "error: I/O exception: "+ex.toString() );
+                                applicationController.setStatus("error: I/O exception: " + ex.toString());
                             } catch (PyException ex) {
                                 annotateError(ex);
                                 ex.printStackTrace();
-                                model.setStatus( "error: "+ex.toString() );
+                                applicationController.setStatus("error: " + ex.toString());
                             }
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
@@ -285,7 +296,7 @@ public class ScriptPanelSupport {
                 if (updateSurl) {
                     model.setDataSourceURL(file.toString());
                 } else {
-                    model.update(true, true);
+                    model.getDataSourceFilterController().update(true, true);
                 }
 
             }
@@ -310,12 +321,12 @@ public class ScriptPanelSupport {
                 }
             }
 
-            Preferences prefs= Preferences.userNodeForPackage(ScriptPanelSupport.class);
-            String openFile= prefs.get( PREFERENCE_OPEN_FILE, "" );
-            
+            Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
+            String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
+
             JFileChooser chooser = new JFileChooser();
-            if ( openFile.length()>0 ) {
-                chooser.setSelectedFile( new File(openFile) );
+            if (openFile.length() > 0) {
+                chooser.setSelectedFile(new File(openFile));
             }
             chooser.setFileFilter(getFileFilter());
             if (file != null) {
@@ -324,7 +335,7 @@ public class ScriptPanelSupport {
             int r = chooser.showOpenDialog(panel);
             if (r == JFileChooser.APPROVE_OPTION) {
                 file = chooser.getSelectedFile();
-                prefs.put( PREFERENCE_OPEN_FILE, file.toString() );
+                prefs.put(PREFERENCE_OPEN_FILE, file.toString());
                 loadFile(file);
                 panel.setFilename(file.toString());
             }

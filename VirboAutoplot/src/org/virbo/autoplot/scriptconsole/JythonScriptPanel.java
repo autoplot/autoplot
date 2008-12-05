@@ -24,6 +24,7 @@ import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.JythonUtil;
+import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.DataSetSelector;
 
 /**
@@ -34,6 +35,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     File file;
     ApplicationModel model;
+    ApplicationController applicationController;
     DataSetSelector selector;
     ScriptPanelSupport support;
     static final int CONTEXT_DATA_SOURCE = 1;
@@ -41,13 +43,16 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     private int context = 0;
 
     /** Creates new form JythonScriptPanel */
-    public JythonScriptPanel(final ApplicationModel model, final DataSetSelector selector) {
+    public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
         initComponents();
+        
         setContext(CONTEXT_APPLICATION);
-
+        
         support = new ScriptPanelSupport(this, model, selector);
 
         this.model = model;
+        this.applicationController= model.getDocumentModel().getController();
+        
         this.selector = selector;
 
         this.textArea.addCaretListener(new CaretListener() {
@@ -92,7 +97,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         JythonCompletionProvider.getInstance().addPropertyChangeListener( JythonCompletionProvider.PROP_MESSAGE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                model.setStatus(JythonCompletionProvider.getInstance().getMessage());
+                applicationController.setStatus(JythonCompletionProvider.getInstance().getMessage());
             }
         });
         
@@ -110,18 +115,20 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     }
 
     void setContext(int context) {
+        int oldContext= this.context;
+        if ( oldContext!=context ) {
+            this.file= null;
+        }
         this.context = context;
         this.contextSelector.setSelectedIndex(context);
         if (context == CONTEXT_APPLICATION) {
             this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
-
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
                     return JythonUtil.createInterpreter(true, false);
                 }
             });
         } else if (context == CONTEXT_DATA_SOURCE) {
             this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
-
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
                     PythonInterpreter interp = org.virbo.jythonsupport.JythonUtil.createInterpreter(false);
                     interp.set("monitor", new NullProgressMonitor());
