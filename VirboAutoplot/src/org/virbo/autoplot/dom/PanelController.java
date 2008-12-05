@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
@@ -30,6 +31,7 @@ import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dsops.Ops;
 
 /**
  * PanelController manages the Panel, for example resolving the datasource and loading the dataset.
@@ -300,6 +302,20 @@ public class PanelController {
 
     }
 
+    private void guessCadence( MutablePropertyDataSet xds, QDataSet fillDs ) {
+        Units xunits= (Units) xds.property( QDataSet.UNITS );
+            if ( xunits==null ) xunits= Units.dimensionless;
+
+            Double cadence = DataSetUtil.guessCadence(xds, fillDs);
+            if ( cadence==null && !UnitsUtil.isTimeLocation(xunits)) {
+                cadence= DataSetUtil.guessCadence( Ops.log(xds),null );
+                if ( cadence!=null ) {
+                    ((MutablePropertyDataSet) xds).putProperty( QDataSet.SCALE_TYPE, "log" );
+                }
+            }
+            ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);   
+    }
+    
     /**
      * this is the old updateFillSeries and updateFillSpectrogram code.  This calculates
      * ranges and preferred symbol settings, and puts the values in cpanel.plotDefaults.
@@ -327,12 +343,11 @@ public class PanelController {
             QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
             if (yds == null) {
                 yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); // QUBE
-
             }
-
-            double cadence = DataSetUtil.guessCadence(xds, null);
-            ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
-
+            
+            guessCadence( (MutablePropertyDataSet)xds, fillDs ); 
+            guessCadence( (MutablePropertyDataSet)yds, null );
+            
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
             AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, (Map) props.get(QDataSet.DEPEND_1));
@@ -366,8 +381,7 @@ public class PanelController {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
             }
 
-            double cadence = DataSetUtil.guessCadence(xds, fillDs);
-            ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);
+            guessCadence( (MutablePropertyDataSet)xds, fillDs);
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
