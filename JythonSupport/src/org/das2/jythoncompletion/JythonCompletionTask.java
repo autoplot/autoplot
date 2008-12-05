@@ -21,6 +21,7 @@ import org.das2.jythoncompletion.support.AsyncCompletionQuery;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 import org.python.core.PyClass;
+import org.python.core.PyException;
 import org.python.core.PyJavaClass;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyJavaInstancePeeker;
@@ -105,7 +106,14 @@ public class JythonCompletionTask implements CompletionTask {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
             if (ss.startsWith(cc.completable)) {
-                PyObject po = context.__getattr__(s);
+                PyObject po;
+                try {
+                    po= context.__getattr__(s);
+                } catch ( PyException e ) {
+                    System.err.println("PyException from \""+ss+"\":");
+                    e.printStackTrace();
+                    continue;
+                }
                 String label = ss;
                 String signature = null;
                 String args= "";
