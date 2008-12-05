@@ -56,9 +56,6 @@ public class DataSourceController {
 
         public void propertyChange(PropertyChangeEvent e) {
             if (dsf.getDataSet() != null && dsf.getDataSet().rank() == 3) updateFill();
-            if ( e.getPropertyName()==DataSourceFilter.PROP_SLICEDIMENSION ) {
-                
-            }
         }
     };
     private PropertyChangeListener updateMePropertyChangeListener = new PropertyChangeListener() {
