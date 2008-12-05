@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
  */
 public class EditorTest {
     public static void main(String[] args ) {
-        AsciiDataSourceEditorPanel panel= new AsciiDataSourceEditorPanel();
+        AsciiTableDataSourceEditorPanel panel= new AsciiTableDataSourceEditorPanel();
         
         panel.setUrl("file:///media/mini/data.backup/examples/dat/A1050412.TXT?skip=23");
 

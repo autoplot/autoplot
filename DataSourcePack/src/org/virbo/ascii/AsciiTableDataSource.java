@@ -190,6 +190,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (o != null) {
             parser.setSkipLines(Integer.parseInt(o));
         }
+        
+        o= params.get("skipLines");
+        if (o != null) {
+            parser.setSkipLines(Integer.parseInt(o));
+        }
 
         o = params.get("recCount");
         if (o != null) {
