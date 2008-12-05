@@ -20,12 +20,17 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import org.das2.graph.DasColorBar;
+import org.das2.graph.DasColorBar.Type;
+import org.das2.graph.DefaultPlotSymbol;
+import org.virbo.autoplot.ApplicationModel;
 
 /**
  *
  * @author jbf
  */
 public class StatePersistence {
+
     
     private StatePersistence() {
     }
@@ -38,6 +43,10 @@ public class StatePersistence {
         e.setPersistenceDelegate( DatumRange.class, new DatumRangePersistenceDelegate() );
         e.setPersistenceDelegate( Units.class, new UnitsPersistenceDelegate() );
         e.setPersistenceDelegate( Datum.class, new DatumPersistenceDelegate() );
+        e.setPersistenceDelegate( Datum.Double.class, new DatumPersistenceDelegate() );
+        e.setPersistenceDelegate( DasColorBar.Type.class, new TypeSafeEnumPersistenceDelegate() );
+        e.setPersistenceDelegate( DefaultPlotSymbol.class, new TypeSafeEnumPersistenceDelegate() );
+        //e.setPersistenceDelegate( ApplicationModel.RenderType.class, new TypeSafeEnumPersistenceDelegate() );
         
         e.setExceptionListener( new ExceptionListener() {
             public void exceptionThrown(Exception e) {
@@ -49,7 +58,8 @@ public class StatePersistence {
     }
     
     public static Object restoreState( File f )  throws IOException {
-        XMLDecoder decode= new XMLDecoder( new FileInputStream(f ) );
-        return decode.readObject();
+        XMLDecoder decode= new XMLDecoder( new FileInputStream(f) );
+        Object state= decode.readObject();
+        return state;
     }
 }

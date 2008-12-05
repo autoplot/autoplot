@@ -14,24 +14,38 @@ import org.das2.datum.Units;
 import java.beans.DefaultPersistenceDelegate;
 import java.beans.Encoder;
 import java.beans.Expression;
+import java.beans.PersistenceDelegate;
+import org.das2.datum.DatumUtil;
+import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeLocationUnits;
 
 /**
  *
  * @author jbf
  */
-public class DatumPersistenceDelegate extends DefaultPersistenceDelegate {
+public class DatumPersistenceDelegate extends PersistenceDelegate {
     
-    /** Creates a new instance of DatumRangePersistenceDelegate */
     public DatumPersistenceDelegate()  {
     }
 
+    @Override
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        // super checks for non-null and same class type.
+        return super.mutatesTo(oldInstance, newInstance) && oldInstance.equals(newInstance);
+    }
+    
     protected Expression instantiate(Object oldInstance, Encoder out) {
-        Expression retValue;
-        
+
         Datum field= (Datum)oldInstance;
         Units u= field.getUnits();
-        
-        return new Expression( field, this.getClass(), "newDatum", new Object[] { field.doubleValue(u), u.toString() } );
+
+        if ( u instanceof EnumerationUnits ) {
+            return new Expression( field, this.getClass(), "newNominal", new Object[] { ((EnumerationUnits)u).toString(), field.toString() } );
+        } else if ( u instanceof TimeLocationUnits ) {
+            return new Expression( field, DatumUtil.class, "parseValue", new Object[] { field.toString() } );
+        } else {
+            return new Expression( field, this.getClass(), "newDatum", new Object[] { field.doubleValue(u), u.toString() } );
+        }
         
     }
     
@@ -40,18 +54,9 @@ public class DatumPersistenceDelegate extends DefaultPersistenceDelegate {
         return u.createDatum( val );
     }
 
-    protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
-        super.initialize(type, oldInstance, newInstance, out);
-    }
-
-    public void writeObject(Object oldInstance, Encoder out) {
-        super.writeObject(oldInstance, out);
-    }
-
-    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
-        boolean retValue;
-        
-        retValue = super.mutatesTo(oldInstance, newInstance);
-        return retValue;
+    public static Datum newNominal( String scheme, String value ) {
+        EnumerationUnits u= EnumerationUnits.create(scheme);
+        //EnumerationUnits u= new EnumerationUnits(scheme);
+        return u.createDatum(value);
     }
 }

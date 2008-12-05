@@ -12,11 +12,13 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
+import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.dom.Application;
 
 /**
  *
@@ -55,10 +57,10 @@ public class UndoRedoSupport {
 
     class StateStackElement {
 
-        ApplicationState state;
+        Application state;
         String deltaDesc;
 
-        public StateStackElement(ApplicationState state, String deltaDesc) {
+        public StateStackElement(Application state, String deltaDesc) {
             this.state = state;
             this.deltaDesc = deltaDesc;
         }
@@ -125,7 +127,7 @@ public class UndoRedoSupport {
         if (ignoringUpdates) {
             return;
         }
-        ApplicationState state = applicationModel.createState(false);
+        Application state = applicationModel.createState(false);
         StateStackElement elephant;
 
         if (stateStackPos > 0) {
@@ -139,7 +141,19 @@ public class UndoRedoSupport {
         }
         String labelStr = "initial";
         if (elephant != null) {
-            labelStr = state.diffs(elephant.state);
+            Map<String,String> diffss= state.diffs(elephant.state);
+            if ( diffss.size()==0 ) {
+                labelStr= "unidentified change";
+            } else if ( diffss.size()>3 ) {
+                labelStr= ""+diffss.size()+" changes";
+            } else {
+                StringBuffer buf= new StringBuffer();
+                for ( String s:diffss.keySet() ) {
+                    buf.append( ", "+s+" "+diffss.get(s) );
+                }
+                labelStr = buf.length()>2 ? buf.substring(2) : "";
+            }
+            
         }
 
         stateStack.add(stateStackPos, new StateStackElement(state, labelStr));

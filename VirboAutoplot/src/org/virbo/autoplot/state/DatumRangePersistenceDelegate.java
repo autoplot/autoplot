@@ -14,20 +14,25 @@ import org.das2.datum.Units;
 import java.beans.DefaultPersistenceDelegate;
 import java.beans.Encoder;
 import java.beans.Expression;
+import java.beans.PersistenceDelegate;
 
 /**
  *
  * @author jbf
  */
-public class DatumRangePersistenceDelegate extends DefaultPersistenceDelegate {
+public class DatumRangePersistenceDelegate extends PersistenceDelegate {
     
-    /** Creates a new instance of DatumRangePersistenceDelegate */
     public DatumRangePersistenceDelegate()  {
     }
 
-    protected Expression instantiate(Object oldInstance, Encoder out) {
-        Expression retValue;
-        
+    @Override
+    protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        // super checks for non-null and same class type.
+        return super.mutatesTo(oldInstance, newInstance) && oldInstance.equals(newInstance);
+    }
+
+
+    protected Expression instantiate(Object oldInstance, Encoder out) {        
         DatumRange field= (DatumRange)oldInstance;
         Units u= field.getUnits();
         

@@ -17,6 +17,7 @@ import org.das2.datum.Units;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.datum.UnitsUtil;
+import org.virbo.autoplot.dom.Panel;
 
 /**
  *
@@ -101,14 +102,7 @@ public class ApplicationState {
         StringBuffer buf= new StringBuffer();
         boolean same= true;
         boolean b;
-        b= ( that.surl==this.surl || ( that.surl!=null && that.surl.equals(this.surl) ) ) ;
-        if ( !b ) buf.append(", surl "+ abbreviateRight(that.surl, 20) + " to " + abbreviateRight(this.surl,20) );
-        b=  that.colortable.equals(this.colortable) ;
-        if ( !b ) buf.append(", colortable " + that.colortable + " to "+ this.colortable );
-        b=  that.lineWidth==this.lineWidth ;
-        if ( !b ) buf.append(", lineWidth " + that.lineWidth+ " to " +this.lineWidth);
-        b=  that.symbolSize==this.symbolSize ;
-        if ( !b ) buf.append(", symbolSize " + that.symbolSize+ " to " +this.symbolSize);
+
         b= that.xlog==this.xlog ;
         if ( !b ) buf.append(", xlog " + that.xlog+ " to " +this.xlog);
         b=  that.xrange.equals(this.xrange) ;
@@ -121,21 +115,7 @@ public class ApplicationState {
         if ( !b ) buf.append(", zlog " + that.zlog+ " to " +this.zlog);
         b= that.zrange.equals(this.zrange) ;
         if ( !b ) buf.append(", zrange " + describe( that.zrange, this.zrange ) );
-        b= that.validRange.equals( this.validRange );
-        if ( !b ) buf.append(", validRange " + that.validRange+ " to " +( this.validRange ) );
-        b= that.fill.equals( this.fill );
-        if ( !b ) buf.append(", fill " + that.fill+ " to " +( this.fill ));
         
-        b= that.plotSymbol.equals( this.plotSymbol ) ;
-        if ( !b ) buf.append(", plotSymbol " + that.plotSymbol+ " to " +( this.plotSymbol ));
-        b= that.symbolConnector.equals( this.symbolConnector ) ;
-        if ( !b ) buf.append(", symbolConnector " + that.symbolConnector+ " to " +( this.symbolConnector ));
-                
-        b= that.fillToReference==this.fillToReference;
-        if ( !b ) buf.append(", fillToReference " + that.fillToReference+ " to " +( this.fillToReference ));
-        
-        b= that.reference.equals( this.reference );
-        if ( !b ) buf.append(", reference " + that.reference+ " to " +( this.reference ));
         
         b= that.options.canvasFont.equals( this.options.canvasFont );
         if ( !b ) buf.append(", font " + that.options.canvasFont+ " to " +( this.options.canvasFont ));
@@ -160,15 +140,17 @@ public class ApplicationState {
         }
     }
 
-    
-    private String surl;
-    
-    public String getSurl() {
-        return this.surl;
+    protected Panel panel = null;
+    public static final String PROP_PANEL = "panel";
+
+    public Panel getPanel() {
+        return panel;
     }
-    
-    public void setSurl(String surl) {
-        this.surl = surl;
+
+    public void setPanel(Panel panel) {
+        Panel oldPanel = this.panel;
+        this.panel = panel;
+        propertyChangeSupport.firePropertyChange(PROP_PANEL, oldPanel, panel);
     }
     
     private DatumRange xrange;
@@ -231,36 +213,6 @@ public class ApplicationState {
         this.zlog = zlog;
     }
     
-    private double symbolSize;
-    
-    public double getSymbolSize() {
-        return this.symbolSize;
-    }
-    
-    public void setSymbolSize(double symbolSize) {
-        this.symbolSize = symbolSize;
-    }
-    
-    private double lineWidth;
-
-    public double getLineWidth() {
-        return this.lineWidth;
-    }
-    
-    public void setLineWidth(double lineWidth) {
-        this.lineWidth = lineWidth;
-    }
-
-    private String colortable;
-    
-    public String getColortable() {
-        return this.colortable;
-    }
-    
-    public void setColortable(String colortable) {
-        this.colortable = colortable;
-    }
-    
     private java.awt.Dimension canvasSize = new java.awt.Dimension( 640, 480 );
 
     public static final String PROP_CANVASSIZE = "canvasSize";
@@ -290,69 +242,7 @@ public class ApplicationState {
         boolean oldCanvasFitted = this.canvasFitted;
         this.canvasFitted = canvasFitted;
         propertyChangeSupport.firePropertyChange(PROP_CANVASFITTED, oldCanvasFitted, canvasFitted);
-    }
-    
-    private String validRange="";
-
-    public String getValidRange() {
-        return this.validRange;
-    }
-    
-    public void setValidRange(String validRange) {
-        this.validRange = validRange;
-    }
-    
-    private String fill="";
-    
-    public String getFill() {
-        return this.fill;
-    }
-    
-    public void setFill(String fill) {
-        this.fill = fill;
-    }
-    
-    private boolean fillToReference;
-    
-    public boolean isFillToReference() {
-        return this.fillToReference;
-    }
-    
-    public void setFillToReference(boolean fillToReference) {
-        this.fillToReference = fillToReference;
-    }
-    
-    private String plotSymbol= DefaultPlotSymbol.NONE.toString();
-
-    
-    public String getPlotSymbol() {
-        return this.plotSymbol;
-    }
-    
-
-    public void setPlotSymbol(String plotSymbol) {
-        this.plotSymbol = plotSymbol;
-    }
-    
-    private String symbolConnector= PsymConnector.NONE.toString();
-    
-    public String getSymbolConnector() {
-        return this.symbolConnector;
-    }
-    
-    public void setSymbolConnector(String symbolConnector) {
-        this.symbolConnector = symbolConnector;
-    }
-    
-    private String reference= "fill";
-    
-    public String getReference() {
-        return this.reference;
-    }
-    
-    public void setReference(String reference) {
-        this.reference = reference;
-    }
+    }    
     
     private String embeddedDataSet;
     
@@ -523,59 +413,6 @@ public class ApplicationState {
         propertyChangeSupport.firePropertyChange(PROP_ISOTROPIC, oldIsotropic, isotropic);
     }
 
-    private String title = "";
-
-    public static final String PROP_TITLE = "title";
-
-    public String getTitle() {
-        return this.title;
-    }
-
-    public void setTitle(String newtitle) {
-        String oldtitle = title;
-        this.title = newtitle;
-        propertyChangeSupport.firePropertyChange(PROP_TITLE, oldtitle, newtitle);
-    }
-    
-    protected String xLabel = "";
-    public static final String PROP_XLABEL = "xLabel";
-
-    public String getXLabel() {
-	return xLabel;
-    }
-
-    public void setXLabel(String xLabel) {
-	String oldXLabel = this.xLabel;
-	this.xLabel = xLabel;
-	propertyChangeSupport.firePropertyChange(PROP_XLABEL, oldXLabel, xLabel);
-    }
-    
-    
-    protected String yLabel = "";
-    public static final String PROP_YLABEL = "yLabel";
-
-    public String getYLabel() {
-	return yLabel;
-    }
-
-    public void setYLabel(String yLabel) {
-	String oldYLabel = this.yLabel;
-	this.yLabel = yLabel;
-	propertyChangeSupport.firePropertyChange(PROP_YLABEL, oldYLabel, yLabel);
-    }
-
-    protected String zLabel = "";
-    public static final String PROP_ZLABEL = "zLabel";
-
-    public String getZLabel() {
-        return zLabel;
-    }
-
-    public void setZLabel(String zLabel) {
-        String oldZLabel = this.zLabel;
-        this.zLabel = zLabel;
-        propertyChangeSupport.firePropertyChange(PROP_ZLABEL, oldZLabel, zLabel);
-    }
 
     protected Options options = new Options();
 
