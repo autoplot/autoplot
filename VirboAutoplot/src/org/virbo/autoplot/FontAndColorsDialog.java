@@ -9,10 +9,13 @@ import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import org.das2.graph.DasCanvas;
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Collections;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import org.das2.graph.GraphUtil;
+import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.state.Options;
 
 /**
@@ -194,7 +197,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
             app.getCanvas().setBaseFont(chooser.getFont());
             Font f = app.getCanvas().getFont();
             fontLabel.setText(Options.getFontLabel(f));
-            app.options.setCanvasFont(Options.getFontLabel(f));
+            app.getDocumentModel().getOptions().setCanvasFont( f );
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -203,19 +206,22 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         jComboBox1.setSelectedIndex(fores.length);
         backgroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
         app.getCanvas().setBackground(c);
-        app.options.setBackground(c);
+        app.getDocumentModel().getOptions().setBackground(c);
         
     }//GEN-LAST:event_backgroundColorButtonActionPerformed
 
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "foreground color", foregroundColorButton.getBackground());
         jComboBox1.setSelectedIndex(fores.length);
-        if (app.seriesRend.getColor().equals(app.getCanvas().getForeground())) {
-            app.seriesRend.setColor(c);
+        List<Panel> panels= Collections.singletonList(app.dom.getPanel());
+        for ( Panel p: panels ) {
+            if ( p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
+                p.getStyle().setColor(c);
+            }
         }
         foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
         app.getCanvas().setForeground(c);
-        app.options.setForeground(c);
+        app.getDocumentModel().getOptions().setForeground(c);
     }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
@@ -223,13 +229,14 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         if (i < fores.length) {
             foregroundColorButton.setIcon( GraphUtil.colorIcon( fores[i], ICON_SIZE, ICON_SIZE ) );
             backgroundColorButton.setIcon( GraphUtil.colorIcon( backs[i], ICON_SIZE, ICON_SIZE ) );
-            if (app.seriesRend.getColor().equals(app.getCanvas().getForeground())) {
-                app.seriesRend.setColor(fores[i]);
+            List<Panel> panels= Collections.singletonList(app.dom.getPanel());
+            for ( Panel p: panels ) {
+                if (p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
+                    p.getStyle().setColor(fores[i]);
+                }
             }
-            app.getCanvas().setForeground(fores[i]);
-            app.getCanvas().setBackground(backs[i]);
-            app.options.setForeground(fores[i]);
-            app.options.setBackground(backs[i]);
+            app.getDocumentModel().getOptions().setForeground(fores[i]);
+            app.getDocumentModel().getOptions().setBackground(backs[i]);
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
 

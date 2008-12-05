@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -54,8 +55,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
+import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.graph.DasPlot;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
@@ -76,6 +82,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
     TearoffTabbedPane tabs;
     ApplicationModel applicationModel;
+    Application dom;
     PersistentStateSupport stateSupport;
     UndoRedoSupport undoRedoSupport;
     TickleTimer tickleTimer;
@@ -117,6 +124,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         ScriptContext.setApplicationModel(model);
         ScriptContext.setView(this);
 
+        this.dom= model.getDocumentModel();
+        
         support = new GuiSupport(this);
 
         applicationModel = model;
@@ -127,21 +136,28 @@ public class AutoPlotUI extends javax.swing.JFrame {
         statusLabel.setIcon(IDLE_ICON);
         support.addKeyBindings((JPanel) getContentPane());
 
-        dataSetSelector.setMonitorContext(applicationModel.plot);
+        dataSetSelector.setMonitorFactory( dom.getController().getMonitorFactory() );
 
-        applicationModel.plot.addFocusListener(new FocusAdapter() {
+        final ApplicationController appController= applicationModel.getDocumentModel().getController();
 
-            @Override
-            public void focusGained(FocusEvent e) {
-                dataSetSelector.setValue(applicationModel.getDataSourceURL());
-                super.focusGained(e);
+        appController.addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                dataSetSelector.setValue( appController.getFocusUri() );
             }
-        });
-
-        applicationModel.canvas.addFocusListener(new FocusAdapter() {
-
+        } );
+        dataSetSelector.setValue( dom.getController().getFocusUri() );
+        
+        appController.addPropertyChangeListener( ApplicationController.PROP_STATUS, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                setStatus(appController.getStatus());
+            }
+        } );
+        
+        
+        applicationModel.getCanvas().addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
+                logger.fine("focus to canvas");
                 if (stateSupport.getCurrentFile() != null) {
                     dataSetSelector.setValue(stateSupport.getCurrentFile().toString());
                 }
@@ -165,7 +181,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
         dataSetSelector.setRecent(urls);
         if (urls.size() > 1) {
             dataSetSelector.setValue(urls.get(urls.size() - 1));
-            applicationModel.maybeSetInitialURL(urls.get(urls.size() - 1));
         }
 
         applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
@@ -178,12 +193,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
                         urls.add(((Bookmark.Item) b).getUrl());
                     }
                     dataSetSelector.setRecent(urls);
-                } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_STATUS)) {
-                    setStatus(applicationModel.getStatus());
                 } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_BOOKMARKS)) {
                     updateBookmarks();
-                } else if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_DATASOURCE_URL)) {
-                    dataSetSelector.setValue(applicationModel.getDataSourceURL());
                 }
             }
         });
@@ -235,11 +246,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
         tabs.insertTab("metadata", null, mdp, TABS_TOOLTIP, 3);
 
-        if (model.options.isScriptVisible()) {
+        if (model.getDocumentModel().getOptions().isScriptVisible()) {
             tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector));
             scriptPanelMenuItem.setSelected(true);
         }
-        if (model.options.isLogConsoleVisible()) {
+        if (model.getDocumentModel().getOptions().isLogConsoleVisible()) {
             initLogConsole();
         }
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
@@ -265,14 +276,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
-
+        applicationModel.dom.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_FILL)) {
-                    mdp.update();
-                }
                 String propName = evt.getPropertyName();
-                if (propName.equals("bounds") || propName.equals("pendingChanges") || propName.equals("recent") || propName.equals("status") || propName.equals("ticks") || propName.contains("PerMillisecond")) return;
+                //if (propName.equals("bounds") || propName.equals("pendingChanges") || propName.equals("recent") || propName.equals("status") || propName.equals("ticks") || propName.contains("PerMillisecond")) return;
+                if ( dom.getController().isValueAdjusting() ) return;
+                logger.finer( "state change: "+evt.getPropertyName() );
                 if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState()) { // TODO: list the props we want!
                     tickleTimer.tickle(evt.getPropertyName() + " from " + evt.getSource());
                 }
@@ -337,7 +346,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                     public void actionPerformed(ActionEvent e) {
                         dataSetSelector.getEditor().setText(((Bookmark.Item) book).getUrl());
                         dataSetSelector.setValue(((Bookmark.Item) book).getUrl());
-                        dataSetSelector.maybePlot();
+                        dataSetSelector.maybePlot(false);
                     }
                 });
 
@@ -426,16 +435,18 @@ public class AutoPlotUI extends javax.swing.JFrame {
         logConsole.logConsoleMessages(); // stderr, stdout logged to Logger "console"
 
         Handler h = logConsole.getHandler();
-        Logger.getLogger("das2").setLevel(Level.ALL);
+        Logger.getLogger("das2").setLevel(Level.INFO);
         Logger.getLogger("das2").addHandler(h);
         Logger.getLogger("virbo").setLevel(Level.ALL);
         Logger.getLogger("virbo").addHandler(h);
+        Logger.getLogger("vap").setLevel(Level.ALL);
+        Logger.getLogger("vap").addHandler(h);
         Logger.getLogger("console").setLevel(Level.ALL);
         Logger.getLogger("console").addHandler(h); // stderr, stdout
 
         setMessage("log console added");
         tabs.addTab("console", logConsole);
-        applicationModel.options.setLogConsoleVisible(true);
+        applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(true);
 
         logConsoleMenuItem.setSelected(true);
     }
@@ -471,6 +482,20 @@ public class AutoPlotUI extends javax.swing.JFrame {
         }
     }
 
+    private void plotAnotherUrl() {
+        try {
+            Logger.getLogger("ap").info("plotAnotherUrl()");
+            final String surl = (String) dataSetSelector.getValue();
+            applicationModel.addRecent(surl);
+            Panel panel= dom.getController().addPanel( null );
+            panel.getController().setSuri( surl );
+            
+        } catch (RuntimeException ex) {
+            applicationModel.application.getExceptionHandler().handle(ex);
+            setStatus(ERROR_ICON,ex.getMessage());
+        }
+    }
+    
     public void setStatus(String message) {
 
         if ( message.startsWith("busy:" ) ) {
@@ -609,6 +634,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         redoMenuItem = new javax.swing.JMenuItem();
         undoMultipleMenu = new javax.swing.JMenu();
         jSeparator2 = new javax.swing.JSeparator();
+        editDomMenuItem = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JSeparator();
         pasteDataSetURLMenuItem = new javax.swing.JMenuItem();
         copyDataSetURLMenuItem = new javax.swing.JMenuItem();
         copyImageMenuItem = new javax.swing.JMenuItem();
@@ -677,6 +704,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
         undoMultipleMenu.setText("Undo...");
         editMenu.add(undoMultipleMenu);
         editMenu.add(jSeparator2);
+
+        editDomMenuItem.setText("Edit DOM");
+        editDomMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editDomMenuItemActionPerformed(evt);
+            }
+        });
+        editMenu.add(editDomMenuItem);
+        editMenu.add(jSeparator1);
 
         pasteDataSetURLMenuItem.setText("Paste URL");
         pasteDataSetURLMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -947,7 +983,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_optionsMenuActionPerformed
 
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
-        plotUrl();
+        if ( ( evt.getModifiers() & KeyEvent.CTRL_MASK ) == KeyEvent.CTRL_MASK ) {
+            plotAnotherUrl();            
+        } else {
+            plotUrl();
+        }
     }//GEN-LAST:event_dataSetSelectorActionPerformed
 
     private void fileMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileMenuActionPerformed
@@ -955,17 +995,19 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_fileMenuActionPerformed
 
     private void zoomOutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutMenuItemActionPerformed
-        DatumRange dr = DatumRangeUtil.rescale(applicationModel.getXAxis().getDatumRange(), -0.333, 1.333);
-        applicationModel.getXAxis().setDatumRange(dr);
+        DasPlot p= dom.getPlot().getController().getDasPlot();
+        DatumRange dr = DatumRangeUtil.rescale( p.getXAxis().getDatumRange(), -0.333, 1.333);
+        p.getXAxis().setDatumRange(dr);
     }//GEN-LAST:event_zoomOutMenuItemActionPerformed
 
     private void zoomInMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomInMenuItemActionPerformed
-        DatumRange dr = DatumRangeUtil.rescale(applicationModel.getXAxis().getDatumRange(), 0.25, 0.75);
-        applicationModel.getXAxis().setDatumRange(dr);
+        DasPlot p= dom.getPlot().getController().getDasPlot();
+        DatumRange dr = DatumRangeUtil.rescale(p.getXAxis().getDatumRange(), 0.25, 0.75);
+        p.getXAxis().setDatumRange(dr);
     }//GEN-LAST:event_zoomInMenuItemActionPerformed
 
     private void resetZoomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetZoomMenuItemActionPerformed
-        applicationModel.resetZoom();
+        dom.getPlot().getController().resetZoom();
     }//GEN-LAST:event_resetZoomMenuItemActionPerformed
 
     private void fontsAndColorsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontsAndColorsMenuItemActionPerformed
@@ -974,15 +1016,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_fontsAndColorsMenuItemActionPerformed
 
     private void specialEffectsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_specialEffectsMenuItemActionPerformed
-        applicationModel.setSpecialEffects(specialEffectsMenuItem.isSelected());
+        applicationModel.getDocumentModel().getOptions().setSpecialEffects(specialEffectsMenuItem.isSelected());
     }//GEN-LAST:event_specialEffectsMenuItemActionPerformed
 
     private void drawAntiAliasMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_drawAntiAliasMenuItemActionPerformed
-        applicationModel.setDrawAntiAlias(drawAntiAliasMenuItem.isSelected());
+        applicationModel.getDocumentModel().getOptions().setDrawAntiAlias(drawAntiAliasMenuItem.isSelected());
     }//GEN-LAST:event_drawAntiAliasMenuItemActionPerformed
 
     private void textAntiAliasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_textAntiAliasActionPerformed
-        applicationModel.getCanvas().setTextAntiAlias(textAntiAlias.isSelected());
+        applicationModel.getDocumentModel().getOptions().setTextAntiAlias(textAntiAlias.isSelected());
     }//GEN-LAST:event_textAntiAliasActionPerformed
 
     private void aboutAutoplotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutAutoplotMenuItemActionPerformed
@@ -1028,7 +1070,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_helpMenuActionPerformed
 
 private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scriptPanelMenuItemActionPerformed
-    applicationModel.options.setScriptVisible(scriptPanelMenuItem.isSelected());
+    applicationModel.getDocumentModel().getOptions().setScriptVisible(scriptPanelMenuItem.isSelected());
     if (scriptPanelMenuItem.isSelected() && scriptPanel == null) {
         scriptPanel = new JythonScriptPanel(applicationModel, this.dataSetSelector);
         tabs.insertTab("script", null, scriptPanel, TABS_TOOLTIP, 4);
@@ -1038,8 +1080,8 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
 }//GEN-LAST:event_scriptPanelMenuItemActionPerformed
 
 private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logConsoleMenuItemActionPerformed
-    applicationModel.options.setLogConsoleVisible(logConsoleMenuItem.isSelected());
-    if (applicationModel.options.isLogConsoleVisible() && logConsole == null) {
+    applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(logConsoleMenuItem.isSelected());
+    if (applicationModel.getDocumentModel().getOptions().isLogConsoleVisible() && logConsole == null) {
         initLogConsole();
     } else {
         if ( logConsole!=null ) {
@@ -1050,8 +1092,8 @@ private void logConsoleMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 }//GEN-LAST:event_logConsoleMenuItemActionPerformed
 
 private void serverCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverCheckBoxMenuItemActionPerformed
-    applicationModel.options.setServerEnabled(serverCheckBoxMenuItem.isSelected());
-    if (applicationModel.options.isServerEnabled()) {
+    applicationModel.getDocumentModel().getOptions().setServerEnabled(serverCheckBoxMenuItem.isSelected());
+    if (applicationModel.getDocumentModel().getOptions().isServerEnabled()) {
         initServer();
     } else {
         stopServer();
@@ -1095,6 +1137,11 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     }
 }//GEN-LAST:event_jMenuItem5ActionPerformed
 
+private void editDomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editDomMenuItemActionPerformed
+    PropertyEditor edit= new PropertyEditor(applicationModel.dom);
+    edit.showDialog(this);
+}//GEN-LAST:event_editDomMenuItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1127,11 +1174,11 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         }
 
         if (alm.getBooleanValue("scriptPanel")) {
-            model.options.setScriptVisible(true);
+            model.getDocumentModel().getOptions().setScriptVisible(true);
         }
 
         if (alm.getBooleanValue("logConsole")) {
-            model.options.setLogConsoleVisible(true);
+            model.getDocumentModel().getOptions().setLogConsoleVisible(true);
         }
 
         if (alm.getBooleanValue("nativeLAF")) {
@@ -1150,7 +1197,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 if (!alm.getValue("port").equals("-1")) {
                     int iport = Integer.parseInt(alm.getValue("port"));
                     app.setupServer(iport, model);
-                    model.options.setServerEnabled(true);
+                    model.getDocumentModel().getOptions().setServerEnabled(true);
                 }
 
                 Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
@@ -1171,7 +1218,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 app.setVisible(true);
                 if (initialURL != null) {
                     app.dataSetSelector.setValue(initialURL);
-                    app.dataSetSelector.maybePlot();
+                    app.dataSetSelector.maybePlot(false);
                 }
                 if (bookmarks != null) {
                     Runnable run = new Runnable() {
@@ -1242,6 +1289,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JMenuItem copyImageMenuItem;
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
+    private javax.swing.JMenuItem editDomMenuItem;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
@@ -1255,6 +1303,7 @@ private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;

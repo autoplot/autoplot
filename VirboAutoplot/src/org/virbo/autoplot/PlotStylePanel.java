@@ -3,101 +3,139 @@
  *
  * Created on July 27, 2007, 9:41 AM
  */
-
 package org.virbo.autoplot;
 
+import java.beans.PropertyChangeEvent;
 import org.das2.components.DatumEditor;
 import org.das2.components.propertyeditor.ColorEditor;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.beans.PropertyChangeListener;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
-import javax.beans.binding.BindingConverter;
 import javax.swing.SpinnerNumberModel;
+import org.das2.graph.DasColorBar;
+import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.PsymConnector;
+import org.das2.graph.SpectrogramRenderer;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.PanelStyle;
 
 /**
  *
  * @author  jbf
  */
 public class PlotStylePanel extends javax.swing.JPanel {
-    
+
     ApplicationModel applicationModel;
     
+    EnumerationEditor psymEditor;
+    EnumerationEditor lineEditor;
+    EnumerationEditor edit;
+    EnumerationEditor rebin;
+    ColorEditor colorEditor;
+    ColorEditor fillColorEditor;
+    DatumEditor referenceEditor;
+    BindingContext panelBindingContext;
+
+    Application dom;
+    
     /** Creates new form PlotStylePanel */
-    public PlotStylePanel( final ApplicationModel applicationModel ) {
-        this.applicationModel= applicationModel;
+    public PlotStylePanel(final ApplicationModel applicationModel) {
+        this.applicationModel = applicationModel;
+        this.dom= applicationModel.getDocumentModel();
+        
+        this.dom.addPropertyChangeListener( Application.PROP_PANEL, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                doPanelBindings();
+            }
+        });
         
         initComponents();
-        
-        symSizeSpinner.setModel( new SpinnerNumberModel( 2.0f, 0.09f, 10.f, 0.2f ) );
-        
-        EnumerationEditor psymEditor= new EnumerationEditor();
-        psymEditor.setValue( applicationModel.seriesRend.getPsym() );
+
+        symSizeSpinner.setModel(new SpinnerNumberModel(2.0f, 0.09f, 10.f, 0.2f));
+
+        psymEditor = new EnumerationEditor();
+        psymEditor.setValue( DefaultPlotSymbol.BOX );
         psymPanel.add(psymEditor.getCustomEditor(), BorderLayout.CENTER);
-        
-        EnumerationEditor lineEditor= new EnumerationEditor();
-        lineEditor.setValue( applicationModel.seriesRend.getPsymConnector() );
+
+        lineEditor = new EnumerationEditor();
+        lineEditor.setValue( PsymConnector.SOLID );
         lineStylePanel.add(lineEditor.getCustomEditor(), BorderLayout.CENTER);
-        
-        lineThickSpinner.setModel( new SpinnerNumberModel( 1.0f, 0.09f, 10.f, 0.2f ) );
-                
-        EnumerationEditor edit= new EnumerationEditor();
-        edit.setValue( applicationModel.colorbar.getType() );
-        colortableTypePanel.add( edit.getCustomEditor(), BorderLayout.CENTER );
-        
-        EnumerationEditor rebin= new EnumerationEditor();
-        rebin.setValue( applicationModel.spectrogramRend.getRebinner() );
-        rebinPanel.add( rebin.getCustomEditor(), BorderLayout.CENTER );
-        
-        ColorEditor colorEditor= new ColorEditor();
-        
-        colorEditor.setValue( applicationModel.seriesRend.getColor() );
-        colorPanel.add( colorEditor.getSmallEditor(), BorderLayout.CENTER );
-        
-        ColorEditor fillColorEditor= new ColorEditor();
-        
-        fillColorEditor.setValue( applicationModel.seriesRend.getFillColor() );
-        fillColorPanel.add( fillColorEditor.getSmallEditor(), BorderLayout.CENTER );
-                
-        DatumEditor referenceEditor= new DatumEditor();
+
+        lineThickSpinner.setModel(new SpinnerNumberModel(1.0f, 0.09f, 10.f, 0.2f));
+
+        edit = new EnumerationEditor();
+        edit.setValue( DasColorBar.Type.GRAYSCALE );
+        colortableTypePanel.add(edit.getCustomEditor(), BorderLayout.CENTER);
+
+        rebin = new EnumerationEditor();
+        rebin.setValue( SpectrogramRenderer.RebinnerEnum.binAverage );
+        rebinPanel.add(rebin.getCustomEditor(), BorderLayout.CENTER);
+
+        colorEditor = new ColorEditor();
+        colorEditor.setValue( Color.BLACK );
+        colorPanel.add(colorEditor.getSmallEditor(), BorderLayout.CENTER);
+
+        fillColorEditor = new ColorEditor();
+
+        fillColorEditor.setValue( Color.DARK_GRAY );
+        fillColorPanel.add(fillColorEditor.getSmallEditor(), BorderLayout.CENTER);
+
+        referenceEditor = new DatumEditor();
         referenceValuePanel.add(referenceEditor.getCustomEditor());
-        
+
         validate();
-        
-        BindingContext bc= new BindingContext();
+
+        doOptionsBindings();
+
+        doPanelBindings();
+    }
+
+    public synchronized void doOptionsBindings( ) {
+        BindingContext bc = new BindingContext();
         Binding b;
-        
-        BindingConverter passThru= new BindingConverter() {
-            public Object sourceToTarget(Object object) {
-                return object;
-            }
-            public Object targetToSource( Object object ) {
-                return object;
-            }
-        };
-        
-        b = bc.addBinding( applicationModel.seriesRend, "${symSize}", symSizeSpinner, "value");        
-        b= bc.addBinding( applicationModel.seriesRend, "${psym}", psymEditor, "value");
-        b = bc.addBinding( applicationModel.seriesRend, "${lineWidth}", lineThickSpinner, "value");
-        b= bc.addBinding( applicationModel.seriesRend, "${psymConnector}", lineEditor, "value");
 
-        b= bc.addBinding( applicationModel.seriesRend, "${color}", colorEditor, "value" );
-        b= bc.addBinding( applicationModel.seriesRend, "${fillToReference}", fillToReferenceCheckBox, "selected" );
-        b= bc.addBinding( applicationModel.seriesRend, "${fillColor}", fillColorEditor, "value" );
-        b= bc.addBinding( applicationModel.seriesRend, "${reference}", referenceEditor, "value" );
+        b = bc.addBinding( dom.getOptions(), "${drawGrid}", majorTicksCheckBox, "selected");
+        b = bc.addBinding( dom.getOptions(), "${drawMinorGrid}", minorGridCheckBox, "selected");
 
-        b= bc.addBinding( applicationModel.colorbar, "${type}", edit, "value" );
-
-        b= bc.addBinding( applicationModel.spectrogramRend, "${rebinner}", rebin, "value" );
-        
-        b= bc.addBinding( applicationModel.plot, "${drawGrid}", majorTicksCheckBox, "selected" );
-        b= bc.addBinding( applicationModel.plot, "${drawMinorGrid}", minorGridCheckBox, "selected" );
-        b= bc.addBinding( applicationModel.plot, "${gridOver}", gridOverCheckBox, "selected" );
-        
         bc.bind();
     }
     
+
+    public synchronized void doPanelBindings() {
+        //TODO: why null?
+        Panel panel= dom.getPanel();
+        if ( panel==null ) return;
+        PanelStyle style= panel.getStyle();
+        BindingContext bc = new BindingContext();
+        Binding b;
+
+        b = bc.addBinding(style, "${symbolSize}", symSizeSpinner, "value");
+        b = bc.addBinding(style, "${plotSymbol}", psymEditor, "value");
+        b = bc.addBinding(style, "${lineWidth}", lineThickSpinner, "value");
+        b = bc.addBinding(style, "${symbolConnector}", lineEditor, "value");
+
+        b = bc.addBinding(style, "${color}", colorEditor, "value");
+        b = bc.addBinding(style, "${fillToReference}", fillToReferenceCheckBox, "selected");
+        b = bc.addBinding(style, "${fillColor}", fillColorEditor, "value");
+        b = bc.addBinding(style, "${reference}", referenceEditor, "value");
+
+        b = bc.addBinding(style, "${colortable}", edit, "value");
+        b = bc.addBinding(style, "${rebinMethod}", rebin, "value");
+        
+        if ( panelBindingContext!=null ) panelBindingContext.unbind();
+        bc.bind();
+        
+        repaint();
+        
+        panelBindingContext= bc;
+        
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -397,14 +435,12 @@ public class PlotStylePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void moreSprectrogramPropsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moreSprectrogramPropsButtonActionPerformed
-        new PropertyEditor(applicationModel.spectrogramRend).showDialog(this);
+        new PropertyEditor(dom.getPanel()).showDialog(this);
     }//GEN-LAST:event_moreSprectrogramPropsButtonActionPerformed
 
     private void moreSeriesPropsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moreSeriesPropsButtonActionPerformed
-        new PropertyEditor(applicationModel.seriesRend).showDialog(this);
+        new PropertyEditor(dom.getPanel()).showDialog(this);
     }//GEN-LAST:event_moreSeriesPropsButtonActionPerformed
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel colorPanel;
     private javax.swing.JPanel colortableTypePanel;
@@ -436,5 +472,4 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private javax.swing.JPanel referenceValuePanel;
     private javax.swing.JSpinner symSizeSpinner;
     // End of variables declaration//GEN-END:variables
-    
 }

@@ -78,8 +78,8 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="xTitleTextField" alignment="1" pref="255" max="32767" attributes="0"/>
-                      <Component id="xAxisRangePanel" alignment="0" pref="255" max="32767" attributes="1"/>
+                      <Component id="xTitleTextField" alignment="1" pref="272" max="32767" attributes="0"/>
+                      <Component id="xAxisRangePanel" alignment="0" pref="272" max="32767" attributes="1"/>
                       <Component id="xLog" alignment="0" min="-2" max="-2" attributes="1"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="showOverviewPlot" min="-2" max="-2" attributes="0"/>
@@ -164,8 +164,8 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="zLog" min="-2" max="-2" attributes="0"/>
-                      <Component id="zAxisRangePanel" alignment="0" pref="255" max="32767" attributes="0"/>
-                      <Component id="zTitleTextField" alignment="0" pref="255" max="32767" attributes="0"/>
+                      <Component id="zAxisRangePanel" alignment="0" pref="272" max="32767" attributes="0"/>
+                      <Component id="zTitleTextField" alignment="0" pref="272" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -221,10 +221,10 @@
               <Group type="102" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="yAxisRangePanel" alignment="0" pref="255" max="32767" attributes="0"/>
+                      <Component id="yAxisRangePanel" alignment="0" pref="272" max="32767" attributes="0"/>
                       <Component id="yLog" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="isotropicCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="yTitleTextField" alignment="0" pref="255" max="32767" attributes="0"/>
+                      <Component id="yTitleTextField" alignment="0" pref="272" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -306,16 +306,18 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="autolayoutCheckbox" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Component id="jLabel2" alignment="1" pref="360" max="32767" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="validRangeLabel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="validRangeComboBox" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="fillValueLabel" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="fillValueComboBox" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel2" alignment="1" pref="369" max="32767" attributes="0"/>
+                      <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                          <Group type="102" alignment="0" attributes="1">
+                              <Component id="fillValueLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="fillValueComboBox" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="validRangeLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="validRangeComboBox" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -447,7 +449,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jLabel3" alignment="0" pref="360" max="32767" attributes="0"/>
+                      <Component id="jLabel3" alignment="0" pref="369" max="32767" attributes="0"/>
                       <Component id="transposeCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">

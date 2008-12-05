@@ -8,6 +8,7 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -30,7 +31,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,18 +45,25 @@ import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.datum.EnumerationUnits;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
+import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
+import org.das2.graph.SeriesRenderer;
+import org.das2.graph.SpectrogramRenderer;
+import org.virbo.autoplot.ApplicationModel.RenderType;
 import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.dataset.TableDataSetAdapter;
+import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.BinAverage;
 import org.w3c.dom.Document;
@@ -84,8 +94,8 @@ public class AutoplotUtil {
         }
         List<Renderer> recycleRends= Arrays.asList( result.getRenderers() );
         
-        ApplicationModel.RenderType type= ApplicationModel.getRenderType(ds);
-        List<Renderer> rends= ApplicationModel.getRenderers( ds, type, recycleRends, cb);
+        ApplicationModel.RenderType type= AutoplotUtil.getRenderType(ds);
+        List<Renderer> rends= AutoplotUtil.getRenderers( ds, type, recycleRends, cb);
         
         for ( Renderer rend1: rends ) {
             result.addRenderer( rend1 );
@@ -166,8 +176,8 @@ public class AutoplotUtil {
 
     public static class AutoRangeDescriptor {
 
-        DatumRange range;
-        boolean log;
+        public DatumRange range;
+        public boolean log;
         double min;
         double max;
         double robustMin;
@@ -266,7 +276,7 @@ public class AutoplotUtil {
                 Units.dimensionless);
     }
 
-    public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties) {
+    public static AutoRangeDescriptor autoRange( QDataSet ds, Map properties ) {
 
         log.fine("enter autoRange");
 
@@ -282,7 +292,8 @@ public class AutoplotUtil {
         boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC));
 
         if (mono) {
-            double cadence = DataSetUtil.guessCadence(ds);
+            Double cadence = DataSetUtil.guessCadence(ds);
+            if ( cadence==null ) cadence= new Double(0.);
             if (ds.length() > 1) {
                 dd = new double[]{ds.value(0) - cadence, ds.value(ds.length() - 1) + cadence};
             } else {
@@ -626,57 +637,6 @@ public class AutoplotUtil {
         return result;
     }
 
-    /**
-     * return robust extent by only including points consistent with adjacent points.
-     * @param ds, rank 1 dataset
-     * @return
-     */
-    private static double[] robustRange(QDataSet ds) {
-        QDataSet res = BinAverage.residuals(ds, 10);
-        QDataSet w = DataSetUtil.weightsDataSet(ds);
-        QubeDataSetIterator it = new QubeDataSetIterator(res);
-        double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
-        int i=0;
-        while ( i< DS_LENGTH_LIMIT && it.hasNext()) {
-            it.next();
-            i++;
-            if (it.getValue(w) > 0. && it.getValue(res) < 2.) {
-                double d = it.getValue(ds);
-                result[0] = Math.min(result[0], d);
-                result[1] = Math.max(result[1], d);
-            }
-        }
-        return result;
-    }
-
-    private static double[] robustRange(QDataSet ds, MomentDescriptor moment) throws IllegalArgumentException {
-        double min = Double.POSITIVE_INFINITY, max = Double.NEGATIVE_INFINITY;
-
-        Units u = (Units) ds.property(QDataSet.UNITS);
-        if (u == null) {
-            u = Units.dimensionless;
-        }
-
-        OldDataSetIterator iter = OldDataSetIterator.create(ds);
-
-        // four std dev's from the mean.
-        double stdmin = moment.moment[0] - moment.moment[1] * 4;
-        double stdmax = moment.moment[0] + moment.moment[1] * 4;
-
-        while (iter.hasNext()) {
-            double d = iter.next();
-            if (u.isValid(d) && d >= stdmin && d <= stdmax) {
-                min = min > d ? d : min;
-                max = max < d ? d : max;
-            }
-        }
-
-        if (min == Double.POSITIVE_INFINITY) {
-            throw new IllegalArgumentException("no valid data found");
-        } else {
-            return new double[]{min, max};
-        }
-    }
 
     /**
      * Rewrite the dataset so that fill values are set by the valid extent and fill
@@ -843,6 +803,126 @@ public class AutoplotUtil {
     
     public static String formatDevicePosition( DasDevicePosition pos ) {
         return DasDevicePosition.formatLayoutStr( pos, true ) + ", "+DasDevicePosition.formatLayoutStr( pos, false );
+    }
+
+    private static boolean isVectorOrBundleIndex(QDataSet dep1) {
+        boolean result = false;
+        Units dep1Units = (Units) dep1.property(QDataSet.UNITS);
+        if (dep1Units != null && dep1Units instanceof EnumerationUnits) {
+            result = true;
+        }
+
+        if (dep1.property(QDataSet.COORDINATE_FRAME) != null) {
+            result = true;
+        }
+
+        return result;
+    }
+    
+    public static RenderType getRenderType(QDataSet fillds) {
+        RenderType spec = fillds.rank() >= 2 ? RenderType.spectrogram : RenderType.series;
+
+        QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
+
+        if (fillds.rank() == 2 && dep1 != null && isVectorOrBundleIndex(dep1)) {
+            spec = RenderType.series;
+        }
+        
+        if ( fillds.rank()==1 && fillds.property(QDataSet.PLANE_0) !=null ) {
+            spec= RenderType.colorScatter;
+        }
+
+        return spec;
+    }
+    
+    /**
+     * return the renderers that should be used to render the data.  More than one renderer can be returned 
+     * to support plotting vector components.
+     * 
+     * The renderer will have the dataset set.
+     * @param ds
+     * @param type
+     * @param recyclable Reuse these if possible to reduce jitter.  May be null.
+     * @return
+     */
+    public static List<Renderer> getRenderers(QDataSet ds, RenderType renderType, List<Renderer> recyclable, DasColorBar colorbar) {
+        if (recyclable == null) recyclable = Collections.emptyList();
+        if (renderType == RenderType.spectrogram) {
+            if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SpectrogramRenderer) {
+                recyclable.get(0).setDataSet(TableDataSetAdapter.create(ds));
+                return recyclable;
+            } else {
+                Renderer result = new SpectrogramRenderer(null, colorbar);
+                colorbar.setVisible(true);
+                result.setDataSet(TableDataSetAdapter.create(ds));
+                return Collections.singletonList(result);
+            }
+        } else {
+            List<Renderer> result;
+            if (ds.rank() == 1) {
+                if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SeriesRenderer) {
+                    result = recyclable;
+                } else {
+                    result = Collections.singletonList((Renderer) new SeriesRenderer());
+                }
+                result.get(0).setDataSet(VectorDataSetAdapter.create(ds));
+                
+                if ( renderType==RenderType.colorScatter ) {
+                    colorbar.setVisible(true);
+                } else {
+                    colorbar.setVisible(false);
+                }
+            } else {
+                int dim = ds.length(0);
+                Color color = Color.black; // TODO: this will change.
+                result = new ArrayList<Renderer>();
+                for (int i = 0; i < dim; i++) {
+                    SeriesRenderer rend1 = new SeriesRenderer();
+                    float[] colorHSV = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+                    if (colorHSV[2] < 0.7f) {
+                        colorHSV[2] = 0.7f;
+                    }
+                    if (colorHSV[1] < 0.7f) {
+                        colorHSV[1] = 0.7f;
+                    }
+                    rend1.setColor(Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]));
+                    rend1.setFillColor(Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]));
+                    rend1.setDataSet(VectorDataSetAdapter.create(DataSetOps.slice1(ds, i)));
+                    result.add(rend1);
+                }
+                colorbar.setVisible(false);
+            }
+
+            for (Renderer rend1 : result) {
+                SeriesRenderer seriesRend = (SeriesRenderer) rend1;
+                if (renderType == RenderType.series) {
+
+                    seriesRend.setPsymConnector(PsymConnector.SOLID);
+                    seriesRend.setHistogram(false);
+                    seriesRend.setFillToReference(false);
+
+                } else if (renderType == RenderType.scatter) {
+                    seriesRend.setPsymConnector(PsymConnector.NONE);
+                    seriesRend.setFillToReference(false);
+
+                } else if ( renderType==RenderType.colorScatter ) {
+                    seriesRend.setPsymConnector(PsymConnector.NONE);
+                    seriesRend.setFillToReference(false);
+                    
+                } else if (renderType == RenderType.histogram) {
+                    seriesRend.setPsymConnector(PsymConnector.SOLID);
+                    seriesRend.setFillToReference(true);
+                    seriesRend.setHistogram(true);
+
+                } else if (renderType == RenderType.fill_to_zero) {
+                    seriesRend.setPsymConnector(PsymConnector.SOLID);
+                    seriesRend.setFillToReference(true);
+                    seriesRend.setHistogram(false);
+
+                }
+            }
+            return result;
+        }
     }
 
 }

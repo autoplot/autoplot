@@ -31,6 +31,7 @@ import org.das2.fsm.FileStorageModel;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.PyJavaInstance;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
+import org.virbo.autoplot.dom.Application;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
@@ -45,16 +46,20 @@ import org.virbo.datasource.datasource.DataSourceFormat;
 public class ScriptContext extends PyJavaInstance {
 
     private static ApplicationModel model = null;
+    private static Application dom= null;
 
     private static synchronized void maybeInitModel() {
         if (model == null) {
             model = new ApplicationModel();
+            dom= model.getDocumentModel();
         }
     }
 
     protected static void setApplicationModel(ApplicationModel m) {
         model = m;
+        dom= m.getDocumentModel();
     }
+    
     private static AutoPlotUI view = null;
 
     private static synchronized void maybeInitView() {
@@ -151,7 +156,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param message
      */
     public static void setStatus( String message ) {
-        model.setStatus(message);
+        dom.getController().setStatus(message);
     }
     
     public static void addTab( String label, JComponent c  ) {
@@ -172,7 +177,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param name string name of the plot style.
      */
     public static void setRenderStyle( String name ) {
-        model.setRenderType( ApplicationModel.RenderType.valueOf(name) );
+        dom.getPanel().setRenderType( ApplicationModel.RenderType.valueOf(name) );
     }
     /**
      * write out the current canvas to a png file.
@@ -252,7 +257,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param title
      */
     public static void setTitle(String title) {
-        model.getPlot().setTitle(title);
+        model.getDocumentModel().getPlot().setTitle(title);
     }
 
     /**
@@ -281,11 +286,11 @@ public class ScriptContext extends PyJavaInstance {
      * 
      * Example:
      * model= getApplicationModel()
-     * bind( model.getPlot(), "title", model.getPlot().getXAxis(), "label" )
+     * bind( model.getPlotDefaults(), "title", model.getPlotDefaults().getXAxis(), "label" )
      * 
-     * @param src java bean such as model.getPlot()
+     * @param src java bean such as model.getPlotDefaults()
      * @param srcProp a property name such as "title"
-     * @param dst java bean such as model.getPlot().getXAxis()
+     * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
      */
     public static void bind(Object src, String srcProp, Object dst, String dstProp) {
@@ -385,4 +390,8 @@ public class ScriptContext extends PyJavaInstance {
 
     }
 
+    public static Application getDocumentModel() {
+        maybeInitModel();
+        return dom;
+    }
 }

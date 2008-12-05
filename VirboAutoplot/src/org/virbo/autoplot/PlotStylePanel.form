@@ -78,7 +78,7 @@
                               <Component id="rebinPanel" alignment="0" min="-2" pref="142" max="-2" attributes="0"/>
                               <Component id="colortableTypePanel" alignment="0" min="-2" pref="141" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace pref="16" max="32767" attributes="0"/>
+                          <EmptySpace pref="31" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="1" attributes="0">
                           <Component id="moreSprectrogramPropsButton" min="-2" max="-2" attributes="0"/>

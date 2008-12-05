@@ -8,6 +8,7 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Component;
 import org.das2.components.DasProgressPanel;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.PsymConnector;
@@ -37,6 +38,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
+import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
@@ -113,8 +116,8 @@ public class GuiSupport {
         return new AbstractAction("Export Data...") {
 
             public void actionPerformed(ActionEvent e) {
-                
-                if ( parent.applicationModel.fillDataset==null ) {
+                Panel p= parent.applicationModel.dom.getPanel();
+                if ( p.getDataSourceFilter().getFillDataSet()==null ) {
                     JOptionPane.showMessageDialog( parent, "No Data to Export.");
                     return;
                 }
@@ -148,8 +151,8 @@ public class GuiSupport {
                 Preferences prefs = Preferences.userNodeForPackage(AutoPlotUI.class);
                 String currentFileString = prefs.get("DumpDataCurrentFile", "");
                 
-                if ( parent.applicationModel.dataset!=null ) {
-                    String name= (String) parent.applicationModel.dataset.property( QDataSet.NAME );
+                if ( p.getDataSourceFilter().getFillDataSet()!=null ) {
+                    String name= (String) p.getDataSourceFilter().getFillDataSet().property( QDataSet.NAME );
                     if ( name!=null ) chooser.setSelectedFile(new File(name.toLowerCase())); 
                 }
 
@@ -186,7 +189,7 @@ public class GuiSupport {
                             }
                         }
                         format.formatData( new File(s),new java.util.HashMap<String, String>(), 
-                                parent.applicationModel.dataset, new DasProgressPanel("formatting data")  );
+                                p.getDataSourceFilter().getFillDataSet(), new DasProgressPanel("formatting data")  );
                         parent.setStatus("created file "+s);
 
                     } catch (IOException ex) {
@@ -199,41 +202,48 @@ public class GuiSupport {
         };
     }
 
-    public static JMenu createEZAccessMenu(final ApplicationModel model) {
+    public static JMenu createEZAccessMenu( final Panel panel ) {
 
         JMenu result = new JMenu("plot style");
         result.add(new JMenuItem(new AbstractAction("scatter") {
 
             public void actionPerformed(ActionEvent e) {
-                model.setRenderType( ApplicationModel.RenderType.scatter );
+                panel.setRenderType( ApplicationModel.RenderType.scatter );
             }
         }));
 
+        result.add(new JMenuItem(new AbstractAction("colorScatter") {
+
+            public void actionPerformed(ActionEvent e) {
+                panel.setRenderType( ApplicationModel.RenderType.colorScatter );
+            }
+        }));
+        
         result.add(new JMenuItem(new AbstractAction("series") {
 
             public void actionPerformed(ActionEvent e) {
-                model.setRenderType( ApplicationModel.RenderType.series );
+                panel.setRenderType( ApplicationModel.RenderType.series );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("histogram") {
 
             public void actionPerformed(ActionEvent e) {
-                model.setRenderType( ApplicationModel.RenderType.histogram );
+                panel.setRenderType( ApplicationModel.RenderType.histogram );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("fill to zero") {
 
             public void actionPerformed(ActionEvent e) {
-                model.setRenderType( ApplicationModel.RenderType.fill_to_zero );
+                panel.setRenderType( ApplicationModel.RenderType.fill_to_zero );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("spectrogram") {
 
             public void actionPerformed(ActionEvent e) {
-                model.setRenderType( ApplicationModel.RenderType.spectrogram );
+                panel.setRenderType( ApplicationModel.RenderType.spectrogram );
             }
         }));
 

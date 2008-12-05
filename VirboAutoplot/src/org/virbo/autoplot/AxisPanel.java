@@ -3,7 +3,6 @@
  *
  * Created on July 27, 2007, 9:41 AM
  */
-
 package org.virbo.autoplot;
 
 import org.das2.components.DatumRangeEditor;
@@ -12,119 +11,193 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
-import javax.beans.binding.BindingConverter;
-import javax.swing.AbstractSpinnerModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import org.das2.graph.DasColorBar;
+import org.das2.graph.DasPlot;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.Plot;
 
 /**
  *
  * @author  jbf
  */
 public class AxisPanel extends javax.swing.JPanel {
-    
+
     ApplicationModel applicationModel;
-    private final static Logger logger= Logger.getLogger("virbo.autoplot");
-    
+    Application dom;
+    DatumRangeEditor xredit;
+    DatumRangeEditor yredit;
+    DatumRangeEditor zredit;
+    private final static Logger logger = Logger.getLogger("virbo.autoplot");
+
     /** Creates new form PlotStylePanel */
-    public AxisPanel( final ApplicationModel applicationModel ) {
-        this.applicationModel= applicationModel;
-        
+    public AxisPanel(final ApplicationModel applicationModel) {
+        this.applicationModel = applicationModel;
+        this.dom = applicationModel.dom;
+
+        this.dom.addPropertyChangeListener(Application.PROP_PANEL, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                setPanel(AxisPanel.this.dom.getPanel());
+            }
+        });
+
+        this.dom.addPropertyChangeListener( Application.PROP_PLOT, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                setPlot(AxisPanel.this.dom.getPlot());
+            }
+        });
         initComponents();
-                
-        DatumRangeEditor xredit= new DatumRangeEditor();
-        xredit.setValue( applicationModel.plot.getXAxis().getDatumRange() );
-        xAxisRangePanel.add( xredit, BorderLayout.CENTER );
-        
-        DatumRangeEditor yredit= new DatumRangeEditor();
-        yredit.setValue( applicationModel.plot.getYAxis().getDatumRange() );
-        yAxisRangePanel.add( yredit, BorderLayout.CENTER );
-        
-        DatumRangeEditor zredit= new DatumRangeEditor();
-        zredit.setValue( applicationModel.colorbar.getDatumRange() );
-        zAxisRangePanel.add( zredit, BorderLayout.CENTER );
-                
-        sliceIndexSpinner.setModel( new SpinnerNumberModel( 0, 0, 100, 1 ) );
-        sliceIndexSpinner.addMouseWheelListener( new MouseWheelListener() {
+
+        DasPlot plot = dom.getPlot().getController().getDasPlot();
+        DasColorBar colorbar = dom.getPlot().getController().getDasColorBar();
+
+        xredit = new DatumRangeEditor();
+        xredit.setValue(plot.getXAxis().getDatumRange());
+        xAxisRangePanel.add(xredit, BorderLayout.CENTER);
+
+        yredit = new DatumRangeEditor();
+        yredit.setValue(plot.getYAxis().getDatumRange());
+        yAxisRangePanel.add(yredit, BorderLayout.CENTER);
+
+        zredit = new DatumRangeEditor();
+        zredit.setValue(colorbar.getDatumRange());
+        zAxisRangePanel.add(zredit, BorderLayout.CENTER);
+
+        doPlotBindings();
+
+        doApplicationBindings();
+
+        doPanelBindings();
+
+    }
+
+    private void doApplicationBindings() {
+
+        Binding b;
+        BindingContext bc = new BindingContext();
+
+        b = bc.addBinding(dom, "${autoOverview}", this.autoContextOverview, "selected");
+        b = bc.addBinding(dom, "${autoranging}", this.allowAutoRangingCheckBox, "selected");
+        b = bc.addBinding(dom, "${autolabelling}", this.autolabellingCheckbox, "selected");
+        b = bc.addBinding(dom, "${autolayout}", this.autolayoutCheckbox, "selected");
+        bc.bind();
+    }
+    BindingContext panelBindingContext;
+
+    private void doPanelBindings() {
+
+        Panel panel = dom.getPanel();
+
+        if (panelBindingContext != null) panelBindingContext.unbind();
+
+        if (panel == null) {
+            panelBindingContext = null;
+            return;
+        }
+
+        Binding b;
+
+        BindingContext bc = new BindingContext();
+        b = bc.addBinding(panel, "${dataSourceFilter.fill}", this.fillValueComboBox, "selectedItem");
+        b = bc.addBinding(panel, "${dataSourceFilter.validRange}", this.validRangeComboBox, "selectedItem");
+
+        b = bc.addBinding(panel, "${dataSourceFilter.sliceDimension}", this.sliceTypeComboBox, "selectedIndex");
+        b = bc.addBinding(panel, "${dataSourceFilter.sliceIndex}", this.sliceIndexSpinner, "value");
+
+        b = bc.addBinding(panel, "${dataSourceFilter.transpose}", this.transposeCheckBox, "selected");
+
+        bc.bind();
+        panelBindingContext = bc;
+
+
+        final DataSourceFilter dsf = panel.getDataSourceFilter();
+
+        sliceIndexSpinner.setModel(new SpinnerNumberModel(0, 0, 100, 1));
+        sliceIndexSpinner.addMouseWheelListener(new MouseWheelListener() {
+
             public void mouseWheelMoved(MouseWheelEvent e) {
-                int pos= (Integer)sliceIndexSpinner.getValue();
-                pos-= e.getWheelRotation();
-                if ( pos<0 ) pos=0;
-                int maxpos= applicationModel.getMaxSliceIndex(applicationModel.getSliceDimension());
-                if ( pos>=maxpos) pos= maxpos-1;
+                int pos = (Integer) sliceIndexSpinner.getValue();
+                pos -= e.getWheelRotation();
+                if (pos < 0) pos = 0;
+                int maxpos = dsf.getController().getMaxSliceIndex(dsf.getSliceIndex());
+                if (pos >= maxpos) pos = maxpos - 1;
                 sliceIndexSpinner.setValue(pos);
             }
         });
-                
-        BindingContext bc= new BindingContext();
-        Binding b;
-        
-        b= bc.addBinding( applicationModel.plot.getXAxis(), "${label}", xTitleTextField, "text" );
-        b= bc.addBinding( applicationModel.plot.getXAxis(), "${datumRange}", xredit, "value" );
-        b= bc.addBinding( applicationModel.plot.getXAxis(), "${log}", xLog, "selected" );
 
-        b= bc.addBinding( applicationModel.plot.getYAxis(), "${label}", yTitleTextField, "text" );
-        b= bc.addBinding( applicationModel.plot.getYAxis(), "${datumRange}", yredit, "value" );
-        b= bc.addBinding( applicationModel.plot.getYAxis(), "${log}", yLog, "selected" );
+//TODO:removePropertyChangeListener
+        dsf.addPropertyChangeListener(new PropertyChangeListener() {
 
-        b= bc.addBinding( applicationModel.colorbar, "${label}", zTitleTextField, "text" );
-        b= bc.addBinding( applicationModel.colorbar, "${datumRange}", zredit, "value" );
-        b= bc.addBinding( applicationModel.colorbar, "${log}", zLog, "selected" );
-                
-        b= bc.addBinding( applicationModel.plot, "${title}", titleTextField, "text" );
-        b= bc.addBinding( applicationModel, "${showContextOverview}", showOverviewPlot, "selected" );
-        
-        b= bc.addBinding( applicationModel, "${autoOverview}", this.autoContextOverview, "selected" );
-        
-        b= bc.addBinding( applicationModel, "${autoranging}", this.allowAutoRangingCheckBox, "selected" );
-        b= bc.addBinding( applicationModel, "${autolabelling}", this.autolabellingCheckbox, "selected" );
-        b= bc.addBinding( applicationModel, "${autolayout}", this.autolayoutCheckbox, "selected" );
-        
-        b= bc.addBinding( applicationModel, "${validRange}", this.validRangeComboBox, "selectedItem" );
-        
-        b= bc.addBinding( applicationModel, "${isotropic}", this.isotropicCheckBox, "selected" );
-        
-        b= bc.addBinding( applicationModel, "${sliceIndex}", this.sliceIndexSpinner, "value" );
-                
-        b= bc.addBinding( applicationModel, "${transpose}", this.transposeCheckBox, "selected" );
-
-        
-        bc.bind();
-        
-        applicationModel.addPropertyChangeListener( new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                zAxisPanel.setEnabled( applicationModel.colorbar.isVisible() );
-                if ( evt.getPropertyName().equals(applicationModel.PROP_DEPNAMES) ) {
-                    final String[] depNames= (String[]) applicationModel.getDepnames().toArray();
-                    for ( int i=0; i<depNames.length; i++ ) {
-                        depNames[i]= depNames[i]+" ("+applicationModel.getMaxSliceIndex(i)+" bins)";
+                if (evt.getPropertyName().equals(DataSourceFilter.PROP_DEPNAMES)) {
+                    final String[] depNames = (String[]) dsf.getDepnames().toArray(); //TODO: what if panel changes...
+                    for (int i = 0; i < depNames.length; i++) {
+                        depNames[i] = depNames[i] + " (" + dsf.getController().getMaxSliceIndex(i) + " bins)";
                     }
-                    SwingUtilities.invokeLater( new Runnable() {
+                    SwingUtilities.invokeLater(new Runnable() {
+
                         public void run() {
-                            sliceTypeComboBox.setModel( new DefaultComboBoxModel( depNames ) ); 
-                            sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
-                        }            
-                    } );
-                }
-                if ( evt.getPropertyName().equals(applicationModel.PROP_SLICEDIMENSION ) ) {
-                    SwingUtilities.invokeLater( new Runnable() {
-                        public void run() {
-                            sliceTypeComboBox.setSelectedIndex( applicationModel.getSliceDimension() );
+                            sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames));
+                            sliceTypeComboBox.setSelectedIndex(dsf.getSliceDimension());
                         }
-                    } );
+                    });
+                }
+                if (evt.getPropertyName().equals(DataSourceFilter.PROP_SLICEDIMENSION)) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        public void run() {
+                            sliceTypeComboBox.setSelectedIndex(dsf.getSliceDimension());
+                        }
+                    });
                 }
             }
-        } );
-        
-    }
-    
-    
+        });
 
+    }
+    BindingContext plotBindingContext;
+
+    private BindingContext doPlotBindings() {
+
+        BindingContext bc = new BindingContext();
+        Binding b;
+        Plot p = dom.getPlot();
+        b = bc.addBinding(p, "${xaxis.label}", xTitleTextField, "text");
+        b = bc.addBinding(p, "${xaxis.range}", xredit, "value");
+        b = bc.addBinding(p, "${xaxis.log}", xLog, "selected");
+
+        b = bc.addBinding(p, "${yaxis.label}", yTitleTextField, "text");
+        b = bc.addBinding(p, "${yaxis.range}", yredit, "value");
+        b = bc.addBinding(p, "${yaxis.log}", yLog, "selected");
+
+        b = bc.addBinding(p, "${zaxis.label}", zTitleTextField, "text");
+        b = bc.addBinding(p, "${zaxis.range}", zredit, "value");
+        b = bc.addBinding(p, "${zaxis.log}", zLog, "selected");
+
+        b = bc.addBinding(p, "${title}", titleTextField, "text");
+
+        b = bc.addBinding(p, "${isotropic}", this.isotropicCheckBox, "selected");
+
+        if (plotBindingContext != null) plotBindingContext.unbind();
+        plotBindingContext = bc;
+        bc.bind();
+
+        return bc;
+    }
+
+    private void setPanel(Panel p) {
+        doPanelBindings();
+    }
+
+    private void setPlot(Plot p) {
+        doPlotBindings();
+    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -194,8 +267,8 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(xAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, xTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
-                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, xTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                    .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
                     .add(xLog)
                     .add(xAxisPanelLayout.createSequentialGroup()
                         .add(showOverviewPlot)
@@ -235,8 +308,8 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(zAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(zLog)
-                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
-                    .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE))
+                    .add(zAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
+                    .add(zTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE))
                 .addContainerGap())
         );
         zAxisPanelLayout.setVerticalGroup(
@@ -271,10 +344,10 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(yAxisPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(yAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+                    .add(yAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
                     .add(yLog)
                     .add(isotropicCheckBox)
-                    .add(yTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE))
+                    .add(yTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE))
                 .addContainerGap())
         );
         yAxisPanelLayout.setVerticalGroup(
@@ -346,15 +419,16 @@ public class AxisPanel extends javax.swing.JPanel {
                         .add(autolabellingCheckbox)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(autolayoutCheckbox))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(validRangeLabel)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(validRangeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(fillValueLabel)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(fillValueComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)
+                    .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
+                            .add(fillValueLabel)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(fillValueComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
+                            .add(validRangeLabel)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(validRangeComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -413,7 +487,7 @@ public class AxisPanel extends javax.swing.JPanel {
             .add(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
+                    .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 369, Short.MAX_VALUE)
                     .add(transposeCheckBox)
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -484,32 +558,30 @@ public class AxisPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void validRangeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validRangeComboBoxActionPerformed
-        String s= (String) validRangeComboBox.getSelectedItem();
-        if ( s.equals("(none)") ) s= "";
-        applicationModel.setValidRange( s );
+        String s = (String) validRangeComboBox.getSelectedItem();
+        if (s.equals("(none)")) s = "";
+        dom.getPanel().getDataSourceFilter().setValidRange(s);
     }//GEN-LAST:event_validRangeComboBoxActionPerformed
 
     private void fillValueComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillValueComboBoxActionPerformed
-        String s= (String) fillValueComboBox.getSelectedItem();
-        if ( s.equals("(none)") ) s= "";
-        applicationModel.setFill( s );
+        String s = (String) fillValueComboBox.getSelectedItem();
+        if (s.equals("(none)")) s = "";
+        dom.getPanel().getDataSourceFilter().setFill(s);
     }//GEN-LAST:event_fillValueComboBoxActionPerformed
 
     private void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
-        logger.fine( "set slice dimension "+sliceTypeComboBox.getSelectedIndex() );
-        applicationModel.setSliceDimension( sliceTypeComboBox.getSelectedIndex() );
-        int max= applicationModel.getMaxSliceIndex(applicationModel.getSliceDimension());
-        if ( max>0 ) max--; // make inclusive, was exclusive.
-        this.sliceIndexSpinner.setModel( new SpinnerNumberModel( 0, 0, max, 1 ) );
-        applicationModel.updateFill(true,true);
+        logger.fine("set slice dimension " + sliceTypeComboBox.getSelectedIndex());
+        DataSourceFilter dsf = dom.getPanel().getDataSourceFilter();
+        dsf.setSliceDimension(sliceTypeComboBox.getSelectedIndex());
+        int max = dsf.getController().getMaxSliceIndex(dsf.getSliceDimension());
+        if (max > 0) max--; // make inclusive, was exclusive.
+        this.sliceIndexSpinner.setModel(new SpinnerNumberModel(0, 0, max, 1));
+    //applicationModel.getPanelController().updateFill(true,true);
     }//GEN-LAST:event_sliceTypeComboBoxActionPerformed
 
     private void transposeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transposeCheckBoxActionPerformed
         //applicationModel.updateFill(true);
-        //beans binding triggers the update.
 }//GEN-LAST:event_transposeCheckBoxActionPerformed
-    
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox allowAutoRangingCheckBox;
     private javax.swing.JCheckBox autoContextOverview;
@@ -546,5 +618,4 @@ public class AxisPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox zLog;
     private javax.swing.JTextField zTitleTextField;
     // End of variables declaration//GEN-END:variables
-    
 }

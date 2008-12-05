@@ -17,8 +17,11 @@ import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.SwingUtilities;
-import javax.swing.event.TreeModelEvent;
 import javax.swing.tree.TreeModel;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.DataSourceController;
+import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.Panel;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
@@ -32,58 +35,109 @@ import org.virbo.metatree.NameValueTreeModel;
 public class MetaDataPanel extends javax.swing.JPanel {
 
     ApplicationModel applicationModel;
+    Application dom;
     CombinedTreeModel tree;
-    
-    PropertiesTreeModel dsTree;
+    TreeModel dsTree;
+    Panel bindToPanel = null;
     private QDataSet dsTreeDs;
-    
+
     /** Creates new form MetaDataPanel */
     public MetaDataPanel(ApplicationModel applicationModel) {
         this.applicationModel = applicationModel;
+        this.dom = applicationModel.getDocumentModel();
         initComponents();
-        SwingUtilities.invokeLater( new Runnable() { public void run() {
-            metaDataTree.setModel(null);
-        } } );
-        applicationModel.addPropertyChangeListener(this.appModelListener);
-        update();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                metaDataTree.setModel(null);
+            }
+        });
+        dom.addPropertyChangeListener(Application.PROP_PANEL, new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                bindToPanel();
+            }
+        });
+
+        bindToPanel();
+        
+        //applicationModel.addPropertyChangeListener(this.appModelListener);
+        updateProperties();
+        updateStatistics();
     }
 
-    public void update() {
-        tree = new CombinedTreeModel("metadata");
+    private void bindToPanel() {
+        if (bindToPanel != null) {
+            bindToPanel.getDataSourceFilter().removePropertyChangeListener(propertiesListener);
+            bindToPanel.getDataSourceFilter().removePropertyChangeListener(fillListener);
+            bindToPanel.getDataSourceFilter().getController().removePropertyChangeListener(propertiesListener);
+        }
+        dom.getPanel().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
+        dom.getPanel().getDataSourceFilter().addPropertyChangeListener(DataSourceFilter.PROP_FILLDATASET, fillListener);
+        updateProperties();
+        updateStatistics();
+    }
+
+    public void updateProperties() {
+
         try {
-            DataSource dsrc = applicationModel.dataSource();
+            Panel panel = dom.getPanel();
+            DataSource dsrc = null;
+            if (panel != null) {
+                dsrc = panel.getDataSourceFilter()._getDataSource();
+            }
             if (dsrc != null) {
-                ProgressMonitor mon = new NullProgressMonitor();
-                Map<String,Object> meta= dsrc.getMetaData(mon);
-                MetadataModel model= dsrc.getMetadataModel();
-                if ( model==null ) {
-                    model= MetadataModel.createNullModel();
+                tree = new CombinedTreeModel("" + dsrc.getURL());
+                Map<String, Object> meta = panel.getDataSourceFilter().getController().getRawProperties();
+                MetadataModel model = dsrc.getMetadataModel();
+                String root = "Metadata";
+                if (model == null) {
+                    model = MetadataModel.createNullModel();
+                } else {
+                    root = root + "(" + model.getLabel() + ")";
                 }
-                String root= "Metadata ("+ model.getLabel()+")";
-                        
-                final TreeModel dsrcMeta = NameValueTreeModel.create( root, meta );
+
+                final TreeModel dsrcMeta = NameValueTreeModel.create(root, meta);
                 if (dsrcMeta != null) {
-                    SwingUtilities.invokeLater( new Runnable() { public void run() {
-                        tree.mountTree( dsrcMeta, 10 );
-                        metaDataTree.setModel(tree);
-                    } } );
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        public void run() {
+                            tree.mountTree(dsrcMeta, 10);
+                            metaDataTree.setModel(tree);
+                        }
+                    });
                 }
             } else {
-                SwingUtilities.invokeLater( new Runnable() { public void run() {
-                    metaDataTree.setModel(tree);
-                } } );
+                tree = new CombinedTreeModel("(no data source)");
+                SwingUtilities.invokeLater(new Runnable() {
+
+                    public void run() {
+                        metaDataTree.setModel(tree);
+                    }
+                });
             }
         } catch (Exception e) {
+            tree = new CombinedTreeModel("Exception: " + e);
             applicationModel.application.getExceptionHandler().handle(e);
         }
     }
-    PropertyChangeListener appModelListener = new PropertyChangeListener() {
+    PropertyChangeListener propertiesListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getPropertyName().equals(ApplicationModel.PROPERTY_FILL)) {
+            if (evt.getPropertyName().equals(DataSourceController.PROP_RAWPROPERTIES)) {
+                updateProperties();
+            }
+        }
+    };
+    /**
+     * update when the fill dataset changes.
+     */
+    PropertyChangeListener fillListener = new PropertyChangeListener() {
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals(DataSourceFilter.PROP_FILLDATASET)) {
                 updateStatistics();
             }
-
         }
     };
 
@@ -112,78 +166,87 @@ public class MetaDataPanel extends javax.swing.JPanel {
     }
 
     private synchronized void updateDataSetPropertiesView() {
-        if ( applicationModel.dataset==null ) {
+        Panel p = applicationModel.dom.getPanel();
+        if (p.getDataSourceFilter().getDataSet() == null) {
+            //dsTree= NameValueTreeModel.create("dataset", Collections.singletonMap("dataset=", "no dataset") );
+            //(PropertiesTreeModel( "no dataset", null );
             return;
+        } else {
+            if (p.getDataSourceFilter().getDataSet() != this.dsTreeDs) {
+                dsTree = new PropertiesTreeModel("dataset= ", p.getDataSourceFilter().getDataSet());
+                this.dsTreeDs = p.getDataSourceFilter().getDataSet();
+            }
         }
-        if ( applicationModel.dataset!= this.dsTreeDs ) {
-            dsTree= new PropertiesTreeModel("dataset= ",applicationModel.dataset);
-            this.dsTreeDs= applicationModel.dataset;
-        }
-        SwingUtilities.invokeLater( new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
-                tree.mountTree( dsTree, 30 );
+                tree.mountTree(dsTree, 30);
             }
         });
     }
 
     private synchronized void updateStatisticsImmediately() {
-
-        QDataSet ds = applicationModel.fillDataset;
-        if (ds == null) {
-            // TODO: do something to indicate state
-            return;
-        }
-
-        AutoplotUtil.MomentDescriptor moments = AutoplotUtil.moment(ds);
+        Panel p = applicationModel.dom.getPanel();
 
         final LinkedHashMap map = new LinkedHashMap();
 
-        map.put("# invalid", String.valueOf(moments.invalidCount) + " of " + String.valueOf(moments.validCount + moments.invalidCount));
-        String s;
-        if (moments.validCount > 0) {
-            s = format(moments.moment[0]);
-        } else {
-            s = "";
-        }
-        map.put("Mean", s);
+        QDataSet ds = p.getDataSourceFilter().getDataSet();
+        if (ds == null) {
+            map.put("dataset", "(no dataset)");
 
-        if (moments.validCount > 1) {
-            s = format(moments.moment[1]);
         } else {
-            s = "";
-        }
-        map.put("Std Dev", s);
 
-        QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
-        
-        Double cadence;
-        Units xunits;
-        
-        if ( dep0==null ) {
-            xunits= Units.dimensionless;
-            cadence= 1.;
-        } else {
-            cadence = (Double) dep0.property(QDataSet.CADENCE);
-            xunits = (Units) dep0.property(QDataSet.UNITS);
-        }
-        if (xunits == null) {
-            xunits = Units.dimensionless;
+            AutoplotUtil.MomentDescriptor moments = AutoplotUtil.moment(ds);
+
+            map.put("# invalid", String.valueOf(moments.invalidCount) + " of " + String.valueOf(moments.validCount + moments.invalidCount));
+            String s;
+            if (moments.validCount > 0) {
+                s = format(moments.moment[0]);
+            } else {
+                s = "";
+            }
+            map.put("Mean", s);
+
+            if (moments.validCount > 1) {
+                s = format(moments.moment[1]);
+            } else {
+                s = "";
+            }
+            map.put("Std Dev", s);
+
+            QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
+
+            Double cadence;
+            Units xunits;
+
+            if (dep0 == null) {
+                xunits = Units.dimensionless;
+                cadence = 1.;
+            } else {
+                cadence = (Double) dep0.property(QDataSet.CADENCE);
+                xunits = (Units) dep0.property(QDataSet.UNITS);
+            }
+            if (xunits == null) {
+                xunits = Units.dimensionless;
+            }
+
+            if (cadence != null) {
+                Datum d = DatumUtil.asOrderOneUnits(xunits.getOffsetUnits().createDatum(cadence));
+                Units u = d.getUnits();
+                map.put("Cadence", format(d.doubleValue(u)) + " " + u);
+            } else {
+                map.put("Cadence", "null");
+            }
+
         }
 
-        if ( cadence!=null ) {
-            Datum d = DatumUtil.asOrderOneUnits(xunits.getOffsetUnits().createDatum(cadence));
-            Units u = d.getUnits();
-            map.put("Cadence", format(d.doubleValue(u)) + " " + u);
-        } else {
-            map.put("Cadence", "null" );
-        }
+        SwingUtilities.invokeLater(new Runnable() {
 
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run( ) {
-                tree.mountTree( NameValueTreeModel.create("Statistics", map), 20 );
+            public void run() {
+                tree.mountTree(NameValueTreeModel.create("Statistics", map), 20);
             }
         });
-        
+
 
         statisticsDirty = false;
     }
