@@ -105,7 +105,7 @@ public abstract class AbstractDataSource implements DataSource {
      * to provide metadata.
      */
     public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
-        return new HashMap();
+        return new HashMap<String,Object>();
     }
     
     public MetadataModel getMetadataModel() {
@@ -114,7 +114,8 @@ public abstract class AbstractDataSource implements DataSource {
     
     public Map<String,Object> getProperties() {
         try {
-            return getMetadataModel().properties( getMetaData( new NullProgressMonitor() ) );
+            Map<String,Object> meta=  getMetaData( new NullProgressMonitor() );
+            return getMetadataModel().properties( meta );
         } catch (Exception e) {
 	    e.printStackTrace();
             return Collections.singletonMap( "Exception",  (Object)e );

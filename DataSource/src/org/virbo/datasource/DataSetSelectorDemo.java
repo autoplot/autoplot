@@ -6,6 +6,7 @@
 
 package org.virbo.datasource;
 
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         statusLabel = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        modifiersLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -63,6 +65,8 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
 
         jLabel2.setText("Selection:");
 
+        modifiersLabel.setText("jLabel3");
+
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
 
@@ -78,11 +82,13 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 615, Short.MAX_VALUE)
+                    .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 365, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(layout.createSequentialGroup()
                         .add(10, 10, 10)
-                        .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE))
-                    .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 615, Short.MAX_VALUE)
-                    .add(jLabel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 365, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(modifiersLabel)
+                            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE))))
                 .addContainerGap())
             .add(layout.createSequentialGroup()
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 615, Short.MAX_VALUE)
@@ -96,7 +102,9 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 162, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(modifiersLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 139, Short.MAX_VALUE)
                 .add(statusLabel)
                 .addContainerGap())
         );
@@ -106,6 +114,7 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
 
     private void dataSetSelector1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelector1ActionPerformed
         this.jLabel1.setText( dataSetSelector1.getValue() ); 
+        this.modifiersLabel.setText( ""+KeyEvent.getKeyModifiersText(evt.getModifiers()) );
     }//GEN-LAST:event_dataSetSelector1ActionPerformed
     
     /**
@@ -126,6 +135,7 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JLabel modifiersLabel;
     private javax.swing.JLabel statusLabel;
     // End of variables declaration//GEN-END:variables
     

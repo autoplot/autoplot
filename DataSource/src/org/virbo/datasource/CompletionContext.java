@@ -95,7 +95,7 @@ public class CompletionContext {
     public int surlpos;
     
     /**
-     * resource file, no params
+     * resource file, no params (and no "vap:" schema);
      */
     public URL resource;
     
@@ -153,7 +153,7 @@ public class CompletionContext {
      */
     public static String get( Object context, CompletionContext cc ) {
         if ( context==CONTEXT_FILESYSTEM || context==CONTEXT_FILE ) {
-            URLSplit split= URLSplit.parse(cc.surl);
+            URLSplit split= URLSplit.parse( cc.surl );
             return split.file;
             
         } else if ( context==CONTEXT_PARAMETER_NAME || context==CONTEXT_PARAMETER_VALUE ) {

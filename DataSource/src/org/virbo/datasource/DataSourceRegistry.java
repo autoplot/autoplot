@@ -24,6 +24,7 @@ public class DataSourceRegistry {
     HashMap<String,Object> dataSourcesByExt;
     HashMap<String,Object> dataSourcesByMime;
     HashMap<String,Object> dataSourceFormatByExt;
+    HashMap<String,Object> dataSourceEditorByExt;
     HashMap<String,String> extToDescription;
 
     /** Creates a new instance of DataSourceRegistry */
@@ -31,6 +32,7 @@ public class DataSourceRegistry {
         dataSourcesByExt = new HashMap<String,Object>();
         dataSourcesByMime = new HashMap<String,Object>();
         dataSourceFormatByExt= new HashMap<String,Object>();
+        dataSourceEditorByExt= new HashMap<String,Object>();
         extToDescription= new HashMap<String,String>();
     }
 
@@ -97,6 +99,11 @@ public class DataSourceRegistry {
         dataSourceFormatByExt.put(extension, className);
     }
 
+    public void registerEditor( String className, String extension ) {
+        extension= getExtension(extension);
+        dataSourceEditorByExt.put(extension, className);
+    }
+    
     public void registerMimeType(String className, String mimeType) {
         dataSourcesByMime.put(mimeType, className);
     }
@@ -187,14 +194,6 @@ public class DataSourceRegistry {
                 Class clas = Class.forName((String) o);
                 Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
                 result = (DataSourceFormat) constructor.newInstance(new Object[]{});
-            } catch (ClassNotFoundException ex) {
-                throw new RuntimeException(ex);
-            } catch (NoSuchMethodException ex) {
-                throw new RuntimeException(ex);
-            } catch (InstantiationException ex) {
-                throw new RuntimeException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new RuntimeException(ex);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -204,6 +203,29 @@ public class DataSourceRegistry {
         return result;
         
     }
+    
+    public DataSourceEditorPanel getEditorByExt(String extension) {
+        if ( extension==null ) return null;
+        extension= getExtension(extension);
+        Object o = dataSourceEditorByExt.get(extension);
+        if (o == null) {
+            return null;
+        }
+
+        DataSourceEditorPanel result;
+        if (o instanceof String) {
+            try {
+                Class clas = Class.forName((String) o);
+                Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
+                result = ( DataSourceEditorPanel) constructor.newInstance(new Object[]{});
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        } else {
+            result = ( DataSourceEditorPanel) o;
+        }
+        return result;        
+    }    
 
     public synchronized DataSourceFactory getSourceByMime(String mime) {
         if ( mime==null ) return null;

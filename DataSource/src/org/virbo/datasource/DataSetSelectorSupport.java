@@ -60,7 +60,9 @@ public class DataSetSelectorSupport {
                             return true;
                         }
                         String t = f.toString();
+                        
                         String ext = DataSetURL.getExt(t);
+                        if ( ext!=null ) ext= "."+ext;
                         return t.endsWith(".vap") || (ext != null && exts.containsKey(ext));
                     }
 
@@ -85,6 +87,7 @@ public class DataSetSelectorSupport {
                             }
                             String t = f.toString();
                             String ext = DataSetURL.getExt(t);
+                            if ( ext!=null ) ext= "."+ext;
                             return (ext != null && extf.equals(ext));
                         }
 
@@ -103,7 +106,7 @@ public class DataSetSelectorSupport {
                     try {
                         prefs.put(PREF_LAST_OPEN_FOLDER, chooser.getSelectedFile().getParent().toString());
                         ui.setValue(chooser.getSelectedFile().toURI().toURL().toString());
-                        ui.maybePlot();
+                        ui.maybePlot(false);
                     } catch (MalformedURLException ex) {
                         Logger.getLogger(DataSetSelectorSupport.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -127,7 +130,7 @@ public class DataSetSelectorSupport {
 
                     public void actionPerformed(ActionEvent e) {
                         ui.setValue(f);
-                        ui.maybePlot();
+                        ui.maybePlot(false);
                     }
                 };
                 recentMenu.add(a);

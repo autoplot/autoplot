@@ -8,7 +8,6 @@
  */
 package org.virbo.datasource;
 
-import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
@@ -20,7 +19,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -29,11 +27,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,8 +84,8 @@ public class DataSetURL {
 
                 int i0 = split.file.lastIndexOf('/');
                 if (i0 == -1) return null;
-                int i1 = split.file.indexOf('.', i0);
-                if (i1 > i0) {
+                int i1 = split.file.lastIndexOf('.');
+                if (i1!=-1 && i1>i0) {
                     return split.file.substring(i1 + 1);
                 } else {
                     return null;
@@ -287,8 +283,8 @@ public class DataSetURL {
 
         URI resourceUri;
         try {
-            String resourceSuri= uri.getSchemeSpecificPart();
-            resourceSuri= resourceSuri.replaceAll("%", "%25");
+            String resourceSuri= uri.getRawSchemeSpecificPart();
+            //resourceSuri= resourceSuri.replaceAll("%", "%25");
             resourceUri = new URI( resourceSuri );
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
@@ -455,11 +451,13 @@ public class DataSetURL {
         if (surl.endsWith("://")) {
             surl += "/";  // what strange case is this?
         }
-        boolean isAlreadyEscaped = split.surl.contains("%25") || split.surl.contains("%20") || split.surl.contains("+"); // TODO: cheesy
-        if (!isAlreadyEscaped) {
-            surl = surl.replaceAll("%", "%25");
+        //boolean isAlreadyEscaped = split.surl.contains("%25") || split.surl.contains("%20") || split.surl.contains("+"); // TODO: cheesy
+        //if (!isAlreadyEscaped) {
+            surl = surl.replaceAll("%([^0-9])", "%25$1");
+            surl = surl.replaceAll("<", "%3C");
+            surl = surl.replaceAll(">", "%3E");
             surl = surl.replaceAll(" ", "+");
-        }
+        //}
         surl= URLSplit.format( URLSplit.parse(surl) ); // add "vap:" if it's not there
         URI result = new URI(surl);
         return result;
@@ -663,8 +661,8 @@ public class DataSetURL {
         URLSplit split = URLSplit.parse(surl1);
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
-
-            DataSourceFactory factory = getDataSourceFactory(DataSetURL.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)), new NullProgressMonitor());
+            
+            DataSourceFactory factory = getDataSourceFactory( getURI(surl1), new NullProgressMonitor());
             if (factory == null) {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
@@ -715,12 +713,12 @@ public class DataSetURL {
                         paramsCopy.put(cc1.completable, null);
                     }
 
-                    String ss = split.file + "?" + URLSplit.formatParams(paramsCopy);
-                    //String ss= CompletionContext.insert( cc, cc1 );
+                    String ss = split.vapScheme + ":" + split.file + "?" + URLSplit.formatParams(paramsCopy);
+                    
                     if (dontYetHave == false) {
                         continue;  // skip it
                     }
-                    result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
+                    result.add(new CompletionResult(  ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
                     i = i + 1;
                 }
 
@@ -743,7 +741,7 @@ public class DataSetURL {
             int i = 0;
             for (CompletionContext cc1 : completions) {
                 if (cc1.completable.startsWith(cc.completable)) {
-                    String ss = CompletionContext.insert(cc, cc1);
+                    String ss = split.vapScheme + ":" + CompletionContext.insert(cc, cc1);
                     result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
                     i = i + 1;
                 }
@@ -884,6 +882,8 @@ public class DataSetURL {
                 }
                 reader.close();
             }
+            
+            
             if (loader == null) {
                 urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
             } else {
@@ -905,6 +905,8 @@ public class DataSetURL {
                 }
                 reader.close();
             }
+            
+            
             if (loader == null) {
                 urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
             } else {
@@ -920,6 +922,29 @@ public class DataSetURL {
                         String[] ss = s.split("\\s");
                         for (int i = 1; i < ss.length; i++) {
                             registry.registerFormatter(ss[0], ss[i]);
+                        }
+                    }
+                    s = reader.readLine();
+                }
+                reader.close();
+            }
+
+            
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions");
+            } else {
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions");
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String s = reader.readLine();
+                while (s != null) {
+                    s = s.trim();
+                    if (s.length() > 0) {
+                        String[] ss = s.split("\\s");
+                        for (int i = 1; i < ss.length; i++) {
+                            registry.registerEditor(ss[0], ss[i]);
                         }
                     }
                     s = reader.readLine();
