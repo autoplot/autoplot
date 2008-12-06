@@ -85,7 +85,8 @@ public class ScriptPanelSupport {
                 return false;
             }
             if (panel.isDirty()) {
-                int result = JOptionPane.showConfirmDialog(panel, "save edits before loading " + file + "?", "Save work", JOptionPane.OK_CANCEL_OPTION);
+                int result = JOptionPane.showConfirmDialog(panel, 
+                        "save edits before loading\n" + sfile + ",\nor cancel script loading?", "loading new script", JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_CANCEL_OPTION) {
                     return false;
                 }
