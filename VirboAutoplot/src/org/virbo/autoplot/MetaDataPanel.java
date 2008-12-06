@@ -5,26 +5,28 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Component;
+import javax.swing.JTree;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
 import org.das2.util.CombinedTreeModel;
-import org.das2.util.monitor.ProgressMonitor;
-import org.das2.util.monitor.NullProgressMonitor;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.SwingUtilities;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceController;
-import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.dsops.Ops;
 import org.virbo.dsutil.PropertiesTreeModel;
 import org.virbo.metatree.NameValueTreeModel;
 
@@ -46,8 +48,8 @@ public class MetaDataPanel extends javax.swing.JPanel {
         this.applicationModel = applicationModel;
         this.dom = applicationModel.getDocumentModel();
         initComponents();
+                
         SwingUtilities.invokeLater(new Runnable() {
-
             public void run() {
                 metaDataTree.setModel(null);
             }
@@ -108,9 +110,12 @@ public class MetaDataPanel extends javax.swing.JPanel {
                     });
                 }
             } else {
-                tree = new CombinedTreeModel("(no data source)");
+                String label= "(no data source)";
+                if ( panel.getDataSourceFilter().getController().getDataSet()!=null ) {
+                    label= "dataset";
+                }
+                tree = new CombinedTreeModel(label);
                 SwingUtilities.invokeLater(new Runnable() {
-
                     public void run() {
                         metaDataTree.setModel(tree);
                     }
@@ -152,6 +157,39 @@ public class MetaDataPanel extends javax.swing.JPanel {
     }
     boolean statisticsDirty;
 
+    private String histStr(QDataSet ds) {
+        QDataSet hist= Ops.histogram(ds, 20);
+        QDataSet dep0= (QDataSet) hist.property(QDataSet.DEPEND_0);
+        double res= (Double)dep0.property(QDataSet.CADENCE);
+        Units u= (Units)dep0.property(QDataSet.UNITS);
+        if ( u==null ) u= Units.dimensionless;
+        
+        String scale;
+        if ( metaDataTree.getFont().canDisplay( (char)2581) ) {
+            scale= "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
+        } else {
+            scale = " .:!#";
+        }
+        int scaleMax= scale.length();
+        
+        Integer max= (Integer) hist.property("max");
+        
+        StringBuffer s= new StringBuffer();
+        
+        s.append( "" + Datum.create( dep0.value(0), u, res ) +" ");
+        for ( int i=0; i<hist.length(); i++ ) {
+            int norm= (int)hist.value(i) * scaleMax / max;
+            if ( norm==scaleMax ) norm=scaleMax-1; // make last bin inclusive
+            //s.append( (char)(2581+norm) );
+            s.append( scale.charAt(norm));
+        }
+        s.append(" "+ Datum.create( dep0.value(dep0.length()-1), u, res ) );
+        if ( "log".equals( dep0.property( QDataSet.SCALE_TYPE ) ) ) {
+            s.append(" log");
+        }
+        return s.toString();
+    }
+
     private void updateStatistics() {
         statisticsDirty = true;
         SwingUtilities.invokeLater(new Runnable() {
@@ -185,6 +223,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
         });
     }
 
+    @SuppressWarnings("unchecked")
     private synchronized void updateStatisticsImmediately() {
         Panel p = applicationModel.dom.getPanel();
 
@@ -237,6 +276,9 @@ public class MetaDataPanel extends javax.swing.JPanel {
             } else {
                 map.put("Cadence", "null");
             }
+            
+            s= histStr( ds );
+            map.put( "Histogram", s );
 
         }
 
