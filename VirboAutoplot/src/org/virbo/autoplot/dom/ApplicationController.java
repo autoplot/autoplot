@@ -109,11 +109,10 @@ public class ApplicationController {
      * add a panel to the application.
      * @return
      */
-    public synchronized Panel addPanel( Plot domPlot) {
+    public synchronized Panel addPanel(  Plot domPlot) {
         logger.fine("enter addPanel");
         final Panel panel = new Panel();
-        new PanelController(application, panel);
-        new DataSourceController(model, panel);
+        new PanelController( this.model, application, panel );
 
         if (domPlot == null) {
             domPlot = addPlot();

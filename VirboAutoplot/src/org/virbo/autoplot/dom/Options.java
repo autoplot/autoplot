@@ -282,6 +282,70 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_OVERRENDERING, oldOverRendering, overRendering);
     }
 
+
+    /**
+     * Holds value of property showContextOverview.
+     */
+    private boolean showContextOverview;
+
+    public boolean isShowContextOverview() {
+        return this.showContextOverview;
+    }
+
+    public void setShowContextOverview(boolean showContextOverview) {
+        //boolean oldShowContextOverview = this.showContextOverview;
+        this.showContextOverview = showContextOverview;
+    //propertyChangeSupport.firePropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
+    }
+    private boolean autoOverview = true;
+    public static final String PROP_AUTOOVERVIEW = "autoOverview";
+
+    public boolean isAutoOverview() {
+        return this.autoOverview;
+    }
+
+    public void setAutoOverview(boolean newautoOverview) {
+        //boolean oldautoOverview = autoOverview;
+        this.autoOverview = newautoOverview;
+    //propertyChangeSupport.firePropertyChange(PROP_AUTOOVERVIEW, oldautoOverview, newautoOverview);
+    }
+    private boolean autoranging = true;
+    public static final String PROP_AUTORANGING = "autoranging";
+
+    public boolean isAutoranging() {
+        return this.autoranging;
+    }
+
+    public void setAutoranging(boolean newautoranging) {
+        boolean oldautoranging = autoranging;
+        this.autoranging = newautoranging;
+        propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
+    }
+    protected boolean autolabelling = true;
+    public static final String PROP_AUTOLABELLING = "autolabelling";
+
+    public boolean isAutolabelling() {
+        return autolabelling;
+    }
+
+    public void setAutolabelling(boolean autolabelling) {
+        boolean oldAutolabelling = this.autolabelling;
+        this.autolabelling = autolabelling;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOLABELLING, oldAutolabelling, autolabelling);
+    }
+    protected boolean autolayout = true;
+    public static final String PROP_AUTOLAYOUT = "autolayout";
+
+    public boolean isAutolayout() {
+        return autolayout;
+    }
+
+    public void setAutolayout(boolean autolayout) {
+        boolean oldAutolayout = this.autolayout;
+        this.autolayout = autolayout;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOLAYOUT, oldAutolayout, autolayout);
+    }
+    
     
     public void syncTo(DomNode n) {
         Options that= (Options)n;
@@ -297,7 +361,10 @@ public class Options extends DomNode {
         this.setDrawMinorGrid( that.isDrawMinorGrid() );
         this.setDrawAntiAlias( that.drawAntiAlias );
         this.setTextAntiAlias( that.textAntiAlias );
-        this.setOverRendering( that.isOverRendering() );
+        this.setOverRendering( that.overRendering );
+        this.setAutoOverview(that.autoOverview );
+        this.setAutolabelling(that.autolabelling);  
+        this.setAutoranging( that.autoranging );
     }
 
     public Map<String, String> diffs(DomNode node) {

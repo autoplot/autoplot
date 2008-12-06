@@ -36,25 +36,26 @@ public class TimeSeriesBrowseController {
     Timer updateTsbTimer;
     PropertyChangeListener timeSeriesBrowseListener;
 
-    TimeSeriesBrowseController( DataSourceController dsc, PanelController pc, Panel p) {
+    TimeSeriesBrowseController( Panel p ) {
         updateTsbTimer = new Timer(100, new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
                 updateTsb(false);
             }
         });
+        
         updateTsbTimer.setRepeats(false);
         this.p = p;
-        this.panelController = pc;
-        this.dataSourceController= dsc;
-        this.plot = pc.getPlot();
-        this.xAxis = pc.getPlot().getXAxis();
+        this.panelController = p.getController();
+        this.dataSourceController= p.getDataSourceFilter().getController();
+        this.plot = panelController.getPlot();
+        this.xAxis = panelController.getPlot().getXAxis();
     }
 
     public void setup() {
         boolean setTsbInitialResolution = true;
         if (setTsbInitialResolution) {
-            DatumRange timeRange = p.getDataSourceFilter().getTsb().getTimeRange();
+            DatumRange timeRange = dataSourceController.getTsb().getTimeRange();
             this.plot.getXAxis().resetRange(timeRange);
             updateTsb(true);
         }
@@ -77,14 +78,14 @@ public class TimeSeriesBrowseController {
 
     public void updateTsb(boolean autorange) {
 
-        if (p.getDataSourceFilter().getTsb() == null) {
+        if ( p.getDataSourceFilter().getController().getTsb() == null) {
             return;
         }
 
         if (UnitsUtil.isTimeLocation(xAxis.getUnits())) {
 
             // CacheTag "tag" identifies what we have already
-            QDataSet ds = p.getDataSourceFilter().getDataSet();
+            QDataSet ds = this.dataSourceController.getDataSet();
             QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
             CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
 
@@ -102,16 +103,16 @@ public class TimeSeriesBrowseController {
                 if (plot.isOverSize()) {
                     visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3);
                 }
-                p.getDataSourceFilter().getTsb().setTimeRange(visibleRange);
-                p.getDataSourceFilter().getTsb().setTimeResolution(newResolution);
+                p.getDataSourceFilter().getController().getTsb().setTimeRange(visibleRange);
+                p.getDataSourceFilter().getController().getTsb().setTimeResolution(newResolution);
                 String surl;
-                surl = DataSetURL.getDataSourceUri(p.getDataSourceFilter()._getDataSource());
+                surl = DataSetURL.getDataSourceUri( p.getDataSourceFilter().getController()._getDataSource());
                 // check the registry for URLs, compare to surl, append prefix if necessary.
-                if (!autorange && surl.equals(p.getDataSourceFilter().getTsbSuri())) {
+                if (!autorange && surl.equals( this.dataSourceController.getTsbSuri())) {
                     logger.fine("we do no better with tsb");
                 } else {
                     dataSourceController.update(autorange, autorange);
-                    p.getDataSourceFilter()._setTsbSuri(surl);
+                    this.dataSourceController._setTsbSuri(surl);
                     p.getDataSourceFilter().setSuri(surl);
                 }
             } else {

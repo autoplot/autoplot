@@ -55,7 +55,7 @@ public class DataSourceController {
     private PropertyChangeListener updateSlicePropertyChangeListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent e) {
-            if (dsf.getDataSet() != null && dsf.getDataSet().rank() == 3) updateFill();
+            if ( getDataSet() != null &&  getDataSet().rank() == 3) updateFill();
         }
     };
     private PropertyChangeListener updateMePropertyChangeListener = new PropertyChangeListener() {
@@ -80,7 +80,7 @@ public class DataSourceController {
     private static final String PENDING_FILL_DATASET = "fillDataSet";
     private static final String PENDING_UPDATE = "update";
 
-    public DataSourceController(ApplicationModel model, final Panel panel) {
+    public DataSourceController( ApplicationModel model, final Panel panel ) {
 
         this.model = model;
         this.dom = model.getDocumentModel();
@@ -108,14 +108,14 @@ public class DataSourceController {
      * @return the number of slice indeces.
      */
     public int getMaxSliceIndex(int i) {
-        if (dsf.getDataSet() == null) {
+        if ( getDataSet() == null) {
             return 0;
         }
         int sliceDimension = i;
         if (sliceDimension == 0) {
-            return dsf.getDataSet().length();
+            return  getDataSet().length();
         }
-        int[] qube = DataSetUtil.qubeDims(dsf.getDataSet());
+        int[] qube = DataSetUtil.qubeDims( getDataSet());
         if (qube == null || qube.length <= sliceDimension) {
             return 0;
         } else {
@@ -135,7 +135,7 @@ public class DataSourceController {
      */
     private void doDimensionNames() {
 
-        QDataSet ds = dsf.getDataSet();
+        QDataSet ds =  getDataSet();
 
         String[] depNames = new String[3];
         for (int i = 0; i < ds.rank(); i++) {
@@ -150,7 +150,7 @@ public class DataSourceController {
         }
 
         logger.fine("dep names: " + Arrays.asList(depNames));
-        dsf.setDepnames(Arrays.asList(depNames));
+        setDepnames(Arrays.asList(depNames));
 
         if (ds.rank() > 2) {
             guessSliceDimension();
@@ -163,28 +163,28 @@ public class DataSourceController {
             timeSeriesBrowseController.release();
         }
 
-        DataSource oldSource = dsf._getDataSource();
+        DataSource oldSource = _getDataSource();
 
         if (dataSource == null) {
-            dsf._setCaching(null);
-            dsf._setTsb(null);
-            dsf._setTsbSuri(null);
+             _setCaching(null);
+             _setTsb(null);
+             _setTsbSuri(null);
             dsf.setSuri(null);
 
         } else {
 
-            dsf._setCaching(dataSource.getCapability(Caching.class));
-            dsf._setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
+             _setCaching(dataSource.getCapability(Caching.class));
+             _setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
 
         }
 
-        dsf._setDataSource(dataSource);
+        _setDataSource(dataSource);
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
-            if (dsf.getTsb() != null) {
-                dsf._setDataSet(null);
+            if ( getTsb() != null) {
+                 _setDataSet(null);
 
-                timeSeriesBrowseController = new TimeSeriesBrowseController(this, panelController, panel);
+                timeSeriesBrowseController = new TimeSeriesBrowseController(panel);
                 timeSeriesBrowseController.setup();
 
             } else {
@@ -232,13 +232,13 @@ public class DataSourceController {
             }
         }
 
-        dsf._setDataSet(ds);
+         _setDataSet(ds);
 
         if (ds == null) {
-            dsf._setDataSet(null);
-            dsf._setProperties(null);
-            dsf._setFillProperties(null);
-            dsf._setFillDataSet(null);
+            _setDataSet(null);
+            _setProperties(null);
+            _setFillProperties(null);
+            _setFillDataSet(null);
             return;
         }
 
@@ -260,12 +260,12 @@ public class DataSourceController {
     private void extractProperties() {
         Map<String, Object> properties; // QDataSet properties.
 
-        properties = AutoplotUtil.extractProperties(dsf.getDataSet());
-        if (dsf._getDataSource() != null) {
-            properties = AutoplotUtil.mergeProperties(dsf._getDataSource().getProperties(), properties);
+        properties = AutoplotUtil.extractProperties(getDataSet());
+        if ( _getDataSource() != null) {
+            properties = AutoplotUtil.mergeProperties( _getDataSource().getProperties(), properties);
         }
 
-        dsf._setProperties(properties);
+        _setProperties(properties);
 
     }
 
@@ -278,7 +278,7 @@ public class DataSourceController {
         Object v;
 
 
-        Map<String, Object> properties = dsf.getProperties();
+        Map<String, Object> properties = getProperties();
 
         if ((v = properties.get(QDataSet.FILL_VALUE)) != null) {
             dsf.setFill(String.valueOf(v));
@@ -318,15 +318,15 @@ public class DataSourceController {
 
         final DataSourceFilter dsf = panel.getDataSourceFilter();
 
-        if (dsf.getDataSet() == null) {
+        if (getDataSet() == null) {
             return;
         }
 
-        Map properties = dsf.getProperties();
+        Map properties = getProperties();
 
         MutablePropertyDataSet fillDs;
 
-        if (dsf.getDataSet().rank() == 3) {
+        if (getDataSet().rank() == 3) {
 
             QDataSet ds;
             QDataSet dep;
@@ -334,29 +334,29 @@ public class DataSourceController {
             int sliceIndex = dsf.getSliceIndex();
 
             if (sliceDimension == 2) {
-                int index = Math.min(dsf.getDataSet().length(0, 0) - 1, sliceIndex);
-                ds = DataSetOps.slice2(dsf.getDataSet(), index);
-                dep = (QDataSet) dsf.getDataSet().property(QDataSet.DEPEND_2);
+                int index = Math.min(getDataSet().length(0, 0) - 1, sliceIndex);
+                ds = DataSetOps.slice2(getDataSet(), index);
+                dep = (QDataSet) getDataSet().property(QDataSet.DEPEND_2);
             } else if (sliceDimension == 1) {
-                int index = Math.min(dsf.getDataSet().length(0) - 1, sliceIndex);
-                ds = DataSetOps.slice1(dsf.getDataSet(), index);
-                dep = (QDataSet) dsf.getDataSet().property(QDataSet.DEPEND_1);
+                int index = Math.min(getDataSet().length(0) - 1, sliceIndex);
+                ds = DataSetOps.slice1(getDataSet(), index);
+                dep = (QDataSet) getDataSet().property(QDataSet.DEPEND_1);
             } else if (sliceDimension == 0) {
-                int index = Math.min(dsf.getDataSet().length() - 1, sliceIndex);
-                ds = DataSetOps.slice0(dsf.getDataSet(), index);
-                dep = (QDataSet) dsf.getDataSet().property(QDataSet.DEPEND_0);
+                int index = Math.min(getDataSet().length() - 1, sliceIndex);
+                ds = DataSetOps.slice0(getDataSet(), index);
+                dep = (QDataSet) getDataSet().property(QDataSet.DEPEND_0);
             } else {
                 throw new IllegalStateException("sliceDimension");
             }
 
             String reduceRankString;
-            List<String> names = dsf.getDepnames();
+            List<String> names = getDepnames();
             if (dep == null) {
                 reduceRankString = names.get(sliceDimension) + "=" + sliceIndex;
             } else {
                 reduceRankString = PanelUtil.describe(names.get(sliceDimension), dep, sliceIndex);
             }
-            dsf._setReduceDataSetString(reduceRankString);
+            _setReduceDataSetString(reduceRankString);
 
             properties = PanelUtil.sliceProperties(properties, sliceDimension);
 
@@ -368,8 +368,8 @@ public class DataSourceController {
             fillDs = DataSetOps.makePropertiesMutable(ds);
 
         } else {
-            fillDs = DataSetOps.makePropertiesMutable(dsf.getDataSet());
-            dsf._setReduceDataSetString(null);
+            fillDs = DataSetOps.makePropertiesMutable(getDataSet());
+            _setReduceDataSetString(null);
         }
 
         /*  begin fill dataset  */
@@ -390,11 +390,11 @@ public class DataSourceController {
         // check the dataset for fill data, inserting canonical fill values.
         AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
 
-        dsf._setFillProperties(properties);
-        if (fillDs == dsf.getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
-            dsf._setFillDataSet(null);
+        _setFillProperties(properties);
+        if (fillDs == getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
+            _setFillDataSet(null);
         }
-        dsf._setFillDataSet(fillDs);
+        _setFillDataSet(fillDs);
         pendingChanges.remove(PENDING_FILL_DATASET);
     }
 
@@ -409,7 +409,7 @@ public class DataSourceController {
         /*** here is the data load ***/
         setStatus("busy: loading dataset");
 
-        if (panel.getDataSourceFilter()._getDataSource() != null) {
+        if ( _getDataSource() != null) {
             QDataSet dataset = loadDataSet();
             setStatus("done loading dataset");
             setDataSetInternal(dataset, autorange);
@@ -417,9 +417,9 @@ public class DataSourceController {
             setDataSetInternal(null, autorange);
         }
 
-        if (panel.getDataSourceFilter().getTsb() != null) {
+        if ( getTsb() != null) {
             String oldsurl = panel.getDataSourceFilter().getSuri();
-            String newsurl = panel.getDataSourceFilter().getTsb().getURL().toString();
+            String newsurl = getTsb().getURL().toString();
             URLSplit split = URLSplit.parse(newsurl);
             if (oldsurl != null) {
                 URLSplit oldSplit = URLSplit.parse(oldsurl);
@@ -440,7 +440,7 @@ public class DataSourceController {
     public synchronized void update(final boolean autorange, final boolean interpretMeta) {
         pendingChanges.add(PENDING_UPDATE);
         DataSourceFilter dsf = panel.getDataSourceFilter();
-        dsf._setDataSet(null);
+        _setDataSet(null);
 
         Runnable run = new Runnable() {
             public void run() {
@@ -449,7 +449,7 @@ public class DataSourceController {
             }
         };
 
-        if (dsf._getDataSource() != null && dsf._getDataSource().asynchronousLoad() && !dom.getController().isHeadless()) {
+        if ( _getDataSource() != null &&  _getDataSource().asynchronousLoad() && !dom.getController().isHeadless()) {
             logger.info("invoke later do load");
             if (mon != null) {
                 System.err.println("double load!");
@@ -463,6 +463,8 @@ public class DataSourceController {
         }
     }
 
+    /****** controller properties *******/
+    
     /**
      * raw properties provided by the datasource after the data load.
      */
@@ -478,6 +480,146 @@ public class DataSourceController {
         this.rawProperties = rawProperties;
         propertyChangeSupport.firePropertyChange(PROP_RAWPROPERTIES, oldRawProperties, rawProperties);
     }
+    
+    
+    protected TimeSeriesBrowse tsb = null;
+    public static final String PROP_TSB = "tsb";
+
+    public TimeSeriesBrowse getTsb() {
+        return tsb;
+    }
+
+    public void _setTsb(TimeSeriesBrowse tsb) {
+        TimeSeriesBrowse oldTsb = this.tsb;
+        this.tsb = tsb;
+        propertyChangeSupport.firePropertyChange(PROP_TSB, oldTsb, tsb);
+    }
+    protected String tsbSuri = null;
+    public static final String PROP_TSBSURI = "tsbSuri";
+
+    public String getTsbSuri() {
+        return tsbSuri;
+    }
+
+    public void _setTsbSuri(String tsbSuri) {
+        String oldTsbSuri = this.tsbSuri;
+        this.tsbSuri = tsbSuri;
+        propertyChangeSupport.firePropertyChange(PROP_TSBSURI, oldTsbSuri, tsbSuri);
+    }
+    
+    protected Caching caching = null;
+    public static final String PROP_CACHING = "caching";
+
+    public Caching getCaching() {
+        return caching;
+    }
+
+    public void _setCaching(Caching caching) {
+        Caching oldCaching = this.caching;
+        this.caching = caching;
+        propertyChangeSupport.firePropertyChange(PROP_CACHING, oldCaching, caching);
+    }
+    
+    protected DataSource dataSource = null;
+    public static final String PROP_DATASOURCE = "dataSource";
+    
+    public DataSource _getDataSource() {
+        return dataSource;
+    }
+
+    public void _setDataSource(DataSource dataSource) {
+        DataSource oldDataSource = this.dataSource;
+        this.dataSource = dataSource;
+        propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, oldDataSource, dataSource);
+    }
+
+    
+    /**
+     * the dataset loaded from the data source.
+     */
+    protected QDataSet dataSet = null;
+    public static final String PROP_DATASET = "dataSet";
+
+    public QDataSet getDataSet() {
+        return dataSet;
+    }
+
+    public void _setDataSet(QDataSet dataSet) {
+        QDataSet oldDataSet = this.dataSet;
+        this.dataSet = dataSet;
+        propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
+    }
+    /**
+     * fill dataset is a copy of the loaded dataset, with fill data applied.  If dataset has mutable properties,
+     * then the fillDataSet will be the same as the dataset, and the dataset's properties are modified.
+     */
+    protected QDataSet fillDataSet = null;
+    public static final String PROP_FILLDATASET = "fillDataSet";
+
+    public QDataSet getFillDataSet() {
+        return fillDataSet;
+    }
+
+    public void _setFillDataSet(QDataSet fillDataSet) {
+        QDataSet oldFillDataSet = this.fillDataSet;
+        this.fillDataSet = fillDataSet;
+        propertyChangeSupport.firePropertyChange(PROP_FILLDATASET, oldFillDataSet, fillDataSet);
+    }
+    
+    private List<String> depnames = Arrays.asList(new String[]{"first", "second", "last"});
+    public static final String PROP_DEPNAMES = "depnames";
+
+    public List<String> getDepnames() {
+        return this.depnames;
+    }
+
+    public void setDepnames(List<String> newdepnames) {
+        List<String> olddepnames = depnames;
+        this.depnames = newdepnames;
+        if (!newdepnames.equals(olddepnames)) {
+            propertyChangeSupport.firePropertyChange(PROP_DEPNAMES, olddepnames, newdepnames);
+        }
+    }
+
+    protected Map<String, Object> properties = null;
+    public static final String PROP_PROPERTIES = "properties";
+
+    public Map<String, Object> getProperties() {
+        return properties;
+    }
+
+    public void _setProperties(Map<String, Object> properties) {
+        Map<String, Object> oldProperties = this.properties;
+        this.properties = properties;
+        propertyChangeSupport.firePropertyChange(PROP_PROPERTIES, oldProperties, properties);
+    }
+    
+    protected Map<String, Object> fillProperties = null;
+    public static final String PROP_FILLPROPERTIES = "fillProperties";
+
+    public Map<String, Object> getFillProperties() {
+        return fillProperties;
+    }
+
+    public void _setFillProperties(Map<String, Object> fillProperties) {
+        Map<String, Object> oldFillProperties = this.fillProperties;
+        this.fillProperties = fillProperties;
+        propertyChangeSupport.firePropertyChange(PROP_FILLPROPERTIES, oldFillProperties, fillProperties);
+    }
+
+    protected String reduceDataSetString = null;
+    public static final String PROP_REDUCEDATASETSTRING = "reduceDataSetString";
+
+    public String getReduceDataSetString() {
+        return reduceDataSetString;
+    }
+
+    public void _setReduceDataSetString(String reduceDataSetString) {
+        String oldReduceDataSetString = this.reduceDataSetString;
+        this.reduceDataSetString = reduceDataSetString;
+        propertyChangeSupport.firePropertyChange(PROP_REDUCEDATASETSTRING, oldReduceDataSetString, reduceDataSetString);
+    }
+    
     
     private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
 
@@ -506,11 +648,11 @@ public class DataSourceController {
         ProgressMonitor mymon;
 
         QDataSet result = null;
-        mymon = getMonitor("loading data", "loading " + panel.getDataSourceFilter()._getDataSource());
+        mymon = getMonitor("loading data", "loading " + _getDataSource());
         this.mon = mymon;
         try {
-            result = panel.getDataSourceFilter()._getDataSource().getDataSet(mymon);
-            setRawProperties( panel.getDataSourceFilter()._getDataSource().getMetaData( new NullProgressMonitor() ) );
+            result = _getDataSource().getDataSet(mymon);
+            setRawProperties( _getDataSource().getMetaData( new NullProgressMonitor() ) );
             
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
@@ -575,7 +717,7 @@ public class DataSourceController {
     public void resolveDataSource(ProgressMonitor mon) {
         pendingChanges.add(PENDING_DATA_SOURCE);
 
-        Caching caching = dsf.getCaching();
+        Caching caching = getCaching();
 
         String surl = dsf.getSuri();
         if (surl == null) {
@@ -621,8 +763,8 @@ public class DataSourceController {
         Panel p = dom.getPanel();
 
         int[] slicePref = new int[]{1, 1, 1};
-        for (int i = 0; i < p.getDataSourceFilter().getDepnames().size(); i++) {
-            String n = p.getDataSourceFilter().getDepnames().get(i);
+        for (int i = 0; i < getDepnames().size(); i++) {
+            String n = getDepnames().get(i);
             if (n.equals("lat")) {
                 slicePref[i] = 0;
                 lat = i;

@@ -24,9 +24,9 @@ import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.ApplicationModel.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
-import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -50,7 +50,7 @@ public class PanelController {
      */
     public static int SYMSIZE_DATAPOINT_COUNT = 500;
 
-    public PanelController(final Application dom, final Panel panel) {
+    public PanelController( final ApplicationModel model, final Application dom, final Panel panel) {
         panel.controller = this;
         this.dom = dom;
         this.panel = panel;
@@ -77,10 +77,22 @@ public class PanelController {
             }
         });
 
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_FILLDATASET, new PropertyChangeListener() {
+        dsf.addPropertyChangeListener(Panel.PROP_RENDERTYPE, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                QDataSet fillDs = dsf.getFillDataSet();
+                setRenderType(panel.getRenderType());
+            }
+        });
+
+        setDataSourceFilterController( new DataSourceController( model, panel) );
+        
+    }
+
+    public void setDataSourceFilterController( final DataSourceController dsc ) {
+        dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                QDataSet fillDs = dsc.getFillDataSet();
                 if (fillDs != null && resetRanges) {
                     doResetRanges(true);
                     setResetRanges(false);
@@ -95,8 +107,8 @@ public class PanelController {
                     }
 
                     final DataSourceFilter dsf = panel.getDataSourceFilter();
-                    String reduceRankString = dsf.getReduceDataSetString();
-                    if (dsf.getReduceDataSetString() != null) { // kludge to update title
+                    String reduceRankString = dsf.getController().getReduceDataSetString();
+                    if (dsf.getController().getReduceDataSetString() != null) { // kludge to update title
                         String title = dom.getPlot().getTitle();
                         Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
                         Matcher m = p.matcher(title);
@@ -109,20 +121,14 @@ public class PanelController {
             }
         });
 
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_DATASOURCE, new PropertyChangeListener() {
-
+        dsc.addPropertyChangeListener( DataSourceController.PROP_DATASOURCE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 setResetRanges(true);
             }
         });
 
-        dsf.addPropertyChangeListener(Panel.PROP_RENDERTYPE, new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                setRenderType(panel.getRenderType());
-            }
-        });
     }
+
 
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
@@ -181,7 +187,7 @@ public class PanelController {
 
         DataSourceFilter dsf = panel.getDataSourceFilter();
 
-        RenderType renderType = AutoplotUtil.getRenderType(dsf.getFillDataSet());
+        RenderType renderType = AutoplotUtil.getRenderType(dsf.getController().getFillDataSet());
         panel.setRenderType(renderType);
 
         this.setRenderer(autorange, true);
@@ -213,8 +219,8 @@ public class PanelController {
      */
     public void doMetadata(Panel panelCopy, boolean autorange, boolean interpretMetadata) {
         final DataSourceFilter dsf = panel.getDataSourceFilter();
-        QDataSet fillDs = dsf.getFillDataSet();
-        Map<String, Object> properties = dsf.getFillProperties();
+        QDataSet fillDs = dsf.getController().getFillDataSet();
+        Map<String, Object> properties = dsf.getController().getFillProperties();
 
         RenderType renderType = panel.getRenderType();
 
@@ -222,7 +228,7 @@ public class PanelController {
         /* begin interpret metadata */
         if (interpretMetadata && autorange) {
 
-            if (dom.isAutolabelling()) {
+            if (dom.getOptions().isAutolabelling()) {
                 panelCopy.getPlotDefaults().getXaxis().setLabel("");
                 panelCopy.getPlotDefaults().getYaxis().setLabel("");
                 panelCopy.getPlotDefaults().getZaxis().setLabel("");
@@ -231,8 +237,8 @@ public class PanelController {
 
             doInterpretMetadata(panelCopy, properties, panel.getRenderType());
 
-            String reduceRankString = panel.getDataSourceFilter().getReduceDataSetString();
-            if (dsf.getReduceDataSetString() != null) {
+            String reduceRankString = panel.getDataSourceFilter().getController().getReduceDataSetString();
+            if (dsf.getController().getReduceDataSetString() != null) {
                 String title = panelCopy.getPlotDefaults().getTitle();
                 title += "!c" + reduceRankString;
                 panelCopy.getPlotDefaults().setTitle(title);
@@ -245,7 +251,7 @@ public class PanelController {
         } else {
             // kludge to support updating slice location report without autoranging.
             // I don't think it's coming into this dead code.
-            if (dsf.getReduceDataSetString() != null) {
+            if (dsf.getController().getReduceDataSetString() != null) {
                 panelCopy.getPlotDefaults().setTitle("");
                 doInterpretMetadata(panelCopy, properties, renderType);
 
@@ -263,15 +269,15 @@ public class PanelController {
         }
 
         if (spec == RenderType.spectrogram) {
-            if (dom.isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
+            if (dom.getOptions().isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
                 cpanel.getPlotDefaults().getZaxis().setLog(v.equals("log"));
             }
 
-            if (dom.isAutolabelling() && (v = properties.get(QDataSet.LABEL)) != null) {
+            if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.LABEL)) != null) {
                 cpanel.getPlotDefaults().getZaxis().setLabel((String) v);
             }
 
-            if (dom.isAutolabelling() && (v = properties.get(QDataSet.DEPEND_1)) != null) {
+            if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.DEPEND_1)) != null) {
                 Map m = (Map) v;
                 Object v2 = m.get(QDataSet.LABEL);
                 if (v2 != null) {
@@ -280,11 +286,11 @@ public class PanelController {
 
             }
         } else {
-            if (dom.isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
+            if (dom.getOptions().isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
                 cpanel.getPlotDefaults().getYaxis().setLog(v.equals("log"));
             }
 
-            if (dom.isAutolabelling() && (v = properties.get(QDataSet.LABEL)) != null) {
+            if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.LABEL)) != null) {
                 cpanel.getPlotDefaults().getYaxis().setLabel((String) v);
             }
 
@@ -294,7 +300,7 @@ public class PanelController {
         if ((v = properties.get(QDataSet.DEPEND_0)) != null) {
             Map m = (Map) v;
             Object v2 = m.get(QDataSet.LABEL);
-            if (dom.isAutolabelling() && v2 != null) {
+            if (dom.getOptions().isAutolabelling() && v2 != null) {
                 cpanel.getPlotDefaults().getXaxis().setLabel((String) v2);
             }
 
@@ -323,15 +329,15 @@ public class PanelController {
      * @param props
      * @param spec
      */
-    private void doAutoranging(Panel cpanel) {
-        Map props = cpanel.getDataSourceFilter().getFillProperties();
-        RenderType spec = cpanel.getRenderType();
+    private void doAutoranging(Panel panelCopy) {
+        Map props = panel.getDataSourceFilter().getController().getFillProperties();
+        RenderType spec = panelCopy.getRenderType();
 
         if (props == null) {
             props = Collections.EMPTY_MAP;
         }
 
-        QDataSet fillDs = panel.getDataSourceFilter().getFillDataSet();
+        QDataSet fillDs = panel.getDataSourceFilter().getController().getFillDataSet();
 
         if (spec == RenderType.spectrogram) {
 
@@ -354,12 +360,12 @@ public class PanelController {
 
             AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs, props);
 
-            cpanel.getPlotDefaults().getZaxis().setRange(desc.range);
-            cpanel.getPlotDefaults().getZaxis().setLog(desc.log);
-            cpanel.getPlotDefaults().getXaxis().setLog(xdesc.log);
-            cpanel.getPlotDefaults().getXaxis().setRange(xdesc.range);
-            cpanel.getPlotDefaults().getYaxis().setLog(ydesc.log);
-            cpanel.getPlotDefaults().getYaxis().setRange(ydesc.range);
+            panelCopy.getPlotDefaults().getZaxis().setRange(desc.range);
+            panelCopy.getPlotDefaults().getZaxis().setLog(desc.log);
+            panelCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+            panelCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+            panelCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
+            panelCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
 
         } else {
 
@@ -367,12 +373,12 @@ public class PanelController {
             QDataSet depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             isSeries = (depend0 == null || DataSetUtil.isMonotonic(depend0));
             if (isSeries) {
-                cpanel.getStyle().setSymbolConnector(PsymConnector.SOLID);
+                panelCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);
             } else {
-                cpanel.getStyle().setSymbolConnector(PsymConnector.NONE);
+                panelCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
             }
 
-            cpanel.getStyle().setLineWidth(1.0f);
+            panelCopy.getStyle().setLineWidth(1.0f);
 
             AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs, props);
 
@@ -385,21 +391,21 @@ public class PanelController {
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
-            cpanel.getPlotDefaults().getYaxis().setLog(desc.log);
-            cpanel.getPlotDefaults().getYaxis().setRange(desc.range);
+            panelCopy.getPlotDefaults().getYaxis().setLog(desc.log);
+            panelCopy.getPlotDefaults().getYaxis().setRange(desc.range);
 
-            cpanel.getPlotDefaults().getXaxis().setLog(xdesc.log);
-            cpanel.getPlotDefaults().getXaxis().setRange(xdesc.range);
+            panelCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+            panelCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
 
             if (fillDs.length() > 30000) {
-                cpanel.getStyle().setSymbolConnector(PsymConnector.NONE);
-                cpanel.getStyle().setSymbolSize(1.0);
+                panelCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
+                panelCopy.getStyle().setSymbolSize(1.0);
             } else {
-                cpanel.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+                panelCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
                 if (fillDs.length() > SYMSIZE_DATAPOINT_COUNT) {
-                    cpanel.getStyle().setSymbolSize(1.0);
+                    panelCopy.getStyle().setSymbolSize(1.0);
                 } else {
-                    cpanel.getStyle().setSymbolSize(3.0);
+                    panelCopy.getStyle().setSymbolSize(3.0);
                 }
 
             }
@@ -443,7 +449,7 @@ public class PanelController {
     public void setRenderType(RenderType renderType) {
 
         // getRenderers sets the dataset.
-        List<Renderer> rs = AutoplotUtil.getRenderers(panel.getDataSourceFilter().getFillDataSet(),
+        List<Renderer> rs = AutoplotUtil.getRenderers( panel.getDataSourceFilter().getController().getFillDataSet(),
                 renderType, Collections.singletonList(getRenderer()), getColorbar());
 
         assert rs.size() == 1;

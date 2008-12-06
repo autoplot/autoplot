@@ -5,15 +5,12 @@
 
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSource;
-import org.virbo.datasource.capability.Caching;
-import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  * Model for a source of data plus additional processing.
@@ -21,8 +18,6 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class DataSourceFilter extends DomNode {
     
-    protected DataSource dataSource = null;
-    public static final String PROP_DATASOURCE = "dataSource";
     protected String suri = null;
     public static final String PROP_SURI = "suri";
 
@@ -36,43 +31,6 @@ public class DataSourceFilter extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_SURI, oldSuri, suri);
     }
     
-    protected TimeSeriesBrowse tsb = null;
-    public static final String PROP_TSB = "tsb";
-
-    public TimeSeriesBrowse getTsb() {
-        return tsb;
-    }
-
-    public void _setTsb(TimeSeriesBrowse tsb) {
-        TimeSeriesBrowse oldTsb = this.tsb;
-        this.tsb = tsb;
-        propertyChangeSupport.firePropertyChange(PROP_TSB, oldTsb, tsb);
-    }
-    protected String tsbSuri = null;
-    public static final String PROP_TSBSURI = "tsbSuri";
-
-    public String getTsbSuri() {
-        return tsbSuri;
-    }
-
-    public void _setTsbSuri(String tsbSuri) {
-        String oldTsbSuri = this.tsbSuri;
-        this.tsbSuri = tsbSuri;
-        propertyChangeSupport.firePropertyChange(PROP_TSBSURI, oldTsbSuri, tsbSuri);
-    }
-    
-    protected Caching caching = null;
-    public static final String PROP_CACHING = "caching";
-
-    public Caching getCaching() {
-        return caching;
-    }
-
-    public void _setCaching(Caching caching) {
-        Caching oldCaching = this.caching;
-        this.caching = caching;
-        propertyChangeSupport.firePropertyChange(PROP_CACHING, oldCaching, caching);
-    }
 
     public static String PROP_VALID_RANGE= "validRange";
     
@@ -101,47 +59,7 @@ public class DataSourceFilter extends DomNode {
         this.fill = fill;
         propertyChangeSupport.firePropertyChange( PROP_FILL, oldFill, fill );
     }    
-
-    public DataSource _getDataSource() {
-        return dataSource;
-    }
-
-    public void _setDataSource(DataSource dataSource) {
-        DataSource oldDataSource = this.dataSource;
-        this.dataSource = dataSource;
-        propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, oldDataSource, dataSource);
-    }
-    /**
-     * the dataset loaded from the data source.
-     */
-    protected QDataSet dataSet = null;
-    public static final String PROP_DATASET = "dataSet";
-
-    public QDataSet getDataSet() {
-        return dataSet;
-    }
-
-    public void _setDataSet(QDataSet dataSet) {
-        QDataSet oldDataSet = this.dataSet;
-        this.dataSet = dataSet;
-        propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
-    }
-    /**
-     * fill dataset is a copy of the loaded dataset, with fill data applied.  If dataset has mutable properties,
-     * then the fillDataSet will be the same as the dataset, and the dataset's properties are modified.
-     */
-    protected QDataSet fillDataSet = null;
-    public static final String PROP_FILLDATASET = "fillDataSet";
-
-    public QDataSet getFillDataSet() {
-        return fillDataSet;
-    }
-
-    public void _setFillDataSet(QDataSet fillDataSet) {
-        QDataSet oldFillDataSet = this.fillDataSet;
-        this.fillDataSet = fillDataSet;
-        propertyChangeSupport.firePropertyChange(PROP_FILLDATASET, oldFillDataSet, fillDataSet);
-    }
+    
     
     private int sliceDimension = 2;
     public static final String PROP_SLICEDIMENSION = "sliceDimension";
@@ -197,60 +115,8 @@ public class DataSourceFilter extends DomNode {
     public boolean isTranspose() {
         return this.transpose;
     }
-    private List<String> depnames = Arrays.asList(new String[]{"first", "second", "last"});
-    public static final String PROP_DEPNAMES = "depnames";
-
-    public List<String> getDepnames() {
-        return this.depnames;
-    }
-
-    public void setDepnames(List<String> newdepnames) {
-        List<String> olddepnames = depnames;
-        this.depnames = newdepnames;
-        if (!newdepnames.equals(olddepnames)) {
-            propertyChangeSupport.firePropertyChange(PROP_DEPNAMES, olddepnames, newdepnames);
-        }
-    }
-
-    protected Map<String, Object> properties = null;
-    public static final String PROP_PROPERTIES = "properties";
-
-    public Map<String, Object> getProperties() {
-        return properties;
-    }
-
-    public void _setProperties(Map<String, Object> properties) {
-        Map<String, Object> oldProperties = this.properties;
-        this.properties = properties;
-        propertyChangeSupport.firePropertyChange(PROP_PROPERTIES, oldProperties, properties);
-    }
     
-    protected Map<String, Object> fillProperties = null;
-    public static final String PROP_FILLPROPERTIES = "fillProperties";
-
-    public Map<String, Object> getFillProperties() {
-        return fillProperties;
-    }
-
-    public void _setFillProperties(Map<String, Object> fillProperties) {
-        Map<String, Object> oldFillProperties = this.fillProperties;
-        this.fillProperties = fillProperties;
-        propertyChangeSupport.firePropertyChange(PROP_FILLPROPERTIES, oldFillProperties, fillProperties);
-    }
-
-    protected String reduceDataSetString = null;
-    public static final String PROP_REDUCEDATASETSTRING = "reduceDataSetString";
-
-    public String getReduceDataSetString() {
-        return reduceDataSetString;
-    }
-
-    public void _setReduceDataSetString(String reduceDataSetString) {
-        String oldReduceDataSetString = this.reduceDataSetString;
-        this.reduceDataSetString = reduceDataSetString;
-        propertyChangeSupport.firePropertyChange(PROP_REDUCEDATASETSTRING, oldReduceDataSetString, reduceDataSetString);
-    }
-
+    
     DataSourceController controller;
     
     public DataSourceController getController() {
