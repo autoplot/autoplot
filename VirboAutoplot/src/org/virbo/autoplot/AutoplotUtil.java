@@ -845,7 +845,8 @@ public class AutoplotUtil {
      * @param recyclable Reuse these if possible to reduce jitter.  May be null.
      * @return
      */
-    public static List<Renderer> getRenderers(QDataSet ds, RenderType renderType, List<Renderer> recyclable, DasColorBar colorbar) {
+    public static List<Renderer> getRenderers( QDataSet ds, RenderType renderType, 
+            List<Renderer> recyclable, DasColorBar colorbar) {
         if (recyclable == null) recyclable = Collections.emptyList();
         if (renderType == RenderType.spectrogram) {
             if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SpectrogramRenderer) {
@@ -853,6 +854,7 @@ public class AutoplotUtil {
                 return recyclable;
             } else {
                 Renderer result = new SpectrogramRenderer(null, colorbar);
+                result.setDataSetLoader(null);
                 colorbar.setVisible(true);
                 result.setDataSet(TableDataSetAdapter.create(ds));
                 return Collections.singletonList(result);
@@ -860,16 +862,23 @@ public class AutoplotUtil {
         } else {
             List<Renderer> result;
             if (ds.rank() == 1) {
+                SeriesRenderer result1;
                 if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SeriesRenderer) {
                     result = recyclable;
+                    result1= (SeriesRenderer) result.get(0);
                 } else {
-                    result = Collections.singletonList((Renderer) new SeriesRenderer());
+                    result1= new SeriesRenderer();
+                    result1.setDataSetLoader(null);
+                    result = Collections.singletonList( (Renderer) result1  );
                 }
                 result.get(0).setDataSet(VectorDataSetAdapter.create(ds));
                 
                 if ( renderType==RenderType.colorScatter ) {
+                    result1.setColorBar(colorbar);
+                    result1.setColorByDataSetId( QDataSet.PLANE_0 ); //schema
                     colorbar.setVisible(true);
                 } else {
+                    result1.setColorByDataSetId( "" ); //schema
                     colorbar.setVisible(false);
                 }
             } else {
@@ -878,6 +887,7 @@ public class AutoplotUtil {
                 result = new ArrayList<Renderer>();
                 for (int i = 0; i < dim; i++) {
                     SeriesRenderer rend1 = new SeriesRenderer();
+                    rend1.setDataSetLoader(null);
                     float[] colorHSV = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
                     if (colorHSV[2] < 0.7f) {
                         colorHSV[2] = 0.7f;
