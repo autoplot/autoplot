@@ -117,7 +117,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel p= parent.applicationModel.dom.getPanel();
-                if ( p.getDataSourceFilter().getFillDataSet()==null ) {
+                if ( p.getDataSourceFilter().getController().getFillDataSet()==null ) {
                     JOptionPane.showMessageDialog( parent, "No Data to Export.");
                     return;
                 }
@@ -151,8 +151,8 @@ public class GuiSupport {
                 Preferences prefs = Preferences.userNodeForPackage(AutoPlotUI.class);
                 String currentFileString = prefs.get("DumpDataCurrentFile", "");
                 
-                if ( p.getDataSourceFilter().getFillDataSet()!=null ) {
-                    String name= (String) p.getDataSourceFilter().getFillDataSet().property( QDataSet.NAME );
+                if ( p.getDataSourceFilter().getController().getFillDataSet()!=null ) {
+                    String name= (String) p.getDataSourceFilter().getController().getFillDataSet().property( QDataSet.NAME );
                     if ( name!=null ) chooser.setSelectedFile(new File(name.toLowerCase())); 
                 }
 
@@ -189,7 +189,7 @@ public class GuiSupport {
                             }
                         }
                         format.formatData( new File(s),new java.util.HashMap<String, String>(), 
-                                p.getDataSourceFilter().getFillDataSet(), new DasProgressPanel("formatting data")  );
+                                p.getDataSourceFilter().getController().getFillDataSet(), new DasProgressPanel("formatting data")  );
                         parent.setStatus("created file "+s);
 
                     } catch (IOException ex) {

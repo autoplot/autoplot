@@ -20,6 +20,7 @@ import javax.swing.SwingUtilities;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Plot;
@@ -83,10 +84,10 @@ public class AxisPanel extends javax.swing.JPanel {
         Binding b;
         BindingContext bc = new BindingContext();
 
-        b = bc.addBinding(dom, "${autoOverview}", this.autoContextOverview, "selected");
-        b = bc.addBinding(dom, "${autoranging}", this.allowAutoRangingCheckBox, "selected");
-        b = bc.addBinding(dom, "${autolabelling}", this.autolabellingCheckbox, "selected");
-        b = bc.addBinding(dom, "${autolayout}", this.autolayoutCheckbox, "selected");
+        b = bc.addBinding(dom, "${options.autoOverview}", this.autoContextOverview, "selected");
+        b = bc.addBinding(dom, "${options.autoranging}", this.allowAutoRangingCheckBox, "selected");
+        b = bc.addBinding(dom, "${options.autolabelling}", this.autolabellingCheckbox, "selected");
+        b = bc.addBinding(dom, "${options.autolayout}", this.autolayoutCheckbox, "selected");
         bc.bind();
     }
     BindingContext panelBindingContext;
@@ -133,11 +134,11 @@ public class AxisPanel extends javax.swing.JPanel {
         });
 
 //TODO:removePropertyChangeListener
-        dsf.addPropertyChangeListener(new PropertyChangeListener() {
+        dsf.getController().addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getPropertyName().equals(DataSourceFilter.PROP_DEPNAMES)) {
-                    final String[] depNames = (String[]) dsf.getDepnames().toArray(); //TODO: what if panel changes...
+                if (evt.getPropertyName().equals(DataSourceController.PROP_DEPNAMES)) {
+                    final String[] depNames = (String[]) dsf.getController().getDepnames().toArray(); //TODO: what if panel changes...
                     for (int i = 0; i < depNames.length; i++) {
                         depNames[i] = depNames[i] + " (" + dsf.getController().getMaxSliceIndex(i) + " bins)";
                     }

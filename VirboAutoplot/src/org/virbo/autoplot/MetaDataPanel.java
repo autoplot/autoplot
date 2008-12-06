@@ -68,12 +68,12 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
     private void bindToPanel() {
         if (bindToPanel != null) {
-            bindToPanel.getDataSourceFilter().removePropertyChangeListener(propertiesListener);
-            bindToPanel.getDataSourceFilter().removePropertyChangeListener(fillListener);
+            bindToPanel.getDataSourceFilter().getController().removePropertyChangeListener(propertiesListener);
+            bindToPanel.getDataSourceFilter().getController().removePropertyChangeListener(fillListener);
             bindToPanel.getDataSourceFilter().getController().removePropertyChangeListener(propertiesListener);
         }
         dom.getPanel().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
-        dom.getPanel().getDataSourceFilter().addPropertyChangeListener(DataSourceFilter.PROP_FILLDATASET, fillListener);
+        dom.getPanel().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillListener);
         updateProperties();
         updateStatistics();
     }
@@ -84,7 +84,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
             Panel panel = dom.getPanel();
             DataSource dsrc = null;
             if (panel != null) {
-                dsrc = panel.getDataSourceFilter()._getDataSource();
+                dsrc = panel.getDataSourceFilter().getController()._getDataSource();
             }
             if (dsrc != null) {
                 tree = new CombinedTreeModel("" + dsrc.getURL());
@@ -135,7 +135,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
     PropertyChangeListener fillListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getPropertyName().equals(DataSourceFilter.PROP_FILLDATASET)) {
+            if (evt.getPropertyName().equals(DataSourceController.PROP_FILLDATASET)) {
                 updateStatistics();
             }
         }
@@ -167,14 +167,14 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
     private synchronized void updateDataSetPropertiesView() {
         Panel p = applicationModel.dom.getPanel();
-        if (p.getDataSourceFilter().getDataSet() == null) {
+        if (p.getDataSourceFilter().getController().getDataSet() == null) {
             //dsTree= NameValueTreeModel.create("dataset", Collections.singletonMap("dataset=", "no dataset") );
             //(PropertiesTreeModel( "no dataset", null );
             return;
         } else {
-            if (p.getDataSourceFilter().getDataSet() != this.dsTreeDs) {
-                dsTree = new PropertiesTreeModel("dataset= ", p.getDataSourceFilter().getDataSet());
-                this.dsTreeDs = p.getDataSourceFilter().getDataSet();
+            if (p.getDataSourceFilter().getController().getDataSet() != this.dsTreeDs) {
+                dsTree = new PropertiesTreeModel("dataset= ", p.getDataSourceFilter().getController().getDataSet());
+                this.dsTreeDs = p.getDataSourceFilter().getController().getDataSet();
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
@@ -190,7 +190,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         final LinkedHashMap map = new LinkedHashMap();
 
-        QDataSet ds = p.getDataSourceFilter().getDataSet();
+        QDataSet ds = p.getDataSourceFilter().getController().getDataSet();
         if (ds == null) {
             map.put("dataset", "(no dataset)");
 

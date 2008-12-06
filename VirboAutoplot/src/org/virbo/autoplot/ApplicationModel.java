@@ -135,7 +135,7 @@ public class ApplicationModel {
 
     public DataSource dataSource() {
         Panel p= dom.getPanel();
-        return p.getDataSourceFilter()._getDataSource();
+        return p.getDataSourceFilter().getController()._getDataSource();
     }
 
     /**
@@ -490,7 +490,7 @@ public class ApplicationModel {
         Application state = (Application) StatePersistence.restoreState(f);
         restoreState(state, true, true);
         setUseEmbeddedDataSet(false);
-        dom.setAutoOverview(true);
+        dom.getOptions().setAutoOverview(true);
         propertyChangeSupport.firePropertyChange("file", null, f);
     }
     
@@ -541,7 +541,7 @@ public class ApplicationModel {
     private void packEmbeddedDataSet() {
         Panel p = dom.getPanel();
         try {
-            if ( p.getDataSourceFilter().getDataSet() == null) {
+            if ( p.getDataSourceFilter().getController().getDataSet() == null) {
                 embedDs = "";
                 return;
             }
@@ -553,7 +553,7 @@ public class ApplicationModel {
             OutputStream dos = out;
 
             SimpleStreamFormatter format = new SimpleStreamFormatter();
-            format.format(p.getDataSourceFilter().getDataSet(), dos, false);
+            format.format(p.getDataSourceFilter().getController().getDataSet(), dos, false);
 
             dos.close();
 

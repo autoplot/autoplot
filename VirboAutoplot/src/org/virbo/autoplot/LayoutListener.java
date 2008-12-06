@@ -42,7 +42,7 @@ public class LayoutListener implements PropertyChangeListener {
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-        if (model.dom.isAutolayout() ) {
+        if (model.dom.getOptions().isAutolayout() ) {
             logger.fine("property change: " + evt.getPropertyName());
             if (evt.getSource() instanceof Component &&
                     ((Component) evt.getSource()).isVisible()) {
