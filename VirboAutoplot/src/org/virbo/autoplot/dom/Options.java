@@ -6,12 +6,8 @@ package org.virbo.autoplot.dom;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import org.das2.system.NullPreferences;
 

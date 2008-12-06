@@ -52,7 +52,7 @@ public class Application extends DomNode {
         } else if (source == canvas) {
             childName = "canvas";
         } else {
-            throw new IllegalArgumentException("child not found");
+            throw new IllegalArgumentException("child not found: "+source);
         }
         return new PropertyChangeEvent(this, childName + "." + ev.getPropertyName(), ev.getOldValue(), ev.getNewValue());
     }
@@ -271,7 +271,7 @@ public class Application extends DomNode {
             controller.addPanel(p);
         }
         while (this.panels.size() > panels.length) {
-            controller.deletePanel(this.panels.get(this.panels.size() - 1));
+            controller.deletePanel( this.panels.get(this.panels.size() - 1));
         }
 
         for (int i = 0; i < panels.length; i++) {

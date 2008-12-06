@@ -264,44 +264,60 @@ public class PanelController {
     private void doInterpretMetadata(Panel cpanel, Map properties, RenderType spec) {
 
         Object v;
+        final Plot plotDefaults = cpanel.getPlotDefaults();
+        
         if ((v = properties.get(QDataSet.TITLE)) != null) {
-            cpanel.getPlotDefaults().setTitle((String) v);
+            plotDefaults.setTitle((String) v);
         }
 
         if (spec == RenderType.spectrogram) {
             if (dom.getOptions().isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
-                cpanel.getPlotDefaults().getZaxis().setLog(v.equals("log"));
+                plotDefaults.getZaxis().setLog(v.equals("log"));
             }
 
             if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.LABEL)) != null) {
-                cpanel.getPlotDefaults().getZaxis().setLabel((String) v);
+                plotDefaults.getZaxis().setLabel((String) v);
             }
 
             if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.DEPEND_1)) != null) {
                 Map m = (Map) v;
                 Object v2 = m.get(QDataSet.LABEL);
                 if (v2 != null) {
-                    cpanel.getPlotDefaults().getYaxis().setLabel((String) v2);
+                    plotDefaults.getYaxis().setLabel((String) v2);
                 }
 
             }
         } else {
             if (dom.getOptions().isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
-                cpanel.getPlotDefaults().getYaxis().setLog(v.equals("log"));
+                plotDefaults.getYaxis().setLog(v.equals("log"));
             }
 
             if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.LABEL)) != null) {
-                cpanel.getPlotDefaults().getYaxis().setLabel((String) v);
+                plotDefaults.getYaxis().setLabel((String) v);
             }
 
-            cpanel.getPlotDefaults().getZaxis().setLabel("");
+            if ( spec==RenderType.colorScatter ) {
+                v = properties.get(QDataSet.PLANE_0);
+                if ( v!=null ) {
+                    Map m = (Map) v;
+                    Object v2 = m.get(QDataSet.LABEL);
+                    if (v2 != null) {
+                        plotDefaults.getZaxis().setLabel((String) v2);
+                    }
+                } else {
+                    plotDefaults.getZaxis().setLabel("");
+                }
+            } else {
+                plotDefaults.getZaxis().setLabel("");
+            }
+            
         }
 
         if ((v = properties.get(QDataSet.DEPEND_0)) != null) {
             Map m = (Map) v;
             Object v2 = m.get(QDataSet.LABEL);
             if (dom.getOptions().isAutolabelling() && v2 != null) {
-                cpanel.getPlotDefaults().getXaxis().setLabel((String) v2);
+                plotDefaults.getXaxis().setLabel((String) v2);
             }
 
         }
@@ -382,6 +398,9 @@ public class PanelController {
 
             AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs, props);
 
+            panelCopy.getPlotDefaults().getYaxis().setLog(desc.log);
+            panelCopy.getPlotDefaults().getYaxis().setRange(desc.range);
+            
             QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             if (xds == null) {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
@@ -391,12 +410,18 @@ public class PanelController {
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
-            panelCopy.getPlotDefaults().getYaxis().setLog(desc.log);
-            panelCopy.getPlotDefaults().getYaxis().setRange(desc.range);
-
             panelCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             panelCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
 
+            if ( spec==RenderType.colorScatter ) {
+                AutoplotUtil.AutoRangeDescriptor zdesc = AutoplotUtil.autoRange( (QDataSet) fillDs.property(QDataSet.PLANE_0),
+                         (Map) props.get(QDataSet.PLANE_0) );
+                panelCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
+                panelCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
+                panelCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
+                
+            }
+            
             if (fillDs.length() > 30000) {
                 panelCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
                 panelCopy.getStyle().setSymbolSize(1.0);
@@ -409,7 +434,7 @@ public class PanelController {
                 }
 
             }
-
+            
         }
     }
 
@@ -444,25 +469,28 @@ public class PanelController {
 
     /**
      * used to explicitly set the rendering type.
+     * If the panel's data isn't loaded then this has no effect.
      * @param renderType
      */
     public void setRenderType(RenderType renderType) {
+        if ( panel.getDataSourceFilter().getController().getFillDataSet()!=null ) {
+            
+            // getRenderers sets the dataset.
+            List<Renderer> rs = AutoplotUtil.getRenderers( panel.getDataSourceFilter().getController().getFillDataSet(),
+                    renderType, Collections.singletonList(getRenderer()), getColorbar());
 
-        // getRenderers sets the dataset.
-        List<Renderer> rs = AutoplotUtil.getRenderers( panel.getDataSourceFilter().getController().getFillDataSet(),
-                renderType, Collections.singletonList(getRenderer()), getColorbar());
+            assert rs.size() == 1;
 
-        assert rs.size() == 1;
+            setRenderer(rs.get(0));
 
-        setRenderer(rs.get(0));
+            DasPlot plot = getPlot();
 
-        DasPlot plot = getPlot();
-
-        Renderer[] rends = plot.getRenderers();
-        for (int i = 0; i < rends.length; i++) {
-            plot.removeRenderer(rends[i]);
+            Renderer[] rends = plot.getRenderers();
+            for (int i = 0; i < rends.length; i++) {
+                plot.removeRenderer(rends[i]);
+            }
+            plot.addRenderer(rs.get(0));
         }
-        plot.addRenderer(rs.get(0));
 
     }
 

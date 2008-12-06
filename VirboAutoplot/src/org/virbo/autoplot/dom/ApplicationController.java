@@ -20,6 +20,7 @@ import javax.beans.binding.Binding;
 import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
 import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
@@ -55,6 +56,8 @@ public class ApplicationController {
     LayoutListener layoutListener;
     boolean headless;
     Map<Object, BindingContext> bindingContexts;
+    Map<BindingModel,Binding> bindings;
+    
     private final static Logger logger = Logger.getLogger("virbo.controller");
 
     public ApplicationController(ApplicationModel model, Application application) {
@@ -67,6 +70,7 @@ public class ApplicationController {
             application.getOptions().loadPreferences();
         }
         bindingContexts = new HashMap<Object, BindingContext>();
+        bindings= new HashMap<BindingModel, Binding>();
     }
 
     public DasCanvas addCanvas() {
@@ -85,69 +89,98 @@ public class ApplicationController {
 
         application.setCanvas(canvas);
         application.bindTo(dasCanvas);
-        
-        canvas.getController().bindTo( outerRow, outerColumn );
-        
+
+        canvas.getController().bindTo(outerRow, outerColumn);
+
         dasCanvas.setPrintingTag("");
         return dasCanvas;
     }
 
-    public void deletePanel(Panel get) {
-        
+    public void deletePanel(Panel panel) {
+        try {
+        int currentIdx = application.panels.indexOf(panel);
+        DasPlot p = panel.getController().getPlot();
+        if (p != null) {
+            p.removeRenderer(panel.getController().getRenderer());
+        }
+        assert (currentIdx != -1);
+        ArrayList<Panel> panels = new ArrayList<Panel>(Arrays.asList(application.getPanels()));
+        panels.remove(panel);
+        if (!panels.contains(application.panel)) {
+            if ( panels.size()==0 ) {
+                application.setPanel(null);
+            } else {
+                application.setPanel(panels.get(0)); // maybe use currentIdx
+            }
+        }
+        application.setPanels(panels.toArray(new Panel[panels.size()]));
+        } catch ( NullPointerException ex ) {
+            throw ex;
+        }
     }
 
     private void movePanel(Panel p, Plot src, Plot dst) {
-        DasPlot srcPlot= src.getController().getDasPlot();
-        DasPlot dstPlot= dst.getController().getDasPlot();
-        
-        Renderer rr= p.getController().getRenderer();
+        assert (p.getPlotId().equals(src.getId()) || p.getPlotId().equals(dst.getId()));
+
+        DasPlot srcPlot = src.getController().getDasPlot();
+        DasPlot dstPlot = dst.getController().getDasPlot();
+
+        Renderer rr = p.getController().getRenderer();
+
         srcPlot.removeRenderer(rr);
         dstPlot.addRenderer(rr);
+
+        p.setPlotId(dst.getId());
+
+        ApplicationModel.RenderType rt = p.getRenderType();
+        p.getController().setRenderType(rt);
+
     }
 
     /**
      * add a panel to the application.
      * @return
      */
-    public synchronized Panel addPanel(  Plot domPlot) {
+    public synchronized Panel addPanel(Plot domPlot) {
         logger.fine("enter addPanel");
         final Panel panel = new Panel();
-        new PanelController( this.model, application, panel );
+        new PanelController(this.model, application, panel);
 
         if (domPlot == null) {
             domPlot = addPlot();
-            domPlot.getController().getDasPlot().getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(panel));
         }
+        
+        domPlot.getController().getDasPlot().getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(panel));        
 
         final int panelIdNum = application.getPanels().length;
         panel.setId("panel_" + panelIdNum);
         panel.getDataSourceFilter().setId("data_" + panelIdNum);
-        
-        final Plot fplot= domPlot;
-        
-        // bind it to the common range if it looks compatible
-        panel.getPlotDefaults().getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, new PropertyChangeListener() {
+
+       /*  final Plot fplot = domPlot;
+
+       // bind it to the common range if it looks compatible
+        panel.getPlotDefaults().getXaxis().addPropertyChangeListener(Axis.PROP_RANGE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                DatumRange dr= panel.getPlotDefaults().getXaxis().getRange();
-                DatumRange appRange= application.getTimeRange();
-                if ( appRange.getUnits().isConvertableTo(dr.getUnits()) && appRange.intersects(dr) ) {
-                    bind( application, Application.PROP_TIMERANGE, fplot, "xaxis."+Axis.PROP_RANGE );
+                DatumRange dr = panel.getPlotDefaults().getXaxis().getRange();
+                DatumRange appRange = application.getTimeRange();
+                if (appRange.getUnits().isConvertableTo(dr.getUnits()) && appRange.intersects(dr)) {
+                    bind(application, Application.PROP_TIMERANGE, fplot, "xaxis." + Axis.PROP_RANGE);
                 }
             }
-        });
-        
-        panel.getStyle().setId("style_"+panelIdNum);
-        panel.getPlotDefaults().setId("plot_defaults_"+panelIdNum);
+        }); */
+
+        panel.getStyle().setId("style_" + panelIdNum);
+        panel.getPlotDefaults().setId("plot_defaults_" + panelIdNum);
 
         panel.addPropertyChangeListener(Panel.PROP_PLOTID, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 Panel p = (Panel) evt.getSource();
-                Plot src = (Plot) DomUtil.getElementById(application,(String)evt.getOldValue());
-                Plot dst = (Plot) DomUtil.getElementById(application,(String)evt.getNewValue());
-                if ( src!=null && dst!=null ) {
+                Plot src = (Plot) DomUtil.getElementById(application, (String) evt.getOldValue());
+                Plot dst = (Plot) DomUtil.getElementById(application, (String) evt.getNewValue());
+                if (src != null && dst != null) {
                     movePanel(p, src, dst);
-                    if ( getPanelsFor(src).size()==0 ) deletePlot(src,true);
+                    if (getPanelsFor(src).size() == 0) deletePlot(src, true);
                 }
             }
         });
@@ -174,12 +207,12 @@ public class ApplicationController {
                 if (domPlot == null) {
                     return;
                 }
-                List<Panel> ps= ApplicationController.this.getPanelsFor(domPlot);
-                if ( ps.size()>0 ) {
+                List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
+                if (ps.size() > 0) {
                     Panel p = ApplicationController.this.getPanelsFor(domPlot).get(0);
                     logger.fine("focus to " + p);
                     setFocusUri(p.getDataSourceFilter().getSuri());
-                    setStatus(""+p+" selected");
+                    setStatus("" + p + " selected");
                     application.setPanel(p);
                 }
                 application.setPlot(domPlot);
@@ -231,6 +264,8 @@ public class ApplicationController {
 
         plot.getMouseAdapter().removeMenuItem("Dump Data");
 
+        plot.getMouseAdapter().addMenuItem(new JSeparator());
+
         plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
 
             public void actionPerformed(ActionEvent e) {
@@ -238,17 +273,24 @@ public class ApplicationController {
             }
         }));
 
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Copy Plot") {
+        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Copy Panels") {
 
             public void actionPerformed(ActionEvent e) {
                 copyPanels(domPlot);
             }
         }));
 
+        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Copy Plot") {
+
+            public void actionPerformed(ActionEvent e) {
+                copyPlot(domPlot);
+            }
+        }));
+
         plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Delete Plot") {
 
             public void actionPerformed(ActionEvent e) {
-                deletePlot(domPlot,false);
+                deletePlot(domPlot, false);
             }
         }));
 
@@ -298,14 +340,14 @@ public class ApplicationController {
         domPlot.addPropertyChangeListener(application.childListener);
         application.setPlot(domPlot);
 
-        if ( plots.size()==1 ) {
-            bind( application, Application.PROP_TIMERANGE, domPlot, "xaxis."+Axis.PROP_RANGE );
+        if (plots.size() == 1) {
+            bind(application, Application.PROP_TIMERANGE, domPlot, "xaxis." + Axis.PROP_RANGE);
         }
 
-        bind( application, "options."+Options.PROP_DRAWGRID, plot, "drawGrid" );
-        bind( application, "options."+Options.PROP_DRAWMINORGRID, plot, "drawMinorGrid" );
-        bind( application, "options."+Options.PROP_OVERRENDERING, plot, "overSize" );
-        
+        bind(application, "options." + Options.PROP_DRAWGRID, plot, "drawGrid");
+        bind(application, "options." + Options.PROP_DRAWMINORGRID, plot, "drawMinorGrid");
+        bind(application, "options." + Options.PROP_OVERRENDERING, plot, "overSize");
+
         return domPlot;
     }
 
@@ -314,30 +356,55 @@ public class ApplicationController {
         if (p.size() == 0) {
             return;
         }
-        
-        Panel newp = addPanel(null);
-        String plotId= newp.getPlotId();
-        newp.syncTo(p.get(0));
+
+        Plot newPlot= copyPlot(domPlot);
+        Panel newp = addPanel(newPlot);
+        String plotId = newp.getPlotId();
+        newp.syncTo(p.get(0)); //TODO: maybe syncTo with exclude
         newp.setPlotId(plotId);
+
     }
 
-    public synchronized void deletePlot( Plot domPlot, boolean allowOrphanPanels ) {
+    public synchronized Plot copyPlot(Plot domPlot) {
+        Plot that = addPlot();
+        that.syncTo(domPlot);
+        BindingModel bb= findBinding( application, Application.PROP_TIMERANGE,  domPlot, "xaxis."+Axis.PROP_RANGE );
+        if ( bb==null ) {
+            bind(domPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
+        } else {
+            bind( application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
+        }
+        return that;
+    }
+
+    public synchronized void deletePlot(Plot domPlot, boolean allowOrphanPanels) {
+
+        unbind(domPlot);
+
         DasPlot p = domPlot.getController().getDasPlot();
         this.getDasCanvas().remove(p);
-        List<Panel> panels= this.getPanelsFor(domPlot);
+        DasColorBar cb = domPlot.getController().getDasColorBar();
+        this.getDasCanvas().remove(cb);
+        List<Panel> panels = this.getPanelsFor(domPlot);
+        
+        if (!allowOrphanPanels) {
+            for (Panel pan : panels) {
+                deletePanel(pan);
+            }
+        }
+        
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
         plots.remove(domPlot);
-        unbind(domPlot);
-        if ( !plots.contains( application.getPlot() ) ) {
-            application.setPlot(plots.get(0)); //TODO: no plots
+        
+        if (!plots.contains(application.getPlot())) {
+            if ( plots.size()==0 ) {
+                application.setPlot(null); 
+            } else {
+                application.setPlot(plots.get(0)); 
+            }
         }
         application.setPlots(plots.toArray(new Plot[plots.size()]));
-        
-        if ( !allowOrphanPanels ) {
-            List<Panel> allPanels= new ArrayList<Panel>( Arrays.asList(application.getPanels()) );
-            allPanels.removeAll(panels);
-            application.setPanels( panels.toArray(new Panel[panels.size()]));
-        }
+
     }
 
     /**
@@ -355,7 +422,7 @@ public class ApplicationController {
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
      */
-    public void bind( DomNode src, String srcProp, Object dst, String dstProp ) {
+    public void bind(DomNode src, String srcProp, Object dst, String dstProp) {
         BindingContext bc;
         synchronized (bindingContexts) {
             bc = bindingContexts.get(src);
@@ -364,30 +431,32 @@ public class ApplicationController {
             }
             bindingContexts.put(src, bc);
         }
-        
-        Binding b= bc.addBinding(src, "${" + srcProp + "}", dst, dstProp);
 
-        BindingModel bb= new BindingModel();
+        Binding b = bc.addBinding(src, "${" + srcProp + "}", dst, dstProp);
+
+        BindingModel bb = new BindingModel();
 
         String srcId = "???";
-        if ( src instanceof DomNode ) srcId= ((DomNode)src).getId();
+        if (src instanceof DomNode) srcId = src.getId();
         String dstId = "???";
-        if ( dst instanceof DomNode ) dstId = ((DomNode)dst).getId();
+        if (dst instanceof DomNode) dstId = ((DomNode) dst).getId();
 
-        bb.setBindingContextId( srcId);
-        bb.setSrcId( srcId );
-        
-        bb.setDstId( dstId);
+        bb.setBindingContextId(srcId);
+        bb.setSrcId(srcId);
+
+        bb.setDstId(dstId);
         bb.setSrcProperty(srcProp);
         bb.setDstProperty(dstProp);
 
-        if ( !dstId.equals("???") ) {
-            List<BindingModel> bindings= new ArrayList<BindingModel>( Arrays.asList( application.getBindings() ) );
+        if (!dstId.equals("???")) {
+            List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
             bindings.add(bb);
-            application.setBindings( bindings.toArray(new BindingModel[bindings.size()]) );
+            application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
         }
 
         bc.bind();
+        
+        this.bindings.put(bb, b);
     }
 
     /**
@@ -396,25 +465,63 @@ public class ApplicationController {
      */
     public void unbind(DomNode src) {
         BindingContext bc;
-        synchronized (bindingContexts) {
-            bc = bindingContexts.get(src);
-            if ( bc==null ) {
-                System.err.println("this is not supposed to happen...");
-                return;
-            }
-            bc.unbind();
-            bindingContexts.remove(bc);
 
-            String bcid= src.getId();
-            List<BindingModel> bindings= new ArrayList<BindingModel>( Arrays.asList( application.getBindings() ) );
-            List<BindingModel> bb2= new ArrayList<BindingModel>( Arrays.asList( application.getBindings() ) );
-            for ( BindingModel bb: bb2 ) {
-                if ( bb.getBindingContextId().equals(bcid) ) {
-                    bindings.remove(bb);
+        synchronized (bindings) {
+            List<BindingModel> bb= new ArrayList( Arrays.asList( application.getBindings() ) );
+            for ( BindingModel b: application.getBindings() ) {
+                if ( b.getSrcId().equals(src.getId()) || b.getDstId().equals(src.getId()) ) {
+                    bb.remove(b);
+                    bindings.get(b).unbind();
+                    bindings.remove(b);
                 }
             }
-            application.setBindings( bindings.toArray(new BindingModel[bindings.size()]) );
+            application.setBindings( bb.toArray( new BindingModel[ bb.size() ]) );
         }
+        
+        synchronized (bindingContexts) {
+            bc = bindingContexts.get(src);
+            if (bc != null) {
+
+                bc.unbind();
+                bindingContexts.remove(bc);
+
+                String bcid = src.getId();
+                List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
+                List<BindingModel> bb2 = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
+                for (BindingModel bb : bb2) {
+                    if (bb.getBindingContextId().equals(bcid)) {
+                        bindings.remove(bb);
+                    }
+                }
+                application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
+                
+            }
+        }
+        
+    }
+    
+    /**
+     * Find the binding, if it exists.  All bindings are symmetric, so the src and dst order is ignored in this
+     * search.  
+     * @param src
+     * @param srcProp
+     * @param dst
+     * @param dstProp
+     * @return the BindingModel or null if it doesn't exist.
+     */
+    public BindingModel findBinding( DomNode src, String srcProp, DomNode dst, String dstProp ) {
+            for ( BindingModel b: application.getBindings() ) {
+                if ( b.getSrcId().equals(src.getId()) 
+                        && b.getDstId().equals(dst.getId()) 
+                        && b.getSrcProperty().equals(srcProp)
+                        && b.getDstProperty().equals(dstProp) ) return b;
+                if ( b.getSrcId().equals(dst.getId()) 
+                        && b.getDstId().equals(src.getId()) 
+                        && b.getSrcProperty().equals(dstProp)
+                        && b.getDstProperty().equals(srcProp) ) return b;
+                
+            }
+            return null;
     }
 
     /**
@@ -466,7 +573,7 @@ public class ApplicationController {
     }
 
     public void setFocusUri(String focusUri) {
-        if ( focusUri==null ) focusUri= "";
+        if (focusUri == null) focusUri = "";
         String oldFocusUri = this.focusUri;
         this.focusUri = focusUri;
         propertyChangeSupport.firePropertyChange(PROP_FOCUSURI, oldFocusUri, focusUri);
@@ -492,10 +599,21 @@ public class ApplicationController {
     /**
      * return the plot containing this panel.
      * @param panel
-     * @return
+     * @return the Plot or null if no plot is found.
+     * @throws IllegalArgumentException if the panel is not a child of the application
      */
-    Plot getPlotFor(Panel panel) {
-        return application.getPlot();
+    public Plot getPlotFor(Panel panel) {
+        if ( !application.panels.contains( panel ) ) {
+            throw new IllegalArgumentException("the panel is not a child of the application");
+        }
+        String id = panel.getPlotId();
+        Plot result= null;
+        for (Plot p : application.getPlots()) {
+            if (p.getId().equals(id)) {
+                result= p;
+            }
+        }
+        return result;
     }
 
     List<Panel> getPanelsFor(Plot plot) {
