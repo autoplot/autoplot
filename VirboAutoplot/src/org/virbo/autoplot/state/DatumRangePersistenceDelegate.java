@@ -15,6 +15,8 @@ import java.beans.DefaultPersistenceDelegate;
 import java.beans.Encoder;
 import java.beans.Expression;
 import java.beans.PersistenceDelegate;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.UnitsUtil;
 
 /**
  *
@@ -35,14 +37,21 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
     protected Expression instantiate(Object oldInstance, Encoder out) {        
         DatumRange field= (DatumRange)oldInstance;
         Units u= field.getUnits();
-        
-        return new Expression( field, this.getClass(), "newDatumRange", new Object[] { field.min().doubleValue(u), field.max().doubleValue(u), u.toString() } );
+        if ( UnitsUtil.isTimeLocation(u) ) {
+            return new Expression( field, this.getClass(), "newTimeRange", new Object[] { field.toString() } );
+        } else {
+            return new Expression( field, this.getClass(), "newDatumRange", new Object[] { field.min().doubleValue(u), field.max().doubleValue(u), u.toString() } );
+        }
         
     }
     
     public static DatumRange newDatumRange( double min, double max, String units ) {
         Units u= Units.getByName(units);
         return DatumRange.newDatumRange( min, max, u );
+    }
+
+    public static DatumRange newTimeRange( String stimeRange ) {
+        return DatumRangeUtil.parseTimeRangeValid(stimeRange);
     }
 
     protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
