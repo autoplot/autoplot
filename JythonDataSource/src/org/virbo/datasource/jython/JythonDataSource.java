@@ -13,13 +13,20 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
@@ -36,6 +43,7 @@ import org.virbo.jythonsupport.JythonUtil;
 public class JythonDataSource extends AbstractDataSource implements Caching {
 
     ExceptionListener listener;
+    private Map<String, Object> metadata;
 
     public JythonDataSource(URL url, JythonDataSourceFactory factory) {
         super(url);
@@ -103,12 +111,37 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
             String expr = params.get("arg_0");
 
+            PyObject result;
+            
             if (expr == null) {
-                expr = "result";
+                try {
+                    result = interp.eval("data");
+                } catch ( PyException ex ) {
+                    result = interp.eval("result"); // legacy
+                }
+            } else {
+                result = interp.eval(expr);
             }
-
-
-            PyObject result = interp.eval(expr);
+            
+            metadata= new LinkedHashMap<String,Object>();
+            
+            PyObject pymeta;
+            try {
+                pymeta= interp.eval("metadata");
+                if ( pymeta instanceof PyDictionary ) {
+                    PyDictionary dict= ((PyDictionary)pymeta);
+                    PyList keys= dict.keys();
+                    
+                    for ( Iterator i= keys.iterator(); i.hasNext();  ) {
+                        Object key= i.next();
+                        String name= key.toString();
+                        String val= dict.get( Py.java2py(key) ).toString();
+                        metadata.put(name,val);
+                    }
+                }
+            } catch ( PyException ex ) {
+            }
+            
 
             QDataSet res;
             if (result instanceof PyList) {
@@ -124,6 +157,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 Logger.getLogger("virbo.jythonDataSouce").warning("exception in processing: " + causedBy);
             }
 
+            mon.finished();
             return res;
 
         } catch (PyException ex) {
@@ -141,6 +175,13 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             mon.finished();
         }
     }
+
+    @Override
+    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+        return metadata;
+    }
+    
+    
     PythonInterpreter interp = null;
 
     private String cacheUrl(URL url) {
