@@ -121,6 +121,10 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                         haveResult = true;
                         break;
                     }
+                    if (s.trim().startsWith("data")) {
+                        haveResult = true;
+                        break;
+                    }
                     s = reader.readLine();
                 }
                 reader.close();
