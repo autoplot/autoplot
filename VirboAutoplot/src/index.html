@@ -16,10 +16,23 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <ul><li> new URI specification implemented.  So Autoplot URLs are now URIs like: vap+dat:/home/jbf/data.asc?rank=2
-</li><li> bugfix: file cache manager actions popup on Windows.
-</li><li> bugfix: init plot clipped by autolayout fixed.
-</li><li> bugfix: completions with uris with aggregation and explicit datasource. e.g. vap+dat:/home/jbf/data_$Y.asc?rank=2
+        <ul><li> several bugfixes:
+
+<ol><li> excessive repainting caused by repeating timer corrected.
+</li><li> bug with rank 3 CDF datasets DEPEND_1 and DEPEND_2 fixed by removing old kludge
+</li><li> bug where controller reference was copied in copy corrected.
+</li></ol>
+</li><li> data URI is displayed in metadata panel
+</li><li> properties are displayed independently of the dataset.
+</li><li> rank 3 support works somewhat
+</li><li> bugfix: metadata binds to single panel
+</li></ol>
+<p>Known Bugs:
+
+</p>
+<ol><li> Copy plot doesn't work consistently.
+</li><li> some work is done on GUI event thread that shouldn't be.
+</li><li> many more
 </li>
 </ul>
 
