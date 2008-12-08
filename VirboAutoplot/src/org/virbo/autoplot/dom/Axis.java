@@ -5,14 +5,10 @@
 
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import javax.beans.binding.BindingContext;
+import java.util.ArrayList;
+import java.util.List;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
-import org.das2.graph.DasAxis;
 
 /**
  *
@@ -27,9 +23,14 @@ public class Axis extends DomNode {
     }
 
     public void setRange(DatumRange range) {
-        DatumRange oldRange = this.range;
-        this.range = range;
-        propertyChangeSupport.firePropertyChange(PROP_RANGE, oldRange, range);
+        try {
+            DatumRange oldRange = this.range;
+            this.range = range;
+            propertyChangeSupport.firePropertyChange(PROP_RANGE, oldRange, range);
+        } catch ( Exception e ) {
+            System.err.println( propertyChangeSupport.toString() );
+            e.printStackTrace();
+        }
     }
 
     protected boolean log = false;
@@ -62,22 +63,23 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_LABEL, oldLabel, label);
     }
     
+    protected boolean drawTickLabels = true;
+    public static final String PROP_DRAWTICKLABELS = "drawTickLabels";
+
+    public boolean isDrawTickLabels() {
+        return drawTickLabels;
+    }
+
+    public void setDrawTickLabels(boolean drawTickLabels) {
+        boolean oldDrawTickLabels = this.drawTickLabels;
+        this.drawTickLabels = drawTickLabels;
+        propertyChangeSupport.firePropertyChange(PROP_DRAWTICKLABELS, oldDrawTickLabels, drawTickLabels);
+    }
+
     AxisController controller;
     
     public AxisController getController() {
         return controller;
-    }
-    
-    BindingContext axisBindingContext= null;
-    DasAxis axis;
-    
-    public synchronized void bindTo( DasAxis p ) {
-        if ( axisBindingContext!=null ) axisBindingContext.unbind();
-        axisBindingContext= new BindingContext();
-        axisBindingContext.addBinding( this, "${range}", p, "datumRange" );
-        axisBindingContext.addBinding( this, "${log}", p, "log" );
-        axisBindingContext.addBinding( this, "${label}", p, "label" );
-        axisBindingContext.bind();
     }
 
     public void syncTo(DomNode n) {
@@ -88,17 +90,20 @@ public class Axis extends DomNode {
         
     }
 
-    public Map<String, String> diffs(DomNode node) {
+    public List<Diff> diffs(DomNode node) {
         Axis that= (Axis)node;
-        LinkedHashMap<String,String> result= new  LinkedHashMap<String,String>();
+        List<Diff> result= new ArrayList<Diff>();
         boolean b;
         
         b= that.log==this.log ;
-        if ( !b ) result.put("log" , that.log+ " to " +this.log);
+        if ( !b ) result.add( new PropertyChangeDiff( "log" , that.log, this.log) );
         b=  that.range.equals(this.range) ;
-        if ( !b ) result.put("range", DomUtil.describe( that.range , this.range ) );
+        if ( !b ) result.add(new PropertyChangeDiff("range", that.range , this.range ) );
         b=  that.label.equals(this.label) ;
-        if ( !b ) result.put("label", that.label + " to " + this.label );
+        if ( !b ) result.add(new PropertyChangeDiff("label", that.label , this.label ) );
+        b=  that.drawTickLabels==this.drawTickLabels;
+        if ( !b ) result.add(new PropertyChangeDiff("drawTickLabels", that.drawTickLabels, this.drawTickLabels ) );
+        
         return result;
     }
 

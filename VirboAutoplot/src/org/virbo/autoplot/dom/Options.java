@@ -6,7 +6,9 @@ package org.virbo.autoplot.dom;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 import org.das2.system.NullPreferences;
@@ -363,33 +365,34 @@ public class Options extends DomNode {
         this.setAutoranging( that.autoranging );
     }
 
-    public Map<String, String> diffs(DomNode node) {
+    public List<Diff> diffs(DomNode node) {
         Options that= (Options)node;
-        LinkedHashMap<String,String> result= new  LinkedHashMap<String,String>();
-
+        
+        List<Diff> result = new ArrayList<Diff>();
+        
         boolean b;
         b=  that.color.equals(this.color) ;
-        if ( !b ) result.put( "color", that.color + " to "+ this.color );
+        if ( !b ) result.add( new PropertyChangeDiff( "color", that.color , this.color ) );
         
         b= that.getBackground() .equals( this.getBackground() );
-        if ( !b ) result.put( "background", that.getBackground() + " to " + this.getBackground() );
+        if ( !b ) result.add( new PropertyChangeDiff( "background", that.getBackground() , this.getBackground() ));
         
         b= that.getForeground().equals( this.getForeground());
-        if ( !b ) result.put( "foreground", that.getForeground()+ " to " + this.getForeground());
+        if ( !b ) result.add( new PropertyChangeDiff( "foreground", that.getForeground(), this.getForeground()));
         b= that.getColor() .equals( this.getColor() );
-        if ( !b ) result.put( "color", that.getColor() + " to " + this.getColor() );
+        if ( !b ) result.add( new PropertyChangeDiff( "color", that.getColor() , this.getColor() ));
         b= that.getFillColor() .equals( this.getFillColor() );
-        if ( !b ) result.put( "fillColor", that.getFillColor() + " to " + this.getFillColor() );
+        if ( !b ) result.add( new PropertyChangeDiff( "fillColor", that.getFillColor() , this.getFillColor() ));
         b= that.getCanvasFont() .equals( this.getCanvasFont() ) ;
-        if ( !b ) result.put( "canvasFont", that.getCanvasFont() + " to " + this.getCanvasFont() ) ;
+        if ( !b ) result.add( new PropertyChangeDiff( "canvasFont", that.getCanvasFont() , this.getCanvasFont() ) );
         b= that.isLogConsoleVisible()== this.isLogConsoleVisible() ;
-        if ( !b ) result.put( "logConsoleVisible", that.isLogConsoleVisible() + " to " + this.isLogConsoleVisible() );
+        if ( !b ) result.add( new PropertyChangeDiff( "logConsoleVisible", that.isLogConsoleVisible() , this.isLogConsoleVisible() ));
         b= that.isScriptVisible()==this.isScriptVisible() ;
-        if ( !b ) result.put( "scriptVisible", that.isScriptVisible()+ " to " + this.isScriptVisible() );
+        if ( !b ) result.add( new PropertyChangeDiff( "scriptVisible", that.isScriptVisible(), this.isScriptVisible() ));
         b= that.isServerEnabled()== this.isServerEnabled() ;
-        if ( !b ) result.put( "serverEnabled", that.isServerEnabled()+ " to " +this.isServerEnabled() ) ;
+        if ( !b ) result.add( new PropertyChangeDiff( "serverEnabled", that.isServerEnabled(),this.isServerEnabled() ) );
         b= that.isOverRendering()== this.isOverRendering();
-        if ( !b ) result.put( PROP_OVERRENDERING, that.isOverRendering()+ " to " +this.isOverRendering() ) ;
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_OVERRENDERING, that.isOverRendering(),this.isOverRendering() ) );
         return result;
     }
 

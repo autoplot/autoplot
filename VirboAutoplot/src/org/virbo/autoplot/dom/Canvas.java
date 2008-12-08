@@ -5,13 +5,8 @@
 
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.Map;
-import org.das2.graph.DasCanvas;
-import org.das2.graph.DasColumn;
-import org.das2.graph.DasRow;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -121,21 +116,21 @@ public class Canvas extends DomNode {
         this.setColumn(that.getColumn());        
     }
 
-    public Map<String, String> diffs(DomNode node) {
-        Map<String,String> result= new HashMap<String,String>();
+    public List<Diff> diffs(DomNode node) {
+        List<Diff> result = new ArrayList<Diff>();
         Canvas that= (Canvas)node;
         boolean b;
         b=  that.fitted==this.fitted ;
-        if ( !b ) result.put( "fitted", that.fitted + " to "+ this.fitted );
+        if ( !b ) result.add( new PropertyChangeDiff( "fitted", that.fitted , this.fitted ) );
 
         b=  that.size.equals(this.size) ;
-        if ( !b ) result.put( "size", that.size + " to "+ this.size );
+        if ( !b ) result.add( new PropertyChangeDiff( "size", that.size , this.size ) );
 
         b=  that.row.equals(this.row) ;
-        if ( !b ) result.put( "row", that.row + " to "+ this.row );
+        if ( !b ) result.add( new PropertyChangeDiff( "row", that.row , this.row ) );
 
         b=  that.column.equals(this.column) ;
-        if ( !b ) result.put( "column", that.column + " to "+ this.column );
+        if ( !b ) result.add( new PropertyChangeDiff( "column", that.column , this.column ) );
 
         return result;
     }

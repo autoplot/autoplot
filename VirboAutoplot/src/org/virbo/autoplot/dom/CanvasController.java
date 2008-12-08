@@ -12,7 +12,6 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.beans.binding.BindingContext;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
@@ -41,10 +40,11 @@ public class CanvasController {
         assert ( dasCanvas!=null );
         this.dasCanvas= canvas;
         
-        BindingContext bc= new BindingContext();
-        bc.addBinding(this.canvas, "${size}", dasCanvas, "size"); //TODO: check this
-        bc.addBinding(this.canvas, "${fitted}", dasCanvas, "fitted");
-        bc.bind();
+        ApplicationController ac= application.getController();
+        
+        ac.bind(this.canvas, Canvas.PROP_SIZE, dasCanvas, "size"); //TODO: check this
+        ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
+        
     }
 
     public DasCanvas getDasCanvas() {

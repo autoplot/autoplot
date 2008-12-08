@@ -173,11 +173,11 @@ public class PanelController {
     protected void setRenderer(Renderer renderer) {
         this.renderer = renderer;
         if (renderer instanceof SeriesRenderer) {
-            panel.bindTo((SeriesRenderer) renderer);
-            panel.bindTo(new SpectrogramRenderer(null, null));
+            bindTo((SeriesRenderer) renderer);
+            bindTo(new SpectrogramRenderer(null, null));
         } else {
-            panel.bindTo((SpectrogramRenderer) renderer);
-            panel.bindTo(new SeriesRenderer());
+            bindTo((SpectrogramRenderer) renderer);
+            bindTo(new SeriesRenderer());
         }
     }
 
@@ -494,6 +494,28 @@ public class PanelController {
 
     }
 
+    public synchronized void bindTo(SeriesRenderer seriesRenderer) {   
+        ApplicationController ac= this.dom.getController();
+
+        ac.bind( panel, "style.lineWidth", seriesRenderer, "lineWidth");
+        ac.bind( panel, "style.color", seriesRenderer, "color");
+        ac.bind( panel, "style.symbolSize", seriesRenderer, "symSize");
+        ac.bind( panel, "style.symbolConnector", seriesRenderer, "psymConnector");
+        ac.bind( panel, "style.plotSymbol", seriesRenderer, "psym");
+        ac.bind( panel, "style.fillColor", seriesRenderer, "fillColor");
+        ac.bind( panel, "style.fillToReference", seriesRenderer, "fillToReference");
+        ac.bind( panel, "style.reference", seriesRenderer, "reference");
+
+    }
+    
+    public void bindTo(SpectrogramRenderer spectrogramRenderer) {
+        ApplicationController ac= this.dom.getController();
+
+        ac.bind( panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
+        ac.bind( panel, "style.colortable", spectrogramRenderer, "colorBar.type");
+
+    }
+    
     public boolean isValueAdjusting() {
         return false;
     }

@@ -45,13 +45,13 @@ public abstract class DomNode implements Cloneable {
         return Collections.emptyList();
     }
     /**
-     * return a map containing the differences between this and another node.
-     * The keys are the node property names, and the values are a description
-     * of the difference.
+     * return a list of the differences between this and another node.  The
+     * differences describe how to mutate that node to make it like this
+     * node.
      * @param node
      * @return
      */
-    abstract Map<String,String> diffs( DomNode node );
+    abstract List<Diff> diffs( DomNode node );
 
     public DomNode() {        
         id= "";

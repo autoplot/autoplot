@@ -6,12 +6,10 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import javax.beans.binding.Binding;
-import javax.beans.binding.BindingContext;
-import org.das2.graph.SeriesRenderer;
-import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.ApplicationModel.RenderType;
 
 /**
@@ -44,44 +42,8 @@ public class Panel extends DomNode {
         }
         return new PropertyChangeEvent(this, childName + "." + ev.getPropertyName(), ev.getOldValue(), ev.getNewValue());
     }
-    BindingContext seriesRendererBindings;
-    private SeriesRenderer seriesRenderer = null;
 
-    public synchronized void bindTo(SeriesRenderer seriesRenderer) {
-        this.seriesRenderer = seriesRenderer;
-        if (seriesRendererBindings != null) seriesRendererBindings.unbind();
-
-        Binding b;
-        seriesRendererBindings = new BindingContext();
-        b = seriesRendererBindings.addBinding(this, "${style.lineWidth}", seriesRenderer, "lineWidth");
-        b = seriesRendererBindings.addBinding(this, "${style.color}", seriesRenderer, "color");
-        b = seriesRendererBindings.addBinding(this, "${style.symbolSize}", seriesRenderer, "symSize");
-        b = seriesRendererBindings.addBinding(this, "${style.symbolConnector}", seriesRenderer, "psymConnector");
-        b = seriesRendererBindings.addBinding(this, "${style.plotSymbol}", seriesRenderer, "psym");
-        b = seriesRendererBindings.addBinding(this, "${style.fillColor}", seriesRenderer, "fillColor");
-        b = seriesRendererBindings.addBinding(this, "${style.fillToReference}", seriesRenderer, "fillToReference");
-        b = seriesRendererBindings.addBinding(this, "${style.reference}", seriesRenderer, "reference");
-
-        seriesRendererBindings.bind();
-
-    }
-    BindingContext spectrogramRendererBindings;
-    private SpectrogramRenderer spectrogramRenderer = null;
-
-    public void bindTo(SpectrogramRenderer spectrogramRenderer) {
-        SpectrogramRenderer oldSpectrogramRenderer = this.spectrogramRenderer;
-        this.spectrogramRenderer = spectrogramRenderer;
-
-        if (spectrogramRendererBindings != null) spectrogramRendererBindings.unbind();
-
-        Binding b;
-        spectrogramRendererBindings = new BindingContext();
-        b = spectrogramRendererBindings.addBinding(this, "${style.rebinMethod}", spectrogramRenderer, "rebinner");
-        b = spectrogramRendererBindings.addBinding(this, "${style.colortable}", spectrogramRenderer, "colorBar.type");
-
-        spectrogramRendererBindings.bind();
-
-    }
+    
     protected DataSourceFilter dataSourceFilter = new DataSourceFilter();
     public static final String PROP_DATASOURCEFILTER = "dataSourceFilter";
 
@@ -173,35 +135,39 @@ public class Panel extends DomNode {
         return result;
     }
 
-    public Map<String, String> diffs(DomNode node) {
-        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
-
+    public List<Diff> diffs(DomNode node) {
+        
+        List<Diff> result = new ArrayList<Diff>();
         Panel that = (Panel) node;
 
         boolean b;
 
-        Map<String, String> diffs1 = this.getDataSourceFilter().diffs(that.getDataSourceFilter());
-        for (String k : diffs1.keySet()) {
-            result.put("dataSourceFilter." + k, diffs1.get(k));
+        if ( !that.plotId.equals( this.plotId ) ) {
+            result.add( new PropertyChangeDiff( "plotId", that.plotId, this.plotId ) );
         }
-
-        diffs1 = this.getStyle().diffs(that.getStyle());
-        for (String k : diffs1.keySet()) {
-            result.put("style." + k, diffs1.get(k));
-        }
-
-        diffs1 = this.plotDefaults.diffs(that.plotDefaults);
-        for (String k : diffs1.keySet()) {
-            result.put("plot." + k, diffs1.get(k));
-        }
-
+        
+        result.addAll( DomUtil.childDiffs("dataSourceFilter", this.getDataSourceFilter().diffs(that.getDataSourceFilter()) ) );
+        
+        result.addAll( DomUtil.childDiffs("style", this.getStyle().diffs(that.getStyle()) ) );
+        result.addAll( DomUtil.childDiffs("plotDefaults", this.getPlotDefaults().diffs(that.getPlotDefaults()) ) );
+   
         return result;
     }
 
     public void syncTo(DomNode n) {
         Panel that = (Panel) n;
+        this.setPlotId(that.getPlotId());
         this.dataSourceFilter.syncTo(that.dataSourceFilter);
         this.style.syncTo(that.style);
         this.plotDefaults.syncTo(that.plotDefaults);
     }
+    
+    public void syncTo( DomNode n, List<String> exclude ) {
+        Panel that = (Panel) n;
+        if ( !exclude.contains("plotId") ) this.setPlotId(that.getPlotId());
+        this.dataSourceFilter.syncTo(that.dataSourceFilter, DomUtil.childProperties( exclude, "dataSourceFilter" ) );
+        this.style.syncTo(that.style);
+        this.plotDefaults.syncTo(that.plotDefaults);
+    }
+    
 }

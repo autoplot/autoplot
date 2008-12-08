@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.logging.Logger;
 import javax.swing.Timer;
 import org.das2.dataset.CacheTag;
@@ -126,4 +127,49 @@ public class TimeSeriesBrowseController {
         this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
         timeSeriesBrowseListener = null;
     }
+    
+    protected DatumRange timeRange = null;
+    public static final String PROP_TIMERANGE = "timeRange";
+
+    public DatumRange getTimeRange() {
+        return timeRange;
+    }
+
+    public void setTimeRange(DatumRange timeRange) {
+        DatumRange oldTimeRange = this.timeRange;
+        this.timeRange = timeRange;
+        propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
+    }
+
+    protected Datum resolution = null;
+    public static final String PROP_RESOLUTION = "resolution";
+
+    public Datum getResolution() {
+        return resolution;
+    }
+
+    public void setResolution(Datum resolution) {
+        Datum oldResolution = this.resolution;
+        this.resolution = resolution;
+        propertyChangeSupport.firePropertyChange(PROP_RESOLUTION, oldResolution, resolution);
+    }
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+
 }

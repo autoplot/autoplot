@@ -12,6 +12,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,14 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import org.das2.DasApplication;
+import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.event.BoxZoomMouseModule;
 import org.das2.event.MouseModule;
 import org.das2.event.PointSlopeDragRenderer;
 import org.das2.event.ZoomPanMouseModule;
+import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
@@ -40,6 +43,7 @@ import org.das2.system.MonitorFactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.LayoutListener;
 
@@ -56,13 +60,16 @@ public class ApplicationController {
     LayoutListener layoutListener;
     boolean headless;
     Map<Object, BindingContext> bindingContexts;
-    Map<BindingModel,Binding> bindings;
-    
+    Map<BindingModel, Binding> bindingImpls;
+    Map<Connector, ColumnColumnConnector> connectorImpls;
     private final static Logger logger = Logger.getLogger("virbo.controller");
+    private int plotIdNum = 0;
+    private int panelIdNum = 0;
 
     public ApplicationController(ApplicationModel model, Application application) {
         this.application = application;
         application.setId("app_0");
+        application.getOptions().setId("options_0");
         this.model = model;
         application.controller = this;
         this.headless = "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false"));
@@ -70,7 +77,9 @@ public class ApplicationController {
             application.getOptions().loadPreferences();
         }
         bindingContexts = new HashMap<Object, BindingContext>();
-        bindings= new HashMap<BindingModel, Binding>();
+        bindingImpls = new HashMap<BindingModel, Binding>();
+        connectorImpls = new HashMap<Connector, ColumnColumnConnector>();
+
     }
 
     public DasCanvas addCanvas() {
@@ -78,6 +87,7 @@ public class ApplicationController {
         //if ( canvas!=null ) throw new IllegalArgumentException("only one canvas for now");
         DasCanvas dasCanvas = new DasCanvas();
         Canvas canvas = new Canvas();
+        canvas.setId("canvas_0");
         new CanvasController(application, canvas).setDasCanvas(dasCanvas);
 
         outerRow = new DasRow(dasCanvas, null, 0, 1, 0, -3, 0, 0);
@@ -85,10 +95,8 @@ public class ApplicationController {
 
         layoutListener = new LayoutListener(model);
 
-        canvas.setId("canvas_0");
-
         application.setCanvas(canvas);
-        application.bindTo(dasCanvas);
+        bindTo(dasCanvas);
 
         canvas.getController().bindTo(outerRow, outerColumn);
 
@@ -97,26 +105,73 @@ public class ApplicationController {
     }
 
     public void deletePanel(Panel panel) {
-        try {
         int currentIdx = application.panels.indexOf(panel);
+        if (currentIdx == -1) throw new IllegalArgumentException("deletePanel but panel isn't part of application");
+        if (application.panels.size() < 2) throw new IllegalArgumentException("last panel may not be deleted");
+
         DasPlot p = panel.getController().getPlot();
         if (p != null) {
-            p.removeRenderer(panel.getController().getRenderer());
+            Renderer r = panel.getController().getRenderer();
+            if (r != null) p.removeRenderer(r);
         }
-        assert (currentIdx != -1);
+
+        unbind(panel);
+
         ArrayList<Panel> panels = new ArrayList<Panel>(Arrays.asList(application.getPanels()));
         panels.remove(panel);
-        if (!panels.contains(application.panel)) {
-            if ( panels.size()==0 ) {
+        if (!panels.contains(application.panel)) {  // reset the focus panel
+            if (panels.size() == 0) {
                 application.setPanel(null);
             } else {
                 application.setPanel(panels.get(0)); // maybe use currentIdx
             }
         }
         application.setPanels(panels.toArray(new Panel[panels.size()]));
-        } catch ( NullPointerException ex ) {
-            throw ex;
-        }
+    }
+
+    /**
+     * adds a context overview plot below the plot.
+     * @param domPlot
+     */
+    protected void addConnector(Plot domPlot, Plot that) {
+
+        List<Connector> connectors = new ArrayList<Connector>(Arrays.asList(application.getConnectors()));
+        final Connector connector = new Connector(domPlot.getId(), that.getId());
+        connectors.add(connector);
+
+        application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
+
+        DasCanvas canvas = getDasCanvas();
+        DasPlot upper = domPlot.getController().getDasPlot();
+        DasPlot lower = that.getController().getDasPlot();
+
+        //overviewPlotConnector.getMouseAdapter().setPrimaryModule(overviewZoom);
+        ColumnColumnConnector overviewPlotConnector =
+                new ColumnColumnConnector(canvas, upper,
+                DasRow.create(null, upper.getRow(), "0%", "100%+2em"), lower);
+
+        connectorImpls.put(connector, overviewPlotConnector);
+
+        overviewPlotConnector.setBottomCurtain(true);
+        overviewPlotConnector.setCurtainOpacityPercent(80);
+
+        overviewPlotConnector.getMouseAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(upper, lower));
+        canvas.add(overviewPlotConnector);
+
+    //TODO: disconnect/delete if one plot is deleted.
+
+    }
+
+    public void deleteConnector(Connector connector) {
+        ColumnColumnConnector impl = connectorImpls.get(connector);
+        getDasCanvas().remove(impl);
+
+        List<Connector> connectors = DomUtil.asArrayList(application.getConnectors());
+        connectors.remove(connector);
+
+        connectorImpls.remove(connector);
+
+        application.setConnectors(connectors);
     }
 
     private void movePanel(Panel p, Plot src, Plot dst) {
@@ -149,24 +204,24 @@ public class ApplicationController {
         if (domPlot == null) {
             domPlot = addPlot();
         }
-        
-        domPlot.getController().getDasPlot().getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(panel));        
 
-        final int panelIdNum = application.getPanels().length;
+        domPlot.getController().getDasPlot().getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(panel));
+
+        final int panelIdNum = this.panelIdNum++;
         panel.setId("panel_" + panelIdNum);
         panel.getDataSourceFilter().setId("data_" + panelIdNum);
 
-       /*  final Plot fplot = domPlot;
-
-       // bind it to the common range if it looks compatible
+        /*  final Plot fplot = domPlot;
+        
+        // bind it to the common range if it looks compatible
         panel.getPlotDefaults().getXaxis().addPropertyChangeListener(Axis.PROP_RANGE, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                DatumRange dr = panel.getPlotDefaults().getXaxis().getRange();
-                DatumRange appRange = application.getTimeRange();
-                if (appRange.getUnits().isConvertableTo(dr.getUnits()) && appRange.intersects(dr)) {
-                    bind(application, Application.PROP_TIMERANGE, fplot, "xaxis." + Axis.PROP_RANGE);
-                }
-            }
+        public void propertyChange(PropertyChangeEvent evt) {
+        DatumRange dr = panel.getPlotDefaults().getXaxis().getRange();
+        DatumRange appRange = application.getTimeRange();
+        if (appRange.getUnits().isConvertableTo(dr.getUnits()) && appRange.intersects(dr)) {
+        bind(application, Application.PROP_TIMERANGE, fplot, "xaxis." + Axis.PROP_RANGE);
+        }
+        }
         }); */
 
         panel.getStyle().setId("style_" + panelIdNum);
@@ -176,11 +231,16 @@ public class ApplicationController {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 Panel p = (Panel) evt.getSource();
-                Plot src = (Plot) DomUtil.getElementById(application, (String) evt.getOldValue());
-                Plot dst = (Plot) DomUtil.getElementById(application, (String) evt.getNewValue());
+                String srcid = (String) evt.getOldValue();
+                String dstid = (String) evt.getNewValue();
+                if (srcid == null) return; // initialization state
+                assert !srcid.equals("");
+                assert dstid != null && !dstid.equals("");
+                Plot src = (Plot) DomUtil.getElementById(application, srcid);
+                Plot dst = (Plot) DomUtil.getElementById(application, dstid);
                 if (src != null && dst != null) {
                     movePanel(p, src, dst);
-                    if (getPanelsFor(src).size() == 0) deletePlot(src, true);
+                    if (getPanelsFor(src).size() == 0) deletePlot(src);
                 }
             }
         });
@@ -212,8 +272,10 @@ public class ApplicationController {
                     Panel p = ApplicationController.this.getPanelsFor(domPlot).get(0);
                     logger.fine("focus to " + p);
                     setFocusUri(p.getDataSourceFilter().getSuri());
-                    setStatus("" + p + " selected");
-                    application.setPanel(p);
+                    if (application.getPanel() != p) {
+                        setStatus("" + p + " selected");
+                        application.setPanel(p);
+                    }
                 }
                 application.setPlot(domPlot);
 
@@ -242,14 +304,21 @@ public class ApplicationController {
         DasAxis yaxis = new DasAxis(y.min(), y.max(), DasAxis.VERTICAL);
         DasRow row = new DasRow(null, outerRow, 0, 1, 0, 0, 0, 0);
         DasColumn col = outerColumn; //new DasColumn( null, outerColumn, 0, 1, 0, 0, 0, 0); //only stack for now
-        DasPlot plot = new DasPlot(xaxis, yaxis);
+        final DasPlot plot = new DasPlot(xaxis, yaxis);
 
         plot.setPreviewEnabled(true);
 
         DatumRange colorRange = new DatumRange(0, 100, Units.dimensionless);
         DasColorBar colorbar = new DasColorBar(colorRange.min(), colorRange.max(), false);
         colorbar.setFillColor(new java.awt.Color(0, true));
-        domPlot.setId("plot_" + application.getPlots().length);
+
+        int num = plotIdNum++;
+
+        domPlot.setId("plot_" + num);
+        domPlot.getXaxis().setId("xaxis_" + num);
+        domPlot.getYaxis().setId("yaxis_" + num);
+        domPlot.getZaxis().setId("zaxis_" + num);
+
         final PlotController plotController = new PlotController(application, domPlot, plot, colorbar);
 
         DasCanvas canvas = getDasCanvas();
@@ -260,39 +329,7 @@ public class ApplicationController {
         plot.getXAxis().setPlot(plot);
         plot.getYAxis().setPlot(plot);
 
-        plot.getMouseAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
-
-        plot.getMouseAdapter().removeMenuItem("Dump Data");
-
-        plot.getMouseAdapter().addMenuItem(new JSeparator());
-
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
-
-            public void actionPerformed(ActionEvent e) {
-                plotController.resetZoom();
-            }
-        }));
-
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Copy Panels") {
-
-            public void actionPerformed(ActionEvent e) {
-                copyPanels(domPlot);
-            }
-        }));
-
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Copy Plot") {
-
-            public void actionPerformed(ActionEvent e) {
-                copyPlot(domPlot);
-            }
-        }));
-
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Delete Plot") {
-
-            public void actionPerformed(ActionEvent e) {
-                deletePlot(domPlot, false);
-            }
-        }));
+        addPlotContextMenuItems(plot, plotController, domPlot);
 
         BoxZoomMouseModule boxmm = (BoxZoomMouseModule) plot.getMouseAdapter().getModuleByLabel("Box Zoom");
         plot.getMouseAdapter().setPrimaryModule(boxmm);
@@ -328,10 +365,20 @@ public class ApplicationController {
         new AxisController(application, domPlot.getYaxis(), yaxis);
         new AxisController(application, domPlot.getZaxis(), colorbar);
 
-        domPlot.bindTo(plot);
-        domPlot.bindTo(colorbar);
+        domPlot.getController().bindTo(plot);
+        domPlot.getController().bindTo(colorbar);
 
         addPlotFocusListener(plot);
+
+        plot.addPropertyChangeListener(DasPlot.PROP_FOCUSRENDERER, new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                Renderer r = plot.getFocusRenderer();
+                if (r == null) return;
+                Panel p = findPanel(r);
+                application.setPanel(p);
+            }
+        });
 
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
         plots.add(domPlot);
@@ -351,56 +398,86 @@ public class ApplicationController {
         return domPlot;
     }
 
-    private void copyPanels(Plot domPlot) {
+    /**
+     * find the panel using this renderer.
+     * @param rend
+     * @return
+     */
+    private Panel findPanel(Renderer rend) {
+        for (Panel p : application.getPanels()) {
+            PanelController pc = p.getController();
+            if (pc.getRenderer() == rend) return p;
+        }
+        throw new IllegalArgumentException("unable to find panel for das renderer");
+    }
+
+    private Plot copyPanels(Plot domPlot) {
         List<Panel> p = getPanelsFor(domPlot);
+
+        Plot newPlot = copyPlot(domPlot);
         if (p.size() == 0) {
-            return;
+            return newPlot;
         }
 
-        Plot newPlot= copyPlot(domPlot);
+        Panel panel = p.get(0);
         Panel newp = addPanel(newPlot);
         String plotId = newp.getPlotId();
-        newp.syncTo(p.get(0)); //TODO: maybe syncTo with exclude
+        newp.syncTo(panel, Arrays.asList("plotId", "dataSourceFilter.suri"));
         newp.setPlotId(plotId);
+        if (panel.getDataSourceFilter().getSuri() == null) {
+            newp.getDataSourceFilter().getController().setDataSetInternal(panel.getDataSourceFilter().getController().getDataSet(), true);
+        } else {
+            newp.getDataSourceFilter().getController().setDataSetInternal(panel.getDataSourceFilter().getController().getDataSet(), true);
+            newp.getDataSourceFilter().suri = panel.getDataSourceFilter().getSuri();
+        }
+        return newPlot;
 
     }
 
     public synchronized Plot copyPlot(Plot domPlot) {
         Plot that = addPlot();
         that.syncTo(domPlot);
-        BindingModel bb= findBinding( application, Application.PROP_TIMERANGE,  domPlot, "xaxis."+Axis.PROP_RANGE );
-        if ( bb==null ) {
+        BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, domPlot, "xaxis." + Axis.PROP_RANGE);
+        if (bb == null) {
             bind(domPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
         } else {
-            bind( application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
+            bind(application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
         }
         return that;
     }
 
-    public synchronized void deletePlot(Plot domPlot, boolean allowOrphanPanels) {
+    public synchronized void deletePlot(Plot domPlot) {
+
+        if (!application.plots.contains(domPlot)) throw new IllegalArgumentException("plot is not in this application");
+        if (application.plots.size() < 2) throw new IllegalArgumentException("last plot cannot be deleted");
+
+        List<Panel> panels = this.getPanelsFor(domPlot);
+        if (panels.size() > 0) throw new IllegalArgumentException("plot must not have panels before deleting");
+
+        for (Connector c : DomUtil.asArrayList(application.getConnectors())) {
+            if (c.getPlotA().equals(domPlot.getId()) || c.getPlotB().equals(domPlot.getId())) {
+                deleteConnector(c);
+            }
+        }
 
         unbind(domPlot);
+        unbind(domPlot.getXaxis());
+        unbind(domPlot.getYaxis());
+        unbind(domPlot.getZaxis());
 
         DasPlot p = domPlot.getController().getDasPlot();
         this.getDasCanvas().remove(p);
         DasColorBar cb = domPlot.getController().getDasColorBar();
         this.getDasCanvas().remove(cb);
-        List<Panel> panels = this.getPanelsFor(domPlot);
-        
-        if (!allowOrphanPanels) {
-            for (Panel pan : panels) {
-                deletePanel(pan);
-            }
-        }
-        
+
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
         plots.remove(domPlot);
-        
+
         if (!plots.contains(application.getPlot())) {
-            if ( plots.size()==0 ) {
-                application.setPlot(null); 
+            if (plots.size() == 0) {
+                application.setPlot(null);
             } else {
-                application.setPlot(plots.get(0)); 
+                application.setPlot(plots.get(0));
             }
         }
         application.setPlots(plots.toArray(new Plot[plots.size()]));
@@ -438,8 +515,10 @@ public class ApplicationController {
 
         String srcId = "???";
         if (src instanceof DomNode) srcId = src.getId();
+
         String dstId = "???";
         if (dst instanceof DomNode) dstId = ((DomNode) dst).getId();
+        if (dst instanceof DasCanvasComponent) dstId = "das2:" + ((DasCanvasComponent) dst).getDasName();
 
         bb.setBindingContextId(srcId);
         bb.setSrcId(srcId);
@@ -448,15 +527,15 @@ public class ApplicationController {
         bb.setSrcProperty(srcProp);
         bb.setDstProperty(dstProp);
 
-        if (!dstId.equals("???")) {
+        if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
             List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
             bindings.add(bb);
             application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
         }
 
-        bc.bind();
-        
-        this.bindings.put(bb, b);
+        b.bind();
+
+        this.bindingImpls.put(bb, b);
     }
 
     /**
@@ -466,18 +545,18 @@ public class ApplicationController {
     public void unbind(DomNode src) {
         BindingContext bc;
 
-        synchronized (bindings) {
-            List<BindingModel> bb= new ArrayList( Arrays.asList( application.getBindings() ) );
-            for ( BindingModel b: application.getBindings() ) {
-                if ( b.getSrcId().equals(src.getId()) || b.getDstId().equals(src.getId()) ) {
+        synchronized (bindingImpls) {
+            List<BindingModel> bb = new ArrayList(Arrays.asList(application.getBindings()));
+            for (BindingModel b : application.getBindings()) {
+                if (b.getSrcId().equals(src.getId()) || b.getDstId().equals(src.getId())) {
                     bb.remove(b);
-                    bindings.get(b).unbind();
-                    bindings.remove(b);
+                    bindingImpls.get(b).unbind();
+                    bindingImpls.remove(b);
                 }
             }
-            application.setBindings( bb.toArray( new BindingModel[ bb.size() ]) );
+            application.setBindings(bb.toArray(new BindingModel[bb.size()]));
         }
-        
+
         synchronized (bindingContexts) {
             bc = bindingContexts.get(src);
             if (bc != null) {
@@ -486,22 +565,33 @@ public class ApplicationController {
                 bindingContexts.remove(bc);
 
                 String bcid = src.getId();
-                List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
-                List<BindingModel> bb2 = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
-                for (BindingModel bb : bb2) {
+                List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
+                List<BindingModel> bb2 = DomUtil.asArrayList(application.getBindings());
+                for (BindingModel bb : bb2) { // avoid concurrent modification
                     if (bb.getBindingContextId().equals(bcid)) {
                         bindings.remove(bb);
                     }
                 }
                 application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
-                
+
             }
         }
-        
+
     }
-    
+
+    public void deleteBinding(BindingModel binding) {
+        Binding b = bindingImpls.get(binding);
+        b.unbind();
+        bindingImpls.remove(binding);
+
+        List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
+        bindings.remove(binding);
+        application.setBindings(bindings);
+
+    }
+
     /**
-     * Find the binding, if it exists.  All bindings are symmetric, so the src and dst order is ignored in this
+     * Find the binding, if it exists.  All bindingImpls are symmetric, so the src and dst order is ignored in this
      * search.  
      * @param src
      * @param srcProp
@@ -509,19 +599,121 @@ public class ApplicationController {
      * @param dstProp
      * @return the BindingModel or null if it doesn't exist.
      */
-    public BindingModel findBinding( DomNode src, String srcProp, DomNode dst, String dstProp ) {
-            for ( BindingModel b: application.getBindings() ) {
-                if ( b.getSrcId().equals(src.getId()) 
-                        && b.getDstId().equals(dst.getId()) 
-                        && b.getSrcProperty().equals(srcProp)
-                        && b.getDstProperty().equals(dstProp) ) return b;
-                if ( b.getSrcId().equals(dst.getId()) 
-                        && b.getDstId().equals(src.getId()) 
-                        && b.getSrcProperty().equals(dstProp)
-                        && b.getDstProperty().equals(srcProp) ) return b;
-                
+    public BindingModel findBinding(DomNode src, String srcProp, DomNode dst, String dstProp) {
+        for (BindingModel b : application.getBindings()) {
+            try {
+                if (b.getSrcId().equals(src.getId()) && b.getDstId().equals(dst.getId()) && b.getSrcProperty().equals(srcProp) && b.getDstProperty().equals(dstProp)) return b;
+                if (b.getSrcId().equals(dst.getId()) && b.getDstId().equals(src.getId()) && b.getSrcProperty().equals(dstProp) && b.getDstProperty().equals(srcProp)) return b;
+            } catch (NullPointerException ex) {
+                throw ex;
             }
-            return null;
+
+        }
+        return null;
+    }
+
+    public BindingModel[] getBindingsFor(DomNode node) {
+        List<BindingModel> result = new ArrayList<BindingModel>();
+        for (BindingModel b : application.getBindings()) {
+            if (b.getSrcId().equals(node.getId()) || b.getDstId().equals(node.getId())) {
+                result.add(b);
+            }
+        }
+        return result.toArray(new BindingModel[result.size()]);
+    }
+
+    private void addPlotContextMenuItems(final DasPlot plot, final PlotController plotController, final Plot domPlot) {
+
+        plot.getMouseAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
+
+        plot.getMouseAdapter().removeMenuItem("Dump Data");
+        plot.getMouseAdapter().removeMenuItem("Properties");
+
+        JMenuItem item;
+
+        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Plot Properties") {
+
+            public void actionPerformed(ActionEvent e) {
+                PropertyEditor pp = new PropertyEditor(domPlot);
+                pp.showDialog(plot.getCanvas());
+            }
+        }));
+
+        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Panel Properties") {
+
+            public void actionPerformed(ActionEvent e) {
+                Panel p = application.getPanel();
+                PropertyEditor pp = new PropertyEditor(p);
+                pp.showDialog(plot.getCanvas());
+            }
+        }));
+
+        plot.getMouseAdapter().addMenuItem(new JSeparator());
+
+        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
+
+            public void actionPerformed(ActionEvent e) {
+                plotController.resetZoom();
+            }
+        }));
+
+
+        item = new JMenuItem(new AbstractAction("Copy Panels") {
+
+            public void actionPerformed(ActionEvent e) {
+                copyPanels(domPlot);
+            }
+        });
+        item.setToolTipText("make a new plot, and copy the panels into it.  The plot's x axis will be bound to this plot's x axis");
+        plot.getMouseAdapter().addMenuItem(item);
+
+        item = new JMenuItem(new AbstractAction("Context Overview") {
+
+            public void actionPerformed(ActionEvent e) {
+                Plot that = copyPanels(domPlot);
+                unbind(that);
+                addConnector(domPlot, that);
+                List<Panel> panelThat = getPanelsFor(that);
+                List<Panel> panelThis = getPanelsFor(domPlot);
+            }
+        });
+        item.setToolTipText("make a new plot, and copy the panels into it.  The plot is not bound,\n" +
+                "and a connector is drawn between the two.  The panel uris are bound as well.");
+        plot.getMouseAdapter().addMenuItem(item);
+
+
+        item = new JMenuItem(new AbstractAction("Remove Bindings") {
+
+            public void actionPerformed(ActionEvent e) {
+                List<Panel> panels = getPanelsFor(domPlot);
+                for (Panel pan : panels) {
+                    unbind(pan);
+                }
+                unbind(domPlot);
+            }
+        });
+        item.setToolTipText("remove any plot and panel property bindings");
+        plot.getMouseAdapter().addMenuItem(item);
+
+
+        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Delete Plot") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (application.getPlots().length > 1) {
+                    List<Panel> panels = getPanelsFor(domPlot);
+                    for (Panel pan : panels) {
+                        if (application.getPanels().length > 1) {
+                            deletePanel(pan);
+                        } else {
+                            setStatus("warning: the last panel may not be deleted");
+                        }
+                    }
+                    deletePlot(domPlot);
+                } else {
+                    setStatus("warning: last plot may not be deleted");
+                }
+            }
+        }));
     }
 
     /**
@@ -603,14 +795,14 @@ public class ApplicationController {
      * @throws IllegalArgumentException if the panel is not a child of the application
      */
     public Plot getPlotFor(Panel panel) {
-        if ( !application.panels.contains( panel ) ) {
+        if (!application.panels.contains(panel)) {
             throw new IllegalArgumentException("the panel is not a child of the application");
         }
         String id = panel.getPlotId();
-        Plot result= null;
+        Plot result = null;
         for (Plot p : application.getPlots()) {
             if (p.getId().equals(id)) {
-                result= p;
+                result = p;
             }
         }
         return result;
@@ -625,6 +817,23 @@ public class ApplicationController {
             }
         }
         return result;
+    }
+
+    private void bindTo(DasCanvas canvas) {
+        ApplicationController ac = this;
+        ac.bind(application, "options.background", canvas, "background");
+        ac.bind(application, "options.foreground", canvas, "foreground");
+        ac.bind(application, "options.canvasFont", canvas, "font");
+    }
+
+    private void bindTo(DasPlot plot) {
+        ApplicationController ac = this;
+        ac.bind(application, "plot.title", plot, "title");
+        ac.bind(application, "plot.xaxis.label", plot, "XAxis.label");
+        ac.bind(application, "plot.yaxis.label", plot, "YAxis.label");
+        ac.bind(application, "plot.zaxis.label", plot, "ZAxis.label");
+        ac.bind(application, "options.drawGrid", plot, "drawGrid");
+        ac.bind(application, "options.drawMinorGrid", plot, "drawMinorGrid");
     }
 
     /**

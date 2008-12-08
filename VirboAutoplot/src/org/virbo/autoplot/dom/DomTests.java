@@ -15,13 +15,26 @@ import java.io.FileOutputStream;
  */
 public class DomTests {
     public static void main(String[] args) throws FileNotFoundException {
-        Application app= new Application();
-        new ApplicationController(null,app);
+        //serializeTest();
+        diffsTest();
+    }
+
+    private static void serializeTest() throws FileNotFoundException {
+        Application app = new Application();
+        new ApplicationController(null, app);
         app.getController().addPanel(null);
 
-        XMLEncoder enc= new XMLEncoder( new FileOutputStream("/home/jbf/foo.xml") );
+        XMLEncoder enc = new XMLEncoder(new FileOutputStream("/home/jbf/foo.xml"));
         enc.writeObject(enc);
         enc.close();
     }
 
+    public static void diffsTest() {
+        Plot p1= new Plot();
+        Plot p2= (Plot) p1.copy();
+        
+        p1.getXaxis().range= p1.getXaxis().range.next();
+        
+        System.err.println( p1.diffs(p2));
+    }
 }

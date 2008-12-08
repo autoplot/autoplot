@@ -6,7 +6,10 @@
 package org.virbo.autoplot.dom;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
@@ -194,33 +197,34 @@ public class PanelStyle extends DomNode {
         this.setSymbolConnector( that.getSymbolConnector() );
     }
 
-    public Map<String, String> diffs(DomNode node) {
+    public List<Diff> diffs(DomNode node) {
         PanelStyle that= (PanelStyle)node;
-        LinkedHashMap<String,String> result= new  LinkedHashMap<String,String>();
+        List<Diff> result = new ArrayList<Diff>();
+        
 
         boolean b;
         b=  that.color.equals(this.color) ;
-        if ( !b ) result.put( "color", that.color + " to "+ this.color );
+        if ( !b ) result.add( new PropertyChangeDiff( "color", that.color , this.color )) ;
         b=  that.fillColor.equals(this.fillColor) ;
-        if ( !b ) result.put( "fillColor", that.fillColor + " to "+ this.fillColor );
+        if ( !b ) result.add( new PropertyChangeDiff( "fillColor", that.fillColor , this.fillColor ) );
         
         b=  that.colortable.equals(this.colortable) ;
-        if ( !b ) result.put( "colortable", that.colortable + " to "+ this.colortable );
+        if ( !b ) result.add( new PropertyChangeDiff( "colortable", that.colortable , this.colortable ) );
         b=  that.lineWidth==this.lineWidth ;
-        if ( !b ) result.put( "lineWidth", that.lineWidth+ " to " +this.lineWidth);
+        if ( !b ) result.add( new PropertyChangeDiff( "lineWidth", that.lineWidth,this.lineWidth) );
         b=  that.symbolSize==this.symbolSize ;
-        if ( !b ) result.put( "symbolSize", that.symbolSize+ " to " +this.symbolSize);
+        if ( !b ) result.add( new PropertyChangeDiff( "symbolSize", that.symbolSize,this.symbolSize) );
 
         b= that.plotSymbol.equals( this.plotSymbol ) ;
-        if ( !b ) result.put("plotSymbol", that.plotSymbol+ " to " +( this.plotSymbol ));
+        if ( !b ) result.add( new PropertyChangeDiff( "plotSymbol", that.plotSymbol, this.plotSymbol ));
         b= that.symbolConnector.equals( this.symbolConnector ) ;
-        if ( !b ) result.put("symbolConnector", that.symbolConnector+ " to " +( this.symbolConnector ));
+        if ( !b ) result.add( new PropertyChangeDiff( "symbolConnector", that.symbolConnector, this.symbolConnector ));
 
         b= that.fillToReference==this.fillToReference;
-        if ( !b ) result.put("fillToReference", that.fillToReference+ " to " +( this.fillToReference ));
+        if ( !b ) result.add( new PropertyChangeDiff( "fillToReference", that.fillToReference, this.fillToReference ));
 
         b= that.reference.equals( this.reference );
-        if ( !b ) result.put("reference",  that.reference+ " to " +( this.reference ));
+        if ( !b ) result.add( new PropertyChangeDiff( "reference",  that.reference, this.reference ));
 
         return result;
     }

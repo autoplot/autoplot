@@ -6,11 +6,8 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import javax.beans.binding.BindingContext;
-import org.das2.graph.DasColorBar;
-import org.das2.graph.DasPlot;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -123,6 +120,9 @@ public class Plot extends DomNode {
     public DomNode copy() {
         Plot result= (Plot) super.copy();
         result.controller= null;
+        result.xaxis= (Axis) result.xaxis.copy();
+        result.yaxis= (Axis) result.yaxis.copy();
+        result.zaxis= (Axis) result.zaxis.copy();
         return result;
     }
     
@@ -136,56 +136,25 @@ public class Plot extends DomNode {
         this.zaxis.syncTo(that.getZaxis());
     }
     
-    BindingContext plotBindingContext = null;
-
-    public synchronized void bindTo(DasPlot p) {
-        if (plotBindingContext != null) plotBindingContext.unbind();
-        plotBindingContext = new BindingContext();
-        plotBindingContext.addBinding( this, "${title}", p, "title" );
-        plotBindingContext.bind();
-        xaxis.bindTo(p.getXAxis());
-        yaxis.bindTo(p.getYAxis());
-    }
-    BindingContext colorbarBindingContext = null;
 
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
-    public synchronized void bindTo(DasColorBar colorbar) {
-        if (colorbarBindingContext != null) colorbarBindingContext.unbind();
-        colorbarBindingContext = new BindingContext();
-        colorbarBindingContext.addBinding(this, "${zaxis.range}", colorbar, "datumRange");
-        colorbarBindingContext.addBinding(this, "${zaxis.log}", colorbar, "log");
-        colorbarBindingContext.addBinding(this, "${zaxis.label}", colorbar, "label" );
-        colorbarBindingContext.bind();
-    }
-
-    public Map<String, String> diffs(DomNode node) {
+    public List<Diff> diffs(DomNode node) {
 
         Plot that = (Plot) node;
-        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
+        List<Diff> result = new ArrayList<Diff>();
 
         boolean b;
         
         b=  that.title.equals(this.title) ;
-        if ( !b ) result.put("title", that.title + " to " + this.title );
+        if ( !b ) result.add( new PropertyChangeDiff( "title", that.title, this.title ) );
         
-        Map<String, String> diffs1 = this.getXaxis().diffs(that.getXaxis());
-        for (String k : diffs1.keySet()) {
-            result.put("xaxis." + k, diffs1.get(k));
-        }
-
-        diffs1 = this.getYaxis().diffs(that.getYaxis());
-        for (String k : diffs1.keySet()) {
-            result.put("yaxis." + k, diffs1.get(k));
-        }
-
-        diffs1 = this.getZaxis().diffs(that.getZaxis());
-        for (String k : diffs1.keySet()) {
-            result.put("zaxis." + k, diffs1.get(k));
-        }
+        result.addAll( DomUtil.childDiffs("xaxis", this.getXaxis().diffs(that.getXaxis()) ) );
+        result.addAll( DomUtil.childDiffs("yaxis", this.getYaxis().diffs(that.getYaxis()) ) );
+        result.addAll( DomUtil.childDiffs("zaxis", this.getZaxis().diffs(that.getZaxis()) ) );
         return result;
     }
 }

@@ -5,6 +5,7 @@
 
 package org.virbo.autoplot.dom;
 
+import java.util.List;
 import org.das2.graph.DasAxis;
 
 /**
@@ -15,15 +16,39 @@ public class AxisController {
     
     DasAxis dasAxis;
     private Application dom;
+    Axis axis;
     
     public AxisController( Application dom, Axis axis, DasAxis dasAxis ) {
         this.dom= dom;
         this.dasAxis= dasAxis;
+        this.axis= axis;
         axis.controller= this;
     }
     
     public boolean valueIsAdjusting() {
         return dasAxis.valueIsAdjusting();
     }
+
+    public synchronized void bindTo( DasAxis p ) {
+        ApplicationController ac= dom.getController();
+        ac.bind( axis, "range", p, "datumRange" );
+        ac.bind( axis, "log", p, "log" );
+        ac.bind( axis, "label", p, "label" );
+        ac.bind( axis, "drawTickLabels", p, "tickLabelsVisible" );
+
+    }
+    
+    public List<BindingModel> getTest() {
+        return DomUtil.asArrayList(getBindings());
+    }
+    public BindingModel[] getBindings() {
+        BindingModel[] result= dom.getController().getBindingsFor( axis );
+        return result;
+    }
+
+    public BindingModel getBindings(int index) {
+        return getBindings()[index];
+    }
+
 
 }

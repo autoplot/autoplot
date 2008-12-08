@@ -5,12 +5,9 @@
 
 package org.virbo.autoplot.dom;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSource;
+import org.virbo.datasource.URLSplit;
 
 /**
  * Model for a source of data plus additional processing.
@@ -26,6 +23,11 @@ public class DataSourceFilter extends DomNode {
     }
 
     public void setSuri(String suri) {
+        if ( suri!=null ) {
+            URLSplit split= URLSplit.parse(suri);
+            suri= URLSplit.format(split); // make canonical
+        }
+        
         String oldSuri = this.suri;
         this.suri = suri;
         propertyChangeSupport.firePropertyChange(PROP_SURI, oldSuri, suri);
@@ -144,28 +146,40 @@ public class DataSourceFilter extends DomNode {
         this.setSuri(that.getSuri());
     }
 
-    public Map<String, String> diffs(DomNode node) {
+    public void syncTo(DomNode n, List<String> exclude ) {
+        DataSourceFilter that= (DataSourceFilter)n;
+        this.setFill(that.getFill());
+        this.setValidRange(that.getValidRange());        
+        this.setSliceDimension(that.getSliceDimension());
+        this.setSliceIndex(that.getSliceIndex());
+        this.setTranspose( that.isTranspose() );
+        if ( !exclude.contains("suri" ) ) this.setSuri(that.getSuri());
+    }
+
+    public List<Diff> diffs(DomNode node) {
         DataSourceFilter that= (DataSourceFilter)node;
-        LinkedHashMap<String,String> result= new  LinkedHashMap<String,String>();
+        
+        List<Diff> result = new ArrayList<Diff>();
+        
         boolean b;
         
         b = (that.suri == this.suri || (that.suri != null && that.suri.equals(this.suri)));
-        if (!b) result.put("suri", DomUtil.abbreviateRight(that.suri, 20) + " to " + DomUtil.abbreviateRight(this.suri, 20));
+        if (!b) result.add( new PropertyChangeDiff( "suri", that.suri, this.suri ) );
         
         b = that.validRange.equals(this.validRange);
-        if (!b) result.put("validRange", that.validRange + " to " + (this.validRange));
+        if (!b) result.add(new PropertyChangeDiff( "validRange", that.validRange , (this.validRange)));
 
         b = that.fill.equals(this.fill);
-        if (!b) result.put("fill", that.fill + " to " + (this.fill));
+        if (!b) result.add(new PropertyChangeDiff( "fill", that.fill , (this.fill)));
         
         b= that.sliceDimension==this.sliceDimension;
-        if ( !b ) result.put("sliceDimension", that.sliceDimension + " to " +this.sliceDimension );
+        if ( !b ) result.add(new PropertyChangeDiff( "sliceDimension", that.sliceDimension ,this.sliceDimension ));
 
         b= that.sliceIndex==this.sliceIndex;
-        if ( !b ) result.put("sliceIndex", that.sliceIndex + " to " +this.sliceIndex );
+        if ( !b ) result.add(new PropertyChangeDiff( "sliceIndex", that.sliceIndex ,this.sliceIndex ));
 
         b= that.transpose==this.transpose;
-        if ( !b ) result.put("transpose", that.transpose + " to " +this.transpose );
+        if ( !b ) result.add(new PropertyChangeDiff( "transpose", that.transpose ,this.transpose ));
         
         return result;
     }

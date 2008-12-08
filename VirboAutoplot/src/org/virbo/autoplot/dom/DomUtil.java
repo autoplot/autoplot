@@ -6,8 +6,13 @@
 package org.virbo.autoplot.dom;
 
 import java.beans.PropertyEditor;
-import javax.beans.binding.Binding;
-import javax.beans.binding.BindingContext;
+import java.lang.Class;
+import java.lang.Class;
+import java.lang.Class;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.das2.beans.BeansUtil;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -32,6 +37,17 @@ public class DomUtil {
             s= "..."+s.substring(s.length()-len);
         }
         return s;
+    }
+
+    static List<String> childProperties(List<String> exclude, String string) {
+        ArrayList<String> result= new ArrayList<String>();
+        int n= string.length()+1;
+        for ( String e: exclude ) {
+            if ( e.startsWith(string+".") ) {
+                result.add(e.substring(n));
+            }
+        }
+        return result;
     }
 
     private static DatumRange round( DatumRange range ) {
@@ -98,23 +114,12 @@ public class DomUtil {
         return result;
     }
     
-    /** 
-     * add binding, possibly validating 
-     * @param bc
-     * @param model
-     * @param propertyName expression like ${name} or just name.
-     * @param bound
-     * @param boundPropertyName
-     * @return
-     */
-    public static Binding addBinding( BindingContext bc, Object model, String propertyName, Object bound, String boundPropertyName ) {
-        if ( !propertyName.startsWith("${" ) ) {
-            propertyName= "${" + propertyName + "}";
-        }
-        return bc.addBinding( model, propertyName, bound, boundPropertyName );
-    }
     
     public static DomNode getElementById( DomNode root, String id) {
+        if ( id==null || id.equals("") ) {
+            throw new IllegalArgumentException("id cannot be null or zero-length string");
+        }
+        if ( root.getId().equals(id) ) return root;
         for ( DomNode n: root.childNodes() ) {
             if ( n.getId().equals(id) ) {
                 return n;
@@ -125,4 +130,52 @@ public class DomUtil {
         }
         return null;
     }
+    
+    /**
+     * Just like Arrays.toList, but copies into ArrayList so elements may be inserted.
+     * @param <T>
+     * @param a
+     * @return ArrayList that can have elements inserted
+     */
+    public static <T> ArrayList<T> asArrayList( T... a ) {
+        return new ArrayList<T>( Arrays.asList( a ) );
+    }
+    
+    /**
+     * return the child diff in the context of the parent node.  May return
+     * null if the diff cannot be described.
+     * @param childName
+     * @param diff
+     * @return
+     */
+    public static Diff childDiff( String childName, Diff diff ) {
+        if ( diff instanceof PropertyChangeDiff ) {
+            PropertyChangeDiff pcd= (PropertyChangeDiff)diff;
+            return new PropertyChangeDiff( childName+"."+pcd.propertyName, pcd.oldVal, pcd.newVal );
+        } else if ( diff instanceof InsertNodeDiff ) {
+            InsertNodeDiff d= (InsertNodeDiff)diff;
+            return new InsertNodeDiff(childName+"."+d.propertyName, d.node, d.index);
+        } else if ( diff instanceof DeleteNodeDiff ) {
+            DeleteNodeDiff d= (DeleteNodeDiff)diff;
+            return new DeleteNodeDiff(childName+"."+d.propertyName, d.node, d.index);
+        } else {
+            return null;
+        }
+    }
+            /**
+     * return the child diff in the context of the parent node.  May return
+     * null if the diff cannot be described.
+     * @param childName
+     * @param diff
+     * @return
+     */
+    public static List<Diff> childDiffs( String childName, List<Diff> diffs ) {
+        ArrayList<Diff> result= new ArrayList<Diff>();
+        for ( Diff diff: diffs ) {
+            Diff r1= childDiff( childName, diff );
+            if ( r1!=null ) result.add(r1);
+        }
+        return result;
+    }
+        
 }

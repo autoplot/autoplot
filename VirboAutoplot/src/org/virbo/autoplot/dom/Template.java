@@ -5,9 +5,8 @@
 
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeSupport;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -43,8 +42,8 @@ public class Template extends DomNode {
         
     }
 
-    public Map<String, String> diffs(DomNode node) {
-        return new HashMap<String,String>();
+    public List<Diff> diffs(DomNode node) {
+        return new ArrayList<Diff>();
     }
 
 }

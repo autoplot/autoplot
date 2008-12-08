@@ -108,6 +108,29 @@ public class PlotController {
         }
     }
 
+    public synchronized void bindTo(DasPlot p) {
+        ApplicationController ac= dom.getController();
+        ac.bind( this.domplot, "title", p, "title" );
+        this.domplot.getXaxis().getController().bindTo(p.getXAxis());
+        this.domplot.getYaxis().getController().bindTo(p.getYAxis());
+    }
+    
+    public synchronized void bindTo(DasColorBar colorbar) {
+        ApplicationController ac= dom.getController();
+        ac.bind( this.domplot, "zaxis.range", colorbar, "datumRange");
+        ac.bind( this.domplot, "zaxis.log", colorbar, "log");
+        ac.bind( this.domplot, "zaxis.label", colorbar, "label" );
+    }
+
+    public BindingModel[] getBindings() {
+        return dom.getController().getBindingsFor(domplot);
+    }
+
+    public BindingModel getBindings(int index) {
+        return getBindings()[index];
+    }
+
+    
     public boolean valueIsAdjusting() {
         return domplot.getXaxis().getController().valueIsAdjusting() || domplot.getYaxis().getController().valueIsAdjusting() || domplot.getZaxis().getController().valueIsAdjusting();
     }

@@ -83,11 +83,31 @@ public class BindingModel {
         propertyChangeSupport.firePropertyChange(PROP_DSTPROPERTY, oldDstProperty, dstProperty);
     }
 
-
+    @Override
     public String toString() {
         return ""+ srcId + "."+ srcProperty + " <--> " + dstId + "." + dstProperty + "  ("+bindingContextId +")";
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if ( obj==null || !(obj instanceof BindingModel) ) return false;
+        BindingModel that= (BindingModel)obj;
+        if (that.getSrcId().equals(this.getSrcId()) && that.getDstId().equals(this.getDstId()) 
+                && that.getSrcProperty().equals(this.getSrcProperty()) && that.getDstProperty().equals(this.getDstProperty())) return true;
+        if (that.getSrcId().equals(this.getDstId()) && that.getDstId().equals(this.getSrcId()) 
+                && that.getSrcProperty().equals(this.getDstProperty()) && that.getDstProperty().equals(this.getSrcProperty())) return true;
+        return false;
+        
+    }
+
+    @Override
+    /**
+     * note equal objects must have the same hashcode.
+     */
+    public int hashCode() {
+        return srcId.hashCode() + srcProperty.hashCode()  + dstId.hashCode() + dstProperty.hashCode();
+    }
+    
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
