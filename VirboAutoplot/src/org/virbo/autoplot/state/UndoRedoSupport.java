@@ -12,13 +12,16 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.Diff;
 
 /**
  *
@@ -141,19 +144,28 @@ public class UndoRedoSupport {
         }
         String labelStr = "initial";
         if (elephant != null) {
-            Map<String,String> diffss= state.diffs(elephant.state);
+            List<Diff> diffss= state.diffs(elephant.state);
             if ( diffss.size()==0 ) {
+                state.diffs(elephant.state);
                 labelStr= "unidentified change";
-            } else if ( diffss.size()>3 ) {
+            } else if ( diffss.size()>6 ) {
                 labelStr= ""+diffss.size()+" changes";
             } else {
                 StringBuffer buf= new StringBuffer();
-                for ( String s:diffss.keySet() ) {
-                    buf.append( ", "+s+" "+diffss.get(s) );
+                for ( Diff s:diffss ) {
+                    buf.append( ", "+s.toString() );
                 }
                 labelStr = buf.length()>2 ? buf.substring(2) : "";
             }
-            
+            if ( labelStr.length()>30 ) {
+                StringTokenizer tok= new StringTokenizer(labelStr,".,[",true);
+                StringBuffer buf= new StringBuffer();
+                while (tok.hasMoreTokens() ) {
+                    String ss= tok.nextToken();
+                    buf.append(ss.substring(0,Math.min(ss.length(), 12) ) );
+                }
+                labelStr= buf.toString();
+            }
         }
 
         stateStack.add(stateStackPos, new StateStackElement(state, labelStr));
