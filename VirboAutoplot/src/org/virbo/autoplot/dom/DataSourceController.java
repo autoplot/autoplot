@@ -119,7 +119,11 @@ public class DataSourceController {
         if (qube == null || qube.length <= sliceDimension) {
             return 0;
         } else {
-            return qube[sliceDimension];
+            try {
+                return qube[sliceDimension];
+            } catch ( ArrayIndexOutOfBoundsException ex ) {
+                throw ex;
+            }
         }
     }
 
@@ -178,6 +182,9 @@ public class DataSourceController {
 
         }
 
+        this.dsf.setValidRange("");
+        this.dsf.setFill("");
+        
         _setDataSource(dataSource);
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
