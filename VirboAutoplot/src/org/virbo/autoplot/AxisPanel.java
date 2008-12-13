@@ -127,7 +127,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 int pos = (Integer) sliceIndexSpinner.getValue();
                 pos -= e.getWheelRotation();
                 if (pos < 0) pos = 0;
-                int maxpos = dsf.getController().getMaxSliceIndex(dsf.getSliceIndex());
+                int maxpos = dsf.getController().getMaxSliceIndex(dsf.getSliceDimension());
                 if (pos >= maxpos) pos = maxpos - 1;
                 sliceIndexSpinner.setValue(pos);
             }
