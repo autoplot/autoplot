@@ -338,6 +338,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bc.bind();
     }
 
+    public void plotUri( String uri ) {
+        dataSetSelector.getEditor().setText(uri);
+        dataSetSelector.setValue(uri);
+        dataSetSelector.maybePlot(false);        
+    }
+    
     private void addBookmarks(JMenu bookmarksMenu, List<Bookmark> bookmarks) {
 
         for (int i = 0; i < bookmarks.size(); i++) {
@@ -347,9 +353,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
 
                     public void actionPerformed(ActionEvent e) {
-                        dataSetSelector.getEditor().setText(((Bookmark.Item) book).getUrl());
-                        dataSetSelector.setValue(((Bookmark.Item) book).getUrl());
-                        dataSetSelector.maybePlot(false);
+                        plotUri(((Bookmark.Item) book).getUrl());
                     }
                 });
 
@@ -1118,7 +1122,7 @@ private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_jMenuItem2ActionPerformed
 
 private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-    JDiskHogPanel panel = new JDiskHogPanel();
+    JDiskHogPanel panel = new JDiskHogPanel( this );
     panel.scan(FileSystem.settings().getLocalCacheDir());
     JDialog dia = new JDialog(this, "Manage Cache", true);
     dia.add(panel);
