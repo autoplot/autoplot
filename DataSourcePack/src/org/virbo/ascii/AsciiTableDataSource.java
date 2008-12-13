@@ -83,11 +83,19 @@ public class AsciiTableDataSource extends AbstractDataSource {
             final Units u = Units.t2000;
             // replace the first column with the datum time
             for (int i = 0; i < ds.length(); i++) {
+                timeParser.resetSeconds();
                 for (int j = 0; j < timeColumns; j++) {
-                    //timeParser.setDigit(j, (int) ds.value(i, timeColumn + j));
-                    timeParser.setDigit(timeFormats[j], (int) ds.value(i, timeColumn + j));
+                    timeParser.setDigit(j, (int) ds.value(i, timeColumn + j));
+                    double d= ds.value(i, timeColumn + j);
+                    double fp= d-(int)Math.floor(d);
+                    timeParser.setDigit(timeFormats[j], (int) d );
+                    if ( fp==0 ) {
+                        timeParser.setDigit(timeFormats[j], (int) d );
+                    } else {
+                        timeParser.setDigit(timeFormats[j], d );
+                    }
                 }
-                ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000));
+                ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000) );                   
             }
             parser.setUnits(timeColumn, Units.t2000);
         }
