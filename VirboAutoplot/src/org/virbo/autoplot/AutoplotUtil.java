@@ -293,7 +293,7 @@ public class AutoplotUtil {
 
         if (mono) {
             Double cadence = DataSetUtil.guessCadence(ds);
-            if ( cadence==null ) cadence= new Double(0.);
+            if ( cadence==null || cadence > Double.MAX_VALUE / 100 ) cadence= new Double(0.);
             if (ds.length() > 1) {
                 dd = new double[]{ds.value(0) - cadence, ds.value(ds.length() - 1) + cadence};
             } else {
