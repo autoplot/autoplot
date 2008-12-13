@@ -19,10 +19,10 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
-import javax.swing.JSeparator;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.autoplot.AutoPlotUI;
 
 /**
  *
@@ -30,8 +30,11 @@ import org.das2.util.monitor.NullProgressMonitor;
  */
 public class JDiskHogPanel extends javax.swing.JPanel {
 
+    AutoPlotUI app;
+    
     /** Creates new form JDiskHogPanel */
-    public JDiskHogPanel() {
+    public JDiskHogPanel( AutoPlotUI model ) {
+        this.app= model;
         initComponents();
         jTree1.addMouseListener(createMouseListener(jTree1));
 
@@ -68,7 +71,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
             
             JPopupMenu popup;
 
-            private void showPopup(MouseEvent e) {
+            private synchronized void showPopup(MouseEvent e) {
                 if (popup == null) {
                     popup = new JPopupMenu();
                     popup.add(new JMenuItem(new AbstractAction("Delete") {
@@ -109,6 +112,24 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                     }));
                     
                     //popup.add(new JSeparator());
+                    popup.add(new JMenuItem( new AbstractAction("Plot") {
+                        public void actionPerformed(ActionEvent e) {
+                                
+                                FSTreeModel model = (FSTreeModel) jtree.getModel();
+
+                                TreePath[] paths = jtree.getSelectionPaths();
+
+
+                                if ( paths.length==0 ) return;
+                                
+                                File f = model.getFile(paths[0]);
+                                app.plotUri( f.toString() );
+                                
+                            }
+
+                        
+                    }));
+                    
                     popup.add(new JMenuItem( new AbstractAction("Copy To...") {
                         public void actionPerformed(ActionEvent e) {
                             JFileChooser chooser = new JFileChooser();
@@ -137,7 +158,7 @@ public class JDiskHogPanel extends javax.swing.JPanel {
                             }
 
                         }
-                    }));
+                    }));                    
                 }
                 popup.show(jtree, e.getX(), e.getY());
             }
