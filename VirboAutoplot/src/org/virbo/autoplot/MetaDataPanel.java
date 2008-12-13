@@ -6,6 +6,7 @@
 package org.virbo.autoplot;
 
 import java.awt.Component;
+import java.awt.EventQueue;
 import javax.swing.JTree;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
@@ -20,6 +21,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
+import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.Panel;
@@ -192,18 +194,19 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
     private void updateStatistics() {
         statisticsDirty = true;
-        SwingUtilities.invokeLater(new Runnable() {
-
+        Runnable run= new Runnable() {
             public void run() {
                 if (statisticsDirty) {
                     updateStatisticsImmediately();
                     updateDataSetPropertiesView();
                 }
             }
-        });
+        };
+        RequestProcessor.invokeLater(run);
     }
 
     private synchronized void updateDataSetPropertiesView() {
+        assert EventQueue.isDispatchThread()==false;
         Panel p = applicationModel.dom.getPanel();
         if (p.getDataSourceFilter().getController().getDataSet() == null) {
             //dsTree= NameValueTreeModel.create("dataset", Collections.singletonMap("dataset=", "no dataset") );
@@ -216,7 +219,6 @@ public class MetaDataPanel extends javax.swing.JPanel {
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
-
             public void run() {
                 tree.mountTree(dsTree, 30);
             }
@@ -225,6 +227,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
     @SuppressWarnings("unchecked")
     private synchronized void updateStatisticsImmediately() {
+        assert EventQueue.isDispatchThread()==false;
         Panel p = applicationModel.dom.getPanel();
 
         final LinkedHashMap map = new LinkedHashMap();
@@ -277,18 +280,16 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 map.put("Cadence", "null");
             }
             
-            s= histStr( ds );
-            map.put( "Histogram", s );
+            //s= histStr( ds );
+            //map.put( "Histogram", s );
 
         }
 
         SwingUtilities.invokeLater(new Runnable() {
-
             public void run() {
                 tree.mountTree(NameValueTreeModel.create("Statistics", map), 20);
             }
         });
-
 
         statisticsDirty = false;
     }
