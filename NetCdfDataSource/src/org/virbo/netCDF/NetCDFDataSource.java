@@ -125,7 +125,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         NetcdfDataset dataset=null;
         
         if ( sMyUrl.endsWith(".ncml" ) ) {
-            String kl= URLSplit.maybeAddFile( file.toString() ); // kludge for readNcML, which doesn't like drive letters.
+            String kl= file.toURI().toURL().toString();
             dataset= NcMLReader.readNcML( kl, null );
         } else {
             NetcdfFile f= NetcdfFile.open( file.toString() );
