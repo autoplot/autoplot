@@ -45,7 +45,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
-            String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
+            String file= cc.resource.toString();
             
             NetcdfDataset dataset= getDataSet( file );
             List<Variable> vars= (List<Variable>)dataset.getVariables();

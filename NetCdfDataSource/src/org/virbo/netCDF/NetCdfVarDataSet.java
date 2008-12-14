@@ -20,6 +20,7 @@ import java.util.Map;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import ucar.ma2.DataType;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
 
@@ -42,8 +43,15 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         this.v= variable;
                 
         ucar.ma2.Array a = v.read();
+
+        if ( v.getDataType()==DataType.FLOAT ) {
+            System.err.println(v);
+        } else if ( v.getDataType()==DataType.DOUBLE ) {
+            System.err.println(v);
+        }
+
         data= (double[])a.get1DJavaArray( Double.class );
-        
+
         shape= v.getShape();
         properties.put( QDataSet.NAME, variable.getName() );
         if ( shape.length>1 ) properties.put( QDataSet.QUBE, Boolean.TRUE );
