@@ -85,7 +85,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
             for (int i = 0; i < ds.length(); i++) {
                 timeParser.resetSeconds();
                 for (int j = 0; j < timeColumns; j++) {
-                    timeParser.setDigit(j, (int) ds.value(i, timeColumn + j));
                     double d= ds.value(i, timeColumn + j);
                     double fp= d-(int)Math.floor(d);
                     timeParser.setDigit(timeFormats[j], (int) d );
