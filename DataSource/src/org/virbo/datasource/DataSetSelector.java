@@ -719,7 +719,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @return Value of property value.
      */
     public String getValue() {
-        return (String) this.dataSetSelector.getSelectedItem();
+        return ((String) this.dataSetSelector.getSelectedItem() ).trim();
     }
     private boolean doItemStateChange = false;
 
