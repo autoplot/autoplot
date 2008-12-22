@@ -49,7 +49,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("dataset")) {
-                URL url= DataSetURL.getURL( CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)  );
+                URL url= cc.resource;
                 List<String> dss= getDatasetsList( url.toString() );
                 for ( String ds: dss ) {
                     if ( ds.startsWith(cc.completable) ) {
@@ -83,7 +83,7 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
                 datasetsList.put( surl, list );
             } catch (IOException ex) {
                 Logger.getLogger(Das2ServerDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
-                return null;
+                throw new RuntimeException(ex);
             } finally {
                 try {
                     reader.close();
