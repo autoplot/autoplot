@@ -22,14 +22,17 @@ public class Int extends BufferDataSet implements WritableDataSet {
     }
     
     public void putValue(int i0, double d) {
+        ensureWritable();
         back.putInt( offset(i0), (int)d );
     }
 
     public void putValue(int i0, int i1, double d) {
+        ensureWritable();
         back.putInt( offset(i0, i1), (int)d );
     }
 
     public void putValue(int i0, int i1, int i2, double d) {
+        ensureWritable();
         back.putInt( offset(i0, i1, i2), (int)d );
     }
 }

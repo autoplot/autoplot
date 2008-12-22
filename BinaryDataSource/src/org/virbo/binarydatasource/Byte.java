@@ -21,14 +21,17 @@ public class Byte extends BufferDataSet {
     }
 
     public void putValue(int i0, double d) {
+        ensureWritable();
         back.put( offset(i0), (byte)d );
     }
 
     public void putValue(int i0, int i1, double d) {
+        ensureWritable();
         back.put( offset(i0, i1), (byte)d );
     }
 
     public void putValue(int i0, int i1, int i2, double d) {
+        ensureWritable();
         back.put( offset(i0, i1, i2), (byte)d );
     }    
 }

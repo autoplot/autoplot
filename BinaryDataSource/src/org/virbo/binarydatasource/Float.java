@@ -22,14 +22,17 @@ public class Float extends BufferDataSet implements WritableDataSet {
     }
     
     public void putValue(int i0, double d) {
+        ensureWritable();
         back.putFloat( offset(i0), (float)d );
     }
 
     public void putValue(int i0, int i1, double d) {
+        ensureWritable();
         back.putFloat( offset(i0, i1), (float)d );
     }
 
     public void putValue(int i0, int i1, int i2, double d) {
+        ensureWritable();
         back.putFloat( offset(i0, i1, i2), (float)d );
     }    
 }

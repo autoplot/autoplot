@@ -22,14 +22,17 @@ public class Double extends BufferDataSet implements WritableDataSet {
     }
 
     public void putValue(int i0, double d) {
+        ensureWritable();
         back.putDouble( offset(i0), d );
     }
 
     public void putValue(int i0, int i1, double d) {
+        ensureWritable();
         back.putDouble( offset(i0, i1), d );
     }
 
     public void putValue(int i0, int i1, int i2, double d) {
+        ensureWritable();
         back.putDouble( offset(i0, i1, i2), d );
     }
     

@@ -72,7 +72,6 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     }
     
     public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, String type ) {
-        
         if ( type.equals(DOUBLE) ) {
             return new Double( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(FLOAT) ) {
@@ -179,6 +178,17 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
 
     @Override
     public abstract double value(int i0, int i1, int i2);
+    
+    /**
+     * copy the data to a writable buffer if it's not already writable.
+     */
+    protected synchronized void ensureWritable() {
+        if ( back.isReadOnly() ) {
+            ByteBuffer wback= ByteBuffer.allocateDirect( back.capacity() );
+            wback.put(back);
+            back= wback;
+        }
+    }
     
     /*public abstract double putValue(int i0, double d );
 
