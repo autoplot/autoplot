@@ -38,7 +38,7 @@ public class AsciiTableTableModel extends DefaultTableModel {
 
     @Override
     public int getColumnCount() {
-        return 10;
+        return 12;
     }
 
     @Override
