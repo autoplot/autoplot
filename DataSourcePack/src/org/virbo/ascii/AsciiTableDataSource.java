@@ -308,6 +308,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (o != null) {
             String timeFormat = o;
             timeFormat = timeFormat.replaceAll("\\$", "%");
+            timeFormat = timeFormat.replaceAll("\\(", "{");
+            timeFormat = timeFormat.replaceAll("\\)", "}");
             String timeColumnName = params.get("time");
             timeColumn = timeColumnName == null ? 0 : parser.getFieldIndex(timeColumnName);
 
@@ -320,7 +322,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     i = 0;
                 }
                 String atime = ss[i];
-                timeFormat = TimeParser.iso8601String(atime);
+                timeFormat = TimeParser.iso8601String(atime.trim());
                 timeParser = TimeParser.create( timeFormat);
                 final Units u = Units.t2000;
                 parser.setUnits(i, u);
