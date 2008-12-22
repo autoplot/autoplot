@@ -114,7 +114,7 @@ public class TimeSeriesBrowseController {
                 } else {
                     dataSourceController.update(autorange, autorange);
                     this.dataSourceController._setTsbSuri(surl);
-                    p.getDataSourceFilter().setSuri(surl);
+                    //p.getDataSourceFilter().setSuri(surl);
                 }
             } else {
                 logger.fine("loaded dataset satifies request");
