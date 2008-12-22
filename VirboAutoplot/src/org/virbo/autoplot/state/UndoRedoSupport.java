@@ -11,6 +11,7 @@ package org.virbo.autoplot.state;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,16 +47,17 @@ public class UndoRedoSupport {
 
     public void refreshUndoMultipleMenu(JMenu undoMultipleMenu) {
         undoMultipleMenu.removeAll();
-        for ( int i=stateStackPos-1; i> Math.max( 0,stateStackPos-10 ); i-- ) {
-            StateStackElement prevState= stateStack.get( i );
-            String label= prevState.deltaDesc;
-            final int ii= stateStackPos-i;
-            undoMultipleMenu.add( new JMenuItem( new AbstractAction( label ) {
-                public void actionPerformed( ActionEvent e ) {
+        for (int i = stateStackPos - 1; i > Math.max(0, stateStackPos - 10); i--) {
+            StateStackElement prevState = stateStack.get(i);
+            String label = prevState.deltaDesc;
+            final int ii = stateStackPos - i;
+            undoMultipleMenu.add(new JMenuItem(new AbstractAction(label) {
+
+                public void actionPerformed(ActionEvent e) {
                     undo(ii);
                 }
-            } ) ) ;
-        }        
+            }));
+        }
     }
 
     class StateStackElement {
@@ -77,9 +79,21 @@ public class UndoRedoSupport {
      * points at the last saved state index + 1;
      */
     int stateStackPos = 0;
+    protected String redoLabel = null;
+    public static final String PROP_REDOLABEL = "redoLabel";
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
 
     public Action getUndoAction() {
         return new AbstractAction("Undo") {
+
             public void actionPerformed(ActionEvent e) {
                 undo();
             }
@@ -90,8 +104,9 @@ public class UndoRedoSupport {
         undo(1);
     }
 
-    public void undo( int level ) {
-        stateStackPos-= level;
+    public void undo(int level) {
+        String oldRedoLabel= getRedoLabel();        
+        stateStackPos -= level;
         if (stateStackPos < 0) {
             stateStackPos = 0;
         }
@@ -99,14 +114,17 @@ public class UndoRedoSupport {
             StateStackElement elephant = stateStack.get(stateStackPos - 1);
             ignoringUpdates = true;
             applicationModel.setRestoringState(true);
-            applicationModel.restoreState( elephant.state, false, false );
+            applicationModel.restoreState(elephant.state, false, false);
             applicationModel.setRestoringState(false);
             ignoringUpdates = false;
         }
+        propertyChangeSupport.firePropertyChange(PROP_REDOLABEL, oldRedoLabel, redoLabel);
+
     }
-    
+
     public Action getRedoAction() {
         return new AbstractAction("redo") {
+
             public void actionPerformed(ActionEvent e) {
                 redo();
             }
@@ -120,7 +138,7 @@ public class UndoRedoSupport {
         if (stateStackPos < stateStack.size()) {
             StateStackElement elephant = stateStack.get(stateStackPos);
             ignoringUpdates = true;
-            applicationModel.restoreState(elephant.state, false, false );
+            applicationModel.restoreState(elephant.state, false, false);
             ignoringUpdates = false;
             stateStackPos++;
         }
@@ -144,27 +162,27 @@ public class UndoRedoSupport {
         }
         String labelStr = "initial";
         if (elephant != null) {
-            List<Diff> diffss= state.diffs(elephant.state);
-            if ( diffss.size()==0 ) {
+            List<Diff> diffss = state.diffs(elephant.state);
+            if (diffss.size() == 0) {
                 state.diffs(elephant.state);
-                labelStr= "unidentified change";
-            } else if ( diffss.size()>6 ) {
-                labelStr= ""+diffss.size()+" changes";
+                labelStr = "unidentified change";
+            } else if (diffss.size() > 6) {
+                labelStr = "" + diffss.size() + " changes";
             } else {
-                StringBuffer buf= new StringBuffer();
-                for ( Diff s:diffss ) {
-                    buf.append( ", "+s.toString() );
+                StringBuffer buf = new StringBuffer();
+                for (Diff s : diffss) {
+                    buf.append(", " + s.toString());
                 }
-                labelStr = buf.length()>2 ? buf.substring(2) : "";
+                labelStr = buf.length() > 2 ? buf.substring(2) : "";
             }
-            if ( labelStr.length()>30 ) {
-                StringTokenizer tok= new StringTokenizer(labelStr,".,[",true);
-                StringBuffer buf= new StringBuffer();
-                while (tok.hasMoreTokens() ) {
-                    String ss= tok.nextToken();
-                    buf.append(ss.substring(0,Math.min(ss.length(), 12) ) );
+            if (labelStr.length() > 30) {
+                StringTokenizer tok = new StringTokenizer(labelStr, ".,[", true);
+                StringBuffer buf = new StringBuffer();
+                while (tok.hasMoreTokens()) {
+                    String ss = tok.nextToken();
+                    buf.append(ss.substring(0, Math.min(ss.length(), 12)));
                 }
-                labelStr= buf.toString();
+                labelStr = buf.toString();
             }
         }
 
