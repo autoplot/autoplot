@@ -10,7 +10,6 @@ import org.python.core.PyFloat;
 import org.python.core.PyFunction;
 import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.python.core.PyTuple;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
