@@ -51,7 +51,8 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("dataset")) {
-                URL url= DataSetURL.getURL( CompletionContext.get(CompletionContext.CONTEXT_FILE, cc)  );
+                //TODO: this is leftover,dead code from Das2ServerDataSourceFactory.
+                URL url= cc.resource;
                 List<String> dss= getDatasetsList( url.toString() );
                 for ( String ds: dss ) {
                     if ( ds.startsWith(cc.completable) ) {
