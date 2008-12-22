@@ -22,6 +22,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.PersistentStateSupport;
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -130,7 +131,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         applicationModel = model;
         undoRedoSupport = new UndoRedoSupport(applicationModel);
+        undoRedoSupport.addPropertyChangeListener(new PropertyChangeListener() {
 
+            public void propertyChange(PropertyChangeEvent evt) {
+                refreshUndoRedoLabel();
+            }
+        });
+        
         initComponents();
 
         statusLabel.setIcon(IDLE_ICON);
@@ -298,6 +305,25 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
     }
 
+    protected void refreshUndoRedoLabel() {
+        assert EventQueue.isDispatchThread();
+
+        String t = undoRedoSupport.getUndoLabel();
+
+        undoMenuItem.setEnabled(t != null);
+        undoMenuItem.setText(t == null ? "Undo" : t);
+
+        undoRedoSupport.refreshUndoMultipleMenu(undoMultipleMenu);
+
+        String tt = undoRedoSupport.getRedoLabel();
+
+        redoMenuItem.setEnabled(tt != null);
+        if (tt != null) {
+            redoMenuItem.setText(tt == null ? "Redo" : tt);
+        }
+    }
+
+    
     /** 
      * provide access to the tabs so that component can be added
      * @return TabbedPane.
