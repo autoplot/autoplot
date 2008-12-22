@@ -60,6 +60,8 @@ public class BinaryDataSource extends AbstractDataSource {
 
         int fieldCount = getIntParameter("fieldCount", params.get("depend0") == null ? 1 : 2);
 
+        int recCount= getIntParameter("recCount", Integer.MAX_VALUE );
+                
         ByteBuffer buf = fc.map(MapMode.READ_ONLY, offset, length);
 
         int dep0 = getIntParameter("depend0", -1);
@@ -92,18 +94,18 @@ public class BinaryDataSource extends AbstractDataSource {
         int recSizeBytes= getIntParameter("recLength", -1 );
         if ( recSizeBytes==-1 ) recSizeBytes= BufferDataSet.byteCount(columnType) * fieldCount;
         
-        final int recCount= length / recSizeBytes;
-        MutablePropertyDataSet ds = BufferDataSet.makeDataSet( 1, recSizeBytes, recOffset, recCount, 1, 1, buf, columnType );
+        final int frecCount= Math.min( length / recSizeBytes, recCount );
+        MutablePropertyDataSet ds = BufferDataSet.makeDataSet( 1, recSizeBytes, recOffset, frecCount, 1, 1, buf, columnType );
 
         if (dep0 > -1 || dep0Offset > -1 ) {
             String dep0Type = getParameter("depend0Type", columnType);
             if ( dep0Offset==-1 ) dep0Offset= BufferDataSet.byteCount(dep0Type) * dep0;
-            QDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, recCount, 1, 1, buf, dep0Type );
+            QDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, buf, dep0Type );
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         } else {
             final int finalRecSizeBytes= recSizeBytes;
             final int finalRecOffset= recOffset;
-            IndexGenDataSet dep0ds= new IndexGenDataSet(recCount) {
+            IndexGenDataSet dep0ds= new IndexGenDataSet(frecCount) {
                 @Override
                 public double value(int i) {
                     return offset + finalRecOffset + i * finalRecSizeBytes;
