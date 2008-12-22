@@ -6,6 +6,7 @@ package org.virbo.autoplot;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.logging.Logger;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import java.awt.Image;
@@ -15,6 +16,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Date;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,8 +27,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
-import org.das2.graph.DasColumn;
+import org.das2.system.DasLogger;
 import org.das2.util.AboutUtil;
+import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.util.PythonInterpreter;
@@ -40,6 +46,25 @@ import org.virbo.dsops.Ops;
  */
 public class SimpleServlet extends HttpServlet {
 
+    static FileHandler handler;
+    
+    private static void addHandlers( long requestId ) {
+        try {
+            FileHandler h = new FileHandler("/tmp/testservlet/log" + requestId + ".txt");
+            TimerConsoleFormatter form = new TimerConsoleFormatter();
+            form.setResetMessage("getImage");
+            h.setFormatter(form);
+            h.setLevel(Level.ALL);
+            DasLogger.addHandlerToAll(h);
+            if ( handler!=null ) handler.close();
+            handler= h;
+        } catch (IOException ex) {
+            Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -48,6 +73,17 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        long t0= System.currentTimeMillis();
+        String suniq= request.getParameter("requestId");
+        long uniq;
+        if ( suniq==null ) {
+            uniq= (long)(Math.random()*100);
+        } else {
+            uniq= Long.parseLong(suniq);
+            addHandlers(uniq);
+        }
+        
+        logit("-- new request "+uniq, t0,uniq);
         try {
 
             String surl = request.getParameter("url");
@@ -78,7 +114,7 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType("text/html");
                 String s = AboutUtil.getAboutHtml();
                 s = s.substring(0, s.length() - 7);
-                s = s + "<br><br>servlet version=20081013_1655<br></html>";
+                s = s + "<br><br>servlet version=20081029_1009<br></html>";
                 out.write(s.getBytes());
                 out.close();
                 return;
@@ -86,10 +122,14 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType(format);
             }
 
+            logit("get parameters",t0,uniq);
+            
             System.setProperty("java.awt.headless", "true");
 
             ApplicationModel appmodel = new ApplicationModel();
 
+            logit("create application model",t0,uniq);
+            
             if ("true".equals(request.getParameter("autolayout"))) {
                 appmodel.setAutolayout(true);
             } else {
@@ -103,7 +143,12 @@ public class SimpleServlet extends HttpServlet {
             appmodel.getCanvas().revalidate();
             appmodel.getCanvas().setPrintingTag("");
 
-            if (vap != null) appmodel.doOpen(new File(vap));
+            logit("set canvas parameters",t0,uniq);
+            
+            if (vap != null) {
+                appmodel.doOpen(new File(vap));
+                logit("opened vap",t0,uniq);
+            }
 
             if (!surl.equals("")) {
                 DataSource dsource;
@@ -114,26 +159,33 @@ public class SimpleServlet extends HttpServlet {
                 } catch (Exception ex) {
                     throw ex;
                 }
-
+                logit("got data source",t0,uniq);
+                
                 DatumRange timeRange=null;
                 if (!stimeRange.equals("")) {
                     timeRange = DatumRangeUtil.parseTimeRangeValid(stimeRange);
                     TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                     if (tsb != null) {
                         tsb.setTimeRange(timeRange);
+                        logit("timeSeriesBrowse got data source",t0,uniq);
                     }
                 }
 
                 if (!process.equals("")) {
                     QDataSet r = dsource.getDataSet(new NullProgressMonitor());
+                    logit("done with read",t0,uniq);
                     if (process.equals("histogram")) {
                         appmodel.setDataSet( Ops.histogram(r, 100 ) );
                     } else if ( process.equals("magnitude(fft)") ) {
                         r= Ops.magnitude(Ops.fft(r));
                         appmodel.setDataSet( r );
+                    } else if ( process.equals("nop") ) {
+                        appmodel.setDataSet( r );
                     }
+                    logit("done with process",t0,uniq);
                 } else {
                     appmodel.setDataSource(dsource);
+                    logit("done with setDataSource",t0,uniq);
                 }
                 
                 if (!stimeRange.equals("") ) {
@@ -141,6 +193,7 @@ public class SimpleServlet extends HttpServlet {
                     if ( UnitsUtil.isTimeLocation( appmodel.getPlot().getXAxis().getUnits() ) ) {
                         appmodel.getPlot().getXAxis().setDatumRange(timeRange);
                     }
+                    logit("done with setTimeRange",t0,uniq);
                 }
 
             }
@@ -164,6 +217,7 @@ public class SimpleServlet extends HttpServlet {
                 appmodel.canvas.setBackground(Color.decode(sbackgroundColor));
             }
 
+            logit("done with setStyle",t0,uniq);
             if (!script.equals("")) {
                 URL url = new URL(request.getRequestURL().toString());
                 URL scriptUrl = new URL(url, script);
@@ -174,13 +228,16 @@ public class SimpleServlet extends HttpServlet {
 
                 interp.execfile(AutoPlotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
 
-
+                logit("done with script",t0,uniq);
             }
-
+            
+            
+            
             if (format.equals("image/png")) {
-
+                logit("waiting for image",t0,uniq);
                 Image image = appmodel.canvas.getImage(width, height);
-
+                logit("got image",t0,uniq);
+                
                 DasPNGEncoder encoder = new DasPNGEncoder();
                 encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
                 try {
@@ -194,27 +251,30 @@ public class SimpleServlet extends HttpServlet {
                     }
                 }
             } else if (format.equals("application/pdf")) {
+                logit("do prepareForOutput",t0,uniq);
                 appmodel.canvas.prepareForOutput(width, height);
-
+                logit("done with prepareForOutput",t0,uniq);
                 GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
 
                 appmodel.canvas.writeToGraphicsOutput(out, go);
-
+                logit("done with write to output",t0,uniq);
             } else if (format.equals("image/svg+xml")) {
+                logit("do prepareForOutput...",t0,uniq);
                 appmodel.canvas.prepareForOutput(width, height);
-
+                logit("done with prepareForOutput",t0,uniq);
                 GraphicsOutput go = new org.das2.util.awt.SvgGraphicsOutput();
 
                 appmodel.canvas.writeToGraphicsOutput(out, go);
-
+                logit("done with write to output",t0,uniq);
             } else {
                 throw new IllegalArgumentException("format must be image/png, application/pdf, or image/svg+xml");
 
             }
 
-
+            
             out.close();
-
+            logit( "done with request",t0,uniq);
+            
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -250,4 +310,8 @@ public class SimpleServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    private void logit(String string, long t0,long id) {
+        System.err.printf("##%d# %s: %d\n", id, string, ( System.currentTimeMillis()-t0) );
+    }
 }
