@@ -269,10 +269,6 @@ public class URLSplit {
         if (file != null && iquery != -1) {
             fileEnd = iquery;
             params = rsurl.substring(iquery + 1);
-            int iquery2 = rsurl.indexOf("?", iquery + 1);
-            if (iquery2 != -1) {
-                throw new IllegalArgumentException("too many ??'s!");
-            }
         } else {
             iquery = rsurl.length();
             fileEnd = rsurl.length();
@@ -392,21 +388,17 @@ public class URLSplit {
     }
 
     /**
-     * convert " " to "+", etc, by looking for and encoding illegal characters.  Some characters, such as percents,
-     * are allowed in URLs but not URIs.
+     * convert " " to "+", etc, by looking for and encoding illegal characters.  
      * @param s
      * @return
      */
-    public static String uriEncode(String s) {
-        boolean isEncoded= s.contains("%25");
-        if ( isEncoded ) {
-            return s;
-        } else {
-            String r = s.replaceAll("%", "%25");
-            r = r.replaceAll(" ", "+");
-            r= r.replaceAll("\\%24", "\\$");
-            return r;
-        } 
+    public static String uriEncode(String surl) {
+        surl = surl.replaceAll("%([^0-9])", "%25$1");
+        surl = surl.replaceAll("<", "%3C");
+        surl = surl.replaceAll(">", "%3E");
+        surl = surl.replaceAll(" ", "+");
+        surl = surl.replaceAll("\\%24", "\\$");
+        return surl;
     }
 
     /**
