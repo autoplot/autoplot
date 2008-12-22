@@ -50,6 +50,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         model= new AsciiTableTableModel();
         
         jTable1.setModel( model );
+
         jTable1.setCellSelectionEnabled(true);
 
         jTable1.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -61,12 +62,13 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     if ( name!=null ) {
                         setColumn( name );
                     } else {
-                        setColumn( "" + (char) (col + 'A') );
+                        setColumn( "field" + col );
                     }
                 }
             }
         });
-
+        
+        
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
@@ -130,7 +132,6 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 819, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
@@ -146,6 +147,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(dep0Columns, 0, 164, Short.MAX_VALUE)
                     .add(columnsComboBox, 0, 164, Short.MAX_VALUE))
                 .add(434, 434, 434))
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 819, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -160,9 +162,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
                     .add(dep0Columns, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 370, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -176,6 +177,8 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
     setDep0( (String)dep0Columns.getSelectedItem() );
 }//GEN-LAST:event_dep0ColumnsItemStateChanged
 
+    URLSplit split= null;
+    
     protected File file = null;
     public static final String PROP_FILE = "file";
 
@@ -260,7 +263,7 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
 
     public void setUrl(String url) {
         try {
-            URLSplit split = URLSplit.parse(url);
+            split = URLSplit.parse(url);
             Map<String, String> params = URLSplit.parseParams(split.params);
 
             File f = DataSetURL.getFile( new URL(split.file), new NullProgressMonitor());
@@ -290,7 +293,7 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
     }
 
     public String getUrl() {
-        String surl=  URLSplit.uriDecode( this.file.toURI().toString() );
+        String surl=  "vap+dat:"+ URLSplit.uriDecode( split.file );
         String args="";
         if ( skipLines>1 ) {
             args+= "&skipLines="+skipLines;
