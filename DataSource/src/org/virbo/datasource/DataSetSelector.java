@@ -5,8 +5,6 @@
  */
 package org.virbo.datasource;
 
-import java.awt.Dialog;
-import java.awt.Dialog.ModalityType;
 import java.awt.Frame;
 import java.awt.Window;
 import org.das2.DasApplication;
@@ -38,9 +36,7 @@ import javax.swing.BoundedRangeModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
