@@ -21,14 +21,17 @@ public class Long extends BufferDataSet {
     }
 
     public void putValue(int i0, double d) {
+        ensureWritable();
         back.putLong( offset(i0), (long)d );
     }
 
     public void putValue(int i0, int i1, double d) {
+        ensureWritable();
         back.putLong( offset(i0, i1), (long)d );
     }
 
     public void putValue(int i0, int i1, int i2, double d) {
+        ensureWritable();
         back.putLong( offset(i0, i1, i2), (long)d );
     }
         

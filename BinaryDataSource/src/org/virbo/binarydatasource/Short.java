@@ -21,14 +21,17 @@ public class Short extends BufferDataSet {
     }
     
     public void putValue(int i0, double d) {
+        ensureWritable();
         back.putShort( offset(i0), (short)d );
     }
 
     public void putValue(int i0, int i1, double d) {
+        ensureWritable();
         back.putShort( offset(i0, i1), (short)d );
     }
 
     public void putValue(int i0, int i1, int i2, double d) {
+        ensureWritable();
         back.putShort( offset(i0, i1, i2), (short)d );
     }
 }
