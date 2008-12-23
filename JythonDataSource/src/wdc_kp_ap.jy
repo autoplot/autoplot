@@ -21,7 +21,7 @@ else:
 for line in fp:
     stime= syear + line[2:6]
     base_t2000= timeparser.parse( stime ).getTime( Units.t2000 )
-    for j in xrange(6):
+    for j in xrange(8):
        i= offs + j*2
        d= int( line[i:i+2] )
        timetags.putValue( -1, base_t2000 + 3600 * ( 1.5 + j*3 ) )
