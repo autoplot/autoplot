@@ -1,7 +1,9 @@
-#getAp= getParam( 'getAp', 0 )
-getAp=0
+getAp= getParam( 'getAp', 0 )
 
-file= '/home/jbf/Desktop/agu2008/data/wdc/ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/1942'
+if ( resourceURI==None ):
+   resourceURI= java.net.URI( 'file:///media/mini/data.backup/wdc/ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/1942' )
+
+file= getFile( resourceURI.toURL(), monitor ).toString()
 
 syear= file[-4:]
 
@@ -9,14 +11,18 @@ fp= open( file, "r" )
 
 import org
 
-timeparser= org.das2.util.TimeParser.create( '%Y%m%d' )
+timeparser= TimeParser.create( '%Y%m%d' )
 timetags= org.virbo.dsutil.DataSetBuilder( 1, 100 )
 kpap= org.virbo.dsutil.DataSetBuilder( 1, 100 )
 
 if ( getAp ):
    offs= 31
+   kpap.putProperty( QDataSet.NAME, 'Ap' )
+   kpap.putProperty( QDataSet.TITLE, 'Ap' )
 else:
    offs= 12
+   kpap.putProperty( QDataSet.NAME, 'Kp' )
+   kpap.putProperty( QDataSet.TITLE, 'Kp' )
 
 for line in fp:
     stime= syear + line[2:6]
