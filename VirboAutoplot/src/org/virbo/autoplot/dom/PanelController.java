@@ -42,6 +42,7 @@ public class PanelController {
     private static final String PENDING_RESET_RANGE = "resetRanges";
     Logger logger = Logger.getLogger("vap.panelController");
     private Application dom;
+    private ApplicationModel appmodel;  //TODO: get rid of this
     private Panel panel;
     private Set<String> pendingChanges = new HashSet<String>();
     private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
@@ -50,20 +51,32 @@ public class PanelController {
      */
     public static int SYMSIZE_DATAPOINT_COUNT = 500;
 
-    public PanelController( final ApplicationModel model, final Application dom, final Panel panel) {
+    public PanelController(final ApplicationModel model, final Application dom, final Panel panel) {
         panel.controller = this;
         this.dom = dom;
         this.panel = panel;
+        this.appmodel= model;
 
         panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
                 setRenderType(panel.getRenderType());
             }
         });
 
+        panel.addPropertyChangeListener(Panel.PROP_DATASOURCEFILTERID, new PropertyChangeListener() {
 
-        final DataSourceFilter dsf = panel.getDataSourceFilter();
+            public void propertyChange(PropertyChangeEvent evt) {
+                resetDataSource();
+            }
+        });
 
+    }
+
+    private void resetDataSource() {
+        assert (panel.getDataSourceFilterId() != null);
+        final DataSourceFilter dsf = getDataSourceFilter();
+        
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
@@ -84,11 +97,10 @@ public class PanelController {
             }
         });
 
-        setDataSourceFilterController( new DataSourceController( model, panel) );
-        
+        setDataSourceFilterController( getDataSourceFilter().getController() );
     }
 
-    public void setDataSourceFilterController( final DataSourceController dsc ) {
+    public void setDataSourceFilterController(final DataSourceController dsc) {
         dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
@@ -106,29 +118,29 @@ public class PanelController {
                         getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
                     }
 
-                    final DataSourceFilter dsf = panel.getDataSourceFilter();
+                    final DataSourceFilter dsf = getDataSourceFilter();
                     String reduceRankString = dsf.getController().getReduceDataSetString();
                     if (dsf.getController().getReduceDataSetString() != null) { // kludge to update title
-                        String title = dom.getPlot().getTitle();
+                        String title = dom.getController().getPlot().getTitle(); //TODO: fix
                         Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
                         Matcher m = p.matcher(title);
                         if (m.matches()) {
                             title = m.group(1) + "!c" + reduceRankString;
-                            getPlot().setTitle(title);
+                            getDasPlot().setTitle(title);
                         }
                     }
                 }
             }
         });
 
-        dsc.addPropertyChangeListener( DataSourceController.PROP_DATASOURCE, new PropertyChangeListener() {
+        dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
                 setResetRanges(true);
             }
         });
 
     }
-
 
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
@@ -162,7 +174,8 @@ public class PanelController {
     }
 
     public void setSuri(String surl) {
-        panel.getDataSourceFilter().setSuri(surl);
+        //TODO: see how this is used.  Should all the other guys listening to this change as well?
+        getDataSourceFilter().setSuri(surl);
     }
     protected Renderer renderer = null;
 
@@ -185,7 +198,7 @@ public class PanelController {
 
         pendingChanges.add(PENDING_RESET_RANGE);
 
-        DataSourceFilter dsf = panel.getDataSourceFilter();
+        DataSourceFilter dsf = getDataSourceFilter();
 
         RenderType renderType = AutoplotUtil.getRenderType(dsf.getController().getFillDataSet());
         panel.setRenderType(renderType);
@@ -218,7 +231,7 @@ public class PanelController {
      * @param interpretMetadata
      */
     public void doMetadata(Panel panelCopy, boolean autorange, boolean interpretMetadata) {
-        final DataSourceFilter dsf = panel.getDataSourceFilter();
+        final DataSourceFilter dsf = getDataSourceFilter();
         QDataSet fillDs = dsf.getController().getFillDataSet();
         Map<String, Object> properties = dsf.getController().getFillProperties();
 
@@ -237,7 +250,7 @@ public class PanelController {
 
             doInterpretMetadata(panelCopy, properties, panel.getRenderType());
 
-            String reduceRankString = panel.getDataSourceFilter().getController().getReduceDataSetString();
+            String reduceRankString = getDataSourceFilter().getController().getReduceDataSetString();
             if (dsf.getController().getReduceDataSetString() != null) {
                 String title = panelCopy.getPlotDefaults().getTitle();
                 title += "!c" + reduceRankString;
@@ -265,7 +278,7 @@ public class PanelController {
 
         Object v;
         final Plot plotDefaults = cpanel.getPlotDefaults();
-        
+
         if ((v = properties.get(QDataSet.TITLE)) != null) {
             plotDefaults.setTitle((String) v);
         }
@@ -296,9 +309,9 @@ public class PanelController {
                 plotDefaults.getYaxis().setLabel((String) v);
             }
 
-            if ( spec==RenderType.colorScatter ) {
+            if (spec == RenderType.colorScatter) {
                 v = properties.get(QDataSet.PLANE_0);
-                if ( v!=null ) {
+                if (v != null) {
                     Map m = (Map) v;
                     Object v2 = m.get(QDataSet.LABEL);
                     if (v2 != null) {
@@ -310,7 +323,7 @@ public class PanelController {
             } else {
                 plotDefaults.getZaxis().setLabel("");
             }
-            
+
         }
 
         if ((v = properties.get(QDataSet.DEPEND_0)) != null) {
@@ -324,20 +337,20 @@ public class PanelController {
 
     }
 
-    private void guessCadence( MutablePropertyDataSet xds, QDataSet fillDs ) {
-        Units xunits= (Units) xds.property( QDataSet.UNITS );
-            if ( xunits==null ) xunits= Units.dimensionless;
+    private void guessCadence(MutablePropertyDataSet xds, QDataSet fillDs) {
+        Units xunits = (Units) xds.property(QDataSet.UNITS);
+        if (xunits == null) xunits = Units.dimensionless;
 
-            Double cadence = DataSetUtil.guessCadence(xds, fillDs);
-            if ( cadence==null && !UnitsUtil.isTimeLocation(xunits)) {
-                cadence= DataSetUtil.guessCadence( Ops.log(xds),null );
-                if ( cadence!=null ) {
-                    ((MutablePropertyDataSet) xds).putProperty( QDataSet.SCALE_TYPE, "log" );
-                }
+        Double cadence = DataSetUtil.guessCadence(xds, fillDs);
+        if (cadence == null && !UnitsUtil.isTimeLocation(xunits)) {
+            cadence = DataSetUtil.guessCadence(Ops.log(xds), null);
+            if (cadence != null) {
+                xds.putProperty(QDataSet.SCALE_TYPE, "log");
             }
-            ((MutablePropertyDataSet) xds).putProperty(QDataSet.CADENCE, cadence);   
+        }
+        xds.putProperty(QDataSet.CADENCE, cadence);
     }
-    
+
     /**
      * this is the old updateFillSeries and updateFillSpectrogram code.  This calculates
      * ranges and preferred symbol settings, and puts the values in cpanel.plotDefaults.
@@ -346,14 +359,14 @@ public class PanelController {
      * @param spec
      */
     private void doAutoranging(Panel panelCopy) {
-        Map props = panel.getDataSourceFilter().getController().getFillProperties();
+        Map props = getDataSourceFilter().getController().getFillProperties();
         RenderType spec = panelCopy.getRenderType();
 
         if (props == null) {
             props = Collections.EMPTY_MAP;
         }
 
-        QDataSet fillDs = panel.getDataSourceFilter().getController().getFillDataSet();
+        QDataSet fillDs = getDataSourceFilter().getController().getFillDataSet();
 
         if (spec == RenderType.spectrogram) {
 
@@ -366,10 +379,10 @@ public class PanelController {
             if (yds == null) {
                 yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); // QUBE
             }
-            
-            guessCadence( (MutablePropertyDataSet)xds, fillDs ); 
-            guessCadence( (MutablePropertyDataSet)yds, null );
-            
+
+            guessCadence((MutablePropertyDataSet) xds, fillDs);
+            guessCadence((MutablePropertyDataSet) yds, null);
+
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
             AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, (Map) props.get(QDataSet.DEPEND_1));
@@ -400,28 +413,28 @@ public class PanelController {
 
             panelCopy.getPlotDefaults().getYaxis().setLog(desc.log);
             panelCopy.getPlotDefaults().getYaxis().setRange(desc.range);
-            
+
             QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             if (xds == null) {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
             }
 
-            guessCadence( (MutablePropertyDataSet)xds, fillDs);
+            guessCadence((MutablePropertyDataSet) xds, fillDs);
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
             panelCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
             panelCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
 
-            if ( spec==RenderType.colorScatter ) {
-                AutoplotUtil.AutoRangeDescriptor zdesc = AutoplotUtil.autoRange( (QDataSet) fillDs.property(QDataSet.PLANE_0),
-                         (Map) props.get(QDataSet.PLANE_0) );
+            if (spec == RenderType.colorScatter) {
+                AutoplotUtil.AutoRangeDescriptor zdesc = AutoplotUtil.autoRange((QDataSet) fillDs.property(QDataSet.PLANE_0),
+                        (Map) props.get(QDataSet.PLANE_0));
                 panelCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
                 panelCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
                 panelCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
-                
+
             }
-            
+
             if (fillDs.length() > 30000) {
                 panelCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
                 panelCopy.getStyle().setSymbolSize(1.0);
@@ -434,20 +447,24 @@ public class PanelController {
                 }
 
             }
-            
+
         }
     }
 
-    /**
-     * get the plotDefaults object for this panel.
-     * @return
-     */
-    public DasPlot getPlot() {
+    public DasPlot getDasPlot() {
         return dom.getController().getPlotFor(panel).getController().getDasPlot();
     }
 
     private DasColorBar getColorbar() {
         return dom.getController().getPlotFor(panel).getController().getDasColorBar();
+    }
+
+    /**
+     * return the data source and filter for this panel.
+     * @return
+     */
+    public DataSourceFilter getDataSourceFilter() {
+        return dom.getController().getDataSourceFilterFor(panel);
     }
 
     /**
@@ -473,17 +490,17 @@ public class PanelController {
      * @param renderType
      */
     public void setRenderType(RenderType renderType) {
-        if ( panel.getDataSourceFilter().getController().getFillDataSet()!=null ) {
-            
+        if (getDataSourceFilter().getController().getFillDataSet() != null) {
+
             // getRenderers sets the dataset.
-            List<Renderer> rs = AutoplotUtil.getRenderers( panel.getDataSourceFilter().getController().getFillDataSet(),
+            List<Renderer> rs = AutoplotUtil.getRenderers(getDataSourceFilter().getController().getFillDataSet(),
                     renderType, Collections.singletonList(getRenderer()), getColorbar());
 
             assert rs.size() == 1;
 
             setRenderer(rs.get(0));
 
-            DasPlot plot = getPlot();
+            DasPlot plot = getDasPlot();
 
             Renderer[] rends = plot.getRenderers();
             for (int i = 0; i < rends.length; i++) {
@@ -494,34 +511,34 @@ public class PanelController {
 
     }
 
-    public synchronized void bindTo(SeriesRenderer seriesRenderer) {   
-        ApplicationController ac= this.dom.getController();
+    public synchronized void bindTo(SeriesRenderer seriesRenderer) {
+        ApplicationController ac = this.dom.getController();
 
-        ac.bind( panel, "style.lineWidth", seriesRenderer, "lineWidth");
-        ac.bind( panel, "style.color", seriesRenderer, "color");
-        ac.bind( panel, "style.symbolSize", seriesRenderer, "symSize");
-        ac.bind( panel, "style.symbolConnector", seriesRenderer, "psymConnector");
-        ac.bind( panel, "style.plotSymbol", seriesRenderer, "psym");
-        ac.bind( panel, "style.fillColor", seriesRenderer, "fillColor");
-        ac.bind( panel, "style.fillToReference", seriesRenderer, "fillToReference");
-        ac.bind( panel, "style.reference", seriesRenderer, "reference");
+        ac.bind(panel, "style.lineWidth", seriesRenderer, "lineWidth");
+        ac.bind(panel, "style.color", seriesRenderer, "color");
+        ac.bind(panel, "style.symbolSize", seriesRenderer, "symSize");
+        ac.bind(panel, "style.symbolConnector", seriesRenderer, "psymConnector");
+        ac.bind(panel, "style.plotSymbol", seriesRenderer, "psym");
+        ac.bind(panel, "style.fillColor", seriesRenderer, "fillColor");
+        ac.bind(panel, "style.fillToReference", seriesRenderer, "fillToReference");
+        ac.bind(panel, "style.reference", seriesRenderer, "reference");
 
     }
-    
+
     public void bindTo(SpectrogramRenderer spectrogramRenderer) {
-        ApplicationController ac= this.dom.getController();
+        ApplicationController ac = this.dom.getController();
 
-        ac.bind( panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
-        ac.bind( panel, "style.colortable", spectrogramRenderer, "colorBar.type");
+        ac.bind(panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
+        ac.bind(panel, "style.colortable", spectrogramRenderer, "colorBar.type");
 
     }
-    
+
     public boolean isValueAdjusting() {
         return false;
     }
 
     public boolean isPendingChanges() {
-        return panel.getDataSourceFilter().getController().isPendingChanges() || pendingChanges.size() > 0;
+        return getDataSourceFilter().getController().isPendingChanges() || pendingChanges.size() > 0;
     }
 
     private void setStatus(String string) {

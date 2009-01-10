@@ -7,9 +7,7 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import org.virbo.autoplot.ApplicationModel.RenderType;
 
 /**
@@ -26,15 +24,13 @@ public class Panel extends DomNode {
             }
         };
         style.addPropertyChangeListener(childListener);
-        dataSourceFilter.addPropertyChangeListener(childListener);
+
     }
 
     private PropertyChangeEvent promoteChild(PropertyChangeEvent ev) {
         String childName;
         if (ev.getSource() == style) {
             childName = "style";
-        } else if (ev.getSource() == dataSourceFilter) {
-            childName = "dataSourceFilter";
         } else if (ev.getSource() == plotDefaults) {
             childName = "plotDefaults";
         } else {
@@ -43,19 +39,22 @@ public class Panel extends DomNode {
         return new PropertyChangeEvent(this, childName + "." + ev.getPropertyName(), ev.getOldValue(), ev.getNewValue());
     }
 
-    
-    protected DataSourceFilter dataSourceFilter = new DataSourceFilter();
-    public static final String PROP_DATASOURCEFILTER = "dataSourceFilter";
+    /**
+     * reference to the datasource of this panel.  Several panels can share the same data source.
+     */
+    protected String dataSourceFilterId;
+    public static final String PROP_DATASOURCEFILTERID = "dataSourceFilterId";
 
-    public DataSourceFilter getDataSourceFilter() {
-        return dataSourceFilter;
+    public String getDataSourceFilterId() {
+        return dataSourceFilterId;
     }
 
-    public void setDataSourceFilter(DataSourceFilter dataSourceFilter) {
-        DataSourceFilter oldDataSourceFilter = this.dataSourceFilter;
-        this.dataSourceFilter = dataSourceFilter;
-        propertyChangeSupport.firePropertyChange(PROP_DATASOURCEFILTER, oldDataSourceFilter, dataSourceFilter);
+    public void setDataSourceFilterId(String dataSourceFilterId) {
+        String oldDataSourceFilterId = this.dataSourceFilterId;
+        this.dataSourceFilterId = dataSourceFilterId;
+        propertyChangeSupport.firePropertyChange(PROP_DATASOURCEFILTERID, oldDataSourceFilterId, dataSourceFilterId);
     }
+
     protected PanelStyle style = new PanelStyle();
     public static final String PROP_STYLE = "style";
 
@@ -68,6 +67,7 @@ public class Panel extends DomNode {
         this.style = style;
         propertyChangeSupport.firePropertyChange(PROP_STYLE, oldStyle, style);
     }
+    
     /**
      * preferred settings for the panel.
      */
@@ -95,6 +95,7 @@ public class Panel extends DomNode {
         this.renderType = renderType;
         propertyChangeSupport.firePropertyChange(PROP_RENDERTYPE, oldRenderType, renderType);
     }
+    
     /**
      * id of the plotDefaults containing the panel.
      */
@@ -110,6 +111,29 @@ public class Panel extends DomNode {
         this.plotId = plotId;
         propertyChangeSupport.firePropertyChange(PROP_PLOTID, oldPlotId, plotId);
     }
+    
+    
+    /**
+     * selects the component of the dataset to plot, such as "X" or "MAGNITUDE".  These
+     * component names come from the dataset labels.  Canonical names are 
+     * X, Y, Z, MAGNITUDE.  A use case to consider is automatic coordinate frame 
+     * conversions.
+     */
+    protected String component="";
+    public static final String PROP_COMPONENT = "component";
+
+    public String getComponent() {
+        return component;
+    }
+
+    public void setComponent(String component) {
+        String oldComponent = this.component;
+        this.component = component;
+        propertyChangeSupport.firePropertyChange(PROP_COMPONENT, oldComponent, component);
+    }
+
+    
+    
     PanelController controller;
 
     public PanelController getController() {
@@ -130,7 +154,6 @@ public class Panel extends DomNode {
         Panel result = (Panel) super.copy();
         result.controller= null;
         result.style = (PanelStyle) style.copy();
-        result.dataSourceFilter = (DataSourceFilter) dataSourceFilter.copy();
         result.plotDefaults = (Plot) plotDefaults.copy();
         return result;
     }
@@ -145,8 +168,9 @@ public class Panel extends DomNode {
         if ( !that.plotId.equals( this.plotId ) ) {
             result.add( new PropertyChangeDiff( "plotId", that.plotId, this.plotId ) );
         }
-        
-        result.addAll( DomUtil.childDiffs("dataSourceFilter", this.getDataSourceFilter().diffs(that.getDataSourceFilter()) ) );
+        if ( !that.dataSourceFilterId.equals( this.dataSourceFilterId ) ) {
+            result.add( new PropertyChangeDiff( "dataSourceFilterId", that.dataSourceFilterId, this.dataSourceFilterId ) );
+        }
         
         result.addAll( DomUtil.childDiffs("style", this.getStyle().diffs(that.getStyle()) ) );
         result.addAll( DomUtil.childDiffs("plotDefaults", this.getPlotDefaults().diffs(that.getPlotDefaults()) ) );
@@ -157,7 +181,7 @@ public class Panel extends DomNode {
     public void syncTo(DomNode n) {
         Panel that = (Panel) n;
         this.setPlotId(that.getPlotId());
-        this.dataSourceFilter.syncTo(that.dataSourceFilter);
+        this.setDataSourceFilterId( that.getDataSourceFilterId() );
         this.style.syncTo(that.style);
         this.plotDefaults.syncTo(that.plotDefaults);
     }
@@ -165,7 +189,7 @@ public class Panel extends DomNode {
     public void syncTo( DomNode n, List<String> exclude ) {
         Panel that = (Panel) n;
         if ( !exclude.contains("plotId") ) this.setPlotId(that.getPlotId());
-        this.dataSourceFilter.syncTo(that.dataSourceFilter, DomUtil.childProperties( exclude, "dataSourceFilter" ) );
+        if ( !exclude.contains("dataSourceFilterId") ) this.setDataSourceFilterId(that.getDataSourceFilterId());
         this.style.syncTo(that.style);
         this.plotDefaults.syncTo(that.plotDefaults);
     }

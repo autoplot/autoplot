@@ -114,7 +114,12 @@ public class DomUtil {
         return result;
     }
     
-    
+    /**
+     * return the node with this id.
+     * @param root
+     * @param id
+     * @return
+     */
     public static DomNode getElementById( DomNode root, String id) {
         if ( id==null || id.equals("") ) {
             throw new IllegalArgumentException("id cannot be null or zero-length string");

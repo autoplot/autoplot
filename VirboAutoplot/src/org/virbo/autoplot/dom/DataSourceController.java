@@ -80,13 +80,13 @@ public class DataSourceController {
     private static final String PENDING_FILL_DATASET = "fillDataSet";
     private static final String PENDING_UPDATE = "update";
 
-    public DataSourceController( ApplicationModel model, final Panel panel ) {
+    public DataSourceController( ApplicationModel model, final Panel panel, DataSourceFilter dsf ) {
 
         this.model = model;
         this.dom = model.getDocumentModel();
         this.panel = panel;
         this.panelController = panel.getController();
-        this.dsf = panel.getDataSourceFilter();
+        this.dsf = dsf;
         this.dsf.controller = this;
 
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, updateSlicePropertyChangeListener);
@@ -161,7 +161,7 @@ public class DataSourceController {
         }
     }
 
-    public void setDataSource(DataSource dataSource) {
+    public synchronized void setDataSource(DataSource dataSource) {
 
         if (timeSeriesBrowseController != null) {
             timeSeriesBrowseController.release();
@@ -323,8 +323,7 @@ public class DataSourceController {
         pendingChanges.add(PENDING_FILL_DATASET);
         logger.fine("enter updateFill");
 
-        final DataSourceFilter dsf = panel.getDataSourceFilter();
-
+        
         if (getDataSet() == null) {
             return;
         }
@@ -425,7 +424,7 @@ public class DataSourceController {
         }
 
         if ( getTsb() != null) {
-            String oldsurl = panel.getDataSourceFilter().getSuri();
+            String oldsurl = dsf.getSuri();
             String newsurl = getTsb().getURL().toString();
             URLSplit split = URLSplit.parse(newsurl);
             if (oldsurl != null) {
@@ -446,7 +445,7 @@ public class DataSourceController {
      */
     public synchronized void update(final boolean autorange, final boolean interpretMeta) {
         pendingChanges.add(PENDING_UPDATE);
-        DataSourceFilter dsf = panel.getDataSourceFilter();
+        
         _setDataSet(null);
 
         Runnable run = new Runnable() {
@@ -650,7 +649,7 @@ public class DataSourceController {
     /**
      * load the data set from the DataSource.
      */
-    private QDataSet loadDataSet() {
+    private synchronized QDataSet loadDataSet() {
 
         ProgressMonitor mymon;
 
@@ -693,7 +692,7 @@ public class DataSourceController {
      * @param mon
      */
     public void setSuri(String suri, ProgressMonitor mon) {
-        panel.getDataSourceFilter().setSuri(suri);
+        dsf.setSuri(suri);
     }
 
     /**
@@ -702,9 +701,9 @@ public class DataSourceController {
      * @param mon
      */
     public void resetSuri(String suri, ProgressMonitor mon) {
-        String old= panel.getDataSourceFilter().getSuri();
+        String old= dsf.getSuri();
         if ( old!=null && old.equals( suri ) ) {
-            panel.getDataSourceFilter().setSuri(null);
+            dsf.setSuri(null);
         }
         setSuri(suri,mon);
     }
@@ -767,8 +766,6 @@ public class DataSourceController {
     private void guessSliceDimension() {
            int lat = -1, lon = -1;
 
-        Panel p = dom.getPanel();
-
         int[] slicePref = new int[]{1, 1, 1};
         for (int i = 0; i < getDepnames().size(); i++) {
             String n = getDepnames().get(i);
@@ -798,10 +795,10 @@ public class DataSourceController {
         }
 
         if (lat > -1 && lon > -1 && lat < lon) {
-            p.getDataSourceFilter().setTranspose(true);
+            dsf.setTranspose(true);
         }
 
-        p.getDataSourceFilter().setSliceDimension(sliceIndex);
+        dsf.setSliceDimension(sliceIndex);
 
     }
 
@@ -820,7 +817,7 @@ public class DataSourceController {
 
     private ProgressMonitor getMonitor(String label, String description) {
         DasCanvas canvas = model.getCanvas();
-        DasPlot p = this.panel.getController().getPlot();
+        DasPlot p = this.panel.getController().getDasPlot();
         return canvas.getApplication().getMonitorFactory().getMonitor(p, label, description);
 
     }

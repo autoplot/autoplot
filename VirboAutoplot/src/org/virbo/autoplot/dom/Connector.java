@@ -7,7 +7,7 @@ package org.virbo.autoplot.dom;
 
 /**
  * Two plots are joined together to connect axes.  
- * 
+ * The class is intended to be immutable, but because XMLDecoder is used it must be mutable.
  * @author jbf
  */
 public class Connector  {

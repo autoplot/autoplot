@@ -80,8 +80,29 @@ public class ApplicationController {
         bindingImpls = new HashMap<BindingModel, Binding>();
         connectorImpls = new HashMap<Connector, ColumnColumnConnector>();
 
+        addListeners();
     }
 
+
+    private void addListeners() {
+       this.addPropertyChangeListener( ApplicationController.PROP_PANEL, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                Panel p= getPanel();
+                if ( p!=null ) {
+                    setDataSourceFilter( getDataSourceFilterFor(p) );
+                    setPlot( getPlotFor(p) );
+                } else {
+                    setDataSourceFilter( null );
+                }
+            }
+        });
+    }
+    
+    /**
+     * add a canvas to the application.  Currently, only one canvas is supported, so this
+     * will have unanticipated effects if called more than once.
+     * @return
+     */
     public DasCanvas addCanvas() {
         logger.fine("enter addCanvas");
         //if ( canvas!=null ) throw new IllegalArgumentException("only one canvas for now");
@@ -95,7 +116,9 @@ public class ApplicationController {
 
         layoutListener = new LayoutListener(model);
 
-        application.setCanvas(canvas);
+        application.setCanvases( new Canvas[] { canvas } );
+        setCanvas(canvas);
+        
         bindTo(dasCanvas);
 
         canvas.getController().bindTo(outerRow, outerColumn);
@@ -109,7 +132,7 @@ public class ApplicationController {
         if (currentIdx == -1) throw new IllegalArgumentException("deletePanel but panel isn't part of application");
         if (application.panels.size() < 2) throw new IllegalArgumentException("last panel may not be deleted");
 
-        DasPlot p = panel.getController().getPlot();
+        DasPlot p = panel.getController().getDasPlot();
         if (p != null) {
             Renderer r = panel.getController().getRenderer();
             if (r != null) p.removeRenderer(r);
@@ -119,18 +142,18 @@ public class ApplicationController {
 
         ArrayList<Panel> panels = new ArrayList<Panel>(Arrays.asList(application.getPanels()));
         panels.remove(panel);
-        if (!panels.contains(application.panel)) {  // reset the focus panel
+        if (!panels.contains(getPanel())) {  // reset the focus panelId
             if (panels.size() == 0) {
-                application.setPanel(null);
+                setPanel(null);
             } else {
-                application.setPanel(panels.get(0)); // maybe use currentIdx
+                setPanel(panels.get(0)); // maybe use currentIdx
             }
         }
         application.setPanels(panels.toArray(new Panel[panels.size()]));
     }
 
     /**
-     * adds a context overview plot below the plot.
+     * adds a context overview plotId below the plotId.
      * @param domPlot
      */
     protected void addConnector(Plot domPlot, Plot that) {
@@ -158,7 +181,7 @@ public class ApplicationController {
         overviewPlotConnector.getMouseAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(upper, lower));
         canvas.add(overviewPlotConnector);
 
-    //TODO: disconnect/delete if one plot is deleted.
+    //TODO: disconnect/delete if one plotId is deleted.
 
     }
 
@@ -193,13 +216,16 @@ public class ApplicationController {
     }
 
     /**
-     * add a panel to the application.
+     * add a panelId to the application.
      * @return
      */
     public synchronized Panel addPanel(Plot domPlot) {
         logger.fine("enter addPanel");
         final Panel panel = new Panel();
+        final DataSourceFilter dsf= new DataSourceFilter();
+        
         new PanelController(this.model, application, panel);
+        new DataSourceController( this.model, panel, dsf );
 
         if (domPlot == null) {
             domPlot = addPlot();
@@ -207,16 +233,16 @@ public class ApplicationController {
 
         domPlot.getController().getDasPlot().getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(panel));
 
-        final int panelIdNum = this.panelIdNum++;
-        panel.setId("panel_" + panelIdNum);
-        panel.getDataSourceFilter().setId("data_" + panelIdNum);
+        final int fpanelIdNum = this.panelIdNum++;
+        panel.setId("panel_" + fpanelIdNum);
+        dsf.setId("data_" + fpanelIdNum);
 
         /*  final Plot fplot = domPlot;
         
         // bind it to the common range if it looks compatible
-        panel.getPlotDefaults().getXaxis().addPropertyChangeListener(Axis.PROP_RANGE, new PropertyChangeListener() {
+        panelId.getPlotDefaults().getXaxis().addPropertyChangeListener(Axis.PROP_RANGE, new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-        DatumRange dr = panel.getPlotDefaults().getXaxis().getRange();
+        DatumRange dr = panelId.getPlotDefaults().getXaxis().getRange();
         DatumRange appRange = application.getTimeRange();
         if (appRange.getUnits().isConvertableTo(dr.getUnits()) && appRange.intersects(dr)) {
         bind(application, Application.PROP_TIMERANGE, fplot, "xaxis." + Axis.PROP_RANGE);
@@ -224,8 +250,8 @@ public class ApplicationController {
         }
         }); */
 
-        panel.getStyle().setId("style_" + panelIdNum);
-        panel.getPlotDefaults().setId("plot_defaults_" + panelIdNum);
+        panel.getStyle().setId("style_" + fpanelIdNum);
+        panel.getPlotDefaults().setId("plot_defaults_" + fpanelIdNum);
 
         panel.addPropertyChangeListener(Panel.PROP_PLOTID, new PropertyChangeListener() {
 
@@ -245,14 +271,21 @@ public class ApplicationController {
             }
         });
 
-        panel.setPlotId(domPlot.getId());
+        List<DataSourceFilter> dataSourceFilters = new ArrayList<DataSourceFilter>( Arrays.asList( this.application.getDataSourceFilters()) );
+        dataSourceFilters.add(dsf);
+        this.application.setDataSourceFilters( dataSourceFilters.toArray(new DataSourceFilter[dataSourceFilters.size()]));
 
+        setDataSourceFilter(dsf);
+        
+        panel.setPlotId(domPlot.getId());
+        panel.setDataSourceFilterId( dsf.getId() );
+        
         List<Panel> panels = new ArrayList<Panel>(Arrays.asList(this.application.getPanels()));
         panels.add(panel);
         this.application.setPanels(panels.toArray(new Panel[panels.size()]));
         panel.addPropertyChangeListener(application.childListener);
-        application.setPanel(panel);
-
+        setPanel(panel);
+                        
         return panel;
     }
 
@@ -271,13 +304,13 @@ public class ApplicationController {
                 if (ps.size() > 0) {
                     Panel p = ApplicationController.this.getPanelsFor(domPlot).get(0);
                     logger.fine("focus to " + p);
-                    setFocusUri(p.getDataSourceFilter().getSuri());
-                    if (application.getPanel() != p) {
+                    setFocusUri(p.getController().getDataSourceFilter().getSuri());
+                    if ( getPanel() != p) {
                         setStatus("" + p + " selected");
-                        application.setPanel(p);
+                        setPanel(p);
                     }
                 }
-                application.setPlot(domPlot);
+                setPlot(domPlot);
 
             }
 
@@ -325,7 +358,7 @@ public class ApplicationController {
 
         canvas.add(plot, row, col);
 
-        // the axes need to know about the plot, so they can do reset axes units properly.
+        // the axes need to know about the plotId, so they can do reset axes units properly.
         plot.getXAxis().setPlot(plot);
         plot.getYAxis().setPlot(plot);
 
@@ -334,7 +367,7 @@ public class ApplicationController {
         BoxZoomMouseModule boxmm = (BoxZoomMouseModule) plot.getMouseAdapter().getModuleByLabel("Box Zoom");
         plot.getMouseAdapter().setPrimaryModule(boxmm);
 
-        //plot.getMouseAdapter().addMouseModule( new AnnotatorMouseModule(plot) ) ;
+        //plotId.getMouseAdapter().addMouseModule( new AnnotatorMouseModule(plotId) ) ;
 
         canvas.add(colorbar, plot.getRow(), DasColorBar.getColorBarColumn(plot.getColumn()));
         colorbar.setVisible(false);
@@ -376,7 +409,7 @@ public class ApplicationController {
                 Renderer r = plot.getFocusRenderer();
                 if (r == null) return;
                 Panel p = findPanel(r);
-                application.setPanel(p);
+                setPanel(p);
             }
         });
 
@@ -385,7 +418,7 @@ public class ApplicationController {
         application.setPlots(plots.toArray(new Plot[plots.size()]));
 
         domPlot.addPropertyChangeListener(application.childListener);
-        application.setPlot(domPlot);
+        setPlot(domPlot);
 
         if (plots.size() == 1) {
             bind(application, Application.PROP_TIMERANGE, domPlot, "xaxis." + Axis.PROP_RANGE);
@@ -399,7 +432,7 @@ public class ApplicationController {
     }
 
     /**
-     * find the panel using this renderer.
+     * find the panelId using this renderer.
      * @param rend
      * @return
      */
@@ -422,13 +455,15 @@ public class ApplicationController {
         Panel panel = p.get(0);
         Panel newp = addPanel(newPlot);
         String plotId = newp.getPlotId();
-        newp.syncTo(panel, Arrays.asList("plotId", "dataSourceFilter.suri"));
+        String dataId= newp.getDataSourceFilterId();
+        newp.syncTo(panel, Arrays.asList("plotId", "dataSourceFilterId","dataSourceFilter.suri"));
         newp.setPlotId(plotId);
-        if (panel.getDataSourceFilter().getSuri() == null) {
-            newp.getDataSourceFilter().getController().setDataSetInternal(panel.getDataSourceFilter().getController().getDataSet(), true);
+        newp.setDataSourceFilterId(dataId);
+        if (panel.getController().getDataSourceFilter().getSuri() == null) {
+            newp.getController().getDataSourceFilter().getController().setDataSetInternal(panel.getController().getDataSourceFilter().getController().getDataSet(), true);
         } else {
-            newp.getDataSourceFilter().getController().setDataSetInternal(panel.getDataSourceFilter().getController().getDataSet(), true);
-            newp.getDataSourceFilter().suri = panel.getDataSourceFilter().getSuri();
+            newp.getController().getDataSourceFilter().getController().setDataSetInternal(panel.getController().getDataSourceFilter().getController().getDataSet(), true);
+            newp.getController().getDataSourceFilter().suri = panel.getController().getDataSourceFilter().getSuri();
         }
         return newPlot;
 
@@ -473,17 +508,39 @@ public class ApplicationController {
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
         plots.remove(domPlot);
 
-        if (!plots.contains(application.getPlot())) {
+        if (!plots.contains(getPlot())) {
             if (plots.size() == 0) {
-                application.setPlot(null);
+                setPlot(null);
             } else {
-                application.setPlot(plots.get(0));
+                setPlot(plots.get(0));
             }
         }
         application.setPlots(plots.toArray(new Plot[plots.size()]));
 
     }
 
+    public synchronized void deleteDataSourceFilter(DataSourceFilter dsf) {
+        if (!application.dataSourceFilters.contains(dsf)) throw new IllegalArgumentException("plot is not in this application");
+        if (application.dataSourceFilters.size() < 2) throw new IllegalArgumentException("last plot cannot be deleted");
+
+        List<Panel> panels = this.getPanelsFor(dsf);
+        if (panels.size() > 0) throw new IllegalArgumentException("plot must not have panels before deleting");
+
+        unbind(dsf);
+
+        List<DataSourceFilter> dsfs = new ArrayList<DataSourceFilter>(Arrays.asList(application.getDataSourceFilters()));
+        dsfs.remove(dsf);
+
+        if (!dsfs.contains(getDataSourceFilter())) {
+            if (dsfs.size() == 0) {
+                setDataSourceFilter(null);
+            } else {
+                setDataSourceFilter(dsfs.get(0));
+            }
+        }
+        application.setDataSourceFilters(dsfs.toArray(new DataSourceFilter[dsfs.size()]));
+        
+    }    
     /**
      * binds two bean properties together.  Bindings are bidirectional, but
      * the initial copy is from src to dst.  In MVC terms, src should be the model
@@ -642,7 +699,7 @@ public class ApplicationController {
         plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Panel Properties") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel p = application.getPanel();
+                Panel p = getPanel();
                 PropertyEditor pp = new PropertyEditor(p);
                 pp.showDialog(plot.getCanvas());
             }
@@ -789,10 +846,10 @@ public class ApplicationController {
     }
 
     /**
-     * return the plot containing this panel.
-     * @param panel
-     * @return the Plot or null if no plot is found.
-     * @throws IllegalArgumentException if the panel is not a child of the application
+     * return the plotId containing this panelId.
+     * @param panelId
+     * @return the Plot or null if no plotId is found.
+     * @throws IllegalArgumentException if the panelId is not a child of the application
      */
     public Plot getPlotFor(Panel panel) {
         if (!application.panels.contains(panel)) {
@@ -819,6 +876,96 @@ public class ApplicationController {
         return result;
     }
 
+    
+    DataSourceFilter getDataSourceFilterFor( Panel panel ) {
+        String id = panel.getDataSourceFilterId();
+        DataSourceFilter result = null;
+        for (DataSourceFilter dsf : application.getDataSourceFilters()) {
+            if (dsf.getId().equals(id)) {
+                result = dsf;
+            }
+        }
+        return result;        
+    }
+
+    List<Panel> getPanelsFor(DataSourceFilter plot) {
+        String id = plot.getId();
+        List<Panel> result = new ArrayList<Panel>();
+        for (Panel p : application.getPanels()) {
+            if (p.getDataSourceFilterId().equals(id)) {
+                result.add(p);
+            }
+        }
+        return result;
+    }
+    
+
+    /** focus **/
+    
+    /**
+     * focus panel
+     */
+    protected Panel panel;
+    public static final String PROP_PANEL = "panel";
+
+    public Panel getPanel() {
+        return panel;
+    }
+
+    public void setPanel(Panel panel) {
+        Panel oldPanel = this.panel;
+        this.panel = panel;
+        propertyChangeSupport.firePropertyChange(PROP_PANEL, oldPanel, panel);
+    }
+    
+    /**
+     * focus plot.
+     */
+    protected Plot plot;
+    public static final String PROP_PLOT = "plot";
+
+    public Plot getPlot() {
+        return plot;
+    }
+
+    public void setPlot(Plot plot) {
+        Plot oldPlot = this.plot;
+        this.plot = plot;
+        propertyChangeSupport.firePropertyChange(PROP_PLOT, oldPlot, plot);
+    }
+
+    /**
+     * focus canvas.
+     */
+    protected Canvas canvas = new Canvas();
+    public static final String PROP_CANVAS = "canvas";
+
+    public Canvas getCanvas() {
+        return canvas;
+    }
+
+    public void setCanvas(Canvas canvas) {
+        Canvas oldCanvas = this.canvas;
+        this.canvas = canvas;
+        propertyChangeSupport.firePropertyChange(PROP_CANVAS, oldCanvas, canvas);
+    }
+    
+    /**
+     * focus dataSourceFilter.
+     */
+    protected DataSourceFilter dataSourceFilter;
+    public static final String PROP_DATASOURCEFILTER = "dataSourceFilter";
+
+    public DataSourceFilter getDataSourceFilter() {
+        return dataSourceFilter;
+    }
+
+    public void setDataSourceFilter(DataSourceFilter dataSourceFilter) {
+        DataSourceFilter oldDataSourceFilter = this.dataSourceFilter;
+        this.dataSourceFilter = dataSourceFilter;
+        propertyChangeSupport.firePropertyChange(PROP_DATASOURCEFILTER, oldDataSourceFilter, dataSourceFilter);
+    }
+
     private void bindTo(DasCanvas canvas) {
         ApplicationController ac = this;
         ac.bind(application, "options.background", canvas, "background");
@@ -826,15 +973,6 @@ public class ApplicationController {
         ac.bind(application, "options.canvasFont", canvas, "font");
     }
 
-    private void bindTo(DasPlot plot) {
-        ApplicationController ac = this;
-        ac.bind(application, "plot.title", plot, "title");
-        ac.bind(application, "plot.xaxis.label", plot, "XAxis.label");
-        ac.bind(application, "plot.yaxis.label", plot, "YAxis.label");
-        ac.bind(application, "plot.zaxis.label", plot, "ZAxis.label");
-        ac.bind(application, "options.drawGrid", plot, "drawGrid");
-        ac.bind(application, "options.drawMinorGrid", plot, "drawMinorGrid");
-    }
 
     /**
      * true if running in headless environment
@@ -844,7 +982,7 @@ public class ApplicationController {
     }
 
     public DasCanvas getDasCanvas() {
-        return application.getCanvas().getController().getDasCanvas();
+        return getCanvas().getController().getDasCanvas();
     }
 
     public DasRow getRow() {

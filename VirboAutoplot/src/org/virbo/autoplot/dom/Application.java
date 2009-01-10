@@ -35,35 +35,46 @@ public class Application extends DomNode {
     private PropertyChangeEvent promoteChild(PropertyChangeEvent ev) {
         String childName;
         final Object source = ev.getSource();
-        if (source == panel) {
-            childName = "panel";
-        } else if (Application.this.panels.contains(source)) {
+        if (Application.this.panels.contains(source)) {
             childName = "panels[" + panels.indexOf(source) + "]";
         } else if (source == options) {
             childName = "options";
-        } else if (source == plot) {
-            childName = "plot";
-        } else if (plots.contains(source)) {
+        } else if (plots.contains(source)) { //TODO: change plots to array from list.
             childName = "plots[" + plots.indexOf(source) + "]";
-        } else if (source == canvas) {
-            childName = "canvas";
+        } else if ( dataSourceFilters.contains(source)) {
+            childName = "dataSourceFilters[" + dataSourceFilters.indexOf(source) + "]";
+        } else if ( canvases.contains(source) ) {
+            childName = "canvases["+canvases.indexOf(source)+"]";
         } else {
             throw new IllegalArgumentException("child not found: "+source);
         }
         return new PropertyChangeEvent(this, childName + "." + ev.getPropertyName(), ev.getOldValue(), ev.getNewValue());
     }
-    protected Panel panel;
-    public static final String PROP_PANEL = "panel";
+    
+    protected List<DataSourceFilter> dataSourceFilters= Arrays.asList( new DataSourceFilter[0] );
+    public static final String PROP_DATASOURCEFILTERS = "dataSourceFilters";
 
-    public Panel getPanel() {
-        return panel;
+    public DataSourceFilter[] getDataSourceFilters() {
+        return (DataSourceFilter[]) dataSourceFilters.toArray();
     }
 
-    public void setPanel(Panel panel) {
-        Panel oldPanel = this.panel;
-        this.panel = panel;
-        propertyChangeSupport.firePropertyChange(PROP_PANEL, oldPanel, panel);
+    public void setDataSourceFilters(DataSourceFilter[] dataSourceFilters) {
+        DataSourceFilter[] oldDataSourceFilters = (DataSourceFilter[]) this.dataSourceFilters.toArray();
+        this.dataSourceFilters = Arrays.asList(dataSourceFilters);
+        propertyChangeSupport.firePropertyChange(PROP_DATASOURCEFILTERS, oldDataSourceFilters, dataSourceFilters);
     }
+
+    public DataSourceFilter getDataSourceFilters(int index) {
+        return this.dataSourceFilters.get(index);
+    }
+
+    public void setDataSourceFilters(int index, DataSourceFilter newDataSourceFilter) {
+        DataSourceFilter oldDataSourceFilters = this.dataSourceFilters.get(index);
+        this.dataSourceFilters.set(index, newDataSourceFilter );
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_DATASOURCEFILTERS, index, oldDataSourceFilters, newDataSourceFilter);
+    }
+
+    
     public static final String PROP_PANELS = "panels";
     protected List<Panel> panels = new LinkedList<Panel>();
 
@@ -83,7 +94,7 @@ public class Application extends DomNode {
 
     public void setPanels(int index, Panel newPanels) {
         Panel oldPanels = this.panels.get(index);
-        this.panels.set(index, panel);
+        this.panels.set(index, newPanels);
         propertyChangeSupport.fireIndexedPropertyChange(PROP_PANELS, index, oldPanels, newPanels);
     }
     public static final String PROP_PLOTS = "plots";
@@ -108,18 +119,30 @@ public class Application extends DomNode {
         this.plots.set(index, newPlots);
         propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOTS, index, oldPlots, newPlots);
     }
-    protected Canvas canvas = new Canvas();
-    public static final String PROP_CANVAS = "canvas";
+    
+    public static final String PROP_CANVASES = "canvases";
+    protected List<Canvas> canvases = new LinkedList<Canvas>();
 
-    public Canvas getCanvas() {
-        return canvas;
+    public Canvas[] getCanvases() {
+        return canvases.toArray(new Canvas[canvases.size()]);
     }
 
-    public void setCanvas(Canvas canvas) {
-        Canvas oldCanvas = this.canvas;
-        this.canvas = canvas;
-        propertyChangeSupport.firePropertyChange(PROP_CANVAS, oldCanvas, canvas);
+    public void setCanvases(Canvas[] canvases) {
+        Canvas[] old = this.canvases.toArray(new Canvas[this.canvases.size()]);
+        this.canvases = Arrays.asList(canvases);
+        propertyChangeSupport.firePropertyChange(PROP_CANVASES, old, canvases);
     }
+
+    public Canvas getCanvases(int index) {
+        return this.canvases.get(index);
+    }
+
+    public void setCanvases(int index, Canvas newCanvas ) {
+        Canvas old = this.canvases.get(index);
+        this.canvases.set(index, newCanvas );
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOTS, index, old, newCanvas );
+    }
+    
     ApplicationController controller;
 
     public ApplicationController getController() {
@@ -134,22 +157,7 @@ public class Application extends DomNode {
 
     public void setOptions(Options options) {
         this.options = options;
-    //TODO: fire
     }
-    protected Plot plot;
-    public static final String PROP_PLOT = "plot";
-
-    public Plot getPlot() {
-        return plot;
-    }
-
-    public void setPlot(Plot plot) {
-        Plot oldPlot = this.plot;
-        this.plot = plot;
-        propertyChangeSupport.firePropertyChange(PROP_PLOT, oldPlot, plot);
-    }
-
-
 
     protected DatumRange timeRange = DatumRangeUtil.parseTimeRangeValid("2008-11-26");
     /**
@@ -239,7 +247,6 @@ public class Application extends DomNode {
         result.controller= null;
         
         result.options = (Options) this.getOptions().copy();
-        result.canvas = (Canvas) this.getCanvas().copy();
         
         Panel[] panelsCopy= this.getPanels();
         for ( int i=0; i<panelsCopy.length; i++ ) {
@@ -252,19 +259,19 @@ public class Application extends DomNode {
             plotsCopy[i]= (Plot) plotsCopy[i].copy();
         }
         result.setPlots( plotsCopy );
+
+        Connector[] connectorsCopy= this.getConnectors();
+        for ( int i=0; i<connectorsCopy.length; i++ ) {
+            connectorsCopy[i]=  connectorsCopy[i]; // connectors are really immutable.
+        }
+        result.setConnectors( connectorsCopy );
         
-        if ( panel!=null ) {
-            int i = this.panels.indexOf(panel);
-            result.panel = result.getPanels(i);
-        } else {
-            result.panel= null;
+        Canvas[] canvasesCopy= this.getCanvases();
+        for ( int i=0; i<canvasesCopy.length; i++ ) {
+            canvasesCopy[i]= (Canvas) canvasesCopy[i].copy();
         }
-        if ( plot!=null ) {
-            int i = this.plots.indexOf(this.plot);
-            result.plot = result.getPlots(i);
-        } else {
-            result.plot = null;
-        }
+        result.setCanvases( canvasesCopy );
+
         return result;
     }
 
@@ -273,13 +280,14 @@ public class Application extends DomNode {
         ArrayList<DomNode> result = new ArrayList<DomNode>();
         result.addAll(plots);
         result.addAll(panels);
-        result.add(canvas);
+        result.addAll(dataSourceFilters);
+        result.addAll(canvases);
         result.add(options);
         
         return result;
     }
 
-    private void syncToPlotsAndPanels(Plot[] plots, Panel[] panels) {
+    private void syncToPlotsAndPanels( Plot[] plots, Panel[] panels, DataSourceFilter[] dataSourceFilters ) {
         while (this.plots.size() < plots.length) {
             controller.addPlot();
         }
@@ -289,12 +297,27 @@ public class Application extends DomNode {
             for ( Panel panell:panelss ) {
                 panell.setPlotId(""); // make it an orphan
             }
-            controller.deletePlot(plot);
+            controller.deletePlot( plott );
         }
         for (int i = 0; i < plots.length; i++) {
             this.plots.get(i).syncTo(plots[i]);
         }
-
+        
+        while (this.dataSourceFilters.size() < dataSourceFilters.length) {
+            controller.addPlot();
+        }
+        while (this.dataSourceFilters.size() > dataSourceFilters.length) {
+            DataSourceFilter plott= this.dataSourceFilters.get(this.dataSourceFilters.size() - 1);
+            List<Panel> panelss= controller.getPanelsFor(plott);
+            for ( Panel panell:panelss ) {
+                panell.setPlotId(""); // make it an orphan
+            }
+            controller.deleteDataSourceFilter( plott );
+        }
+        for (int i = 0; i < dataSourceFilters.length; i++) {
+            this.dataSourceFilters.get(i).syncTo(dataSourceFilters[i]);
+        }
+        
         while (this.panels.size() < panels.length) {
             int i = this.panels.size();
             String idd = panels[i].getPlotId();
@@ -375,19 +398,13 @@ public class Application extends DomNode {
     
     public void syncTo(DomNode n) {
         Application that = (Application) n;
-        this.getCanvas().syncTo(that.getCanvas());
         this.getOptions().syncTo(that.getOptions());
 
-        syncToPlotsAndPanels(that.getPlots(), that.getPanels());
+        syncToPlotsAndPanels(that.getPlots(), that.getPanels(), that.getDataSourceFilters() );
 
         syncBindings(that.getBindings());
         syncConnectors(that.getConnectors());
-        
-        int i = that.panels.indexOf(that.panel);
-        this.setPanel( this.getPanels(i) );
-        i = that.plots.indexOf(that.plot);
-        this.setPlot( this.getPlots(i) );
-        
+                
     }
 
     private void addArrayDiffs( String property, Object[] thata, Object[] thisa, List<Diff> result ) {
@@ -414,8 +431,6 @@ public class Application extends DomNode {
         
         List<Diff> result = new ArrayList<Diff>();
         
-        boolean b;
-
         addArrayDiffs( "panels", that.getPanels(), this.getPanels(), result );
 
         addArrayDiffs( "plots", that.getPlots(), this.getPlots(), result );
@@ -433,8 +448,6 @@ public class Application extends DomNode {
         for ( int i=0; i<Math.min(this.panels.size(),that.panels.size()); i++ ) {
             result.addAll( DomUtil.childDiffs( "panels["+i+"]", that.getPanels(i).diffs( this.panels.get(i) ) ) );
         }
-        
-        result.addAll( DomUtil.childDiffs( "canvas",  this.getCanvas().diffs(that.getCanvas()) ));
         
         result.addAll( DomUtil.childDiffs( "options", this.getOptions().diffs(  that.getOptions()) ));
         

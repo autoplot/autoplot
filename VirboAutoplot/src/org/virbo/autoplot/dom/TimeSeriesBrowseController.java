@@ -32,6 +32,7 @@ public class TimeSeriesBrowseController {
     DasPlot plot;
     PanelController panelController;
     DataSourceController dataSourceController;
+    DataSourceFilter dsf;
     
     private static final Logger logger = Logger.getLogger("ap.tsb");
     Timer updateTsbTimer;
@@ -48,9 +49,11 @@ public class TimeSeriesBrowseController {
         updateTsbTimer.setRepeats(false);
         this.p = p;
         this.panelController = p.getController();
-        this.dataSourceController= p.getDataSourceFilter().getController();
-        this.plot = panelController.getPlot();
-        this.xAxis = panelController.getPlot().getXAxis();
+        this.dsf= p.getController().getDataSourceFilter();
+        this.dataSourceController= dsf.getController();
+        
+        this.plot = panelController.getDasPlot();
+        this.xAxis = panelController.getDasPlot().getXAxis();
     }
 
     public void setup() {
@@ -79,7 +82,7 @@ public class TimeSeriesBrowseController {
 
     public void updateTsb(boolean autorange) {
 
-        if ( p.getDataSourceFilter().getController().getTsb() == null) {
+        if ( p.getController().getDataSourceFilter().getController().getTsb() == null) {
             return;
         }
 
@@ -104,16 +107,16 @@ public class TimeSeriesBrowseController {
                 if (plot.isOverSize()) {
                     visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3);
                 }
-                p.getDataSourceFilter().getController().getTsb().setTimeRange(visibleRange);
-                p.getDataSourceFilter().getController().getTsb().setTimeResolution(newResolution);
+                dataSourceController.getTsb().setTimeRange(visibleRange);
+                dataSourceController.getTsb().setTimeResolution(newResolution);
                 String surl;
-                surl = DataSetURL.getDataSourceUri( p.getDataSourceFilter().getController()._getDataSource());
+                surl = DataSetURL.getDataSourceUri( dataSourceController._getDataSource());
                 // check the registry for URLs, compare to surl, append prefix if necessary.
-                if (!autorange && surl.equals( this.dataSourceController.getTsbSuri())) {
+                if (!autorange && surl.equals( dataSourceController.getTsbSuri())) {
                     logger.fine("we do no better with tsb");
                 } else {
                     dataSourceController.update(autorange, autorange);
-                    this.dataSourceController._setTsbSuri(surl);
+                    dataSourceController._setTsbSuri(surl);
                     //p.getDataSourceFilter().setSuri(surl);
                 }
             } else {
