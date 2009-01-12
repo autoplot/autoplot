@@ -171,6 +171,9 @@ public class Panel extends DomNode {
         if ( !that.dataSourceFilterId.equals( this.dataSourceFilterId ) ) {
             result.add( new PropertyChangeDiff( "dataSourceFilterId", that.dataSourceFilterId, this.dataSourceFilterId ) );
         }
+        if ( !that.component.equals( this.component ) ) {
+            result.add( new PropertyChangeDiff(  PROP_COMPONENT, that.component, this.component ) );
+        }
         
         result.addAll( DomUtil.childDiffs("style", this.getStyle().diffs(that.getStyle()) ) );
         result.addAll( DomUtil.childDiffs("plotDefaults", this.getPlotDefaults().diffs(that.getPlotDefaults()) ) );
@@ -182,14 +185,16 @@ public class Panel extends DomNode {
         Panel that = (Panel) n;
         this.setPlotId(that.getPlotId());
         this.setDataSourceFilterId( that.getDataSourceFilterId() );
+        this.setComponent(that.getComponent());
         this.style.syncTo(that.style);
         this.plotDefaults.syncTo(that.plotDefaults);
     }
     
     public void syncTo( DomNode n, List<String> exclude ) {
         Panel that = (Panel) n;
-        if ( !exclude.contains("plotId") ) this.setPlotId(that.getPlotId());
-        if ( !exclude.contains("dataSourceFilterId") ) this.setDataSourceFilterId(that.getDataSourceFilterId());
+        if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
+        if ( !exclude.contains( PROP_DATASOURCEFILTERID ) ) this.setDataSourceFilterId(that.getDataSourceFilterId());
+        if ( !exclude.contains( PROP_COMPONENT ) ) this.setComponent(that.getComponent());
         this.style.syncTo(that.style);
         this.plotDefaults.syncTo(that.plotDefaults);
     }
