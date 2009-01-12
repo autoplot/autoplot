@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -24,13 +25,16 @@ import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.system.MutatorLock;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.ApplicationModel.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.dataset.DataSetAdapter;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 
 /**
@@ -55,7 +59,7 @@ public class PanelController {
         panel.controller = this;
         this.dom = dom;
         this.panel = panel;
-        this.appmodel= model;
+        this.appmodel = model;
 
         panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, new PropertyChangeListener() {
 
@@ -76,7 +80,7 @@ public class PanelController {
     private void resetDataSource() {
         assert (panel.getDataSourceFilterId() != null);
         final DataSourceFilter dsf = getDataSourceFilter();
-        
+
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
@@ -97,7 +101,59 @@ public class PanelController {
             }
         });
 
-        setDataSourceFilterController( getDataSourceFilter().getController() );
+        setDataSourceFilterController(getDataSourceFilter().getController());
+    }
+
+    private Color deriveColor(Color color, int i) {
+
+        float[] colorHSV = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+        if (colorHSV[2] < 0.7f) {
+            colorHSV[2] = 0.7f;
+        }
+        if (colorHSV[1] < 0.7f) {
+            colorHSV[1] = 0.7f;
+        }
+        return Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]);
+    }
+
+
+    
+    private void setDataSet(QDataSet fillDs) throws IllegalArgumentException {
+
+        String label= "";
+        if ( ! panel.getComponent().equals("") && fillDs.length()>0 ) {
+            String[] labels= SemanticOps.getComponentLabels(fillDs);
+            if ( panel.getComponent().equals("X") ) {
+                fillDs = DataSetOps.slice1(fillDs, 0);
+                label= labels[0];
+            } else if (panel.getComponent().equals("Y")) {
+                fillDs = DataSetOps.slice1(fillDs, 1);
+                label= labels[1];
+            } else if (panel.getComponent().equals("Z")) {
+                fillDs = DataSetOps.slice1(fillDs, 2);
+                label= labels[2];
+            } else {
+                throw new IllegalArgumentException("not supported: " + panel.getComponent());
+            }
+        }
+        
+        if (getRenderer() != null) {
+            getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
+            if (  !label.equals("") ) ((SeriesRenderer)getRenderer()).setLegendLabel(label);
+        }
+
+        final DataSourceFilter dsf = getDataSourceFilter();
+        String reduceRankString = dsf.getController().getReduceDataSetString();
+        if (dsf.getController().getReduceDataSetString() != null) {
+            // kludge to update title
+            String title = dom.getController().getPlot().getTitle(); //TODO: fix
+            Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
+            Matcher m = p.matcher(title);
+            if (m.matches()) {
+                title = m.group(1) + "!c" + reduceRankString;
+                getDasPlot().setTitle(title);
+            }
+        }
     }
 
     public void setDataSourceFilterController(final DataSourceController dsc) {
@@ -114,21 +170,26 @@ public class PanelController {
                         getRenderer().setDataSet(null);
                     }
                 } else {
-                    if (getRenderer() != null) {
-                        getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
+                    if (!dom.getController().isValueAdjusting() && panel.getRenderType() == RenderType.series && fillDs.rank() == 2 && panel.getComponent().equals("")) {
+                        MutatorLock lock = dom.getController().mutatorLock();
+                        lock.lock();
+
+                        panel.setComponent("X");
+                        Color c = panel.getStyle().getColor();
+                        panel.getStyle().setColor(deriveColor(c, 0));
+                        Plot domPlot = dom.getController().getPlotFor(panel);
+                        for (int i = 1; i < fillDs.length(0); i++) {
+                            Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsc.dsf);
+                            //Panel cpanel = dom.getController().getPanelsFor(cplot).get(0);
+                            cpanel.getStyle().setColor(deriveColor(c, i));
+                            cpanel.setComponent(String.valueOf((char) ('X' + i)));
+                            cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
+                            cpanel.getController().setDataSet(fillDs);
+                        }
+                        lock.unlock();
                     }
 
-                    final DataSourceFilter dsf = getDataSourceFilter();
-                    String reduceRankString = dsf.getController().getReduceDataSetString();
-                    if (dsf.getController().getReduceDataSetString() != null) { // kludge to update title
-                        String title = dom.getController().getPlot().getTitle(); //TODO: fix
-                        Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
-                        Matcher m = p.matcher(title);
-                        if (m.matches()) {
-                            title = m.group(1) + "!c" + reduceRankString;
-                            getDasPlot().setTitle(title);
-                        }
-                    }
+                    setDataSet(fillDs);
                 }
             }
         });
@@ -186,11 +247,11 @@ public class PanelController {
     protected void setRenderer(Renderer renderer) {
         this.renderer = renderer;
         if (renderer instanceof SeriesRenderer) {
-            bindTo((SeriesRenderer) renderer);
-            bindTo(new SpectrogramRenderer(null, null));
+            bindToSeriesRenderer((SeriesRenderer) renderer);
+            bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
         } else {
-            bindTo((SpectrogramRenderer) renderer);
-            bindTo(new SeriesRenderer());
+            bindToSpectrogramRenderer((SpectrogramRenderer) renderer);
+            bindToSeriesRenderer(new SeriesRenderer());
         }
     }
 
@@ -492,26 +553,30 @@ public class PanelController {
     public void setRenderType(RenderType renderType) {
         if (getDataSourceFilter().getController().getFillDataSet() != null) {
 
-            // getRenderers sets the dataset.
+            Renderer oldRenderer = getRenderer();
+
+            // getRenderers sets the dataset.  The result should always be a singleton list.
             List<Renderer> rs = AutoplotUtil.getRenderers(getDataSourceFilter().getController().getFillDataSet(),
                     renderType, Collections.singletonList(getRenderer()), getColorbar());
 
             assert rs.size() == 1;
 
-            setRenderer(rs.get(0));
+            Renderer newRenderer = rs.get(0);
 
-            DasPlot plot = getDasPlot();
+            if (oldRenderer != newRenderer) {
+                setRenderer(newRenderer);
 
-            Renderer[] rends = plot.getRenderers();
-            for (int i = 0; i < rends.length; i++) {
-                plot.removeRenderer(rends[i]);
+                DasPlot plot = getDasPlot();
+
+                if ( oldRenderer!=null ) plot.removeRenderer(oldRenderer);
+                plot.addRenderer(newRenderer);
+                
             }
-            plot.addRenderer(rs.get(0));
         }
 
     }
 
-    public synchronized void bindTo(SeriesRenderer seriesRenderer) {
+    public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
         ApplicationController ac = this.dom.getController();
 
         ac.bind(panel, "style.lineWidth", seriesRenderer, "lineWidth");
@@ -525,7 +590,7 @@ public class PanelController {
 
     }
 
-    public void bindTo(SpectrogramRenderer spectrogramRenderer) {
+    public void bindToSpectrogramRenderer(SpectrogramRenderer spectrogramRenderer) {
         ApplicationController ac = this.dom.getController();
 
         ac.bind(panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
