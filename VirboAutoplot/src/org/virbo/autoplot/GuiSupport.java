@@ -39,6 +39,7 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
@@ -116,8 +117,9 @@ public class GuiSupport {
         return new AbstractAction("Export Data...") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel p= parent.applicationModel.dom.getPanel();
-                if ( p.getDataSourceFilter().getController().getFillDataSet()==null ) {
+                DataSourceController dsc= parent.applicationModel.getDataSourceFilterController();
+                
+                if ( dsc.getFillDataSet()==null ) {
                     JOptionPane.showMessageDialog( parent, "No Data to Export.");
                     return;
                 }
@@ -151,8 +153,8 @@ public class GuiSupport {
                 Preferences prefs = Preferences.userNodeForPackage(AutoPlotUI.class);
                 String currentFileString = prefs.get("DumpDataCurrentFile", "");
                 
-                if ( p.getDataSourceFilter().getController().getFillDataSet()!=null ) {
-                    String name= (String) p.getDataSourceFilter().getController().getFillDataSet().property( QDataSet.NAME );
+                if ( dsc.getFillDataSet()!=null ) {
+                    String name= (String) dsc.getFillDataSet().property( QDataSet.NAME );
                     if ( name!=null ) chooser.setSelectedFile(new File(name.toLowerCase())); 
                 }
 
@@ -189,7 +191,7 @@ public class GuiSupport {
                             }
                         }
                         format.formatData( new File(s),new java.util.HashMap<String, String>(), 
-                                p.getDataSourceFilter().getController().getFillDataSet(), new DasProgressPanel("formatting data")  );
+                                dsc.getFillDataSet(), new DasProgressPanel("formatting data")  );
                         parent.setStatus("created file "+s);
 
                     } catch (IOException ex) {

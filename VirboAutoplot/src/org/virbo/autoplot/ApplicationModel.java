@@ -102,7 +102,7 @@ public class ApplicationModel {
 
         this.application = canvas.getApplication();
 
-        dom.getController().addPanel(null);
+        dom.getController().addPanel(null,null);
 
     }
 
@@ -122,24 +122,21 @@ public class ApplicationModel {
      * @param ds
      */
     void setDataSet(QDataSet ds) {
-        Panel p= dom.getPanel();
-        p.getDataSourceFilter().getController().setDataSetInternal(ds, true);
+        dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds, true);
     }
-
 
 
     public void setDataSource(DataSource dataSource) {
-        Panel p= dom.getPanel();
-        p.getDataSourceFilter().getController().setDataSource(dataSource);
+        dom.getController().getDataSourceFilter().getController().setDataSource(dataSource);
     }
 
     public DataSource dataSource() {
-        Panel p= dom.getPanel();
-        return p.getDataSourceFilter().getController()._getDataSource();
+        return dom.getController().getDataSourceFilter().getController()._getDataSource();
     }
 
     /**
      * set the plot range, minding the isotropic property.
+     * TODO: the DasAxis.Lock never worked its way into the MVC version.  Find it, then delete this.
      * @param plot
      * @param xdesc
      * @param ydesc
@@ -147,7 +144,7 @@ public class ApplicationModel {
     private void setPlotRange(DasPlot plot,
             AutoplotUtil.AutoRangeDescriptor xdesc, AutoplotUtil.AutoRangeDescriptor ydesc) {
 
-        if (dom.getPlot().isIsotropic() && xdesc.range.getUnits().isConvertableTo(ydesc.range.getUnits()) && xdesc.log == false && ydesc.log == false) {
+        if (dom.getController().getPlot().isIsotropic() && xdesc.range.getUnits().isConvertableTo(ydesc.range.getUnits()) && xdesc.log == false && ydesc.log == false) {
 
             DasAxis axis;
             AutoplotUtil.AutoRangeDescriptor desc; // controls the range
@@ -221,7 +218,6 @@ public class ApplicationModel {
      * @param mon progress monitor which is just used to convey messages.
      */
     protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
-        Panel p= dom.getPanel();
         
         if (surl == null) {
             return;
@@ -258,9 +254,7 @@ public class ApplicationModel {
      * @throws RuntimeException when _getDataSource throws Exception
      */
     public void setDataSourceURL(String surl) {
-        Panel p= dom.getPanel();
-        
-        String oldVal = p.getDataSourceFilter().getSuri();
+        String oldVal = dom.getController().getDataSourceFilter().getSuri();
         if ( surl == null && oldVal == null) {
             return;
         }
@@ -273,8 +267,7 @@ public class ApplicationModel {
     }
 
     public String getDataSourceURL() {
-        Panel p= dom.getPanel();
-        return p.getDataSourceFilter().getSuri();
+        return dom.getController().getDataSourceFilter().getSuri();
     }
 
     
@@ -441,7 +434,7 @@ public class ApplicationModel {
     }
 
     void resetZoom() {
-        dom.getPlot().getController().resetZoom();
+        dom.getController().getPlot().getController().resetZoom();
     }
 
     void increaseFontSize() {
@@ -539,9 +532,9 @@ public class ApplicationModel {
     }
 
     private void packEmbeddedDataSet() {
-        Panel p = dom.getPanel();
+        
         try {
-            if ( p.getDataSourceFilter().getController().getDataSet() == null) {
+            if ( dom.getController().getDataSourceFilter().getController().getDataSet() == null) {
                 embedDs = "";
                 return;
             }
@@ -553,7 +546,7 @@ public class ApplicationModel {
             OutputStream dos = out;
 
             SimpleStreamFormatter format = new SimpleStreamFormatter();
-            format.format(p.getDataSourceFilter().getController().getDataSet(), dos, false);
+            format.format(dom.getController().getDataSourceFilter().getController().getDataSet(), dos, false);
 
             dos.close();
 
@@ -652,7 +645,7 @@ public class ApplicationModel {
      * @return
      */
     public DataSourceController getDataSourceFilterController() {
-        return dom.getPanel().getDataSourceFilter().getController();
+        return dom.getController().getDataSourceFilter().getController();
     }
 }
 

@@ -20,6 +20,7 @@ import javax.swing.SwingUtilities;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Panel;
@@ -33,31 +34,36 @@ public class AxisPanel extends javax.swing.JPanel {
 
     ApplicationModel applicationModel;
     Application dom;
+    ApplicationController applicationController;
     DatumRangeEditor xredit;
     DatumRangeEditor yredit;
     DatumRangeEditor zredit;
+    PropertyChangeListener dsfListener;
+    DataSourceFilter dsf; // current focus
+    
     private final static Logger logger = Logger.getLogger("virbo.autoplot");
 
     /** Creates new form PlotStylePanel */
     public AxisPanel(final ApplicationModel applicationModel) {
         this.applicationModel = applicationModel;
         this.dom = applicationModel.dom;
+        this.applicationController= this.dom.getController();
 
-        this.dom.addPropertyChangeListener(Application.PROP_PANEL, new PropertyChangeListener() {
+        this.applicationController.addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                setPanel(AxisPanel.this.dom.getPanel());
+                doDataSourceFilterBindings();
             }
         });
-
-        this.dom.addPropertyChangeListener( Application.PROP_PLOT, new PropertyChangeListener() {
+        
+        this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                setPlot(AxisPanel.this.dom.getPlot());
+                setPlot( applicationController.getPlot() );
             }
         });
         initComponents();
 
-        DasPlot plot = dom.getPlot().getController().getDasPlot();
-        DasColorBar colorbar = dom.getPlot().getController().getDasColorBar();
+        DasPlot plot = applicationController.getPlot().getController().getDasPlot();
+        DasColorBar colorbar = applicationController.getPlot().getController().getDasColorBar();
 
         xredit = new DatumRangeEditor();
         xredit.setValue(plot.getXAxis().getDatumRange());
@@ -75,7 +81,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         doApplicationBindings();
 
-        doPanelBindings();
+        doDataSourceFilterBindings();
 
     }
 
@@ -90,35 +96,34 @@ public class AxisPanel extends javax.swing.JPanel {
         b = bc.addBinding(dom, "${options.autolayout}", this.autolayoutCheckbox, "selected");
         bc.bind();
     }
-    BindingContext panelBindingContext;
+    BindingContext dataSourceFilterBindingContext;
 
-    private void doPanelBindings() {
+    private synchronized void doDataSourceFilterBindings() {
 
-        Panel panel = dom.getPanel();
+        if (dataSourceFilterBindingContext != null) dataSourceFilterBindingContext.unbind();
 
-        if (panelBindingContext != null) panelBindingContext.unbind();
-
-        if (panel == null) {
-            panelBindingContext = null;
+        if ( dsf!=null ) {
+            dsf.getController().removePropertyChangeListener(dsfListener);
+        }
+        
+        final DataSourceFilter newDsf = applicationController.getDataSourceFilter();
+        
+        if (newDsf == null) {
+            dataSourceFilterBindingContext = null;
             return;
         }
-
-        Binding b;
-
+        
         BindingContext bc = new BindingContext();
-        b = bc.addBinding(panel, "${dataSourceFilter.fill}", this.fillValueComboBox, "selectedItem");
-        b = bc.addBinding(panel, "${dataSourceFilter.validRange}", this.validRangeComboBox, "selectedItem");
+        bc.addBinding(newDsf, "${fill}", this.fillValueComboBox, "selectedItem");
+        bc.addBinding(newDsf, "${validRange}", this.validRangeComboBox, "selectedItem");
 
-        b = bc.addBinding(panel, "${dataSourceFilter.sliceDimension}", this.sliceTypeComboBox, "selectedIndex");
-        b = bc.addBinding(panel, "${dataSourceFilter.sliceIndex}", this.sliceIndexSpinner, "value");
+        bc.addBinding(newDsf, "${sliceDimension}", this.sliceTypeComboBox, "selectedIndex");
+        bc.addBinding(newDsf, "${sliceIndex}", this.sliceIndexSpinner, "value");
 
-        b = bc.addBinding(panel, "${dataSourceFilter.transpose}", this.transposeCheckBox, "selected");
+        bc.addBinding(newDsf, "${transpose}", this.transposeCheckBox, "selected");
 
         bc.bind();
-        panelBindingContext = bc;
-
-
-        final DataSourceFilter dsf = panel.getDataSourceFilter();
+        dataSourceFilterBindingContext = bc;
 
         sliceIndexSpinner.setModel(new SpinnerNumberModel(0, 0, 100, 1));
         sliceIndexSpinner.addMouseWheelListener(new MouseWheelListener() {
@@ -127,26 +132,26 @@ public class AxisPanel extends javax.swing.JPanel {
                 int pos = (Integer) sliceIndexSpinner.getValue();
                 pos -= e.getWheelRotation();
                 if (pos < 0) pos = 0;
-                int maxpos = dsf.getController().getMaxSliceIndex(dsf.getSliceDimension());
+                int maxpos = newDsf.getController().getMaxSliceIndex(newDsf.getSliceDimension());
                 if (pos >= maxpos) pos = maxpos - 1;
                 sliceIndexSpinner.setValue(pos);
             }
         });
 
-//TODO:removePropertyChangeListener
-        dsf.getController().addPropertyChangeListener(new PropertyChangeListener() {
+
+        dsfListener= new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(DataSourceController.PROP_DEPNAMES)) {
-                    final String[] depNames = (String[]) dsf.getController().getDepnames().toArray(); //TODO: what if panel changes...
+                    final String[] depNames = (String[]) newDsf.getController().getDepnames().toArray(); //TODO: what if panelId changes...
                     for (int i = 0; i < depNames.length; i++) {
-                        depNames[i] = depNames[i] + " (" + dsf.getController().getMaxSliceIndex(i) + " bins)";
+                        depNames[i] = depNames[i] + " (" + newDsf.getController().getMaxSliceIndex(i) + " bins)";
                     }
                     SwingUtilities.invokeLater(new Runnable() {
 
                         public void run() {
                             sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames));
-                            sliceTypeComboBox.setSelectedIndex(dsf.getSliceDimension());
+                            sliceTypeComboBox.setSelectedIndex(newDsf.getSliceDimension());
                         }
                     });
                 }
@@ -154,12 +159,15 @@ public class AxisPanel extends javax.swing.JPanel {
                     SwingUtilities.invokeLater(new Runnable() {
 
                         public void run() {
-                            sliceTypeComboBox.setSelectedIndex(dsf.getSliceDimension());
+                            sliceTypeComboBox.setSelectedIndex(newDsf.getSliceDimension());
                         }
                     });
                 }
             }
-        });
+        };
+        
+        dsf= newDsf;
+        newDsf.getController().addPropertyChangeListener(dsfListener);
 
     }
     BindingContext plotBindingContext;
@@ -168,7 +176,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         BindingContext bc = new BindingContext();
         Binding b;
-        Plot p = dom.getPlot();
+        Plot p = applicationController.getPlot();
         b = bc.addBinding(p, "${xaxis.label}", xTitleTextField, "text");
         b = bc.addBinding(p, "${xaxis.range}", xredit, "value");
         b = bc.addBinding(p, "${xaxis.log}", xLog, "selected");
@@ -192,10 +200,7 @@ public class AxisPanel extends javax.swing.JPanel {
         return bc;
     }
 
-    private void setPanel(Panel p) {
-        doPanelBindings();
-    }
-
+    
     private void setPlot(Plot p) {
         doPlotBindings();
     }
@@ -561,18 +566,18 @@ public class AxisPanel extends javax.swing.JPanel {
     private void validRangeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_validRangeComboBoxActionPerformed
         String s = (String) validRangeComboBox.getSelectedItem();
         if (s.equals("(none)")) s = "";
-        dom.getPanel().getDataSourceFilter().setValidRange(s);
+        applicationController.getDataSourceFilter().setValidRange(s);
     }//GEN-LAST:event_validRangeComboBoxActionPerformed
 
     private void fillValueComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fillValueComboBoxActionPerformed
         String s = (String) fillValueComboBox.getSelectedItem();
         if (s.equals("(none)")) s = "";
-        dom.getPanel().getDataSourceFilter().setFill(s);
+        applicationController.getDataSourceFilter().setFill(s);
     }//GEN-LAST:event_fillValueComboBoxActionPerformed
 
     private void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
         logger.fine("set slice dimension " + sliceTypeComboBox.getSelectedIndex());
-        DataSourceFilter dsf = dom.getPanel().getDataSourceFilter();
+        DataSourceFilter dsf = applicationController.getDataSourceFilter();
         dsf.setSliceDimension(sliceTypeComboBox.getSelectedIndex());
         int max = dsf.getController().getMaxSliceIndex(dsf.getSliceDimension());
         if (max > 0) max--; // make inclusive, was exclusive.

@@ -213,7 +213,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "foreground color", foregroundColorButton.getBackground());
         jComboBox1.setSelectedIndex(fores.length);
-        List<Panel> panels= Collections.singletonList(app.dom.getPanel());
+        List<Panel> panels= Collections.singletonList(app.dom.getController().getPanel());
         for ( Panel p: panels ) {
             if ( p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
                 p.getStyle().setColor(c);
@@ -229,7 +229,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         if (i < fores.length) {
             foregroundColorButton.setIcon( GraphUtil.colorIcon( fores[i], ICON_SIZE, ICON_SIZE ) );
             backgroundColorButton.setIcon( GraphUtil.colorIcon( backs[i], ICON_SIZE, ICON_SIZE ) );
-            List<Panel> panels= Collections.singletonList(app.dom.getPanel());
+            List<Panel> panels= Collections.singletonList(app.dom.getController().getPanel());
             for ( Panel p: panels ) {
                 if (p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
                     p.getStyle().setColor(fores[i]);

@@ -21,6 +21,7 @@ import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.PanelStyle;
 
@@ -48,7 +49,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         this.applicationModel = applicationModel;
         this.dom= applicationModel.getDocumentModel();
         
-        this.dom.addPropertyChangeListener( Application.PROP_PANEL, new PropertyChangeListener() {
+        this.dom.getController().addPropertyChangeListener( ApplicationController.PROP_PANEL, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 doPanelBindings();
             }
@@ -108,7 +109,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
     public synchronized void doPanelBindings() {
         //TODO: why null?
-        Panel panel= dom.getPanel();
+        Panel panel= dom.getController().getPanel();
         if ( panel==null ) return;
         PanelStyle style= panel.getStyle();
         BindingContext bc = new BindingContext();
@@ -435,11 +436,11 @@ public class PlotStylePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void moreSprectrogramPropsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moreSprectrogramPropsButtonActionPerformed
-        new PropertyEditor(dom.getPanel()).showDialog(this);
+        new PropertyEditor(dom.getController().getPanel()).showDialog(this);
     }//GEN-LAST:event_moreSprectrogramPropsButtonActionPerformed
 
     private void moreSeriesPropsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moreSeriesPropsButtonActionPerformed
-        new PropertyEditor(dom.getPanel()).showDialog(this);
+        new PropertyEditor(dom.getController().getPanel()).showDialog(this);
     }//GEN-LAST:event_moreSeriesPropsButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel colorPanel;

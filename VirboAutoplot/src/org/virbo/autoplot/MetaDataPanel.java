@@ -5,9 +5,7 @@
  */
 package org.virbo.autoplot;
 
-import java.awt.Component;
 import java.awt.EventQueue;
-import javax.swing.JTree;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.Units;
@@ -18,13 +16,12 @@ import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import org.das2.system.RequestProcessor;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
-import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
@@ -42,7 +39,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
     Application dom;
     CombinedTreeModel tree;
     TreeModel dsTree;
-    Panel bindToPanel = null;
+    DataSourceFilter bindToDataSourceFilter= null;  //TODO: these should be weak references or such.
     private QDataSet dsTreeDs;
 
     /** Creates new form MetaDataPanel */
@@ -56,49 +53,61 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 metaDataTree.setModel(null);
             }
         });
-        dom.addPropertyChangeListener(Application.PROP_PANEL, new PropertyChangeListener() {
-
+        
+        dom.getController().addPropertyChangeListener(ApplicationController.PROP_PANEL, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 bindToPanel();
             }
         });
 
+        dom.getController().addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                bindToDataSourceFilter();
+            }
+        });
+
         bindToPanel();
-        
+        bindToDataSourceFilter();
+
         //applicationModel.addPropertyChangeListener(this.appModelListener);
         updateProperties();
         updateStatistics();
     }
 
-    private void bindToPanel() {
-        if (bindToPanel != null) {
-            bindToPanel.getDataSourceFilter().getController().removePropertyChangeListener(propertiesListener);
-            bindToPanel.getDataSourceFilter().getController().removePropertyChangeListener(fillListener);
-            bindToPanel.getDataSourceFilter().getController().removePropertyChangeListener(propertiesListener);
+    private void bindToDataSourceFilter() {
+        if (bindToDataSourceFilter != null) {
+            DataSourceController dsc= bindToDataSourceFilter.getController();
+            dsc.removePropertyChangeListener(propertiesListener);
+            dsc.removePropertyChangeListener(fillListener);
         }
-        dom.getPanel().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
-        dom.getPanel().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillListener);
+        dom.getController().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
+        dom.getController().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillListener);
         updateProperties();
         updateStatistics();
+    }
+    
+    private void bindToPanel() {
+
     }
 
     public void updateProperties() {
 
         try {
-            Panel panel = dom.getPanel();
+            DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+            
             DataSource dsrc = null;
-            if (panel != null) {
-                dsrc = panel.getDataSourceFilter().getController()._getDataSource();
+            if (dsf != null) {
+                dsrc = dsf.getController()._getDataSource();
             }
             if (dsrc != null) {
                 tree = new CombinedTreeModel("" + dsrc.getURL());
-                Map<String, Object> meta = panel.getDataSourceFilter().getController().getRawProperties();
+                Map<String, Object> meta = dsf.getController().getRawProperties();
                 MetadataModel model = dsrc.getMetadataModel();
                 String root = "Metadata";
                 if (model == null) {
                     model = MetadataModel.createNullModel();
                 } else {
-                    root = root + "(" + model.getLabel() + ")";
+                    if ( !model.getLabel().equals("") ) root = root+ "(" + model.getLabel() + ")";
                 }
 
                 final TreeModel dsrcMeta = NameValueTreeModel.create(root, meta);
@@ -113,7 +122,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 }
             } else {
                 String label= "(no data source)";
-                if ( panel.getDataSourceFilter().getController().getDataSet()!=null ) {
+                if ( dsf.getController().getDataSet()!=null ) {
                     label= "dataset";
                 }
                 tree = new CombinedTreeModel(label);
@@ -143,6 +152,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceController.PROP_FILLDATASET)) {
+                System.err.println("fillChanged: "+evt+" "+evt.getPropertyName()+" "+evt.getOldValue()+" "+evt.getNewValue());
                 updateStatistics();
             }
         }
@@ -207,32 +217,37 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
     private synchronized void updateDataSetPropertiesView() {
         assert EventQueue.isDispatchThread()==false;
-        Panel p = applicationModel.dom.getPanel();
-        if (p.getDataSourceFilter().getController().getDataSet() == null) {
+        final TreeModel unmount;
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        if ( dsf.getController().getDataSet() == null) {
             //dsTree= NameValueTreeModel.create("dataset", Collections.singletonMap("dataset=", "no dataset") );
             //(PropertiesTreeModel( "no dataset", null );
             return;
         } else {
-            if (p.getDataSourceFilter().getController().getDataSet() != this.dsTreeDs) {
-                dsTree = new PropertiesTreeModel("dataset= ", p.getDataSourceFilter().getController().getDataSet());
-                this.dsTreeDs = p.getDataSourceFilter().getController().getDataSet();
+            if ( dsf.getController().getDataSet() != this.dsTreeDs) {
+                unmount= dsTree;
+                dsTree = new PropertiesTreeModel("Dataset= ", dsf.getController().getDataSet());
+                this.dsTreeDs = dsf.getController().getDataSet();
+            } else {
+                unmount= null;
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                tree.mountTree(dsTree, 30);
-            }
+                public void run() {
+                    if ( unmount!=null ) tree.unmountTree(unmount);
+                    tree.mountTree(dsTree, 30);
+                }
         });
     }
 
     @SuppressWarnings("unchecked")
     private synchronized void updateStatisticsImmediately() {
         assert EventQueue.isDispatchThread()==false;
-        Panel p = applicationModel.dom.getPanel();
-
+        
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
         final LinkedHashMap map = new LinkedHashMap();
 
-        QDataSet ds = p.getDataSourceFilter().getController().getDataSet();
+        QDataSet ds = dsf.getController().getDataSet();
         if (ds == null) {
             map.put("dataset", "(no dataset)");
 

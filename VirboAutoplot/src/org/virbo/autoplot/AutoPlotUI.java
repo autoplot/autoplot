@@ -114,7 +114,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private static String RESOURCES= "/org/virbo/autoplot/resources/";
     public static final Icon WARNING_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"warning-icon.png") );
     public static final Icon ERROR_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"error-icon.png") );
-    public static final Icon BUSY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"indProgress.gif") );
+    public static final Icon BUSY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"spinner_16.gif") );
     public static final Icon READY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"indProgress0.png") );
     public static final Icon IDLE_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"idle-icon.png") );
         
@@ -263,6 +263,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
+                
+                if ( dom.getController().isValueAdjusting() ) return;
+                
                 //tickleTimer.getMessages();
                 undoRedoSupport.pushState(evt);
                 stateSupport.markDirty();
@@ -520,7 +523,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             Logger.getLogger("ap").info("plotAnotherUrl()");
             final String surl = (String) dataSetSelector.getValue();
             applicationModel.addRecent(surl);
-            Panel panel= dom.getController().addPanel( null );
+            Panel panel= dom.getController().addPanel( null ,null );
             panel.getController().setSuri( surl );
             
         } catch (RuntimeException ex) {
@@ -1034,19 +1037,19 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_fileMenuActionPerformed
 
     private void zoomOutMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomOutMenuItemActionPerformed
-        DasPlot p= dom.getPlot().getController().getDasPlot();
+        DasPlot p= dom.getController().getPlot().getController().getDasPlot();
         DatumRange dr = DatumRangeUtil.rescale( p.getXAxis().getDatumRange(), -0.333, 1.333);
         p.getXAxis().setDatumRange(dr);
     }//GEN-LAST:event_zoomOutMenuItemActionPerformed
 
     private void zoomInMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_zoomInMenuItemActionPerformed
-        DasPlot p= dom.getPlot().getController().getDasPlot();
+        DasPlot p= dom.getController().getPlot().getController().getDasPlot();
         DatumRange dr = DatumRangeUtil.rescale(p.getXAxis().getDatumRange(), 0.25, 0.75);
         p.getXAxis().setDatumRange(dr);
     }//GEN-LAST:event_zoomInMenuItemActionPerformed
 
     private void resetZoomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetZoomMenuItemActionPerformed
-        dom.getPlot().getController().resetZoom();
+        dom.getController().getPlot().getController().resetZoom();
     }//GEN-LAST:event_resetZoomMenuItemActionPerformed
 
     private void fontsAndColorsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontsAndColorsMenuItemActionPerformed
