@@ -22,7 +22,7 @@ public class DomTests {
     private static void serializeTest() throws FileNotFoundException {
         Application app = new Application();
         new ApplicationController(null, app);
-        app.getController().addPanel(null);
+        app.getController().addPanel(null,null);
 
         XMLEncoder enc = new XMLEncoder(new FileOutputStream("/home/jbf/foo.xml"));
         enc.writeObject(enc);
