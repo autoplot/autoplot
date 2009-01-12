@@ -255,7 +255,7 @@ public class Application extends DomNode {
         result.setPanels( panelsCopy );
         
         Plot[] plotsCopy= this.getPlots();
-        for ( int i=0; i<panelsCopy.length; i++ ) {
+        for ( int i=0; i<plotsCopy.length; i++ ) {
             plotsCopy[i]= (Plot) plotsCopy[i].copy();
         }
         result.setPlots( plotsCopy );
@@ -325,7 +325,7 @@ public class Application extends DomNode {
             for (int j = 0; j < plots.length; j++) {
                 if (plots[j].getId().equals(idd)) p = plots[j];
             }
-            controller.addPanel(p);
+            controller.addPanel(p,null);
         }
         while (this.panels.size() > panels.length) {
             controller.deletePanel( this.panels.get(this.panels.size() - 1));
