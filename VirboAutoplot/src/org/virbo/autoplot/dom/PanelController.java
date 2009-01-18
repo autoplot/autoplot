@@ -116,30 +116,42 @@ public class PanelController {
         return Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]);
     }
 
+    private boolean rendererAcceptsData( QDataSet fillDs ) {
+        if ( fillDs.rank()==1 && getRenderer() instanceof SpectrogramRenderer ) {
+            return false;
+        } else if ( fillDs.rank()==2 && getRenderer() instanceof SeriesRenderer ) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
-    
     private void setDataSet(QDataSet fillDs) throws IllegalArgumentException {
 
-        String label= "";
-        if ( ! panel.getComponent().equals("") && fillDs.length()>0 ) {
-            String[] labels= SemanticOps.getComponentLabels(fillDs);
-            if ( panel.getComponent().equals("X") ) {
+        String label = "";
+        if (!panel.getComponent().equals("") && fillDs.length() > 0) {
+            String[] labels = SemanticOps.getComponentLabels(fillDs);
+            if (panel.getComponent().equals("X")) {
                 fillDs = DataSetOps.slice1(fillDs, 0);
-                label= labels[0];
+                label = labels[0];
             } else if (panel.getComponent().equals("Y")) {
                 fillDs = DataSetOps.slice1(fillDs, 1);
-                label= labels[1];
+                label = labels[1];
             } else if (panel.getComponent().equals("Z")) {
                 fillDs = DataSetOps.slice1(fillDs, 2);
-                label= labels[2];
+                label = labels[2];
             } else {
                 throw new IllegalArgumentException("not supported: " + panel.getComponent());
             }
         }
-        
+
         if (getRenderer() != null) {
-            getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
-            if (  !label.equals("") ) ((SeriesRenderer)getRenderer()).setLegendLabel(label);
+            if ( rendererAcceptsData(fillDs) ) {
+                getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
+                if (!label.equals("")) ((SeriesRenderer) getRenderer()).setLegendLabel(label);
+            } else {
+                getRenderer().setException( new Exception( "renderer cannot plot "+fillDs ));
+            }
         }
 
         final DataSourceFilter dsf = getDataSourceFilter();
@@ -551,26 +563,20 @@ public class PanelController {
      * @param renderType
      */
     public void setRenderType(RenderType renderType) {
-        if (getDataSourceFilter().getController().getFillDataSet() != null) {
 
-            Renderer oldRenderer = getRenderer();
+        Renderer oldRenderer = getRenderer();
+        Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
 
-            // getRenderers sets the dataset.  The result should always be a singleton list.
-            List<Renderer> rs = AutoplotUtil.getRenderers(getDataSourceFilter().getController().getFillDataSet(),
-                    renderType, Collections.singletonList(getRenderer()), getColorbar());
+        if (oldRenderer != newRenderer) {
+            setRenderer(newRenderer);
 
-            assert rs.size() == 1;
+            DasPlot plot = getDasPlot();
 
-            Renderer newRenderer = rs.get(0);
+            if (oldRenderer != null) plot.removeRenderer(oldRenderer);
+            plot.addRenderer(newRenderer);
 
-            if (oldRenderer != newRenderer) {
-                setRenderer(newRenderer);
-
-                DasPlot plot = getDasPlot();
-
-                if ( oldRenderer!=null ) plot.removeRenderer(oldRenderer);
-                plot.addRenderer(newRenderer);
-                
+            if (getDataSourceFilter().getController().getFillDataSet() != null) {
+              setDataSet(getDataSourceFilter().getController().getFillDataSet());
             }
         }
 
