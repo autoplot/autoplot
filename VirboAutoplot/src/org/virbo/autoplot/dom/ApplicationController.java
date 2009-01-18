@@ -257,8 +257,6 @@ public class ApplicationController {
             domPlot = addPlot();
         }
 
-        domPlot.getController().getDasPlot().getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(panel));
-
         panel.setId("panel_" + fpanelIdNum);
 
         /*  final Plot fplot = domPlot;
@@ -839,6 +837,8 @@ public class ApplicationController {
                 }
             }
         }));
+
+        plot.getMouseAdapter().addMenuItem( GuiSupport.createEZAccessMenu(domPlot) );
     }
 
     /**
