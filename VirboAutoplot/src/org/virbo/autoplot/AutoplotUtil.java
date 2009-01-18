@@ -82,7 +82,15 @@ public class AutoplotUtil {
      * absolute length limit for plots.  This is used to limit the elements used in autoranging, etc.
      */
     public final static int DS_LENGTH_LIMIT= 10000000;
-    
+
+    /**
+     * this is not used.  It is called from createIcon, which is not used.
+     * @param c
+     * @param ds
+     * @param recyclable
+     * @param cb
+     * @return
+     */
     static DasPlot createPlot( DasCanvas c, QDataSet ds, DasPlot recyclable, DasColorBar cb ) {
         DasRow row= DasRow.create(c);            
         DasColumn col= DasColumn.create(c);
@@ -836,8 +844,74 @@ public class AutoplotUtil {
     }
     
     /**
+     * return a renderer that is configured for this renderType.
+     * @param renderType
+     * @param recyclable
+     * @param colorbar
+     * @return
+     */
+    public static Renderer maybeCreateRenderer( RenderType renderType,
+            Renderer recyclable, DasColorBar colorbar ) {
+        if (renderType == RenderType.spectrogram) {
+            if ( recyclable != null && recyclable instanceof SpectrogramRenderer) {
+                return recyclable;
+            } else {
+                Renderer result = new SpectrogramRenderer(null, colorbar);
+                result.setDataSetLoader(null);
+                colorbar.setVisible(true);
+                return result;
+            }
+        } else {
+                SeriesRenderer result;
+                if (recyclable != null && recyclable instanceof SeriesRenderer) {
+                    result = (SeriesRenderer) recyclable;
+                } else {
+                    result= new SeriesRenderer();
+                    result.setDataSetLoader(null);
+                }
+
+                if ( renderType==RenderType.colorScatter ) {
+                    result.setColorBar(colorbar);
+                    result.setColorByDataSetId( QDataSet.PLANE_0 ); //schema
+                    colorbar.setVisible(true);
+                } else {
+                    result.setColorByDataSetId( "" ); //schema
+                    colorbar.setVisible(false);
+                }
+            
+                if (renderType == RenderType.series) {
+                    result.setPsymConnector(PsymConnector.SOLID);
+                    result.setHistogram(false);
+                    result.setFillToReference(false);
+
+                } else if (renderType == RenderType.scatter) {
+                    result.setPsymConnector(PsymConnector.NONE);
+                    result.setFillToReference(false);
+
+                } else if ( renderType==RenderType.colorScatter ) {
+                    result.setPsymConnector(PsymConnector.NONE);
+                    result.setFillToReference(false);
+
+                } else if (renderType == RenderType.histogram) {
+                    result.setPsymConnector(PsymConnector.SOLID);
+                    result.setFillToReference(true);
+                    result.setHistogram(true);
+
+                } else if (renderType == RenderType.fill_to_zero) {
+                    result.setPsymConnector(PsymConnector.SOLID);
+                    result.setFillToReference(true);
+                    result.setHistogram(false);
+
+                }
+
+              return result;
+        }
+
+    }
+
+    /**
      * return the renderers that should be used to render the data.  More than one renderer can be returned 
-     * to support plotting vector components.
+     * to support plotting vector components.  This is not used.
      * 
      * The renderer will have the dataset set.
      * @param ds
