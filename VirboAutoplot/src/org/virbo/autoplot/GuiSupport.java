@@ -41,6 +41,7 @@ import javax.swing.filechooser.FileFilter;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
@@ -204,18 +205,19 @@ public class GuiSupport {
         };
     }
 
-    public static JMenu createEZAccessMenu( final Panel panel ) {
+    public static JMenu createEZAccessMenu( final Plot plot ) {
 
         JMenu result = new JMenu("plot style");
         result.add(new JMenuItem(new AbstractAction("scatter") {
 
             public void actionPerformed(ActionEvent e) {
+                Panel panel= plot.getController().getApplication().getController().getPanel();
                 panel.setRenderType( ApplicationModel.RenderType.scatter );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("colorScatter") {
-
+            Panel panel= plot.getController().getApplication().getController().getPanel();
             public void actionPerformed(ActionEvent e) {
                 panel.setRenderType( ApplicationModel.RenderType.colorScatter );
             }
@@ -224,6 +226,7 @@ public class GuiSupport {
         result.add(new JMenuItem(new AbstractAction("series") {
 
             public void actionPerformed(ActionEvent e) {
+                Panel panel= plot.getController().getApplication().getController().getPanel();
                 panel.setRenderType( ApplicationModel.RenderType.series );
             }
         }));
@@ -231,20 +234,21 @@ public class GuiSupport {
         result.add(new JMenuItem(new AbstractAction("histogram") {
 
             public void actionPerformed(ActionEvent e) {
+                Panel panel= plot.getController().getApplication().getController().getPanel();
                 panel.setRenderType( ApplicationModel.RenderType.histogram );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("fill to zero") {
-
             public void actionPerformed(ActionEvent e) {
+                Panel panel= plot.getController().getApplication().getController().getPanel();
                 panel.setRenderType( ApplicationModel.RenderType.fill_to_zero );
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("spectrogram") {
-
             public void actionPerformed(ActionEvent e) {
+                Panel panel= plot.getController().getApplication().getController().getPanel();
                 panel.setRenderType( ApplicationModel.RenderType.spectrogram );
             }
         }));
