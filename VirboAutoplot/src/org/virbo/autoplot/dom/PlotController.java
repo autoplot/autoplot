@@ -134,4 +134,9 @@ public class PlotController {
     public boolean valueIsAdjusting() {
         return domplot.getXaxis().getController().valueIsAdjusting() || domplot.getYaxis().getController().valueIsAdjusting() || domplot.getZaxis().getController().valueIsAdjusting();
     }
+
+    public Application getApplication() {
+        return dom;
+    }
+    
 }
