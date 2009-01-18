@@ -272,6 +272,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 String t = undoRedoSupport.getUndoLabel();
                 undoMenuItem.setEnabled(t != null);
                 undoMenuItem.setText(t == null ? "Undo" : t);
+                undoMenuItem.setToolTipText(undoRedoSupport.getUndoDescription());
                 t = undoRedoSupport.getRedoLabel();
                 redoMenuItem.setEnabled(t != null);
                 if (t != null) {
