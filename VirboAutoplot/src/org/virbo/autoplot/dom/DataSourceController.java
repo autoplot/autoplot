@@ -75,17 +75,14 @@ public class DataSourceController {
         }
     };
     private TimeSeriesBrowseController timeSeriesBrowseController;
-    private PanelController panelController;
     private static final String PENDING_DATA_SOURCE = "dataSource";
     private static final String PENDING_FILL_DATASET = "fillDataSet";
     private static final String PENDING_UPDATE = "update";
 
-    public DataSourceController( ApplicationModel model, final Panel panel, DataSourceFilter dsf ) {
+    public DataSourceController( ApplicationModel model, DataSourceFilter dsf ) {
 
         this.model = model;
         this.dom = model.getDocumentModel();
-        this.panel = panel;
-        this.panelController = panel.getController();
         this.dsf = dsf;
         this.dsf.controller = this;
 
@@ -190,9 +187,11 @@ public class DataSourceController {
         if (oldSource == null || !oldSource.equals(dataSource)) {
             if ( getTsb() != null) {
                  _setDataSet(null);
-
-                timeSeriesBrowseController = new TimeSeriesBrowseController(panel);
-                timeSeriesBrowseController.setup();
+                 List<Panel> ps= dom.getController().getPanelsFor(dsf);
+                 if ( ps.size()>0 ) {
+                    timeSeriesBrowseController = new TimeSeriesBrowseController(ps.get(0));
+                    timeSeriesBrowseController.setup();
+                 }
 
             } else {
                 update(true, true);
@@ -572,6 +571,22 @@ public class DataSourceController {
         propertyChangeSupport.firePropertyChange(PROP_FILLDATASET, oldFillDataSet, fillDataSet);
     }
     
+    /**
+     * when the dataset fails to load, then the exception thrown is here.
+     */
+    protected Exception exception = null;
+    public static final String PROP_EXCEPTION = "exception";
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public void setException(Exception exception) {
+        Exception oldException = this.exception;
+        this.exception = exception;
+        propertyChangeSupport.firePropertyChange(PROP_EXCEPTION, oldException, exception);
+    }
+
     private List<String> depnames = Arrays.asList(new String[]{"first", "second", "last"});
     public static final String PROP_DEPNAMES = "depnames";
 
@@ -662,16 +677,14 @@ public class DataSourceController {
             
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
-            panel.getController().getRenderer().setException(ex);
-            panel.getController().getRenderer().setDataSet(null);
-            panel.getController().getRenderer().setException(ex);
-            panel.getController().getRenderer().setDataSet(null);
+            setException(ex);
+            _setDataSet(null);
         } catch (CancelledOperationException ex) {
-            panel.getController().getRenderer().setException(ex);
-            panel.getController().getRenderer().setDataSet(null);
-            panel.getController().getRenderer().setException(ex);
-            panel.getController().getRenderer().setDataSet(null);
+            setException(ex);
+            _setDataSet(null);
         } catch (Exception e) {
+            setException(e);
+            _setDataSet(null);
             setStatus("error: " + e.getMessage());
             handleException(e);
         } finally {
@@ -815,10 +828,31 @@ public class DataSourceController {
         model.getCanvas().getApplication().getExceptionHandler().handle(e);
     }
 
+    /**
+     * return a panel for this.
+     * @return null or a panel.
+     */
+    private Panel getPanel() {
+        List<Panel> panels= dom.getController().getPanelsFor(dsf);
+        if ( panels.size()==0 ) {
+            return null;
+        } else {
+            return panels.get(0);
+        }
+        
+    }
+    
     private ProgressMonitor getMonitor(String label, String description) {
-        DasCanvas canvas = model.getCanvas();
-        DasPlot p = this.panel.getController().getDasPlot();
-        return canvas.getApplication().getMonitorFactory().getMonitor(p, label, description);
+        DasCanvas canvas = dom.getController().getDasCanvas();
+        
+        Panel panel= getPanel();
+        if ( panel!=null ) {
+            Plot plot= dom.getController().getPlotFor(panel);
+            DasPlot p = plot.getController().getDasPlot(); 
+            return dom.getController().getMonitorFactory().getMonitor( p, label, description );
+        } else {
+            return dom.getController().getMonitorFactory().getMonitor( label, description );
+        }
 
     }
 
