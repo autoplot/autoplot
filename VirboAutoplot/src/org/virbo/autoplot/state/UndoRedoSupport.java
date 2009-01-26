@@ -51,12 +51,13 @@ public class UndoRedoSupport {
             StateStackElement prevState = stateStack.get(i);
             String label = prevState.deltaDesc;
             final int ii = stateStackPos - i;
-            undoMultipleMenu.add(new JMenuItem(new AbstractAction(label) {
-
+            JMenuItem item= new JMenuItem(new AbstractAction(label) {
                 public void actionPerformed(ActionEvent e) {
                     undo(ii);
                 }
-            }));
+            });
+            item.setToolTipText(prevState.docString);
+            undoMultipleMenu.add(item);
         }
     }
 
@@ -64,10 +65,12 @@ public class UndoRedoSupport {
 
         Application state;
         String deltaDesc;
+        String docString; // verbose description
 
-        public StateStackElement(Application state, String deltaDesc) {
+        public StateStackElement(Application state, String deltaDesc, String docString ) {
             this.state = state;
             this.deltaDesc = deltaDesc;
+            this.docString= docString;
         }
 
         public String toString() {
@@ -93,7 +96,6 @@ public class UndoRedoSupport {
 
     public Action getUndoAction() {
         return new AbstractAction("Undo") {
-
             public void actionPerformed(ActionEvent e) {
                 undo();
             }
@@ -161,11 +163,20 @@ public class UndoRedoSupport {
             return;
         }
         String labelStr = "initial";
+        String docString= "initial state of application";
         if (elephant != null) {
             List<Diff> diffss = state.diffs(elephant.state);
+                StringBuffer docBuf= new StringBuffer();
+                for (Diff s : diffss) {
+                    docBuf.append("<br>"+s.toString());
+                }
+                docString= docBuf.length()>4 ? docBuf.substring(4) : "";
+                docString= "<html>"+docString+"</html>";
+
             if (diffss.size() == 0) {
                 state.diffs(elephant.state);
                 labelStr = "unidentified change";
+                docString= "change was detected but could not be identified.";
             } else if (diffss.size() > 6) {
                 labelStr = "" + diffss.size() + " changes";
             } else {
@@ -186,7 +197,7 @@ public class UndoRedoSupport {
             }
         }
 
-        stateStack.add(stateStackPos, new StateStackElement(state, labelStr));
+        stateStack.add(stateStackPos, new StateStackElement(state, labelStr,docString));
 
         while (stateStack.size() > (1 + stateStackPos)) {
             stateStack.removeLast();
@@ -194,6 +205,13 @@ public class UndoRedoSupport {
         stateStackPos++;
     }
 
+    public String getUndoDescription() {
+        if (stateStackPos > 1) {
+            return stateStack.get(stateStackPos - 1).docString;
+        } else {
+            return null;
+        }
+    }
     /**
      * returns a label describing the undo operation, or null if the operation
      * doesn't exist.
@@ -201,6 +219,14 @@ public class UndoRedoSupport {
     public String getUndoLabel() {
         if (stateStackPos > 1) {
             return "Undo " + stateStack.get(stateStackPos - 1).deltaDesc;
+        } else {
+            return null;
+        }
+    }
+
+    public String getRedoDescription() {
+        if (stateStackPos < stateStack.size()) {
+            return stateStack.get(stateStackPos).docString;
         } else {
             return null;
         }
@@ -217,6 +243,7 @@ public class UndoRedoSupport {
             return null;
         }
     }
+
 
     public void resetHistory() {
         stateStack = new LinkedList<StateStackElement>();
