@@ -12,17 +12,21 @@ import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
-import javax.beans.binding.Binding;
-import javax.beans.binding.BindingContext;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
+import org.jdesktop.beansbinding.BindingGroup;
+import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Plot;
 
@@ -88,19 +92,19 @@ public class AxisPanel extends javax.swing.JPanel {
     private void doApplicationBindings() {
 
         Binding b;
-        BindingContext bc = new BindingContext();
+        BindingGroup bc = new BindingGroup();
 
-        b = bc.addBinding(dom, "${options.autoOverview}", this.autoContextOverview, "selected");
-        b = bc.addBinding(dom, "${options.autoranging}", this.allowAutoRangingCheckBox, "selected");
-        b = bc.addBinding(dom, "${options.autolabelling}", this.autolabellingCheckbox, "selected");
-        b = bc.addBinding(dom, "${options.autolayout}", this.autolayoutCheckbox, "selected");
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autoOverview" ), this.autoContextOverview, BeanProperty.create( "selected")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autoranging"), this.allowAutoRangingCheckBox, BeanProperty.create( "selected")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autolabelling"), this.autolabellingCheckbox, BeanProperty.create( "selected")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autolayout"), this.autolayoutCheckbox,BeanProperty.create(  "selected")));
         bc.bind();
     }
-    BindingContext dataSourceFilterBindingContext;
+    BindingGroup dataSourceFilterBindingGroup;
 
     private synchronized void doDataSourceFilterBindings() {
 
-        if (dataSourceFilterBindingContext != null) dataSourceFilterBindingContext.unbind();
+        if (dataSourceFilterBindingGroup != null) dataSourceFilterBindingGroup.unbind();
 
         if ( dsf!=null ) {
             dsf.getController().removePropertyChangeListener(dsfListener);
@@ -109,21 +113,21 @@ public class AxisPanel extends javax.swing.JPanel {
         final DataSourceFilter newDsf = applicationController.getDataSourceFilter();
         
         if (newDsf == null) {
-            dataSourceFilterBindingContext = null;
+            dataSourceFilterBindingGroup = null;
             return;
         }
         
-        BindingContext bc = new BindingContext();
-        bc.addBinding(newDsf, "${fill}", this.fillValueComboBox, "selectedItem");
-        bc.addBinding(newDsf, "${validRange}", this.validRangeComboBox, "selectedItem");
+        BindingGroup bc = new BindingGroup();
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("fill"), this.fillValueComboBox, BeanProperty.create("selectedItem")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("validRange"), this.validRangeComboBox, BeanProperty.create("selectedItem")));
 
-        bc.addBinding(newDsf, "${sliceDimension}", this.sliceTypeComboBox, "selectedIndex");
-        bc.addBinding(newDsf, "${sliceIndex}", this.sliceIndexSpinner, "value");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("sliceDimension"), this.sliceTypeComboBox, BeanProperty.create("selectedIndex")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create( "sliceIndex"), this.sliceIndexSpinner, BeanProperty.create("value")));
 
-        bc.addBinding(newDsf, "${transpose}", this.transposeCheckBox, "selected");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("transpose"), this.transposeCheckBox, BeanProperty.create("selected")));
 
         bc.bind();
-        dataSourceFilterBindingContext = bc;
+        dataSourceFilterBindingGroup = bc;
 
         sliceIndexSpinner.setModel(new SpinnerNumberModel(0, 0, 100, 1));
         sliceIndexSpinner.addMouseWheelListener(new MouseWheelListener() {
@@ -170,31 +174,32 @@ public class AxisPanel extends javax.swing.JPanel {
         newDsf.getController().addPropertyChangeListener(dsfListener);
 
     }
-    BindingContext plotBindingContext;
+    BindingGroup plotBindingGroup;
 
-    private BindingContext doPlotBindings() {
+    private BindingGroup doPlotBindings() {
 
-        BindingContext bc = new BindingContext();
+        BindingGroup bc = new BindingGroup();
         Binding b;
         Plot p = applicationController.getPlot();
-        b = bc.addBinding(p, "${xaxis.label}", xTitleTextField, "text");
-        b = bc.addBinding(p, "${xaxis.range}", xredit, "value");
-        b = bc.addBinding(p, "${xaxis.log}", xLog, "selected");
 
-        b = bc.addBinding(p, "${yaxis.label}", yTitleTextField, "text");
-        b = bc.addBinding(p, "${yaxis.range}", yredit, "value");
-        b = bc.addBinding(p, "${yaxis.log}", yLog, "selected");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.label"), xTitleTextField, BeanProperty.create("text")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p,BeanProperty.create( "xaxis.range"), xredit, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.log"), xLog, BeanProperty.create("selected")));
 
-        b = bc.addBinding(p, "${zaxis.label}", zTitleTextField, "text");
-        b = bc.addBinding(p, "${zaxis.range}", zredit, "value");
-        b = bc.addBinding(p, "${zaxis.log}", zLog, "selected");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("yaxis.label"), yTitleTextField, BeanProperty.create("text")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("yaxis.range"), yredit,BeanProperty.create( "value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("yaxis.log"), yLog, BeanProperty.create("selected")));
 
-        b = bc.addBinding(p, "${title}", titleTextField, "text");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.label"), zTitleTextField, BeanProperty.create("text")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.range"), zredit, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("zaxis.log"), zLog, BeanProperty.create("selected")));
 
-        b = bc.addBinding(p, "${isotropic}", this.isotropicCheckBox, "selected");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("title"), titleTextField, BeanProperty.create("text")));
 
-        if (plotBindingContext != null) plotBindingContext.unbind();
-        plotBindingContext = bc;
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("isotropic"), this.isotropicCheckBox, BeanProperty.create("selected")));
+
+        if (plotBindingGroup != null) plotBindingGroup.unbind();
+        plotBindingGroup = bc;
         bc.bind();
 
         return bc;
