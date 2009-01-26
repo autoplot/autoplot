@@ -41,9 +41,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
-import javax.beans.binding.Binding;
-import javax.beans.binding.BindingContext;
-import javax.beans.binding.BindingConverter;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -59,6 +56,11 @@ import javax.swing.SwingUtilities;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
 import org.das2.util.filesystem.FileSystem;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
+import org.jdesktop.beansbinding.BindingGroup;
+import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -264,24 +266,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 
-                if ( dom.getController().isValueAdjusting() ) return;
+                if ( dom.getController().isValueAdjusting() ) return; // don't listen to property changes during state transitions.
                 
                 //tickleTimer.getMessages();
                 undoRedoSupport.pushState(evt);
                 stateSupport.markDirty();
-                String t = undoRedoSupport.getUndoLabel();
-                undoMenuItem.setEnabled(t != null);
-                undoMenuItem.setText(t == null ? "Undo" : t);
-                undoMenuItem.setToolTipText(undoRedoSupport.getUndoDescription());
-                t = undoRedoSupport.getRedoLabel();
-                redoMenuItem.setEnabled(t != null);
-                if (t != null) {
-                    redoMenuItem.setText(t == null ? "Redo" : t);
-                }
+                
                 SwingUtilities.invokeLater(new Runnable() {
-
                     public void run() {
-                        undoRedoSupport.refreshUndoMultipleMenu(undoMultipleMenu);
+                        refreshUndoRedoLabel();
                     }
                 });
             }
@@ -289,7 +282,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         applicationModel.dom.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                String propName = evt.getPropertyName();
+                //String propName = evt.getPropertyName();
                 //if (propName.equals("bounds") || propName.equals("pendingChanges") || propName.equals("recent") || propName.equals("status") || propName.equals("ticks") || propName.contains("PerMillisecond")) return;
                 if ( dom.getController().isValueAdjusting() ) return;
                 logger.finer( "state change: "+evt.getPropertyName() );
@@ -316,15 +309,16 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         undoMenuItem.setEnabled(t != null);
         undoMenuItem.setText(t == null ? "Undo" : t);
-
-        undoRedoSupport.refreshUndoMultipleMenu(undoMultipleMenu);
-
+        undoMenuItem.setToolTipText( t==null ? "" : undoRedoSupport.getUndoDescription() );
+        
         String tt = undoRedoSupport.getRedoLabel();
 
         redoMenuItem.setEnabled(tt != null);
-        if (tt != null) {
-            redoMenuItem.setText(tt == null ? "Redo" : tt);
-        }
+        redoMenuItem.setText(tt == null ? "Redo" : tt);
+        redoMenuItem.setToolTipText( tt==null ? "" : undoRedoSupport.getRedoDescription() );
+
+        undoRedoSupport.refreshUndoMultipleMenu(undoMultipleMenu);
+        
     }
 
     
@@ -338,33 +332,20 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
     private void addBindings() {
 
-        BindingContext bc = new BindingContext();
+        BindingGroup bc = new BindingGroup();
         Binding b;
-
-        BindingConverter conv = new BindingConverter() { // for debugging
-
-            public Object sourceToTarget(Object value) {
-                return value;
-            }
-
-            public Object targetToSource(Object value) {
-                return value;
-            }
-        };
-
-        b = bc.addBinding( dom.getOptions(), "${drawAntiAlias}", drawAntiAliasMenuItem, "selected");
-        b = bc.addBinding( dom.getOptions(), "${textAntiAlias}", textAntiAlias, "selected");
-        b = bc.addBinding( dom.getOptions(), "${specialEffects}", specialEffectsMenuItem, "selected");
-        b = bc.addBinding( dom.getOptions(), "${overRendering}", overRenderingCheckBox, "selected");
+//Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, BeanProperty.create( srcProp ), dst, BeanProperty.create(dstProp));
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("drawAntiAlias"), drawAntiAliasMenuItem, BeanProperty.create("selected")));
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("textAntiAlias"), textAntiAlias, BeanProperty.create("selected")));
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("specialEffects"), specialEffectsMenuItem, BeanProperty.create("selected")));
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("overRendering"), overRenderingCheckBox, BeanProperty.create("selected")));
         
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
-
             public void propertyChange(PropertyChangeEvent evt) {
                 applicationModel.setDataSourceURL(dataSetSelector.getValue());
             }
         });
 
-        b.setConverter(conv);
         bc.bind();
     }
 
@@ -580,9 +561,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private void maybeCreateBookmarksManager() {
         if (bookmarksManager == null) {
             bookmarksManager = new BookmarksManager(AutoPlotUI.this, false);
-            BindingContext bc = new BindingContext();
-            bc.addBinding(applicationModel, "${bookmarks}", bookmarksManager.getModel(), "list");
-            bc.bind();
+
+            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, applicationModel, BeanProperty.create( "bookmarks" ), bookmarksManager.getModel(), BeanProperty.create("list"));
+            b.bind();
+
             bookmarksManager.getModel().addPropertyChangeListener(BookmarksManagerModel.PROP_BOOKMARK, new PropertyChangeListener() {
 
                 public void propertyChange(PropertyChangeEvent evt) {
