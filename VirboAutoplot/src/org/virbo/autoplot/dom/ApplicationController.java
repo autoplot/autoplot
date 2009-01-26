@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.beans.binding.Binding;
-import javax.beans.binding.BindingContext;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
@@ -42,6 +40,11 @@ import org.das2.graph.Renderer;
 import org.das2.system.MonitorFactory;
 import org.das2.system.MutatorLock;
 import org.das2.util.monitor.ProgressMonitor;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
+import org.jdesktop.beansbinding.BindingGroup;
+import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
@@ -60,7 +63,7 @@ public class ApplicationController {
     DasColumn outerColumn;
     LayoutListener layoutListener;
     boolean headless;
-    Map<Object, BindingContext> bindingContexts;
+    Map<Object, BindingGroup> bindingContexts;
     Map<BindingModel, Binding> bindingImpls;
     Map<Connector, ColumnColumnConnector> connectorImpls;
     private final static Logger logger = Logger.getLogger("virbo.controller");
@@ -78,7 +81,7 @@ public class ApplicationController {
         if (!headless) {
             application.getOptions().loadPreferences();
         }
-        bindingContexts = new HashMap<Object, BindingContext>();
+        bindingContexts = new HashMap<Object, BindingGroup>();
         bindingImpls = new HashMap<BindingModel, Binding>();
         connectorImpls = new HashMap<Connector, ColumnColumnConnector>();
 
@@ -615,16 +618,17 @@ public class ApplicationController {
      * @param dstProp a property name such as "label"
      */
     public void bind(DomNode src, String srcProp, Object dst, String dstProp) {
-        BindingContext bc;
+        BindingGroup bc;
         synchronized (bindingContexts) {
             bc = bindingContexts.get(src);
             if (bc == null) {
-                bc = new BindingContext();
+                bc = new BindingGroup();
             }
             bindingContexts.put(src, bc);
         }
 
-        Binding b = bc.addBinding(src, "${" + srcProp + "}", dst, dstProp);
+        Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp) );
+        bc.addBinding( b );
 
         BindingModel bb = new BindingModel();
 
@@ -662,7 +666,7 @@ public class ApplicationController {
      * @param src
      */
     public void unbind(DomNode src) {
-        BindingContext bc;
+        BindingGroup bc;
 
         synchronized (bindingImpls) {
             List<BindingModel> bb = new ArrayList(Arrays.asList(application.getBindings()));
