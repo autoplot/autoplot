@@ -13,15 +13,19 @@ import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.beans.PropertyChangeListener;
-import javax.beans.binding.Binding;
-import javax.beans.binding.BindingContext;
 import javax.swing.SpinnerNumberModel;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
+import org.jdesktop.beansbinding.BindingGroup;
+import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.PanelStyle;
 
@@ -40,7 +44,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
     ColorEditor colorEditor;
     ColorEditor fillColorEditor;
     DatumEditor referenceEditor;
-    BindingContext panelBindingContext;
+    BindingGroup panelBindingContext;
 
     Application dom;
     
@@ -97,11 +101,13 @@ public class PlotStylePanel extends javax.swing.JPanel {
     }
 
     public synchronized void doOptionsBindings( ) {
-        BindingContext bc = new BindingContext();
+        BindingGroup bc = new BindingGroup();
         Binding b;
 
-        b = bc.addBinding( dom.getOptions(), "${drawGrid}", majorTicksCheckBox, "selected");
-        b = bc.addBinding( dom.getOptions(), "${drawMinorGrid}", minorGridCheckBox, "selected");
+        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create( Options.PROP_DRAWGRID ), majorTicksCheckBox, BeanProperty.create("selected") );
+        bc.addBinding(b);
+        b = Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,  dom.getOptions(), BeanProperty.create( Options.PROP_DRAWMINORGRID ), minorGridCheckBox, BeanProperty.create("selected") );
+        bc.addBinding(b);
 
         bc.bind();
     }
@@ -112,21 +118,21 @@ public class PlotStylePanel extends javax.swing.JPanel {
         Panel panel= dom.getController().getPanel();
         if ( panel==null ) return;
         PanelStyle style= panel.getStyle();
-        BindingContext bc = new BindingContext();
+        BindingGroup bc = new BindingGroup();
         Binding b;
 
-        b = bc.addBinding(style, "${symbolSize}", symSizeSpinner, "value");
-        b = bc.addBinding(style, "${plotSymbol}", psymEditor, "value");
-        b = bc.addBinding(style, "${lineWidth}", lineThickSpinner, "value");
-        b = bc.addBinding(style, "${symbolConnector}", lineEditor, "value");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style,BeanProperty.create(  "symbolSize" ), symSizeSpinner, BeanProperty.create("value")) );
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "plotSymbol" ), psymEditor,BeanProperty.create( "value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "lineWidth" ), lineThickSpinner, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "symbolConnector" ), lineEditor, BeanProperty.create("value")));
 
-        b = bc.addBinding(style, "${color}", colorEditor, "value");
-        b = bc.addBinding(style, "${fillToReference}", fillToReferenceCheckBox, "selected");
-        b = bc.addBinding(style, "${fillColor}", fillColorEditor, "value");
-        b = bc.addBinding(style, "${reference}", referenceEditor, "value");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "color" ), colorEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillToReference" ), fillToReferenceCheckBox, BeanProperty.create("selected")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillColor" ), fillColorEditor, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "reference" ), referenceEditor, BeanProperty.create("value")));
 
-        b = bc.addBinding(style, "${colortable}", edit, "value");
-        b = bc.addBinding(style, "${rebinMethod}", rebin, "value");
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "colortable" ), edit, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "rebinMethod" ), rebin, BeanProperty.create("value")));
         
         if ( panelBindingContext!=null ) panelBindingContext.unbind();
         bc.bind();
