@@ -8,8 +8,6 @@ package org.virbo.autoplot.scriptconsole;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import javax.beans.binding.Binding;
-import javax.beans.binding.BindingContext;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
