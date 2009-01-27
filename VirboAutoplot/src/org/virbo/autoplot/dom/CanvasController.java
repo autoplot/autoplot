@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,12 +28,15 @@ public class CanvasController {
     private Application application;
     private Canvas canvas;
     private PropertyChangeListener plotsListener;
-    
+    private ChangesSupport changesSupport;
+
     public CanvasController( Application dom, Canvas canvas ) {
         this.application= dom;
         this.canvas= canvas;
         canvas.setController(this);
         plotsListener= definePlotsListener();
+        changesSupport= new ChangesSupport(propertyChangeSupport);
+
         dom.addPropertyChangeListener( Application.PROP_PLOTS, plotsListener );
     }
     
@@ -50,6 +54,23 @@ public class CanvasController {
     public DasCanvas getDasCanvas() {
         return dasCanvas;
     }
+
+    public synchronized void registerPendingChange(Object client, Object lockObject) {
+        changesSupport.registerPendingChange(client, lockObject);
+    }
+
+    public synchronized void performingChange(Object client, Object lockObject) {
+        changesSupport.performingChange(client, lockObject);
+    }
+
+    public boolean isPendingChanges() {
+        return changesSupport.isPendingChanges();
+    }
+
+    public synchronized void changePerformed(Object client, Object lockObject) {
+        changesSupport.changePerformed(client, lockObject);
+    }
+
 
     private PropertyChangeListener definePlotsListener() {
         return new PropertyChangeListener() {
@@ -108,4 +129,15 @@ public class CanvasController {
             }
         });
     }
+    
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
 }
