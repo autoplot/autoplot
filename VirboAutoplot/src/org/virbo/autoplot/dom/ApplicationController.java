@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
@@ -70,9 +71,11 @@ public class ApplicationController {
     private int plotIdNum = 0;
     private int panelIdNum = 0;
     private int dsfIdNum = 0;
+    ChangesSupport changesSupport;
 
     public ApplicationController(ApplicationModel model, Application application) {
         this.application = application;
+        this.changesSupport= new ChangesSupport(propertyChangeSupport);
         application.setId("app_0");
         application.getOptions().setId("options_0");
         this.model = model;
@@ -86,6 +89,20 @@ public class ApplicationController {
         connectorImpls = new HashMap<Connector, ColumnColumnConnector>();
 
         addListeners();
+    }
+
+    /**
+     * block the calling thread until the application is idle.
+     * @see isPendingChanges.
+     */
+    public void waitUntilIdle() {
+        while ( this.isPendingChanges() ) {
+            try {
+                Thread.sleep(30);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ApplicationController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     private synchronized DataSourceFilter addDataSourceFilter() {
@@ -238,7 +255,17 @@ public class ApplicationController {
     }
 
     /**
-     * add a panelId to the application.
+     * add a new panel, creating a new Plot and DataSourceFilter as well.
+     * @return
+     */
+    public synchronized Panel addPanel( ) {
+        return addPanel( null, null );
+    }
+
+    /**
+     * add a panel to the application, attaching it to the given Plot and DataSourceFilter.
+     * @param domPlot if null, create a Plot, if non-null, add the panel to this plot.
+     * @param dsf if null, create a DataSourceFilter.  If non-null, connect the panel to this data source.
      * @return
      */
     public synchronized Panel addPanel(Plot domPlot, DataSourceFilter dsf) {
@@ -851,6 +878,10 @@ public class ApplicationController {
      */
     public boolean isPendingChanges() {
         boolean result = false;
+        if ( changesSupport.isPendingChanges() ) return true;
+        for (Canvas c : application.getCanvases()) {
+            result = result | c.getController().isPendingChanges();
+        }
         for (Panel p : application.getPanels()) {
             result = result | p.getController().isPendingChanges();
         }
@@ -862,25 +893,13 @@ public class ApplicationController {
      * @return
      */
     public boolean isValueAdjusting() {
-        return valueIsAdjusting;
+        return changesSupport.isValueAdjusting();
     }
-    private boolean valueIsAdjusting = false;
 
     protected synchronized MutatorLock mutatorLock() {
-        return new MutatorLock() {
-
-            public void lock() {
-                if (valueIsAdjusting) {
-                    System.err.println("lock is already set!");
-                }
-                valueIsAdjusting = true;
-            }
-
-            public void unlock() {
-                valueIsAdjusting = false;
-            }
-        };
+        return changesSupport.mutatorLock();
     }
+
     protected String status = "";
     public static final String PROP_STATUS = "status";
 
