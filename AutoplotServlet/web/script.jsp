@@ -26,14 +26,22 @@
     <form action="ScriptServlet" method="POST">
         Enter Script:
         <textarea rows="10" cols="80" name="script" >
+
 setCanvasSize( 400, 400 )
+
+dom= getDocumentModel()
 setDataSourceURL( 'http://www.sarahandjeremy.net/jeremy/1wire/data/2008/0B000800408DD710.20080117.d2s' )
 setTitle( 'Garage 20080117' )
+
+panel= dom.controller.addPanel()
+setDataSourceURL( 'http://www.sarahandjeremy.net/jeremy/1wire/data/2008/0B000800408DD710.20080118.d2s' )
+setTitle( 'Garage 20080118' )
 
 response.setContentType("image/png");
 out = response.getOutputStream()
 writeToPng( out )
 out.close()
+
         </textarea>
         <input type="submit" value="Plot" />
     </form>
