@@ -52,10 +52,12 @@ public class LayoutListener implements PropertyChangeListener {
                         public void actionPerformed(ActionEvent e) {
                             logger.fine("do autolayout");
                             ApplicationController applicationController= model.getDocumentModel().getController();
+                            model.dom.getController().getCanvas().getController().performingChange(this,"autolayout");
                             model.canvas.performingChange(this, "autolayout");
                             LayoutUtil.autolayout( applicationController.getDasCanvas(), 
                                     applicationController.getRow(), applicationController.getColumn() );
                             model.canvas.changePerformed(this, "autolayout");
+                            model.dom.getController().getCanvas().getController().changePerformed(this,"autolayout");
                         }
                     });
                     t.setRepeats(false);
