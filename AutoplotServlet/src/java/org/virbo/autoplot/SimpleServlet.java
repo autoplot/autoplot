@@ -5,6 +5,7 @@
 package org.virbo.autoplot;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.util.logging.Logger;
 import org.das2.util.DasPNGConstants;
@@ -33,6 +34,7 @@ import org.das2.util.TimerConsoleFormatter;
 import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.dom.Application;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURL;
@@ -129,19 +131,20 @@ public class SimpleServlet extends HttpServlet {
             ApplicationModel appmodel = new ApplicationModel();
 
             logit("create application model",t0,uniq);
-            
+
+            Application dom= appmodel.getDocumentModel();
+
             if ("true".equals(request.getParameter("autolayout"))) {
-                appmodel.setAutolayout(true);
+                dom.getOptions().setAutolayout(true);
             } else {
-                if (!row.equals("")) AutoplotUtil.setDevicePosition(appmodel.plot.getRow(), row);
-                if (!column.equals("")) AutoplotUtil.setDevicePosition(appmodel.plot.getColumn(), column);
+                dom.getOptions().setAutolayout(false);
+                if (!row.equals("")) dom.getController().getCanvas().setRow(row);
+                if (!column.equals("")) dom.getController().getCanvas().setColumn(column);
             }
 
-            if (!font.equals("")) appmodel.canvas.setBaseFont(Font.decode(font));
+            if (!font.equals("")) appmodel.getCanvas().setBaseFont(Font.decode(font));
 
-            appmodel.getCanvas().setSize(width, height);
-            appmodel.getCanvas().revalidate();
-            appmodel.getCanvas().setPrintingTag("");
+            dom.getController().getCanvas().setSize( new Dimension( width, height) );
 
             logit("set canvas parameters",t0,uniq);
             
@@ -190,8 +193,8 @@ public class SimpleServlet extends HttpServlet {
                 
                 if (!stimeRange.equals("") ) {
                     appmodel.waitUntilIdle(true);
-                    if ( UnitsUtil.isTimeLocation( appmodel.getPlot().getXAxis().getUnits() ) ) {
-                        appmodel.getPlot().getXAxis().setDatumRange(timeRange);
+                    if ( UnitsUtil.isTimeLocation( dom.getTimeRange().getUnits() ) ) {
+                        dom.setTimeRange(timeRange);
                     }
                     logit("done with setTimeRange",t0,uniq);
                 }
@@ -200,21 +203,21 @@ public class SimpleServlet extends HttpServlet {
 
             if (!srenderType.equals("")) {
                 ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
-                appmodel.setRenderType(renderType);
+                dom.getController().getPanel().setRenderType(renderType);
             }
 
             if (!scolor.equals("")) {
-                appmodel.seriesRend.setColor(Color.decode(scolor));
+                dom.getController().getPanel().getStyle().setColor(Color.decode(scolor));
             }
 
             if (!sfillColor.equals("")) {
-                appmodel.seriesRend.setFillColor(Color.decode(sfillColor));
+                dom.getController().getPanel().getStyle().setFillColor(Color.decode(sfillColor));
             }
             if (!sforegroundColor.equals("")) {
-                appmodel.canvas.setForeground(Color.decode(sforegroundColor));
+                dom.getOptions().setForeground(Color.decode(sforegroundColor));
             }
             if (!sbackgroundColor.equals("")) {
-                appmodel.canvas.setBackground(Color.decode(sbackgroundColor));
+                dom.getOptions().setBackground(Color.decode(sbackgroundColor));
             }
 
             logit("done with setStyle",t0,uniq);
@@ -231,7 +234,7 @@ public class SimpleServlet extends HttpServlet {
                 logit("done with script",t0,uniq);
             }
             
-            
+            dom.getController().waitUntilIdle();
             
             if (format.equals("image/png")) {
                 logit("waiting for image",t0,uniq);

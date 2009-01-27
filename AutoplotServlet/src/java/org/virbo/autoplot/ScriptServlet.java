@@ -6,8 +6,6 @@
 package org.virbo.autoplot;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -31,6 +29,9 @@ public class ScriptServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         try {
+
+            ApplicationModel appmodel = new ApplicationModel();
+
             String script= request.getParameter("script");
             
             if ( script==null ) {
@@ -49,21 +50,19 @@ public class ScriptServlet extends HttpServlet {
                 if ( ss[i].contains("import") ) throw new IllegalArgumentException("imports not allowed for security");
                 if ( ss[i].contains("eval") ) throw new IllegalArgumentException("eval not allowed for security");
             }
-                    
-            PythonInterpreter interp = new PythonInterpreter();
+
+            PythonInterpreter interp = JythonUtil.createInterpreter( true, true );
             interp.setOut( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) );
-            
-            interp.execfile(AutoPlotUI.class.getResource("imports.py").openStream(), "imports.py");
             
             interp.set( "response", response );
             
             ScriptContext._setOutputStream( new LoggingOutputStream( Logger.getLogger("virbo.scriptservlet"), Level.INFO ) ); 
             
             throw new IllegalArgumentException("server-side scripting disabled");
-            //interp.exec(script);            
-            
+            //interp.exec(script);
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
         } finally { 
-            
             
         }
     } 

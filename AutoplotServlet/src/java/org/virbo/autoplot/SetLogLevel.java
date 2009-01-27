@@ -62,9 +62,8 @@ public class SetLogLevel extends HttpServlet {
             }
             out.println("</body>");
             out.println("</html>");
-            
-        } finally { 
-            out.close();
+        } catch ( Exception e ) {
+            throw new RuntimeException(e);
         }
     } 
 
