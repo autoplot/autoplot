@@ -154,7 +154,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             surl += "?";
                         }
                         setValue(surl);
-                        setMessage("url ambiguous, inspecting resource for parameters");
+                        setMessage("busy: url ambiguous, inspecting resource for parameters");
                         browseSourceType();
                         //int carotpos = surl.indexOf("?") + 1;
                        
