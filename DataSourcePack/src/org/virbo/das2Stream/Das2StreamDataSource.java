@@ -12,8 +12,6 @@ import org.das2.client.DataSetStreamHandler;
 import org.das2.stream.StreamException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.StreamTool;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,7 +63,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
             
         } else {
 
-            HashMap props = new HashMap();
+            HashMap<String,String> props = new HashMap<String,String>();
             props.put("file", url.toString());
 
             DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
