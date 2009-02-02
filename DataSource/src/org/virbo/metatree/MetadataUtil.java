@@ -10,6 +10,7 @@ import org.das2.datum.NumberUnits;
 import org.das2.datum.Units;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.das2.datum.Basis;
 import org.das2.datum.Datum;
 import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.TimeUtil;
@@ -32,7 +33,13 @@ public class MetadataUtil {
         try {
             result= Units.getByName(units);
         } catch ( IllegalArgumentException ex ) {
-            result= new NumberUnits( units );
+            if ( units.equals("sec") ) {   // begin, giant table of kludges
+                result= Units.seconds;
+            } else if ( units.equals("msec") ) {  // CDF
+                result= Units.milliseconds;
+            } else {
+                result= new NumberUnits( units );
+            }
         }
         return result;
     }
@@ -80,7 +87,8 @@ public class MetadataUtil {
             Units offsetUnits= lookupTimeLengthUnit(ss[0]);
             Datum datum= TimeUtil.create(ss[1]);
             String canonicalName = "" + offsetUnits + " since "+ datum;
-            result= new TimeLocationUnits(canonicalName, canonicalName, offsetUnits);
+            Basis basis= new Basis( "since "+ datum, "since "+ datum, Basis.since2000, datum.doubleValue(Units.us2000), Units.us2000.getOffsetUnits() );
+            result= new TimeLocationUnits( canonicalName, canonicalName, offsetUnits, basis );
             result.registerConverter( Units.us2000, 
                     new ScaleOffset( 
                     offsetUnits.convertDoubleTo(Units.microseconds, 1.0), 
