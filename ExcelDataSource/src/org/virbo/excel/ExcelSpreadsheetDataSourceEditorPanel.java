@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.beans.binding.BindingContext;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
@@ -28,6 +27,10 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.BindingGroup;
+import org.jdesktop.beansbinding.Bindings;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URLSplit;
@@ -68,12 +71,12 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
             }
         });
 
-        BindingContext bc = new BindingContext();
+        BindingGroup bc = new BindingGroup();
 
-        bc.addBinding(this, "${firstRow}", this.firstRowTextField, "value");
-        bc.addBinding(this, "${column}", this.columnsComboBox, "selectedItem");
-        bc.addBinding(this, "${dep0}", this.dep0Columns, "selectedItem");
-        bc.addBinding(this, "${sheet}", this.sheetComboBox, "selectedItem");
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, this, BeanProperty.create("firstRow"), this.firstRowTextField, BeanProperty.create("value") ) );
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, this, BeanProperty.create("column"), this.columnsComboBox, BeanProperty.create("selectedItem") ) );
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, this, BeanProperty.create("dep0"), this.dep0Columns, BeanProperty.create("selectedItem") ) );
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, this, BeanProperty.create("sheet"), this.sheetComboBox, BeanProperty.create("selectedItem") ) );
 
         bc.bind();
     }
