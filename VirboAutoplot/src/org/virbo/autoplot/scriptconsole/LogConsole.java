@@ -13,6 +13,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,9 +28,18 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.JFileChooser;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.text.Keymap;
+import org.das2.system.RequestProcessor;
+import org.python.core.PyException;
+import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.JythonUtil;
 
 /**
  * GUI for graphically handling log records.  This defines a Handler, and has
@@ -40,8 +50,8 @@ import javax.swing.Timer;
  * @author  jbf
  */
 public class LogConsole extends javax.swing.JPanel {
-    public static final int RECORD_SIZE_LIMIT = 1000;
 
+    public static final int RECORD_SIZE_LIMIT = 1000;
     List<LogRecord> records = new LinkedList<LogRecord>();
     int eventThreadId = -1;
     int level = Level.INFO.intValue();
@@ -49,14 +59,48 @@ public class LogConsole extends javax.swing.JPanel {
     private Timer timer2;
     PrintStream oldStdOut;
     PrintStream oldStdErr;
+    PythonInterpreter interp = null;
 
     /** Creates new form LogConsole */
     public LogConsole() {
         initComponents();
-        timer2= new Timer( 100, new ActionListener() {
-           public void actionPerformed( ActionEvent e ) {
-               update();
-           } 
+        ActionMap map = editorTextPane1.getActionMap();
+        Action evalAction = new AbstractAction("eval") {
+
+            public synchronized void actionPerformed(ActionEvent e) {
+                final String s = editorTextPane1.getText();
+                RequestProcessor.invokeLater(new Runnable() {
+                    public void run() {
+                        try {
+                            System.out.println("AP> "+s);
+                            if (interp == null) {
+                                editorTextPane1.setText("initializing interpretter...");
+                                interp = JythonUtil.createInterpreter(true, false);
+                                editorTextPane1.setText(s);
+                            }
+                            interp.exec(s);
+                            editorTextPane1.setText("");
+                        } catch (IOException ex) {
+                            Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch ( PyException ex ) {
+                            System.err.println(ex.toString());
+                        }
+
+                    }
+                } );
+            }
+        };
+        map.put("eval", evalAction);
+        editorTextPane1.setActionMap(map);
+        Keymap keys = editorTextPane1.getKeymap();
+        keys.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), evalAction);
+        editorTextPane1.setKeymap(keys);
+
+        timer2 = new Timer(100, new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                update();
+            }
         });
         timer2.setRepeats(false);
     }
@@ -73,18 +117,19 @@ public class LogConsole extends javax.swing.JPanel {
      */
     public Handler getHandler() {
         Handler h = new Handler() {
+
             public synchronized void publish(LogRecord rec) {
                 synchronized (LogConsole.this) {
                     //if ( !records.get(records.size()-1).equals(rec)) {
-                        records.add(rec);
-                        timer2.restart();
-                        //timer.tickle();
-                        if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
-                            eventThreadId = rec.getThreadID();
-                        }
-                    //}
+                    records.add(rec);
+                    timer2.restart();
+                    //timer.tickle();
+                    if (eventThreadId == -1 && EventQueue.isDispatchThread()) {
+                        eventThreadId = rec.getThreadID();
+                    }
+                //}
                 }
-                if ( rec.getLevel().intValue() >= Level.WARNING.intValue() ) {
+                if (rec.getLevel().intValue() >= Level.WARNING.intValue()) {
                     LogConsole.this.oldStdErr.println(rec.getMessage());
                 }
             }
@@ -106,39 +151,39 @@ public class LogConsole extends javax.swing.JPanel {
      * This is used with turnOffConsoleHandlers.
      * @see turnOffConsoleHandlers
      */
-    public void logConsoleMessages( ) {
-        Logger logger;                                                         
-        LoggingOutputStream los;                                               
-                                                                               
-        logger = Logger.getLogger("console.stdout");                                   
-        los = new LoggingOutputStream(logger, Level.INFO );          
-        oldStdOut= System.out;
-        System.setOut(new PrintStream(los, true));                             
-                            
-        logger = Logger.getLogger("console.stderr");                                   
-        los= new LoggingOutputStream(logger, Level.WARNING );
-        oldStdErr= System.err;
-        System.setErr(new PrintStream(los, true));       
+    public void logConsoleMessages() {
+        Logger logger;
+        LoggingOutputStream los;
+
+        logger = Logger.getLogger("console.stdout");
+        los = new LoggingOutputStream(logger, Level.INFO);
+        oldStdOut = System.out;
+        System.setOut(new PrintStream(los, true));
+
+        logger = Logger.getLogger("console.stderr");
+        los = new LoggingOutputStream(logger, Level.WARNING);
+        oldStdErr = System.err;
+        System.setErr(new PrintStream(los, true));
     }
 
     public void undoLogConsoleMessages() {
         System.setOut(oldStdOut);
         System.setErr(oldStdErr);
     }
-    
+
     /**
      * iterate through the Handlers, looking for ConsoleHandlers, and turning
      * them off.
      * @see logConsoleMessages
      */
     public void turnOffConsoleHandlers() {
-        for ( Handler h : Logger.getLogger("").getHandlers() ) {
-            if ( h instanceof ConsoleHandler ) {
+        for (Handler h : Logger.getLogger("").getHandlers()) {
+            if (h instanceof ConsoleHandler) {
                 h.setLevel(Level.OFF);
             }
         }
     }
-    
+
     private synchronized void update() {
         final StringBuffer buf = new StringBuffer();
 
@@ -175,14 +220,15 @@ public class LogConsole extends javax.swing.JPanel {
                 buf.append(recMsg).append("\n");
             }
         }
-        
+
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 logTextArea.setText(buf.toString());
             }
         });
-        
-        while (records.size() > RECORD_SIZE_LIMIT ) {
+
+        while (records.size() > RECORD_SIZE_LIMIT) {
             records.remove(0);
         }
     }
@@ -208,6 +254,9 @@ public class LogConsole extends javax.swing.JPanel {
         timeStampsCheckBox = new javax.swing.JCheckBox();
         verbositySelect = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        editorTextPane1 = new org.virbo.autoplot.scriptconsole.EditorTextPane();
 
         jScrollPane1.setAutoscrolls(true);
 
@@ -327,24 +376,39 @@ public class LogConsole extends javax.swing.JPanel {
                     .add(loggerIDCheckBox)))
         );
 
+        jLabel2.setText("AP>");
+
+        jScrollPane2.setViewportView(editorTextPane1);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 191, Short.MAX_VALUE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jLabel2)
+                        .add(2, 2, 2)
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
+                .add(12, 12, 12)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                            .add(jLabel2)
+                            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -384,38 +448,39 @@ private void loggerIDCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//
 
 private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
     JFileChooser chooser = new JFileChooser();
-    if ( JFileChooser.APPROVE_OPTION == chooser.showSaveDialog(this) ) {
-            FileOutputStream fo = null;
+    if (JFileChooser.APPROVE_OPTION == chooser.showSaveDialog(this)) {
+        FileOutputStream fo = null;
+        try {
+            fo = new FileOutputStream(chooser.getSelectedFile());
+            LogConsoleUtil.serializeLogRecords(records, fo);
+            fo.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
             try {
-                fo = new FileOutputStream(chooser.getSelectedFile());
-                LogConsoleUtil.serializeLogRecords( records, fo );
                 fo.close();
-            } catch (FileNotFoundException ex) {
+            } catch (IOException ex) {
                 Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
-            } catch ( IOException ex ) {
-                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    fo.close();
-                } catch (IOException ex) {
-                    Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
-                }
             }
+        }
     }
 }//GEN-LAST:event_saveButtonActionPerformed
 
 private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
     try {
-    ByteArrayOutputStream out= new ByteArrayOutputStream(1000);
-    LogConsoleUtil.serializeLogRecords( records, out );
-    out.close();
-        StringSelection stringSelection = new StringSelection( out.toString() );
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1000);
+        LogConsoleUtil.serializeLogRecords(records, out);
+        out.close();
+        StringSelection stringSelection = new StringSelection(out.toString());
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, new ClipboardOwner() {
+
             public void lostOwnership(Clipboard clipboard, Transferable contents) {
             }
         });
-    } catch ( IOException ex ) {
+    } catch (IOException ex) {
         throw new RuntimeException(ex);
     }
 }//GEN-LAST:event_copyButtonActionPerformed
@@ -424,8 +489,11 @@ private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JPanel actionsPanel;
     private javax.swing.JButton clearButton;
     private javax.swing.JButton copyButton;
+    private org.virbo.autoplot.scriptconsole.EditorTextPane editorTextPane1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JCheckBox logLevelCheckBox;
     private javax.swing.JTextArea logTextArea;
     private javax.swing.JCheckBox loggerIDCheckBox;
