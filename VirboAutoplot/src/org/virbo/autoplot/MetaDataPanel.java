@@ -152,7 +152,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceController.PROP_FILLDATASET)) {
-                System.err.println("fillChanged: "+evt+" "+evt.getPropertyName()+" "+evt.getOldValue()+" "+evt.getNewValue());
+                //System.err.println("fillChanged: "+evt+" "+evt.getPropertyName()+" "+evt.getOldValue()+" "+evt.getNewValue());
                 updateStatistics();
             }
         }
