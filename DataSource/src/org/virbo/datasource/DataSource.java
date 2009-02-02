@@ -11,7 +11,6 @@ package org.virbo.datasource;
 
 import org.das2.util.monitor.ProgressMonitor;
 import java.util.Map;
-import javax.swing.tree.TreeModel;
 import org.virbo.dataset.QDataSet;
 
 /**
