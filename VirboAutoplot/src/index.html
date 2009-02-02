@@ -16,14 +16,19 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <ul><li> TimeSeriesBrowse (aggregration,etc) works.
-</li><li> minor bugfixes in AsciiTableEditorPanel
-</li><li> timeParser allows $-1m/$d/$y so that fields aren't assumed to be fixed width.
-</li>            
+        <li> misc. minor bugfixes
+</li><li> console tab now has command-line interpreter for controlling application.
+</li><li> cdfDataSource has new option interpMeta=no.
+</li></ol>
 <p>Known Bugs:
-    <li>Still largely untested...</li>
 </p>
-</ul>
+<ol><li> SeriesRenderers accept context click anyway within concave region, causing confusion.  <a href="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" class="external text" title="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" rel="nofollow">bug report</a>
+</li><li> If three panels plot three components, then the URI is reset to a rank 1 dataset, the extra panels are not removed.  A mechanism for detecting and automatically removing component panels is needed.
+</li><li> Controls for removing and moving panels, plots, and dataSources is lacking.  DataSources are never removed from the application, but are often recycled.  Same is true with Plots and Panels.
+
+</li><li> Rendering performance is poor on Fedora 10.  This has not been isolated to the OS, Java, or a new bug in the application.  Windows performance is fine.
+</li>
+
 
 	<p>data is input from: 
 	<li>ascii files (.dat,.txt)</li>
