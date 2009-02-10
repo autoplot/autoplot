@@ -43,6 +43,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 
     HSSFWorkbook wb;
     Map<Integer,String> columns;
+    boolean focusDepend0= false;
     
     /** Creates new form AsciiDataSourceEditorPanel */
     public ExcelSpreadsheetDataSourceEditorPanel() {
@@ -55,10 +56,13 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                 if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
                     int col = jTable1.getColumnModel().getSelectedColumns()[0];
                     String name= columns.get(col);
-                    if ( name!=null ) {
-                        setColumn( name );
+                    if ( name==null ) {
+                        name= "" + (char) (col + 'A');
+                    }
+                    if ( focusDepend0 ) {
+                        setDep0( name );
                     } else {
-                        setColumn( "" + (char) (col + 'A') );
+                        setColumn( name );
                     }
                 }
             }
@@ -67,7 +71,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
-                setFirstRow(e.getFirstIndex() + 1);
+                setFirstRow( jTable1.getSelectedRow() + 1);
             }
         });
 
@@ -130,11 +134,15 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 
         jLabel3.setText("Column:");
 
-        columnsComboBox.setEditable(true);
         columnsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         columnsComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 columnsComboBoxItemStateChanged(evt);
+            }
+        });
+        columnsComboBox.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                columnsComboBoxFocusGained(evt);
             }
         });
 
@@ -144,6 +152,11 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         dep0Columns.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 dep0ColumnsItemStateChanged(evt);
+            }
+        });
+        dep0Columns.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                dep0ColumnsFocusGained(evt);
             }
         });
 
@@ -164,8 +177,8 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                         .add(jLabel3)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(dep0Columns, 0, 170, Short.MAX_VALUE)
-                    .add(columnsComboBox, 0, 170, Short.MAX_VALUE))
+                    .add(dep0Columns, 0, 187, Short.MAX_VALUE)
+                    .add(columnsComboBox, 0, 187, Short.MAX_VALUE))
                 .add(245, 245, 245)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -187,8 +200,8 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
                     .add(dep0Columns, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 370, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -238,6 +251,14 @@ private void columnsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GE
 private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
     setDep0( (String)dep0Columns.getSelectedItem() );
 }//GEN-LAST:event_dep0ColumnsItemStateChanged
+
+private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dep0ColumnsFocusGained
+    this.focusDepend0= true;
+}//GEN-LAST:event_dep0ColumnsFocusGained
+
+private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_columnsComboBoxFocusGained
+    this.focusDepend0= false;
+}//GEN-LAST:event_columnsComboBoxFocusGained
 
     protected File file = null;
     public static final String PROP_FILE = "file";
@@ -295,6 +316,8 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
             Rectangle rect = jTable1.getCellRect(getFirstRow() - 1, 0, true);
             columns= ExcelUtil.getColumns( wb, getSheet(), "" + getFirstRow(), new NullProgressMonitor() );
             columnsComboBox.setModel( new DefaultComboBoxModel( columns.values().toArray() ) );
+            int col= jTable1.getSelectedColumn();
+            setColumn(columns.get(col));
             List<String> dep0Values= new ArrayList<String>( columns.values() );
             dep0Values.add(0,"");
             dep0Columns.setModel( new DefaultComboBoxModel( dep0Values.toArray() ) );
@@ -314,6 +337,9 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
     }
 
     public void setColumn(String column) {
+        if ( column.equals("parcel") ) {
+            System.err.println("hseles");
+        }
         String oldColumn = this.column;
         this.column = column;
         firePropertyChange(PROP_COLUMN, oldColumn, column);
@@ -350,6 +376,8 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
             
             if ( params.containsKey("firstRow") ) {
                 setFirstRow( Integer.parseInt(params.get("firstRow") ) );
+            } else {
+                setFirstRow( 1 );
             }
             
             if ( params.containsKey("column" ) ) {
