@@ -1,22 +1,23 @@
 Manifest-Version: 1.0
-Ant-Version: Apache Ant 1.7.0
-Created-By: 1.6.0_03-b05 (Sun Microsystems Inc.)
-Main-Class: org.virbo.autoplot.JythonMain
-Class-Path: lib/QDataSet.jar lib/JythonSupport.jar lib/DataSource.jar 
- lib/DataSourcePack.jar lib/JythonDataSource.jar lib/WavDataSource.jar
-  lib/CdfDataSource.jar lib/CefDataSource.jar lib/NetCdfDataSource.jar
-  lib/OpenDapDataSource.jar lib/BinaryDataSource.jar lib/ExcelDataSour
- ce.jar lib/FitsDataSource.jar lib/swing-layout-1.0.3.jar lib/dasCore.
- jar lib/beansbinding.jar lib/JFontChooser.jar lib/jython.jar lib/bati
- k-awt-util.jar lib/batik-svggen.jar lib/batik-util.jar lib/cdfjava.ja
- r lib/itext-1.2.jar lib/jfits-0.93.jar lib/bufr.jar lib/commons-codec
- -1.3.jar lib/commons-httpclient-3.0.jar lib/commons-logging-1.0.4.jar
-  lib/gnu-regexp-1.1.4.jar lib/grib-5.0.04.jar lib/jdom.jar lib/jpeg20
- 00.jar lib/lucene.jar lib/netcdfUI-2.2.18.jar lib/nlog4j-1.2.21.jar l
- ib/prefsAll.jar lib/resourcesOptional.jar lib/visadNoDods.jar lib/xer
- cesImpl.jar lib/xml-apis.jar lib/poi-3.1-FINAL-20080629.jar lib/poi-c
- ontrib-3.1-FINAL-20080629.jar lib/poi-scratchpad-3.1-FINAL-20080629.j
- ar lib/Das2ServerDataSource.jar lib/ImageDataSource.jar lib/TsdsDataS
- ource.jar lib/metadata-extractor-2.1.0.jar lib/dasCoreUI.jar
+Ant-Version: Apache Ant 1.6.5
+Created-By: 1.5.0_15-b04 (Sun Microsystems Inc.)
+Main-Class: org.virbo.autoplot.AutoPlotUI
+Class-Path: lib/QDataSet.jar lib/QStream.jar lib/JythonSupport.jar lib
+ /DataSource.jar lib/DataSourcePack.jar lib/JythonDataSource.jar lib/W
+ avDataSource.jar lib/CdfDataSource.jar lib/CefDataSource.jar lib/Open
+ DapDataSource.jar lib/BinaryDataSource.jar lib/ExcelDataSource.jar li
+ b/FitsDataSource.jar lib/Das2ServerDataSource.jar lib/ImageDataSource
+ .jar lib/TsdsDataSource.jar lib/NetCdfDataSource.jar lib/IdlSupport.j
+ ar lib/beansbinding.jar lib/swing-layout-1.0.3.jar lib/JFontChooser.j
+ ar lib/jython.jar lib/dasCore-1.0.0.jar lib/batik-awt-util.jar lib/ba
+ tik-svggen.jar lib/batik-util.jar lib/cdfjava.jar lib/itext-1.2.jar l
+ ib/jfits-0.93.jar lib/metadata-extractor-2.1.0.jar lib/bufr.jar lib/c
+ ommons-codec-1.3.jar lib/commons-httpclient-3.0.jar lib/commons-loggi
+ ng-1.0.4.jar lib/gnu-regexp-1.1.4.jar lib/grib-5.0.04.jar lib/jdom.ja
+ r lib/jpeg2000.jar lib/lucene.jar lib/netcdfUI-2.2.18.jar lib/nlog4j-
+ 1.2.21.jar lib/prefsAll.jar lib/resourcesOptional.jar lib/visadNoDods
+ .jar lib/xercesImpl.jar lib/xml-apis.jar lib/poi-3.1-FINAL-20080629.j
+ ar lib/poi-contrib-3.1-FINAL-20080629.jar lib/poi-scratchpad-3.1-FINA
+ L-20080629.jar
 X-COMMENT: Main-Class will be added automatically by build
 

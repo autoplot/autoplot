@@ -837,7 +837,14 @@ public class AutoplotUtil {
         }
         
         if ( fillds.rank()==1 && fillds.property(QDataSet.PLANE_0) !=null ) {
-            spec= RenderType.colorScatter;
+            QDataSet plane0= (QDataSet) fillds.property(QDataSet.PLANE_0);
+            Units u= (Units) plane0.property(QDataSet.UNITS);
+            if ( u!=null && ( UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u) ) ) {
+                spec= RenderType.colorScatter;
+            } else {
+                spec= RenderType.series;
+            }
+            
         }
 
         return spec;

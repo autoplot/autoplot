@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import javax.swing.JComponent;
+import org.das2.DasApplication;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -297,8 +298,12 @@ public class ScriptContext extends PyJavaInstance {
      * @param dstProp a property name such as "label"
      */
     public static void bind(Object src, String srcProp, Object dst, String dstProp) {
-        Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, BeanProperty.create( srcProp ), dst, BeanProperty.create(dstProp));
-        b.bind();
+        if ( DasApplication.hasAllPermission() ) {
+            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, BeanProperty.create( srcProp ), dst, BeanProperty.create(dstProp));
+            b.bind();
+        } else {
+            System.err.println("bindings disabled in applet environment");
+        }
     }
 
 

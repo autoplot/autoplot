@@ -12,13 +12,13 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 import org.das2.DasApplication;
@@ -26,6 +26,7 @@ import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.event.BoxZoomMouseModule;
+import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
 import org.das2.event.PointSlopeDragRenderer;
 import org.das2.event.ZoomPanMouseModule;
@@ -72,16 +73,18 @@ public class ApplicationController {
     private int panelIdNum = 0;
     private int dsfIdNum = 0;
     ChangesSupport changesSupport;
+    ApplicationControllerSyncSupport syncSupport;
 
     public ApplicationController(ApplicationModel model, Application application) {
         this.application = application;
-        this.changesSupport= new ChangesSupport(propertyChangeSupport);
+        this.syncSupport = new ApplicationControllerSyncSupport(this);
+        this.changesSupport = new ChangesSupport(propertyChangeSupport);
         application.setId("app_0");
         application.getOptions().setId("options_0");
         this.model = model;
         application.controller = this;
         this.headless = "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false"));
-        if (!headless) {
+        if (!headless && DasApplication.hasAllPermission()) {
             application.getOptions().loadPreferences();
         }
         bindingContexts = new HashMap<Object, BindingGroup>();
@@ -96,7 +99,7 @@ public class ApplicationController {
      * @see isPendingChanges.
      */
     public void waitUntilIdle() {
-        while ( this.isPendingChanges() ) {
+        while (this.isPendingChanges()) {
             try {
                 Thread.sleep(30);
             } catch (InterruptedException ex) {
@@ -105,7 +108,7 @@ public class ApplicationController {
         }
     }
 
-    private synchronized DataSourceFilter addDataSourceFilter() {
+    protected synchronized DataSourceFilter addDataSourceFilter() {
         DataSourceFilter dsf = new DataSourceFilter();
         new DataSourceController(this.model, dsf);
         dsf.setId("data_" + dsfIdNum);
@@ -119,6 +122,10 @@ public class ApplicationController {
 
     private void addListeners() {
         this.addPropertyChangeListener(ApplicationController.PROP_PANEL, new PropertyChangeListener() {
+
+            public String toString() {
+                return "" + ApplicationController.this;
+            }
 
             public void propertyChange(PropertyChangeEvent evt) {
                 Panel p = getPanel();
@@ -178,6 +185,7 @@ public class ApplicationController {
         }
 
         unbind(panel);
+        panel.getController().unbind();
 
         ArrayList<Panel> panels = new ArrayList<Panel>(Arrays.asList(application.getPanels()));
         panels.remove(panel);
@@ -219,7 +227,7 @@ public class ApplicationController {
 
         overviewPlotConnector.getMouseAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(upper, lower));
         canvas.add(overviewPlotConnector);
-
+        canvas.revalidate();
     //TODO: disconnect/delete if one plotId is deleted.
 
     }
@@ -258,8 +266,8 @@ public class ApplicationController {
      * add a new panel, creating a new Plot and DataSourceFilter as well.
      * @return
      */
-    public synchronized Panel addPanel( ) {
-        return addPanel( null, null );
+    public synchronized Panel addPanel() {
+        return addPanel(null, null);
     }
 
     /**
@@ -307,15 +315,20 @@ public class ApplicationController {
 
         panel.addPropertyChangeListener(Panel.PROP_PLOTID, new PropertyChangeListener() {
 
+            public String toString() {
+                return "" + ApplicationController.this;
+            }
+
             public void propertyChange(PropertyChangeEvent evt) {
                 Panel p = (Panel) evt.getSource();
                 String srcid = (String) evt.getOldValue();
                 String dstid = (String) evt.getNewValue();
-                if (srcid == null) {
+                if (srcid == null || srcid.equals("")) {
                     return; // initialization state
                 }
-                assert !srcid.equals("");
-                assert dstid != null && !dstid.equals("");
+                if (dstid == null || dstid.equals("")) {
+                    return;
+                }
                 Plot src = (Plot) DomUtil.getElementById(application, srcid);
                 Plot dst = (Plot) DomUtil.getElementById(application, dstid);
                 if (src != null && dst != null) {
@@ -354,9 +367,9 @@ public class ApplicationController {
                 if (ps.size() > 0) {
                     Panel p = ApplicationController.this.getPanelsFor(domPlot).get(0);
                     logger.fine("focus to " + p);
-                    setFocusUri(p.getController().getDataSourceFilter().getSuri());
+                    setFocusUri(p.getController().getDataSourceFilter().getUri());
                     if (getPanel() != p) {
-                        setStatus("" + p + " selected");
+                        setStatus("" + domPlot + ", " + p + " selected");
                         setPanel(p);
                     }
                 }
@@ -412,8 +425,6 @@ public class ApplicationController {
         plot.getXAxis().setPlot(plot);
         plot.getYAxis().setPlot(plot);
 
-        addPlotContextMenuItems(plot, plotController, domPlot);
-
         BoxZoomMouseModule boxmm = (BoxZoomMouseModule) plot.getMouseAdapter().getModuleByLabel("Box Zoom");
         plot.getMouseAdapter().setPrimaryModule(boxmm);
 
@@ -451,9 +462,18 @@ public class ApplicationController {
         domPlot.getController().bindTo(plot);
         domPlot.getController().bindTo(colorbar);
 
+        addPlotContextMenuItems(plot, plotController, domPlot);
+        addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getXaxis());
+        addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getYaxis());
+        addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getZaxis());
+
         addPlotFocusListener(plot);
 
         plot.addPropertyChangeListener(DasPlot.PROP_FOCUSRENDERER, new PropertyChangeListener() {
+
+            public String toString() {
+                return "" + ApplicationController.this;
+            }
 
             public void propertyChange(PropertyChangeEvent evt) {
                 Renderer r = plot.getFocusRenderer();
@@ -461,12 +481,12 @@ public class ApplicationController {
                     return;
                 }
                 Panel p = findPanel(r);
-                
+
                 if (getPanel() != p) {
-                    setStatus("" + p + " selected");
+                    setStatus("" + domPlot + ", " + p + " selected");
                     setPanel(p);
                 }
-                
+
             }
         });
 
@@ -517,8 +537,8 @@ public class ApplicationController {
             return newPlot;
         }
 
-        for ( Panel srcPanel: p ) {
-            Panel newp= copyPanel( srcPanel, newPlot, dsf );
+        for (Panel srcPanel : p) {
+            Panel newp = copyPanel(srcPanel, newPlot, dsf);
         }
         return newPlot;
 
@@ -534,10 +554,10 @@ public class ApplicationController {
     protected Panel copyPanel(Panel srcPanel, Plot domPlot, DataSourceFilter dsf) {
         Panel newp = addPanel(domPlot, dsf);
         newp.syncTo(srcPanel, Arrays.asList("plotId", "dataSourceFilterId"));
-        if ( dsf==null ) {
-            newp.getController().getDataSourceFilter().getController().setDataSetInternal(srcPanel.getController().getDataSourceFilter().getController().getDataSet(), true);
-            if (srcPanel.getController().getDataSourceFilter().getSuri() != null) {
-                newp.getController().getDataSourceFilter().suri = srcPanel.getController().getDataSourceFilter().getSuri();
+        if (dsf == null) {
+            newp.getController().getDataSourceFilter().getController().setDataSetInternal(srcPanel.getController().getDataSourceFilter().getController().getDataSet());
+            if (srcPanel.getController().getDataSourceFilter().getUri() != null) {
+                newp.getController().getDataSourceFilter().uri = srcPanel.getController().getDataSourceFilter().getUri();
             }
         }
         return newp;
@@ -634,6 +654,8 @@ public class ApplicationController {
      * the initial copy is from src to dst.  In MVC terms, src should be the model
      * and dst should be a view.  The properties must fire property
      * change events for the binding mechanism to work.
+     *
+     * BeansBinding library is appearently not thread-safe.
      * 
      * Example:
      * model= getApplicationModel()
@@ -644,7 +666,7 @@ public class ApplicationController {
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
      */
-    public void bind(DomNode src, String srcProp, Object dst, String dstProp) {
+    public synchronized void bind(DomNode src, String srcProp, Object dst, String dstProp) {
         BindingGroup bc;
         synchronized (bindingContexts) {
             bc = bindingContexts.get(src);
@@ -654,8 +676,17 @@ public class ApplicationController {
             bindingContexts.put(src, bc);
         }
 
-        Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp) );
-        bc.addBinding( b );
+        Binding b;
+        //if ( DasApplication.hasAllPermission() ) {
+        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
+        bc.addBinding(b);
+        //} else {
+        //    Property propa= BeanProperty.create(srcProp);
+        //    Property propb= BeanProperty.create(dstProp);
+        //
+        //    System.err.println("bindings disabled in the applet environment");
+        //    return;
+        //}
 
         BindingModel bb = new BindingModel();
 
@@ -776,6 +807,119 @@ public class ApplicationController {
         return result.toArray(new BindingModel[result.size()]);
     }
 
+    /**
+     * support for binding two plot axes.
+     * @param dstPlot
+     * @param plot
+     * @param axis
+     * @throws java.lang.IllegalArgumentException
+     */
+    private void bindToPlotPeer(Plot dstPlot, Plot plot, Axis axis) throws IllegalArgumentException {
+        Axis targetAxis;
+        if (plot.getXaxis() == axis) {
+            targetAxis = dstPlot.getXaxis();
+        } else if (plot.getYaxis() == axis) {
+            targetAxis = dstPlot.getYaxis();
+        } else if (plot.getZaxis() == axis) {
+            targetAxis = dstPlot.getZaxis();
+        } else {
+            throw new IllegalArgumentException("this axis and plot don't go together");
+        }
+        bind(targetAxis, Axis.PROP_RANGE, axis, Axis.PROP_RANGE);
+        bind(targetAxis, Axis.PROP_LOG, axis, Axis.PROP_LOG);
+    }
+
+
+    private void addAxisContextMenuItems(final DasPlot dasPlot, final PlotController plotController, final Plot plot, final Axis axis) {
+
+        final DasAxis dasAxis = axis.getController().getDasAxis();
+        final DasMouseInputAdapter mouseAdapter = dasAxis.getMouseAdapter();
+
+        mouseAdapter.removeMenuItem("Properties");
+
+        JMenuItem item;
+
+        mouseAdapter.addMenuItem(new JMenuItem(new AbstractAction("Axis Properties") {
+
+            public void actionPerformed(ActionEvent e) {
+                PropertyEditor pp = new PropertyEditor(axis);
+                pp.showDialog(dasAxis.getCanvas());
+            }
+        }));
+
+        mouseAdapter.addMenuItem(new JSeparator());
+
+        if (axis == plot.getXaxis()) {
+            JMenu addPlotMenu = new JMenu("Add Plot");
+            mouseAdapter.addMenuItem(addPlotMenu);
+
+            item = new JMenuItem(new AbstractAction("Bound Plot Below") {
+
+                public void actionPerformed(ActionEvent e) {
+                    Plot newPlot = copyPlot(plot);
+                }
+            });
+            item.setToolTipText("add a new plot below.  The plot's x axis will be bound to this plot's x axis");
+            addPlotMenu.add(item);
+
+        }
+
+        item = new JMenuItem(new AbstractAction("Remove Bindings") {
+
+            public void actionPerformed(ActionEvent e) {
+                unbind(axis);  // TODO: check for application timerange
+            }
+        });
+        item.setToolTipText("remove any plot and panel property bindings");
+        mouseAdapter.addMenuItem(item);
+
+
+        JMenu bindingMenu = new JMenu("Add Binding");
+
+        mouseAdapter.addMenuItem(bindingMenu);
+
+        item = new JMenuItem(new AbstractAction("Bind to Plot Above") {
+
+            public void actionPerformed(ActionEvent e) {
+                Plot dstPlot = getPlotAbove(plot);
+                if (dstPlot == null) {
+                    setStatus("warning: no plot above");
+                } else {
+                    bindToPlotPeer(dstPlot, plot, axis);
+                }
+            }
+        });
+        bindingMenu.add(item);
+        item = new JMenuItem(new AbstractAction("Bind to Plot Below") {
+            public void actionPerformed(ActionEvent e) {
+                Plot dstPlot = getPlotBelow(plot);
+                if (dstPlot == null) {
+                    setStatus("warning: no plot below");
+                } else {
+                    bindToPlotPeer( dstPlot, plot, axis );
+                }
+            }
+        });
+        bindingMenu.add(item);
+
+        JMenu connectorMenu = new JMenu("Add Connector");
+
+        mouseAdapter.addMenuItem(connectorMenu);
+
+        item = new JMenuItem(new AbstractAction("Connector to Plot Above") {
+
+            public void actionPerformed(ActionEvent e) {
+                Plot dstPlot = getPlotAbove(plot);
+                if (dstPlot == null) {
+                    setStatus("warning: no plot above");
+                } else {
+                    addConnector(dstPlot, plot);
+                }
+            }
+        });
+        connectorMenu.add(item);
+    }
+
     private void addPlotContextMenuItems(final DasPlot plot, final PlotController plotController, final Plot domPlot) {
 
         plot.getMouseAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
@@ -804,13 +948,8 @@ public class ApplicationController {
 
         plot.getMouseAdapter().addMenuItem(new JSeparator());
 
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
-
-            public void actionPerformed(ActionEvent e) {
-                plotController.resetZoom();
-            }
-        }));
-
+        JMenu addPlotMenu = new JMenu("Add Plot");
+        plot.getMouseAdapter().addMenuItem(addPlotMenu);
 
         item = new JMenuItem(new AbstractAction("Copy Panels") {
 
@@ -819,7 +958,7 @@ public class ApplicationController {
             }
         });
         item.setToolTipText("make a new plot, and copy the panels into it.  The plot's x axis will be bound to this plot's x axis");
-        plot.getMouseAdapter().addMenuItem(item);
+        addPlotMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Context Overview") {
 
@@ -831,10 +970,13 @@ public class ApplicationController {
                 List<Panel> panelThis = getPanelsFor(domPlot);
             }
         });
+
         item.setToolTipText("make a new plot, and copy the panels into it.  The plot is not bound,\n" +
                 "and a connector is drawn between the two.  The panel uris are bound as well.");
-        plot.getMouseAdapter().addMenuItem(item);
+        addPlotMenu.add(item);
 
+        JMenu editPlotMenu = new JMenu("Edit Plot");
+        plot.getMouseAdapter().addMenuItem(editPlotMenu);
 
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
 
@@ -847,10 +989,9 @@ public class ApplicationController {
             }
         });
         item.setToolTipText("remove any plot and panel property bindings");
-        plot.getMouseAdapter().addMenuItem(item);
+        editPlotMenu.add(item);
 
-
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Delete Plot") {
+        item = new JMenuItem(new AbstractAction("Delete Plot") {
 
             public void actionPerformed(ActionEvent e) {
                 if (application.getPlots().length > 1) {
@@ -867,9 +1008,65 @@ public class ApplicationController {
                     setStatus("warning: last plot may not be deleted");
                 }
             }
+        });
+
+        editPlotMenu.add(item);
+
+        JMenu panelMenu = new JMenu("Edit Panel");
+
+        plot.getMouseAdapter().addMenuItem(panelMenu);
+
+        item = new JMenuItem(new AbstractAction("Move to Plot Above") {
+
+            public void actionPerformed(ActionEvent e) {
+                Panel panel = getPanel();
+                Plot plot = getPlotFor(panel);
+                Plot dstPlot = getPlotAbove(plot);
+                if (dstPlot == null) {
+                    setStatus("warning: no plot above");
+                } else {
+                    panel.setPlotId(dstPlot.getId());
+                }
+            }
+        });
+        panelMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Move to Plot Below") {
+
+            public void actionPerformed(ActionEvent e) {
+                Panel panel = getPanel();
+                Plot plot = getPlotFor(panel);
+                Plot dstPlot = getPlotBelow(plot);
+                if (dstPlot == null) {
+                    dstPlot = addPlot();
+                    panel.setPlotId(dstPlot.getId());
+                } else {
+                    panel.setPlotId(dstPlot.getId());
+                }
+            }
+        });
+        panelMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Delete Panel") {
+
+            public void actionPerformed(ActionEvent e) {
+                Panel panel = getPanel();
+                deletePanel(panel);
+            }
+        });
+        panelMenu.add(item);
+
+        plot.getMouseAdapter().addMenuItem(new JSeparator());
+
+        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
+
+            public void actionPerformed(ActionEvent e) {
+                plotController.resetZoom();
+            }
         }));
 
-        plot.getMouseAdapter().addMenuItem( GuiSupport.createEZAccessMenu(domPlot) );
+
+        plot.getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(domPlot));
     }
 
     /**
@@ -878,7 +1075,9 @@ public class ApplicationController {
      */
     public boolean isPendingChanges() {
         boolean result = false;
-        if ( changesSupport.isPendingChanges() ) return true;
+        if (changesSupport.isPendingChanges()) {
+            return true;
+        }
         for (Canvas c : application.getCanvases()) {
             result = result | c.getController().isPendingChanges();
         }
@@ -899,7 +1098,6 @@ public class ApplicationController {
     protected synchronized MutatorLock mutatorLock() {
         return changesSupport.mutatorLock();
     }
-
     protected String status = "";
     public static final String PROP_STATUS = "status";
 
@@ -956,6 +1154,38 @@ public class ApplicationController {
     }
 
     /**
+     * return a plot that is immediately above the given plot.  This
+     * encapsulates the layout model, and implementation should change.
+     * @param p
+     * @return
+     */
+    public Plot getPlotAbove(Plot p) {
+        int n = application.getPlots().length;
+        for (int i = 0; i < n - 1; i++) {
+            if (application.getPlots(i + 1) == p) {
+                return application.getPlots(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * return a plot that is immediately below the given plot.  This
+     * encapsulates the layout model, and implementation should change.
+     * @param p
+     * @return
+     */
+    public Plot getPlotBelow(Plot p) {
+        int n = application.getPlots().length;
+        for (int i = 1; i < n; i++) {
+            if (application.getPlots(i - 1) == p) {
+                return application.getPlots(i);
+            }
+        }
+        return null;
+    }
+
+    /**
      * return the plotId containing this panelId.
      * @param panelId
      * @return the Plot or null if no plotId is found.
@@ -986,7 +1216,7 @@ public class ApplicationController {
         return result;
     }
 
-    DataSourceFilter getDataSourceFilterFor(Panel panel) {
+    public DataSourceFilter getDataSourceFilterFor(Panel panel) {
         String id = panel.getDataSourceFilterId();
         DataSourceFilter result = null;
         for (DataSourceFilter dsf : application.getDataSourceFilters()) {
@@ -1074,6 +1304,20 @@ public class ApplicationController {
         ac.bind(application, "options.background", canvas, "background");
         ac.bind(application, "options.foreground", canvas, "foreground");
         ac.bind(application, "options.canvasFont", canvas, "font");
+    }
+
+    protected void syncTo(Application that) {
+        MutatorLock lock = changesSupport.mutatorLock();
+        lock.lock();
+
+        application.getOptions().syncTo(that.getOptions());
+
+        syncSupport.syncToPlotsAndPanels(that.getPlots(), that.getPanels(), that.getDataSourceFilters());
+
+        syncSupport.syncBindings(that.getBindings());
+        syncSupport.syncConnectors(that.getConnectors());
+        lock.unlock();
+
     }
 
     /**

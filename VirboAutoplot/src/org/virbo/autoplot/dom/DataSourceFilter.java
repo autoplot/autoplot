@@ -15,22 +15,22 @@ import org.virbo.datasource.URLSplit;
  */
 public class DataSourceFilter extends DomNode {
     
-    protected String suri = null;
-    public static final String PROP_SURI = "suri";
+    protected String uri = null;
+    public static final String PROP_URI = "uri";
 
-    public String getSuri() {
-        return suri;
+    public String getUri() {
+        return uri;
     }
 
-    public void setSuri(String suri) {
-        if ( suri!=null ) {
-            URLSplit split= URLSplit.parse(suri);
-            suri= URLSplit.format(split); // make canonical
+    public void setUri(String uri) {
+        if ( uri!=null ) {
+            URLSplit split= URLSplit.parse(uri);
+            uri= URLSplit.format(split); // make canonical
         }
         
-        String oldSuri = this.suri;
-        this.suri = suri;
-        propertyChangeSupport.firePropertyChange(PROP_SURI, oldSuri, suri);
+        String oldUri = this.uri;
+        this.uri = uri;
+        propertyChangeSupport.firePropertyChange(PROP_URI, oldUri, uri);
     }
     
 
@@ -137,23 +137,25 @@ public class DataSourceFilter extends DomNode {
     
 
     public void syncTo(DomNode n) {
+        super.syncTo(n);
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setValidRange(that.getValidRange());        
         this.setSliceDimension(that.getSliceDimension());
         this.setSliceIndex(that.getSliceIndex());
         this.setTranspose( that.isTranspose() );
-        this.setSuri(that.getSuri());
+        this.setUri(that.getUri());
     }
 
     public void syncTo(DomNode n, List<String> exclude ) {
+        if ( !exclude.contains( DomNode.PROP_ID ) ) super.syncTo(n);
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setValidRange(that.getValidRange());        
         this.setSliceDimension(that.getSliceDimension());
         this.setSliceIndex(that.getSliceIndex());
         this.setTranspose( that.isTranspose() );
-        if ( !exclude.contains("suri" ) ) this.setSuri(that.getSuri());
+        if ( !exclude.contains("uri" ) ) this.setUri(that.getUri());
     }
 
     public List<Diff> diffs(DomNode node) {
@@ -163,8 +165,8 @@ public class DataSourceFilter extends DomNode {
         
         boolean b;
         
-        b = (that.suri == this.suri || (that.suri != null && that.suri.equals(this.suri)));
-        if (!b) result.add( new PropertyChangeDiff( "suri", that.suri, this.suri ) );
+        b = (that.uri == this.uri || (that.uri != null && that.uri.equals(this.uri)));
+        if (!b) result.add( new PropertyChangeDiff( "uri", that.uri, this.uri ) );
         
         b = that.validRange.equals(this.validRange);
         if (!b) result.add(new PropertyChangeDiff( "validRange", that.validRange , (this.validRange)));

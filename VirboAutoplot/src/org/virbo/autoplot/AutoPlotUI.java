@@ -51,7 +51,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
@@ -506,7 +505,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             final String surl = (String) dataSetSelector.getValue();
             applicationModel.addRecent(surl);
             Panel panel= dom.getController().addPanel( null ,null );
-            panel.getController().setSuri( surl );
+            dom.getController().getDataSourceFilterFor(panel).setUri(surl);
             
         } catch (RuntimeException ex) {
             applicationModel.application.getExceptionHandler().handle(ex);

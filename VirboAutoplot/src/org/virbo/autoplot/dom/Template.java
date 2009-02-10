@@ -39,7 +39,7 @@ public class Template extends DomNode {
     }
 
     public void syncTo(DomNode n) {
-        
+        super.syncTo(n);
     }
 
     public List<Diff> diffs(DomNode node) {

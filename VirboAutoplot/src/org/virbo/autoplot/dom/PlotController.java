@@ -39,7 +39,9 @@ public class PlotController {
         plot.controller = this;
     }
     private PropertyChangeListener listener = new PropertyChangeListener() {
-
+        public String toString() {
+            return ""+PlotController.this;
+        }
         public void propertyChange(PropertyChangeEvent e) {
             if (e.getSource() instanceof DasAxis) {
                 DasAxis axis = (DasAxis) e.getSource();
@@ -138,5 +140,7 @@ public class PlotController {
     public Application getApplication() {
         return dom;
     }
-    
+    public String toString() {
+        return this.domplot + " controller";
+    }
 }

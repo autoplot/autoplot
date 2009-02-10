@@ -109,6 +109,7 @@ public class Canvas extends DomNode {
     
 
     public void syncTo(DomNode n) {
+        super.syncTo(n);
         Canvas that= (Canvas)n;
         this.setFitted(that.isFitted());
         this.setSize(that.getSize());

@@ -46,31 +46,45 @@ public class DataSourceController {
     DataSourceFilter dsf;
     private ApplicationModel model;
     private Application dom;
-    private Panel panel;
+    private ChangesSupport changesSupport;
     /**
      * the current load being monitored.
      */
     private ProgressMonitor mon;
-    
     private PropertyChangeListener updateSlicePropertyChangeListener = new PropertyChangeListener() {
-
+        public String toString() {
+            return "" + dsf + " controller";
+        }
         public void propertyChange(PropertyChangeEvent e) {
-            if ( getDataSet() != null &&  getDataSet().rank() == 3) updateFill();
+            if ( dataSet!=null && dataSet.rank() == 3) updateFill();
         }
     };
     private PropertyChangeListener updateMePropertyChangeListener = new PropertyChangeListener() {
-
+        public String toString() {
+            return "" + dsf + " controller";
+        }
         public void propertyChange(PropertyChangeEvent e) {
-            updateFill();
+            if ( dataSet!=null ) updateFill();
         }
     };
     private PropertyChangeListener resetMePropertyChangeListener = new PropertyChangeListener() {
-
+        public String toString() {
+            return "" + dsf + " controller";
+        }
         public void propertyChange(PropertyChangeEvent e) {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
-                resolveDataSource(getMonitor("resetting data source", "resetting data source"));
+                if ( !dom.getController().isValueAdjusting() ) {
+                    resolveDataSource(getMonitor("resetting data source", "resetting data source"));
+                } else {
+                    dom.getController().addPropertyChangeListener( ChangesSupport.PROP_VALUEADJUSTING, new PropertyChangeListener() {
+                        public void propertyChange(PropertyChangeEvent evt) {
+                            dom.getController().removePropertyChangeListener(this);
+                            resolveDataSource(getMonitor("resetting data source", "resetting data source"));
+                        }
+                    });
+                }
             }
         }
     };
@@ -79,10 +93,11 @@ public class DataSourceController {
     private static final String PENDING_FILL_DATASET = "fillDataSet";
     private static final String PENDING_UPDATE = "update";
 
-    public DataSourceController( ApplicationModel model, DataSourceFilter dsf ) {
+    public DataSourceController(ApplicationModel model, DataSourceFilter dsf) {
 
         this.model = model;
         this.dom = model.getDocumentModel();
+        this.changesSupport= new ChangesSupport(this.propertyChangeSupport);
         this.dsf = dsf;
         this.dsf.controller = this;
 
@@ -93,7 +108,7 @@ public class DataSourceController {
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_FILL, updateMePropertyChangeListener);
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_VALID_RANGE, updateMePropertyChangeListener);
 
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_SURI, resetMePropertyChangeListener);
+        dsf.addPropertyChangeListener(DataSourceFilter.PROP_URI, resetMePropertyChangeListener);
 
     }
 
@@ -105,20 +120,20 @@ public class DataSourceController {
      * @return the number of slice indeces.
      */
     public int getMaxSliceIndex(int i) {
-        if ( getDataSet() == null) {
+        if (getDataSet() == null) {
             return 0;
         }
         int sliceDimension = i;
         if (sliceDimension == 0) {
-            return  getDataSet().length();
+            return getDataSet().length();
         }
-        int[] qube = DataSetUtil.qubeDims( getDataSet());
+        int[] qube = DataSetUtil.qubeDims(getDataSet());
         if (qube == null || qube.length <= sliceDimension) {
             return 0;
         } else {
             try {
                 return qube[sliceDimension];
-            } catch ( ArrayIndexOutOfBoundsException ex ) {
+            } catch (ArrayIndexOutOfBoundsException ex) {
                 throw ex;
             }
         }
@@ -136,7 +151,7 @@ public class DataSourceController {
      */
     private void doDimensionNames() {
 
-        QDataSet ds =  getDataSet();
+        QDataSet ds = getDataSet();
 
         String[] depNames = new String[3];
         for (int i = 0; i < ds.rank(); i++) {
@@ -167,31 +182,31 @@ public class DataSourceController {
         DataSource oldSource = _getDataSource();
 
         if (dataSource == null) {
-             _setCaching(null);
-             _setTsb(null);
-             _setTsbSuri(null);
-            dsf.setSuri(null);
+            _setCaching(null);
+            _setTsb(null);
+            _setTsbSuri(null);
+            dsf.setUri(null);
 
         } else {
 
-             _setCaching(dataSource.getCapability(Caching.class));
-             _setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
+            _setCaching(dataSource.getCapability(Caching.class));
+            _setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
 
         }
 
         this.dsf.setValidRange("");
         this.dsf.setFill("");
-        
+
         _setDataSource(dataSource);
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
-            if ( getTsb() != null) {
-                 _setDataSet(null);
-                 List<Panel> ps= dom.getController().getPanelsFor(dsf);
-                 if ( ps.size()>0 ) {
+            if (getTsb() != null) {
+                _setDataSet(null);
+                List<Panel> ps = dom.getController().getPanelsFor(dsf);
+                if (ps.size() > 0) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(ps.get(0));
                     timeSeriesBrowseController.setup();
-                 }
+                }
 
             } else {
                 update(true, true);
@@ -217,7 +232,7 @@ public class DataSourceController {
      * @param autorange if false, autoranging will not be done.  if false, autoranging
      *   might be done.
      */
-    public synchronized void setDataSetInternal(QDataSet ds, boolean autorange) {
+    public synchronized void setDataSetInternal(QDataSet ds) {
 
         List<String> problems = new ArrayList<String>();
 
@@ -228,33 +243,46 @@ public class DataSourceController {
             }
             JOptionPane.showMessageDialog(model.getCanvas(), message); //TODO: View code in controller
 
-            if ( ds instanceof MutablePropertyDataSet ) {
+            if (ds instanceof MutablePropertyDataSet) {
                 //MutablePropertyDataSet mds= (MutablePropertyDataSet)ds;
                 //DataSetUtil.makeValid(mds);
-               //  we would also have to modify the metadata, labels etc.
+                //  we would also have to modify the metadata, labels etc.
                 return;
             } else {
                 return;
             }
         }
 
-         _setDataSet(ds);
+        if (this.dom.getController().isValueAdjusting()) {
+            final QDataSet fds = ds;
+            this.dom.getController().addPropertyChangeListener(ChangesSupport.PROP_VALUEADJUSTING, new PropertyChangeListener() {
+                public String toString() {
+                   return "" + dsf + " controller";
+                }
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    dom.getController().removePropertyChangeListener(this);
+                    setDataSetInternal(fds);
+                }
+            });
+        } else {
+            _setDataSet(ds);
 
-        if (ds == null) {
-            _setDataSet(null);
-            _setProperties(null);
-            _setFillProperties(null);
-            _setFillDataSet(null);
-            return;
+            if (ds == null) {
+                _setDataSet(null);
+                _setProperties(null);
+                _setFillProperties(null);
+                _setFillDataSet(null);
+                return;
+            }
+
+            setStatus("busy: apply fill and autorange");
+
+            extractProperties();
+            doDimensionNames();
+            doFillValidRange();
+            updateFill();
         }
-
-        setStatus("busy: apply fill and autorange");
-
-        extractProperties();
-        doDimensionNames();
-        doFillValidRange();
-        updateFill();
-
     }
 
     /**
@@ -267,8 +295,8 @@ public class DataSourceController {
         Map<String, Object> properties; // QDataSet properties.
 
         properties = AutoplotUtil.extractProperties(getDataSet());
-        if ( _getDataSource() != null) {
-            properties = AutoplotUtil.mergeProperties( _getDataSource().getProperties(), properties);
+        if (_getDataSource() != null) {
+            properties = AutoplotUtil.mergeProperties(_getDataSource().getProperties(), properties);
         }
 
         _setProperties(properties);
@@ -319,10 +347,10 @@ public class DataSourceController {
      */
     @SuppressWarnings("unchecked")
     private void updateFill() {
-        pendingChanges.add(PENDING_FILL_DATASET);
+        changesSupport.performingChange(this, PENDING_FILL_DATASET);
+
         logger.fine("enter updateFill");
 
-        
         if (getDataSet() == null) {
             return;
         }
@@ -400,30 +428,28 @@ public class DataSourceController {
             _setFillDataSet(null);
         }
         _setFillDataSet(fillDs);
-        pendingChanges.remove(PENDING_FILL_DATASET);
+        changesSupport.changePerformed(this, PENDING_FILL_DATASET);
     }
 
     /**
      * do update on this thread, ensuring that only one data load is occuring at a
      * time.  Note if a dataSource doesn't check mon.isCancelled(), then processing
      * will block until the old load is done.
-     * @param autorange
-     * @param interpretMeta
      */
-    private synchronized void updateImmediately( final boolean autorange, boolean interpretMeta ) {
+    private synchronized void updateImmediately() {
         /*** here is the data load ***/
         setStatus("busy: loading dataset");
 
-        if ( _getDataSource() != null) {
+        if (_getDataSource() != null) {
             QDataSet dataset = loadDataSet();
             setStatus("done loading dataset");
-            setDataSetInternal(dataset, autorange);
+            setDataSetInternal(dataset);
         } else {
-            setDataSetInternal(null, autorange);
+            setDataSetInternal(null);
         }
 
-        if ( getTsb() != null) {
-            String oldsurl = dsf.getSuri();
+        if (getTsb() != null) {
+            String oldsurl = dsf.getUri();
             String newsurl = getTsb().getURL().toString();
             URLSplit split = URLSplit.parse(newsurl);
             if (oldsurl != null) {
@@ -443,18 +469,19 @@ public class DataSourceController {
      * @param autorange if false, then no autoranging is done, just the fill part.
      */
     public synchronized void update(final boolean autorange, final boolean interpretMeta) {
-        pendingChanges.add(PENDING_UPDATE);
-        
+        changesSupport.performingChange(this, PENDING_UPDATE);
+
         _setDataSet(null);
 
         Runnable run = new Runnable() {
+
             public void run() {
-                updateImmediately(autorange, interpretMeta);
-                pendingChanges.remove(PENDING_UPDATE);
+                updateImmediately();
+                changesSupport.changePerformed(this, PENDING_UPDATE);
             }
         };
 
-        if ( _getDataSource() != null &&  _getDataSource().asynchronousLoad() && !dom.getController().isHeadless()) {
+        if (_getDataSource() != null && _getDataSource().asynchronousLoad() && !dom.getController().isHeadless()) {
             logger.info("invoke later do load");
             if (mon != null) {
                 System.err.println("double load!");
@@ -467,9 +494,7 @@ public class DataSourceController {
             run.run();
         }
     }
-
     /****** controller properties *******/
-    
     /**
      * raw properties provided by the datasource after the data load.
      */
@@ -485,8 +510,6 @@ public class DataSourceController {
         this.rawProperties = rawProperties;
         propertyChangeSupport.firePropertyChange(PROP_RAWPROPERTIES, oldRawProperties, rawProperties);
     }
-    
-    
     protected TimeSeriesBrowse tsb = null;
     public static final String PROP_TSB = "tsb";
 
@@ -511,7 +534,6 @@ public class DataSourceController {
         this.tsbSuri = tsbSuri;
         propertyChangeSupport.firePropertyChange(PROP_TSBSURI, oldTsbSuri, tsbSuri);
     }
-    
     protected Caching caching = null;
     public static final String PROP_CACHING = "caching";
 
@@ -524,10 +546,9 @@ public class DataSourceController {
         this.caching = caching;
         propertyChangeSupport.firePropertyChange(PROP_CACHING, oldCaching, caching);
     }
-    
     protected DataSource dataSource = null;
     public static final String PROP_DATASOURCE = "dataSource";
-    
+
     public DataSource _getDataSource() {
         return dataSource;
     }
@@ -537,8 +558,6 @@ public class DataSourceController {
         this.dataSource = dataSource;
         propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, oldDataSource, dataSource);
     }
-
-    
     /**
      * the dataset loaded from the data source.
      */
@@ -570,7 +589,6 @@ public class DataSourceController {
         this.fillDataSet = fillDataSet;
         propertyChangeSupport.firePropertyChange(PROP_FILLDATASET, oldFillDataSet, fillDataSet);
     }
-    
     /**
      * when the dataset fails to load, then the exception thrown is here.
      */
@@ -586,7 +604,6 @@ public class DataSourceController {
         this.exception = exception;
         propertyChangeSupport.firePropertyChange(PROP_EXCEPTION, oldException, exception);
     }
-
     private List<String> depnames = Arrays.asList(new String[]{"first", "second", "last"});
     public static final String PROP_DEPNAMES = "depnames";
 
@@ -601,7 +618,6 @@ public class DataSourceController {
             propertyChangeSupport.firePropertyChange(PROP_DEPNAMES, olddepnames, newdepnames);
         }
     }
-
     protected Map<String, Object> properties = null;
     public static final String PROP_PROPERTIES = "properties";
 
@@ -614,7 +630,6 @@ public class DataSourceController {
         this.properties = properties;
         propertyChangeSupport.firePropertyChange(PROP_PROPERTIES, oldProperties, properties);
     }
-    
     protected Map<String, Object> fillProperties = null;
     public static final String PROP_FILLPROPERTIES = "fillProperties";
 
@@ -627,7 +642,6 @@ public class DataSourceController {
         this.fillProperties = fillProperties;
         propertyChangeSupport.firePropertyChange(PROP_FILLPROPERTIES, oldFillProperties, fillProperties);
     }
-
     protected String reduceDataSetString = null;
     public static final String PROP_REDUCEDATASETSTRING = "reduceDataSetString";
 
@@ -640,8 +654,6 @@ public class DataSourceController {
         this.reduceDataSetString = reduceDataSetString;
         propertyChangeSupport.firePropertyChange(PROP_REDUCEDATASETSTRING, oldReduceDataSetString, reduceDataSetString);
     }
-    
-    
     private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
 
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
@@ -660,7 +672,6 @@ public class DataSourceController {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-
     /**
      * load the data set from the DataSource.
      */
@@ -673,8 +684,8 @@ public class DataSourceController {
         this.mon = mymon;
         try {
             result = _getDataSource().getDataSet(mymon);
-            setRawProperties( _getDataSource().getMetaData( new NullProgressMonitor() ) );
-            
+            setRawProperties(_getDataSource().getMetaData(new NullProgressMonitor()));
+
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
             setException(ex);
@@ -701,11 +712,11 @@ public class DataSourceController {
 
     /**
      * set the data source uri.
-     * @param suri
+     * @param uri
      * @param mon
      */
     public void setSuri(String suri, ProgressMonitor mon) {
-        dsf.setSuri(suri);
+        dsf.setUri(suri);
     }
 
     /**
@@ -714,16 +725,16 @@ public class DataSourceController {
      * @param mon
      */
     public void resetSuri(String suri, ProgressMonitor mon) {
-        String old= dsf.getSuri();
-        if ( old!=null && old.equals( suri ) ) {
-            dsf.setSuri(null);
+        String old = dsf.getUri();
+        if (old != null && old.equals(suri)) {
+            dsf.setUri(null);
         }
-        setSuri(suri,mon);
+        setSuri(suri, mon);
     }
 
     /**
      * Preconditions: 
-     *   dsf.getSuri is set.
+     *   dsf.getUri is set.
      *   Any or no datasource is set.
      * Postconditions: 
      *   A dataSource object is created 
@@ -734,14 +745,14 @@ public class DataSourceController {
      *   if this is headless, then the dataset has been loaded sychronously.
      */
     public void resolveDataSource(ProgressMonitor mon) {
-        pendingChanges.add(PENDING_DATA_SOURCE);
+        changesSupport.performingChange(this, PENDING_DATA_SOURCE);
 
         Caching caching = getCaching();
 
-        String surl = dsf.getSuri();
+        String surl = dsf.getUri();
         if (surl == null) {
             setDataSource(null);
-            pendingChanges.remove(PENDING_DATA_SOURCE);
+            changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
         } else {
             surl = URLSplit.format(URLSplit.parse(surl));
             //surl = DataSetURL.maybeAddFile(surl);
@@ -760,7 +771,7 @@ public class DataSourceController {
 
                 DataSource source = DataSetURL.getDataSource(surl);
                 setDataSource(source);
-                pendingChanges.remove(PENDING_DATA_SOURCE);
+                changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
 
                 mon.setProgressMessage("done getting data source");
 
@@ -777,7 +788,7 @@ public class DataSourceController {
      * this looks for the names lat, lon, and angle.
      */
     private void guessSliceDimension() {
-           int lat = -1, lon = -1;
+        int lat = -1, lon = -1;
 
         int[] slicePref = new int[]{1, 1, 1};
         for (int i = 0; i < getDepnames().size(); i++) {
@@ -818,10 +829,9 @@ public class DataSourceController {
     public TimeSeriesBrowseController getTimeSeriesBrowseController() {
         return timeSeriesBrowseController;
     }
-    Set<String> pendingChanges = new HashSet<String>();
 
     public boolean isPendingChanges() {
-        return pendingChanges.size() > 0;
+        return changesSupport.isPendingChanges();
     }
 
     private void handleException(Exception e) {
@@ -833,25 +843,25 @@ public class DataSourceController {
      * @return null or a panel.
      */
     private Panel getPanel() {
-        List<Panel> panels= dom.getController().getPanelsFor(dsf);
-        if ( panels.size()==0 ) {
+        List<Panel> panels = dom.getController().getPanelsFor(dsf);
+        if (panels.size() == 0) {
             return null;
         } else {
             return panels.get(0);
         }
-        
+
     }
-    
+
     private ProgressMonitor getMonitor(String label, String description) {
         DasCanvas canvas = dom.getController().getDasCanvas();
-        
-        Panel panel= getPanel();
-        if ( panel!=null ) {
-            Plot plot= dom.getController().getPlotFor(panel);
-            DasPlot p = plot.getController().getDasPlot(); 
-            return dom.getController().getMonitorFactory().getMonitor( p, label, description );
+
+        Panel panel = getPanel();
+        if (panel != null) {
+            Plot plot = dom.getController().getPlotFor(panel);
+            DasPlot p = plot.getController().getDasPlot();
+            return dom.getController().getMonitorFactory().getMonitor(p, label, description);
         } else {
-            return dom.getController().getMonitorFactory().getMonitor( label, description );
+            return dom.getController().getMonitorFactory().getMonitor(label, description);
         }
 
     }

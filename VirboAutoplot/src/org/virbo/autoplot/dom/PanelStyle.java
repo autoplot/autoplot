@@ -100,7 +100,7 @@ public class PanelStyle extends DomNode {
 
     public final static String PROP_PLOT_SYMBOL= "plotSymbol";
     
-    private PlotSymbol plotSymbol= DefaultPlotSymbol.NONE;
+    private PlotSymbol plotSymbol= DefaultPlotSymbol.CIRCLES;
 
     public PlotSymbol getPlotSymbol() {
         return this.plotSymbol;
@@ -185,6 +185,7 @@ public class PanelStyle extends DomNode {
     /*  DomNode Stuff ******************/
 
     public void syncTo( DomNode node ) {
+        super.syncTo(node);
         PanelStyle that= ( PanelStyle )node;
         this.setColortable( that.colortable );
         this.setFillToReference( that.fillToReference );

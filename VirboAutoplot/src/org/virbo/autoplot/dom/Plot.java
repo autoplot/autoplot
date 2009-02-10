@@ -17,6 +17,9 @@ public class Plot extends DomNode {
 
     public Plot() {
         PropertyChangeListener childListener = new PropertyChangeListener() {
+            public String toString() {
+                return ""+ Plot.this;
+            }
             public void propertyChange(PropertyChangeEvent evt) {
                 Plot.this.propertyChangeSupport.firePropertyChange( promoteChild(evt) );
             }
@@ -128,6 +131,7 @@ public class Plot extends DomNode {
     
     
     public void syncTo(DomNode n) {
+        super.syncTo(n);
         Plot that = (Plot) n;
         this.setTitle( that.getTitle() );
         this.setIsotropic( that.isIsotropic() );

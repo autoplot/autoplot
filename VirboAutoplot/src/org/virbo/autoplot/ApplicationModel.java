@@ -122,7 +122,8 @@ public class ApplicationModel {
      * @param ds
      */
     void setDataSet(QDataSet ds) {
-        dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds, true);
+        dom.getController().getPanel().getController().setResetRanges(true);
+        dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds);
     }
 
 
@@ -254,7 +255,7 @@ public class ApplicationModel {
      * @throws RuntimeException when _getDataSource throws Exception
      */
     public void setDataSourceURL(String surl) {
-        String oldVal = dom.getController().getDataSourceFilter().getSuri();
+        String oldVal = dom.getController().getDataSourceFilter().getUri();
         if ( surl == null && oldVal == null) {
             return;
         }
@@ -267,7 +268,7 @@ public class ApplicationModel {
     }
 
     public String getDataSourceURL() {
-        return dom.getController().getDataSourceFilter().getSuri();
+        return dom.getController().getDataSourceFilter().getUri();
     }
 
     
@@ -470,7 +471,6 @@ public class ApplicationModel {
      * @param forceFill, force a data load
      */
     public void restoreState( Application state, boolean deep, boolean forceFill) {
-        
         this.dom.syncTo(state);
     }
 
@@ -481,6 +481,7 @@ public class ApplicationModel {
 
     void doOpen(File f) throws IOException {
         Application state = (Application) StatePersistence.restoreState(f);
+        logger.fine( "" + this.dom.diffs(state) );
         restoreState(state, true, true);
         setUseEmbeddedDataSet(false);
         dom.getOptions().setAutoOverview(true);
@@ -583,7 +584,7 @@ public class ApplicationModel {
         QDataSetStreamHandler handler = new QDataSetStreamHandler();
         try {
             org.virbo.qstream.StreamTool.readStream(ich, handler);
-            getDataSourceFilterController().setDataSetInternal(handler.getDataSet(), false);
+            getDataSourceFilterController().setDataSetInternal(handler.getDataSet());
 
         } catch (org.virbo.qstream.StreamException ex) {
             Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);

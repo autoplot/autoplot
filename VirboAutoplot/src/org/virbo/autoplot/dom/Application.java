@@ -22,7 +22,9 @@ import org.das2.datum.DatumRangeUtil;
 public class Application extends DomNode {
 
     PropertyChangeListener childListener = new PropertyChangeListener() {
-
+        public String toString() {
+           return ""+Application.this;
+        }
         public void propertyChange(PropertyChangeEvent evt) {
             Application.this.propertyChangeSupport.firePropertyChange(promoteChild(evt));
         }
@@ -286,124 +288,13 @@ public class Application extends DomNode {
         
         return result;
     }
-
-    private void syncToPlotsAndPanels( Plot[] plots, Panel[] panels, DataSourceFilter[] dataSourceFilters ) {
-        while (this.plots.size() < plots.length) {
-            controller.addPlot();
-        }
-        while (this.plots.size() > plots.length) {
-            Plot plott= this.plots.get(this.plots.size() - 1);
-            List<Panel> panelss= controller.getPanelsFor(plott);
-            for ( Panel panell:panelss ) {
-                panell.setPlotId(""); // make it an orphan
-            }
-            controller.deletePlot( plott );
-        }
-        for (int i = 0; i < plots.length; i++) {
-            this.plots.get(i).syncTo(plots[i]);
-        }
-        
-        while (this.dataSourceFilters.size() < dataSourceFilters.length) {
-            controller.addPlot();
-        }
-        while (this.dataSourceFilters.size() > dataSourceFilters.length) {
-            DataSourceFilter plott= this.dataSourceFilters.get(this.dataSourceFilters.size() - 1);
-            List<Panel> panelss= controller.getPanelsFor(plott);
-            for ( Panel panell:panelss ) {
-                panell.setPlotId(""); // make it an orphan
-            }
-            controller.deleteDataSourceFilter( plott );
-        }
-        for (int i = 0; i < dataSourceFilters.length; i++) {
-            this.dataSourceFilters.get(i).syncTo(dataSourceFilters[i]);
-        }
-        
-        while (this.panels.size() < panels.length) {
-            int i = this.panels.size();
-            String idd = panels[i].getPlotId();
-            Plot p = null;
-            for (int j = 0; j < plots.length; j++) {
-                if (plots[j].getId().equals(idd)) p = plots[j];
-            }
-            controller.addPanel(p,null);
-        }
-        while (this.panels.size() > panels.length) {
-            controller.deletePanel( this.panels.get(this.panels.size() - 1));
-        }
-
-        for (int i = 0; i < panels.length; i++) {
-            this.panels.get(i).syncTo(panels[i]);
-        }
-
-
-    }
-
-    private void syncConnectors( Connector[] connectors ) {
-        List<Connector> addConnectors= new ArrayList<Connector>();
-        List<Connector> deleteConnectors= new ArrayList<Connector>();
-        
-        List<Connector> thisConnectors= Arrays.asList(this.connectors);
-        List<Connector> thatConnectors= Arrays.asList(connectors);
-        
-        for ( Connector c: thatConnectors ) {
-            if ( !thisConnectors.contains(c) ) addConnectors.add(c);
-        }
-        
-        for ( Connector c: this.connectors ) {
-            if ( thatConnectors.contains(c) ) deleteConnectors.add(c);
-        }
-        
-        for ( Connector c:addConnectors ) {
-            Plot plotA= (Plot)DomUtil.getElementById(this, c.plotA );
-            Plot plotB= (Plot)DomUtil.getElementById(this, c.plotB) ;
-            controller.addConnector( plotA, plotB );
-        }
-        
-        for ( Connector c:deleteConnectors ) {
-            controller.deleteConnector( c );
-        }
-
-    }
-    
-
-    private void syncBindings( BindingModel[] bindings ) {
-        
-        List<BindingModel> addBindings= new ArrayList<BindingModel>();
-        List<BindingModel> deleteBindings= new ArrayList<BindingModel>();
-        
-        List<BindingModel> thisBindings= Arrays.asList(this.bindings);
-        List<BindingModel> thatBindings= Arrays.asList(bindings);
-        
-        for ( BindingModel c: thatBindings ) {
-            if ( !thisBindings.contains(c) ) addBindings.add(c);
-        }
-        
-        for ( BindingModel c: this.bindings ) {
-            if ( thatBindings.contains(c) ) deleteBindings.add(c);
-        }
-        
-        for ( BindingModel c:addBindings ) {
-            DomNode src= DomUtil.getElementById(this,c.srcId);
-            DomNode dst= DomUtil.getElementById(this,c.dstId);
-            controller.bind( src, c.srcProperty, dst, c.dstProperty  );
-        }
-        
-        for ( BindingModel c:deleteBindings ) {
-            DomNode src= DomUtil.getElementById(this,c.srcId);
-            DomNode dst= DomUtil.getElementById(this,c.dstId);
-            controller.deleteBinding( controller.findBinding( src, c.srcProperty, dst, c.dstProperty  ) );
-        }
-
-    }
     
     public void syncTo(DomNode n) {
-        Application that = (Application) n;
-        this.getOptions().syncTo(that.getOptions());
-
-        syncToPlotsAndPanels(that.getPlots(), that.getPanels(), that.getDataSourceFilters() );
-
-        syncBindings(that.getBindings());
-        syncConnectors(that.getConnectors());
+        super.syncTo(n);
+        if ( this.controller!=null ) {
+            this.controller.syncTo( (Application)n );
+        }
+        
                 
     }
 
@@ -453,4 +344,5 @@ public class Application extends DomNode {
         
         return result;
     }
+
 }

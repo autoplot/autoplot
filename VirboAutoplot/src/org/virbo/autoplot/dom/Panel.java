@@ -18,7 +18,9 @@ public class Panel extends DomNode {
 
     public Panel() {
         PropertyChangeListener childListener = new PropertyChangeListener() {
-
+            public String toString() {
+               return ""+Panel.this;
+            }
             public void propertyChange(PropertyChangeEvent evt) {
                 Panel.this.propertyChangeSupport.firePropertyChange(promoteChild(evt));
             }
@@ -182,6 +184,7 @@ public class Panel extends DomNode {
     }
 
     public void syncTo(DomNode n) {
+        super.syncTo(n);
         Panel that = (Panel) n;
         this.setPlotId(that.getPlotId());
         this.setDataSourceFilterId( that.getDataSourceFilterId() );
@@ -191,6 +194,7 @@ public class Panel extends DomNode {
     }
     
     public void syncTo( DomNode n, List<String> exclude ) {
+        if ( !exclude.contains( DomNode.PROP_ID ) ) super.syncTo(n);
         Panel that = (Panel) n;
         if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
         if ( !exclude.contains( PROP_DATASOURCEFILTERID ) ) this.setDataSourceFilterId(that.getDataSourceFilterId());

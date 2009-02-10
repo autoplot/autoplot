@@ -346,6 +346,7 @@ public class Options extends DomNode {
     
     
     public void syncTo(DomNode n) {
+        super.syncTo(n);
         Options that= (Options)n;
         this.setBackground( that.getBackground() );
         this.setForeground(that.getForeground());

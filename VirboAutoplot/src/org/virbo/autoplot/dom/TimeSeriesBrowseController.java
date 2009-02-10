@@ -65,7 +65,9 @@ public class TimeSeriesBrowseController {
         }
 
         timeSeriesBrowseListener = new PropertyChangeListener() {
-
+            public String toString() {
+               return ""+TimeSeriesBrowseController.this;
+            }
             public void propertyChange(PropertyChangeEvent e) {
                 if (plot.getXAxis().valueIsAdjusting()) {
                     return;
@@ -117,7 +119,7 @@ public class TimeSeriesBrowseController {
                 } else {
                     dataSourceController.update(autorange, autorange);
                     dataSourceController._setTsbSuri(surl);
-                    //p.getDataSourceFilter().setSuri(surl);
+                    //p.getDataSourceFilter().setUri(surl);
                 }
             } else {
                 logger.fine("loaded dataset satifies request");
@@ -174,5 +176,7 @@ public class TimeSeriesBrowseController {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-
+    public String toString() {
+        return this.dsf + " timeSeriesBrowse controller";
+    }
 }

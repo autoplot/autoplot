@@ -9,6 +9,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -39,7 +40,6 @@ import org.virbo.dsops.Ops;
  * @author jbf
  */
 public class PanelController {
-
     private static final String PENDING_RESET_RANGE = "resetRanges";
     Logger logger = Logger.getLogger("vap.panelController");
     private Application dom;
@@ -47,26 +47,32 @@ public class PanelController {
     private Panel panel;
     private ChangesSupport changesSupport;
     private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
+    private DataSourceFilter dsf; // This is the one we are listening to.
     /**
      * switch over between fine and course points.
      */
     public static int SYMSIZE_DATAPOINT_COUNT = 500;
+    public static final int LARGE_DATASET_COUNT = 30000;
 
     public PanelController(final ApplicationModel model, final Application dom, final Panel panel) {
         panel.controller = this;
         this.dom = dom;
         this.panel = panel;
         this.appmodel = model;
-        this.changesSupport= new ChangesSupport(this.propertyChangeSupport);
+        this.changesSupport = new ChangesSupport(this.propertyChangeSupport);
         panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, new PropertyChangeListener() {
-
+            public String toString() {
+                return ""+PanelController.this;
+            }
             public void propertyChange(PropertyChangeEvent evt) {
                 setRenderType(panel.getRenderType());
             }
         });
 
         panel.addPropertyChangeListener(Panel.PROP_DATASOURCEFILTERID, new PropertyChangeListener() {
-
+            public String toString() {
+                return ""+PanelController.this;
+            }
             public void propertyChange(PropertyChangeEvent evt) {
                 resetDataSource();
             }
@@ -74,29 +80,42 @@ public class PanelController {
 
     }
 
-    private void resetDataSource() {
-        assert (panel.getDataSourceFilterId() != null);
-        final DataSourceFilter dsf = getDataSourceFilter();
+    /**
+     * remove any bindings and listeners
+     */
+    void unbind() {
+        dsf.removePropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION,dsfListener);
+        dsf.removePropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE,dsfListener);
+        dsf.removePropertyChangeListener(Panel.PROP_RENDERTYPE,dsfListener);
+        dsf.getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET,fillDataSetListener);
+        dsf.getController().removePropertyChangeListener(DataSourceController.PROP_DATASOURCE,dataSourceDataSetListener);
+    }
 
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
+    PropertyChangeListener dsfListener = new PropertyChangeListener() {
+        public String toString() {
+            return ""+PanelController.this;
+        }
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals(DataSourceFilter.PROP_SLICEDIMENSION) || evt.getPropertyName().equals(DataSourceFilter.PROP_TRANSPOSE)) {
                 setResetRanges(true);
-            }
-        });
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                setResetRanges(true);
-            }
-        });
-
-        dsf.addPropertyChangeListener(Panel.PROP_RENDERTYPE, new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
+            } else if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) { //TODO: Huh?  Why is this Panel not DSF?
                 setRenderType(panel.getRenderType());
             }
-        });
+        }
+
+    };
+
+    private void resetDataSource() {
+        if (dsf != null) {
+            unbind();
+        }
+
+        assert (panel.getDataSourceFilterId() != null);
+        dsf = getDataSourceFilter();
+
+        dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
+        dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
+        dsf.addPropertyChangeListener(Panel.PROP_RENDERTYPE, dsfListener);
 
         setDataSourceFilterController(getDataSourceFilter().getController());
     }
@@ -113,10 +132,10 @@ public class PanelController {
         return Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]);
     }
 
-    private boolean rendererAcceptsData( QDataSet fillDs ) {
-        if ( fillDs.rank()==1 && getRenderer() instanceof SpectrogramRenderer ) {
+    private boolean rendererAcceptsData(QDataSet fillDs) {
+        if (fillDs.rank() == 1 && getRenderer() instanceof SpectrogramRenderer) {
             return false;
-        } else if ( fillDs.rank()==2 && getRenderer() instanceof SeriesRenderer ) {
+        } else if (fillDs.rank() == 2 && getRenderer() instanceof SeriesRenderer) {
             return false;
         } else {
             return true;
@@ -126,6 +145,17 @@ public class PanelController {
     private void setDataSet(QDataSet fillDs) throws IllegalArgumentException {
 
         String label = null;
+        if (fillDs.rank() == 1 && !panel.getComponent().equals("")) {
+            List<Panel> panels = dom.getController().getPanelsFor(getDataSourceFilter());
+            for (Panel p : panels) {
+                if (p == this.panel) {
+                    p.setComponent("");
+                } else {
+                    dom.getController().deletePanel(p);
+                }
+            }
+        }
+
         if (!panel.getComponent().equals("") && fillDs.length() > 0) {
             String[] labels = SemanticOps.getComponentLabels(fillDs);
 
@@ -139,24 +169,24 @@ public class PanelController {
                 fillDs = DataSetOps.slice1(fillDs, 2);
                 label = labels[2];
             } else {
-                for ( int i=0; i<labels.length; i++ ) {
-                    if ( labels[i].equals(panel.getComponent()) ) {
-                        fillDs= DataSetOps.slice1(fillDs, i);
+                for (int i = 0; i < labels.length; i++) {
+                    if (labels[i].equals(panel.getComponent())) {
+                        fillDs = DataSetOps.slice1(fillDs, i);
                         label = labels[i];
                     }
                 }
             }
-            if ( label==null ) {
+            if (label == null) {
                 throw new IllegalArgumentException("not supported: " + panel.getComponent());
             }
         }
 
         if (getRenderer() != null) {
-            if ( rendererAcceptsData(fillDs) ) {
+            if (rendererAcceptsData(fillDs)) {
                 getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
-                if ( label!=null ) ((SeriesRenderer) getRenderer()).setLegendLabel(label);
+                if (label != null) ((SeriesRenderer) getRenderer()).setLegendLabel(label);
             } else {
-                getRenderer().setException( new Exception( "renderer cannot plot "+fillDs ));
+                getRenderer().setException(new Exception("renderer cannot plot " + fillDs));
             }
         }
 
@@ -174,51 +204,66 @@ public class PanelController {
         }
     }
 
+    
+    PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
+
+        public String toString() {
+            return ""+PanelController.this;
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            
+            QDataSet fillDs = dsf.getController().getFillDataSet();
+            if ( fillDs != null && resetRanges ) {
+                doResetRanges(true);
+                setResetRanges(false);
+            }
+            if (fillDs == null) {
+                if (getRenderer() != null) {
+                    getRenderer().setDataSet(null);
+                }
+            } else {
+                // add additional panels when it's a bundle of rank1 datasets.
+                if (!dom.getController().isValueAdjusting() 
+                        && panel.getRenderType() == RenderType.series
+                        && fillDs.rank() == 2
+                        && fillDs.length(0)<32 
+                        && panel.getComponent().equals("")) {
+                    MutatorLock lock = dom.getController().mutatorLock();
+                    lock.lock();
+                    String[] labels = SemanticOps.getComponentLabels(fillDs);
+                    panel.setComponent(labels[0]);
+                    Color c = panel.getStyle().getColor();
+                    panel.getStyle().setColor(deriveColor(c, 0));
+                    Plot domPlot = dom.getController().getPlotFor(panel);
+                    for (int i = 1; i < fillDs.length(0); i++) {
+                        Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsf);
+                        //Panel cpanel = dom.getController().getPanelsFor(cplot).get(0);
+                        cpanel.getStyle().setColor(deriveColor(c, i));
+                        cpanel.setComponent(labels[i]);
+                        cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
+                        cpanel.getController().setDataSet(fillDs);
+                    }
+                    lock.unlock();
+                }
+
+                setDataSet(fillDs);
+            }
+        }
+    };
+    PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
+        public String toString() {
+            return ""+PanelController.this;
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            setResetRanges(true);
+        }
+    };
+
     public void setDataSourceFilterController(final DataSourceController dsc) {
-        dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                QDataSet fillDs = dsc.getFillDataSet();
-                if (fillDs != null && resetRanges) {
-                    doResetRanges(true);
-                    setResetRanges(false);
-                }
-                if (fillDs == null) {
-                    if (getRenderer() != null) {
-                        getRenderer().setDataSet(null);
-                    }
-                } else {
-                    if (!dom.getController().isValueAdjusting() && panel.getRenderType() == RenderType.series && fillDs.rank() == 2 && panel.getComponent().equals("")) {
-                        MutatorLock lock = dom.getController().mutatorLock();
-                        lock.lock();
-                        String[] labels = SemanticOps.getComponentLabels(fillDs);
-                        panel.setComponent(labels[0]);
-                        Color c = panel.getStyle().getColor();
-                        panel.getStyle().setColor(deriveColor(c, 0));
-                        Plot domPlot = dom.getController().getPlotFor(panel);
-                        for (int i = 1; i < fillDs.length(0); i++) {
-                            Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsc.dsf);
-                            //Panel cpanel = dom.getController().getPanelsFor(cplot).get(0);
-                            cpanel.getStyle().setColor(deriveColor(c, i));
-                            cpanel.setComponent(labels[i]);
-                            cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
-                            cpanel.getController().setDataSet(fillDs);
-                        }
-                        lock.unlock();
-                    }
-
-                    setDataSet(fillDs);
-                }
-            }
-        });
-
-        dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                setResetRanges(true);
-            }
-        });
-
+        dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
+        dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
     }
 
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
@@ -252,17 +297,13 @@ public class PanelController {
         propertyChangeSupport.firePropertyChange(PROP_RESETRANGES, oldResetRanges, resetRanges);
     }
 
-    public void setSuri(String surl) {
-        //TODO: see how this is used.  Should all the other guys listening to this change as well?
-        getDataSourceFilter().setSuri(surl);
-    }
     protected Renderer renderer = null;
 
-    protected Renderer getRenderer() {
+    public Renderer getRenderer() {
         return renderer;
     }
 
-    protected void setRenderer(Renderer renderer) {
+    public void setRenderer(Renderer renderer) {
         this.renderer = renderer;
         if (renderer instanceof SeriesRenderer) {
             bindToSeriesRenderer((SeriesRenderer) renderer);
@@ -277,25 +318,30 @@ public class PanelController {
 
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
-        DataSourceFilter dsf = getDataSourceFilter();
-
         RenderType renderType = AutoplotUtil.getRenderType(dsf.getController().getFillDataSet());
         panel.setRenderType(renderType);
 
         this.setRenderer(autorange, true);
 
+        Plot plot= dom.getController().getPlotFor(panel);
+
         Panel panelCopy = (Panel) panel.copy();
+        panelCopy.getPlotDefaults().syncTo(plot);
 
-        doMetadata(panelCopy, autorange, true);
+        if ( dom.getOptions().isAutolabelling() ) {
+            doMetadata(panelCopy, autorange, true);
+        }
 
-        doAutoranging(panelCopy);
+        if ( dom.getOptions().isAutoranging() ) {
+            doAutoranging(panelCopy);
+        }
 
         panel.syncTo(panelCopy);
 
-        dom.getController().getPlotFor(panel).syncTo(panel.getPlotDefaults());
+        plot.syncTo(panel.getPlotDefaults());
 
         setStatus("done, apply fill and autorange");
-        changesSupport.changePerformed( this, PENDING_RESET_RANGE );
+        changesSupport.changePerformed(this, PENDING_RESET_RANGE);
     }
 
     /**
@@ -514,8 +560,9 @@ public class PanelController {
 
             }
 
-            if (fillDs.length() > 30000) {
+            if (fillDs.length() > LARGE_DATASET_COUNT) {
                 panelCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
+                panelCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
                 panelCopy.getStyle().setSymbolSize(1.0);
             } else {
                 panelCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
@@ -582,7 +629,7 @@ public class PanelController {
             plot.addRenderer(newRenderer);
 
             if (getDataSourceFilter().getController().getFillDataSet() != null) {
-              setDataSet(getDataSourceFilter().getController().getFillDataSet());
+                setDataSet(getDataSourceFilter().getController().getFillDataSet());
             }
         }
 
@@ -620,5 +667,9 @@ public class PanelController {
 
     private void setStatus(String string) {
         this.dom.getController().setStatus(string);
+    }
+
+    public String toString() {
+        return "" + this.panel + " controller";
     }
 }

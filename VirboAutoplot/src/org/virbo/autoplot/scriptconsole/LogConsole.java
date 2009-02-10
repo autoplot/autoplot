@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -90,11 +91,17 @@ public class LogConsole extends javax.swing.JPanel {
                 } );
             }
         };
+
         map.put("eval", evalAction);
         editorTextPane1.setActionMap(map);
-        Keymap keys = editorTextPane1.getKeymap();
-        keys.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), evalAction);
-        editorTextPane1.setKeymap(keys);
+
+        InputMap imap= editorTextPane1.getInputMap();
+        imap.put( KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "eval" );
+
+        //Keymap keys = editorTextPane1.getKeymap();
+        //keys.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), evalAction);
+        //editorTextPane1.setKeymap(keys);
+        evalButton.setAction(evalAction);
 
         timer2 = new Timer(100, new ActionListener() {
 
@@ -257,6 +264,7 @@ public class LogConsole extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         editorTextPane1 = new org.virbo.autoplot.scriptconsole.EditorTextPane();
+        evalButton = new javax.swing.JButton();
 
         jScrollPane1.setAutoscrolls(true);
 
@@ -380,6 +388,8 @@ public class LogConsole extends javax.swing.JPanel {
 
         jScrollPane2.setViewportView(editorTextPane1);
 
+        evalButton.setText("eval");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -391,7 +401,9 @@ public class LogConsole extends javax.swing.JPanel {
                         .addContainerGap()
                         .add(jLabel2)
                         .add(2, 2, 2)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)))
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(evalButton)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
@@ -406,7 +418,9 @@ public class LogConsole extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                             .add(jLabel2)
-                            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                .add(evalButton)
+                                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
         );
@@ -490,6 +504,7 @@ private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JButton clearButton;
     private javax.swing.JButton copyButton;
     private org.virbo.autoplot.scriptconsole.EditorTextPane editorTextPane1;
+    private javax.swing.JButton evalButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;

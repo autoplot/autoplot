@@ -50,5 +50,8 @@ public class AxisController {
         return getBindings()[index];
     }
 
+    public DasAxis getDasAxis() {
+        return dasAxis;
+    }
 
 }

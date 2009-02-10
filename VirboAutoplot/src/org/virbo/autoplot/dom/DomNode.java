@@ -31,11 +31,14 @@ public abstract class DomNode implements Cloneable {
     }
 
     /**
-     * bulk assignment of properties.
-     * TODO: what about different number of children?
+     * bulk assignment of properties.  When the node's children differ, then a controller should be used
+     * to implement the sync.
+     * Syncing should include the node's ID.  (for now, it's not clear what the ramifications are...)
      * @param n
      */
-    abstract void syncTo( DomNode n );
+    public void syncTo( DomNode n ) {
+        //this.id= n.id;  don't sync ID!!!
+    }
 
     /**
      * return any child nodes.
