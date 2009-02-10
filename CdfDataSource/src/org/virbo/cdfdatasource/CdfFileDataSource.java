@@ -25,11 +25,11 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.Slice1DataSet;
-import org.virbo.dataset.SortDataSet;
+import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.MetadataModel;
@@ -96,23 +96,33 @@ public class CdfFileDataSource extends AbstractDataSource {
             svariable = (String) map.get("arg_0");
         }
 
-        String constraint= null;
-        int i= svariable.indexOf("[");
-        if ( i!=-1 ) {
-            constraint= svariable.substring(i);
-            svariable= svariable.substring(0,i);
+        String constraint = null;
+        int i = svariable.indexOf("[");
+        if (i != -1) {
+            constraint = svariable.substring(i);
+            svariable = svariable.substring(0, i);
         }
-        
+
         try {
             Variable variable = cdf.getVariable(svariable);
-            attributes = readAttributes(cdf, variable, 0);
-
+            String interpMeta = (String) map.get("interpMeta");
+            if (!"no".equals(interpMeta)) {
+                attributes = readAttributes(cdf, variable, 0);
+            }
             WritableDataSet result = wrapDataSet(cdf, svariable, constraint, false);
             cdf.close();
 
+            if (!"no".equals(interpMeta)) {
+                MetadataModel model = new IstpMetadataModel();
+                Map<String, Object> istpProps = model.properties(attributes);
+                result.putProperty(QDataSet.VALID_MAX, istpProps.get(QDataSet.VALID_MAX));
+                result.putProperty(QDataSet.VALID_MIN, istpProps.get(QDataSet.VALID_MIN));
+                result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
+            // apply properties.
+            }
             return result;
         } catch (CDFException ex) {
-            throw new IllegalArgumentException("no such variable: "+svariable);
+            throw new IllegalArgumentException("no such variable: " + svariable);
         }
 
     }
@@ -122,76 +132,108 @@ public class CdfFileDataSource extends AbstractDataSource {
      * @param constraint
      * @return
      */
-    private long[] parseConstraint( String constraint, long recCount ) throws ParseException {
-        long[] result= new long[] { 0, recCount, 1 };
-        if ( constraint==null ) {
+    private long[] parseConstraint(String constraint, long recCount) throws ParseException {
+        long[] result = new long[]{0, recCount, 1};
+        if (constraint == null) {
             return result;
         } else {
-            Pattern p= Pattern.compile("\\[(\\d*)[:](\\d*)(?:[:](\\d*))?\\]");
-            Matcher m= p.matcher(constraint);
-            if ( m.matches() ) {
-                if ( m.group(1).length()>0 ) result[0]= Integer.parseInt(m.group(1));
-                if ( m.group(2).length()>0 ) result[1]= Integer.parseInt(m.group(2));
-                if ( m.group(3)!=null ) {
-                    if ( m.group(3).length()>0 ) result[2]= Integer.parseInt(m.group(3));
-                } 
+            Pattern p = Pattern.compile("\\[(\\d*)[:](\\d*)(?:[:](\\d*))?\\]");
+            Matcher m = p.matcher(constraint);
+            if (m.matches()) {
+                if (m.group(1).length() > 0) {
+                    result[0] = Integer.parseInt(m.group(1));
+                }
+                if (m.group(2).length() > 0) {
+                    result[1] = Integer.parseInt(m.group(2));
+                }
+                if (m.group(3) != null) {
+                    if (m.group(3).length() > 0) {
+                        result[2] = Integer.parseInt(m.group(3));
+                    }
+                }
                 return result;
             } else {
                 throw new ParseException("no match!", 0);
             }
         }
     }
-    
-    
+
     /**
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      */
     private WritableDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform) throws CDFException, ParseException {
         Variable variable = cdf.getVariable(svariable);
 
+        HashMap thisAttributes = readAttributes(cdf, variable, 0);
+
         long varType = variable.getDataType();
         long numRec = variable.getNumWrittenRecords();
 
+
         if (numRec == 0) {
-            throw new IllegalArgumentException("variable " + svariable + " contains no records!");
+            if (thisAttributes.containsKey("COMPONENT_0")) {
+                // themis kludge that CDAWeb supports, so we support it too.  The variable has no records, but has
+                // two attributes, COMPONENT_0 and COMPONENT_1.  These are two datasets that should be added to
+                // get the result.  Note cdf_epoch16 fixes the shortcoming that themis was working around.
+                QDataSet c0 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_0"), constraints, true);
+                if (thisAttributes.containsKey("COMPONENT_1")) {
+                    QDataSet c1 = wrapDataSet(cdf, (String) thisAttributes.get("COMPONENT_1"), constraints, false);
+                    if (c0.rank() == 1 && CdfDataSetUtil.validCount(c0, 2) == 1 && c1.length() > 1) { // it should have been rank 0.
+                        c0 = DataSetOps.slice0(c0, 0);
+                        // Convert the units to the more precise Units.us2000.  We may still truncate here, and the only way
+                        // to avoid this would be to introduce a new Basis that is equal to c0.
+                        if (Units.cdfEpoch == c0.property(QDataSet.UNITS)) {
+                            double value = ((RankZeroDataSet) c0).value();
+                            double valueUs2000 = Units.cdfEpoch.convertDoubleTo(Units.us2000, value);
+                            c0 = CdfDataSetUtil.toRank0DataSet(Units.us2000.createDatum(valueUs2000));
+                        }
+                    }
+                    c0 = CdfDataSetUtil.add(c0, c1);
+                }
+                return DDataSet.maybeCopy(c0);
+            } else {
+                throw new IllegalArgumentException("variable " + svariable + " contains no records!");
+            }
         }
-        
-        long[] recs= parseConstraint( constraints, numRec );
-        
+
+        long[] recs = parseConstraint(constraints, numRec);
+
         WritableDataSet result;
         if (reform) {
-            result = CdfUtil.wrapCdfHyperData(variable, 0, -1);
+            result = CdfUtil.wrapCdfHyperData(variable, 0, -1, 1);
         } else {
-            long recCount= ( recs[1]-recs[0] ) / recs[2] ;
-            result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2] );
+            long recCount = (recs[1] - recs[0]) / recs[2];
+            result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         result.putProperty(QDataSet.NAME, svariable);
-        HashMap thisAttributes = readAttributes(cdf, variable, 0);
 
         final boolean doUnits = true;
-        if (doUnits && thisAttributes.containsKey("UNITS")) {
-            Units mu = MetadataUtil.lookupUnits((String) thisAttributes.get("UNITS"));
-            Units u = (Units) result.property(QDataSet.UNITS);
-            if (u == null) {
-                result.putProperty(QDataSet.UNITS, mu);
+        if (doUnits) {
+            if (thisAttributes.containsKey("UNITS")) {
+                Units mu = MetadataUtil.lookupUnits((String) thisAttributes.get("UNITS"));
+                Units u = (Units) result.property(QDataSet.UNITS);
+                if (u == null) {
+                    result.putProperty(QDataSet.UNITS, mu);
+                }
             }
         }
 
         for (int idep = 0; idep < 3; idep++) {
             Map dep = (Map) thisAttributes.get("DEPEND_" + idep);
-            if (dep != null) {
+            String labl = (String) thisAttributes.get("LABL_PTR_" + idep);
+            if (dep != null && labl == null) {
                 try {
-                    WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep==0 ? constraints : null, idep > 0);
+                    WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, idep > 0);
                     //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
-                    if ( depDs.rank()==2 && depDs.length(0)==2 ) {
-                        WritableDataSet depDs1= (WritableDataSet) Ops.reduceMean(depDs, 1);
-                        QDataSet binmax= DataSetOps.slice1(depDs, 1) ;
-                        QDataSet binmin= DataSetOps.slice1(depDs, 0) ;
-                        depDs1.putProperty( QDataSet.DELTA_MINUS, Ops.subtract( depDs1, binmin ) );
-                        depDs1.putProperty( QDataSet.DELTA_PLUS, Ops.subtract( binmax, depDs1 ) );
-                        depDs= depDs1;
+                    if (depDs.rank() == 2 && depDs.length(0) == 2) {
+                        WritableDataSet depDs1 = (WritableDataSet) Ops.reduceMean(depDs, 1);
+                        QDataSet binmax = DataSetOps.slice1(depDs, 1);
+                        QDataSet binmin = DataSetOps.slice1(depDs, 0);
+                        depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
+                        depDs1.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(binmax, depDs1));
+                        depDs = depDs1;
                     }
-                    
+
                     if (DataSetUtil.isMonotonic(depDs)) {
                         depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                     } else {
@@ -208,10 +250,9 @@ public class CdfFileDataSource extends AbstractDataSource {
                     e.printStackTrace(); // to support lanl.
                 }
             } else {
-                String s = (String) thisAttributes.get("LABL_PTR_" + idep);
-                if (s != null) {
+                if (labl != null) {
                     try {
-                        WritableDataSet depDs = wrapDataSet(cdf, s, idep==0 ? constraints : null, idep > 0);
+                        WritableDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0);
                         result.putProperty("DEPEND_" + idep, depDs);
                     } catch (Exception e) {
                         e.printStackTrace(); // to support lanl.
@@ -220,8 +261,22 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
         }
 
-        boolean swapHack= false; // TODO: figure out where this was needed.
-        if ( swapHack && result.rank() == 3) { // need to swap for rank 3.
+        boolean swapHack = false; // TODO: figure out where this was needed.
+
+        if (result.rank() == 3) {
+            int n1 = result.length(0);
+            int n2 = result.length(0, 0);
+            QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
+            QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
+            if (n1 != n2 && dep1 != null && dep1.length() == n2) {
+                if (dep2 != null && dep2.length() == n1) {
+                    swapHack = true;
+                    System.err.println("swaphack avoids runtime error");
+                }
+            }
+        }
+
+        if (swapHack && result.rank() == 3) { // need to swap for rank 3.
             QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
             QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
             result.putProperty(QDataSet.DEPEND_2, dep1);

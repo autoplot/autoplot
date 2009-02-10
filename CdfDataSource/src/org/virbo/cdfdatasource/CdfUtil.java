@@ -297,6 +297,12 @@ public class CdfUtil {
         return wrapCdfHyperData( variable, recStart, recCount, 1 );
     }
     
+    /**
+     * wraps response from CDFVariable.getHyperData() into QDataSet.  The response object
+     * should be float[], float[][], double[], double[][], etc.  recStart, recCount, recInterval
+     * control subsetting in the zeroth dimension.
+     * @param reccount reccount -1 indicates read the one and only record and do a reform.
+     */    
     public static WritableDataSet wrapCdfHyperData(Variable variable, long recStart, long recCount, long recInterval ) throws CDFException {
         long varType = variable.getDataType();
         long[] dimIndeces = new long[]{0};
@@ -337,7 +343,7 @@ public class CdfUtil {
         WritableDataSet result;
 
         int rank = 1;
-        if (recCount == 1) {
+        if (recCount == 1 || recCount==-1 ) {
             if (!odata.getClass().isArray()) {
                 return wrapSingle(varType, variable.getName(), odata);
             }
