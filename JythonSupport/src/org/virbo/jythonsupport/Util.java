@@ -44,9 +44,14 @@ public class Util {
         }
         QDataSet rds= result.getDataSet(mon == null ? new NullProgressMonitor() : mon);
         //Logger.getLogger("virbo.jythonsupport").fine( "created dataset #"+rds.getClass().gethashCode() );
-        
-        metadata= result.getMetaData( new NullProgressMonitor() );
+
+        try {
+            metadata= result.getMetaData( new NullProgressMonitor() );
+        } catch ( Exception e ) {
+            
+        }
         metadataSurl= surl;
+
 
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
             return rds;
