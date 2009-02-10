@@ -42,17 +42,18 @@ import org.virbo.dsutil.AsciiParser.DelimParser;
 public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
     AsciiTableTableModel model;
-    Map<Integer,String> columns;
+    Map<Integer, String> columns;
     AsciiParser parser;
-    
+    boolean focusDep0 = false;
+
     /** Creates new form AsciiDataSourceEditorPanel */
     public AsciiTableDataSourceEditorPanel() {
         initComponents();
-        
-        parser= new AsciiParser();
-        model= new AsciiTableTableModel();
-        
-        jTable1.setModel( model );
+
+        parser = new AsciiParser();
+        model = new AsciiTableTableModel();
+
+        jTable1.setModel(model);
 
         jTable1.setCellSelectionEnabled(true);
 
@@ -61,29 +62,32 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             public void valueChanged(ListSelectionEvent e) {
                 if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
                     int col = jTable1.getColumnModel().getSelectedColumns()[0];
-                    String name= columns.get(col);
-                    if ( name!=null ) {
-                        setColumn( name );
+                    String name = columns.get(col);
+                    if (name == null) {
+                        name = "field" + col;
+                    }
+                    if (focusDep0) {
+                        setDep0(name);
                     } else {
-                        setColumn( "field" + col );
+                        setColumn(name);
                     }
                 }
             }
         });
-        
-        
+
+
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
-                setSkipLines(e.getFirstIndex() );
+                setSkipLines(jTable1.getSelectedRow());
             }
         });
 
         BindingGroup bc = new BindingGroup();
 
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, this, BeanProperty.create("skipLines"), this.skipLinesTextField, BeanProperty.create("value") ) );
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, this, BeanProperty.create("column"), this.columnsComboBox, BeanProperty.create("selectedItem" ) ) );
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, this, BeanProperty.create("dep0"), this.dep0Columns, BeanProperty.create("selectedItem") ) );
+        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, this, BeanProperty.create("skipLines"), this.skipLinesTextField, BeanProperty.create("value")));
+        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, this, BeanProperty.create("column"), this.columnsComboBox, BeanProperty.create("selectedItem")));
+        bc.addBinding(Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, this, BeanProperty.create("dep0"), this.dep0Columns, BeanProperty.create("selectedItem")));
 
         bc.bind();
     }
@@ -114,11 +118,15 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jLabel3.setText("Column:");
 
-        columnsComboBox.setEditable(true);
         columnsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         columnsComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 columnsComboBoxItemStateChanged(evt);
+            }
+        });
+        columnsComboBox.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                columnsComboBoxFocusGained(evt);
             }
         });
 
@@ -128,6 +136,11 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         dep0Columns.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 dep0ColumnsItemStateChanged(evt);
+            }
+        });
+        dep0Columns.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                dep0ColumnsFocusGained(evt);
             }
         });
 
@@ -147,8 +160,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         .add(jLabel3)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(dep0Columns, 0, 164, Short.MAX_VALUE)
-                    .add(columnsComboBox, 0, 164, Short.MAX_VALUE))
+                    .add(dep0Columns, 0, 175, Short.MAX_VALUE)
+                    .add(columnsComboBox, 0, 175, Short.MAX_VALUE))
                 .add(434, 434, 434))
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 819, Short.MAX_VALUE)
         );
@@ -170,18 +183,24 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    
-
 private void columnsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_columnsComboBoxItemStateChanged
     setColumn((String) columnsComboBox.getSelectedItem());
 }//GEN-LAST:event_columnsComboBoxItemStateChanged
 
 private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_dep0ColumnsItemStateChanged
-    setDep0( (String)dep0Columns.getSelectedItem() );
+    setDep0((String) dep0Columns.getSelectedItem());
 }//GEN-LAST:event_dep0ColumnsItemStateChanged
 
-    URLSplit split= null;
-    
+private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_columnsComboBoxFocusGained
+    focusDep0 = false;
+    System.err.println("focusDep0=" + focusDep0);
+}//GEN-LAST:event_columnsComboBoxFocusGained
+
+private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dep0ColumnsFocusGained
+    focusDep0 = true;
+    System.err.println("focusDep0=" + focusDep0);
+}//GEN-LAST:event_dep0ColumnsFocusGained
+    URLSplit split = null;
     protected File file = null;
     public static final String PROP_FILE = "file";
 
@@ -190,27 +209,24 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
     }
 
     public void setFile(File file) throws IOException {
-        this.file= file;
+        this.file = file;
         this.model.setFile(file);
-        
+
     }
-
-
     protected int skipLines = 0;
     public static final String PROP_FIRST_ROW = "skipLines";
 
-    
-    public Map<Integer,String> getColumnNames() throws IOException {
-        
-        if (skipLines>0 )  {
-            parser.setSkipLines( skipLines );
+    public Map<Integer, String> getColumnNames() throws IOException {
+
+        if (skipLines > 0) {
+            parser.setSkipLines(skipLines);
         }
-        
-        String line= parser.readFirstRecord(file.toString());
-        DelimParser dp= parser.guessDelimParser(line);
+
+        String line = parser.readFirstRecord(file.toString());
+        DelimParser dp = parser.guessDelimParser(line);
         String[] columns = parser.getFieldNames();
-        Map<Integer,String> result= new LinkedHashMap<Integer,String>();
-        for ( int i=0; i< columns.length; i++ ) {
+        Map<Integer, String> result = new LinkedHashMap<Integer, String>();
+        for (int i = 0; i < columns.length; i++) {
             result.put(i, columns[i]);
         }
         return result;
@@ -225,16 +241,14 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
             int oldRow = this.skipLines;
             this.skipLines = row;
             Rectangle rect = jTable1.getCellRect(getSkipLines(), 0, true);
-            update(  );
+            update();
             jTable1.scrollRectToVisible(rect);
             firePropertyChange(PROP_FIRST_ROW, oldRow, row);
         } catch (IOException ex) {
             Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
-    protected String column="field0";
+    protected String column = "field0";
     public static final String PROP_COLUMN = "column";
 
     public String getColumn() {
@@ -246,8 +260,7 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
         this.column = column;
         firePropertyChange(PROP_COLUMN, oldColumn, column);
     }
-
-    protected String dep0="";
+    protected String dep0 = "";
     public static final String PROP_DEP0 = "dep0";
 
     public String getDep0() {
@@ -269,52 +282,53 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
             split = URLSplit.parse(url);
             Map<String, String> params = URLSplit.parseParams(split.params);
 
-            File f = DataSetURL.getFile( new URL(split.file), new NullProgressMonitor());
+            File f = DataSetURL.getFile(new URL(split.file), new NullProgressMonitor());
             setFile(f);
-            
-            if ( params.containsKey("skipLines") ) {
-                setSkipLines( Integer.parseInt(params.get("skipLines") ) );
+
+            if (params.containsKey("skipLines")) {
+                setSkipLines(Integer.parseInt(params.get("skipLines")));
             }
-            
-            if ( params.containsKey("column" ) ) {
-                setColumn(params.get("column"));   
+            if (params.containsKey("skip")) {
+                setSkipLines(Integer.parseInt(params.get("skip")));
             }
-            
-            if ( params.containsKey("depend0" ) ) {
-                setDep0(params.get("depend0"));   
+
+            if (params.containsKey("column")) {
+                setColumn(params.get("column"));
+            }
+
+            if (params.containsKey("depend0")) {
+                setDep0(params.get("depend0"));
             }
 
             try {
                 update();
             } catch (IOException ex) {
                 Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }            
+            }
         } catch (IOException ex) {
             Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
     }
 
     public String getUrl() {
-        String surl=  "vap+dat:"+ URLSplit.uriDecode( split.file );
-        String args="";
-        if ( skipLines>1 ) {
-            args+= "&skipLines="+skipLines;
+        String surl = "vap+dat:" + URLSplit.uriDecode(split.file);
+        String args = "";
+        if (skipLines > 1) {
+            args += "&skipLines=" + skipLines;
         }
-                
-        if ( !this.getDep0().equals("") ) {
-            args+= "&depend0="+this.getDep0();
+
+        if (!this.getDep0().equals("")) {
+            args += "&depend0=" + this.getDep0();
         }
-         
-        args+= "&column=" + getColumn();
-        
-        if ( args.length()>0 ) {
-            surl+= "?" + args.substring(1);
+
+        args += "&column=" + getColumn();
+
+        if (args.length() > 0) {
+            surl += "?" + args.substring(1);
         }
         return surl;
     }
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox columnsComboBox;
     public javax.swing.JComboBox dep0Columns;
@@ -327,19 +341,20 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
     // End of variables declaration//GEN-END:variables
 
     private void update() throws IOException {
-        
-        String line = model.getLine( this.skipLines );
-        if (line == null || parser==null ) {
- //               throw new IllegalArgumentException("no records found");
+
+        String line = model.getLine(this.skipLines);
+        if (line == null || parser == null) {
+            //               throw new IllegalArgumentException("no records found");
             return;
         }
         AsciiParser.DelimParser p = parser.guessDelimParser(line);
-        model.setRecParser( p );
+        model.setRecParser(p);
         columns = getColumnNames();
+        int icol = jTable1.getSelectedColumn();
         columnsComboBox.setModel(new DefaultComboBoxModel(columns.values().toArray()));
+        setColumn(columns.get(icol));
         List<String> dep0Values = new ArrayList<String>(columns.values());
         dep0Values.add(0, "");
         dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
     }
-
 }

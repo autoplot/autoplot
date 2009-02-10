@@ -30,8 +30,8 @@
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="dep0Columns" pref="164" max="32767" attributes="2"/>
-                  <Component id="columnsComboBox" alignment="0" pref="164" max="32767" attributes="2"/>
+                  <Component id="dep0Columns" pref="175" max="32767" attributes="2"/>
+                  <Component id="columnsComboBox" alignment="0" pref="175" max="32767" attributes="2"/>
               </Group>
               <EmptySpace min="-2" pref="434" max="-2" attributes="0"/>
           </Group>
@@ -88,7 +88,6 @@
     </Component>
     <Component class="javax.swing.JComboBox" name="columnsComboBox">
       <Properties>
-        <Property name="editable" type="boolean" value="true"/>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="4">
             <StringItem index="0" value="Item 1"/>
@@ -100,6 +99,7 @@
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="columnsComboBoxItemStateChanged"/>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="columnsComboBoxFocusGained"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
@@ -120,6 +120,7 @@
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="dep0ColumnsItemStateChanged"/>
+        <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="dep0ColumnsFocusGained"/>
       </Events>
     </Component>
   </SubComponents>
