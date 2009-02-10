@@ -2,99 +2,112 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package org.virbo.datasource.wav;
 
-import org.das2.datum.Units;
-import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.ShortBuffer;
-import java.nio.channels.FileChannel.MapMode;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.AudioSystem;
-import org.virbo.dataset.BDataSet;
+import org.das2.datum.Units;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.binarydatasource.BinaryDataSource;
+import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.SDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.URLSplit;
 
 /**
- *
+ * This version of the DataSource works by wrapping BinaryDataSource.  It
+ * reads in the wav header, then creates a URI for the BinaryDataSource.
  * @author jbf
  */
-public class WavDataSource extends AbstractDataSource {
+public class WavDataSource2 extends AbstractDataSource {
 
-    public WavDataSource(URL url) {
+    public WavDataSource2(URL url) {
         super(url);
     }
 
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-
         File wavFile = DataSetURL.getFile(this.url, mon);
-                
+
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(wavFile);
         AudioFormat audioFormat = fileFormat.getFormat();
 
         // leave 64 bytes for the header.  The wav file format is much more complex than this.  See http://www.sonicspot.com/guide/wavefiles.html
         int headerLength= 64;
-        
+
         int frameSize = audioFormat.getFrameSize();
         int frameCount = (int) ( ( wavFile.length() - headerLength ) / frameSize );
         int bits = audioFormat.getSampleSizeInBits();
         int frameOffset=0;
-        
+
         if ( params.get("offset")!=null ) {
             double offsetSeconds= Double.parseDouble( params.get( "offset" ) );
             frameOffset= (int) Math.floor( offsetSeconds * audioFormat.getSampleRate() );
             frameCount-= frameOffset;
         }
-        
+
         if ( params.get("length")!=null ) {
             double lengthSeconds= Double.parseDouble( params.get( "length" ) );
             int frameCountLimit= (int) Math.floor( lengthSeconds * audioFormat.getSampleRate() );
             frameCount= Math.min( frameCount, frameCountLimit );
         }
 
-        FileInputStream fin = new FileInputStream(wavFile);
-        ByteBuffer byteBuffer = fin.getChannel().map( MapMode.READ_ONLY, headerLength + frameOffset * frameSize, frameCount * frameSize );
-        
-        boolean unsigned= audioFormat.getEncoding().equals(AudioFormat.Encoding.PCM_UNSIGNED );
-        if ( unsigned ) throw new IllegalArgumentException("Unsupported wave file format: " + audioFormat + ", need signed.");
-        if (audioFormat.getChannels() > 1) {
-            throw new IllegalArgumentException("Unsupported wave file format: " + audioFormat + ", need mono.");
-        }
-        if (bits != 16 && bits != 8) {
-            throw new IllegalArgumentException("Unsupported wave file format: " + audioFormat + ", need 8 or 16 bits.");
-        }
-
-        MutablePropertyDataSet result;
-
-        if (bits == 16) {
-            byteBuffer.order( audioFormat.isBigEndian() ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN );
-            ShortBuffer shortBuffer = byteBuffer.asShortBuffer();
-            short[] buf = new short[frameCount];
-            shortBuffer.get(buf);
-            result = SDataSet.wrap(buf);
+        int channel;
+        if ( params.get("channel")!=null ) {
+            channel= Integer.parseInt(params.get("channel"));
         } else {
-            byte[] buf = new byte[frameCount];
-            byteBuffer.get(buf);
-            result = BDataSet.wrap(buf);
+            channel= 0;
         }
+
+        int byteOffset= headerLength + frameOffset * frameSize;
+        int byteLength= frameCount * frameSize;
+        String byteOrder= audioFormat.isBigEndian() ? "big" : "little";
+        String type=null;
+
+        if ( audioFormat.getEncoding()!= Encoding.PCM_SIGNED ) {
+            if ( bits==16 ) {
+                type= "short";
+            } else if ( bits==8 ) {
+                type= "byte";
+            }
+        } else {
+            if ( bits==16 ) {
+                type= "short";
+            } else if ( bits==8 ) {
+                type= "ubyte";
+            }
+        }
+
+        Map<String,String> params= new HashMap<String,String>();
+        params.put( "byteOffset", ""+byteOffset );
+        params.put( "byteLength", ""+byteLength );
+        params.put( "recLength", ""+ frameSize );
+        params.put( "recOffset", ""+ ( channel*bits/8) );
+        params.put( "type", type );
+        params.put( "byteOrder", byteOrder );
+
+        URL url= new URL( ""+wavFile.toURI().toURL() + "?" + URLSplit.formatParams(params) );
+
+        BinaryDataSource bds= new BinaryDataSource( url );
+        MutablePropertyDataSet result= (BufferDataSet) bds.getDataSet( new NullProgressMonitor() );
 
         MutablePropertyDataSet timeTags= DataSetUtil.tagGenDataSet( frameCount, 0., 1./audioFormat.getSampleRate() );
         timeTags.putProperty( QDataSet.UNITS, Units.seconds );
         result.putProperty( QDataSet.DEPEND_0, timeTags );
-                
+
         return result;
+
     }
 
     @Override
@@ -109,5 +122,5 @@ public class WavDataSource extends AbstractDataSource {
         properties.put( "bits", audioFormat.getSampleSizeInBits() );
         return properties;
     }
-    
+
 }
