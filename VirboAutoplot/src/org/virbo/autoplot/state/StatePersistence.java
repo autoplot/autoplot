@@ -21,10 +21,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import org.das2.graph.DasColorBar;
-import org.das2.graph.DasColorBar.Type;
 import org.das2.graph.DefaultPlotSymbol;
-import org.virbo.autoplot.ApplicationModel;
-import org.virbo.autoplot.dom.DebugXMLEncoder;
 
 /**
  *
@@ -37,7 +34,7 @@ public class StatePersistence {
     }
 
     public static void saveState( File f, Object state ) throws IOException {
-        DebugXMLEncoder e = new DebugXMLEncoder( new BufferedOutputStream( new FileOutputStream(f) ) );
+        XMLEncoder e = new XMLEncoder( new BufferedOutputStream( new FileOutputStream(f) ) );
         
         e.setPersistenceDelegate( DatumRange.class, new DatumRangePersistenceDelegate() );
         e.setPersistenceDelegate( Units.class, new UnitsPersistenceDelegate() );
