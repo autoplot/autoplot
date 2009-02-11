@@ -259,7 +259,6 @@ public class DataSourceController {
                 public String toString() {
                    return "" + dsf + " controller";
                 }
-                @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     dom.getController().removePropertyChangeListener(this);
                     setDataSetInternal(fds);
