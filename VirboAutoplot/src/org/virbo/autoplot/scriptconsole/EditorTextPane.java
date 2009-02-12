@@ -21,7 +21,7 @@ public class EditorTextPane extends JTextPane {
     
     private EditorAnnotationsSupport support= new EditorAnnotationsSupport( this );
 
-    EditorTextPane() {
+    public EditorTextPane() {
 
         final UndoManager undo = new UndoManager();
         getDocument().addUndoableEditListener(undo);

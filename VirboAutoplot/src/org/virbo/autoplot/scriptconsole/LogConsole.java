@@ -65,43 +65,30 @@ public class LogConsole extends javax.swing.JPanel {
     /** Creates new form LogConsole */
     public LogConsole() {
         initComponents();
-        ActionMap map = editorTextPane1.getActionMap();
-        Action evalAction = new AbstractAction("eval") {
-
-            public synchronized void actionPerformed(ActionEvent e) {
-                final String s = editorTextPane1.getText();
+        
+        commandLineTextPane1.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                final String s = commandLineTextPane1.getText();
                 RequestProcessor.invokeLater(new Runnable() {
                     public void run() {
                         try {
                             System.out.println("AP> "+s);
                             if (interp == null) {
-                                editorTextPane1.setText("initializing interpretter...");
+                                commandLineTextPane1.setText("initializing interpretter...");
                                 interp = JythonUtil.createInterpreter(true, false);
-                                editorTextPane1.setText(s);
+                                commandLineTextPane1.setText(s);
                             }
                             interp.exec(s);
-                            editorTextPane1.setText("");
+                            commandLineTextPane1.setText("");
                         } catch (IOException ex) {
                             Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
                         } catch ( PyException ex ) {
                             System.err.println(ex.toString());
                         }
-
                     }
                 } );
             }
-        };
-
-        map.put("eval", evalAction);
-        editorTextPane1.setActionMap(map);
-
-        InputMap imap= editorTextPane1.getInputMap();
-        imap.put( KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "eval" );
-
-        //Keymap keys = editorTextPane1.getKeymap();
-        //keys.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), evalAction);
-        //editorTextPane1.setKeymap(keys);
-        evalButton.setAction(evalAction);
+        });
 
         timer2 = new Timer(100, new ActionListener() {
 
@@ -263,8 +250,7 @@ public class LogConsole extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        editorTextPane1 = new org.virbo.autoplot.scriptconsole.EditorTextPane();
-        evalButton = new javax.swing.JButton();
+        commandLineTextPane1 = new org.virbo.autoplot.scriptconsole.CommandLineTextPane();
 
         jScrollPane1.setAutoscrolls(true);
 
@@ -386,9 +372,7 @@ public class LogConsole extends javax.swing.JPanel {
 
         jLabel2.setText("AP>");
 
-        jScrollPane2.setViewportView(editorTextPane1);
-
-        evalButton.setText("eval");
+        jScrollPane2.setViewportView(commandLineTextPane1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -400,10 +384,8 @@ public class LogConsole extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
                         .add(jLabel2)
-                        .add(2, 2, 2)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 306, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(evalButton)))
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 336, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 652, Short.MAX_VALUE)
@@ -411,16 +393,14 @@ public class LogConsole extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
-                .add(12, 12, 12)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 309, Short.MAX_VALUE)
+                .add(17, 17, 17)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(jLabel2)
-                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                .add(evalButton)
-                                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jLabel2))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
         );
@@ -502,9 +482,8 @@ private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionsPanel;
     private javax.swing.JButton clearButton;
+    private org.virbo.autoplot.scriptconsole.CommandLineTextPane commandLineTextPane1;
     private javax.swing.JButton copyButton;
-    private org.virbo.autoplot.scriptconsole.EditorTextPane editorTextPane1;
-    private javax.swing.JButton evalButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
