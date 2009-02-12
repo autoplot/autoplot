@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.system.DasLogger;
 import org.das2.util.AboutUtil;
@@ -35,6 +36,8 @@ import org.das2.util.awt.GraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.Plot;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURL;
@@ -92,8 +95,9 @@ public class SimpleServlet extends HttpServlet {
             String process = ServletUtil.getStringParameter(request, "process", "");
             String vap = request.getParameter("vap");
             String script = ServletUtil.getStringParameter(request, "script", "");
-            int width = ServletUtil.getIntParameter(request, "width", 700);
-            int height = ServletUtil.getIntParameter(request, "height", 400);
+            int width = ServletUtil.getIntParameter(request, "width", -1);
+            int height = ServletUtil.getIntParameter(request, "height", -1);
+            String scanvasAspect= ServletUtil.getStringParameter(request, "canvas.aspect", "");
             String format = ServletUtil.getStringParameter(request, "format", "image/png");
             String font = ServletUtil.getStringParameter(request, "font", "");
             String column = ServletUtil.getStringParameter(request, "column", "");
@@ -104,6 +108,21 @@ public class SimpleServlet extends HttpServlet {
             String sfillColor = ServletUtil.getStringParameter(request, "fillColor", "");
             String sforegroundColor = ServletUtil.getStringParameter(request, "foregroundColor", "");
             String sbackgroundColor = ServletUtil.getStringParameter(request, "backgroundColor", "");
+            String title = ServletUtil.getStringParameter(request, "plot.title", "" );
+            String xlabel= ServletUtil.getStringParameter(request, "plot.xaxis.label", "" );
+            String xrange= ServletUtil.getStringParameter(request, "plot.xaxis.range", "" );
+            String xlog= ServletUtil.getStringParameter(request, "plot.xaxis.log", "" );
+            String xdrawTickLabels= ServletUtil.getStringParameter(request, "plot.xaxis.drawTickLabels", "" );
+            String ylabel= ServletUtil.getStringParameter(request, "plot.yaxis.label", "" );
+            String yrange= ServletUtil.getStringParameter(request, "plot.yaxis.range", "" );
+            String ylog= ServletUtil.getStringParameter(request, "plot.yaxis.log", "" );
+            String ydrawTickLabels= ServletUtil.getStringParameter(request, "plot.yaxis.drawTickLabels", "" );
+            String zlabel= ServletUtil.getStringParameter(request, "plot.zaxis.label", "" );
+            String zrange= ServletUtil.getStringParameter(request, "plot.zaxis.range", "" );
+            String zlog= ServletUtil.getStringParameter(request, "plot.zaxis.log", "" );
+            String zdrawTickLabels= ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "" );
+            
+            
 
             OutputStream out = response.getOutputStream();
 
@@ -144,6 +163,16 @@ public class SimpleServlet extends HttpServlet {
 
             if (!font.equals("")) appmodel.getCanvas().setBaseFont(Font.decode(font));
 
+
+            // do dimensions
+            if ( "".equals(scanvasAspect) ) {
+                if ( width==-1 ) width= 700;
+                if ( height==-1 ) height= 400;
+            } else {
+                double aspect= Units.dimensionless.parse(scanvasAspect).doubleValue(Units.dimensionless);
+                if ( width==-1 && height!=-1 ) width= (int)( height * aspect );
+                if ( height==-1 && width!=-1 ) height= (int)( width / aspect );
+            }
             dom.getController().getCanvas().setSize( new Dimension( width, height) );
 
             logit("set canvas parameters",t0,uniq);
@@ -201,6 +230,43 @@ public class SimpleServlet extends HttpServlet {
 
             }
 
+            // axis settings
+            Plot p= dom.getController().getPlot();
+
+            if ( !title.equals("") )  p.setTitle(title);
+
+            Axis axis = p.getXaxis();
+            if ( !xlabel.equals("") )  axis.setLabel(xlabel);
+            if ( !xrange.equals("") )  {
+                Units u= axis.getController().getDasAxis().getUnits();
+                DatumRange newRange= DatumRangeUtil.parseDatumRange(xrange, u);
+                axis.setRange(newRange);
+            }
+            if ( !xlog.equals("") )  axis.setLog("true".equals(xlog) );
+            if ( !xdrawTickLabels.equals("") )  axis.setDrawTickLabels("true".equals(xdrawTickLabels));
+            
+            axis = p.getYaxis();
+            if ( !ylabel.equals("") )  axis.setLabel(ylabel);
+            if ( !yrange.equals("") )  {
+                Units u= axis.getController().getDasAxis().getUnits();
+                DatumRange newRange= DatumRangeUtil.parseDatumRange(yrange, u);
+                axis.setRange(newRange);
+            }
+            if ( !ylog.equals("") )  axis.setLog("true".equals(ylog) );
+            if ( !ydrawTickLabels.equals("") )  axis.setDrawTickLabels("true".equals(ydrawTickLabels));
+
+            axis = p.getZaxis();
+            if ( !zlabel.equals("") )  axis.setLabel(zlabel);
+            if ( !zrange.equals("") )  {
+                Units u= axis.getController().getDasAxis().getUnits();
+                DatumRange newRange= DatumRangeUtil.parseDatumRange(zrange, u);
+                axis.setRange(newRange);
+            }
+            if ( !zlog.equals("") )  axis.setLog("true".equals(zlog) );
+            if ( !zdrawTickLabels.equals("") )  axis.setDrawTickLabels("true".equals(zdrawTickLabels));
+
+
+
             if (!srenderType.equals("")) {
                 ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
                 dom.getController().getPanel().setRenderType(renderType);
@@ -235,7 +301,9 @@ public class SimpleServlet extends HttpServlet {
             }
             
             dom.getController().waitUntilIdle();
-            
+
+            System.err.println( dom.getController().getPlot().getController().getDasPlot().getRow() );
+
             if (format.equals("image/png")) {
                 logit("waiting for image",t0,uniq);
                 Image image = appmodel.canvas.getImage(width, height);
