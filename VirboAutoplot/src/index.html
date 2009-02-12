@@ -16,13 +16,13 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <li> misc. minor bugfixes
-</li><li> console tab now has command-line interpreter for controlling application.
-</li><li> cdfDataSource has new option interpMeta=no.
-</li></ol>
+        <li> add plot and axis context menus to bind to other plots, add connectors, add plots, etc.
+</li><li> bugfixes for servlet
+</li><li> bugfixes in data source editors for ascii tables and excel spreadsheets.</li>
+
 <p>Known Bugs:
 </p>
-<ol><li> SeriesRenderers accept context click anyway within concave region, causing confusion.  <a href="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" class="external text" title="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" rel="nofollow">bug report</a>
+<li> SeriesRenderers accept context click anyway within concave region, causing confusion.  <a href="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" class="external text" title="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" rel="nofollow">bug report</a>
 </li><li> If three panels plot three components, then the URI is reset to a rank 1 dataset, the extra panels are not removed.  A mechanism for detecting and automatically removing component panels is needed.
 </li><li> Controls for removing and moving panels, plots, and dataSources is lacking.  DataSources are never removed from the application, but are often recycled.  Same is true with Plots and Panels.
 
