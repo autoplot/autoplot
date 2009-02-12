@@ -18,7 +18,7 @@ public class TestApplet extends JApplet {
      * into the browser.
      */
     public void init() {
-        System.err.println("init...");
+        System.err.println("init TestApplet 20090112.1...");
     }
 
     @Override
