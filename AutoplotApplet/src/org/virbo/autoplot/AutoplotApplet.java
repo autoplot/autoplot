@@ -4,7 +4,6 @@
  */
 package org.virbo.autoplot;
 
-import org.virbo.autoplot.*;
 import java.applet.AppletContext;
 import java.applet.AppletStub;
 import java.awt.BorderLayout;
@@ -13,13 +12,15 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,11 +32,14 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.util.AboutUtil;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
-import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.dataset.QDataSet;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.Plot;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURL;
@@ -50,76 +54,93 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
 public class AutoplotApplet extends JApplet {
 
     ApplicationModel model;
+    Application dom;
     static Logger logger = Logger.getLogger("virbo.autoplot.applet");
 
-    private String getStringParameter( String name, String deft) {
+    private String getStringParameter(String name, String deft) {
         String result = getParameter(name);
-        if (result == null) return deft;
-        else return result;
+        if (result == null) {
+            return deft;
+        } else {
+            return result;
+        }
     }
 
-    private int getIntParameter(Object ignore, String name, int deft) {
+    private int getIntParameter(String name, int deft) {
         String result = getParameter(name);
-        if (result == null) return deft;
-        else return Integer.parseInt(result);
+        if (result == null) {
+            return deft;
+        } else {
+            return Integer.parseInt(result);
+        }
     }
 
     @Override
     public void init() {
         super.init();
-        
-        System.err.println("THIS IS APPLET 1.0.0");
+
+        System.err.println("AutoplotApplet 20090209.3");
 
         model = new ApplicationModel();
-        
+
         setLayout(new BorderLayout());
         add(model.getCanvas(), BorderLayout.CENTER);
+        validate();
 
     }
 
     @Override
     public void start() {
-        
-        System.err.println("THIS IS APPLET 1.0.0");
-        
+
         super.start();
         try {
-            System.err.println(DataSetURL.getDataSource("/home/jbf/foo.qds"));
-            System.err.println("Formatters: "+DataSourceRegistry.getInstance().getFormatterExtensions());
+            System.err.println("Formatters: " + DataSourceRegistry.getInstance().getFormatterExtensions());
         } catch (Exception ex) {
             Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        ApplicationModel appmodel = model;
-        
-        final DataSetSelector select = new DataSetSelector();
-        Object request = null;
-        int width = getIntParameter(request, "width", 700);
-        int height = getIntParameter(request, "height", 400);
-        String font = getStringParameter( "font", "");
-        String column = getStringParameter( "column", "");
-        String row = getStringParameter( "row", "");
-        String scolor = getStringParameter( "color", "");
-        String sfillColor = getStringParameter( "fillColor", "");
-        String sforegroundColor = getStringParameter( "foregroundColor", "");
-        String sbackgroundColor = getStringParameter( "backgroundColor", "");
 
-        if ("true".equals(getParameter("autolayout"))) {
-            appmodel.setAutolayout(true);
-        } else {
-            if (!row.equals("")) try {
-                    AutoplotUtil.setDevicePosition(appmodel.plot.getRow(), row);
-                } catch (ParseException ex) {
-                    Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            if (!column.equals("")) try {
-                    AutoplotUtil.setDevicePosition(appmodel.plot.getColumn(), column);
-                } catch (ParseException ex) {
-                    Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
-                }
+        ApplicationModel appmodel = model;
+        dom = model.getDocumentModel();
+
+        Object request = null;
+        int width = getIntParameter("width", 700);
+        int height = getIntParameter("height", 400);
+        String font = getStringParameter("font", "");
+        String column = getStringParameter("column", "");
+        String row = getStringParameter("row", "");
+        String scolor = getStringParameter("color", "");
+        String srenderType = getStringParameter("renderType", "");
+        String stimeRange = getStringParameter("timeRange", "");
+        String sfillColor = getStringParameter("fillColor", "");
+        String sforegroundColor = getStringParameter("foregroundColor", "");
+        String sbackgroundColor = getStringParameter("backgroundColor", "");
+        String title = getStringParameter("plot.title", "");
+        String xlabel = getStringParameter("plot.xaxis.label", "");
+        String xrange = getStringParameter("plot.xaxis.range", "");
+        String xlog = getStringParameter("plot.xaxis.log", "");
+        String xdrawTickLabels = getStringParameter("plot.xaxis.drawTickLabels", "");
+        String ylabel = getStringParameter("plot.yaxis.label", "");
+        String yrange = getStringParameter("plot.yaxis.range", "");
+        String ylog = getStringParameter("plot.yaxis.log", "");
+        String ydrawTickLabels = getStringParameter("plot.yaxis.drawTickLabels", "");
+        String zlabel = getStringParameter("plot.zaxis.label", "");
+        String zrange = getStringParameter("plot.zaxis.range", "");
+        String zlog = getStringParameter("plot.zaxis.log", "");
+        String zdrawTickLabels = getStringParameter("plot.zaxis.drawTickLabels", "");
+
+        dom.getOptions().setAutolayout("true".equals(getParameter("autolayout")));
+        if (!dom.getOptions().isAutolayout()) {
+            if (!row.equals("")) {
+                dom.getController().getCanvas().setRow(row);
+            }
+            if (!column.equals("")) {
+                dom.getController().getCanvas().setColumn(column);
+            }
         }
 
-        if (!font.equals("")) appmodel.canvas.setBaseFont(Font.decode(font));
+        if (!font.equals("")) {
+            appmodel.canvas.setBaseFont(Font.decode(font));
+        }
 
         appmodel.getCanvas().setSize(width, height);
         appmodel.getCanvas().revalidate();
@@ -127,57 +148,50 @@ public class AutoplotApplet extends JApplet {
 
         //if (vap != null) appmodel.doOpen(new File(vap));
 
-
-        if ( scolor!=null && !scolor.equals("")) {
-            appmodel.seriesRend.setColor(Color.decode(scolor));
-        }
-
-        if ( sfillColor!=null && !sfillColor.equals("")) {
-            appmodel.seriesRend.setFillColor(Color.decode(sfillColor));
-        }
-        if ( sforegroundColor!=null && !sforegroundColor.equals("")) {
+        if (sforegroundColor != null && !sforegroundColor.equals("")) {
             appmodel.canvas.setForeground(Color.decode(sforegroundColor));
         }
-        if ( sbackgroundColor!=null && !sbackgroundColor.equals("")) {
+        if (sbackgroundColor != null && !sbackgroundColor.equals("")) {
             appmodel.canvas.setBackground(Color.decode(sbackgroundColor));
         }
 
 
+        if (getParameter("select") != null) {
+            final DataSetSelector select = new DataSetSelector();
 
-        if (getCodeBase() != null) select.setValue(getCodeBase().toString());
-        select.addActionListener(new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                System.err.println("actionPerformed()");
-                System.err.println("  " + select.getValue());
-                setDataSetURL(select.getValue());
+            if (getCodeBase() != null) {
+                select.setValue(getCodeBase().toString());
             }
-        });
+            select.addActionListener(new ActionListener() {
 
-        add(select, BorderLayout.NORTH);
+                public void actionPerformed(ActionEvent e) {
+                    System.err.println("actionPerformed()");
+                    System.err.println("  " + select.getValue());
+                    setDataSetURL(select.getValue());
+                }
+            });
+
+            add(select, BorderLayout.NORTH);
+        }
 
 
-    // createAppletTester();
-    //Logger.getLogger("").setLevel( Level.WARNING );
-        
-        String srenderType = getStringParameter( "renderType", "");
-        String stimeRange = getStringParameter( "timeRange", "");
+        // createAppletTester();
+        //Logger.getLogger("").setLevel( Level.WARNING );
+
         String surl = getParameter("url");
-        String process = getStringParameter( "process", "");
+        String process = getStringParameter("process", "");
         //String vap = getParameter("vap");
-        String script = getStringParameter( "script", "");
-                
-        if ( surl!=null && !surl.equals("")) {
+        String script = getStringParameter("script", "");
+
+        if (surl != null && !surl.equals("")) {
             DataSource dsource;
             try {
-                System.err.println("THIS IS APPLET 1.0.0");
-                
                 dsource = DataSetURL.getDataSource(surl);
             } catch (NullPointerException ex) {
                 throw new RuntimeException("No such data source: ", ex);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                dsource= null;
+                dsource = null;
             }
 
             DatumRange timeRange = null;
@@ -191,24 +205,112 @@ public class AutoplotApplet extends JApplet {
 
             appmodel.setDataSource(dsource);
 
-            if (stimeRange!=null && !stimeRange.equals("")) {
+            if (stimeRange != null && !stimeRange.equals("")) {
                 try {
                     appmodel.waitUntilIdle(true);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                if (UnitsUtil.isTimeLocation(appmodel.getPlot().getXAxis().getUnits())) {
-                    appmodel.getPlot().getXAxis().setDatumRange(timeRange);
+                if (UnitsUtil.isTimeLocation(dom.getTimeRange().getUnits())) {
+                    dom.setTimeRange(timeRange);
                 }
             }
 
         }
 
-        if ( srenderType!=null && !srenderType.equals("")) {
-            ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
-            appmodel.setRenderType(renderType);
+
+        // axis settings
+        Plot p = dom.getController().getPlot();
+
+        if (!title.equals("")) {
+            p.setTitle(title);
         }
-        
+
+        Axis axis = p.getXaxis();
+        if (!xlabel.equals("")) {
+            axis.setLabel(xlabel);
+        }
+        if (!xrange.equals("")) {
+            try {
+                Units u = axis.getController().getDasAxis().getUnits();
+                DatumRange newRange = DatumRangeUtil.parseDatumRange(xrange, u);
+                axis.setRange(newRange);
+            } catch (ParseException ex) {
+                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (!xlog.equals("")) {
+            axis.setLog("true".equals(xlog));
+        }
+        if (!xdrawTickLabels.equals("")) {
+            axis.setDrawTickLabels("true".equals(xdrawTickLabels));
+        }
+
+        axis = p.getYaxis();
+        if (!ylabel.equals("")) {
+            axis.setLabel(ylabel);
+        }
+        if (!yrange.equals("")) {
+            try {
+                Units u = axis.getController().getDasAxis().getUnits();
+                DatumRange newRange = DatumRangeUtil.parseDatumRange(yrange, u);
+                axis.setRange(newRange);
+            } catch (ParseException ex) {
+                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (!ylog.equals("")) {
+            axis.setLog("true".equals(ylog));
+        }
+        if (!ydrawTickLabels.equals("")) {
+            axis.setDrawTickLabels("true".equals(ydrawTickLabels));
+        }
+
+        axis = p.getZaxis();
+        if (!zlabel.equals("")) {
+            axis.setLabel(zlabel);
+        }
+        if (!zrange.equals("")) {
+            try {
+                Units u = axis.getController().getDasAxis().getUnits();
+                DatumRange newRange = DatumRangeUtil.parseDatumRange(zrange, u);
+                axis.setRange(newRange);
+            } catch (ParseException ex) {
+                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if (!zlog.equals("")) {
+            axis.setLog("true".equals(zlog));
+        }
+        if (!zdrawTickLabels.equals("")) {
+            axis.setDrawTickLabels("true".equals(zdrawTickLabels));
+        }
+
+
+        if (srenderType != null && !srenderType.equals("")) {
+            ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
+            dom.getController().getPanel().setRenderType(renderType);
+        }
+
+        if (!srenderType.equals("")) {
+            ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
+            dom.getController().getPanel().setRenderType(renderType);
+        }
+
+        if (!scolor.equals("")) {
+            dom.getController().getPanel().getStyle().setColor(Color.decode(scolor));
+        }
+
+        if (!sfillColor.equals("")) {
+            dom.getController().getPanel().getStyle().setFillColor(Color.decode(sfillColor));
+        }
+        if (!sforegroundColor.equals("")) {
+            dom.getOptions().setForeground(Color.decode(sforegroundColor));
+        }
+        if (!sbackgroundColor.equals("")) {
+            dom.getOptions().setBackground(Color.decode(sbackgroundColor));
+        }
+
         surl = getParameter("dataSetURL");
         if (surl != null) {
             setDataSetURL(surl);
@@ -268,6 +370,38 @@ public class AutoplotApplet extends JApplet {
                     if (surl.equals("about:plugins")) {
                         String text = DataSetSelectorSupport.getPluginsText();
                         JOptionPane.showMessageDialog(AutoplotApplet.this, text);
+                        return;
+
+                    } else if (surl.equals("about:autoplot")) {
+
+                        try {
+                            StringBuffer buffy = new StringBuffer();
+                            URL aboutHtml = ApplicationModel.class.getResource("aboutAutoplot.html");
+
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()));
+                            String s = reader.readLine();
+                            while (s != null) {
+                                buffy.append(s + "");
+                                s = reader.readLine();
+                            }
+                            reader.close();
+
+                            buffy.append("    <h2>Build Information:</h2>");
+                            buffy.append("<ul>");
+                            buffy.append("<li>release tag: " + AboutUtil.getReleaseTag() + "</li>");
+
+                            List<String> bi = Util.getBuildInfos();
+                            for (String ss : bi) {
+                                buffy.append("    <li>" + ss + "");
+                            }
+                            buffy.append("<ul>    </p></html>");
+
+                            JOptionPane.showMessageDialog(AutoplotApplet.this, buffy.toString());
+                            return;
+
+                        } catch (IOException iOException) {
+                            iOException.printStackTrace();
+                        }
                     }
                     System.err.println(surl);
                     model.setDataSourceURL(surl);
@@ -277,13 +411,62 @@ public class AutoplotApplet extends JApplet {
             ex.printStackTrace();
         }
     }
+    protected String timeRange;
+    public static final String PROP_TIMERANGE = "timeRange";
+
+    public String getTimeRange() {
+        return dom.getTimeRange().toString();
+    }
+
+    public void setTimeRange(final String timeRange) {
+        Runnable run = new Runnable() {
+
+            public void run() {
+                try {
+                    String oldv = getTimeRange();
+                    dom.getController().getPlot().getController().getDasPlot().getXAxis().setDatumRange(DatumRangeUtil.parseTimeRangeValid(timeRange));
+                    //dom.setTimeRange(DatumRangeUtil.parseTimeRangeValid(timeRange));
+                    propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldv, timeRange);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        SwingUtilities.invokeLater(run);
+    }
+    
+    protected String font;
+    public static final String PROP_FONT = "canvasFont";
+
+    public String getCanvasFont() {
+        return model.getCanvas().getBaseFont().toString();
+    }
+
+    public void setCanvasFont(String font) {
+        try {
+            String oldFont = getCanvasFont();
+            model.getCanvas().setBaseFont(Font.decode(font));
+            propertyChangeSupport.firePropertyChange(PROP_FONT, oldFont, font);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
 
     public static void main(String[] args) {
         JFrame frame = new JFrame("autoplot applet");
         AppletStub stub = new AppletStub() {
 
             Map<String, String> params = new HashMap<String, String>();
-            
+
 
             {
                 //"tsds.http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0";
