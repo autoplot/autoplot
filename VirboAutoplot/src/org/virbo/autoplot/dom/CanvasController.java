@@ -80,12 +80,14 @@ public class CanvasController {
             public void propertyChange(PropertyChangeEvent evt) {
                 Plot[] plots = application.getPlots();
                 int n = plots.length;
+                int emIn= n>1 ? 2 : 0;
                 for (int i = 0; i < n; i++) {
                     DasPlot dasPlot = plots[i].getController().getDasPlot();
                     DasRow row = dasPlot.getRow();
                     row.setMaximum((i + 1.) / n);
                     row.setMinimum((i + 0.) / n);
-                    row.setEmMinimum(4);
+                    row.setEmMinimum(emIn);
+                    row.setEmMaximum(-1*emIn);
                 }
                 Timer timer = new Timer(100, new ActionListener() {
 
