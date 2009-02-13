@@ -69,9 +69,4 @@
 
     -->
 
-
-    <!-- allow for use outside of Netbeans by including copy of CopyLibs task. -->
-    <property name="libs.CopyLibs.classpath" value="../APLibs/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar" />
-
-
 </project>
