@@ -646,6 +646,7 @@ public class PanelController {
         ac.bind(panel, "style.fillColor", seriesRenderer, "fillColor");
         ac.bind(panel, "style.fillToReference", seriesRenderer, "fillToReference");
         ac.bind(panel, "style.reference", seriesRenderer, "reference");
+        ac.bind(panel, "style.antiAliased", seriesRenderer, "antiAliased");
 
     }
 

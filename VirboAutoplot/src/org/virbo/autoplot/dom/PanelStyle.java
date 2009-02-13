@@ -7,10 +7,7 @@ package org.virbo.autoplot.dom;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import org.das2.graph.DasColorBar;

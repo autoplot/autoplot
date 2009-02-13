@@ -280,7 +280,7 @@ public class ApplicationController {
         logger.fine("enter addPanel");
 
         final int fpanelIdNum = this.panelIdNum++;
-        final Panel panel = new Panel();
+        final Panel panel1 = new Panel();
 
         if (dsf == null) {
             dsf = addDataSourceFilter();
@@ -289,13 +289,13 @@ public class ApplicationController {
 
         }
 
-        new PanelController(this.model, application, panel);
+        new PanelController(this.model, application, panel1);
 
         if (domPlot == null) {
             domPlot = addPlot();
         }
 
-        panel.setId("panel_" + fpanelIdNum);
+        panel1.setId("panel_" + fpanelIdNum);
 
         /*  final Plot fplot = domPlot;
         
@@ -310,10 +310,13 @@ public class ApplicationController {
         }
         }); */
 
-        panel.getStyle().setId("style_" + fpanelIdNum);
-        panel.getPlotDefaults().setId("plot_defaults_" + fpanelIdNum);
+        panel1.getStyle().setId("style_" + fpanelIdNum);
+        panel1.getPlotDefaults().setId("plot_defaults_" + fpanelIdNum);
+        panel1.getStyle().setColor(application.getOptions().getColor());
+        panel1.getStyle().setFillColor(application.getOptions().getFillColor());
+        panel1.getStyle().setAntiAliased(application.getOptions().isDrawAntiAlias());
 
-        panel.addPropertyChangeListener(Panel.PROP_PLOTID, new PropertyChangeListener() {
+        panel1.addPropertyChangeListener(Panel.PROP_PLOTID, new PropertyChangeListener() {
 
             public String toString() {
                 return "" + ApplicationController.this;
@@ -340,16 +343,16 @@ public class ApplicationController {
             }
         });
 
-        panel.setPlotId(domPlot.getId());
-        panel.setDataSourceFilterId(dsf.getId());
+        panel1.setPlotId(domPlot.getId());
+        panel1.setDataSourceFilterId(dsf.getId());
 
         List<Panel> panels = new ArrayList<Panel>(Arrays.asList(this.application.getPanels()));
-        panels.add(panel);
+        panels.add(panel1);
         this.application.setPanels(panels.toArray(new Panel[panels.size()]));
-        panel.addPropertyChangeListener(application.childListener);
-        setPanel(panel);
+        panel1.addPropertyChangeListener(application.childListener);
+        setPanel(panel1);
 
-        return panel;
+        return panel1;
     }
 
     private void addPlotFocusListener(DasPlot plot) {
