@@ -2,6 +2,11 @@
 <!-- You may freely edit this file. See commented blocks below for -->
 <!-- some examples of how to customize the build. -->
 <!-- (If you delete it and reopen the project it will be recreated.) -->
+<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- Commands such as Run, Debug, and Test only use this build script if -->
+<!-- the Compile on Save feature is turned off for the project. -->
+<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- in the project's Project Properties dialog box.-->
 <project name="AutoplotServlet" default="default" basedir=".">
     <description>Builds, tests, and runs the project AutoplotServlet.</description>
     <import file="nbproject/build-impl.xml"/>
@@ -63,17 +68,4 @@
     nbproject/build-impl.xml file. 
 
     -->
-    
-    <target name="-post-dist">
-        <!-- remove beansbinding.jar from war file.  It conflicts with j2ee, and
-        isn't used for simple applications.  See javax.el.Expression.-->
-        <echo message="rejaring war file to remove beansbinding.jar" />
-        <unjar dest="rejar" src="${dist.war}" />
-        <move file="${dist.war}" tofile="${dist.war}.0" />
-        <delete file="rejar/WEB-INF/lib/beansbinding.jar" />
-        <jar destfile="${dist.war}"  >
-            <fileset dir="rejar"/>
-        </jar>
-    </target>
-        
 </project>
