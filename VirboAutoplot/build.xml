@@ -67,6 +67,11 @@
     nbproject/build-impl.xml file. 
 
     -->
+
+    <!-- allow for use outside of Netbeans by including copy of CopyLibs task. -->
+    <property name="libs.CopyLibs.classpath" value="../APLibs/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar" />
+
+
     <target name="do-tag" depends="init"  unless="no.deps" description="timetag the jar files">
         <property name="das2.dotag" value="true" />
         <!-- copied from build-impl.xml.  This must be updated by hand. -->
