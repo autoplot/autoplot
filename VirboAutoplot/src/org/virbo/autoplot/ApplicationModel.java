@@ -484,7 +484,6 @@ public class ApplicationModel {
         logger.fine( "" + this.dom.diffs(state) );
         restoreState(state, true, true);
         setUseEmbeddedDataSet(false);
-        dom.getOptions().setAutoOverview(true);
         propertyChangeSupport.firePropertyChange("file", null, f);
     }
     
