@@ -37,7 +37,6 @@ public class Options extends DomNode {
         prefs = Preferences.userNodeForPackage(Options.class);
         autolabelling = prefs.getBoolean(PROP_AUTOLABELLING, autolabelling);
         autolayout = prefs.getBoolean(PROP_AUTOLAYOUT, autolayout);
-        autoOverview = prefs.getBoolean(PROP_AUTOOVERVIEW, autoOverview);
         autoranging = prefs.getBoolean(PROP_AUTORANGING, autoranging);
         background = Color.decode(prefs.get(PROP_BACKGROUND, encodeColor(background)));
         canvasFont = Font.decode(prefs.get(PROP_CANVASFONT, encodeFont(canvasFont)));
@@ -302,35 +301,7 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_OVERRENDERING, oldOverRendering, overRendering);
     }
 
-    /**
-     * Holds value of property showContextOverview.
-     */
-    private boolean showContextOverview;
-
-    public boolean isShowContextOverview() {
-        return this.showContextOverview;
-    }
-
-    public void setShowContextOverview(boolean showContextOverview) {
-        //boolean oldShowContextOverview = this.showContextOverview;
-        this.showContextOverview = showContextOverview;
-    //propertyChangeSupport.firePropertyChange("showContextOverview", new Boolean(oldShowContextOverview), new Boolean(showContextOverview));
-    }
-
-    private boolean autoOverview = true;
-    public static final String PROP_AUTOOVERVIEW = "autoOverview";
-
-    public boolean isAutoOverview() {
-        return this.autoOverview;
-    }
-
-    public void setAutoOverview(boolean newautoOverview) {
-        boolean oldautoOverview = autoOverview;
-        this.autoOverview = newautoOverview;
-        prefs.putBoolean(PROP_AUTOOVERVIEW, autoOverview);
-        propertyChangeSupport.firePropertyChange(PROP_AUTOOVERVIEW, oldautoOverview, newautoOverview);
-    }
-
+ 
     private boolean autoranging = true;
     public static final String PROP_AUTORANGING = "autoranging";
 
@@ -389,7 +360,6 @@ public class Options extends DomNode {
         this.setDrawAntiAlias(that.drawAntiAlias);
         this.setTextAntiAlias(that.textAntiAlias);
         this.setOverRendering(that.overRendering);
-        this.setAutoOverview(that.autoOverview);
         this.setAutolabelling(that.autolabelling);
         this.setAutoranging(that.autoranging);
     }
