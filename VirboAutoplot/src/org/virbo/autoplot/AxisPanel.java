@@ -26,8 +26,6 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Plot;
 
 /**
@@ -94,7 +92,6 @@ public class AxisPanel extends javax.swing.JPanel {
         Binding b;
         BindingGroup bc = new BindingGroup();
 
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autoOverview" ), this.autoContextOverview, BeanProperty.create( "selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autoranging"), this.allowAutoRangingCheckBox, BeanProperty.create( "selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autolabelling"), this.autolabellingCheckbox, BeanProperty.create( "selected")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autolayout"), this.autolayoutCheckbox,BeanProperty.create(  "selected")));
@@ -222,8 +219,6 @@ public class AxisPanel extends javax.swing.JPanel {
         xAxisPanel = new javax.swing.JPanel();
         xLog = new javax.swing.JCheckBox();
         xAxisRangePanel = new javax.swing.JPanel();
-        showOverviewPlot = new javax.swing.JCheckBox();
-        autoContextOverview = new javax.swing.JCheckBox();
         xTitleTextField = new javax.swing.JTextField();
         zAxisPanel = new javax.swing.JPanel();
         zLog = new javax.swing.JCheckBox();
@@ -262,13 +257,6 @@ public class AxisPanel extends javax.swing.JPanel {
 
         xAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
-        showOverviewPlot.setText("Show context overview plot");
-        showOverviewPlot.setToolTipText("A second plot below the main plot is made visible, so that main plot can be seen in context.  The overview plot is useful for navagating as well.\n"); // NOI18N
-        showOverviewPlot.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
-        autoContextOverview.setText("Auto");
-        autoContextOverview.setToolTipText("Automatically show context overview plot when zooming in along a horizontal axis."); // NOI18N
-
         xTitleTextField.setText("jTextField1");
 
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
@@ -280,11 +268,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, xTitleTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
                     .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 272, Short.MAX_VALUE)
-                    .add(xLog)
-                    .add(xAxisPanelLayout.createSequentialGroup()
-                        .add(showOverviewPlot)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(autoContextOverview)))
+                    .add(xLog))
                 .addContainerGap())
         );
         xAxisPanelLayout.setVerticalGroup(
@@ -295,11 +279,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(xAxisRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(xLog)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(xAxisPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(showOverviewPlot)
-                    .add(autoContextOverview))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Colorbar"));
@@ -371,7 +351,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 .add(yLog)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(isotropicCheckBox)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("dataset"));
@@ -507,7 +487,7 @@ public class AxisPanel extends javax.swing.JPanel {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(sliceIndexSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 104, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(sliceTypeComboBox, 0, 242, Short.MAX_VALUE))))
+                            .add(sliceTypeComboBox, 0, 251, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -533,11 +513,12 @@ public class AxisPanel extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, yAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(xAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jLabel1)
-                    .add(zAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(yAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, xAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                        .add(jLabel1)
+                        .add(zAxisPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -595,7 +576,6 @@ public class AxisPanel extends javax.swing.JPanel {
 }//GEN-LAST:event_transposeCheckBoxActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox allowAutoRangingCheckBox;
-    private javax.swing.JCheckBox autoContextOverview;
     private javax.swing.JCheckBox autolabellingCheckbox;
     private javax.swing.JCheckBox autolayoutCheckbox;
     private javax.swing.JComboBox fillValueComboBox;
@@ -609,7 +589,6 @@ public class AxisPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JCheckBox showOverviewPlot;
     private javax.swing.JSpinner sliceIndexSpinner;
     private javax.swing.JComboBox sliceTypeComboBox;
     private javax.swing.JTextField titleTextField;
