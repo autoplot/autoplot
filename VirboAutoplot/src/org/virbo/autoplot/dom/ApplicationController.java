@@ -535,7 +535,7 @@ public class ApplicationController {
     protected Plot copyPlotAndPanels(Plot domPlot, DataSourceFilter dsf) {
         List<Panel> p = getPanelsFor(domPlot);
 
-        Plot newPlot = copyPlot(domPlot);
+        Plot newPlot = copyPlot(domPlot, false, false);
         if (p.size() == 0) {
             return newPlot;
         }
@@ -567,19 +567,24 @@ public class ApplicationController {
     }
 
     /**
-     * copy the plor and its axis settings.  The xaxis is bound to the srcPlot.
-     * @param srcPlot
-     * @return
+     * Copy the plot and its axis settings, optionally binding the axes. Whether
+     * the axes are bound or not, the duplicate plot is initially synchronized to
+     * the source plot.
+     *
+     * @param srcPlot The plot to be copied
+     * @param bindx If true, X axes are bound
+     * @param bindy If true, Y axes are bound
+     * @return The duplicate plot
      */
-    public synchronized Plot copyPlot(Plot srcPlot) {
+    public synchronized Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy) {
         Plot that = addPlot();
         that.syncTo(srcPlot);
-        BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
-        if (bb == null) {
-            bind(srcPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
-        } else {
-            bind(application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
-        }
+
+        //BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
+        if (bindx) bind(srcPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
+        //else if (bb != null) bind(application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
+        if (bindy) bind(srcPlot, "yaxis." + Axis.PROP_RANGE, that, "yaxis." + Axis.PROP_RANGE);
+
         return that;
     }
 
@@ -859,7 +864,7 @@ public class ApplicationController {
             item = new JMenuItem(new AbstractAction("Bound Plot Below") {
 
                 public void actionPerformed(ActionEvent e) {
-                    Plot newPlot = copyPlot(plot);
+                    Plot newPlot = copyPlot(plot, true, false);
                 }
             });
             item.setToolTipText("add a new plot below.  The plot's x axis will be bound to this plot's x axis");
@@ -960,17 +965,15 @@ public class ApplicationController {
                 copyPlotAndPanels(domPlot, null);
             }
         });
-        item.setToolTipText("make a new plot, and copy the panels into it.  The plot's x axis will be bound to this plot's x axis");
+        item.setToolTipText("make a new plot, and copy the panels into it.");
         addPlotMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Context Overview") {
 
             public void actionPerformed(ActionEvent e) {
                 Plot that = copyPlotAndPanels(domPlot, null);
-                unbind(that);
+                unbind(that);  // Is this necessary now?
                 addConnector(domPlot, that);
-                List<Panel> panelThat = getPanelsFor(that);
-                List<Panel> panelThis = getPanelsFor(domPlot);
             }
         });
 
