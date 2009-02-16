@@ -48,6 +48,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     public final static String LONG= "long";
     public final static String INT= "int";
     public final static String SHORT= "short";
+    public final static String USHORT= "ushort";
     public final static String BYTE= "byte";
     public final static String UBYTE= "ubyte";
     
@@ -62,6 +63,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
             return 4;
         } else if (type.equals(SHORT)) {
             return 2;
+        } else if (type.equals(USHORT)) {
+            return 2;
         } else if (type.equals(BYTE)) {
             return 1;
         } else if (type.equals(UBYTE)) {
@@ -71,6 +74,18 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         }
     }
     
+    /**
+     * 
+     * @param rank
+     * @param reclen  length in bytes of each record
+     * @param recoffs  byte offet of each record
+     * @param len0   number of elements in the first index
+     * @param len1   number of elements in the second index
+     * @param len2   number of elements in the third index
+     * @param buf   ByteBuffer containing the data, which should be at least reclen * len0 bytes long.
+     * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
+     * @return
+     */
     public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, String type ) {
         if ( type.equals(DOUBLE) ) {
             return new Double( rank, reclen, recoffs, len0, len1, len2, buf );
@@ -82,6 +97,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
             return new  Int( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(SHORT) ) {
             return new  Short( rank, reclen, recoffs, len0, len1, len2, buf );
+        } else if ( type.equals(USHORT) ) {
+            return new  UShort( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(BYTE) ) {
             return new  Byte( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if (type.equals(UBYTE) ) {
