@@ -10,6 +10,11 @@
 <project name="AutoplotServlet" default="default" basedir=".">
     <description>Builds, tests, and runs the project AutoplotServlet.</description>
     <import file="nbproject/build-impl.xml"/>
+
+    <!-- allow for use outside of Netbeans by including copy of CopyLibs task. -->
+    <property name="libs.CopyLibs.classpath" value="../APLibs/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar" />
+
+
     <!--
 
     There exist several targets which are by default empty and which can be 
