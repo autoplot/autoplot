@@ -207,4 +207,20 @@
             <zipfileset file="${dist.jar}" />
         </jar>
     </target>
+    
+	<target name="findbugs" description="produce findbugs report" depends="jar" if="libs.FindBugs.classpath">
+		<taskdef name="findbugs" classpath="${libs.FindBugs.classpath}" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" />
+		<findbugs home="${findbugs.home}"
+				output="xml" outputFile="${basedir}/findbugs.xml">
+			<auxClasspath path="${dist.dir}/lib/dasCore-1.0.0.jar" />
+			<auxClasspath path="${dist.dir}/lib/DataSource.jar" />
+			<auxClasspath path="${dist.dir}/lib/QDataSet.jar" />
+            <auxClasspath path="${dist.dir}/lib/batik-svggen.jar" />
+			<auxClasspath path="${dist.dir}/lib/itext-1.3.jar" />
+			<auxClasspath path="${dist.dir}/lib/swing-layout-1.0.3.jar" />
+			<sourcePath path="${basedir}/src" />
+			<class location="${dist.jar}" />
+		</findbugs>
+	</target>
+
 </project>
