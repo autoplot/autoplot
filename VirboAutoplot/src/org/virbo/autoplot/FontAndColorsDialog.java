@@ -222,6 +222,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         foregroundColorButton.setIcon( GraphUtil.colorIcon( c, ICON_SIZE, ICON_SIZE ) );
         app.getCanvas().setForeground(c);
         app.getDocumentModel().getOptions().setForeground(c);
+        app.getDocumentModel().getOptions().setColor(c);
     }//GEN-LAST:event_foregroundColorButtonActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
@@ -236,6 +237,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
                 }
             }
             app.getDocumentModel().getOptions().setForeground(fores[i]);
+            app.getDocumentModel().getOptions().setColor(fores[i]);
             app.getDocumentModel().getOptions().setBackground(backs[i]);
         }
     }//GEN-LAST:event_jComboBox1ActionPerformed
