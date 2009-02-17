@@ -442,15 +442,21 @@ public class AutoplotApplet extends JApplet {
         return model.getCanvas().getBaseFont().toString();
     }
 
-    public void setCanvasFont(String font) {
-        try {
-            String oldFont = getCanvasFont();
-            model.getCanvas().setBaseFont(Font.decode(font));
-            propertyChangeSupport.firePropertyChange(PROP_FONT, oldFont, font);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void setCanvasFont(final String font) {
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
+                    String oldFont = getCanvasFont();
+                    model.getCanvas().setBaseFont(Font.decode(font));
+                    propertyChangeSupport.firePropertyChange(PROP_FONT, oldFont, font);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
+
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
