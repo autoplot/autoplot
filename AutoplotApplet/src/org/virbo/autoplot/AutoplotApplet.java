@@ -79,7 +79,7 @@ public class AutoplotApplet extends JApplet {
     public void init() {
         super.init();
 
-        System.err.println("AutoplotApplet 20090209.3");
+        System.err.println("AutoplotApplet 20090217.1");
 
         model = new ApplicationModel();
 
@@ -448,6 +448,7 @@ public class AutoplotApplet extends JApplet {
                 try {
                     String oldFont = getCanvasFont();
                     model.getCanvas().setBaseFont(Font.decode(font));
+                    model.getCanvas().repaint();
                     propertyChangeSupport.firePropertyChange(PROP_FONT, oldFont, font);
                 } catch (Exception e) {
                     e.printStackTrace();
