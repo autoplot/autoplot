@@ -216,7 +216,7 @@
 			<auxClasspath path="${dist.dir}/lib/DataSource.jar" />
 			<auxClasspath path="${dist.dir}/lib/QDataSet.jar" />
             <auxClasspath path="${dist.dir}/lib/batik-svggen.jar" />
-			<auxClasspath path="${dist.dir}/lib/itext-1.3.jar" />
+			<auxClasspath path="${dist.dir}/lib/itext-1.2.jar" />
 			<auxClasspath path="${dist.dir}/lib/swing-layout-1.0.3.jar" />
 			<sourcePath path="${basedir}/src" />
 			<class location="${dist.jar}" />
