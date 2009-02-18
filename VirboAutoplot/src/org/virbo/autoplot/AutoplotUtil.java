@@ -51,6 +51,7 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
+import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
@@ -828,25 +829,32 @@ public class AutoplotUtil {
     }
     
     public static RenderType getRenderType(QDataSet fillds) {
-        RenderType spec = fillds.rank() >= 2 ? RenderType.spectrogram : RenderType.series;
+        RenderType spec;
 
         QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
+        QDataSet plane0= (QDataSet) fillds.property(QDataSet.PLANE_0);
 
-        if (fillds.rank() == 2 && dep1 != null && isVectorOrBundleIndex(dep1)) {
-            spec = RenderType.series;
+        if ( fillds.rank() >= 2 ) {
+            if ( dep1 != null && isVectorOrBundleIndex(dep1) ) {
+                spec = RenderType.series;
+            } else {
+                spec= RenderType.spectrogram;
+            }
+        } else {
+            if ( fillds.length()>200000 ) {
+               spec= RenderType.hugeScatter;
+            } else {
+               spec= RenderType.series;
+            }
+
+            if ( plane0 !=null ) {
+                Units u= (Units) plane0.property(QDataSet.UNITS);
+                if ( u!=null && ( UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u) ) ) {
+                    spec= RenderType.colorScatter;
+                }
+            }
         }
         
-        if ( fillds.rank()==1 && fillds.property(QDataSet.PLANE_0) !=null ) {
-            QDataSet plane0= (QDataSet) fillds.property(QDataSet.PLANE_0);
-            Units u= (Units) plane0.property(QDataSet.UNITS);
-            if ( u!=null && ( UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u) ) ) {
-                spec= RenderType.colorScatter;
-            } else {
-                spec= RenderType.series;
-            }
-            
-        }
-
         return spec;
     }
     
@@ -866,6 +874,15 @@ public class AutoplotUtil {
                 Renderer result = new SpectrogramRenderer(null, colorbar);
                 result.setDataSetLoader(null);
                 colorbar.setVisible(true);
+                return result;
+            }
+        } else if ( renderType==RenderType.hugeScatter ) {
+            if ( recyclable != null && recyclable instanceof ImageVectorDataSetRenderer ) {
+                return recyclable;
+            } else {
+                Renderer result = new ImageVectorDataSetRenderer( null );
+                result.setDataSetLoader(null);
+                colorbar.setVisible(false);
                 return result;
             }
         } else {
