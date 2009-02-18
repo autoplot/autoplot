@@ -246,6 +246,13 @@ public class GuiSupport {
             }
         }));
 
+        result.add(new JMenuItem(new AbstractAction("huge scatter") {
+            public void actionPerformed(ActionEvent e) {
+                Panel panel= plot.getController().getApplication().getController().getPanel();
+                panel.setRenderType( ApplicationModel.RenderType.hugeScatter );
+            }
+        }));
+
         result.add(new JMenuItem(new AbstractAction("spectrogram") {
             public void actionPerformed(ActionEvent e) {
                 Panel panel= plot.getController().getApplication().getController().getPanel();
