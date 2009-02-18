@@ -324,7 +324,6 @@ public class AxisPanel extends javax.swing.JPanel {
         isotropicCheckBox.setText("Isotropic");
         isotropicCheckBox.setToolTipText("When units are convertable to X Axis units, automatically set y axis to ensure pixel:data ratio is the same.");
         isotropicCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        isotropicCheckBox.setEnabled(false);
 
         yTitleTextField.setText("jTextField1");
 
