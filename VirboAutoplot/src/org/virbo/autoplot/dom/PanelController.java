@@ -308,8 +308,11 @@ public class PanelController {
         if (renderer instanceof SeriesRenderer) {
             bindToSeriesRenderer((SeriesRenderer) renderer);
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
-        } else {
+        } else if ( renderer instanceof SpectrogramRenderer ) {
             bindToSpectrogramRenderer((SpectrogramRenderer) renderer);
+            bindToSeriesRenderer(new SeriesRenderer());
+        } else {
+            bindToSpectrogramRenderer( new SpectrogramRenderer(null, null) );
             bindToSeriesRenderer(new SeriesRenderer());
         }
     }
@@ -355,7 +358,7 @@ public class PanelController {
      * @param autorange
      * @param interpretMetadata
      */
-    public void doMetadata(Panel panelCopy, boolean autorange, boolean interpretMetadata) {
+    private void doMetadata(Panel panelCopy, boolean autorange, boolean interpretMetadata) {
         final DataSourceFilter dsf = getDataSourceFilter();
         QDataSet fillDs = dsf.getController().getFillDataSet();
         Map<String, Object> properties = dsf.getController().getFillProperties();
@@ -425,7 +428,7 @@ public class PanelController {
                 }
 
             }
-        } else {
+        } else { // hugeScatter okay
             if (dom.getOptions().isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
                 plotDefaults.getYaxis().setLog(v.equals("log"));
             }
