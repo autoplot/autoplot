@@ -53,7 +53,7 @@ public class DataSetURL {
     static {
         DataSourceRegistry registry = DataSourceRegistry.getInstance();
         discoverFactories(registry);
-        discoverRegisteryEntries(registry);
+        discoverRegistryEntries(registry);
     }
     
 
@@ -857,7 +857,7 @@ public class DataSetURL {
         }
     }
 
-    private static void discoverRegisteryEntries(DataSourceRegistry registry) {
+    private static void discoverRegistryEntries(DataSourceRegistry registry) {
         try {
             ClassLoader loader = DataSetURL.class.getClassLoader();
             Enumeration<URL> urls;
