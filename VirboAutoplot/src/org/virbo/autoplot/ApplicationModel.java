@@ -74,7 +74,7 @@ public class ApplicationModel {
     Application dom;
 
     public enum RenderType {
-        spectrogram, series, scatter, colorScatter, histogram, fill_to_zero,
+        spectrogram, hugeScatter, series, scatter, colorScatter, histogram, fill_to_zero,
     }
 
     static final Logger logger = Logger.getLogger("virbo.autoplot");
