@@ -215,7 +215,7 @@ public class ApplicationController {
         DasPlot upper = domPlot.getController().getDasPlot();
         DasPlot lower = that.getController().getDasPlot();
 
-        //overviewPlotConnector.getMouseAdapter().setPrimaryModule(overviewZoom);
+        //overviewPlotConnector.getDasMouseInputAdapter().setPrimaryModule(overviewZoom);
         ColumnColumnConnector overviewPlotConnector =
                 new ColumnColumnConnector(canvas, upper,
                 DasRow.create(null, upper.getRow(), "0%", "100%+2em"), lower);
@@ -225,7 +225,7 @@ public class ApplicationController {
         overviewPlotConnector.setBottomCurtain(true);
         overviewPlotConnector.setCurtainOpacityPercent(80);
 
-        overviewPlotConnector.getMouseAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(upper, lower));
+        overviewPlotConnector.getDasMouseInputAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(upper, lower));
         canvas.add(overviewPlotConnector);
         canvas.revalidate();
     //TODO: disconnect/delete if one plotId is deleted.
@@ -428,10 +428,10 @@ public class ApplicationController {
         plot.getXAxis().setPlot(plot);
         plot.getYAxis().setPlot(plot);
 
-        BoxZoomMouseModule boxmm = (BoxZoomMouseModule) plot.getMouseAdapter().getModuleByLabel("Box Zoom");
-        plot.getMouseAdapter().setPrimaryModule(boxmm);
+        BoxZoomMouseModule boxmm = (BoxZoomMouseModule) plot.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
+        plot.getDasMouseInputAdapter().setPrimaryModule(boxmm);
 
-        //plotId.getMouseAdapter().addMouseModule( new AnnotatorMouseModule(plotId) ) ;
+        //plotId.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(plotId) ) ;
 
         canvas.add(colorbar, plot.getRow(), DasColorBar.getColorBarColumn(plot.getColumn()));
         colorbar.setVisible(false);
@@ -441,16 +441,16 @@ public class ApplicationController {
         }
 
         MouseModule zoomPan = new ZoomPanMouseModule(plot, plot.getXAxis(), plot.getYAxis());
-        plot.getMouseAdapter().setSecondaryModule(zoomPan);
+        plot.getDasMouseInputAdapter().setSecondaryModule(zoomPan);
 
         MouseModule zoomPanX = new ZoomPanMouseModule(plot.getXAxis(), plot.getXAxis(), null);
-        plot.getXAxis().getMouseAdapter().setSecondaryModule(zoomPanX);
+        plot.getXAxis().getDasMouseInputAdapter().setSecondaryModule(zoomPanX);
 
         MouseModule zoomPanY = new ZoomPanMouseModule(plot.getYAxis(), null, plot.getYAxis());
-        plot.getYAxis().getMouseAdapter().setSecondaryModule(zoomPanY);
+        plot.getYAxis().getDasMouseInputAdapter().setSecondaryModule(zoomPanY);
 
         MouseModule zoomPanZ = new ZoomPanMouseModule(colorbar, null, colorbar);
-        colorbar.getMouseAdapter().setSecondaryModule(zoomPanZ);
+        colorbar.getDasMouseInputAdapter().setSecondaryModule(zoomPanZ);
 
         canvas.revalidate();
         canvas.repaint();
@@ -841,7 +841,7 @@ public class ApplicationController {
     private void addAxisContextMenuItems(final DasPlot dasPlot, final PlotController plotController, final Plot plot, final Axis axis) {
 
         final DasAxis dasAxis = axis.getController().getDasAxis();
-        final DasMouseInputAdapter mouseAdapter = dasAxis.getMouseAdapter();
+        final DasMouseInputAdapter mouseAdapter = dasAxis.getDasMouseInputAdapter();
 
         mouseAdapter.removeMenuItem("Properties");
 
@@ -930,14 +930,14 @@ public class ApplicationController {
 
     private void addPlotContextMenuItems(final DasPlot plot, final PlotController plotController, final Plot domPlot) {
 
-        plot.getMouseAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
+        plot.getDasMouseInputAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
 
-        plot.getMouseAdapter().removeMenuItem("Dump Data");
-        plot.getMouseAdapter().removeMenuItem("Properties");
+        plot.getDasMouseInputAdapter().removeMenuItem("Dump Data");
+        plot.getDasMouseInputAdapter().removeMenuItem("Properties");
 
         JMenuItem item;
 
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Plot Properties") {
+        plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Plot Properties") {
 
             public void actionPerformed(ActionEvent e) {
                 PropertyEditor pp = new PropertyEditor(domPlot);
@@ -945,7 +945,7 @@ public class ApplicationController {
             }
         }));
 
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Panel Properties") {
+        plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Panel Properties") {
 
             public void actionPerformed(ActionEvent e) {
                 Panel p = getPanel();
@@ -954,10 +954,10 @@ public class ApplicationController {
             }
         }));
 
-        plot.getMouseAdapter().addMenuItem(new JSeparator());
+        plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
         JMenu addPlotMenu = new JMenu("Add Plot");
-        plot.getMouseAdapter().addMenuItem(addPlotMenu);
+        plot.getDasMouseInputAdapter().addMenuItem(addPlotMenu);
 
         item = new JMenuItem(new AbstractAction("Copy Panels") {
 
@@ -982,7 +982,7 @@ public class ApplicationController {
         addPlotMenu.add(item);
 
         JMenu editPlotMenu = new JMenu("Edit Plot");
-        plot.getMouseAdapter().addMenuItem(editPlotMenu);
+        plot.getDasMouseInputAdapter().addMenuItem(editPlotMenu);
 
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
 
@@ -1020,7 +1020,7 @@ public class ApplicationController {
 
         JMenu panelMenu = new JMenu("Edit Panel");
 
-        plot.getMouseAdapter().addMenuItem(panelMenu);
+        plot.getDasMouseInputAdapter().addMenuItem(panelMenu);
 
         item = new JMenuItem(new AbstractAction("Move to Plot Above") {
 
@@ -1062,9 +1062,9 @@ public class ApplicationController {
         });
         panelMenu.add(item);
 
-        plot.getMouseAdapter().addMenuItem(new JSeparator());
+        plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
-        plot.getMouseAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
+        plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
 
             public void actionPerformed(ActionEvent e) {
                 plotController.resetZoom();
@@ -1072,7 +1072,7 @@ public class ApplicationController {
         }));
 
 
-        plot.getMouseAdapter().addMenuItem(GuiSupport.createEZAccessMenu(domPlot));
+        plot.getDasMouseInputAdapter().addMenuItem(GuiSupport.createEZAccessMenu(domPlot));
     }
 
     /**
