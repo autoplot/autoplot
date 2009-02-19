@@ -195,10 +195,12 @@ public class PanelController {
         if (getRenderer() != null) {
             if (rendererAcceptsData(fillDs)) {
                 getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
-                if (label != null) {
-                    ((SeriesRenderer) getRenderer()).setLegendLabel(label);
-                } else {
-                    ((SeriesRenderer) getRenderer()).setLegendLabel("");
+                if (getRenderer() instanceof SeriesRenderer) {
+                    if (label != null) {
+                        ((SeriesRenderer) getRenderer()).setLegendLabel(label);
+                    } else {
+                        ((SeriesRenderer) getRenderer()).setLegendLabel("");
+                    }
                 }
             } else {
                 getRenderer().setException(new Exception("renderer cannot plot " + fillDs));
@@ -598,8 +600,8 @@ public class PanelController {
     }
 
     private DasColorBar getColorbar() {
-            return dom.getController().getPlotFor(panel).getController().getDasColorBar();
-        }
+        return dom.getController().getPlotFor(panel).getController().getDasColorBar();
+    }
 
     /**
      * return the data source and filter for this panel.
@@ -641,7 +643,9 @@ public class PanelController {
 
             DasPlot plot = getDasPlot();
 
-            if (oldRenderer != null) plot.removeRenderer(oldRenderer);
+            if (oldRenderer != null) {
+                plot.removeRenderer(oldRenderer);
+            }
             plot.addRenderer(newRenderer);
 
             if (getDataSourceFilter().getController().getFillDataSet() != null) {
