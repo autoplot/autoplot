@@ -16,17 +16,14 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-        <li> add plot and axis context menus to bind to other plots, add connectors, add plots, etc.
-</li><li> bugfixes for servlet
-</li><li> bugfixes in data source editors for ascii tables and excel spreadsheets.</li>
-
+     <li>bugfixes associated with automatically adding extra panels for components.
+</li><li> introduce "huge scatter" render type that easily handles millions of points.  This is used when the rank 1 dataset has more than 200K points, rather than clipping the data.
+</li><li> bugfix: add plot-&gt;context overview doesn't reset the range on the original plot.
+</li><li> bugfix: dates are again printed along with times on time axes.
+</li>
 <p>Known Bugs:
 </p>
 <li> SeriesRenderers accept context click anyway within concave region, causing confusion.  <a href="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" class="external text" title="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" rel="nofollow">bug report</a>
-</li><li> If three panels plot three components, then the URI is reset to a rank 1 dataset, the extra panels are not removed.  A mechanism for detecting and automatically removing component panels is needed.
-</li><li> Controls for removing and moving panels, plots, and dataSources is lacking.  DataSources are never removed from the application, but are often recycled.  Same is true with Plots and Panels.
-
-</li><li> Rendering performance is poor on Fedora 10.  This has not been isolated to the OS, Java, or a new bug in the application.  Windows performance is fine.
 </li>
 
 
