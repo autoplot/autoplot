@@ -329,16 +329,19 @@ public class AutoPlotUI extends javax.swing.JFrame {
         return this.tabs;
     }
 
+    private void bind( BindingGroup bc, Object src, String srcProperty, Object dst, String dstProperty ) {
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProperty), dst, BeanProperty.create(dstProperty) ));
+    }
+
     private void addBindings() {
 
         BindingGroup bc = new BindingGroup();
-        Binding b;
-//Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, BeanProperty.create( srcProp ), dst, BeanProperty.create(dstProp));
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("drawAntiAlias"), drawAntiAliasMenuItem, BeanProperty.create("selected")));
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("textAntiAlias"), textAntiAlias, BeanProperty.create("selected")));
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("specialEffects"), specialEffectsMenuItem, BeanProperty.create("selected")));
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("overRendering"), overRenderingCheckBox, BeanProperty.create("selected")));
-        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create(Options.PROP_DRAWGRID), drawGridCheckBox, BeanProperty.create("selected")));
+        bind( bc, dom.getOptions(), Options.PROP_DRAWANTIALIAS, drawAntiAliasMenuItem, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_TEXTANTIALIAS, textAntiAlias, "selected") ;
+        bind( bc, dom.getOptions(), Options.PROP_SPECIALEFFECTS, specialEffectsMenuItem, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_OVERRENDERING, overRenderingCheckBox, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_DRAWGRID, drawGridCheckBox, "selected" );
+        bc.bind();
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
             public void propertyChange(PropertyChangeEvent evt) {
@@ -346,7 +349,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        bc.bind();
     }
 
     public void plotUri( String uri ) {
