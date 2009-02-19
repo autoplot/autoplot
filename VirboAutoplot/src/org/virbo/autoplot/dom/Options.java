@@ -25,7 +25,7 @@ public class Options extends DomNode {
         return "#" + Integer.toHexString(c.getRGB() & 0xFFFFFF);
     }
 
-    private String encodeFont(Font f) {
+    public static String encodeFont(Font f) {
         return f.getFontName() + "-" + f.getSize();
     }
 
