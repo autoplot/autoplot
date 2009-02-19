@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 
 /**
  *
@@ -161,7 +162,7 @@ public class Application extends DomNode {
         this.options = options;
     }
 
-    protected DatumRange timeRange = DatumRangeUtil.parseTimeRangeValid("2008-11-26");
+    protected DatumRange timeRange = new DatumRange( 0, 100, Units.dimensionless );
     /**
      * all time axes should hang off of this.
      */
