@@ -163,6 +163,12 @@
                     <Property name="toolTipText" type="java.lang.String" value="Render (and load) data outside plot bounds to improve appearance."/>
                   </Properties>
                 </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="drawGridCheckBox">
+                  <Properties>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="Draw Grid"/>
+                  </Properties>
+                </MenuItem>
               </SubComponents>
             </Menu>
             <Menu class="javax.swing.JMenu" name="plotStyleMenu">

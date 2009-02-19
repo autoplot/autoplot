@@ -16,7 +16,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import org.das2.graph.GraphUtil;
 import org.virbo.autoplot.dom.Panel;
-import org.virbo.autoplot.state.Options;
+import org.virbo.autoplot.dom.Options;
 
 /**
  *
@@ -40,7 +40,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         backs = new Color[]{Color.WHITE, Color.BLACK, Color.BLUE.darker()};
         String[] names = {"black on white", "white on black", "white on blue", "custom"};
         Font f = app.getCanvas().getFont();
-        fontLabel.setText(Options.getFontLabel(f));
+        fontLabel.setText(Options.encodeFont(f));
         //guiFontLabel.setText( parent.getFont().toString());
         int index = 3; // custom
         for (int i = 0; i < fores.length; i++) {
@@ -196,7 +196,7 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
             app.getCanvas().setBaseFont(chooser.getFont());
             Font f = app.getCanvas().getFont();
-            fontLabel.setText(Options.getFontLabel(f));
+            fontLabel.setText(Options.encodeFont(f));
             app.getDocumentModel().getOptions().setCanvasFont( f );
         }
     }//GEN-LAST:event_jButton1ActionPerformed

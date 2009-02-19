@@ -68,7 +68,7 @@ import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
-import org.virbo.autoplot.state.Options;
+import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetSelector;
@@ -104,7 +104,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             SerializeUtil.processElement(element, applicationModel);
         }
     };
-    Options options;
+    
     private Logger logger = Logger.getLogger("virbo.autoplot");
     private JythonScriptPanel scriptPanel;
     private LogConsole logConsole;
@@ -338,7 +338,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("textAntiAlias"), textAntiAlias, BeanProperty.create("selected")));
         bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("specialEffects"), specialEffectsMenuItem, BeanProperty.create("selected")));
         bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create("overRendering"), overRenderingCheckBox, BeanProperty.create("selected")));
-        
+        bc.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom.getOptions(), BeanProperty.create(Options.PROP_DRAWGRID), drawGridCheckBox, BeanProperty.create("selected")));
+
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
             public void propertyChange(PropertyChangeEvent evt) {
                 applicationModel.setDataSourceURL(dataSetSelector.getValue());
@@ -667,6 +668,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         drawAntiAliasMenuItem = new javax.swing.JCheckBoxMenuItem();
         specialEffectsMenuItem = new javax.swing.JCheckBoxMenuItem();
         jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
+        drawGridCheckBox = new javax.swing.JCheckBoxMenuItem();
         plotStyleMenu = new javax.swing.JMenu();
         fontsAndColorsMenuItem = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
@@ -828,6 +830,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jCheckBoxMenuItem1.setText("Over-Rendering");
         jCheckBoxMenuItem1.setToolTipText("Render (and load) data outside plot bounds to improve appearance.");
         overRenderingCheckBox.add(jCheckBoxMenuItem1);
+
+        drawGridCheckBox.setSelected(true);
+        drawGridCheckBox.setText("Draw Grid");
+        overRenderingCheckBox.add(drawGridCheckBox);
 
         optionsMenu.add(overRenderingCheckBox);
 
@@ -1313,6 +1319,7 @@ private void editDomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
     private javax.swing.JMenuItem copyImageMenuItem;
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
+    private javax.swing.JCheckBoxMenuItem drawGridCheckBox;
     private javax.swing.JMenuItem editDomMenuItem;
     private javax.swing.JMenu editMenu;
     private javax.swing.JMenu fileMenu;
