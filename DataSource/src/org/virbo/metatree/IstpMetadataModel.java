@@ -48,15 +48,15 @@ public class IstpMetadataModel extends MetadataModel {
             return ((Short) o).doubleValue();
         } else if (o instanceof Integer) {
             return ((Integer) o).doubleValue();
-        } else if (o instanceof Byte ) {
-             return ((Byte) o).doubleValue();
+        } else if (o instanceof Byte) {
+            return ((Byte) o).doubleValue();
         } else if (o instanceof String) {
             try {
                 return units.parse(DataSourceUtil.unquote((String) o)).doubleValue(units);
             } catch (ParseException ex) {
                 try {
-                    return Double.parseDouble((String)o);
-                } catch ( NumberFormatException ex2 ) {
+                    return Double.parseDouble((String) o);
+                } catch (NumberFormatException ex2) {
                     throw new IllegalArgumentException("unable to parse " + o);
                 }
             }
@@ -172,12 +172,16 @@ public class IstpMetadataModel extends MetadataModel {
         }
 
         try {
+
             DatumRange range = getRange(attrs, units);
-            properties.put(QDataSet.TYPICAL_MIN, range.min().doubleValue(units));
-            properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units));
-            range = getValidRange(attrs, units);
-            properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units));
-            properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units));
+            if ( ! attrs.containsKey("COMPONENT_0") ) { // Themis kludge
+                properties.put(QDataSet.TYPICAL_MIN, range.min().doubleValue(units));
+                properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units));
+            
+                range = getValidRange(attrs, units);
+                properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units));
+                properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units));
+            } 
 
             properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
         } catch (IllegalArgumentException ex) {
