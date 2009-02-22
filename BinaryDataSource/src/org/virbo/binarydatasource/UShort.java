@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 public class UShort extends BufferDataSet {
 
     public UShort(int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer back ) {
-        super(rank, reclen, recoffs, len0, len1, len2, 1, back );
+        super(rank, reclen, recoffs, len0, len1, len2, 2, back );
     }
 
     public double value(int i0) {
@@ -29,16 +29,16 @@ public class UShort extends BufferDataSet {
     
     public void putValue(int i0, double d) {
         ensureWritable();
-        back.putShort( offset(i0), (byte)( d > 32768 ? d - 65536 : d ) );
+        back.putShort( offset(i0), (short)( d > 32768 ? d - 65536 : d ) );
     }
 
     public void putValue(int i0, int i1, double d) {
         ensureWritable();
-        back.putShort( offset(i0, i1), (byte)( d > 32768 ? d - 65536 : d ) );
+        back.putShort( offset(i0, i1), (short)( d > 32768 ? d - 65536 : d ) );
     }
 
     public void putValue(int i0, int i1, int i2, double d) {
         ensureWritable();
-        back.putShort( offset(i0, i1, i2), (byte)( d > 32768 ? d - 65536 : d ) );
+        back.putShort( offset(i0, i1, i2), (short)( d > 32768 ? d - 65536 : d ) );
     }        
 }
