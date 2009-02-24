@@ -47,6 +47,11 @@ public class PanelController {
     private Application dom;
     private ApplicationModel appmodel;  //TODO: get rid of this
     private Panel panel;
+    /** when additional panels are automatically added, this panel keeps the original and 
+     * perhaps default settings for the child panels.
+     */
+    private Panel parentPanel;
+
     private ChangesSupport changesSupport;
     private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
     private DataSourceFilter dsf; // This is the one we are listening to.
@@ -484,9 +489,9 @@ public class PanelController {
             xunits = Units.dimensionless;
         }
 
-        Double cadence = DataSetUtil.guessCadence(xds, fillDs);
+        Double cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
         if (cadence == null && !UnitsUtil.isTimeLocation(xunits)) {
-            cadence = DataSetUtil.guessCadence(Ops.log(xds), null);
+            cadence = DataSetUtil.guessCadenceNew(Ops.log(xds), null);
             if (cadence != null) {
                 xds.putProperty(QDataSet.SCALE_TYPE, "log");
             }
