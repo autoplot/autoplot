@@ -201,7 +201,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                     .add(jLabel4)
                     .add(dep0Columns, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -317,7 +317,9 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
             columns= ExcelUtil.getColumns( wb, getSheet(), "" + getFirstRow(), new NullProgressMonitor() );
             columnsComboBox.setModel( new DefaultComboBoxModel( columns.values().toArray() ) );
             int col= jTable1.getSelectedColumn();
-            setColumn(columns.get(col));
+            if ( col!=-1 ) {
+                setColumn(columns.get(col));
+            }
             List<String> dep0Values= new ArrayList<String>( columns.values() );
             dep0Values.add(0,"");
             dep0Columns.setModel( new DefaultComboBoxModel( dep0Values.toArray() ) );
