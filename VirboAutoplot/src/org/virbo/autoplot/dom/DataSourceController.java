@@ -270,6 +270,7 @@ public class DataSourceController {
             if (ds == null) {
                 _setDataSet(null);
                 _setProperties(null);
+                setRawProperties(null);
                 _setFillProperties(null);
                 _setFillDataSet(null);
                 return;
@@ -327,6 +328,8 @@ public class DataSourceController {
                 vmax = 1e38;
             }
             dsf.setValidRange("" + vmin + " to " + vmax);
+        } else {
+            dsf.setValidRange("");
         }
     }
 
