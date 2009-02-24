@@ -301,7 +301,7 @@ public class AutoplotUtil {
         boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC));
 
         if (mono) {
-            Double cadence = DataSetUtil.guessCadence(ds);
+            Double cadence = DataSetUtil.guessCadenceNew(ds,null);
             if ( cadence==null || cadence > Double.MAX_VALUE / 100 ) cadence= new Double(0.);
             if (ds.length() > 1) {
                 dd = new double[]{ds.value(0) - cadence, ds.value(ds.length() - 1) + cadence};
