@@ -67,16 +67,6 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
         }
         return result;
     }
-
-    @Override
-    public List<String> extensions() {
-        return Collections.singletonList("cef");
-    }
-
-    @Override
-    public List<String> mimeTypes() {
-        return Collections.emptyList();
-    }
     
     @Override
     public boolean reject( String surl ,ProgressMonitor mon ) {
