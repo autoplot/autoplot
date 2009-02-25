@@ -11,10 +11,9 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,7 +25,6 @@ import org.python.core.PyDictionary;
 import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyObject;
-import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
@@ -44,6 +42,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
     ExceptionListener listener;
     private Map<String, Object> metadata;
+    private final static String PARAM_SCRIPT= "script";
 
     public JythonDataSource(URL url, JythonDataSourceFactory factory) {
         super(url);
@@ -57,9 +56,21 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         mon.started();
 
+        File jythonScript; // script to run.
+        URI resourceURI;     // optional resource URI that is argument to script, excluding script argument.
+        
+        if ( params.get( PARAM_SCRIPT )!=null ) {
+            jythonScript= DataSetURL.getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
+            mon.setProgressMessage( "loading "+url );
+            resourceURI= url.toURI();
+        } else {
+            resourceURI= null;
+            jythonScript= getFile(new NullProgressMonitor());
+        }
+        
         PyException causedBy = null;
         try {
-            if (interp == null) {
+            if (interp == null) { // caching.
                 mon.started();
                 mon.setProgressMessage( "initialize Jython interpreter...");
                 interp = JythonUtil.createInterpreter(false);
@@ -68,19 +79,21 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
                 interp.exec("params=dict()");
                 for (String s : params.keySet()) {
-                    if (!s.equals("arg_0")) {
+                    if (!s.equals("arg_0") && !s.equals("script") ) {
                         interp.exec("params['" + s + "']=" + params.get(s));
                     }
                 }
 
                 interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
-
+                
+                interp.set("resourceURI", resourceURI);
+                
                 mon.setProgressMessage( "executing script");
                 try {
                     boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
                         int i = 0;
-                        BufferedReader reader = new BufferedReader(new FileReader(super.getFile(new NullProgressMonitor())));
+                        BufferedReader reader = new BufferedReader(new FileReader( jythonScript ) );
                         String s = reader.readLine();
                         i++;
                         while (s != null) {
@@ -90,7 +103,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                             i++;
                         }
                     } else {
-                        interp.execfile(new FileInputStream(super.getFile(new NullProgressMonitor())));
+                        interp.execfile(new FileInputStream( jythonScript ));
                     }
                     mon.setProgressMessage( "done executing script");
                 } catch (PyException ex) {
@@ -117,7 +130,15 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 try {
                     result = interp.eval("data");
                 } catch ( PyException ex ) {
-                    result = interp.eval("result"); // legacy
+                    try {
+                        result = interp.eval("result"); // legacy
+                    } catch ( PyException ex2 ) {
+                        if ( causedBy!=null ) {
+                            throw ex2;
+                        } else {
+                            throw new IllegalArgumentException("neither \"data\" nor \"result\" is defined");
+                        }
+                    }
                 }
             } else {
                 result = interp.eval(expr);
@@ -140,6 +161,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     }
                 }
             } catch ( PyException ex ) {
+                // symbol "metadata" is not found.
             }
             
 
