@@ -81,7 +81,7 @@ public class ScriptPanelSupport {
                 return false;
             }
             split = URLSplit.parse(sfile);
-            if (!(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
+            if ( !( split.vapScheme.endsWith("jyds") ||split.file.endsWith(".jyds" ) ) ) {
                 return false;
             }
             if (panel.isDirty()) {
@@ -94,11 +94,11 @@ public class ScriptPanelSupport {
             }
             file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
             loadFile(file);
-
-            panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
+            panel.setContext( JythonScriptPanel.CONTEXT_DATA_SOURCE );
             panel.setFilename(sfile.toString());
         } catch (NullPointerException ex) {
-            throw ex;
+            Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex); 
+            return false;
         } catch (IOException ex) {
             Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -116,8 +116,12 @@ public class ScriptPanelSupport {
         int r = chooser.showSaveDialog(panel);
         if (r == JFileChooser.APPROVE_OPTION) {
             file = chooser.getSelectedFile();
-            if (!(file.toString().endsWith(".jy") || file.toString().endsWith(".py"))) {
-                file = new File(file.toString() + ".jy");
+            if (!(file.toString().endsWith(".jy") || file.toString().endsWith(".py") || file.toString().endsWith(".jyds") )) {
+                if ( panel.getContext()==JythonScriptPanel.CONTEXT_DATA_SOURCE ) {
+                    file = new File(file.toString() + ".jyds");
+                } else {
+                    file = new File(file.toString() + ".jy");
+                }
             }
         }
         return r;
@@ -143,12 +147,17 @@ public class ScriptPanelSupport {
             Document d = panel.getEditorPanel().getDocument();
             d.remove(0, d.getLength());
             d.insertString(0, buf.toString(), null);
-            panel.setFilename(file.toString());
             panel.setDirty(false);
+            if ( file.toString().endsWith(".jyds") ) {
+                panel.setContext( JythonScriptPanel.CONTEXT_DATA_SOURCE );
+            } else {
+                panel.setContext( JythonScriptPanel.CONTEXT_APPLICATION );
+            }
         } catch (BadLocationException ex) {
             throw new RuntimeException(ex);
         }
     }
+
 
     private boolean uriFilesEqual(String surl1, String surl2) throws URISyntaxException {
         int i1 = surl1.indexOf("?");
@@ -215,7 +224,10 @@ public class ScriptPanelSupport {
                     } catch (URISyntaxException ex) {
                         updateSurl = true;
                     }
-                    save();
+                    
+                    if ( panel.isDirty() ) {
+                        save();
+                    }
 
                     if (updateSurl) {
                         selector.setValue(file.toURI().toString());
@@ -273,7 +285,7 @@ public class ScriptPanelSupport {
 
             @Override
             public boolean accept(File f) {
-                return (f.isDirectory() || f.toString().endsWith(".jy") || f.toString().endsWith(".py"));
+                return (f.isDirectory() || f.toString().endsWith(".jy") || f.toString().endsWith(".py") || f.toString().endsWith(".jyds"));
             }
 
             @Override
