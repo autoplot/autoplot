@@ -5,27 +5,26 @@
 package org.virbo.datasource.wav;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.spi.AudioFileWriter;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.metatree.MetadataUtil;
 
 /**
  * Format data to binary file.
@@ -38,9 +37,6 @@ public class WavDataSourceFormat implements DataSourceFormat {
         QDataSet dep0 = null;
         
         String type = params.get("type");
-        if (type == null) {
-            type = "double";
-        }
 
         int dep0Len = (dep0 == null ? 0 : 1);
         int typeSize = BufferDataSet.byteCount(type);
@@ -104,7 +100,26 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
     public void formatData(File url, java.util.Map<String, String> params, QDataSet data, ProgressMonitor mon) throws IOException {
 
-        AudioFormat outDataFormat = new AudioFormat((float) 8000.0, (int) 16, (int) 1, true, false);
+        QDataSet dep0= (QDataSet) data.property( QDataSet.DEPEND_0 );
+
+        float samplesPerSecond= 8000.0f;
+
+
+        if ( dep0!=null && dep0.length()>0 ) {
+            Units u= (Units) dep0.property( QDataSet.UNITS ) ;
+            if ( u==null ) {
+                u= Units.dimensionless;
+            } else {
+                u= u.getOffsetUnits();  // allow for datasets with timetags.
+            }
+
+            UnitsConverter uc= u.getConverter( Units.seconds );
+            double periodSeconds= uc.convert( dep0.value(1) - dep0.value(0) );
+
+            samplesPerSecond= (float) Math.round( 1 / periodSeconds );
+        }
+
+        AudioFormat outDataFormat = new AudioFormat((float) samplesPerSecond, (int) 16, (int) 1, true, false);
 
         Map<String, String> params2 = new HashMap<String, String>();
         params2.put("type", "short");
