@@ -606,6 +606,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
+        bookmarksMenu.add( new AbstractAction("Export Recent...") {
+            public void actionPerformed(ActionEvent e) {
+                support.exportRecent(AutoPlotUI.this);
+            }
+        } );
+
         bookmarksMenu.add(new JSeparator());
         JMenuItem item = new JMenuItem(new AbstractAction("Make Aggregation From URL") {
 
