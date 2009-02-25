@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -93,6 +94,45 @@ public class ApplicationController {
 
         addListeners();
     }
+    FocusAdapter focusAdapter = new FocusAdapter() {
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            super.focusGained(e);
+            Plot domPlot = getPlotFor(e.getComponent());
+            if (domPlot == null) {
+                return;
+            }
+            List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
+            if (ps.size() > 0) {
+                Panel p = ApplicationController.this.getPanelsFor(domPlot).get(0);
+                logger.fine("focus to " + p);
+                setFocusUri(p.getController().getDataSourceFilter().getUri());
+                if (getPanel() != p) {
+                    setStatus("" + domPlot + ", " + p + " selected");
+                    setPanel(p);
+                }
+            }
+            setPlot(domPlot);
+
+        }
+
+        private Plot getPlotFor(Component c) {
+            Plot plot = null;
+            for (Plot p : application.getPlots()) {
+                DasPlot p1 = p.getController().getDasPlot();
+                if (p1 == c || p1.getXAxis() == c || p1.getYAxis() == c) {
+                    plot = p;
+                    break;
+                }
+                if (p.getController().getDasColorBar() == c) {
+                    plot = p;
+                    break;
+                }
+            }
+            return plot;
+        }
+    };
 
     /**
      * block the calling thread until the application is idle.
@@ -357,39 +397,9 @@ public class ApplicationController {
 
     private void addPlotFocusListener(DasPlot plot) {
         logger.fine("add focus listener to " + plot);
-        plot.addFocusListener(new FocusAdapter() {
-
-            @Override
-            public void focusGained(FocusEvent e) {
-                super.focusGained(e);
-                Plot domPlot = getPlotFor(((DasPlot) e.getComponent()));
-                if (domPlot == null) {
-                    return;
-                }
-                List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
-                if (ps.size() > 0) {
-                    Panel p = ApplicationController.this.getPanelsFor(domPlot).get(0);
-                    logger.fine("focus to " + p);
-                    setFocusUri(p.getController().getDataSourceFilter().getUri());
-                    if (getPanel() != p) {
-                        setStatus("" + domPlot + ", " + p + " selected");
-                        setPanel(p);
-                    }
-                }
-                setPlot(domPlot);
-
-            }
-
-            private Plot getPlotFor(DasPlot dasPlot) {
-                Plot plot = null;
-                for (Plot p : application.getPlots()) {
-                    if (p.getController().getDasPlot() == dasPlot) {
-                        plot = p;
-                    }
-                }
-                return plot;
-            }
-        });
+        plot.addFocusListener(focusAdapter);
+        plot.getXAxis().addFocusListener(focusAdapter);
+        plot.getYAxis().addFocusListener(focusAdapter);
     }
 
     public synchronized Plot addPlot() {
@@ -409,6 +419,7 @@ public class ApplicationController {
 
         DatumRange colorRange = new DatumRange(0, 100, Units.dimensionless);
         DasColorBar colorbar = new DasColorBar(colorRange.min(), colorRange.max(), false);
+        colorbar.addFocusListener(focusAdapter);
         colorbar.setFillColor(new java.awt.Color(0, true));
 
         int num = plotIdNum++;
@@ -557,10 +568,14 @@ public class ApplicationController {
     protected Panel copyPanel(Panel srcPanel, Plot domPlot, DataSourceFilter dsf) {
         Panel newp = addPanel(domPlot, dsf);
         newp.syncTo(srcPanel, Arrays.asList("plotId", "dataSourceFilterId"));
-        if (dsf == null) {
-            newp.getController().getDataSourceFilter().getController().setDataSetInternal(srcPanel.getController().getDataSourceFilter().getController().getDataSet());
-            if (srcPanel.getController().getDataSourceFilter().getUri() != null) {
-                newp.getController().getDataSourceFilter().uri = srcPanel.getController().getDataSourceFilter().getUri();
+        if (dsf == null) { // new DataSource, but with the same URI.
+            DataSourceFilter dsfnew= newp.getController().getDataSourceFilter();
+            DataSourceFilter dsfsrc= srcPanel.getController().getDataSourceFilter();
+            dsfnew.getController().setRawProperties(dsfsrc.getController().getRawProperties());
+            dsfnew.getController()._setProperties(dsfsrc.getController().getProperties());
+            dsfnew.getController().setDataSetInternal(dsfsrc.getController().getDataSet());
+            if (dsfsrc.getUri() != null) {
+                dsfnew.setUri( dsfsrc.getUri() );
             }
         }
         return newp;
@@ -581,9 +596,13 @@ public class ApplicationController {
         that.syncTo(srcPlot);
 
         //BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
-        if (bindx) bind(srcPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
+        if (bindx) {
+            bind(srcPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
+        }
         //else if (bb != null) bind(application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
-        if (bindy) bind(srcPlot, "yaxis." + Axis.PROP_RANGE, that, "yaxis." + Axis.PROP_RANGE);
+        if (bindy) {
+            bind(srcPlot, "yaxis." + Axis.PROP_RANGE, that, "yaxis." + Axis.PROP_RANGE);
+        }
 
         return that;
     }
@@ -680,8 +699,8 @@ public class ApplicationController {
             bc = bindingContexts.get(src);
             if (bc == null) {
                 bc = new BindingGroup();
+                bindingContexts.put(src, bc);
             }
-            bindingContexts.put(src, bc);
         }
 
         Binding b;
@@ -837,7 +856,6 @@ public class ApplicationController {
         bind(targetAxis, Axis.PROP_LOG, axis, Axis.PROP_LOG);
     }
 
-
     private void addAxisContextMenuItems(final DasPlot dasPlot, final PlotController plotController, final Plot plot, final Axis axis) {
 
         final DasAxis dasAxis = axis.getController().getDasAxis();
@@ -899,12 +917,13 @@ public class ApplicationController {
         });
         bindingMenu.add(item);
         item = new JMenuItem(new AbstractAction("Bind to Plot Below") {
+
             public void actionPerformed(ActionEvent e) {
                 Plot dstPlot = getPlotBelow(plot);
                 if (dstPlot == null) {
                     setStatus("warning: no plot below");
                 } else {
-                    bindToPlotPeer( dstPlot, plot, axis );
+                    bindToPlotPeer(dstPlot, plot, axis);
                 }
             }
         });
@@ -972,7 +991,9 @@ public class ApplicationController {
 
             public void actionPerformed(ActionEvent e) {
                 Plot that = copyPlotAndPanels(domPlot, null);
-                unbind(that);  // Is this necessary now?
+                bind( domPlot.zaxis, Axis.PROP_RANGE, that.zaxis, Axis.PROP_RANGE );
+                bind( domPlot.zaxis, Axis.PROP_LOG, that.zaxis, Axis.PROP_LOG );
+                bind( domPlot.zaxis, Axis.PROP_LABEL, that.zaxis, Axis.PROP_LABEL );
                 addConnector(domPlot, that);
             }
         });
