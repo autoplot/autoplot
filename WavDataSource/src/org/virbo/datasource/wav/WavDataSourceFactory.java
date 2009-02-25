@@ -61,13 +61,5 @@ public class WavDataSourceFactory extends AbstractDataSourceFactory {
 
         return audioFormat.getChannels();
     }
-
-    public List<String> extensions() {
-        return Collections.singletonList("wav");
-    }
-
-    public List<String> mimeTypes() {
-        return Collections.emptyList();
-    }
    
 }
