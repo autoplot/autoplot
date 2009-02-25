@@ -16,7 +16,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,16 +42,6 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     public DataSource getDataSource(URL url) throws Exception {
         JythonDataSource result = new JythonDataSource(url,this);
         return result;
-    }
-
-    @Override
-    public List<String> extensions() {
-        return Collections.singletonList("jy");
-    }
-
-    @Override
-    public List<String> mimeTypes() {
-        return Collections.emptyList();
     }
 
     private Map<String, Object> getNames(URL url, ProgressMonitor mon) throws Exception {
