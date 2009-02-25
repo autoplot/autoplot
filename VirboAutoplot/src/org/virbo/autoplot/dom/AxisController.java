@@ -37,18 +37,6 @@ public class AxisController {
         ac.bind( axis, "drawTickLabels", p, "tickLabelsVisible" );
 
     }
-    
-    public List<BindingModel> getTest() {
-        return DomUtil.asArrayList(getBindings());
-    }
-    public BindingModel[] getBindings() {
-        BindingModel[] result= dom.getController().getBindingsFor( axis );
-        return result;
-    }
-
-    public BindingModel getBindings(int index) {
-        return getBindings()[index];
-    }
 
     public DasAxis getDasAxis() {
         return dasAxis;
