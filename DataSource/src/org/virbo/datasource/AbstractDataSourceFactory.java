@@ -28,19 +28,4 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
         return false;
     }
     
-    /**
-     * return a list of file extensions handled by the factory, such as "wav"
-     * @return
-     */
-    public List<String> extensions() {
-        throw new IllegalArgumentException("Implement AbstractDataSourceFactory.extensions()");
-    }
-    
-    /**
-     * 
-     * @return
-     */
-    public List<String> mimeTypes() {
-        throw new IllegalArgumentException("Implement AbstractDataSourceFactory.extensions()");
-    }
 }
