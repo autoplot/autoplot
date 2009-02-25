@@ -105,7 +105,13 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     }
 
     protected void updateStatus() {
-        fileNameLabel.setText( ( filename==null ? "" : filename ) + ( dirty ? " *" : "" ) ) ;
+        if ( filename==null ) {
+            fileNameLabel.setText( "" + ( dirty ? " *" : "" ));
+        } else {
+            File file= new File(filename);
+            getEditorPanel().setEditable(file.canWrite());
+            fileNameLabel.setText( filename + ( file.canWrite() ? "" : " (read only)" ) + ( dirty ? " *" : "" ) ) ;
+        }
     }
 
     int getContext() {
@@ -287,7 +293,7 @@ private void contextSelectorActionPerformed(java.awt.event.ActionEvent evt) {//G
     public void setDirty(boolean dirty) {
         boolean oldDirty = this.dirty;
         this.dirty = dirty;
-        updateStatus();
+        if ( oldDirty!=dirty ) updateStatus();
         firePropertyChange(PROP_DIRTY, oldDirty, dirty);
     }
 
