@@ -51,7 +51,7 @@ public class BookmarksManagerModel {
         int r = chooser.showOpenDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
             try {
-                List<Bookmark> recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(chooser.getSelectedFile())));
+                List<Bookmark> recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(chooser.getSelectedFile())).getDocumentElement());
                 setList(recent);
             } catch (SAXException ex) {
                 Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -78,8 +78,10 @@ public class BookmarksManagerModel {
         int r = chooser.showSaveDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
             try {
+                File f= chooser.getSelectedFile();
+                if ( !f.toString().endsWith(".xml") ) f= new File( f.toString()+".xml" );
                 String format = Bookmark.formatBooks(getList());
-                FileOutputStream out = new FileOutputStream(chooser.getSelectedFile());
+                FileOutputStream out = new FileOutputStream(f);
                 out.write(format.getBytes());
                 out.close();
             } catch (IOException e) {
