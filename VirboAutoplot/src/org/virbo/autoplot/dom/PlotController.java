@@ -138,9 +138,9 @@ public class PlotController {
     
     public synchronized void bindTo(DasColorBar colorbar) {
         ApplicationController ac= dom.getController();
-        ac.bind( this.domPlot, "zaxis.range", colorbar, "datumRange");
-        ac.bind( this.domPlot, "zaxis.log", colorbar, "log");
-        ac.bind( this.domPlot, "zaxis.label", colorbar, "label" );
+        ac.bind( this.domPlot.zaxis, Axis.PROP_RANGE, colorbar, "datumRange");
+        ac.bind( this.domPlot.zaxis, Axis.PROP_LOG, colorbar, "log");
+        ac.bind( this.domPlot.zaxis, Axis.PROP_LABEL, colorbar, "label" );
     }
 
     public BindingModel[] getBindings() {
