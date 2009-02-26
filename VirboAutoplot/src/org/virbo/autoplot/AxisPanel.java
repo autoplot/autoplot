@@ -11,6 +11,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SpinnerNumberModel;
@@ -144,12 +145,12 @@ public class AxisPanel extends javax.swing.JPanel {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(DataSourceController.PROP_DEPNAMES)) {
-                    final String[] depNames = (String[]) newDsf.getController().getDepnames().toArray(); //TODO: what if panelId changes...
+                    List<String> depNamesList= newDsf.getController().getDepnames();
+                    final String[] depNames = (String[]) depNamesList.toArray( new String[depNamesList.size()] ); //TODO: what if panelId changes...
                     for (int i = 0; i < depNames.length; i++) {
                         depNames[i] = depNames[i] + " (" + newDsf.getController().getMaxSliceIndex(i) + " bins)";
                     }
                     SwingUtilities.invokeLater(new Runnable() {
-
                         public void run() {
                             sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames));
                             sliceTypeComboBox.setSelectedIndex(newDsf.getSliceDimension());
