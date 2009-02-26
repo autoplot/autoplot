@@ -58,11 +58,11 @@ public class Application extends DomNode {
     public static final String PROP_DATASOURCEFILTERS = "dataSourceFilters";
 
     public DataSourceFilter[] getDataSourceFilters() {
-        return (DataSourceFilter[]) dataSourceFilters.toArray();
+        return (DataSourceFilter[]) dataSourceFilters.toArray( new DataSourceFilter[dataSourceFilters.size()] );
     }
 
     public void setDataSourceFilters(DataSourceFilter[] dataSourceFilters) {
-        DataSourceFilter[] oldDataSourceFilters = (DataSourceFilter[]) this.dataSourceFilters.toArray();
+        DataSourceFilter[] oldDataSourceFilters = (DataSourceFilter[]) this.dataSourceFilters.toArray( new DataSourceFilter[this.dataSourceFilters.size()] );
         this.dataSourceFilters = Arrays.asList(dataSourceFilters);
         propertyChangeSupport.firePropertyChange(PROP_DATASOURCEFILTERS, oldDataSourceFilters, dataSourceFilters);
     }
@@ -183,7 +183,9 @@ public class Application extends DomNode {
     public static final String PROP_BINDINGS = "bindings";
 
     public BindingModel[] getBindings() {
-        return bindings;
+        BindingModel[] result= new BindingModel[bindings.length];
+        System.arraycopy( bindings, 0, result, 0, bindings.length );
+        return result;
     }
 
     public void setBindings(BindingModel[] bindings) {
@@ -210,7 +212,9 @@ public class Application extends DomNode {
     public static final String PROP_CONNECTORS = "connectors";
 
     public Connector[] getConnectors() {
-        return connectors;
+        Connector[] result= new Connector[connectors.length];
+        System.arraycopy( connectors, 0, result, 0, connectors.length );
+        return result;
     }
 
     public void setConnectors(Connector[] connectors) {
@@ -239,11 +243,6 @@ public class Application extends DomNode {
     
     
     /*****  end properties *********************/
-
-
-    public boolean equals(Object o) {
-        return super.equals(o); // use me to check for failed copy.  A node should never be compared to itsself.
-    }
 
     public DomNode copy() {
         Application result = (Application) super.copy();
