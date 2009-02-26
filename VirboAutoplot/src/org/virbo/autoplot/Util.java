@@ -13,6 +13,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
@@ -117,8 +118,8 @@ public class Util {
 
         }
 
-        for (String val : abbrevs.keySet()) {
-            result.add("" + abbrevs.get(val) + " " + val);
+        for ( Entry<String,String> val : abbrevs.entrySet()) {
+            result.add("" + val.getValue() + " " + val.getKey() );
         }
 
         return result;
