@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -66,7 +67,6 @@ import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dsops.Ops;
-import org.virbo.dsutil.BinAverage;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -285,6 +285,20 @@ public class AutoplotUtil {
                 Units.dimensionless);
     }
 
+    /**
+     * This early implementation of autoRange calculates the range of the
+     * data, then locates the median to establish a linear or log scale type.
+     * Very early on it tried to establish a robust range as well that would
+     * exclude outliers.
+     *
+     * This should be rewritten to use the recently-implemented AutoHistogram,
+     * which does an efficient, self-configuring, one-pass histogram of the data
+     * that more effectively identifies the data range and outliers.
+     *
+     * @param ds
+     * @param properties
+     * @return
+     */
     public static AutoRangeDescriptor autoRange( QDataSet ds, Map properties ) {
 
         log.fine("enter autoRange");
@@ -315,14 +329,7 @@ public class AutoplotUtil {
         } else {
             // find min and max of three-point medians
             try {
-                if (ds.rank() == 1) {
-                    //dd = robustRange(ds);
-                    dd = simpleRange(ds);
-                } else {
-                    //MomentDescriptor moment = moment(ds);
-                    //dd = robustRange(ds, moment);
-                    dd = simpleRange(ds);
-                }
+                dd = simpleRange(ds);
             } catch (IllegalArgumentException ex) {
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
@@ -407,9 +414,9 @@ public class AutoplotUtil {
 
         // interpret properties, looking for hints about scale type and ranges.
         if (properties != null) {
-            String log = (String) properties.get(QDataSet.SCALE_TYPE);
-            if (log != null) {
-                result.log = log.equals("log");
+            String log1 = (String) properties.get(QDataSet.SCALE_TYPE);
+            if (log1 != null) {
+                result.log = log1.equals("log");
             }
             Double tmin = (Double) properties.get(QDataSet.TYPICAL_MIN);
             Double tmax = (Double) properties.get(QDataSet.TYPICAL_MAX);
@@ -511,10 +518,8 @@ public class AutoplotUtil {
     }
 
     public static class MomentDescriptor {
-
         double[] moment;
         Units units;
-        int rank;
         int invalidCount;
         int validCount;
     }
@@ -523,7 +528,6 @@ public class AutoplotUtil {
 
         MomentDescriptor result = new MomentDescriptor();
 
-        result.rank = ds.rank();
         result.moment = new double[2];
 
         Units u = (Units) ds.property(QDataSet.UNITS);
@@ -739,8 +743,9 @@ public class AutoplotUtil {
         if (deflt == null)
             return properties;
         HashMap<String, Object> result = new HashMap<String, Object>(deflt);
-        for (String key : properties.keySet()) {
-            Object val = properties.get(key);
+        for ( Entry<String,Object> entry : properties.entrySet()) {
+            Object val = entry.getValue();
+            String key = entry.getKey();
             if (val instanceof Map) {
                 result.put(key, mergeProperties((Map<String, Object>) val, (Map<String, Object>) deflt.get(key)));
             } else {
