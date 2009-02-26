@@ -161,16 +161,6 @@ public class PanelController {
         }
 
         String label = null;
-        if (fillDs.rank() == 1 && !panel.getComponent().equals("")) {
-            List<Panel> panels = dom.getController().getPanelsFor(getDataSourceFilter());
-            for (Panel p : panels) {
-                if (p == this.panel) {
-                    p.setComponent("");
-                } else {
-                    dom.getController().deletePanel(p);
-                }
-            }
-        }
 
         if (!panel.getComponent().equals("") && fillDs.length() > 0) {
             String[] labels = SemanticOps.getComponentLabels(fillDs);
@@ -231,11 +221,23 @@ public class PanelController {
             return "" + PanelController.this;
         }
 
-        public void propertyChange(PropertyChangeEvent evt) {
+        public synchronized void propertyChange(PropertyChangeEvent evt) {
             if (!Arrays.asList(dom.getPanels()).contains(panel)) {
                 return;  // TODO: kludge, I was deleted.
             }
             QDataSet fillDs = dsf.getController().getFillDataSet();
+
+            if ( resetRanges ) {
+                //TODO: see if there's a way to preserve the component panels
+                if ( parentPanel!=null ) {
+                    dom.getController().deletePanel(panel);
+                    parentPanel=null;
+                    return;
+                } else {
+                    if ( renderer!=null ) renderer.setActive(true);
+                }
+            }
+
             if (fillDs != null && resetRanges) {
                 doResetRanges(true);
                 setResetRanges(false);
@@ -246,17 +248,18 @@ public class PanelController {
                 }
             } else {
                 // add additional panels when it's a bundle of rank1 datasets.
-                if (!dom.getController().isValueAdjusting() && panel.getRenderType() == RenderType.series && fillDs.rank() == 2 && fillDs.length(0) < 32 && panel.getComponent().equals("")) {
+                if ( !dom.getController().isValueAdjusting()
+                        && panel.getRenderType() == RenderType.series
+                        && fillDs.rank() == 2 && fillDs.length(0) < 32 ) {
                     MutatorLock lock = dom.getController().mutatorLock();
                     lock.lock();
                     String[] labels = SemanticOps.getComponentLabels(fillDs);
-                    panel.setComponent(labels[0]);
                     Color c = panel.getStyle().getColor();
-                    panel.getStyle().setColor(deriveColor(c, 0));
                     Plot domPlot = dom.getController().getPlotFor(panel);
-                    for (int i = 1; i < fillDs.length(0); i++) {
+                    renderer.setActive(false);
+                    for (int i = 0; i < fillDs.length(0); i++) {
                         Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsf);
-                        //Panel cpanel = dom.getController().getPanelsFor(cplot).get(0);
+                        cpanel.getController().parentPanel= panel;
                         cpanel.getStyle().setColor(deriveColor(c, i));
                         cpanel.setComponent(labels[i]);
                         cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
