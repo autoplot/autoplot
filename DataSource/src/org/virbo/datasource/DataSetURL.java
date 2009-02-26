@@ -58,6 +58,7 @@ public class DataSetURL {
     
 
     static {
+        //FileSystem.registerFileSystemFactory("zip", new zipfs.ZipFileSystemFactory());
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
         FileSystem.settings().setPersistence(FileSystemSettings.Persistence.EXPIRES);
 
@@ -357,40 +358,18 @@ public class DataSetURL {
     }
 
     public static InputStream getInputStream(URL url, ProgressMonitor mon) throws IOException {
-        URLSplit split = parse(url.toString());
+        URLSplit split = URLSplit.parse(url.toString());
 
-        String proto = url.getProtocol();
-        if (proto.equals("file")) {
-            String surl = url.toString();
-            int idx1 = surl.indexOf("?");
-            if (idx1 == -1) {
-                idx1 = surl.length();
+        try {
+            FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
+            FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
+            if (!fo.isLocal()) {
+                Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
             }
-            surl = surl.substring(0, idx1);
+            return fo.getInputStream(mon);
 
-            String sfile;
-            int idx0 = surl.indexOf("file:///");
-            if (idx0 == -1) {
-                idx0 = surl.indexOf("file:/");
-                sfile = surl.substring(idx0 + 5);
-            } else {
-                sfile = surl.substring(idx0 + 7);
-            }
-            sfile = URLDecoder.decode(sfile, "US-ASCII");
-            return new FileInputStream(new File(sfile));
-
-        } else {
-            try {
-                FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
-                FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
-                if (!fo.isLocal()) {
-                    Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
-                }
-                return fo.getInputStream(mon);
-
-            } catch (URISyntaxException ex) {
-                throw new IOException("URI Syntax Exception: " + ex.getMessage());
-            }
+        } catch (URISyntaxException ex) {
+            throw new IOException("URI Syntax Exception: " + ex.getMessage());
         }
     }
 
@@ -401,40 +380,18 @@ public class DataSetURL {
      */
     public static File getFile(URL url, ProgressMonitor mon) throws IOException {
 
-        URLSplit split = parse(url.toString());
+        URLSplit split = URLSplit.parse(url.toString());
 
-        String proto = url.getProtocol();
-        if (proto.equals("file")) {
-            String surl = url.toString();
-            int idx1 = surl.indexOf("?");
-            if (idx1 == -1) {
-                idx1 = surl.length();
+        try {
+            FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
+            FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
+            if (!fo.isLocal()) {
+                Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
             }
-            surl = surl.substring(0, idx1);
-
-            String sfile;
-            int idx0 = surl.indexOf("file:///");
-            if (idx0 == -1) {
-                idx0 = surl.indexOf("file:/");
-                sfile = surl.substring(idx0 + 5);
-            } else {
-                sfile = surl.substring(idx0 + 7);
-            }
-            sfile = URLDecoder.decode(sfile, "US-ASCII");
-            return new File(sfile);
-
-        } else {
-            try {
-                FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
-                FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
-                if (!fo.isLocal()) {
-                    Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
-                }
-                File tfile = fo.getFile(mon);
-                return tfile;
-            } catch (URISyntaxException ex) {
-                throw new IOException("URI Syntax Exception: " + ex.getMessage());
-            }
+            File tfile = fo.getFile(mon);
+            return tfile;
+        } catch (URISyntaxException ex) {
+            throw new IOException("URI Syntax Exception: " + ex.getMessage());
         }
     }
 
