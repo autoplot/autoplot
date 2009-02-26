@@ -91,7 +91,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     GuiSupport support;
     LayoutListener autoLayout;
     final String TABS_TOOLTIP = "right-click to undock";
-    PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
+    transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
         public Element serialize(Document document, ProgressMonitor monitor) {
             DOMBuilder builder = new DOMBuilder(applicationModel);
@@ -394,7 +394,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
         fileMenu.add(new AbstractAction("Save With Data...") {
 
             public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
                 applicationModel.setUseEmbeddedDataSet(true);
                 stateSupport.saveAs();
             }
