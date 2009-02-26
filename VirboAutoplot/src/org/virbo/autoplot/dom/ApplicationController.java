@@ -704,23 +704,14 @@ public class ApplicationController {
         }
 
         Binding b;
-        //if ( DasApplication.hasAllPermission() ) {
+        
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
         bc.addBinding(b);
-        //} else {
-        //    Property propa= BeanProperty.create(srcProp);
-        //    Property propb= BeanProperty.create(dstProp);
-        //
-        //    System.err.println("bindings disabled in the applet environment");
-        //    return;
-        //}
 
         BindingModel bb = new BindingModel();
 
-        String srcId = "???";
-        if (src instanceof DomNode) {
-            srcId = src.getId();
-        }
+        String srcId = src.getId();
+        
         String dstId = "???";
         if (dst instanceof DomNode) {
             dstId = ((DomNode) dst).getId();
@@ -880,9 +871,8 @@ public class ApplicationController {
             mouseAdapter.addMenuItem(addPlotMenu);
 
             item = new JMenuItem(new AbstractAction("Bound Plot Below") {
-
                 public void actionPerformed(ActionEvent e) {
-                    Plot newPlot = copyPlot(plot, true, false);
+                    copyPlot(plot, true, false);
                 }
             });
             item.setToolTipText("add a new plot below.  The plot's x axis will be bound to this plot's x axis");
