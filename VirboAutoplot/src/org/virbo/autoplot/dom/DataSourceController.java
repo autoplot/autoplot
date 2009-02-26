@@ -241,7 +241,11 @@ public class DataSourceController {
             for (String s : problems) {
                 message.append(s + "\n");
             }
-            JOptionPane.showMessageDialog(model.getCanvas(), message); //TODO: View code in controller
+            if ( dom.getController().isHeadless() ) {
+                throw new IllegalArgumentException(message.toString());
+            } else {
+                JOptionPane.showMessageDialog(model.getCanvas(), message); //TODO: View code in controller
+            }
 
             if (ds instanceof MutablePropertyDataSet) {
                 //MutablePropertyDataSet mds= (MutablePropertyDataSet)ds;
