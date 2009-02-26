@@ -101,12 +101,10 @@ public class MetaDataPanel extends javax.swing.JPanel {
             }
             if (dsrc != null) {
                 tree = new CombinedTreeModel("" + dsrc.getURL());
-                Map<String, Object> meta = dsf.getController().getRawProperties();
+                Map<String, Object> meta = dsf.getController().getRawProperties();  // findbugs NP_GUARANTEED_DEREF okay
                 MetadataModel model = dsrc.getMetadataModel();
                 String root = "Metadata";
-                if (model == null) {
-                    model = MetadataModel.createNullModel();
-                } else {
+                if (model != null) {
                     if ( !model.getLabel().equals("") ) root = root+ "(" + model.getLabel() + ")";
                 }
 
@@ -137,7 +135,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
             applicationModel.application.getExceptionHandler().handle(e);
         }
     }
-    PropertyChangeListener propertiesListener = new PropertyChangeListener() {
+    transient PropertyChangeListener propertiesListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceController.PROP_RAWPROPERTIES)) {
@@ -148,7 +146,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
     /**
      * update when the fill dataset changes.
      */
-    PropertyChangeListener fillListener = new PropertyChangeListener() {
+    transient PropertyChangeListener fillListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceController.PROP_FILLDATASET)) {
