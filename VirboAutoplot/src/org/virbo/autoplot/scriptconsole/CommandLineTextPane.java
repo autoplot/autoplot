@@ -8,6 +8,8 @@ package org.virbo.autoplot.scriptconsole;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
+import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
@@ -16,26 +18,70 @@ import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 
 /**
- * command line component with history and keybindings.
+ * Generally-useful command line component with history and keybindings.
  * @author jbf
  */
 public class CommandLineTextPane extends JTextPane {
 
+    List<String> history;
+    int historyIndex;
+    String pendingEntry;
+    private static final int HIST_LENGTH=20;
+
     public CommandLineTextPane() {
         ActionMap map = getActionMap();
 
+        history= new LinkedList<String>();
+        historyIndex=0;
+        pendingEntry="";
+
         Action evalAction= new AbstractAction("eval") {
             public void actionPerformed( ActionEvent e ) {
+                history.add( getText() );
+                while ( history.size()>HIST_LENGTH ) history.remove(0);
+                historyIndex= history.size();
+                pendingEntry= "";
                 fireActionPerformed( e );
             }
         };
 
+        Action histNextAction= new AbstractAction("histNext") {
+            public void actionPerformed( ActionEvent e ) {
+                if ( historyIndex<history.size() ) {
+                    historyIndex++;
+                    if ( historyIndex==history.size() ) {
+                        setText(pendingEntry);
+                    } else {
+                        setText( history.get(historyIndex) );
+                    }
+                }
+            }
+        };
+
+        Action histPrevAction= new AbstractAction("histPrev") {
+            public void actionPerformed( ActionEvent e ) {
+                if ( historyIndex>0 ) { 
+                   if ( historyIndex==history.size() ) {
+                        pendingEntry= getText();
+                   }
+                   historyIndex--;
+                   setText( history.get(historyIndex) );
+                }
+            }
+        };
+
+
         map.put("eval", evalAction);
+        map.put("histPrev",histPrevAction);
+        map.put("histNext",histNextAction);
+        
         setActionMap(map);
 
         InputMap imap= getInputMap();
         imap.put( KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "eval" );
- 
+        imap.put( KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "histPrev" );
+        imap.put( KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "histNext" );
+
     }
 
     /**
