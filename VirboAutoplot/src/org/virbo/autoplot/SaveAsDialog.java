@@ -196,7 +196,7 @@ public class SaveAsDialog extends java.awt.Dialog {
     public void setEmbedData(boolean embedData) {
         boolean oldEmbedData = embedDataCB.isSelected();
         this.embedDataCB.setSelected( embedData );
-        propertyChangeSupport.firePropertyChange ("embedData", new Boolean (oldEmbedData), new Boolean (embedData));
+        propertyChangeSupport.firePropertyChange ("embedData", Boolean.valueOf(oldEmbedData), Boolean.valueOf(embedData));
     }
 
     /**
@@ -214,7 +214,7 @@ public class SaveAsDialog extends java.awt.Dialog {
     public void setBookmark(boolean bookmark) {
         boolean oldBookmark = isBookmark();
         this.bookmarkCB.setSelected( bookmark );
-        propertyChangeSupport.firePropertyChange ("bookmark", new Boolean (oldBookmark), new Boolean (bookmark));
+        propertyChangeSupport.firePropertyChange ("bookmark", Boolean.valueOf(oldBookmark), Boolean.valueOf(bookmark));
     }
     
 }
