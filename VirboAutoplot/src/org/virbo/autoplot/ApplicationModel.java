@@ -82,10 +82,10 @@ public class ApplicationModel {
     /**
      * dataset with fill data has been recalculated
      */
-    public static String PROPERTY_FILL = "fill";
-    public static String PROPERTY_FILE = "file";
-    public static String PROPERTY_RECENT = "recent";
-    public static String PROPERTY_BOOKMARKS = "bookmarks";
+    public static final String PROPERTY_FILL = "fill";
+    public static final String PROPERTY_FILE = "file";
+    public static final String PROPERTY_RECENT = "recent";
+    public static final String PROPERTY_BOOKMARKS = "bookmarks";
     
     private static final int MAX_RECENT = 20;
 
@@ -413,8 +413,11 @@ public class ApplicationModel {
 
         List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
         List<Bookmark> newValue = new ArrayList<Bookmark>(bookmarks);
-        if (newValue.contains(surl)) { // move it to the front of the list
-            newValue.remove(surl);
+
+        if (newValue.contains(item)) { // move it to the front of the list
+            Bookmark.Item old= (Bookmark.Item) newValue.get( newValue.indexOf(item) );
+            item= old;  // preserve titles and other future metadata.
+            newValue.remove(old);
         }
 
         newValue.add(item);
