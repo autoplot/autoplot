@@ -253,7 +253,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void showCompletions() {
         final String surl = (String) dataSetSelector.getEditor().getItem();
         int carotpos = ((JTextField) dataSetSelector.getEditor().getEditorComponent()).getCaretPosition();
-        setMessage("getting completions");
+        setMessage("busy: getting completions");
         showCompletions(surl, carotpos);
 
     }
@@ -662,8 +662,8 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         URLSplit split = URLSplit.parse(context);
 
-
-        if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(split.ext) != null) {
+        String ext= DataSetURL.getExt(context);
+        if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
             browseSourceType();
 
         } else {
