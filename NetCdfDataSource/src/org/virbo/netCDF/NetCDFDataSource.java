@@ -119,7 +119,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             File file= getFile(mon);
             location= file.toURI().toURL().toString();
         } else {
-            location= getURL();
+            location= resourceURL.toString();
         }
         
         NetcdfDataset dataset=null;
