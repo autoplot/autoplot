@@ -583,6 +583,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }
 
     private void updateBookmarks() {
+
+        JMenuItem item;
         List<Bookmark> bookmarks = applicationModel.getBookmarks();
         bookmarksMenu.removeAll();
 
@@ -605,14 +607,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        bookmarksMenu.add( new AbstractAction("Export Recent...") {
+        item= bookmarksMenu.add( new AbstractAction("Export Recent...") {
             public void actionPerformed(ActionEvent e) {
                 support.exportRecent(AutoPlotUI.this);
             }
         } );
+        item.setToolTipText("Export recent URIs to a bookmarks file.  (There is no method for importing recent URIs.)");
 
         bookmarksMenu.add(new JSeparator());
-        JMenuItem item = new JMenuItem(new AbstractAction("Make Aggregation From URL") {
+        item = new JMenuItem(new AbstractAction("Make Aggregation From URL") {
 
             public void actionPerformed(ActionEvent e) {
                 String s = dataSetSelector.getValue();
@@ -718,6 +721,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenuBar1.add(fileMenu);
 
         editMenu.setText("Edit");
+        editMenu.setToolTipText("Edit the DOM, which is the internal application state.\n");
 
         undoMenuItem.setAction(undoRedoSupport.getUndoAction());
         undoMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
