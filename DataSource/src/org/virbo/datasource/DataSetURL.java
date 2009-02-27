@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
@@ -539,6 +540,8 @@ public class DataSetURL {
         fs = FileSystem.create(new URL( surlDir ) );
 
         s = fs.listDirectory("/");
+
+        Arrays.sort(s);
 
         boolean foldCase = Boolean.TRUE.equals(fs.getProperty(fs.PROP_CASE_INSENSITIVE));
         if (foldCase) {
