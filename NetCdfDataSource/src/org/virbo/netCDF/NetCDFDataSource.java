@@ -16,16 +16,9 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URLSplit;
 import org.virbo.dsutil.TransposeRankNDataSet;
 import ucar.nc2.Attribute;
 import ucar.nc2.NetcdfFile;
@@ -120,15 +113,21 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     private synchronized void readData( ProgressMonitor mon ) throws IOException {
 
-        File file= getFile(mon);
+        String location;
+        boolean makeLocal= false;
+        if ( makeLocal ) {
+            File file= getFile(mon);
+            location= file.toURI().toURL().toString();
+        } else {
+            location= getURL();
+        }
         
         NetcdfDataset dataset=null;
         
         if ( sMyUrl.endsWith(".ncml" ) ) {
-            String kl= file.toURI().toURL().toString();
-            dataset= NcMLReader.readNcML( kl, null );
+            dataset= NcMLReader.readNcML( location, null );
         } else {
-            NetcdfFile f= NetcdfFile.open( file.toString() );
+            NetcdfFile f= NetcdfFile.open( location );
             dataset= new NetcdfDataset( f );
         }
         
