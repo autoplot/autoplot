@@ -16,24 +16,43 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-     <li>bugfixes associated with automatically adding extra panels for components.
-</li><li> introduce "huge scatter" render type that easily handles millions of points.  This is used when the rank 1 dataset has more than 200K points, rather than clipping the data.
-</li><li> bugfix: add plot-&gt;context overview doesn't reset the range on the original plot.
-</li><li> bugfix: dates are again printed along with times on time axes.
-</li>
+     <ul>
+     <li>introduce AutoHistogram, a one-pass histogram which adjusts binsize and first bin location, and detects outliers.
+</li><li> improved cadence-guessing algorithm uses AutoHistogram for more robust and accurate result.
+</li><li> SeriesRenderer allows cadence check to be disabled.
+</li><li> introduce support for ZipFileSystem, which allows files within zip files to be accessed.
+</li><li> many bugfixes, including
+<ol><li>  2620088: shortcomings of the automatic addition of panels
+</li><li>  2618423: jython ambiguity, introduce jyds extension
+
+</li><li>  2617650: jython script panel needs to check read only mode.
+</li><li>  2620792: jython plot(ds) uses leftover metadata.
+</li><li>  2619858: filesystem completions not sorted
+</li><li>  bugs in context overview.
+</li></ol>
+</li><li> introduce hdf5 support through NetcdfDataSource
+</li><li> history added to console command line
+</li><li> feature 2427040: recent URIs can be exported to bookmarks file
+</li><li> axis labels and plot titles can contain entities like &amp;rho; or &amp;#x03C1;
+
+</li></ul>
 <p>Known Bugs:
 </p>
-<li> SeriesRenderers accept context click anyway within concave region, causing confusion.  <a href="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" class="external text" title="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" rel="nofollow">bug report</a>
-</li>
+<ul><li> 2618432: huge scatter only renders in black
+</li><li> 2620033: panel focus problems
+</li><li> 2619827: cdf doesn't work on amd64 linux
+</li><li> 2458542: missing repaint triggers
+</li></ul>
 
 
 	<p>data is input from: 
-	<li>ascii files (.dat,.txt)</li>
+	<li>ASCII files (.dat,.txt)</li>
         <li>binary files (.bin)</li>
-	<li>excel spread sheets (.xls)</li>
+	<li>Excel spread sheets (.xls)</li>
 	<li>das2Streams (.d2s or .das2Stream)</li>
         <li>QStreams (.qds), QDataSet on a das2Stream
 	<li>netcdf files (.nc,.ncml)</li>
+    <li>HDF5 files</li>
         <li>cdf files(.cdf)</li>
 	<li>dods servers (.dds)</li>
         <li>Cluster Exchange Format files (.cef)</li>
@@ -41,11 +60,11 @@ be applied to the data, for example, specifying valid range and fill data.
         <li>ViRBO's TSDS server</li>
         <li>Plasma Wave Group das2 Server</li>
         <li>Images (.jpg, .png, .gif)</li>
+        <li>Wav audio files</li>
 	</p>
 	<p>This is not complete, and limitations include:</p>
 	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
 	<li>Quantities of rank 4 dimensionality cannot be plotted.</li>
-	<li>Vector quantities such as B(GSM) are plotted as a stack of lineplots, with limited controls.</li>
          
          <p><a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
          more information than this launch page.</p>
