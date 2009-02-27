@@ -3,8 +3,8 @@
 "http://www.cottagesystems.com/lib/dtd/jnlp-1.5.dtd">
 <jnlp 
     spec="1.0+" 
-    codebase="http://www.autoplot.org/jnlp-#{tag}/"
-    href="autoplot.jnlp"> 
+    codebase="http://www.autoplot.org/jnlp/#{tag}/"
+    href="autoplot-#{tag}.jnlp">
     
     <information> 
         <title>Autoplot(#{tag})</title> 
