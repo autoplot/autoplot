@@ -75,7 +75,7 @@ public class WavDataSource2 extends AbstractDataSource {
         String byteOrder= audioFormat.isBigEndian() ? "big" : "little";
         String type=null;
 
-        if ( audioFormat.getEncoding()!= Encoding.PCM_SIGNED ) {
+        if ( audioFormat.getEncoding()== Encoding.PCM_SIGNED ) {
             if ( bits==16 ) {
                 type= "short";
             } else if ( bits==8 ) {
@@ -83,7 +83,7 @@ public class WavDataSource2 extends AbstractDataSource {
             }
         } else {
             if ( bits==16 ) {
-                type= "short";
+                type= "ushort";
             } else if ( bits==8 ) {
                 type= "ubyte";
             }
