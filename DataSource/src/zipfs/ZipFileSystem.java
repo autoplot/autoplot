@@ -1,0 +1,138 @@
+package zipfs;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import org.das2.util.filesystem.FileObject;
+import org.das2.util.filesystem.FileSystem;
+
+/**
+ * A filesystem to read data from zip files.
+ * @author Ed Jackson
+ */
+public class ZipFileSystem extends FileSystem {
+
+    private ZipFile zipFile;
+    private TreeMap<String, ZipFileObject> filemap = new TreeMap<String, ZipFileObject>();
+
+    protected ZipFileSystem(URL root) throws IOException {
+        super(root);
+        if ( !("file".equals(root.getProtocol()) ) ) {
+            throw new IllegalArgumentException("Cannot access non-local zip file: "+root);
+        }
+        System.err.println("ZipFileSystem starting with URL " + root);
+        // We'll assume the url ends in ".zip"; that's why we're here
+        String split[] = FileSystem.splitUrl(root.toString());
+
+        // This may throw ZipException, IOException, or SecurityException
+        zipFile = new ZipFile(split[3].substring(split[0].length()));
+
+        // First create the root FileObject, which has no corresponding ZipEntry
+        filemap.put("/", new ZipFileObject(this, null, null));
+
+        Enumeration<? extends ZipEntry> contents = zipFile.entries();
+        while(contents.hasMoreElements()) {
+            ZipEntry entry = contents.nextElement();
+            String entryName = "/" + entry.getName();
+            addZipEntry(entryName, entry);
+        }
+    }
+
+    private void addZipEntry(String name, ZipEntry entry) {
+        System.err.println("addZipEntry: " + name);
+        String parentName = name.substring(0, name.lastIndexOf("/", name.length()-2)+1);
+        // recursively back up until we find a path we've already added.
+        if (!filemap.containsKey(parentName)) addZipEntry(parentName, null);
+
+        String n = null;
+        if (entry == null) {
+            n = name;
+            if (n.endsWith("/")) n = n.substring(0, n.length()-1);
+            n = n.substring(n.lastIndexOf("/"));
+        }
+        ZipFileObject zfo = new ZipFileObject(this, entry, filemap.get(parentName),n);
+        filemap.put(name, zfo);
+        filemap.get(parentName).addChildObject(zfo);
+    }
+
+    // ZipFileObject will need this for opening streams
+    protected ZipFile getZipFile() {
+        return zipFile;
+    }
+
+    @Override
+    public FileObject getFileObject(String filename) {
+        String f = FileSystem.toCanonicalFilename(filename);
+        if (filemap.containsKey(f)) {
+            return filemap.get(f);
+        } else if (filemap.containsKey(f+"/")) {  //maybe it's a folder with out trailing /
+            return filemap.get(f+"/");
+        }
+        // Otherwise an invalid filename was specified
+        // Can't throw exception because overridden method doesn't.
+        return null;
+    }
+
+    @Override
+    public boolean isDirectory(String filename) throws IOException {
+        // First try canonical version of given filename, then try as folder name
+        String f = FileSystem.toCanonicalFilename(filename);
+        if (filemap.containsKey(f))
+            return filemap.get(f).isFolder();
+        f = FileSystem.toCanonicalFolderName(filename);
+        if (filemap.containsKey(f)) return filemap.get(f).isFolder();
+
+        // if we make it this far, the given filename doesn't exist
+        throw new FileNotFoundException("No such file in zip: " + filename);
+    }
+
+    @Override
+    public String[] listDirectory(String directory) throws IOException {
+        String dname = FileSystem.toCanonicalFolderName(directory);
+        if (!isDirectory(dname)) {
+            throw new IllegalArgumentException("Not a folder in zip file: " + dname);
+        }
+        FileObject[] contents = filemap.get(dname).getChildren();
+        String[] results = new String[contents.length];
+        
+        for(int i=0; i<contents.length; ++i) {
+            String s = contents[i].getNameExt();
+            results[i] = s.substring(s.lastIndexOf("/",s.length()-2)+1);
+        }
+        return results;
+    }
+
+    @Override
+    public String[] listDirectory(String directory, String regex) throws IOException {
+        directory = toCanonicalFilename(directory);
+        String[] listing = listDirectory(directory);  // throws exception if not directory
+        Pattern pattern = Pattern.compile(regex + "/?");
+        ArrayList result = new ArrayList();
+        for (int i = 0; i < listing.length; i++) {
+            if (pattern.matcher(listing[i]).matches()) {
+                result.add(listing[i]);
+            }
+        }
+        return (String[]) result.toArray(new String[result.size()]);
+    }
+
+    @Override
+    public File getLocalRoot() {
+        // For /home/user/file.zip create zip/home/user/file/ in the cache dir
+        File localCacheDir =  settings().getLocalCacheDir();
+        String zipCacheName = localCacheDir.getAbsolutePath() + "/zip" +
+                zipFile.getName().substring(0, zipFile.getName().length()-4) + "/";
+
+        File zipCache = new File(zipCacheName);
+        if (!zipCache.exists() && !zipCache.mkdirs()) System.err.println("Error accessing zip cache");
+        return zipCache;
+    }
+
+}

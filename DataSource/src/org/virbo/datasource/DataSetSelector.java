@@ -128,9 +128,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
 
         try {
-            if (surl.endsWith("/")) {
+            if (surl.endsWith("/") || surl.endsWith(".zip")) {
                 int carotpos = surl.length();
-                setMessage("ends with /, filesystem completions");
+                setMessage("Getting filesystem completions.");
                 showCompletions(surl, carotpos);
 
             } else if (surl.endsWith("/..")) { // pop up one directory
