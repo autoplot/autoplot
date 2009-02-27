@@ -4,7 +4,6 @@
  */
 package org.tsds.datasource;
 
-import java.awt.EventQueue;
 import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -18,7 +17,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
@@ -41,7 +39,6 @@ import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
@@ -120,7 +117,7 @@ class TsdsDataSource extends AbstractDataSource {
     int currentPpd = -1;
     private static final int SIZE_DOUBLE = 8;
     private static final Logger logger = Logger.getLogger("virbo.tsds.datasource");
-    Document document;
+    Document initialDocument;
     DatumRange parameterRange = null; // extent of the parameter.
     int parameterPpd = -1; // max resolution of the parameter.
     boolean haveInitialTsml = false;
@@ -131,7 +128,7 @@ class TsdsDataSource extends AbstractDataSource {
         //System.err.println( "  ### "+string + ": "+ (System.currentTimeMillis()-t0) );
     }
     
-    private DatumRange quantize(DatumRange timeRange) {
+    private DatumRange quantizeTimeRange(DatumRange timeRange) {
         timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
         return timeRange;
     }
@@ -156,7 +153,7 @@ class TsdsDataSource extends AbstractDataSource {
 
         DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(params2.get("StartDate"));
         DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(params2.get("EndDate"));
-        timeRange = quantize(new DatumRange(dr0.min(), dr1.max()));
+        timeRange = quantizeTimeRange(new DatumRange(dr0.min(), dr1.max()));
 
         int ppd;
         String sppd = params2.get("ppd");
@@ -175,6 +172,7 @@ class TsdsDataSource extends AbstractDataSource {
         }
 
     }
+
     boolean inRequest = false;
 
     @Override
@@ -204,7 +202,7 @@ class TsdsDataSource extends AbstractDataSource {
         // quantum levels
 
         if (timeRange != null) {
-            timeRange = quantize(timeRange);
+            timeRange = quantizeTimeRange(timeRange);
             params2.put("StartDate", "" + df.format(timeRange.min()));
             params2.put("EndDate", "" + df.format(TimeUtil.prev(TimeUtil.DAY, timeRange.max())));
         } else {
@@ -277,7 +275,7 @@ class TsdsDataSource extends AbstractDataSource {
 
             public void setTimeRange(DatumRange dr) {
                 System.out.println(dr);
-                timeRange = quantize(dr);
+                timeRange = quantizeTimeRange(dr);
                 System.out.println(timeRange);
                 System.out.println(timeRange.width());
             }
@@ -376,16 +374,16 @@ class TsdsDataSource extends AbstractDataSource {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             InputSource source = new InputSource(in);
-            document = builder.parse(source);
+            initialDocument = builder.parse(source);
             in.close();
 
             XPathFactory factory = XPathFactory.newInstance();
             XPath xpath = factory.newXPath();
 
-            String sStartTime = xpath.evaluate("//TSML/StartDate/text()", document);
-            String sEndTime = xpath.evaluate("//TSML/EndDate/text()", document);
+            String sStartTime = xpath.evaluate("//TSML/StartDate/text()", initialDocument);
+            String sEndTime = xpath.evaluate("//TSML/EndDate/text()", initialDocument);
 
-            String sppd = xpath.evaluate("//TSML/IntervalsPerDay/text()", document);
+            String sppd = xpath.evaluate("//TSML/IntervalsPerDay/text()", initialDocument);
 
             int ppd = Integer.parseInt(sppd);
             parameterPpd = ppd;
@@ -418,7 +416,7 @@ class TsdsDataSource extends AbstractDataSource {
 
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             InputSource source = new InputSource(in);
-            document = builder.parse(source);
+            Document document = builder.parse(source);
             in.close();
 
             XPathFactory factory = XPathFactory.newInstance();
@@ -467,7 +465,7 @@ class TsdsDataSource extends AbstractDataSource {
             BufferDataSet data = dataUrl(dataUrl.openStream(), size, points, mon);
             logit("done loading mean",t0);
             
-            boolean minMax = true;
+            boolean minMax = ppd < parameterPpd;
             if (minMax && surl.contains("-filter_0-")) {
                 String sDataMax = surl.replace("-filter_0-", "-filter_2-");
                 logger.fine("loading " + sDataMax);
@@ -498,7 +496,7 @@ class TsdsDataSource extends AbstractDataSource {
 
     @Override
     public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
-        Node n = document.getFirstChild();
+        Node n = initialDocument.getFirstChild();
         return MetadataUtil.toMetaTree(n);
     }
 
