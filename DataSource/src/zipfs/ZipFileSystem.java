@@ -27,7 +27,7 @@ public class ZipFileSystem extends FileSystem {
         if ( !("file".equals(root.getProtocol()) ) ) {
             throw new IllegalArgumentException("Cannot access non-local zip file: "+root);
         }
-        System.err.println("ZipFileSystem starting with URL " + root);
+        //System.err.println("ZipFileSystem starting with URL " + root);
         // We'll assume the url ends in ".zip"; that's why we're here
         String split[] = FileSystem.splitUrl(root.toString());
 
@@ -46,7 +46,7 @@ public class ZipFileSystem extends FileSystem {
     }
 
     private void addZipEntry(String name, ZipEntry entry) {
-        System.err.println("addZipEntry: " + name);
+        //System.err.println("addZipEntry: " + name);
         String parentName = name.substring(0, name.lastIndexOf("/", name.length()-2)+1);
         // recursively back up until we find a path we've already added.
         if (!filemap.containsKey(parentName)) addZipEntry(parentName, null);
@@ -131,7 +131,10 @@ public class ZipFileSystem extends FileSystem {
                 zipFile.getName().substring(0, zipFile.getName().length()-4) + "/";
 
         File zipCache = new File(zipCacheName);
-        if (!zipCache.exists() && !zipCache.mkdirs()) System.err.println("Error accessing zip cache");
+        /*if (!zipCache.exists() && !zipCache.mkdirs()) {
+            throw new RuntimeException( new IOException( "Error accessing zip cache" ) );
+            //TODO: FileSystem.getLocalRoot throws IOException
+        }*/
         return zipCache;
     }
 

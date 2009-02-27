@@ -3,6 +3,7 @@ package zipfs;
 import java.io.IOException;
 import java.net.URL;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.filesystem.FileSystemFactory;
 
 /**
@@ -19,9 +20,7 @@ public class ZipFileSystemFactory implements FileSystemFactory {
         try {
             zfs = new ZipFileSystem(root);
         } catch (IOException ex) {
-            // Have to catch this here because FileSystemFactory.createFileSystem doesn't throw IOException
-            System.err.println("Error encountered opening zip file:");
-            ex.printStackTrace();
+            throw new FileSystemOfflineException(ex);
         }
         return zfs;
     }
