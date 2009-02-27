@@ -9,8 +9,7 @@
 
 package org.virbo.netCDF;
 
-import org.das2.datum.Datum;
-import org.das2.datum.TimeUtil;
+import java.text.ParseException;
 import org.das2.datum.Units;
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,6 +19,7 @@ import java.util.Map;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.metatree.MetadataUtil;
 import ucar.ma2.DataType;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
@@ -92,25 +92,14 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             String unitsString= (String)attributes.get("units");
             
             if ( unitsString.contains(" since ") ) {
-                Units out= Units.t2000;
-                
-                String[] ss= unitsString.split(" since ");
-                
-                double scale; // multiply by this to convert to seconds
-                if ( ss[0].trim().equals("seconds" ) ) {
-                    scale= 1.;
-                } else if ( ss[0].trim().equals("days") ) {
-                    scale= 86400.;
-                } else {
-                    throw new IllegalArgumentException("units not supported: "+ss[0]+" in "+ unitsString );
+                Units u;
+                try {
+                    u = MetadataUtil.lookupTimeUnits(unitsString);
+                } catch (ParseException ex) {
+                    throw new RuntimeException(ex);
                 }
-                Datum base= TimeUtil.createValid(ss[1] );
                 
-                double offset= base.doubleValue( out );
-                for ( int i=0; i<data.length; i++ ) {
-                    data[i]= data[i] * scale + offset;
-                }
-                properties.put( QDataSet.UNITS, out );
+                properties.put( QDataSet.UNITS, u );
                 properties.put( QDataSet.MONOTONIC, Boolean.TRUE );
             }
         }
