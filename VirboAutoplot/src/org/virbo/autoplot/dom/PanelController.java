@@ -51,7 +51,6 @@ public class PanelController {
      * perhaps default settings for the child panels.
      */
     private Panel parentPanel;
-
     private ChangesSupport changesSupport;
     private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
     private DataSourceFilter dsf; // This is the one we are listening to.
@@ -227,26 +226,27 @@ public class PanelController {
             }
             QDataSet fillDs = dsf.getController().getFillDataSet();
 
-            if ( resetRanges ) {
+            if (resetRanges) {
+                
                 //TODO: see if there's a way to preserve the component panels
-                if ( parentPanel!=null ) {
+                if (parentPanel != null) {
                     dom.getController().deletePanel(panel);
-                    parentPanel=null;
+                    parentPanel = null;
                     return;
                 } else {
-                    if ( renderer!=null ) renderer.setActive(true);
+                    if ( renderer!=null ) {
+                        renderer.setActive(true);
+                    }
                 }
             }
 
             if (fillDs != null && resetRanges) {
+                RenderType renderType = AutoplotUtil.getRenderType(dsf.getController().getFillDataSet());
+                panel.setRenderType(renderType);
+
                 doResetRanges(true);
                 setResetRanges(false);
-            }
-            if (fillDs == null) {
-                if (getRenderer() != null) {
-                    getRenderer().setDataSet(null);
-                }
-            } else {
+
                 // add additional panels when it's a bundle of rank1 datasets.
                 if ( !dom.getController().isValueAdjusting()
                         && panel.getRenderType() == RenderType.series
@@ -259,7 +259,7 @@ public class PanelController {
                     renderer.setActive(false);
                     for (int i = 0; i < fillDs.length(0); i++) {
                         Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsf);
-                        cpanel.getController().parentPanel= panel;
+                        cpanel.getController().parentPanel = panel;
                         cpanel.getStyle().setColor(deriveColor(c, i));
                         cpanel.setComponent(labels[i]);
                         cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
@@ -267,7 +267,13 @@ public class PanelController {
                     }
                     lock.unlock();
                 }
+            }
 
+            if (fillDs == null) {
+                if (getRenderer() != null) {
+                    getRenderer().setDataSet(null);
+                }
+            } else {
                 setDataSet(fillDs);
             }
         }
@@ -307,7 +313,7 @@ public class PanelController {
      * true indicates the controller should autorange next time the fillDataSet is changed.
      */
     public static final String PROP_RESETRANGES = "resetRanges";
-    protected boolean resetRanges = true;
+    protected boolean resetRanges = false;
 
     public boolean isResetRanges() {
         return resetRanges;
@@ -341,9 +347,6 @@ public class PanelController {
     private synchronized void doResetRanges(boolean autorange) {
 
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
-
-        RenderType renderType = AutoplotUtil.getRenderType(dsf.getController().getFillDataSet());
-        panel.setRenderType(renderType);
 
         this.setRenderer(autorange, true);
 
