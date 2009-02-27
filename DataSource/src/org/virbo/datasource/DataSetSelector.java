@@ -663,7 +663,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         URLSplit split = URLSplit.parse(context);
 
         String ext= DataSetURL.getExt(context);
-        if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
+        if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) { 
             browseSourceType();
 
         } else {
