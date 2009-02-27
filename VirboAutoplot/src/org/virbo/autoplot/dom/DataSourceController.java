@@ -431,7 +431,7 @@ public class DataSourceController {
 
         _setFillProperties(properties);
         if (fillDs == getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
-            _setFillDataSet(null);
+            this.fillDataSet = null;
         }
         _setFillDataSet(fillDs);
         changesSupport.changePerformed(this, PENDING_FILL_DATASET);
