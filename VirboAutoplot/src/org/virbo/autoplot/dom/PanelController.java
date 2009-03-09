@@ -20,6 +20,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
@@ -338,6 +339,8 @@ public class PanelController {
         } else if (renderer instanceof SpectrogramRenderer) {
             bindToSpectrogramRenderer((SpectrogramRenderer) renderer);
             bindToSeriesRenderer(new SeriesRenderer());
+        } else if (renderer instanceof ImageVectorDataSetRenderer) {
+            bindToImageVectorDataSetRenderer((ImageVectorDataSetRenderer) renderer);
         } else {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
@@ -687,6 +690,11 @@ public class PanelController {
         ac.bind(panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
         ac.bind(panel, "style.colortable", spectrogramRenderer, "colorBar.type");
 
+    }
+
+    public void bindToImageVectorDataSetRenderer(ImageVectorDataSetRenderer renderer) {
+        ApplicationController ac = this.dom.getController();
+        ac.bind(panel, "style.color", renderer, "color");
     }
 
     public boolean isValueAdjusting() {
