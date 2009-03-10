@@ -37,6 +37,9 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.text.Keymap;
+import org.das2.jythoncompletion.JythonCompletionTask;
+import org.das2.jythoncompletion.JythonInterpreterProvider;
+import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.system.RequestProcessor;
 import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
@@ -91,6 +94,15 @@ public class LogConsole extends javax.swing.JPanel {
                 } );
             }
         });
+
+        CompletionImpl impl = CompletionImpl.get();
+        impl.startPopup(this.commandLineTextPane1);
+
+        this.commandLineTextPane1.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
+                public PythonInterpreter createInterpreter() throws java.io.IOException {
+                    return interp;
+                }
+            });
 
         timer2 = new Timer(100, new ActionListener() {
 
