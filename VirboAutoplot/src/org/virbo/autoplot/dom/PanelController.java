@@ -162,7 +162,7 @@ public class PanelController {
 
         String label = null;
 
-        if (!panel.getComponent().equals("") && fillDs.length() > 0) {
+        if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank()==2 ) {
             String[] labels = SemanticOps.getComponentLabels(fillDs);
 
             if (panel.getComponent().equals("X")) {
@@ -251,7 +251,7 @@ public class PanelController {
                 // add additional panels when it's a bundle of rank1 datasets.
                 if ( !dom.getController().isValueAdjusting()
                         && panel.getRenderType() == RenderType.series
-                        && fillDs.rank() == 2 && fillDs.length(0) < 32 ) {
+                        && fillDs.rank() == 2 && fillDs.length(0) < 6 ) {
                     MutatorLock lock = dom.getController().mutatorLock();
                     lock.lock();
                     String[] labels = SemanticOps.getComponentLabels(fillDs);
@@ -320,6 +320,10 @@ public class PanelController {
         return resetRanges;
     }
 
+    /**
+     * if true, then the next time we get a new dataset, we will autorange.
+     * @param resetRanges
+     */
     public void setResetRanges(boolean resetRanges) {
         boolean oldResetRanges = this.resetRanges;
         this.resetRanges = resetRanges;
