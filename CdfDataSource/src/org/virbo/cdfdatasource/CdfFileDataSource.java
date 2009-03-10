@@ -115,9 +115,9 @@ public class CdfFileDataSource extends AbstractDataSource {
             if (!"no".equals(interpMeta)) {
                 MetadataModel model = new IstpMetadataModel();
                 Map<String, Object> istpProps = model.properties(attributes);
-                result.putProperty(QDataSet.VALID_MAX, istpProps.get(QDataSet.VALID_MAX));
-                result.putProperty(QDataSet.VALID_MIN, istpProps.get(QDataSet.VALID_MIN));
-                result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
+                    result.putProperty(QDataSet.VALID_MAX, istpProps.get(QDataSet.VALID_MAX));
+                    result.putProperty(QDataSet.VALID_MIN, istpProps.get(QDataSet.VALID_MIN));
+                    result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
             // apply properties.
             }
             return result;
@@ -210,7 +210,13 @@ public class CdfFileDataSource extends AbstractDataSource {
         final boolean doUnits = true;
         if (doUnits) {
             if (thisAttributes.containsKey("UNITS")) {
-                Units mu = MetadataUtil.lookupUnits((String) thisAttributes.get("UNITS"));
+                String sunits= (String) thisAttributes.get("UNITS");
+                Units mu;
+                if ( sunits.equalsIgnoreCase("row number") || sunits.equalsIgnoreCase("column number" ) ) {
+                    mu= Units.dimensionless;
+                } else {
+                    mu = MetadataUtil.lookupUnits(sunits);
+                }
                 Units u = (Units) result.property(QDataSet.UNITS);
                 if (u == null) {
                     result.putProperty(QDataSet.UNITS, mu);
@@ -218,10 +224,11 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
         }
 
+        int[] qubeDims= DataSetUtil.qubeDims(result);
         for (int idep = 0; idep < 3; idep++) {
             Map dep = (Map) thisAttributes.get("DEPEND_" + idep);
             String labl = (String) thisAttributes.get("LABL_PTR_" + idep);
-            if (dep != null && labl == null) {
+            if (dep != null && ( qubeDims[idep]>6 || labl == null) ) {
                 try {
                     WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, idep > 0);
                     //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
