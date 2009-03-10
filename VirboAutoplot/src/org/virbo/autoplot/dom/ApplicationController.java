@@ -116,23 +116,58 @@ public class ApplicationController {
             setPlot(domPlot);
 
         }
+    };
 
-        private Plot getPlotFor(Component c) {
-            Plot plot = null;
-            for (Plot p : application.getPlots()) {
-                DasPlot p1 = p.getController().getDasPlot();
-                if (p1 == c || p1.getXAxis() == c || p1.getYAxis() == c) {
-                    plot = p;
-                    break;
+    public void fillEditPlotMenu( JMenu editPlotMenu, final Plot domPlot ) {
+        JMenuItem item;
+        item = new JMenuItem(new AbstractAction("Remove Bindings") {
+
+            public void actionPerformed(ActionEvent e) {
+                List<Panel> panels = getPanelsFor(domPlot);
+                for (Panel pan : panels) {
+                    unbind(pan);
                 }
-                if (p.getController().getDasColorBar() == c) {
-                    plot = p;
-                    break;
+                unbind(domPlot);
+            }
+        });
+        item.setToolTipText("remove any plot and panel property bindings");
+        editPlotMenu.add(item);
+        item = new JMenuItem(new AbstractAction("Delete Plot") {
+
+            public void actionPerformed(ActionEvent e) {
+                if (application.getPlots().length > 1) {
+                    List<Panel> panels = getPanelsFor(domPlot);
+                    for (Panel pan : panels) {
+                        if (application.getPanels().length > 1) {
+                            deletePanel(pan);
+                        } else {
+                            setStatus("warning: the last panel may not be deleted");
+                        }
+                    }
+                    deletePlot(domPlot);
+                } else {
+                    setStatus("warning: last plot may not be deleted");
                 }
             }
-            return plot;
+        });
+        editPlotMenu.add(item);
+    }
+
+    public Plot getPlotFor(Component c) {
+        Plot plot = null;
+        for (Plot p : application.getPlots()) {
+            DasPlot p1 = p.getController().getDasPlot();
+            if (p1 == c || p1.getXAxis() == c || p1.getYAxis() == c) {
+                plot = p;
+                break;
+            }
+            if (p.getController().getDasColorBar() == c) {
+                plot = p;
+                break;
+            }
         }
-    };
+        return plot;
+    }
 
     /**
      * block the calling thread until the application is idle.
@@ -543,10 +578,10 @@ public class ApplicationController {
      * @param dsf
      * @return
      */
-    protected Plot copyPlotAndPanels(Plot domPlot, DataSourceFilter dsf) {
+    protected Plot copyPlotAndPanels( Plot domPlot, DataSourceFilter dsf ,boolean bindx, boolean bindy) {
         List<Panel> p = getPanelsFor(domPlot);
 
-        Plot newPlot = copyPlot(domPlot, false, false);
+        Plot newPlot = copyPlot(domPlot, bindx, bindy);
         if (p.size() == 0) {
             return newPlot;
         }
@@ -569,13 +604,13 @@ public class ApplicationController {
         Panel newp = addPanel(domPlot, dsf);
         newp.syncTo(srcPanel, Arrays.asList("plotId", "dataSourceFilterId"));
         if (dsf == null) { // new DataSource, but with the same URI.
-            DataSourceFilter dsfnew= newp.getController().getDataSourceFilter();
-            DataSourceFilter dsfsrc= srcPanel.getController().getDataSourceFilter();
+            DataSourceFilter dsfnew = newp.getController().getDataSourceFilter();
+            DataSourceFilter dsfsrc = srcPanel.getController().getDataSourceFilter();
             dsfnew.getController().setRawProperties(dsfsrc.getController().getRawProperties());
             dsfnew.getController()._setProperties(dsfsrc.getController().getProperties());
             dsfnew.getController().setDataSetInternal(dsfsrc.getController().getDataSet());
             if (dsfsrc.getUri() != null) {
-                dsfnew.setUri( dsfsrc.getUri() );
+                dsfnew.setUri(dsfsrc.getUri());
             }
         }
         return newp;
@@ -593,6 +628,7 @@ public class ApplicationController {
      */
     public synchronized Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy) {
         Plot that = addPlot();
+        addPanel(that,null);
         that.syncTo(srcPlot);
 
         //BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
@@ -693,7 +729,7 @@ public class ApplicationController {
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
      */
-    public synchronized void bind(DomNode src, String srcProp, Object dst, String dstProp) {
+    public void bind(DomNode src, String srcProp, Object dst, String dstProp) {
         BindingGroup bc;
         synchronized (bindingContexts) {
             bc = bindingContexts.get(src);
@@ -704,14 +740,14 @@ public class ApplicationController {
         }
 
         Binding b;
-        
+
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
         bc.addBinding(b);
 
         BindingModel bb = new BindingModel();
 
         String srcId = src.getId();
-        
+
         String dstId = "???";
         if (dst instanceof DomNode) {
             dstId = ((DomNode) dst).getId();
@@ -871,6 +907,7 @@ public class ApplicationController {
             mouseAdapter.addMenuItem(addPlotMenu);
 
             item = new JMenuItem(new AbstractAction("Bound Plot Below") {
+
                 public void actionPerformed(ActionEvent e) {
                     copyPlot(plot, true, false);
                 }
@@ -971,19 +1008,19 @@ public class ApplicationController {
         item = new JMenuItem(new AbstractAction("Copy Panels") {
 
             public void actionPerformed(ActionEvent e) {
-                copyPlotAndPanels(domPlot, null);
+                copyPlotAndPanels(domPlot, null,true, false);
             }
         });
-        item.setToolTipText("make a new plot, and copy the panels into it.");
+        item.setToolTipText("make a new plot, and copy the panels into it.  New plot is bound by the x axis.");
         addPlotMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Context Overview") {
 
             public void actionPerformed(ActionEvent e) {
-                Plot that = copyPlotAndPanels(domPlot, null);
-                bind( domPlot.zaxis, Axis.PROP_RANGE, that.zaxis, Axis.PROP_RANGE );
-                bind( domPlot.zaxis, Axis.PROP_LOG, that.zaxis, Axis.PROP_LOG );
-                bind( domPlot.zaxis, Axis.PROP_LABEL, that.zaxis, Axis.PROP_LABEL );
+                Plot that = copyPlotAndPanels(domPlot, null,false, false);
+                bind(domPlot.zaxis, Axis.PROP_RANGE, that.zaxis, Axis.PROP_RANGE);
+                bind(domPlot.zaxis, Axis.PROP_LOG, that.zaxis, Axis.PROP_LOG);
+                bind(domPlot.zaxis, Axis.PROP_LABEL, that.zaxis, Axis.PROP_LABEL);
                 addConnector(domPlot, that);
             }
         });
@@ -995,39 +1032,7 @@ public class ApplicationController {
         JMenu editPlotMenu = new JMenu("Edit Plot");
         plot.getDasMouseInputAdapter().addMenuItem(editPlotMenu);
 
-        item = new JMenuItem(new AbstractAction("Remove Bindings") {
-
-            public void actionPerformed(ActionEvent e) {
-                List<Panel> panels = getPanelsFor(domPlot);
-                for (Panel pan : panels) {
-                    unbind(pan);
-                }
-                unbind(domPlot);
-            }
-        });
-        item.setToolTipText("remove any plot and panel property bindings");
-        editPlotMenu.add(item);
-
-        item = new JMenuItem(new AbstractAction("Delete Plot") {
-
-            public void actionPerformed(ActionEvent e) {
-                if (application.getPlots().length > 1) {
-                    List<Panel> panels = getPanelsFor(domPlot);
-                    for (Panel pan : panels) {
-                        if (application.getPanels().length > 1) {
-                            deletePanel(pan);
-                        } else {
-                            setStatus("warning: the last panel may not be deleted");
-                        }
-                    }
-                    deletePlot(domPlot);
-                } else {
-                    setStatus("warning: last plot may not be deleted");
-                }
-            }
-        });
-
-        editPlotMenu.add(item);
+        fillEditPlotMenu( editPlotMenu, domPlot );
 
         JMenu panelMenu = new JMenu("Edit Panel");
 
@@ -1222,7 +1227,7 @@ public class ApplicationController {
         return result;
     }
 
-    List<Panel> getPanelsFor(Plot plot) {
+    public List<Panel> getPanelsFor(Plot plot) {
         String id = plot.getId();
         List<Panel> result = new ArrayList<Panel>();
         for (Panel p : application.getPanels()) {
