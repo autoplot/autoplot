@@ -56,7 +56,7 @@ public class DataSourceController {
             return "" + dsf + " controller";
         }
         public void propertyChange(PropertyChangeEvent e) {
-            if ( dataSet!=null && dataSet.rank() == 3) updateFill();
+            if ( dataSet!=null && dataSet.rank() == 3) updateFillSoon();
         }
     };
     private PropertyChangeListener updateMePropertyChangeListener = new PropertyChangeListener() {
@@ -64,7 +64,7 @@ public class DataSourceController {
             return "" + dsf + " controller";
         }
         public void propertyChange(PropertyChangeEvent e) {
-            if ( dataSet!=null ) updateFill();
+            if ( dataSet!=null ) updateFillSoon();
         }
     };
     private PropertyChangeListener resetMePropertyChangeListener = new PropertyChangeListener() {
@@ -335,6 +335,19 @@ public class DataSourceController {
         } else {
             dsf.setValidRange("");
         }
+    }
+
+    /**
+     * call updateFill in new thread
+     */
+    private void updateFillSoon() {
+        changesSupport.performingChange(this, PENDING_FILL_DATASET);
+        RequestProcessor.invokeLater( new Runnable() {
+            public void run() {
+                updateFill();
+                changesSupport.changePerformed(this, PENDING_FILL_DATASET);
+            }
+        });
     }
 
     /**
