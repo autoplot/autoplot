@@ -13,6 +13,7 @@ import gsfc.nssdc.cdf.CDF;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +132,10 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 }
                 
                 return ccresult;
-                
+            } else if ( parmname.equals("interpMeta") ) {
+                return Arrays.asList(
+                        new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "yes", "use metadata" ),
+                        new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "no", "inhibit use of metadata" ) );
             } else {
                 return Collections.emptyList();
             }
