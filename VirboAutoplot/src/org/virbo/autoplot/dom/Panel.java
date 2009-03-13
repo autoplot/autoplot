@@ -134,8 +134,36 @@ public class Panel extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_COMPONENT, oldComponent, component);
     }
 
+     /**
+     * A label to (optionally) display in the plot legend.  This string will be
+     * rendered by the GrannyTextRenderer.
+     */
+    protected String legendLabel="";
+    public static final String PROP_LEGENDLABEL = "legendLabel";
+
+    public String getLegendLabel() {
+        return legendLabel;
+    }
+
+    public void setLegendLabel(String legendLabel) {
+        String oldLegendLabel = this.legendLabel;
+        this.legendLabel = legendLabel;
+        propertyChangeSupport.firePropertyChange(PROP_LEGENDLABEL, oldLegendLabel, legendLabel);
+    }
+
+    protected boolean displayLegend = false;
+    public static final String PROP_DISPLAYLEGEND = "displayLegend";
+
+    public boolean isDisplayLegend() {
+        return displayLegend;
+    }
     
-    
+    public void setDisplayLegend(boolean displayLegend) {
+        boolean oldDisplayLegend = this.displayLegend;
+        this.displayLegend = displayLegend;
+        propertyChangeSupport.firePropertyChange(PROP_DISPLAYLEGEND, oldDisplayLegend, displayLegend);
+    }
+
     PanelController controller;
 
     public PanelController getController() {

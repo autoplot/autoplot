@@ -10,7 +10,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -86,6 +85,33 @@ public class PanelController {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 resetDataSource();
+            }
+        });
+
+        panel.addPropertyChangeListener(Panel.PROP_DISPLAYLEGEND, new PropertyChangeListener() {
+
+            @Override
+            public String toString() {
+                return "" + PanelController.this;
+            }
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (panel.isDisplayLegend())
+                    renderer.setLegendLabel(panel.getLegendLabel());
+                else
+                    renderer.setLegendLabel("");
+            }
+        });
+        
+        panel.addPropertyChangeListener(Panel.PROP_LEGENDLABEL, new PropertyChangeListener() {
+            @Override
+            public String toString() {
+                return "" + PanelController.this;
+            }
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (panel.isDisplayLegend())
+                    renderer.setLegendLabel(panel.getLegendLabel());
             }
         });
 
