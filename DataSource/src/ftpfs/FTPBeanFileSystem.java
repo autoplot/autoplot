@@ -41,8 +41,11 @@ import org.das2.datum.Units;
  */
 public class FTPBeanFileSystem extends WebFileSystem {
 
+    String userHost;
+
     FTPBeanFileSystem(URL root) {
         super(root, localRoot(root));
+        userHost= root.getUserInfo();
     }
 
     /* dumb method looks for / in parent directory's listing */
@@ -197,11 +200,18 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                 FtpBean bean = new FtpBean();
                 try {
-                    bean.ftpConnect(getRootURL().getHost(), "ftp");
+                    if ( userHost!=null ) {
+                        String[] userHostArr= userHost.split(":");
+                        bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
+                        String cwd= bean.getDirectory();
+                        bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
+                    } else {
+                        bean.ftpConnect(getRootURL().getHost(), "ftp");
+                        bean.setDirectory(getRootURL().getPath() + directory.substring(1));
+                    }
                 } catch (NullPointerException ex) {
                     throw new IOException("Unable to make connection to " + getRootURL().getHost());
                 }
-                bean.setDirectory(getRootURL().getPath() + directory.substring(1));
 
                 FtpObserver observer = new FtpObserver() {
 
