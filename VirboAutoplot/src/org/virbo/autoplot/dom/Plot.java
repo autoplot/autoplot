@@ -139,6 +139,16 @@ public class Plot extends DomNode {
         this.yaxis.syncTo(that.getYaxis());
         this.zaxis.syncTo(that.getZaxis());
     }
+
+    @Override
+    public List<DomNode> childNodes() {
+        ArrayList<DomNode> result = new ArrayList<DomNode>();
+        result.add(xaxis);
+        result.add(yaxis);
+        result.add(zaxis);
+        
+        return result;
+    }
     
 
     @Override
