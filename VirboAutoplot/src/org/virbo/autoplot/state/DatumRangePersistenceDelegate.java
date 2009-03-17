@@ -18,6 +18,7 @@ import java.beans.PersistenceDelegate;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
+import org.virbo.metatree.MetadataUtil;
 
 /**
  *
@@ -70,7 +71,7 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
     }
     
     public static DatumRange newDatumRange( double min, double max, String units ) {
-        Units u= Units.getByName(units);
+        Units u= MetadataUtil.lookupUnits(units);
         return DatumRange.newDatumRange( min, max, u );
     }
 
