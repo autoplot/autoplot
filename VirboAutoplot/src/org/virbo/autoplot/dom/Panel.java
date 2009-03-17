@@ -176,10 +176,6 @@ public class Panel extends DomNode {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
     public DomNode copy() {
         Panel result = (Panel) super.copy();
         result.controller= null;
@@ -198,6 +194,10 @@ public class Panel extends DomNode {
         if ( !that.plotId.equals( this.plotId ) ) {
             result.add( new PropertyChangeDiff( "plotId", that.plotId, this.plotId ) );
         }
+        if ( !that.legendLabel.equals( this.legendLabel ) ) {
+            result.add( new PropertyChangeDiff( "legendLabel", that.legendLabel, this.legendLabel ) );
+        }
+
         if ( !that.dataSourceFilterId.equals( this.dataSourceFilterId ) ) {
             result.add( new PropertyChangeDiff( "dataSourceFilterId", that.dataSourceFilterId, this.dataSourceFilterId ) );
         }
@@ -215,6 +215,7 @@ public class Panel extends DomNode {
         super.syncTo(n);
         Panel that = (Panel) n;
         this.setPlotId(that.getPlotId());
+        this.setLegendLabel(that.getLegendLabel());
         this.setDataSourceFilterId( that.getDataSourceFilterId() );
         this.setComponent(that.getComponent());
         this.style.syncTo(that.style);
@@ -227,8 +228,16 @@ public class Panel extends DomNode {
         if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
         if ( !exclude.contains( PROP_DATASOURCEFILTERID ) ) this.setDataSourceFilterId(that.getDataSourceFilterId());
         if ( !exclude.contains( PROP_COMPONENT ) ) this.setComponent(that.getComponent());
+        if ( !exclude.contains( PROP_LEGENDLABEL ) ) this.setLegendLabel(that.getLegendLabel());
         this.style.syncTo(that.style);
         this.plotDefaults.syncTo(that.plotDefaults);
     }
-    
+
+    @Override
+    public String toString() {
+        String l= getLegendLabel().length()==0 ? "" : " ("+getLegendLabel()+")";
+        return super.toString() + l;
+    }
+
+
 }
