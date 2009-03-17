@@ -11,13 +11,13 @@ package org.virbo.autoplot.state;
 
 import org.das2.datum.Datum;
 import org.das2.datum.Units;
-import java.beans.DefaultPersistenceDelegate;
 import java.beans.Encoder;
 import java.beans.Expression;
 import java.beans.PersistenceDelegate;
 import org.das2.datum.DatumUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeLocationUnits;
+import org.virbo.metatree.MetadataUtil;
 
 /**
  *
@@ -50,7 +50,7 @@ public class DatumPersistenceDelegate extends PersistenceDelegate {
     }
     
     public static Datum newDatum( double val, String units ) {
-        Units u= Units.getByName(units);
+        Units u= MetadataUtil.lookupUnits(units);
         return u.createDatum( val );
     }
 
