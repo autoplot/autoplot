@@ -22,6 +22,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
+import org.virbo.autoplot.dom.BindingModel;
+import org.virbo.autoplot.dom.Connector;
 
 /**
  *
@@ -42,6 +44,9 @@ public class StatePersistence {
         e.setPersistenceDelegate( Datum.Double.class, new DatumPersistenceDelegate() );
         e.setPersistenceDelegate( DasColorBar.Type.class, new TypeSafeEnumPersistenceDelegate() );
         e.setPersistenceDelegate( DefaultPlotSymbol.class, new TypeSafeEnumPersistenceDelegate() );
+        e.setPersistenceDelegate( BindingModel.class, new BindingPersistenceDelegate() );
+        e.setPersistenceDelegate( Connector.class, new ConnectorPersistenceDelegate() );
+
         //e.setPersistenceDelegate( ApplicationModel.RenderType.class, new TypeSafeEnumPersistenceDelegate() );
         
         e.setExceptionListener( new ExceptionListener() {
