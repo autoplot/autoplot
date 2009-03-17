@@ -12,7 +12,7 @@ package org.virbo.autoplot.dom;
  */
 public class Connector  {
     
-    Connector( String plotA, String plotB ) {
+    public Connector( String plotA, String plotB ) {
         this.plotA= plotA;
         this.plotB= plotB;
     }
@@ -23,27 +23,12 @@ public class Connector  {
         return plotA;
     }
 
-    /**
-     * no propertyChangeSupport
-     * @param plotA
-     */
-    public void setPlotA(String plotA) {
-        this.plotA = plotA;
-    }
-
     protected String plotB;
 
     public String getPlotB() {
         return plotB;
     }
 
-    /**
-     * no propertyChangeSupport
-     * @param plotB
-     */
-    public void setPlotB(String plotB) {
-        this.plotB = plotB;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -57,6 +42,9 @@ public class Connector  {
         return plotA.hashCode() + plotB.hashCode();
     }
 
+    public String toString() {
+        return plotA + " to " + plotB;
+    }
     
     
 }
