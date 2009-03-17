@@ -15,7 +15,6 @@ import org.das2.datum.Datum;
 import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.UnitsConverter.ScaleOffset;
-import org.das2.datum.UnitsUtil;
 import org.w3c.dom.Node;
 
 /**
@@ -28,17 +27,17 @@ public class MetadataUtil {
      * @param units string identifier.
      * @return canonical units object.
      */
-    public static synchronized Units lookupUnits(String units) {
+    public static synchronized Units lookupUnits(String sunits) {
         Units result;
         try {
-            result= Units.getByName(units);
+            result= Units.getByName(sunits);
         } catch ( IllegalArgumentException ex ) {
-            if ( units.equals("sec") ) {   // begin, giant table of kludges
+            if ( sunits.equals("sec") ) {   // begin, giant table of kludges
                 result= Units.seconds;
-            } else if ( units.equals("msec") ) {  // CDF
+            } else if ( sunits.equals("msec") ) {  // CDF
                 result= Units.milliseconds;
             } else {
-                result= new NumberUnits( units );
+                result= new NumberUnits( sunits );
             }
         }
         return result;
