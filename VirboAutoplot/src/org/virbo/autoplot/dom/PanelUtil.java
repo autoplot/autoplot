@@ -37,12 +37,20 @@ public class PanelUtil {
 
         Units u = (Units) dep.property(QDataSet.UNITS);
         if (u == null) u = Units.dimensionless;
-        Datum value = u.createDatum(dep.value(index));
+
+        String svalue;
+        if ( index<0 || index>=dep.length() ) {
+            svalue="(index out of bounds)";
+        } else {
+            Datum value = u.createDatum(dep.value(index));
+            svalue= String.valueOf(value);
+        }
+        
 
         if (UnitsUtil.isTimeLocation(u)) {
-            return "time=" + value; // needed for the replace kludge
+            return "time=" + svalue; // needed for the replace kludge
         } else {
-            return name + "=" + value;
+            return name + "=" + svalue;
         }
 
     }
