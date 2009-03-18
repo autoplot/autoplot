@@ -224,7 +224,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
         } else {
             if ( dsf.getController().getDataSet() != this.dsTreeDs) {
                 unmount= dsTree;
-                dsTree = new PropertiesTreeModel("Dataset= ", dsf.getController().getDataSet());
+                dsTree = new PropertiesTreeModel("Dataset= ", dsf.getController().getDataSet(),20);
                 this.dsTreeDs = dsf.getController().getDataSet();
             } else {
                 unmount= null;
@@ -269,6 +269,8 @@ public class MetaDataPanel extends javax.swing.JPanel {
             }
             map.put("Std Dev", s);
 
+            map.put("Histogram", dsf.getController().getHistogram() );
+
             QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
 
             Double cadence;
@@ -300,7 +302,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                tree.mountTree(NameValueTreeModel.create("Statistics", map), 20);
+                tree.mountTree( NameValueTreeModel.create("Statistics", map), 20);
             }
         });
 
