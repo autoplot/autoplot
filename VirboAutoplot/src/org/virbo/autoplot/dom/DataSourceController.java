@@ -35,6 +35,7 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.dsutil.AutoHistogram;
 
 /**
  *
@@ -284,7 +285,8 @@ public class DataSourceController {
 
             extractProperties();
             doDimensionNames();
-            doFillValidRange();
+            _setHistogram( new AutoHistogram().doit(ds, null) );
+            //doFillValidRange();  the QDataSet returned 
             updateFill();
         }
     }
@@ -608,6 +610,7 @@ public class DataSourceController {
         this.fillDataSet = fillDataSet;
         propertyChangeSupport.firePropertyChange(PROP_FILLDATASET, oldFillDataSet, fillDataSet);
     }
+
     /**
      * when the dataset fails to load, then the exception thrown is here.
      */
@@ -623,6 +626,21 @@ public class DataSourceController {
         this.exception = exception;
         propertyChangeSupport.firePropertyChange(PROP_EXCEPTION, oldException, exception);
     }
+
+
+    protected QDataSet histogram = null;
+    public static final String PROP_HISTOGRAM = "histogram";
+
+    public QDataSet getHistogram() {
+        return histogram;
+    }
+
+    public void _setHistogram(QDataSet histogram) {
+        QDataSet oldHistogram = this.histogram;
+        this.histogram = histogram;
+        propertyChangeSupport.firePropertyChange(PROP_HISTOGRAM, oldHistogram, histogram);
+    }
+
     private List<String> depnames = Arrays.asList(new String[]{"first", "second", "last"});
     public static final String PROP_DEPNAMES = "depnames";
 
