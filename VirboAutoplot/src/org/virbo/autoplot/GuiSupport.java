@@ -224,10 +224,8 @@ public class GuiSupport {
         }));
 
         result.add(new JMenuItem(new AbstractAction("colorScatter") {
-
-            Panel panel = plot.getController().getApplication().getController().getPanel();
-
             public void actionPerformed(ActionEvent e) {
+                Panel panel = plot.getController().getApplication().getController().getPanel();
                 panel.setRenderType(ApplicationModel.RenderType.colorScatter);
             }
         }));
