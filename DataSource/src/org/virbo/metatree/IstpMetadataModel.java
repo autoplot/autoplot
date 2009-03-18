@@ -63,7 +63,13 @@ public class IstpMetadataModel extends MetadataModel {
         } else {
             Class c = o.getClass();
             if (c.isArray()) {
-                return Array.getDouble(o, 0);
+                if ( units==Units.cdfEpoch && Array.getLength(o)==2 ) { // kludge for Epoch16
+                    double cdfEpoch= Array.getDouble(o, 0) * 1000 + Array.getDouble(o,1) / 1e9;
+                    Units.cdfEpoch.createDatum(cdfEpoch);
+                    return cdfEpoch;
+                } else {
+                    return Array.getDouble(o, 0);
+                }
             } else {
                 throw new RuntimeException("Unsupported Data Type: " + o.getClass().getName());
             }
@@ -153,7 +159,7 @@ public class IstpMetadataModel extends MetadataModel {
                 units = Units.dimensionless;
             }
 
-            boolean isEpoch = (units == Units.milliseconds) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
+            boolean isEpoch = (units == Units.milliseconds ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
             if (isEpoch) {
                 units = Units.cdfEpoch;
                 properties.put(QDataSet.LABEL, "");
