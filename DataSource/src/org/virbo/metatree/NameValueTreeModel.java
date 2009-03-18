@@ -17,6 +17,8 @@ import java.util.Map;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.virbo.dataset.QDataSet;
+import org.virbo.dsutil.PropertiesTreeModel;
 
 /**
  *
@@ -162,6 +164,34 @@ public class NameValueTreeModel implements TreeModel {
         }
     }
 
+    static class TreeNodeAdapter implements TreeNode {
+        javax.swing.tree.TreeNode node;
+        String name;
+        TreeNodeAdapter( String name, javax.swing.tree.TreeNode node ) {
+            this.node= node;
+            this.name= name;
+        }
+        public int childCount() {
+            return node.getChildCount();
+        }
+
+        public Object getChild(int i) {
+            return new TreeNodeAdapter( null, node.getChildAt(i) );
+        }
+
+        public boolean isLeaf() {
+            return node.isLeaf();
+        }
+        public String toString() {
+            if ( name!=null ) {
+                return name + "=" + node.toString();
+            } else {
+                return node.toString();
+            }
+        }
+
+    }
+
     static Object createNode(String name, Object value) {
         if ( value==null ) {
             return new StringPropertyNode(name, String.valueOf(value) );
@@ -171,6 +201,9 @@ public class NameValueTreeModel implements TreeModel {
             return new StringPropertyNode(name, (String) value);
         } else if (value instanceof Map) {
             return new MapPropertyNode(name, (Map) value);
+        } else if (value instanceof QDataSet ) {
+            PropertiesTreeModel model= new PropertiesTreeModel((QDataSet)value,100);
+            return new TreeNodeAdapter( name, (javax.swing.tree.TreeNode)model.getRoot() );
         } else {
             return new StringPropertyNode(name, String.valueOf(value));
         }
@@ -250,7 +283,7 @@ public class NameValueTreeModel implements TreeModel {
             
             for (Iterator i = map.keySet().iterator(); i.hasNext();) {
                 Object key = i.next();
-                nodes.add(createNode((String) key, map.get(key)));
+                nodes.add( createNode( (String) key, map.get(key) ) );
             }
         } else {
             nodes= Collections.EMPTY_LIST;
