@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.datum.UnitsConverter;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -115,9 +116,12 @@ public class CdfFileDataSource extends AbstractDataSource {
             if (!"no".equals(interpMeta)) {
                 MetadataModel model = new IstpMetadataModel();
                 Map<String, Object> istpProps = model.properties(attributes);
-                    result.putProperty(QDataSet.VALID_MAX, istpProps.get(QDataSet.VALID_MAX));
-                    result.putProperty(QDataSet.VALID_MIN, istpProps.get(QDataSet.VALID_MIN));
-                    result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
+                Units pu= (Units) istpProps.get(QDataSet.UNITS);
+                Units u= (Units) result.property( QDataSet.UNITS );
+                UnitsConverter uc= UnitsConverter.getConverter( pu, u );
+                result.putProperty(QDataSet.VALID_MAX, uc.convert((Double)istpProps.get(QDataSet.VALID_MAX)) );
+                result.putProperty(QDataSet.VALID_MIN, uc.convert((Double)istpProps.get(QDataSet.VALID_MIN)) );
+                result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
             // apply properties.
             }
             return result;
