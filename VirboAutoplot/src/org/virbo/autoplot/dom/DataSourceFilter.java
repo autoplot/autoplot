@@ -81,7 +81,7 @@ public class DataSourceFilter extends DomNode {
             propertyChangeSupport.firePropertyChange(PROP_SLICEDIMENSION, oldsliceDimension, newsliceDimension);
         }
     }
-    private int sliceIndex = 1;
+    private int sliceIndex = 0;
     public static final String PROP_SLICEINDEX = "sliceIndex";
 
     /**
