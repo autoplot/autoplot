@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -53,29 +54,30 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     /* read all the variable attributes into a HashMap */
     private HashMap<String, Object> readAttributes(CDF cdf, Variable var, int depth) {
-        HashMap<String, Object> properties = new HashMap<String, Object>();
+        LinkedHashMap<String, Object> properties = new LinkedHashMap<String, Object>();
         Pattern p = Pattern.compile("DEPEND_[0-9]");
 
         Vector v = cdf.getAttributes();
-        for (int i = 0; i < v.size(); i++) {
-            Attribute attr = (Attribute) v.get(i);
+        for ( int ipass=0; ipass<2; ipass++ ) { // first pass is for subtrees, second pass is for items
+        for (int ivar = 0; ivar < v.size(); ivar++) {
+            Attribute attr = (Attribute) v.get(ivar);
             Entry entry = null;
             try {
                 entry = attr.getEntry(var);
-
-
-                if (p.matcher(attr.getName()).matches() & depth == 0) {
+                boolean isDep= p.matcher(attr.getName()).matches() & depth == 0;
+                if ( ipass==0 && isDep ) {
                     Object val = entry.getData();
                     String name = (String) val;
                     Map<String, Object> newVal = readAttributes(cdf, cdf.getVariable(name), depth + 1);
                     newVal.put("NAME", name); // tuck it away, we'll need it later.
                     properties.put(attr.getName(), newVal);
 
-                } else {
+                } else if ( ipass==1 && !isDep ) {
                     properties.put(attr.getName(), entry.getData());
                 }
             } catch (CDFException e) {
             }
+        }
         }
 
         return properties;
