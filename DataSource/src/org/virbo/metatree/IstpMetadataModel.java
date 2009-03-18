@@ -51,20 +51,30 @@ public class IstpMetadataModel extends MetadataModel {
         } else if (o instanceof Byte) {
             return ((Byte) o).doubleValue();
         } else if (o instanceof String) {
-            try {
-                return units.parse(DataSourceUtil.unquote((String) o)).doubleValue(units);
-            } catch (ParseException ex) {
+            String s = (String) o;
+            if (s.startsWith("CDF_PARSE_EPOCH(")) {  // hack for Onera CDFs
                 try {
-                    return Double.parseDouble((String) o);
-                } catch (NumberFormatException ex2) {
+                    // hack for Onera CDFs
+                    return units.parse(s.substring(16, s.length() - 1)).doubleValue(units);
+                } catch (ParseException ex) {
                     throw new IllegalArgumentException("unable to parse " + o);
+                }
+            } else {
+                try {
+                    return units.parse(DataSourceUtil.unquote((String) o)).doubleValue(units);
+                } catch (ParseException ex) {
+                    try {
+                        return Double.parseDouble((String) o);
+                    } catch (NumberFormatException ex2) {
+                        throw new IllegalArgumentException("unable to parse " + o);
+                    }
                 }
             }
         } else {
             Class c = o.getClass();
             if (c.isArray()) {
-                if ( units==Units.cdfEpoch && Array.getLength(o)==2 ) { // kludge for Epoch16
-                    double cdfEpoch= Array.getDouble(o, 0) * 1000 + Array.getDouble(o,1) / 1e9;
+                if (units == Units.cdfEpoch && Array.getLength(o) == 2) { // kludge for Epoch16
+                    double cdfEpoch = Array.getDouble(o, 0) * 1000 + Array.getDouble(o, 1) / 1e9;
                     Units.cdfEpoch.createDatum(cdfEpoch);
                     return cdfEpoch;
                 } else {
@@ -159,7 +169,7 @@ public class IstpMetadataModel extends MetadataModel {
                 units = Units.dimensionless;
             }
 
-            boolean isEpoch = (units == Units.milliseconds ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
+            boolean isEpoch = (units == Units.milliseconds) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
             if (isEpoch) {
                 units = Units.cdfEpoch;
                 properties.put(QDataSet.LABEL, "");
@@ -180,14 +190,14 @@ public class IstpMetadataModel extends MetadataModel {
         try {
 
             DatumRange range = getRange(attrs, units);
-            if ( ! attrs.containsKey("COMPONENT_0") ) { // Themis kludge
+            if (!attrs.containsKey("COMPONENT_0")) { // Themis kludge
                 properties.put(QDataSet.TYPICAL_MIN, range.min().doubleValue(units));
                 properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units));
-            
+
                 range = getValidRange(attrs, units);
                 properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units));
                 properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units));
-            } 
+            }
 
             properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
         } catch (IllegalArgumentException ex) {
