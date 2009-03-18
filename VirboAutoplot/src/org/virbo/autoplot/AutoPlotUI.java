@@ -70,6 +70,7 @@ import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.state.UndoRedoSupport;
+import org.virbo.autoplot.util.CanvasLayoutPanel;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
@@ -245,14 +246,17 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         applicationModel.getCanvas().setFitted(true);
         JScrollPane scrollPane = new JScrollPane(applicationModel.getCanvas());
-        tabs.insertTab("plot", null, scrollPane, TABS_TOOLTIP, 0);
+        tabs.insertTab("canvas", null, scrollPane, TABS_TOOLTIP, 0);
 
-        //tabs.insertTab("plot", null, applicationModel.getCanvas(), TOOLTIP, 0);
         tabs.insertTab("axes", null, new AxisPanel(applicationModel), TABS_TOOLTIP, 1);
         tabs.insertTab("style", null, new PlotStylePanel(applicationModel), TABS_TOOLTIP, 2);
 
+        LayoutUI lui= new LayoutUI();
+        lui.setApplication(dom);
+        tabs.insertTab("layout",null, lui, TABS_TOOLTIP, 3 );
+        
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
-        tabs.insertTab("metadata", null, mdp, TABS_TOOLTIP, 3);
+        tabs.insertTab("metadata", null, mdp, TABS_TOOLTIP, 4);
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector));
@@ -267,7 +271,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 
                 if ( dom.getController().isValueAdjusting() ) return; // don't listen to property changes during state transitions.
                 
-                //tickleTimer.getMessages();
                 undoRedoSupport.pushState(evt);
                 stateSupport.markDirty();
                 
@@ -281,8 +284,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         applicationModel.dom.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                //String propName = evt.getPropertyName();
-                //if (propName.equals("bounds") || propName.equals("pendingChanges") || propName.equals("recent") || propName.equals("status") || propName.equals("ticks") || propName.contains("PerMillisecond")) return;
                 if ( dom.getController().isValueAdjusting() ) return;
                 logger.finer( "state change: "+evt.getPropertyName() );
                 if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState()) { // TODO: list the props we want!
