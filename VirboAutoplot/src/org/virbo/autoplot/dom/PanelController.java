@@ -8,8 +8,10 @@ import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -51,6 +53,7 @@ public class PanelController {
      * perhaps default settings for the child panels.
      */
     private Panel parentPanel;
+    private List<Panel> childPanels;
     private ChangesSupport changesSupport;
     private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
     private DataSourceFilter dsf; // This is the one we are listening to.
@@ -66,64 +69,16 @@ public class PanelController {
         this.panel = panel;
         this.appmodel = model;
         this.changesSupport = new ChangesSupport(this.propertyChangeSupport);
-        panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, new PropertyChangeListener() {
-
-            public String toString() {
-                return "" + PanelController.this;
-            }
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                setRenderType(panel.getRenderType());
-            }
-        });
-
-        panel.addPropertyChangeListener(Panel.PROP_DATASOURCEFILTERID, new PropertyChangeListener() {
-
-            public String toString() {
-                return "" + PanelController.this;
-            }
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                resetDataSource();
-            }
-        });
-
-        panel.addPropertyChangeListener(Panel.PROP_DISPLAYLEGEND, new PropertyChangeListener() {
-
-            @Override
-            public String toString() {
-                return "" + PanelController.this;
-            }
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (panel.isDisplayLegend())
-                    renderer.setLegendLabel(panel.getLegendLabel());
-                else
-                    renderer.setLegendLabel("");
-            }
-        });
-        
-        panel.addPropertyChangeListener(Panel.PROP_LEGENDLABEL, new PropertyChangeListener() {
-            @Override
-            public String toString() {
-                return "" + PanelController.this;
-            }
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (panel.isDisplayLegend())
-                    renderer.setLegendLabel(panel.getLegendLabel());
-            }
-        });
-
+        panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, panelListener);
+        panel.addPropertyChangeListener(Panel.PROP_DATASOURCEFILTERID, panelListener);
     }
 
     /**
      * remove any bindings and listeners
      */
-    void unbind() {
+    void unbindDsf() {
         dsf.removePropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
         dsf.removePropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
-        dsf.removePropertyChangeListener(Panel.PROP_RENDERTYPE, dsfListener);
         dsf.getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
         dsf.getController().removePropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
     }
@@ -136,19 +91,31 @@ public class PanelController {
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceFilter.PROP_SLICEDIMENSION) || evt.getPropertyName().equals(DataSourceFilter.PROP_TRANSPOSE)) {
                 setResetRanges(true);
-            } else if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) { //TODO: Huh?  Why is this Panel not DSF?
+            }
+        }
+    };
+    PropertyChangeListener panelListener = new PropertyChangeListener() {
+
+        public String toString() {
+            return "" + PanelController.this;
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) {
                 setRenderType(panel.getRenderType());
+            } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
+                resetDataSource();
             }
         }
     };
 
     private void resetDataSource() {
         if (dsf != null) {
-            unbind();
+            unbindDsf();
         }
 
         assert (panel.getDataSourceFilterId() != null);
-        dsf = getDataSourceFilter();
+        dsf = dom.getController().getDataSourceFilterFor(panel);
 
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
@@ -170,10 +137,12 @@ public class PanelController {
     }
 
     private boolean rendererAcceptsData(QDataSet fillDs) {
-        if (fillDs.rank() == 1 && getRenderer() instanceof SpectrogramRenderer) {
-            return false;
-        } else if (fillDs.rank() == 2 && getRenderer() instanceof SeriesRenderer) {
-            return false;
+        if ( getRenderer() instanceof SpectrogramRenderer ) {
+            return fillDs.rank()>1;
+        } else if ( getRenderer() instanceof SeriesRenderer) {
+            return fillDs.rank()==1;
+        } else if ( getRenderer() instanceof ImageVectorDataSetRenderer ) {
+            return fillDs.rank()==1;
         } else {
             return true;
         }
@@ -188,7 +157,7 @@ public class PanelController {
 
         String label = null;
 
-        if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank()==2 ) {
+        if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
             String[] labels = SemanticOps.getComponentLabels(fillDs);
 
             if (panel.getComponent().equals("X")) {
@@ -216,13 +185,6 @@ public class PanelController {
         if (getRenderer() != null) {
             if (rendererAcceptsData(fillDs)) {
                 getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
-                if (getRenderer() instanceof SeriesRenderer) {
-                    if (label != null) {
-                        ((SeriesRenderer) getRenderer()).setLegendLabel(label);
-                    } else {
-                        ((SeriesRenderer) getRenderer()).setLegendLabel("");
-                    }
-                }
             } else {
                 getRenderer().setException(new Exception("renderer cannot plot " + fillDs));
             }
@@ -253,47 +215,11 @@ public class PanelController {
             }
             QDataSet fillDs = dsf.getController().getFillDataSet();
 
-            if (resetRanges) {
-                
-                //TODO: see if there's a way to preserve the component panels
-                if (parentPanel != null) {
-                    dom.getController().deletePanel(panel);
-                    parentPanel = null;
-                    return;
-                } else {
-                    if ( renderer!=null ) {
-                        renderer.setActive(true);
-                    }
-                }
-            }
-
-            if (fillDs != null && resetRanges) {
-                RenderType renderType = AutoplotUtil.getRenderType(dsf.getController().getFillDataSet());
+            if (resetRanges && fillDs != null) {
+                RenderType renderType = AutoplotUtil.getRenderType(fillDs);
                 panel.setRenderType(renderType);
 
-                doResetRanges(true);
-                setResetRanges(false);
-
-                // add additional panels when it's a bundle of rank1 datasets.
-                if ( !dom.getController().isValueAdjusting()
-                        && panel.getRenderType() == RenderType.series
-                        && fillDs.rank() == 2 && fillDs.length(0) < 6 ) {
-                    MutatorLock lock = dom.getController().mutatorLock();
-                    lock.lock();
-                    String[] labels = SemanticOps.getComponentLabels(fillDs);
-                    Color c = panel.getStyle().getColor();
-                    Plot domPlot = dom.getController().getPlotFor(panel);
-                    renderer.setActive(false);
-                    for (int i = 0; i < fillDs.length(0); i++) {
-                        Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsf);
-                        cpanel.getController().parentPanel = panel;
-                        cpanel.getStyle().setColor(deriveColor(c, i));
-                        cpanel.setComponent(labels[i]);
-                        cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
-                        cpanel.getController().setDataSet(fillDs);
-                    }
-                    lock.unlock();
-                }
+                resetPanel(fillDs);
             }
 
             if (fillDs == null) {
@@ -303,8 +229,58 @@ public class PanelController {
             } else {
                 setDataSet(fillDs);
             }
+
         }
     };
+
+    private void resetPanel(QDataSet fillDs) {
+
+        //TODO: see if there's a way to preserve the component panels
+        if (parentPanel != null) {
+            return;
+        } else {
+            if (renderer != null) {
+                renderer.setActive(true);
+            }
+        }
+
+        if (childPanels != null) {
+            for (Panel p : this.childPanels) {
+                dom.getController().deletePanel(p);
+            }
+        }
+
+        if (fillDs != null) {
+            doResetRanges(true);
+            setResetRanges(false);
+
+            // add additional panels when it's a bundle of rank1 datasets.
+            if (!dom.getController().isValueAdjusting()) {
+                if (panel.getRenderType() == RenderType.series && fillDs.rank() == 2 && fillDs.length(0) < 12) {
+                    MutatorLock lock = dom.getController().mutatorLock();
+                    lock.lock();
+                    String[] labels = SemanticOps.getComponentLabels(fillDs);
+                    Color c = panel.getStyle().getColor();
+                    Plot domPlot = dom.getController().getPlotFor(panel);
+                    renderer.setActive(false);
+                    List<Panel> cp = new ArrayList<Panel>(fillDs.length(0));
+                    for (int i = 0; i < fillDs.length(0); i++) {
+                        Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsf);
+                        cp.add(cpanel);
+                        cpanel.getController().parentPanel = panel;
+                        cpanel.getStyle().setColor(deriveColor(c, i));
+                        cpanel.setComponent(labels[i]);
+                        cpanel.setDisplayLegend(true);
+                        cpanel.setLegendLabel(labels[i]);
+                        cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
+                        cpanel.getController().setDataSet(fillDs);
+                    }
+                    PanelController.this.childPanels = cp;
+                    lock.unlock();
+                }
+            } //!dom.getController().isValueAdjusting()
+        } //fillDs != null
+    }
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
 
         public String toString() {
@@ -375,13 +351,14 @@ public class PanelController {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
         }
+
     }
 
     private synchronized void doResetRanges(boolean autorange) {
 
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
-        this.setRenderer(autorange, true);
+        setRenderType(panel.getRenderType());
 
         Plot plot = dom.getController().getPlotFor(panel);
 
@@ -405,9 +382,9 @@ public class PanelController {
     }
 
     /**
-     * extract properties from the data and metadata to get axis labels, fill values, and 
+     * extract properties from the data and metadata to get axis labels, fill values, and
      * preconditions:
-     *    fillData is set.  
+     *    fillData is set.
      *    fillProperties is set.
      * postconditions:
      *    metadata is inspected to get axis labels, fill values, etc.
@@ -466,6 +443,9 @@ public class PanelController {
 
         if ((v = properties.get(QDataSet.TITLE)) != null) {
             plotDefaults.setTitle((String) v);
+        }
+        if ((v = properties.get(QDataSet.LABEL)) != null) {
+            cpanel.setLegendLabel((String) v);
         }
 
         if (spec == RenderType.spectrogram) {
@@ -652,32 +632,35 @@ public class PanelController {
      * @return
      */
     public DataSourceFilter getDataSourceFilter() {
-        return dom.getController().getDataSourceFilterFor(panel);
+        return dsf;
     }
 
     /**
-     * preconditions:
-     *   fill dataset has been calculated.
-     *   renderer type has been identified.
-     * postconditions:
-     *   renderer has been identified.  If the existing renderer is usable, then it is reused.
-     *   renderer is set to plotDefaults at fillDataSet.
-     *   colorbar has been hidden or revealed.
-     * @param autorange
-     * @param interpretMetadata
-     */
-    public void setRenderer(boolean autorange, boolean interpretMetadata) {
-
-        setRenderType(panel.getRenderType());
-
-    }
-
-    /**
-     * used to explicitly set the rendering type.
-     * If the panel's data isn't loaded then this has no effect.
+     * used to explicitly set the rendering type.  This installs a das2 renderer
+     * into the plot to implement the render type.
      * @param renderType
      */
     public void setRenderType(RenderType renderType) {
+        if (this.parentPanel != null && !this.parentPanel.renderType.equals(renderType)) {
+            this.parentPanel.setRenderType(renderType);
+            return;
+        }
+
+        if (childPanels != null) { // kludge
+            if (renderType == RenderType.spectrogram) {
+                //RenderType.spectrogram changes the rank of the view, so we need to
+                //treat it specially.
+
+                this.childPanels = null;
+                this.setResetRanges(true);
+                this.resetPanel(dsf.getController().getFillDataSet());
+
+            } else {
+                for (Panel p : this.childPanels) {
+                    p.setRenderType(renderType);
+                }
+            }
+        }
 
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
@@ -711,6 +694,8 @@ public class PanelController {
         ac.bind(panel, "style.fillToReference", seriesRenderer, "fillToReference");
         ac.bind(panel, "style.reference", seriesRenderer, "reference");
         ac.bind(panel, "style.antiAliased", seriesRenderer, "antiAliased");
+        ac.bind(panel, Panel.PROP_LEGENDLABEL, seriesRenderer, Renderer.PROP_LEGENDLABEL);
+        ac.bind(panel, Panel.PROP_DISPLAYLEGEND, seriesRenderer, Renderer.PROP_DRAWLEGENDLABEL);
 
     }
 
@@ -719,12 +704,16 @@ public class PanelController {
 
         ac.bind(panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
         ac.bind(panel, "style.colortable", spectrogramRenderer, "colorBar.type");
+        ac.bind(panel, Panel.PROP_LEGENDLABEL, spectrogramRenderer, Renderer.PROP_LEGENDLABEL);
+        ac.bind(panel, Panel.PROP_DISPLAYLEGEND, spectrogramRenderer, Renderer.PROP_DRAWLEGENDLABEL);
 
     }
 
     public void bindToImageVectorDataSetRenderer(ImageVectorDataSetRenderer renderer) {
         ApplicationController ac = this.dom.getController();
         ac.bind(panel, "style.color", renderer, "color");
+        ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL);
+        ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
     }
 
     public boolean isValueAdjusting() {
