@@ -66,9 +66,9 @@ public class ApplicationController {
     DasColumn outerColumn;
     LayoutListener layoutListener;
     boolean headless;
-    Map<Object, BindingGroup> bindingContexts;
-    Map<BindingModel, Binding> bindingImpls;
-    Map<Connector, ColumnColumnConnector> connectorImpls;
+    final Map<Object, BindingGroup> bindingContexts;
+    final Map<BindingModel, Binding> bindingImpls;
+    final Map<Connector, ColumnColumnConnector> connectorImpls;
     private final static Logger logger = Logger.getLogger("virbo.controller");
     private int plotIdNum = 0;
     private int panelIdNum = 0;
@@ -260,7 +260,7 @@ public class ApplicationController {
         }
 
         unbind(panel);
-        panel.getController().unbind();
+        panel.getController().unbindDsf();
 
         ArrayList<Panel> panels = new ArrayList<Panel>(Arrays.asList(application.getPanels()));
         panels.remove(panel);
@@ -744,8 +744,6 @@ public class ApplicationController {
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
         bc.addBinding(b);
 
-        BindingModel bb = new BindingModel();
-
         String srcId = src.getId();
 
         String dstId = "???";
@@ -755,12 +753,8 @@ public class ApplicationController {
         if (dst instanceof DasCanvasComponent) {
             dstId = "das2:" + ((DasCanvasComponent) dst).getDasName();
         }
-        bb.setBindingContextId(srcId);
-        bb.setSrcId(srcId);
 
-        bb.setDstId(dstId);
-        bb.setSrcProperty(srcProp);
-        bb.setDstProperty(dstProp);
+        BindingModel bb = new BindingModel(srcId,srcId,srcProp,dstId,dstProp);
 
         if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
             List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
@@ -774,7 +768,7 @@ public class ApplicationController {
     }
 
     /**
-     * unbind the object.  For example, when the object is about to be deleted.
+     * unbindDsf the object.  For example, when the object is about to be deleted.
      * @param src
      */
     public void unbind(DomNode src) {
@@ -801,12 +795,13 @@ public class ApplicationController {
 
                 String bcid = src.getId();
                 List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
-                List<BindingModel> bb2 = DomUtil.asArrayList(application.getBindings());
-                for (BindingModel bb : bb2) { // avoid concurrent modification
+                List<BindingModel> remove = new ArrayList<BindingModel>();
+                for (BindingModel bb : bindings) { // avoid concurrent modification
                     if (bb.getBindingContextId().equals(bcid)) {
-                        bindings.remove(bb);
+                        remove.add(bb);
                     }
                 }
+                bindings.removeAll(remove);
                 application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
 
             }
