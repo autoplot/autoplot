@@ -17,9 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Date;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -301,8 +299,6 @@ public class SimpleServlet extends HttpServlet {
             }
             
             dom.getController().waitUntilIdle();
-
-            System.err.println( dom.getController().getPlot().getController().getDasPlot().getRow() );
 
             if (format.equals("image/png")) {
                 logit("waiting for image",t0,uniq);
