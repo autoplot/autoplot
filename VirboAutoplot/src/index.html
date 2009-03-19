@@ -20,30 +20,31 @@ be applied to the data, for example, specifying valid range and fill data.
         
         <p>Recent changes include:</p>
      <ul>
-     <li>introduce AutoHistogram, a one-pass histogram which adjusts binsize and first bin location, and detects outliers.
-</li><li> improved cadence-guessing algorithm uses AutoHistogram for more robust and accurate result.
-</li><li> SeriesRenderer allows cadence check to be disabled.
-</li><li> introduce support for ZipFileSystem, which allows files within zip files to be accessed.
-</li><li> many bugfixes, including
-<ol><li>  2620088: shortcomings of the automatic addition of panels
-</li><li>  2618423: jython ambiguity, introduce jyds extension
-
-</li><li>  2617650: jython script panel needs to check read only mode.
-</li><li>  2620792: jython plot(ds) uses leftover metadata.
-</li><li>  2619858: filesystem completions not sorted
-</li><li>  bugs in context overview.
+     many bugfixes:
+<ol><li> 2619858:  filesystem completions not sorted
+</li><li> 2213890: isotropic doesn't work for polar/vis images
+</li><li> 2071413: autoLayout can oscillate
+</li><li> 2694142: Epoch16 validmin, validmax are not supported
+</li><li> 2620033: panel focus problems
+</li><li> <a href="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" class="external free" title="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" rel="nofollow">https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346</a>: seriesRenderer accept context concave regions
 </li></ol>
-</li><li> introduce hdf5 support through NetcdfDataSource
-</li><li> history added to console command line
-</li><li> feature 2427040: recent URIs can be exported to bookmarks file
-</li><li> axis labels and plot titles can contain entities like &amp;rho; or &amp;#x03C1;
+<li> ZipFileSystem allows data from within Zip files to be accessed.
+</li><li> Improve support for Onera CDFs
+</li><li> AutoHistogram result available in Metadata Panel Statistics node.
+</li><li> introduce Legend labels that can be added for any panel.
+</li><li> introduce Layout tab that improves access to panels and improves transparency.  This will soon provide sophistocated layout controls.
+</li><li> headerDelim parameter added to AsciiTable reader.
+</li><li> rank2 parameter added to BinaryDataSource.
+</li><li> support for unsigned shorts in BinaryDataSource.
+</li><li> ftp allows for credentials to be used <a href="ftp://" class="external free" title="ftp://" rel="nofollow">ftp://</a>&lt;user&gt;:&lt;pass&gt;@nis-ftp.gov/
 
+</li><li> bugfix in ftp that prevented some sites from being used.
+</li><li> bugfix in das2 that allows spectrograms to be used server-side.
+</li><li> bugfix in TagGenDataSet that prevented some FITS from being veiwed.
 </li></ul>
 <p>Known Bugs:
 </p>
-<ul><li> 2618432: huge scatter only renders in black
-</li><li> 2620033: panel focus problems
-</li><li> 2619827: cdf doesn't work on amd64 linux
+<ul><li> 2619827: cdf doesn't work on amd64 linux
 </li><li> 2458542: missing repaint triggers
 </li></ul>
 
