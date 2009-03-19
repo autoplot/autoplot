@@ -165,7 +165,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                     DirectoryEntry item = new DirectoryEntry();
                     item.name = aline.substring(i + 1);
-                    item.size = Long.parseLong(aline.substring(31, 31 + 11).trim());
+                    try {
+                        item.size = Long.parseLong(aline.substring(31, 31 + 11).trim());
+                    } catch ( NumberFormatException ex ) {
+                        item.size = Long.parseLong(aline.substring(31, 31 + 10).trim());
+                    }
                     item.type = type == 'd' ? 'd' : 'f';
                     item.modified = parseTime1970(aline.substring(42, 54), Calendar.getInstance());
 
@@ -207,7 +211,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
                         bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
                     } else {
                         bean.ftpConnect(getRootURL().getHost(), "ftp");
-                        bean.setDirectory(getRootURL().getPath() + directory.substring(1));
+                        String cwd= bean.getDirectory();
+                        bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1));
                     }
                 } catch (NullPointerException ex) {
                     throw new IOException("Unable to make connection to " + getRootURL().getHost());
@@ -305,8 +310,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
             try {
                 FtpBean bean = new FtpBean();
                 bean.ftpConnect(url.getHost(), "ftp");
-                bean.setDirectory(ss[2].substring(ss[1].length()));
-
+                String cwd= bean.getDirectory();
+                bean.setDirectory( cwd + ss[2].substring(ss[1].length()));
 
                 File listingFile = new File(targetFile.getParentFile(), ".listing");
                 if (!listingFile.exists()) {
