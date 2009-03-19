@@ -38,7 +38,7 @@ public class LayoutUtil {
 
     private static boolean maybeSetMinimum(final DasDevicePosition c, double need, double norm, double em, int pt) {
         em = Math.ceil(em);
-        double excess = c.getEmMaximum() - em;
+        double excess = c.getEmMinimum() - em;
         if (ALLOW_EXCESS_SPACE && c.getMinimum() == norm && excess >= 0 && excess < 4) return false;
         if (Math.abs(c.getEmMinimum() - em) < 0.1 && Math.abs(norm - c.getMinimum()) < 0.001) return false;
         c.setMinimum(norm);
