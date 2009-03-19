@@ -389,7 +389,12 @@ public class ScriptContext extends PyJavaInstance {
             throw new IllegalArgumentException("no format for extension: " + file);
         }
 
-        File f = DataSetURL.getFile(url, new NullProgressMonitor());
+        File f;
+        if ( url.getProtocol().equals("file" ) ) {
+            f= new File( url.getPath() );
+        } else {
+            f = DataSetURL.getFile(url, new NullProgressMonitor());
+        }
         String sparams = url.getQuery();
         HashMap<String, String> params = sparams == null ? new HashMap<String, String>() : URLSplit.parseParams(sparams);
 
