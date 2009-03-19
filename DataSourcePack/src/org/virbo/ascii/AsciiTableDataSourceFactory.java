@@ -63,6 +63,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fill="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "comment=",
                     "comment line prefix, default is hash (#)"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "headerDelim=",
+                    "string indicating the end of the header (a regular expression)"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMin=",
                     "values less than this value are treated as fill."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "validMax=",
@@ -75,6 +77,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("skip")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "the number of lines to skip before attempting to parse."));
+            } else if ( paramName.equals("headerDelim") ) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<string>" ) );
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "#####" ));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "DATA_UNTIL", "Cluster CEF uses these"));
+                return result;
             } else if (paramName.equals("recCount")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "limit number of records to parse."));
             } else if (paramName.equals("rank2")) {
@@ -97,8 +105,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return result;
             } else if (paramName.equals("timeFormat")) {
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "%Y %j %H"));
-                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "$Y+$j+$H+$M","times can span multiple fields"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "ISO8601", "parse ISO8601 times in one field."));
                 return result;
             } else if (paramName.equals("fill")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
@@ -124,7 +132,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
 
     private List<CompletionContext> getFieldNames(CompletionContext cc, ProgressMonitor mon) throws IOException {
 
-        Map params = URLSplit.parseParams(cc.params);
+        Map<String,String> params = URLSplit.parseParams(cc.params);
         Object o;
         File file = DataSetURL.getFile(cc.resource, mon);
 
@@ -132,7 +140,12 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         if (params.containsKey("skip")) {
             parser.setSkipLines(Integer.parseInt((String) params.get("skip")));
         }
-        
+        if (params.containsKey("comment") ) {
+            parser.setCommentPrefix(params.get("comment") );
+        }
+        if (params.containsKey("headerDelim") ) {
+            parser.setHeaderDelimiter(params.get("headerDelim"));
+        }
         String line= parser.readFirstRecord(file.toString());
         DelimParser dp= parser.guessDelimParser(line);
         String[] fields= dp.fields(line);
