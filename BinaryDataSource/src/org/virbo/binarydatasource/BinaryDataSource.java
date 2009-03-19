@@ -80,7 +80,36 @@ public class BinaryDataSource extends AbstractDataSource {
 
         String columnType = getParameter("type", UBYTE );
 
+        int recSizeBytes= getIntParameter("recLength", -1 );
+        if ( recSizeBytes==-1 ) recSizeBytes= BufferDataSet.byteCount(columnType) * fieldCount;
+
+        fieldCount= recSizeBytes / BufferDataSet.byteCount(columnType);
+
+        final int frecCount= Math.min( length / recSizeBytes, recCount );
+
         int col = getIntParameter("column", defltcol);
+        int[] rank2= null;
+
+        String o = params.get("rank2");
+        if (o != null) {
+            String s = o;
+            int first = 0;
+            int last = -999;
+            if (s.contains(":")) {
+                String[] ss = s.split(":");
+                if (ss[0].length() > 0) {
+                    first = Integer.parseInt(ss[0]);
+                }
+                if (ss.length > 1 && ss[1].length() > 0) {
+                    last = Integer.parseInt(ss[1]);
+                }
+            }
+            rank2 = new int[]{first, last};
+            col = first;
+            if ( col<0 ) col= fieldCount + col;
+        }
+
+
         int recOffset= getIntParameter( "recOffset", -1 );
         if ( recOffset==-1 ) recOffset= col * BufferDataSet.byteCount(columnType);
 
@@ -90,12 +119,22 @@ public class BinaryDataSource extends AbstractDataSource {
         } else {
             buf.order(ByteOrder.LITTLE_ENDIAN);
         }
-        
-        int recSizeBytes= getIntParameter("recLength", -1 );
-        if ( recSizeBytes==-1 ) recSizeBytes= BufferDataSet.byteCount(columnType) * fieldCount;
-        
-        final int frecCount= Math.min( length / recSizeBytes, recCount );
-        MutablePropertyDataSet ds = BufferDataSet.makeDataSet( 1, recSizeBytes, recOffset, frecCount, 1, 1, buf, columnType );
+                
+        MutablePropertyDataSet ds;
+
+        if ( rank2!=null ) {
+            if ( rank2[1]==-999 ) {
+                rank2[1]= frecCount;
+            } if ( rank2[1]<0 ) {
+                rank2[1]= fieldCount + rank2[1];
+            }
+            if ( rank2[0]<0 ) {
+                rank2[0]= fieldCount + rank2[0];
+            }
+            ds= BufferDataSet.makeDataSet( 2, recSizeBytes, recOffset, frecCount, rank2[1]-rank2[0], 1, buf, columnType );
+        } else {
+            ds= BufferDataSet.makeDataSet( 1, recSizeBytes, recOffset, frecCount, 1, 1, buf, columnType );
+        }
 
         if (dep0 > -1 || dep0Offset > -1 ) {
             String dep0Type = getParameter("depend0Type", columnType);
