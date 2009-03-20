@@ -55,7 +55,9 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "recCount="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns="));
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rank2="));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "read in more than one column to create a rank 2 dataset."));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend1Labels=", "label each of the columns, bundling different data together in rank 2 dataset"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend1Values=", "values for each column, making a rank 2 table of values."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "time="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "timeFormat=",
                     "template for parsing time digits, default is ISO8601."));
@@ -91,6 +93,14 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
+                return result;
+            } else if (paramName.equals("depend1Labels")) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "labels for each column"));
+                return result;
+            } else if (paramName.equals("depend1Values")) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "values for each column"));
                 return result;
             } else if (paramName.equals("column")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
