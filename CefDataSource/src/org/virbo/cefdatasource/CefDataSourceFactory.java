@@ -4,7 +4,6 @@
  */
 package org.virbo.cefdatasource;
 
-import org.das2.util.monitor.NullProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,7 +12,6 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
@@ -22,7 +20,6 @@ import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
-import org.virbo.datasource.MetadataModel;
 
 /**
  *
@@ -55,7 +52,7 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
                 List<String> plottable = getPlottable(new URL(surl), mon );
                 for (String s : plottable) {
-                    result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0" ,null ,null ));
+                    result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0" ,null ,null, true ));
                 }
 
             } catch (MalformedURLException ex) {

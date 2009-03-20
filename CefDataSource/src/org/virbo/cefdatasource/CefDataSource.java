@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.swing.tree.TreeModel;
 import org.das2.datum.EnumerationUnits;
 import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
 import org.virbo.dataset.DDataSet;
@@ -32,7 +31,6 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsutil.DataSetBuilder;
-import org.virbo.metatree.NameValueTreeModel;
 
 /**
  *
