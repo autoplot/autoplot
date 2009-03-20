@@ -172,7 +172,7 @@ public class LayoutUI extends javax.swing.JPanel {
 
         contextMenus.put(jList1, panelContextMenu);
     }
-    ListSelectionListener panelSelectionListener = new ListSelectionListener() {
+    transient ListSelectionListener panelSelectionListener = new ListSelectionListener() {
 
         public void valueChanged(ListSelectionEvent e) {
             if (jList1.getSelectedValues().length == 1) {
@@ -185,13 +185,13 @@ public class LayoutUI extends javax.swing.JPanel {
     };
     Application app;
     AbstractListModel panelList;
-    PropertyChangeListener panelsListener = new PropertyChangeListener() {
+    transient PropertyChangeListener panelsListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
             updateList();
         }
     };
-    private PropertyChangeListener plotListener = new PropertyChangeListener() {
+    transient private PropertyChangeListener plotListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
             List<Panel> p = app.getController().getPanelsFor(app.getController().getPlot());
@@ -205,7 +205,7 @@ public class LayoutUI extends javax.swing.JPanel {
             canvasLayoutPanel1.setComponent(dasPlot);
         }
     };
-    private PropertyChangeListener panelListener = new PropertyChangeListener() {
+    transient private PropertyChangeListener panelListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             Panel p = app.getController().getPanel();
             List<Panel> allPanels = Arrays.asList(app.getPanels());
