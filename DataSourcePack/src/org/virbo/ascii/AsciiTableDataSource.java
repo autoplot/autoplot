@@ -8,6 +8,8 @@
  */
 package org.virbo.ascii;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
@@ -26,7 +28,10 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.dsutil.AsciiParser;
 import org.das2.util.TimeParser;
 import java.text.ParseException;
+import java.util.regex.Matcher;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
 /**
@@ -62,6 +67,14 @@ public class AsciiTableDataSource extends AbstractDataSource {
      */
     int[] rank2 = null;
     /**
+     * non-null indicates the first record will provide the labels for the rows of the rank 2 dataset.
+     */
+    int[] depend1Labels = null;
+    /**
+     * non-null indicates the first record will provide the values for the rows of the rank 2 dataset.
+     */
+    int[] depend1Values = null;
+    /**
      * limit the number of records.  Parsing will stop at this point.
      */
     int recCount = -1;
@@ -85,16 +98,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
             for (int i = 0; i < ds.length(); i++) {
                 timeParser.resetSeconds();
                 for (int j = 0; j < timeColumns; j++) {
-                    double d= ds.value(i, timeColumn + j);
-                    double fp= d-(int)Math.floor(d);
-                    timeParser.setDigit(timeFormats[j], (int) d );
-                    if ( fp==0 ) {
-                        timeParser.setDigit(timeFormats[j], (int) d );
+                    double d = ds.value(i, timeColumn + j);
+                    double fp = d - (int) Math.floor(d);
+                    timeParser.setDigit(timeFormats[j], (int) d);
+                    if (fp == 0) {
+                        timeParser.setDigit(timeFormats[j], (int) d);
                     } else {
-                        timeParser.setDigit(timeFormats[j], d );
+                        timeParser.setDigit(timeFormats[j], d);
                     }
                 }
-                ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000) );                   
+                ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000));
             }
             parser.setUnits(timeColumn, Units.t2000);
         }
@@ -102,10 +115,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
         DDataSet vds = null;
         DDataSet dep0 = null;
 
-        if ( ( column==null ) && ( timeColumn!=-1 ) ) {
-            column= parser.getFieldNames()[timeColumn];
+        if ((column == null) && (timeColumn != -1)) {
+            column = parser.getFieldNames()[timeColumn];
         }
-        
+
         if (column != null) {
             int icol = parser.getFieldIndex(column);
             if (icol == -1) {
@@ -155,7 +168,39 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (validMin != Double.NEGATIVE_INFINITY) {
                 ds.putProperty(QDataSet.VALID_MIN, validMin);
             }
-            return DataSetOps.leafTrim(ds, rank2[0], rank2[1]);
+
+            MutablePropertyDataSet mds = DataSetOps.leafTrim(ds, rank2[0], rank2[1]);
+
+            if (depend1Labels != null) {
+                QDataSet labels = Ops.labels(parser.getFieldNames());
+                labels = DataSetOps.leafTrim(labels, depend1Labels[0], depend1Labels[1]);
+                mds.putProperty(QDataSet.DEPEND_1, labels);
+            }
+
+            if (depend1Values != null) {
+                String[] fieldNames = parser.getFieldNames();
+                String[] fieldUnits = parser.getFieldUnits();
+                DDataSet dep1 = DDataSet.createRank1(depend1Values[1] - depend1Values[0]);
+                for (int i = depend1Values[0]; i < depend1Values[1]; i++) {
+                    Units u1 = Units.dimensionless;
+                    double d;
+                    try {
+                        d = Double.parseDouble(fieldNames[i]);
+                    } catch (NumberFormatException ex) {
+                        try {
+                            d = Double.parseDouble(fieldUnits[i]);
+                        } catch (NumberFormatException ex2) {
+                            d = i - depend1Values[0];
+                        }
+                    }
+                    dep1.putValue(i-depend1Values[0], d);
+                }
+
+                mds.putProperty(QDataSet.DEPEND_1, dep1);
+            }
+
+            return mds;
+
         } else {
             if (vds == null) {
                 throw new IllegalArgumentException("didn't find column: " + column);
@@ -197,8 +242,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (o != null) {
             parser.setSkipLines(Integer.parseInt(o));
         }
-        
-        o= params.get("skipLines");
+
+        o = params.get("skipLines");
         if (o != null) {
             parser.setSkipLines(Integer.parseInt(o));
         }
@@ -215,11 +260,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
             parser.setCommentPrefix(o);
         }
 
-        o= params.get("headerDelim");
-        if ( o!=null ) {
+        o = params.get("headerDelim");
+        if (o != null) {
             parser.setHeaderDelimiter(o);
         }
-        
+
         o = params.get("delim");
         if (o != null) {
             delim = o;
@@ -320,7 +365,9 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
             if (timeFormat.equals("ISO8601")) {
                 String line = parser.readFirstParseableRecord(file.toString());
-                if ( line==null ) throw new IllegalArgumentException("file contains no parseable records.");
+                if (line == null) {
+                    throw new IllegalArgumentException("file contains no parseable records.");
+                }
                 String[] ss = parser.getRecordParser().fields(line);
                 int i = parser.getFieldIndex(timeColumnName);
                 if (i == -1) {
@@ -328,10 +375,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 }
                 String atime = ss[i];
                 timeFormat = TimeParser.iso8601String(atime.trim());
-                timeParser = TimeParser.create( timeFormat);
+                timeParser = TimeParser.create(timeFormat);
                 final Units u = Units.t2000;
                 parser.setUnits(i, u);
                 AsciiParser.FieldParser timeFieldParser = new AsciiParser.FieldParser() {
+
                     public double parseField(String field, int fieldIndex) throws ParseException {
                         return timeParser.parse(field).getTime(u);
                     }
@@ -348,6 +396,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if (ib != -1) {
                     int monthColumn = timeFormat.substring(0, ib).split("%", -2).length - 1;
                     AsciiParser.FieldParser monthNameFieldParser = new AsciiParser.FieldParser() {
+
                         public double parseField(String field, int columnIndex) throws ParseException {
                             return TimeUtil.monthNumber(field);
                         }
@@ -360,6 +409,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 final Units u = Units.t2000;
                 parser.setUnits(timeColumn, u);
                 AsciiParser.FieldParser timeFieldParser = new AsciiParser.FieldParser() {
+
                     public double parseField(String field, int fieldIndex) throws ParseException {
                         return timeParser.parse(field).getTime(u);
                     }
@@ -383,25 +433,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         o = params.get("rank2");
         if (o != null) {
-            String s = o;
-            int first = 0;
-            int last = columnCount;
-            if (s.contains(":")) {
-                String[] ss = s.split(":");
-                if (ss[0].length() > 0) {
-                    first = Integer.parseInt(ss[0]);
-                    if (first < 0) {
-                        first = columnCount + first;
-                    }
-                }
-                if (ss.length > 1 && ss[1].length() > 0) {
-                    last = Integer.parseInt(ss[1]);
-                    if (last < 0) {
-                        last = columnCount + last;
-                    }
-                }
-            }
-            rank2 = new int[]{first, last};
+            rank2 = parseRangeStr(o, columnCount);
             column = null;
         }
 
@@ -418,6 +450,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
             } else {
                 column = parser.getFieldNames()[0];
             }
+        }
+
+        o = params.get("depend1Labels");
+        if (o != null) {
+            depend1Labels = parseRangeStr(o, columnCount);
+        }
+
+        o = params.get("depend1Values");
+        if (o != null) {
+            depend1Values = parseRangeStr(o, columnCount);
         }
 
         // check to see if the depend0 column appears to be times.  I Promise I won't open the file again until it's read in.
@@ -474,5 +516,34 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
 
         return props;
+    }
+
+    /**
+     * parse range strings like "3:6", "3:-5", and sometime we'll parse "Bx_gsm:+Bz_gsm"
+     * @param o
+     * @param columnCount
+     * @return
+     * @throws java.lang.NumberFormatException
+     */
+    private static int[] parseRangeStr(String o, int lastIndex) throws NumberFormatException {
+        String s = o;
+        int first = 0;
+        int last = lastIndex;
+        if (s.contains(":")) {
+            String[] ss = s.split(":");
+            if (ss[0].length() > 0) {
+                first = Integer.parseInt(ss[0]);
+                if (first < 0) {
+                    first = lastIndex + first;
+                }
+            }
+            if (ss.length > 1 && ss[1].length() > 0) {
+                last = Integer.parseInt(ss[1]);
+                if (last < 0) {
+                    last = lastIndex + last;
+                }
+            }
+        }
+        return new int[]{first, last};
     }
 }
