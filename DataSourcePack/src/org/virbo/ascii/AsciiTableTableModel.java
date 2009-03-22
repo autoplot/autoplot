@@ -2,15 +2,12 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.virbo.ascii;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -22,18 +19,19 @@ import org.virbo.dsutil.AsciiParser.RecordParser;
  *
  * @author jbf
  */
-public class AsciiTableTableModel extends DefaultTableModel {
-    
+public class AsciiTableTableModel extends DefaultTableModel implements ColSpanTableCellRenderer.ColSpanTableModel {
+
     String[] lines;
     int lineStart;
     int lineCount;
     String[] fields;
+    boolean[] isRecord;
     int lineNumber;
     int recCount;
-    
+
     AsciiTableTableModel() {
-        lines= null;
-        lineNumber= -1;
+        lines = null;
+        lineNumber = -1;
     }
 
     @Override
@@ -46,38 +44,63 @@ public class AsciiTableTableModel extends DefaultTableModel {
         return recCount;
     }
 
+    /**
+     * returns true if the row is believed to be a record.  If it is not,
+     * then the entire line is returned for each column, and the
+     * ColSpanTableCellRenderer should be used.
+     *
+     * @param row
+     * @return
+     */
+    public boolean isRecord( int row ) {
+        return this.isRecord[row - lineStart];
+    }
+
+    public boolean isColSpan( int row, int column ) {
+        return ! isRecord(row);
+    }
+
     @Override
     public synchronized Object getValueAt(int row, int column) {
-        if ( row<lineStart || row >= lineStart+lineCount ) {
-            readLines( row/10*10, 10 );
+        if (row < lineStart || row >= lineStart + lineCount) {
+            readLines(row / 10 * 10, 10);
         }
-        if ( lineCount==0 || recParser==null ) {
+        if (lineCount == 0 || recParser == null) {
             return "";
         }
-        if ( lineNumber!=row ) {
-            fields= recParser.fields(lines[row-lineStart]);
+        if (lineNumber != row) {
+            fields= new String[recParser.fieldCount()];
+            if ( recParser.splitRecord(lines[row-lineStart], fields) ) {
+                this.isRecord[row - lineStart] = true;
+            } else {
+                this.isRecord[row - lineStart] = false;
+            }
         }
-        if ( fields.length <=column ) {
-            return "";
+        if (this.isRecord[row - lineStart]) {
+            if (fields.length <= column) {
+                return "";
+            } else {
+                return fields[column];
+            }
         } else {
-            return fields[column];
+            return lines[row - lineStart];
         }
-        
+
     }
 
     public String getLine(int skip) {
-        readLines( skip, 20 );
-        if ( lineCount>0 ) {
-            return lines[skip-lineStart];
+        readLines(skip, 20);
+        if (lineCount > 0) {
+            return lines[skip - lineStart];
         } else {
             return null;
         }
     }
-    
-    private synchronized void readLines( int lineNumber, int count ) {
-        if ( file==null ) {
-            lines=null;
-            lineCount= 0;
+
+    private synchronized void readLines(int lineNumber, int count) {
+        if (file == null) {
+            lines = null;
+            lineCount = 0;
             return;
         }
         BufferedReader reader = null;
@@ -88,6 +111,7 @@ public class AsciiTableTableModel extends DefaultTableModel {
                 s = reader.readLine();
             }
             lines = new String[count];
+            isRecord= new boolean[count];
             for (int i = 0; i < count; i++) {
                 lines[i] = reader.readLine();
             }
@@ -103,7 +127,6 @@ public class AsciiTableTableModel extends DefaultTableModel {
             }
         }
     }
-    
     protected File file = null;
     public static final String PROP_FILE = "file";
 
@@ -114,14 +137,14 @@ public class AsciiTableTableModel extends DefaultTableModel {
     public void setFile(File file) {
         File oldFile = this.file;
         this.file = file;
-        this.recCount= countLines();
+        this.recCount = countLines();
         fireTableDataChanged();
         propertyChangeSupport.firePropertyChange(PROP_FILE, oldFile, file);
     }
-    
+
     private int countLines() {
         BufferedReader reader = null;
-        
+
         try {
             int lineCount = 0;
             reader = new BufferedReader(new FileReader(file));
@@ -142,7 +165,6 @@ public class AsciiTableTableModel extends DefaultTableModel {
         }
         return -1;
     }
-    
     protected RecordParser recParser = null;
     public static final String PROP_RECPARSER = "recParser";
 
@@ -155,7 +177,6 @@ public class AsciiTableTableModel extends DefaultTableModel {
         this.recParser = recParser;
         propertyChangeSupport.firePropertyChange(PROP_RECPARSER, oldRecParser, recParser);
     }
-
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -165,5 +186,4 @@ public class AsciiTableTableModel extends DefaultTableModel {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
-
 }
