@@ -246,7 +246,9 @@ public class PanelController {
 
         if (childPanels != null) {
             for (Panel p : this.childPanels) {
-                dom.getController().deletePanel(p);
+                if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
+                    dom.getController().deletePanel(p);
+                }
             }
         }
 
@@ -351,7 +353,10 @@ public class PanelController {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
         }
-
+        ApplicationController ac = this.dom.getController();
+        ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL);
+        ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
+        ac.bind(panel, Panel.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
     }
 
     private synchronized void doResetRanges(boolean autorange) {
@@ -444,7 +449,14 @@ public class PanelController {
         if ((v = properties.get(QDataSet.TITLE)) != null) {
             plotDefaults.setTitle((String) v);
         }
+        String legendLabel= null;
+        if ((v = properties.get(QDataSet.NAME)) != null) {
+            legendLabel= (String)v;
+        }
         if ((v = properties.get(QDataSet.LABEL)) != null) {
+            legendLabel= (String)v;
+        }
+        if ( legendLabel!=null ) {
             cpanel.setLegendLabel((String) v);
         }
 
@@ -694,8 +706,6 @@ public class PanelController {
         ac.bind(panel, "style.fillToReference", seriesRenderer, "fillToReference");
         ac.bind(panel, "style.reference", seriesRenderer, "reference");
         ac.bind(panel, "style.antiAliased", seriesRenderer, "antiAliased");
-        ac.bind(panel, Panel.PROP_LEGENDLABEL, seriesRenderer, Renderer.PROP_LEGENDLABEL);
-        ac.bind(panel, Panel.PROP_DISPLAYLEGEND, seriesRenderer, Renderer.PROP_DRAWLEGENDLABEL);
 
     }
 
@@ -704,8 +714,6 @@ public class PanelController {
 
         ac.bind(panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
         ac.bind(panel, "style.colortable", spectrogramRenderer, "colorBar.type");
-        ac.bind(panel, Panel.PROP_LEGENDLABEL, spectrogramRenderer, Renderer.PROP_LEGENDLABEL);
-        ac.bind(panel, Panel.PROP_DISPLAYLEGEND, spectrogramRenderer, Renderer.PROP_DRAWLEGENDLABEL);
 
     }
 
