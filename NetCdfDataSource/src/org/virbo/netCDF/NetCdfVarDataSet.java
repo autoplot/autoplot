@@ -44,12 +44,6 @@ public class NetCdfVarDataSet extends AbstractDataSet {
                 
         ucar.ma2.Array a = v.read();
 
-        if ( v.getDataType()==DataType.FLOAT ) {
-            System.err.println(v);
-        } else if ( v.getDataType()==DataType.DOUBLE ) {
-            System.err.println(v);
-        }
-
         data= (double[])a.get1DJavaArray( Double.class );
 
         shape= v.getShape();
