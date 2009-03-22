@@ -126,7 +126,7 @@ public class DodsAdapter {
         } else if (v instanceof DArray) {
             return getSizeForType((DArray) v, streaming );
         } else {
-            throw new IllegalArgumentException("not supported");
+            throw new IllegalArgumentException("not supported: "+v);
         }
     }
 
@@ -154,7 +154,8 @@ public class DodsAdapter {
                                 Object k = enume2.nextElement();
                                 j += getSizeForType((BaseType) k,true);
                             }
-
+                        } else if ( ele instanceof DSequence ) {
+                            j+= 0;
                         } else if (ele instanceof BaseType) {
                             j += getSizeForType((BaseType) ele,true);
 
