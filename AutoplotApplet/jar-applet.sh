@@ -8,8 +8,7 @@ cd temp
 for i in \
   ../../VirboAutoplot/dist/lib/QDataSet.jar \
   ../../VirboAutoplot/dist/lib/QStream.jar \
-  ../../VirboAutoplot/dist/lib/dasCore-1.0.0.jar \
-  ../../VirboAutoplot/dist/lib/dasCoreUI.jar \
+  ../../VirboAutoplot/dist/lib/dasCore.jar \
   ../../VirboAutoplot/dist/lib/DataSource.jar \
   ../../VirboAutoplot/dist/lib/BinaryDataSource.jar \
   ../../VirboAutoplot/dist/lib/DataSourcePack.jar \
@@ -66,13 +65,18 @@ rm -r temp/*
 # VirboAutoplot is the application, copy it last so its META-INF stuff is used.
 unzip -o -d appletjar dist/AutoplotApplet.jar
 
+# remove all the extraneous junk from Autoplot application
+mv appletjar/LICENSE.txt temp/
+rm -f appletjar/*   # not the directories
+mv temp/LICENSE.txt appletjar/
+
+mv appletjar/META-INF/MANIFEST.MF temp/     # get it out of the way
+rm -f appletjar/META-INF/*.RSA
+rm -f appletjar/META-INF/*.SF
+rm -f appletjar/META-INF/build.txt
+rm -f appletjar/META-INF/INDEX.LIST
 
 cd appletjar
-mv META-INF/MANIFEST.MF ../temp/     # get it out of the way
-rm -f META-INF/*.RSA
-rm -f META-INF/*.SF
-rm -f META-INF/build.txt
-rm -f META-INF/INDEX.LIST
 
 # Preferences Object needs to be installed
 mkdir META-INF/services
