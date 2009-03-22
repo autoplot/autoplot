@@ -49,6 +49,7 @@ import org.das2.system.RequestProcessor;
 import org.virbo.datasource.DataSetURL.CompletionResult;
 
 /**
+ * Swing Component for selecting dataset URIs.  This provides hooks for completions.
  *
  * @author  jbf
  */
@@ -724,7 +725,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @param value New value of property value.
      */
     public void setValue(String value) {
-        if ( value==null ) throw new NullPointerException("I must not be set to null");
+        if ( value==null ) throw new NullPointerException("value must not be null");
         doItemStateChange = false;
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
