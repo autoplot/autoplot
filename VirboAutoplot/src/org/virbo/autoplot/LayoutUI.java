@@ -34,6 +34,7 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.PanelStyle;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
 
@@ -56,13 +57,13 @@ public class LayoutUI extends javax.swing.JPanel {
                 }
             }
         });
-        jList1.addListSelectionListener(panelSelectionListener);
+        panelListComponent.addListSelectionListener(panelSelectionListener);
 
         createPopupMenus();
 
         MouseListener popupTrigger = createPopupTrigger();
         canvasLayoutPanel1.addMouseListener(popupTrigger);
-        jList1.addMouseListener(popupTrigger);
+        panelListComponent.addMouseListener(popupTrigger);
     }
 
     private MouseListener createPopupTrigger() {
@@ -150,17 +151,46 @@ public class LayoutUI extends javax.swing.JPanel {
         item = new JMenuItem(new AbstractAction("Edit Panel Properties") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = app.getController().getPanel();
-                PropertyEditor edit = new PropertyEditor(panel);
+                Object[] os= panelListComponent.getSelectedValues();
+                Panel p= (Panel)panelListComponent.getSelectedValue();
+                PropertyEditor edit;
+                if ( os.length==1 ) {
+                    edit = new PropertyEditor(p);
+                } else {
+                    Panel[] peers= new Panel[os.length];
+                    for ( int i=0; i<os.length; i++ ) peers[i]= (Panel)os[i];
+                    edit= PropertyEditor.createPeersEditor( p, peers );
+                }
                 edit.showDialog(LayoutUI.this);
             }
         });
+        item.setToolTipText("edit the panel or panels");
+        panelContextMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Edit Style Properties") {
+
+            public void actionPerformed(ActionEvent e) {
+                Object[] os= panelListComponent.getSelectedValues();
+                Panel p= (Panel)panelListComponent.getSelectedValue();
+                PropertyEditor edit;
+                if ( os.length==1 ) {
+                    edit = new PropertyEditor(p.getStyle());
+                } else {
+                    PanelStyle[] peers= new PanelStyle[os.length];
+                    for ( int i=0; i<os.length; i++ ) peers[i]= ((Panel)os[i]).getStyle();
+                    edit= PropertyEditor.createPeersEditor( p, peers );
+                }
+                edit.showDialog(LayoutUI.this);
+            }
+        });
+
+        item.setToolTipText("edit the style of panel or panels");
         panelContextMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Delete Panel") {
 
             public void actionPerformed(ActionEvent e) {
-                Object[] os= jList1.getSelectedValues();
+                Object[] os= panelListComponent.getSelectedValues();
                 for ( Object o : os ) {
                     Panel panel = (Panel) o;
                     app.getController().deletePanel(panel);
@@ -170,13 +200,13 @@ public class LayoutUI extends javax.swing.JPanel {
         });
         panelContextMenu.add(item);
 
-        contextMenus.put(jList1, panelContextMenu);
+        contextMenus.put(panelListComponent, panelContextMenu);
     }
     transient ListSelectionListener panelSelectionListener = new ListSelectionListener() {
 
         public void valueChanged(ListSelectionEvent e) {
-            if (jList1.getSelectedValues().length == 1) {
-                Panel p = (Panel) jList1.getSelectedValue();
+            if (panelListComponent.getSelectedValues().length == 1) {
+                Panel p = (Panel) panelListComponent.getSelectedValue();
                 Plot plot = app.getController().getPlotFor(p);
                 app.getController().setPlot(plot);
                 app.getController().setPanel(p);
@@ -200,7 +230,7 @@ public class LayoutUI extends javax.swing.JPanel {
             for (int i = 0; i < p.size(); i++) {
                 indices[i] = allPanels.indexOf(p.get(i));
             }
-            jList1.setSelectedIndices(indices);
+            panelListComponent.setSelectedIndices(indices);
             DasPlot dasPlot = app.getController().getPlot().getController().getDasPlot();
             canvasLayoutPanel1.setComponent(dasPlot);
         }
@@ -209,7 +239,7 @@ public class LayoutUI extends javax.swing.JPanel {
         public void propertyChange(PropertyChangeEvent evt) {
             Panel p = app.getController().getPanel();
             List<Panel> allPanels = Arrays.asList(app.getPanels());
-            jList1.setSelectedIndex(allPanels.indexOf(p));
+            panelListComponent.setSelectedIndex(allPanels.indexOf(p));
         }
     };
 
@@ -233,7 +263,7 @@ public class LayoutUI extends javax.swing.JPanel {
                 return app.getPanels(index);
             }
         };
-        jList1.setModel(panelList);
+        panelListComponent.setModel(panelList);
     }
 
     /** This method is called from within the constructor to
@@ -246,17 +276,17 @@ public class LayoutUI extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        panelListComponent = new javax.swing.JList();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         canvasLayoutPanel1 = new org.virbo.autoplot.util.CanvasLayoutPanel();
 
-        jList1.setModel(new javax.swing.AbstractListModel() {
+        panelListComponent.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(panelListComponent);
 
         jLabel1.setText("Panels:");
 
@@ -293,7 +323,7 @@ public class LayoutUI extends javax.swing.JPanel {
     private org.virbo.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList jList1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JList panelListComponent;
     // End of variables declaration//GEN-END:variables
 }
