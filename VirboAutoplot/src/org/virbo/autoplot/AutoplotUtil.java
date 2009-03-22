@@ -412,6 +412,10 @@ public class AutoplotUtil {
             
         }
 
+        if ( "log".equals( ds.property( QDataSet.SCALE_TYPE ) ) ) {
+            result.log= true;
+        }
+
         // interpret properties, looking for hints about scale type and ranges.
         if (properties != null) {
             String log1 = (String) properties.get(QDataSet.SCALE_TYPE);
