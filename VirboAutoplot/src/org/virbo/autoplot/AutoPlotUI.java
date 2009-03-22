@@ -63,6 +63,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.scriptconsole.JythonScriptPanel;
 import org.virbo.autoplot.scriptconsole.LogConsole;
@@ -292,6 +293,25 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
+        //TODO: perhaps keep a track of dirty URI in dataset selector
+        applicationModel.dom.getController().addPropertyChangeListener( ApplicationController.PROP_DATASOURCEFILTER,
+                new PropertyChangeListener() {
+            public void propertyChange( PropertyChangeEvent evt ) {
+                DataSourceFilter dsf= (DataSourceFilter) evt.getNewValue();
+
+                if ( dsf==null ) {
+                    dataSetSelector.setValue("");
+                } else {
+                    String uri= dsf.getUri();
+                    if ( uri!=null ) {
+                        dataSetSelector.setValue(uri);
+                    } else {
+                        dataSetSelector.setValue("");
+                    }
+                }
+            }
+        });
+
         tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
 
         tabbedPanelContainer.validate();
@@ -502,9 +522,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
         }
     }
 
+
+    /**
+     * add a new plot and panel.  This is attached to control-enter.
+     */
     private void plotAnotherUrl() {
         try {
-            Logger.getLogger("ap").info("plotAnotherUrl()");
+            Logger.getLogger("ap").fine("plotAnotherUrl()");
             final String surl = (String) dataSetSelector.getValue();
             applicationModel.addRecent(surl);
             Panel panel= dom.getController().addPanel( null ,null );
@@ -515,7 +539,24 @@ public class AutoPlotUI extends javax.swing.JFrame {
             setStatus(ERROR_ICON,ex.getMessage());
         }
     }
-    
+
+    /**
+     * add a panel to the focus plot.  This is attached to shift-enter.
+     */
+    private void overplotAnotherUrl() {
+        try {
+            Logger.getLogger("ap").fine("overplotAnotherUrl()");
+            final String surl = (String) dataSetSelector.getValue();
+            applicationModel.addRecent(surl);
+            Panel panel= dom.getController().addPanel( dom.getController().getPlot() ,null );
+            dom.getController().getDataSourceFilterFor(panel).setUri(surl);
+
+        } catch (RuntimeException ex) {
+            applicationModel.application.getExceptionHandler().handle(ex);
+            setStatus(ERROR_ICON,ex.getMessage());
+        }
+    }
+
     public void setStatus(String message) {
 
         if ( message.startsWith("busy:" ) ) {
@@ -1026,7 +1067,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
     private void dataSetSelectorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelectorActionPerformed
         if ( ( evt.getModifiers() & KeyEvent.CTRL_MASK ) == KeyEvent.CTRL_MASK ) {
-            plotAnotherUrl();            
+            plotAnotherUrl();
+        } else if ( ( evt.getModifiers() & KeyEvent.SHIFT_MASK ) == KeyEvent.SHIFT_MASK )  {
+            overplotAnotherUrl();
         } else {
             plotUrl();
         }
