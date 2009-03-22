@@ -371,6 +371,7 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="deps-ear-jar" unless="no.deps">
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="jar"/>
@@ -383,6 +384,7 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="jar"/>
+        <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init, deps-module-jar, deps-ear-jar" name="deps-jar" unless="no.deps"/>
     <target depends="init,deps-jar" name="-pre-pre-compile">
@@ -534,14 +536,14 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.batik-svggen.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.batik-svggen.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.batik-util.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.batik-util.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.itext-1.2.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.itext-1.2.jar" todir="${dist.ear.dir}"/>
-        <copyfiles files="${file.reference.dasCore-1.0.0.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.dasCore-1.0.0.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.jython.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.jython.jar" todir="${dist.ear.dir}"/>
+        <copyfiles files="${reference.dasCore.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.reference.dasCore.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.cdfjava.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.cdfjava.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.jfits-0.93.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.jfits-0.93.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.beansbinding-1.2.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.beansbinding-1.2.1.jar" todir="${dist.ear.dir}"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.reference.VirboAutoplot.jar} ${manifest.reference.QDataSet.jar} ${manifest.reference.QStream.jar} ${manifest.reference.DataSource.jar} ${manifest.reference.DataSourcePack.jar} ${manifest.reference.BinaryDataSource.jar} ${manifest.reference.ImageDataSource.jar} ${manifest.reference.WavDataSource.jar} ${manifest.reference.TsdsDataSource.jar} ${manifest.reference.JythonSupport.jar} ${manifest.file.reference.batik-awt-util.jar} ${manifest.file.reference.batik-svggen.jar} ${manifest.file.reference.batik-util.jar} ${manifest.file.reference.itext-1.2.jar} ${manifest.file.reference.dasCore-1.0.0.jar} ${manifest.file.reference.jython.jar} ${manifest.file.reference.cdfjava.jar} ${manifest.file.reference.jfits-0.93.jar} ${manifest.file.reference.beansbinding-1.2.1.jar} "/>
+            <attribute name="Class-Path" value="${manifest.reference.VirboAutoplot.jar} ${manifest.reference.QDataSet.jar} ${manifest.reference.QStream.jar} ${manifest.reference.DataSource.jar} ${manifest.reference.DataSourcePack.jar} ${manifest.reference.BinaryDataSource.jar} ${manifest.reference.ImageDataSource.jar} ${manifest.reference.WavDataSource.jar} ${manifest.reference.TsdsDataSource.jar} ${manifest.reference.JythonSupport.jar} ${manifest.file.reference.batik-awt-util.jar} ${manifest.file.reference.batik-svggen.jar} ${manifest.file.reference.batik-util.jar} ${manifest.file.reference.itext-1.2.jar} ${manifest.file.reference.jython.jar} ${manifest.reference.dasCore.jar} ${manifest.file.reference.cdfjava.jar} ${manifest.file.reference.jfits-0.93.jar} ${manifest.file.reference.beansbinding-1.2.1.jar} "/>
         </manifest>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
@@ -559,8 +561,8 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.batik-svggen.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.batik-util.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.itext-1.2.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${file.reference.dasCore-1.0.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jython.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${reference.dasCore.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.cdfjava.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jfits-0.93.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.beansbinding-1.2.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
@@ -851,6 +853,7 @@ exists or setup the property manually. For example like this:
         <ant antfile="${project.TsdsDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.VirboAutoplot}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.WavDataSource}/build.xml" inheritall="false" target="clean"/>
+        <ant antfile="${project.dasCore}/build.xml" inheritall="false" target="clean"/>
     </target>
     <target depends="init" name="do-clean">
         <condition property="build.dir.to.clean" value="${build.web.dir}">
