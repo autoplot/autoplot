@@ -6,14 +6,12 @@
 package org.virbo.ascii;
 
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +22,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -45,6 +44,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     Map<Integer, String> columns;
     AsciiParser parser;
     boolean focusDep0 = false;
+    TableCellRenderer defaultCellRenderer;
 
     /** Creates new form AsciiDataSourceEditorPanel */
     public AsciiTableDataSourceEditorPanel() {
@@ -54,6 +54,23 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         model = new AsciiTableTableModel();
 
         jTable1.setModel(model);
+        defaultCellRenderer = jTable1.getDefaultRenderer(Object.class);
+        jTable1.setDefaultRenderer(Object.class, new ColSpanTableCellRenderer());
+
+        model.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent e) {
+                if ( columns!=null ) {
+                    for (int i = 0; i < model.getColumnCount(); i++) {
+                        String label= columns.get(i);
+                        jTable1.getColumnModel().getColumn(i).setHeaderValue(label);
+                    }
+                    jTable1.getTableHeader().repaint();
+                }
+                jTable1.repaint();
+
+            }
+        });
 
         jTable1.setCellSelectionEnabled(true);
 
@@ -70,6 +87,29 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                         setDep0(name);
                     } else {
                         setColumn(name);
+                    }
+                } else {
+                    int[] cols = jTable1.getColumnModel().getSelectedColumns();
+                    int first= cols[0];
+                    int last= cols[cols.length-1];
+                    String sfirst = columns.get(first);
+                    if (sfirst == null) {
+                        sfirst = "" + first;
+                    }
+                    boolean haveColumnNames= true;
+                    String slast = columns.get(last);
+                    if (slast == null) {
+                        slast = "" + last;
+                        haveColumnNames= false;
+                    }
+
+                    if (focusDep0) {
+                    } else {
+                        if ( haveColumnNames ) {
+                            setColumn( sfirst + "-" + slast );
+                        } else {
+                            setColumn( "" + first + ":" + (last+1) );
+                        }
                     }
                 }
             }
@@ -118,6 +158,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jLabel3.setText("Column:");
 
+        columnsComboBox.setEditable(true);
         columnsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         columnsComboBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -193,12 +234,10 @@ private void dep0ColumnsItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FI
 
 private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_columnsComboBoxFocusGained
     focusDep0 = false;
-    System.err.println("focusDep0=" + focusDep0);
 }//GEN-LAST:event_columnsComboBoxFocusGained
 
 private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dep0ColumnsFocusGained
     focusDep0 = true;
-    System.err.println("focusDep0=" + focusDep0);
 }//GEN-LAST:event_dep0ColumnsFocusGained
     URLSplit split = null;
     protected File file = null;
@@ -237,16 +276,12 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
     }
 
     public void setSkipLines(int row) {
-        try {
             int oldRow = this.skipLines;
             this.skipLines = row;
             Rectangle rect = jTable1.getCellRect(getSkipLines(), 0, true);
             update();
             jTable1.scrollRectToVisible(rect);
             firePropertyChange(PROP_FIRST_ROW, oldRow, row);
-        } catch (IOException ex) {
-            Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     protected String column = "field0";
     public static final String PROP_COLUMN = "column";
@@ -260,6 +295,7 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
         this.column = column;
         firePropertyChange(PROP_COLUMN, oldColumn, column);
     }
+
     protected String dep0 = "";
     public static final String PROP_DEP0 = "dep0";
 
@@ -295,16 +331,16 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
             if (params.containsKey("column")) {
                 setColumn(params.get("column"));
             }
+            if (params.containsKey("rank2") ) {
+                setColumn(params.get("rank2"));
+            }
 
             if (params.containsKey("depend0")) {
                 setDep0(params.get("depend0"));
             }
 
-            try {
-                update();
-            } catch (IOException ex) {
-                Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            update();
+
         } catch (IOException ex) {
             Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -312,22 +348,29 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
     }
 
     public String getUrl() {
-        String surl = "vap+dat:" + URLSplit.uriDecode(split.file);
+        Map<String, String> params = URLSplit.parseParams(split.params);
         String args = "";
         if (skipLines > 1) {
-            args += "&skipLines=" + skipLines;
+            params.put("skipLines", "" + skipLines);
         }
-
+        if (params.get("skip") !=null ) {
+            params.remove("skip");
+        }
         if (!this.getDep0().equals("")) {
-            args += "&depend0=" + this.getDep0();
+            params.put("depend0", this.getDep0());
         }
 
-        args += "&column=" + getColumn();
-
-        if (args.length() > 0) {
-            surl += "?" + args.substring(1);
+        if ( getColumn().contains(":") || getColumn().contains("-") ) {
+            params.remove("column");
+            params.put( "rank2", getColumn() );
+        } else {
+            params.put("column", getColumn());
         }
-        return surl;
+
+        split.params = URLSplit.formatParams(params);
+
+        return URLSplit.format(split);
+
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox columnsComboBox;
@@ -340,21 +383,34 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
     public javax.swing.JFormattedTextField skipLinesTextField;
     // End of variables declaration//GEN-END:variables
 
-    private void update() throws IOException {
+    private void update() {
+        try {
+            String line = model.getLine(this.skipLines);
+            if (line == null || parser == null) {
+                //               throw new IllegalArgumentException("no records found");
+                return;
+            }
+            AsciiParser.DelimParser p = parser.guessDelimParser(line);
+            model.setRecParser(p);
+            columns = getColumnNames();
 
-        String line = model.getLine(this.skipLines);
-        if (line == null || parser == null) {
-            //               throw new IllegalArgumentException("no records found");
-            return;
+            String lcol= getColumn();
+            int icol = jTable1.getSelectedColumn();
+            columnsComboBox.setModel(new DefaultComboBoxModel(columns.values().toArray()));
+            columnsComboBox.setSelectedItem(getColumn());
+            if (icol != -1) {
+                setColumn(columns.get(icol));
+            } else {
+                setColumn(lcol);
+            }
+            
+            List<String> dep0Values = new ArrayList<String>(columns.values());
+            String ldep0= getDep0();
+            dep0Values.add(0, "");
+            dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
+            dep0Columns.setSelectedItem(ldep0);
+        } catch (IOException ex) {
+            Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        AsciiParser.DelimParser p = parser.guessDelimParser(line);
-        model.setRecParser(p);
-        columns = getColumnNames();
-        int icol = jTable1.getSelectedColumn();
-        columnsComboBox.setModel(new DefaultComboBoxModel(columns.values().toArray()));
-        setColumn(columns.get(icol));
-        List<String> dep0Values = new ArrayList<String>(columns.values());
-        dep0Values.add(0, "");
-        dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
     }
 }
