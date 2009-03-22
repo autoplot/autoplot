@@ -151,6 +151,9 @@ public class Panel extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_LEGENDLABEL, oldLegendLabel, legendLabel);
     }
 
+    /**
+     * display the plot legend.
+     */
     protected boolean displayLegend = false;
     public static final String PROP_DISPLAYLEGEND = "displayLegend";
 
@@ -163,6 +166,23 @@ public class Panel extends DomNode {
         this.displayLegend = displayLegend;
         propertyChangeSupport.firePropertyChange(PROP_DISPLAYLEGEND, oldDisplayLegend, displayLegend);
     }
+
+    /**
+     * display the plot.  This is allows panels to be disabled without removing them from the application.
+     */
+    protected boolean active = true;
+    public static final String PROP_ACTIVE = "active";
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        boolean oldActive = this.active;
+        this.active = active;
+        propertyChangeSupport.firePropertyChange(PROP_ACTIVE, oldActive, active);
+    }
+
 
     PanelController controller;
 
