@@ -138,6 +138,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if (validMin != Double.NEGATIVE_INFINITY) {
                 vds.putProperty(QDataSet.VALID_MIN, validMin);
             }
+            if ( column.length()>1 ) vds.putProperty( QDataSet.NAME, column );
+            vds.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
         }
 
         if (depend0 != null) {
@@ -368,7 +370,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if (line == null) {
                     throw new IllegalArgumentException("file contains no parseable records.");
                 }
-                String[] ss = parser.getRecordParser().fields(line);
+                String[] ss = new String[ parser.getRecordParser().fieldCount() ];
+                parser.getRecordParser().splitRecord(line,ss);
                 int i = parser.getFieldIndex(timeColumnName);
                 if (i == -1) {
                     i = 0;
@@ -379,7 +382,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 final Units u = Units.t2000;
                 parser.setUnits(i, u);
                 AsciiParser.FieldParser timeFieldParser = new AsciiParser.FieldParser() {
-
                     public double parseField(String field, int fieldIndex) throws ParseException {
                         return timeParser.parse(field).getTime(u);
                     }
@@ -466,7 +468,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (timeColumn == -1 && depend0 != null) {
             String s = parser.readFirstParseableRecord(file.toString());
             if (s != null) {
-                String[] fields = parser.getRecordParser().fields(s);
+                String[] fields = new String[parser.getRecordParser().fieldCount()];
+                parser.getRecordParser().splitRecord(s,fields);
                 int idep0 = parser.getFieldIndex(depend0);
                 if (idep0 != -1) { // deal with -1 later
                     String field = fields[idep0];
@@ -519,29 +522,64 @@ public class AsciiTableDataSource extends AbstractDataSource {
     }
 
     /**
-     * parse range strings like "3:6", "3:-5", and sometime we'll parse "Bx_gsm:+Bz_gsm"
+     * returns the field index of the name, which can be:
+     *   a column name
+     *   an implicit column name "field1"
+     *   a column index (0 is the first column)
+     *   a negative column index (-1 is the last column)
+     * @param name
+     * @param count
+     * @return the index of the field.
+     */
+    private int columnIndex( String name, int count ) {
+        if ( Pattern.matches( "\\d+", name) ) {
+            return Integer.parseInt(name);
+        } else if ( Pattern.matches( "-\\d+", name) ) {
+            return count + Integer.parseInt(name);
+        } else if ( Pattern.matches( "field\\d+", name) ) {
+            return Integer.parseInt( name.substring(5) );
+        } else {
+            int idx= parser.getFieldIndex(name);
+            return idx;
+        }
+    }
+
+    /**
+     * parse range strings like "3:6", "3:-5", and "Bx_gsm-Bz_gsm"
+     * if the delimiter is colon, then the end is exclusive.  If it is "-",
+     * then it is inclusive.
      * @param o
      * @param columnCount
      * @return
      * @throws java.lang.NumberFormatException
      */
-    private static int[] parseRangeStr(String o, int lastIndex) throws NumberFormatException {
+    private int[] parseRangeStr(String o, int columnCount) throws NumberFormatException {
         String s = o;
         int first = 0;
-        int last = lastIndex;
+        int last = columnCount;
         if (s.contains(":")) {
             String[] ss = s.split(":");
-            if (ss[0].length() > 0) {
-                first = Integer.parseInt(ss[0]);
-                if (first < 0) {
-                    first = lastIndex + first;
-                }
+            if ( ss[0].length() > 0 ) {
+                first = columnIndex(ss[0],columnCount);
             }
-            if (ss.length > 1 && ss[1].length() > 0) {
-                last = Integer.parseInt(ss[1]);
-                if (last < 0) {
-                    last = lastIndex + last;
-                }
+            if ( ss[1].length() > 0 ) {
+                last = columnIndex(ss[1],columnCount);
+            }
+        } else if ( s.contains("--") ) {
+            int isplit= s.indexOf("--",1);
+            if ( isplit > 0 ) {
+                first = columnIndex( s.substring(0,isplit),columnCount);
+            }
+            if ( isplit < s.length()-2 ) {
+                last = 1 + columnIndex( s.substring(isplit+1),columnCount);
+            }
+        } else if ( s.contains("-") ) {
+            String[] ss = s.split("-");
+            if ( ss[0].length() > 0 ) {
+                first = columnIndex(ss[0],columnCount);
+            }
+            if ( ss[1].length() > 0 ) {
+                last = 1 + columnIndex(ss[1],columnCount);
             }
         }
         return new int[]{first, last};
