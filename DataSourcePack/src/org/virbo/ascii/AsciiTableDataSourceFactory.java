@@ -150,6 +150,9 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         if (params.containsKey("skip")) {
             parser.setSkipLines(Integer.parseInt((String) params.get("skip")));
         }
+        if (params.containsKey("skipLines")) {
+            parser.setSkipLines(Integer.parseInt((String) params.get("skipLines")));
+        }
         if (params.containsKey("comment") ) {
             parser.setCommentPrefix(params.get("comment") );
         }
@@ -158,7 +161,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         }
         String line= parser.readFirstRecord(file.toString());
         DelimParser dp= parser.guessDelimParser(line);
-        String[] fields= dp.fields(line);
+        String[] fields= new String[ dp.fieldCount() ];
+        dp.splitRecord( line, fields );
 
         String[] columns = parser.getFieldNames();
         List<CompletionContext> result = new ArrayList<CompletionContext>();
