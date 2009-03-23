@@ -229,8 +229,10 @@ public class ApplicationController {
         canvas.setId("canvas_0");
         new CanvasController(application, canvas).setDasCanvas(dasCanvas);
 
-        outerRow = new DasRow(dasCanvas, null, 0, 1, 0, -3, 0, 0);
-        outerColumn = new DasColumn(dasCanvas, null, 0, 1, 5, -3, 0, 0);
+        String[] ss= canvas.getRow().split(",");
+        outerRow = DasRow.create( dasCanvas, null, ss[0], ss[1] );
+        ss= canvas.getColumn().split(",");
+        outerColumn = DasColumn.create(dasCanvas, null, ss[0], ss[1]);
 
         layoutListener = new LayoutListener(model);
 
