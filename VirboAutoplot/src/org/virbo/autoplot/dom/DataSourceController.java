@@ -276,7 +276,7 @@ public class DataSourceController {
             });
         } else {
             _setDataSet(ds);
-            setRawProperties(null);
+            setRawProperties(null);  // TODO: what if this is from a datasource?  We might want to avoid null in raw properties tree view.
 
             if (ds == null) {
                 _setDataSet(null);
