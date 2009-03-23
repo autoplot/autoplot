@@ -51,7 +51,7 @@ public class TickleTimer {
             newRunnable().run();
         } else {
             new Thread( newRunnable(), "tickleTimerThread" ).start();
-            messages.removeAll(messages);
+            messages.clear();
         }
     }
     
