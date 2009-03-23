@@ -86,45 +86,24 @@ public class TickleTimer {
         messages.add(message);
     }
     
-    /**
-     * Utility field used by bound properties.
-     */
     private java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport(this);
 
-    /**
-     * Adds a PropertyChangeListener to the listener list.
-     * @param l The listener to add.
-     */
     public void addPropertyChangeListener(java.beans.PropertyChangeListener l) {
         propertyChangeSupport.addPropertyChangeListener(l);
     }
 
-    /**
-     * Removes a PropertyChangeListener from the listener list.
-     * @param l The listener to remove.
-     */
     public void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
         propertyChangeSupport.removePropertyChangeListener(l);
     }
 
-    /**
-     * Getter for property running.
-     * @return Value of property running.
-     */
     public boolean isRunning() {
         return this.running;
     }
 
-    /**
-     * Setter for property running.
-     * @param running New value of property running.
-     * 
-     * @throws PropertyVetoException if some vetoable listeners reject the new value
-     */
-    public void setRunning(boolean running) throws java.beans.PropertyVetoException {
+    public void setRunning(boolean running) {
         boolean oldRunning = this.running;
         this.running = running;
-        propertyChangeSupport.firePropertyChange ("running", new Boolean (oldRunning), new Boolean (running));
+        propertyChangeSupport.firePropertyChange ("running", Boolean.valueOf(oldRunning), Boolean.valueOf(running));
     }
     
     public List<String> getMessages() {
