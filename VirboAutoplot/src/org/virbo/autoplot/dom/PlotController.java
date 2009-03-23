@@ -110,7 +110,7 @@ public class PlotController {
         }
 
         if ( axis==null ) {
-            axis= scalex.gt(scaley) ? axis=  dasPlot.getXAxis()  : dasPlot.getYAxis() ;
+            axis= scalex.gt(scaley) ?  dasPlot.getXAxis()  : dasPlot.getYAxis() ;
         }
 
         if ( (axis == dasPlot.getXAxis() || axis == dasPlot.getYAxis()) ) {
