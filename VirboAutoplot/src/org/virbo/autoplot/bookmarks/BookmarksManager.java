@@ -81,7 +81,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         return model;
     }
 
-    private void addIcon() {
+    /*private void addIcon() {
         Runnable run = new Runnable() {
 
             public void run() {
@@ -93,7 +93,7 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         };
         new Thread(run).start();
-    }
+    }*/
 
     public void setAddBookmark( Bookmark b ) {
         TreePath tp= model.getPathFor( b, jTree1.getModel(), new TreePath(jTree1.getModel().getRoot()) );
