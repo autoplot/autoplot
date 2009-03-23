@@ -187,8 +187,6 @@ public class AutoplotUtil {
 
         public DatumRange range;
         public boolean log;
-        double min;
-        double max;
         double robustMin;
         double robustMax;
         double median;
@@ -196,79 +194,6 @@ public class AutoplotUtil {
         public String toString() {
             return "" + range + " " + (log ? "log" : "");
         }
-    }
-
-    /**
-     * return the median of three numbers
-     */
-    private static double medianOfThree(double[] data) {
-        double median;
-        double max = Math.max(data[0], data[1]);
-        if (data[2] > max) {
-            median = max;
-        } else { // data[2] is either the min or the median.  Either data[0] or data[1] is the max.
-            if (data[0] == max) {
-                median = Math.max(data[1], data[2]);  // implies data[0] is max
-            } else {
-                median = Math.max(data[0], data[2]);
-            }
-        }
-        return median;
-    }
-
-    /**
-     * return the min and max of 3-point medians
-     * @param ds a rank N dataset.
-     * @throws IllegalArgumentException if fewer than three points are found.
-     */
-    private static double[] median3Range(QDataSet ds) throws IllegalArgumentException {
-
-        double[] d = new double[3]; // ordered points, rotating buffer
-        int id; // index of the first point.
-        int dc = 0; // number of valid points in d.
-
-        Units u = (Units) ds.property(QDataSet.UNITS);
-
-        int i;
-
-        //TODO: use dataset iterator
-        OldDataSetIterator iter = OldDataSetIterator.create(ds);
-
-        while (iter.hasNext() && dc < 3) {
-            double dd = iter.next();
-            if (!Double.isNaN(dd) && (u == null || !u.isFill(dd))) {
-                d[dc++] = dd;
-            }
-        }
-
-        // TODO: find a compile-time exception for this error.
-        if (dc < 3) {
-            throw new IllegalArgumentException("need 3 valid points");
-        }
-
-        id = 0;
-
-        double min = medianOfThree(d);
-        double max = medianOfThree(d);
-        while (iter.hasNext()) {
-            double d1 = iter.next();
-
-            if (!Double.isNaN(d1) && (u == null || !u.isFill(d1))) {
-                d[id++] = d1;
-                if (id == d.length) {
-                    id = 0;
-                }
-                double median = medianOfThree(d);
-                if (median < min) {
-                    min = median;
-                }
-                if (median > max) {
-                    max = median;
-                }
-            }
-        }
-
-        return new double[]{min, max};
     }
 
     private static DatumRange getRange( Double min, Double max, Units units ) {
@@ -371,16 +296,12 @@ public class AutoplotUtil {
         }
 
         if (total < 3) {
-            result.min = dd[0];
-            result.max = dd[1];
             result.median = median;
             result.range = DatumRange.newDatumRange(dd[0], dd[1], u);
             result.robustMin = dd[0];
             result.robustMax = dd[1];
 
         } else {
-            result.min = dd[0];
-            result.max = dd[1];
             result.median = median;
             result.robustMin = dd[0];
             result.robustMax = dd[1];
