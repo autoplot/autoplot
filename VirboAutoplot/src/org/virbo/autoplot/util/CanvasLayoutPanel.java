@@ -34,7 +34,7 @@ public class CanvasLayoutPanel extends JLabel {
         types = new ClassMap<Color>();
         addMouseListener(mouseListener);
     }
-    MouseListener mouseListener = new MouseAdapter() {
+    transient MouseListener mouseListener = new MouseAdapter() {
 
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -120,7 +120,8 @@ public class CanvasLayoutPanel extends JLabel {
             }
         }
     }
-    ComponentListener componentListener = new ComponentListener() {
+    
+    transient ComponentListener componentListener = new ComponentListener() {
 
         public void componentResized(ComponentEvent e) {
             repaint();
