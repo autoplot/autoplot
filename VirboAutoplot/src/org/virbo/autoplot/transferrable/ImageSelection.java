@@ -1,11 +1,5 @@
 package org.virbo.autoplot.transferrable;
         
-/*
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
- */
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -21,8 +15,7 @@ import javax.swing.TransferHandler;
 
 public class ImageSelection implements Transferable {
     
-    private static final DataFlavor flavors[] =
-    {DataFlavor.imageFlavor};
+    private static final DataFlavor defaultFlavor = DataFlavor.imageFlavor;
     
     private Image image;
     
@@ -34,22 +27,19 @@ public class ImageSelection implements Transferable {
         this.image= i;
     }
     
-    public boolean canImport(JComponent comp, DataFlavor
-            flavor[]) {
-        if (!(comp instanceof JLabel) ||
-                (comp instanceof AbstractButton)) {
+    public boolean canImport(JComponent comp, DataFlavor flavors[]) {
+        if (!(comp instanceof JLabel) || (comp instanceof AbstractButton)) {
             return false;
         }
-        for (int i=0, n=flavor.length; i<n; i++) {
-            if (flavor.equals(flavors[0])) {
+        for (int i=0, n=flavors.length; i<n; i++) {
+            if (flavors[i].equals(defaultFlavor)) {
                 return true;
             }
         }
         return false;
     }
     
-    public Transferable createTransferable(JComponent
-            comp) {
+    public Transferable createTransferable(JComponent  comp) {
 // Clear
         image = null;
         Icon icon = null;
@@ -68,12 +58,11 @@ public class ImageSelection implements Transferable {
         return null;
     }
     
-    public boolean importData(JComponent comp,
-            Transferable t) {
+    public boolean importData(JComponent comp, Transferable t) {
         ImageIcon icon = null;
         try {
-            if (t.isDataFlavorSupported(flavors[0])) {
-                image = (Image)t.getTransferData(flavors[0]);
+            if (t.isDataFlavorSupported(defaultFlavor)) {
+                image = (Image)t.getTransferData(defaultFlavor);
                 icon = new ImageIcon(image);
             }
             if (comp instanceof JLabel) {
@@ -87,7 +76,9 @@ public class ImageSelection implements Transferable {
             }
             
         } catch (UnsupportedFlavorException ignored) {
+            ignored.printStackTrace();
         } catch (IOException ignored) {
+            ignored.printStackTrace();;
         }
         return false;
     }
@@ -101,11 +92,10 @@ public class ImageSelection implements Transferable {
     }
     
     public DataFlavor[] getTransferDataFlavors() {
-        return flavors;
+        return new DataFlavor[] { defaultFlavor };
     }
     
-    public boolean isDataFlavorSupported(DataFlavor
-            flavor) {
-        return flavor.equals(flavors[0]);
+    public boolean isDataFlavorSupported( DataFlavor flavor ) {
+        return flavor.equals(defaultFlavor);
     }
 }
