@@ -68,6 +68,10 @@ public class DataSourceController {
             if ( dataSet!=null ) updateFillSoon();
         }
     };
+
+    //TODO: This is the only thing listening to the dsf.uri.  TSB resets uri by setting the field directly
+    // to avoid the property change event.  This should probably be refactored so other clients can
+    // listen for changes in dsf.uri.  TSB must reset the URI without triggering reset ranges,etc.
     private PropertyChangeListener resetMePropertyChangeListener = new PropertyChangeListener() {
         public String toString() {
             return "" + dsf + " controller";
@@ -89,6 +93,7 @@ public class DataSourceController {
             }
         }
     };
+    
     private TimeSeriesBrowseController timeSeriesBrowseController;
     private static final String PENDING_DATA_SOURCE = "dataSource";
     private static final String PENDING_FILL_DATASET = "fillDataSet";
@@ -478,6 +483,7 @@ public class DataSourceController {
                 split.vapScheme = oldSplit.vapScheme;
             }
             newsurl = URLSplit.format(split);
+            dsf.uri= newsurl; // don't fire off event. TODO: should we?
         }
 
         setStatus("ready");
@@ -890,8 +896,6 @@ public class DataSourceController {
     }
 
     private ProgressMonitor getMonitor(String label, String description) {
-        DasCanvas canvas = dom.getController().getDasCanvas();
-
         Panel panel = getPanel();
         if (panel != null) {
             Plot plot = dom.getController().getPlotFor(panel);
