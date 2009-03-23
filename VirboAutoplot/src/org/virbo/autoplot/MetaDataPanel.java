@@ -120,7 +120,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 }
             } else {
                 String label= "(no data source)";
-                if ( dsf.getController().getDataSet()!=null ) {
+                if ( dsf.getController().getDataSet()!=null ) {  // findbugs indicates NP_GUARANTEED_DEREF, but I don't see it. JBF
                     label= "dataset";
                 }
                 tree = new CombinedTreeModel(label);
