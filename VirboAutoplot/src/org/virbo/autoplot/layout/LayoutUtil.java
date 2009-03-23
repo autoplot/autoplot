@@ -165,9 +165,7 @@ public class LayoutUtil {
     public static Rectangle getChildBounds(DasColumn col) {
         DasCanvas canvas = col.getParent();
         Rectangle rect = null;
-        List<DasDevicePosition> result = new ArrayList<DasDevicePosition>();
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
-            DasDevicePosition ccol = cc.getColumn();
             if (cc.getColumn().getParentDevicePosition() == col && cc.isVisible()) {
                 if (rect == null) {
                     rect = cc.getBounds();
@@ -187,9 +185,7 @@ public class LayoutUtil {
     public static Rectangle getChildBounds(DasRow row) {
         DasCanvas canvas = row.getParent();
         Rectangle rect = null;
-        List<DasDevicePosition> result = new ArrayList<DasDevicePosition>();
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
-            DasDevicePosition ccol = cc.getColumn();
             if (cc.getRow().getParentDevicePosition() == row && cc.isVisible()) {
                 if (rect == null) {
                     rect = cc.getBounds();
