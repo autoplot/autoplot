@@ -217,9 +217,11 @@ public class ApplicationController {
     /**
      * add a canvas to the application.  Currently, only one canvas is supported, so this
      * will have unanticipated effects if called more than once.
+     *
+     * This must be public to provide access to org.virbo.autoplot.ApplicationModel
      * @return
      */
-    public DasCanvas addCanvas() {
+    public synchronized DasCanvas addCanvas() {
         logger.fine("enter addCanvas");
         //if ( canvas!=null ) throw new IllegalArgumentException("only one canvas for now");
         DasCanvas dasCanvas = new DasCanvas();
