@@ -60,7 +60,7 @@ public class PanelController {
     /**
      * switch over between fine and course points.
      */
-    public static int SYMSIZE_DATAPOINT_COUNT = 500;
+    public static final int SYMSIZE_DATAPOINT_COUNT = 500;
     public static final int LARGE_DATASET_COUNT = 30000;
 
     public PanelController(final ApplicationModel model, final Application dom, final Panel panel) {
