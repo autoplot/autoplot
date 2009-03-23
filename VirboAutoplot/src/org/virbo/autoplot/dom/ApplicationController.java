@@ -626,7 +626,8 @@ public class ApplicationController {
      * the source plot.
      *
      * @param srcPlot The plot to be copied
-     * @param bindx If true, X axes are bound
+     * @param bindx If true, X axes are bound.  If the srcPlot x axis is bound to the
+     *    application timerange, then bind to that instead (kludge--handle higher)
      * @param bindy If true, Y axes are bound
      * @return The duplicate plot
      */
@@ -635,11 +636,16 @@ public class ApplicationController {
         addPanel(that,null);
         that.syncTo(srcPlot);
 
-        //BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
         if (bindx) {
-            bind(srcPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
+            BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
+            if ( bb==null ) {
+                bind(srcPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
+            } else {
+                bind(application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
+            }
+
         }
-        //else if (bb != null) bind(application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
+        
         if (bindy) {
             bind(srcPlot, "yaxis." + Axis.PROP_RANGE, that, "yaxis." + Axis.PROP_RANGE);
         }
@@ -929,6 +935,16 @@ public class ApplicationController {
         JMenu bindingMenu = new JMenu("Add Binding");
 
         mouseAdapter.addMenuItem(bindingMenu);
+
+        if ( axis== plot.getXaxis() ) {
+            item = new JMenuItem(new AbstractAction("Bind to Application Time Range") {
+                public void actionPerformed(ActionEvent e) {
+                    bind( application, Application.PROP_TIMERANGE, axis, Axis.PROP_RANGE );
+                }
+            });
+            bindingMenu.add(item);
+        }
+
 
         item = new JMenuItem(new AbstractAction("Bind to Plot Above") {
 
