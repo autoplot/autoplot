@@ -32,7 +32,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
     DasPlot oppositePlot; // this plot we're dragging along
     DasAxis topAxis;
     DasAxis bottomAxis;
-    Point p0;
+    Point p0;  // initial mouse press
     DatumRange topAxisRange0;
     DatumRange bottomAxisRange0;
     DasAxis panAxis = null; // this is the axis we're panning
@@ -51,6 +51,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         super.setLabel("Connector Zoom Pan");
     }
 
+    @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         double nmin, nmax;
         if (e.getWheelRotation() < 0) {
@@ -81,6 +82,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         super.mouseWheelMoved(e);
     }
 
+    @Override
     public void mouseReleased(MouseEvent e) {
         super.mouseReleased(e);
         if (panAxis != null) {
@@ -95,6 +97,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         }
     }
 
+    @Override
     public void mouseDragged(MouseEvent e) {
         super.mouseDragged(e);
         Point p2 = e.getPoint();
@@ -122,6 +125,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         }
     }
 
+    @Override
     public void mousePressed(MouseEvent e) {
         super.mousePressed(e);
         p0 = e.getPoint();
