@@ -88,9 +88,7 @@ public class EditorAnnotationsSupport {
         }
     }
 
-    private class Annotation {
-
-        Style style;
+    private static class Annotation {
         String text;
         int offset;
         int len;
@@ -149,7 +147,6 @@ public class EditorAnnotationsSupport {
         ann.len = i1 - i0;
         ann.offset = i0;
         ann.text = text;
-        ann.style = style;
         annotations.put(ann.offset, ann);
     }
     
