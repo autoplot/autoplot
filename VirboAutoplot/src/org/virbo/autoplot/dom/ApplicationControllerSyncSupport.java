@@ -87,7 +87,7 @@ public class ApplicationControllerSyncSupport {
         List<Connector> addConnectors= new ArrayList<Connector>();
         List<Connector> deleteConnectors= new ArrayList<Connector>();
 
-        List<Connector> thisConnectors= Arrays.asList(application.connectors);
+        List<Connector> thisConnectors= Arrays.asList(application.getConnectors());
         List<Connector> thatConnectors= Arrays.asList(connectors);
 
         for ( Connector c: thatConnectors ) {
@@ -116,7 +116,7 @@ public class ApplicationControllerSyncSupport {
         List<BindingModel> addBindings= new ArrayList<BindingModel>();
         List<BindingModel> deleteBindings= new ArrayList<BindingModel>();
 
-        List<BindingModel> thisBindings= Arrays.asList(application.bindings);
+        List<BindingModel> thisBindings= Arrays.asList(application.getBindings());
         List<BindingModel> thatBindings= Arrays.asList(bindings);
 
         for ( BindingModel c: thatBindings ) {

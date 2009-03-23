@@ -8,6 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.das2.datum.DatumRange;
@@ -176,71 +177,58 @@ public class Application extends DomNode {
     }
 
 
-    protected BindingModel[] bindings= new BindingModel[0];
+    protected List<BindingModel> bindings= Collections.emptyList();
     public static final String PROP_BINDINGS = "bindings";
 
     public BindingModel[] getBindings() {
-        BindingModel[] result= new BindingModel[bindings.length];
-        System.arraycopy( bindings, 0, result, 0, bindings.length );
+        BindingModel[] result= bindings.toArray(new BindingModel[bindings.size()]);
         return result;
     }
 
     public void setBindings(BindingModel[] bindings) {
-        BindingModel[] oldBindings = this.bindings;
-        this.bindings = bindings;
+        BindingModel[] oldBindings = getBindings();
+        this.bindings = Arrays.asList(bindings);
         propertyChangeSupport.firePropertyChange(PROP_BINDINGS, oldBindings, bindings);
     }
     
-    public void setBindings( List<BindingModel> bindings ) {
-        setBindings( bindings.toArray(new BindingModel[bindings.size()] ) );
-    }
-
     public BindingModel getBindings(int index) {
-        return this.bindings[index];
+        return this.bindings.get(index);
     }
 
-    public void setBindings(int index, BindingModel newBindings) {
-        BindingModel oldBindings = this.bindings[index];
-        this.bindings[index] = newBindings;
-        propertyChangeSupport.fireIndexedPropertyChange(PROP_BINDINGS, index, oldBindings, newBindings);
+    public void setBindings(int index, BindingModel newBinding) {
+        BindingModel oldBinding = this.bindings.get(index);
+        this.bindings.set(index, newBinding);
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_BINDINGS, index, oldBinding, newBinding);
     }
 
-    protected Connector[] connectors= new Connector[0];
+    protected List<Connector> connectors= Collections.EMPTY_LIST;
     public static final String PROP_CONNECTORS = "connectors";
 
     public Connector[] getConnectors() {
-        Connector[] result= new Connector[connectors.length];
-        System.arraycopy( connectors, 0, result, 0, connectors.length );
+        Connector[] result= connectors.toArray(new Connector[connectors.size()]);
         return result;
     }
 
     public void setConnectors(Connector[] connectors) {
-        Connector[] oldConnectors = this.connectors;
-        this.connectors = connectors;
+        Connector[] oldConnectors = getConnectors();
+        this.connectors = Arrays.asList(connectors);
         propertyChangeSupport.firePropertyChange(PROP_CONNECTORS, oldConnectors, connectors);
-    }
-
-    /**
-     * convenient list setter.
-     * @param connectors
-     */
-    protected void setConnectors( List<Connector> connectors ) {
-        setConnectors( connectors.toArray(new Connector[connectors.size()] ) );
     }
     
     public Connector getConnectors(int index) {
-        return this.connectors[index];
+        return this.connectors.get(index);
     }
 
-    public void setConnectors(int index, Connector newConnectors) {
-        Connector oldConnectors = this.connectors[index];
-        this.connectors[index] = newConnectors;
-        propertyChangeSupport.fireIndexedPropertyChange(PROP_CONNECTORS, index, oldConnectors, newConnectors);
+    public void setConnectors(int index, Connector newConnector) {
+        Connector oldConnector = this.connectors.get(index);
+        this.connectors.set(index, newConnector);
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_CONNECTORS, index, oldConnector, newConnector);
     }
     
     
     /*****  end properties *********************/
 
+    @Override
     public DomNode copy() {
         Application result = (Application) super.copy();
         result.controller= null;

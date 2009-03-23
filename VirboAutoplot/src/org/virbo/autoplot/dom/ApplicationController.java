@@ -318,7 +318,7 @@ public class ApplicationController {
 
         connectorImpls.remove(connector);
 
-        application.setConnectors(connectors);
+        application.setConnectors( connectors.toArray(new Connector[connectors.size()]) );
     }
 
     private void movePanel(Panel p, Plot src, Plot dst) {
@@ -818,7 +818,7 @@ public class ApplicationController {
 
         List<BindingModel> bindings = DomUtil.asArrayList(application.getBindings());
         bindings.remove(binding);
-        application.setBindings(bindings);
+        application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
 
     }
 
