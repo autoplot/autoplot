@@ -72,11 +72,4 @@ public class Util {
         oc.close();
     }
 
-    public static void main(String[] args) throws IOException {
-        // verify handling of links
-        File f = new File("/home/jbf/.wine/dosdevices/c:/windows/profiles/jbf/My Documents");
-        System.err.println(f.exists());
-        System.err.println(f);
-        System.err.println(f.getCanonicalFile());
-    }
 }
