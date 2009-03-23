@@ -64,7 +64,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         BookmarksManagerTransferrable trans = new BookmarksManagerTransferrable(model, jTree1);
 
         DragSource dragSource = DragSource.getDefaultDragSource();
-        DropTarget dropTarget = trans.createDropTarget();
+        DropTarget dropTarget = new DropTarget();
         try {
             dropTarget.addDropTargetListener(trans.createDropTargetListener());
         } catch (TooManyListenersException ex) {

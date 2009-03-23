@@ -107,31 +107,6 @@ public class BookmarksManagerTransferrable {
         };
     }
 
-    DropTarget createDropTarget() {
-        return new DropTarget() {
-
-            public void dragEnter(DragSourceDragEvent dsde) {
-                System.err.println("dragEnter");
-            }
-
-            public void dragOver(DragSourceDragEvent dsde) {
-                System.err.println("dragOver");
-            }
-
-            public void dropActionChanged(DragSourceDragEvent dsde) {
-                System.err.println("dropActionChanged");
-            }
-
-            public void dragExit(DragSourceEvent dse) {
-                System.err.println("dragExit");
-            }
-
-            public void dragDropEnd(DragSourceDropEvent dsde) {
-                System.err.println("dragDropEnd");
-            }
-        };
-    }
-
     DragGestureListener createDragGestureListener() {
         return new DragGestureListener() {
 
