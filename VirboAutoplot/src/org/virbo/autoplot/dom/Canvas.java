@@ -76,7 +76,7 @@ public class Canvas extends DomNode {
      */
     public static final String PROP_ROW = "row";
 
-    protected String row = "0em,100%-3em";
+    protected String row = "2em,100%-3em";
     
     public String getRow() {
         return row;
