@@ -77,15 +77,22 @@ public class BookmarksManagerModel {
         });
         int r = chooser.showSaveDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
+            FileOutputStream out=null;
             try {
                 File f= chooser.getSelectedFile();
                 if ( !f.toString().endsWith(".xml") ) f= new File( f.toString()+".xml" );
                 String format = Bookmark.formatBooks(getList());
-                FileOutputStream out = new FileOutputStream(f);
+                out = new FileOutputStream(f);
                 out.write(format.getBytes());
-                out.close();
+                
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                if ( out!=null ) try {
+                    out.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }
