@@ -276,11 +276,11 @@ public class DataSourceController {
             });
         } else {
             _setDataSet(ds);
+            setRawProperties(null);
 
             if (ds == null) {
                 _setDataSet(null);
                 _setProperties(null);
-                setRawProperties(null);
                 _setFillProperties(null);
                 _setFillDataSet(null);
                 return;
