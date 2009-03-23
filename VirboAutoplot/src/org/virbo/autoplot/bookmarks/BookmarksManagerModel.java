@@ -267,7 +267,7 @@ public class BookmarksManagerModel {
     }
 
     void doImportUrl(Component c) {
-        String ansr = null;  // it's likely they will mistype, preserve their work.
+        String ansr = null;  // possibly invalid entry.
         URL url = null;
         boolean okay = false;
         while (okay == false) {
@@ -282,6 +282,7 @@ public class BookmarksManagerModel {
                 return;
             } else {
                 try {
+                    ansr= s; // it's likely they will mistype, preserve their work.
                     url = new URL(s);
                     okay = true;
                 } catch (MalformedURLException ex) {
