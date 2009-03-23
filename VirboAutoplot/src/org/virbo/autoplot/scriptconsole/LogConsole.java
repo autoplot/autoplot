@@ -427,7 +427,7 @@ public class LogConsole extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearButtonActionPerformed
-    records.removeAll(records);
+    records.clear();
     update();
 }//GEN-LAST:event_clearButtonActionPerformed
 
