@@ -34,7 +34,7 @@ public class DataSourceFilter extends DomNode {
     }
     
 
-    public static String PROP_VALID_RANGE= "validRange";
+    public static final String PROP_VALID_RANGE= "validRange";
     
     private String validRange = "";
 
@@ -48,7 +48,7 @@ public class DataSourceFilter extends DomNode {
         propertyChangeSupport.firePropertyChange( PROP_VALID_RANGE, oldVal, validRange );
     }
     
-    public static String PROP_FILL= "fill";
+    public static final String PROP_FILL= "fill";
     
     private String fill = "";
 
