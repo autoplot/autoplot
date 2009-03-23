@@ -141,17 +141,16 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
                                 TreePath[] paths = jtree.getSelectionPaths();
 
-                                boolean okay = true;
-                                IllegalArgumentException ex = null;
-
                                 for (int i = 0; i < paths.length; i++) {
                                     File f = model.getFile(paths[i]);
                                     try {
                                         Util.fileCopy(f, destdir);
                                     } catch (FileNotFoundException ex1) {
                                         Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                                        JOptionPane.showMessageDialog(JDiskHogPanel.this, "File Not Found:\n"+ex1.getLocalizedMessage());
                                     } catch (IOException ex1) {
                                         Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                                        JOptionPane.showMessageDialog(JDiskHogPanel.this, "Error Occurred:\n"+ex1.getLocalizedMessage());
                                     }
                                 }
 
