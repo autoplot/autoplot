@@ -149,12 +149,6 @@ public class Plot extends DomNode {
         
         return result;
     }
-    
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
 
     public List<Diff> diffs(DomNode node) {
 
