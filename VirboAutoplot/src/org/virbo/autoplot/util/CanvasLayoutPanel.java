@@ -17,9 +17,6 @@ import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import org.das2.util.ClassMap;
@@ -44,8 +41,6 @@ public class CanvasLayoutPanel extends JLabel {
             if (target == null) {
                 return;
             }
-            int theight = target.getHeight();
-            int mheight = getHeight();
             int twidth = target.getWidth();
             int mwidth = getWidth();
             for (int i = target.getComponentCount() - 1; i >= 0; i--) {
@@ -99,7 +94,6 @@ public class CanvasLayoutPanel extends JLabel {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setColor(getBackground());
         int theight = target.getHeight();
-        int mheight = getHeight();
         int twidth = target.getWidth();
         int mwidth = getWidth();
         g.fillRect(0, 0, mwidth, theight * mwidth / twidth);
