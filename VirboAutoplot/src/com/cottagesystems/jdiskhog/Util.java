@@ -49,13 +49,13 @@ public class Util {
     public static void fileCopy( File src, File dst ) throws FileNotFoundException, IOException {
         if ( src.isDirectory() && dst.isDirectory() ) {
             File dst1= new File( dst, src.getName() );
-            dst1.mkdir();
+            if ( !dst1.mkdir() ) throw new IOException("unable to mkdir " + dst1);
             dst= dst1;
             File[] files= src.listFiles();
             for ( File f:files ) {
                 if ( f.isDirectory() ) {
                     dst1= new File( dst, f.getName() );
-                    dst1.mkdir();
+                    if ( !dst1.mkdir() ) throw new IOException("unable to mkdir " + dst1);
                 } else {
                     dst1= dst;
                 }
