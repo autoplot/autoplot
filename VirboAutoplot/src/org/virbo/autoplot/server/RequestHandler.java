@@ -26,7 +26,7 @@ import org.virbo.autoplot.ScriptContext;
 public class RequestHandler {
 
 
-    public void RequestHandler() {
+    public RequestHandler() {
     }
 
     /**
