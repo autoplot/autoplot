@@ -58,12 +58,14 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.ApplicationModel.RenderType;
+import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dsops.Ops;
@@ -240,10 +242,16 @@ public class AutoplotUtil {
         boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC));
 
         if (mono) {
-            Double cadence = DataSetUtil.guessCadenceNew(ds,null);
-            if ( cadence==null || cadence > Double.MAX_VALUE / 100 ) cadence= new Double(0.);
+            RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds,null);
+            if ( cadence==null || cadence.value() > Double.MAX_VALUE / 100 ) cadence= DRank0DataSet.create(0.);
             if (ds.length() > 1) {
-                dd = new double[]{ds.value(0) - cadence, ds.value(ds.length() - 1) + cadence};
+                if ( "log".equals(cadence.property(QDataSet.SCALE_TYPE) ) ) {
+                    Units cu= (Units) cadence.property(QDataSet.UNITS);
+                    double factor= ( cu.convertDoubleTo( Units.percentIncrease, cadence.value() ) + 100 ) / 100.;
+                    dd = new double[]{ ds.value(0)/ factor, ds.value(ds.length() - 1) * factor};
+                } else {
+                    dd = new double[]{ds.value(0) - cadence.value(), ds.value(ds.length() - 1) + cadence.value()};
+                }
             } else {
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};

@@ -22,7 +22,9 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
@@ -170,7 +172,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
     private String histStr(QDataSet ds) {
         QDataSet hist= Ops.histogram(ds, 20);
         QDataSet dep0= (QDataSet) hist.property(QDataSet.DEPEND_0);
-        double res= (Double)dep0.property(QDataSet.CADENCE);
+        Datum res= DataSetUtil.asDatum((RankZeroDataSet)dep0.property(QDataSet.CADENCE));
         Units u= (Units)dep0.property(QDataSet.UNITS);
         if ( u==null ) u= Units.dimensionless;
         
@@ -186,14 +188,14 @@ public class MetaDataPanel extends javax.swing.JPanel {
         
         StringBuffer s= new StringBuffer();
         
-        s.append( "" + Datum.create( dep0.value(0), u, res ) +" ");
+        s.append( "" + Datum.create( dep0.value(0), u, res.doubleValue(u.getOffsetUnits()) ) +" ");
         for ( int i=0; i<hist.length(); i++ ) {
             int norm= (int)hist.value(i) * scaleMax / max;
             if ( norm==scaleMax ) norm=scaleMax-1; // make last bin inclusive
             //s.append( (char)(2581+norm) );
             s.append( scale.charAt(norm));
         }
-        s.append(" "+ Datum.create( dep0.value(dep0.length()-1), u, res ) );
+        s.append(" "+ Datum.create( dep0.value(dep0.length()-1), u, res.doubleValue(u.getOffsetUnits()) ) );
         if ( "log".equals( dep0.property( QDataSet.SCALE_TYPE ) ) ) {
             s.append(" log");
         }
@@ -273,14 +275,14 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
             QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
 
-            Double cadence;
+            RankZeroDataSet cadence;
             Units xunits;
 
             if (dep0 == null) {
                 xunits = Units.dimensionless;
-                cadence = 1.;
+                cadence = DataSetUtil.asDataSet(1);
             } else {
-                cadence = (Double) dep0.property(QDataSet.CADENCE);
+                cadence = (RankZeroDataSet) dep0.property(QDataSet.CADENCE);
                 xunits = (Units) dep0.property(QDataSet.UNITS);
             }
             if (xunits == null) {
@@ -288,7 +290,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
             }
 
             if (cadence != null) {
-                Datum d = DatumUtil.asOrderOneUnits(xunits.getOffsetUnits().createDatum(cadence));
+                Datum d = DatumUtil.asOrderOneUnits( DataSetUtil.asDatum(cadence) );
                 Units u = d.getUnits();
                 map.put("Cadence", format(d.doubleValue(u)) + " " + u);
             } else {

@@ -35,6 +35,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 
@@ -520,12 +521,9 @@ public class PanelController {
             xunits = Units.dimensionless;
         }
 
-        Double cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
-        if (cadence == null && !UnitsUtil.isTimeLocation(xunits)) {
-            cadence = DataSetUtil.guessCadenceNew(Ops.log(xds), null);
-            if (cadence != null) {
-                xds.putProperty(QDataSet.SCALE_TYPE, "log");
-            }
+        RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
+        if ( "log".equals(cadence.property(QDataSet.SCALE_TYPE) ) ) {
+            xds.putProperty( QDataSet.SCALE_TYPE, "log" );
         }
         xds.putProperty(QDataSet.CADENCE, cadence);
     }
