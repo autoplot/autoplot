@@ -753,6 +753,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()-2f));
         statusLabel.setText("starting...");
+        statusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                statusLabelMouseClicked(evt);
+            }
+        });
 
         fileMenu.setText("File");
         fileMenu.addActionListener(new java.awt.event.ActionListener() {
@@ -1226,6 +1231,11 @@ private void editDomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
     PropertyEditor edit= new PropertyEditor(applicationModel.dom);
     edit.showDialog(this);
 }//GEN-LAST:event_editDomMenuItemActionPerformed
+
+private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_statusLabelMouseClicked
+    statusLabel.setText("");
+    statusLabel.setIcon(null);
+}//GEN-LAST:event_statusLabelMouseClicked
 
     /**
      * @param args the command line arguments
