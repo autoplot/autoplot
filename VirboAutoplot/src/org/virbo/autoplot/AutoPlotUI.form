@@ -395,6 +395,9 @@
         </Property>
         <Property name="text" type="java.lang.String" value="starting..."/>
       </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="statusLabelMouseClicked"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
