@@ -178,7 +178,7 @@ public class LayoutUI extends javax.swing.JPanel {
                 } else {
                     PanelStyle[] peers= new PanelStyle[os.length];
                     for ( int i=0; i<os.length; i++ ) peers[i]= ((Panel)os[i]).getStyle();
-                    edit= PropertyEditor.createPeersEditor( p, peers );
+                    edit= PropertyEditor.createPeersEditor( p.getStyle(), peers );
                 }
                 edit.showDialog(LayoutUI.this);
             }
