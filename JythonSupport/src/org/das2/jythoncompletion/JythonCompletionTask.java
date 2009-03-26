@@ -97,6 +97,11 @@ public class JythonCompletionTask implements CompletionTask {
 
         String eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
 
+        //kludge to handle increase in indent level
+        if ( eval.endsWith(":\n") ) {
+            eval= eval + "  pass\n";
+        }
+        
         interp.exec(eval);
 
         PyObject context = interp.eval(cc.contextString);
