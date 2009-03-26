@@ -35,7 +35,7 @@ public class CanvasController {
         this.canvas = canvas;
         canvas.setController(this);
         plotsListener = definePlotsListener();
-        changesSupport = new ChangesSupport(propertyChangeSupport);
+        changesSupport = new ChangesSupport(propertyChangeSupport,this);
 
         dom.addPropertyChangeListener(Application.PROP_PLOTS, plotsListener);
     }

@@ -53,6 +53,7 @@ import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.LayoutListener;
+import thredds.catalog.DatasetFilter;
 
 /**
  *
@@ -79,7 +80,7 @@ public class ApplicationController {
     public ApplicationController(ApplicationModel model, Application application) {
         this.application = application;
         this.syncSupport = new ApplicationControllerSyncSupport(this);
-        this.changesSupport = new ChangesSupport(propertyChangeSupport);
+        this.changesSupport = new ChangesSupport(propertyChangeSupport,this);
         application.setId("app_0");
         application.getOptions().setId("options_0");
         this.model = model;
@@ -1115,11 +1116,14 @@ public class ApplicationController {
         if (changesSupport.isPendingChanges()) {
             return true;
         }
-        for (Canvas c : application.getCanvases()) {
+        for ( Canvas c : application.getCanvases() ) {
             result = result | c.getController().isPendingChanges();
         }
-        for (Panel p : application.getPanels()) {
+        for ( Panel p : application.getPanels() ) {
             result = result | p.getController().isPendingChanges();
+        }
+        for ( DataSourceFilter dsf : application.getDataSourceFilters() ) {
+            result = result | dsf.getController().isPendingChanges();
         }
         return result;
     }

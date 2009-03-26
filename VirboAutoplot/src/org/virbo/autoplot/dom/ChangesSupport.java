@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.system.MutatorLock;
+import org.virbo.autoplot.util.TransparentLogger;
 
 /**
  * Support class for encapsulating implementation of pendingChanges and mutator locks.
@@ -21,19 +22,17 @@ import org.das2.system.MutatorLock;
  */
 public class ChangesSupport {
     Map<Object,Object> changesPending;
-    private static final Logger logger= Logger.getLogger( "dom" );
-
-    ChangesSupport( ) {
-        this( null );
-        this.propertyChangeSupport= new PropertyChangeSupport(this);
-    }
+    Object parent;
+    private static final Logger logger= TransparentLogger.getLogger( "dom" );
 
     /**
      * if the propertyChangeSupport is provided, then change messages will be sent to
      * it directly.  If null, then one is created.
      * @param pcs
+     * @param parent  the object this is supporting, for debugging purposes.
      */
-    ChangesSupport( PropertyChangeSupport pcs ) {
+    ChangesSupport( PropertyChangeSupport pcs, Object parent ) {
+        this.parent= parent;
         this.changesPending= new HashMap<Object,Object>(); // client->lock
         this.propertyChangeSupport= pcs;
     }
@@ -50,7 +49,8 @@ public class ChangesSupport {
      * @param lockObject object identifying the change.
      */
     synchronized void registerPendingChange( Object client, Object lockObject ) {
-        logger.fine( "registerPendingChange "+lockObject+" by "+client);
+        String msg= "registerPendingChange "+lockObject+" by "+client + "  in "+parent ;
+        logger.fine( msg );
         Object existingClient= changesPending.get(lockObject);
         if ( existingClient!=null ) {
             if ( existingClient!=client ) {
@@ -76,6 +76,7 @@ public class ChangesSupport {
         if ( c==null || c!=client ) {
             registerPendingChange( client, lockObject );
         }
+        logger.fine( "performingChange "+lockObject+" by "+client + "  in "+parent );
     }
 
     /**
@@ -84,7 +85,7 @@ public class ChangesSupport {
      * @param lockObject
      */
     synchronized void changePerformed( Object client, Object lockObject ) {
-        logger.fine( "clearPendingChange "+lockObject+" by "+client);
+        logger.fine( "clearPendingChange "+lockObject+" by "+client + "  in "+parent);
         if ( changesPending.get(lockObject)==null ) {
            // throw new IllegalStateException( "no such lock object: "+lockObject );  //TODO: handle multiple registrations by the same client
         }

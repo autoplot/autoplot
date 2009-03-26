@@ -33,16 +33,22 @@ public class TimeSeriesBrowseController {
     PanelController panelController;
     DataSourceController dataSourceController;
     DataSourceFilter dsf;
-    
+    private ChangesSupport changesSupport;
+
+    private static final String PENDING_AXIS_DIRTY= "tsbAxisDirty";
+
     private static final Logger logger = Logger.getLogger("ap.tsb");
     Timer updateTsbTimer;
     PropertyChangeListener timeSeriesBrowseListener;
 
     TimeSeriesBrowseController( Panel p ) {
-        updateTsbTimer = new Timer(100, new ActionListener() {
 
+        this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
+        
+        updateTsbTimer = new Timer(100, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 updateTsb(false);
+                changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
             }
         });
         
@@ -73,6 +79,7 @@ public class TimeSeriesBrowseController {
                     return;
                 } 
                 if (e.getPropertyName().equals("datumRange")) {
+                    changesSupport.registerPendingChange( this, PENDING_AXIS_DIRTY );
                     updateTsbTimer.restart();
                 }
             }
@@ -119,13 +126,16 @@ public class TimeSeriesBrowseController {
                 } else {
                     dataSourceController.update(autorange, autorange);
                     dataSourceController._setTsbSuri(surl);
-                    //p.getDataSourceFilter().setUri(surl);
                 }
             } else {
                 logger.fine("loaded dataset satifies request");
             }
         }
 
+    }
+
+    public boolean isPendingChanges() {
+        return changesSupport.isPendingChanges();
     }
 
     void release() {
@@ -158,6 +168,7 @@ public class TimeSeriesBrowseController {
         this.resolution = resolution;
         propertyChangeSupport.firePropertyChange(PROP_RESOLUTION, oldResolution, resolution);
     }
+    
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {

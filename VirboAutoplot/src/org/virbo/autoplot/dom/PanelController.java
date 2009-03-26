@@ -46,6 +46,8 @@ import org.virbo.dsops.Ops;
 public class PanelController {
 
     private static final String PENDING_RESET_RANGE = "resetRanges";
+    private static final String PENDING_SET_DATASET= "setDataSet";
+
     Logger logger = Logger.getLogger("vap.panelController");
     private Application dom;
     private ApplicationModel appmodel;  //TODO: get rid of this
@@ -69,7 +71,7 @@ public class PanelController {
         this.dom = dom;
         this.panel = panel;
         this.appmodel = model;
-        this.changesSupport = new ChangesSupport(this.propertyChangeSupport);
+        this.changesSupport = new ChangesSupport(this.propertyChangeSupport,this);
         panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, panelListener);
         panel.addPropertyChangeListener(Panel.PROP_DATASOURCEFILTERID, panelListener);
     }
@@ -211,6 +213,7 @@ public class PanelController {
         }
 
         public synchronized void propertyChange(PropertyChangeEvent evt) {
+            changesSupport.performingChange( this, PENDING_SET_DATASET );
             if (!Arrays.asList(dom.getPanels()).contains(panel)) {
                 return;  // TODO: kludge, I was deleted.
             }
@@ -230,7 +233,7 @@ public class PanelController {
             } else {
                 setDataSet(fillDs);
             }
-
+            changesSupport.changePerformed( this, PENDING_SET_DATASET );
         }
     };
 

@@ -11,14 +11,11 @@ import java.io.InterruptedIOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.CancelledOperationException;
-import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -103,7 +100,7 @@ public class DataSourceController {
 
         this.model = model;
         this.dom = model.getDocumentModel();
-        this.changesSupport= new ChangesSupport(this.propertyChangeSupport);
+        this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         this.dsf = dsf;
         this.dsf.controller = this;
 
@@ -874,6 +871,7 @@ public class DataSourceController {
     }
 
     public boolean isPendingChanges() {
+        if ( timeSeriesBrowseController!=null && timeSeriesBrowseController.isPendingChanges() ) return true;
         return changesSupport.isPendingChanges();
     }
 
