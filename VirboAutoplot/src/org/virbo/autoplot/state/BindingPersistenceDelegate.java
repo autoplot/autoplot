@@ -31,7 +31,7 @@ public class BindingPersistenceDelegate extends PersistenceDelegate {
     }
     
     public static BindingModel newBindingModel( String description ) {
-        Pattern p= Pattern.compile("(.+?)\\.(.+) to (.+?)\\.(.+) (.+)");
+        Pattern p= Pattern.compile("(.+?)\\.(.+?) +to +(.+?)\\.(.+?) +\\((.+)\\)");
         Matcher m= p.matcher(description);
         if ( m.matches() ) {
             BindingModel bm= new BindingModel( m.group(5), m.group(1), m.group(2), m.group(3), m.group(4) );
