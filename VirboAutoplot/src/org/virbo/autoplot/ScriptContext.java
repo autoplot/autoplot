@@ -192,6 +192,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void writeToPng(String filename) throws InterruptedException, IOException {
         model.waitUntilIdle(false);
         model.getCanvas().writeToPng(filename);
+        setStatus("wrote to "+filename);
     }
 
     public static void peekAt(Object o) throws IOException {
@@ -228,6 +229,7 @@ public class ScriptContext extends PyJavaInstance {
     public static void writeToPdf(String filename) throws InterruptedException, IOException {
         model.waitUntilIdle(false);
         model.getCanvas().writeToPDF(filename);
+        setStatus("wrote to "+filename);
     }
 
     /**
