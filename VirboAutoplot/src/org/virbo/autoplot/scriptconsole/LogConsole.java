@@ -13,7 +13,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,15 +27,9 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.ActionMap;
-import javax.swing.InputMap;
 import javax.swing.JFileChooser;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.text.Keymap;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
@@ -95,8 +88,6 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
 
-        CompletionImpl impl = CompletionImpl.get();
-        impl.startPopup(this.commandLineTextPane1);
 
         this.commandLineTextPane1.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
@@ -392,6 +383,11 @@ public class LogConsole extends javax.swing.JPanel {
 
         jLabel2.setText("AP>");
 
+        commandLineTextPane1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                commandLineTextPane1FocusGained(evt);
+            }
+        });
         jScrollPane2.setViewportView(commandLineTextPane1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -498,6 +494,11 @@ private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         throw new RuntimeException(ex);
     }
 }//GEN-LAST:event_copyButtonActionPerformed
+
+private void commandLineTextPane1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_commandLineTextPane1FocusGained
+     CompletionImpl impl = CompletionImpl.get();
+     impl.startPopup(this.commandLineTextPane1);
+}//GEN-LAST:event_commandLineTextPane1FocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionsPanel;

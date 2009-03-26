@@ -234,6 +234,9 @@
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
         <Component class="org.virbo.autoplot.scriptconsole.CommandLineTextPane" name="commandLineTextPane1">
+          <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="commandLineTextPane1FocusGained"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

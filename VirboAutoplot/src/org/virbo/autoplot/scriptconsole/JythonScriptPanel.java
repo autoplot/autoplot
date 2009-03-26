@@ -193,6 +193,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         caretPositionLabel.setText("1,1");
 
         textArea.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+        textArea.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                textAreaFocusGained(evt);
+            }
+        });
         jScrollPane1.setViewportView(textArea);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -251,6 +256,12 @@ private void contextSelectorActionPerformed(java.awt.event.ActionEvent evt) {//G
     setContext(contextSelector.getSelectedIndex());
 
 }//GEN-LAST:event_contextSelectorActionPerformed
+
+private void textAreaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_textAreaFocusGained
+    CompletionImpl impl = CompletionImpl.get();
+    impl.startPopup(textArea);
+}//GEN-LAST:event_textAreaFocusGained
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel caretPositionLabel;
     private javax.swing.JComboBox contextSelector;

@@ -119,6 +119,9 @@
               <Font name="Monospaced" size="13" style="0"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="textAreaFocusGained"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
