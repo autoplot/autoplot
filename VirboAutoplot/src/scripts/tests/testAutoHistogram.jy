@@ -1,0 +1,18 @@
+len= 1000
+
+dist1= ( randn( len ) * 0.03 ) + 0.4
+dist2= ( randn( len ) * 0.45 ) + 71.3
+dist3= ( randn( len ) * 0.04 ) + 10.5
+dist4= ( randn( len ) * 0.021 ) + 15.5
+
+from org.virbo.dsutil import AutoHistogram
+ah= AutoHistogram()
+ah.doit( dist1 )
+ah.doit( dist2 )
+ah.doit( dist3 )
+ah.doit( dist4 )
+
+from org.virbo.dataset import TrimStrideWrapper 
+hist= ah.getHistogram()
+
+plot( hist )
