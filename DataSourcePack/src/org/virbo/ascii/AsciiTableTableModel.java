@@ -40,12 +40,10 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
         lineNumber = -1;
     }
 
-    @Override
     public int getColumnCount() {
         return 12;
     }
 
-    @Override
     public int getRowCount() {
         return recCount;
     }
@@ -66,7 +64,6 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
         return ! isRecord(row);
     }
 
-    @Override
     public synchronized Object getValueAt(int row, int column) {
         if (row < lineStart || row >= lineStart + lineCount) {
             readLines(row / LINE_BUFFER_COUNT * LINE_BUFFER_COUNT, LINE_BUFFER_COUNT );
