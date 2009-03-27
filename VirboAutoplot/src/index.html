@@ -18,27 +18,29 @@ be applied to the data, for example, specifying valid range and fill data.
         
         <p>Recent changes include:</p>
      <ul>
-     many bugfixes:
-<ol><li> 2619858:  filesystem completions not sorted
-</li><li> 2213890: isotropic doesn't work for polar/vis images
-</li><li> 2071413: autoLayout can oscillate
-</li><li> 2694142: Epoch16 validmin, validmax are not supported
-</li><li> 2620033: panel focus problems
-</li><li> <a href="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" class="external free" title="https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346" rel="nofollow">https://bugs-pw.physics.uiowa.edu/mantis/view.php?id=346</a>: seriesRenderer accept context concave regions
+     Improvements to the Ascii Table GUI
+<ol><li> non-records (e.g. comments) are not broken up into fields
+</li><li> unrecognized parameters are preserved
+</li><li> support for rank 2 specs using multiple column selection
+</li><li> clarify gui use with "select" buttons
 </li></ol>
-<li> ZipFileSystem allows data from within Zip files to be accessed.
-</li><li> Improve support for Onera CDFs
-</li><li> AutoHistogram result available in Metadata Panel Statistics node.
-</li><li> introduce Legend labels that can be added for any panel.
-</li><li> introduce Layout tab that improves access to panels and improves transparency.  This will soon provide sophistocated layout controls.
-</li><li> headerDelim parameter added to AsciiTable reader.
-</li><li> rank2 parameter added to BinaryDataSource.
-</li><li> support for unsigned shorts in BinaryDataSource.
-</li><li> ftp allows for credentials to be used <a href="ftp://" class="external free" title="ftp://" rel="nofollow">ftp://</a>&lt;user&gt;:&lt;pass&gt;@nis-ftp.gov/
+</li><li> ASCII table depend1labels and depend1values improve support for spectrograms and multiple channel plots.
+</li><li> Property Editor edits multiple panels simultaneously.
 
-</li><li> bugfix in ftp that prevented some sites from being used.
-</li><li> bugfix in das2 that allows spectrograms to be used server-side.
-</li><li> bugfix in TagGenDataSet that prevented some FITS from being veiwed.
+</li><li> many findbugs warnings resolved, identifying a few real bugs, such as copy image to clipboard.
+</li><li> bugfix: TimeSeriesBrowse had a bug that could result in empty plots in writeToPng.
+</li><li> autorange detection of log/lin (and cadence) is improved by using autohistogram improving result when xtags are log spaced.
+</li><li> QDataSet.CADENCE is now a rank 0 dataset, removing ambiguity about how it should be used.
+</li><li> bugfix: jython completions popup works again in both the script panel and the command line.
+</li><li> jython script panel has horizontal scrollbar.
+</li><li> bugfix: default row is "2em,100%-3em" fixing clipped axis plot from servlet when row is not specified.
+</li><li> dasCore is now built from source.
+</li><li> add overplotAnotherUrl which adds a panel on the current plot.
+
+</li><li> shift+enter on URI address bar adds the panel as an overplot.
+</li><li> active property in dom Panel nodes.
+</li><li> many other bugfixes.
+</li><li> webstart release uses CDF 3.3.0, which supports 64 bit Linux and Mac desktops.
 </li></ul>
 <p>Known Bugs:
 </p>
