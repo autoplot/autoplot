@@ -182,6 +182,7 @@ public class LogConsole extends javax.swing.JPanel {
      * @see logConsoleMessages
      */
     public void turnOffConsoleHandlers() {
+        System.err.println("turning off console log, look for messages in LogConsole");
         for (Handler h : Logger.getLogger("").getHandlers()) {
             if (h instanceof ConsoleHandler) {
                 h.setLevel(Level.OFF);
