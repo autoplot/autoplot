@@ -6,6 +6,7 @@
 package org.virbo.ascii;
 
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -18,8 +19,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -46,12 +50,35 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     boolean focusDep0 = false;
     TableCellRenderer defaultCellRenderer;
 
+    private enum Tool {
+
+        NONE, SKIPLINES, COLUMN, DEPEND_0,
+    }
+    Tool currentTool = Tool.NONE;
+    JToggleButton currentToolButton;
+
+    Action createToolAction(final String label, final Tool t) {
+        return new AbstractAction(label) {
+
+            public void actionPerformed(ActionEvent e) {
+                System.err.println(e.getSource());
+                if ( e.getSource() instanceof JToggleButton ) {
+                    currentToolButton= ( JToggleButton ) e.getSource();
+                    currentTool = t;
+                }
+                
+            }
+        };
+    }
+
     /** Creates new form AsciiDataSourceEditorPanel */
     public AsciiTableDataSourceEditorPanel() {
         initComponents();
+        columnsComboBox.requestFocusInWindow();
 
         parser = new AsciiParser();
         model = new AsciiTableTableModel();
+        model.setParser(parser);
 
         jTable1.setModel(model);
         defaultCellRenderer = jTable1.getDefaultRenderer(Object.class);
@@ -60,12 +87,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         model.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent e) {
-                if ( columns!=null ) {
-                    for (int i = 0; i < model.getColumnCount(); i++) {
-                        String label= columns.get(i);
-                        jTable1.getColumnModel().getColumn(i).setHeaderValue(label);
-                    }
-                    jTable1.getTableHeader().repaint();
+                if (columns != null) {
+                    updateColumns();
                 }
                 jTable1.repaint();
 
@@ -77,41 +100,46 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jTable1.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
-                if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
+                if ( e.getValueIsAdjusting() ) return;
+
+                if (jTable1.getColumnModel().getSelectedColumnCount() == 0) {
+                    
+                } else if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
                     int col = jTable1.getColumnModel().getSelectedColumns()[0];
                     String name = columns.get(col);
                     if (name == null) {
                         name = "field" + col;
                     }
-                    if (focusDep0) {
+                    if ( currentTool==Tool.DEPEND_0 ) {
                         setDep0(name);
-                    } else {
+                    } else if ( currentTool==Tool.COLUMN ) {
                         setColumn(name);
                     }
                 } else {
                     int[] cols = jTable1.getColumnModel().getSelectedColumns();
-                    int first= cols[0];
-                    int last= cols[cols.length-1];
+                    int first = cols[0];
+                    int last = cols[cols.length - 1];
                     String sfirst = columns.get(first);
                     if (sfirst == null) {
                         sfirst = "" + first;
                     }
-                    boolean haveColumnNames= true;
+                    boolean haveColumnNames = true;
                     String slast = columns.get(last);
                     if (slast == null) {
                         slast = "" + last;
-                        haveColumnNames= false;
+                        haveColumnNames = false;
                     }
 
-                    if (focusDep0) {
-                    } else {
-                        if ( haveColumnNames ) {
-                            setColumn( sfirst + "-" + slast );
+                    if (currentTool==Tool.DEPEND_0 ) {
+                    } else if ( currentTool==Tool.COLUMN ) {
+                        if (haveColumnNames) {
+                            setColumn(sfirst + "-" + slast);
                         } else {
-                            setColumn( "" + first + ":" + (last+1) );
+                            setColumn("" + first + ":" + (last + 1));
                         }
                     }
                 }
+                clearTool();
             }
         });
 
@@ -119,7 +147,15 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             public void valueChanged(ListSelectionEvent e) {
-                setSkipLines(jTable1.getSelectedRow());
+                if (e.getValueIsAdjusting()) return;
+                switch (currentTool) {
+                    case SKIPLINES:
+                        if (jTable1.getSelectedRow() != -1) {
+                            setSkipLines(jTable1.getSelectedRow());
+                            clearTool();
+                        }
+                        break;
+                }
             }
         });
 
@@ -132,6 +168,12 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         bc.bind();
     }
 
+    private void clearTool() {
+        currentTool = Tool.NONE;
+        currentToolButton.setSelected(false);
+        currentToolButton = null;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -141,35 +183,25 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        skipLinesTextField = new javax.swing.JFormattedTextField();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        columnsComboBox = new javax.swing.JComboBox();
         jLabel4 = new javax.swing.JLabel();
         dep0Columns = new javax.swing.JComboBox();
-
-        jLabel1.setText("Skip Lines:");
+        columnsComboBox = new javax.swing.JComboBox();
+        jToggleButton2 = new javax.swing.JToggleButton();
+        jToggleButton3 = new javax.swing.JToggleButton();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        skipLinesTextField = new javax.swing.JFormattedTextField();
+        jToggleButton1 = new javax.swing.JToggleButton();
+        jPanel3 = new javax.swing.JPanel();
 
         jScrollPane1.setViewportView(jTable1);
 
-        skipLinesTextField.setText("11");
-
         jLabel3.setText("Column:");
-
-        columnsComboBox.setEditable(true);
-        columnsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        columnsComboBox.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                columnsComboBoxItemStateChanged(evt);
-            }
-        });
-        columnsComboBox.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                columnsComboBoxFocusGained(evt);
-            }
-        });
 
         jLabel4.setText("Depends On:");
 
@@ -185,42 +217,128 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
+        columnsComboBox.setEditable(true);
+        columnsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        columnsComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                columnsComboBoxItemStateChanged(evt);
+            }
+        });
+        columnsComboBox.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                columnsComboBoxFocusGained(evt);
+            }
+        });
+
+        jToggleButton2.setAction(createToolAction( "column", Tool.COLUMN ));
+        jToggleButton2.setText("Select");
+        jToggleButton2.setToolTipText("Select column or range of columns");
+
+        jToggleButton3.setAction(createToolAction( "depend0", Tool.DEPEND_0 ));
+        jToggleButton3.setText("Select");
+        jToggleButton3.setToolTipText("select the column that is the independent variable on which the data values depend.");
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(jLabel4)
+                    .add(jLabel3))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(dep0Columns, 0, 175, Short.MAX_VALUE)
+                    .add(columnsComboBox, 0, 175, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jToggleButton2)
+                    .add(jToggleButton3))
+                .add(487, 487, 487))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel3)
+                    .add(columnsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jToggleButton2))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel4)
+                    .add(dep0Columns, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jToggleButton3))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("data", jPanel1);
+
+        jLabel1.setText("Skip Lines:");
+
+        skipLinesTextField.setText("11");
+        skipLinesTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                skipLinesTextFieldFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                skipLinesTextFieldFocusLost(evt);
+            }
+        });
+
+        jToggleButton1.setAction(createToolAction( "skiplines", Tool.SKIPLINES ));
+        jToggleButton1.setText("Select");
+        jToggleButton1.setToolTipText("select the first row to parse as data or column headers");
+
+        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jToggleButton1)
+                .addContainerGap(642, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel2Layout.createSequentialGroup()
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jToggleButton1))
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("header", jPanel2);
+
+        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 815, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 69, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("times", jPanel3);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(jLabel4)
-                    .add(layout.createSequentialGroup()
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(18, 18, 18)
-                        .add(jLabel3)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(dep0Columns, 0, 175, Short.MAX_VALUE)
-                    .add(columnsComboBox, 0, 175, Short.MAX_VALUE))
-                .add(434, 434, 434))
             .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 819, Short.MAX_VALUE)
+            .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 819, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel3)
-                    .add(columnsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 100, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel4)
-                    .add(dep0Columns, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 354, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -239,6 +357,12 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
 private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_dep0ColumnsFocusGained
     focusDep0 = true;
 }//GEN-LAST:event_dep0ColumnsFocusGained
+
+private void skipLinesTextFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_skipLinesTextFieldFocusGained
+}//GEN-LAST:event_skipLinesTextFieldFocusGained
+
+private void skipLinesTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_skipLinesTextFieldFocusLost
+}//GEN-LAST:event_skipLinesTextFieldFocusLost
     URLSplit split = null;
     protected File file = null;
     public static final String PROP_FILE = "file";
@@ -276,12 +400,12 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
     }
 
     public void setSkipLines(int row) {
-            int oldRow = this.skipLines;
-            this.skipLines = row;
-            Rectangle rect = jTable1.getCellRect(getSkipLines(), 0, true);
-            update();
-            jTable1.scrollRectToVisible(rect);
-            firePropertyChange(PROP_FIRST_ROW, oldRow, row);
+        int oldRow = this.skipLines;
+        this.skipLines = row;
+        Rectangle rect = jTable1.getCellRect(Math.max(0, getSkipLines() - 3), 0, true);
+        update();
+        jTable1.scrollRectToVisible(rect);
+        firePropertyChange(PROP_FIRST_ROW, oldRow, row);
     }
     protected String column = "field0";
     public static final String PROP_COLUMN = "column";
@@ -295,7 +419,6 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
         this.column = column;
         firePropertyChange(PROP_COLUMN, oldColumn, column);
     }
-
     protected String dep0 = "";
     public static final String PROP_DEP0 = "dep0";
 
@@ -331,7 +454,7 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
             if (params.containsKey("column")) {
                 setColumn(params.get("column"));
             }
-            if (params.containsKey("rank2") ) {
+            if (params.containsKey("rank2")) {
                 setColumn(params.get("rank2"));
             }
 
@@ -353,16 +476,16 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
         if (skipLines > 1) {
             params.put("skipLines", "" + skipLines);
         }
-        if (params.get("skip") !=null ) {
+        if (params.get("skip") != null) {
             params.remove("skip");
         }
         if (!this.getDep0().equals("")) {
             params.put("depend0", this.getDep0());
         }
 
-        if ( getColumn().contains(":") || getColumn().contains("-") ) {
+        if (getColumn().contains(":") || getColumn().contains("-")) {
             params.remove("column");
-            params.put( "rank2", getColumn() );
+            params.put("rank2", getColumn());
         } else {
             params.put("column", getColumn());
         }
@@ -378,10 +501,31 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
+    public javax.swing.JPanel jPanel1;
+    public javax.swing.JPanel jPanel2;
+    public javax.swing.JPanel jPanel3;
     public javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JTabbedPane jTabbedPane1;
     public javax.swing.JTable jTable1;
+    public javax.swing.JToggleButton jToggleButton1;
+    public javax.swing.JToggleButton jToggleButton2;
+    public javax.swing.JToggleButton jToggleButton3;
     public javax.swing.JFormattedTextField skipLinesTextField;
     // End of variables declaration//GEN-END:variables
+
+    private void updateColumns() {
+        for (int i = 0; i < jTable1.getColumnCount(); i++) {
+            String label;
+            if (i < columns.size()) {
+                label = columns.get(i);
+            } else {
+                label = "x"; // hopefully transient
+            }
+            jTable1.getColumnModel().getColumn(i).setHeaderValue(label);
+        }
+        jTable1.getTableHeader().repaint();
+
+    }
 
     private void update() {
         try {
@@ -394,7 +538,9 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
             model.setRecParser(p);
             columns = getColumnNames();
 
-            String lcol= getColumn();
+            updateColumns();
+
+            String lcol = getColumn();
             int icol = jTable1.getSelectedColumn();
             columnsComboBox.setModel(new DefaultComboBoxModel(columns.values().toArray()));
             columnsComboBox.setSelectedItem(getColumn());
@@ -403,9 +549,9 @@ private void dep0ColumnsFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:
             } else {
                 setColumn(lcol);
             }
-            
+
             List<String> dep0Values = new ArrayList<String>(columns.values());
-            String ldep0= getDep0();
+            String ldep0 = getDep0();
             dep0Values.add(0, "");
             dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
             dep0Columns.setSelectedItem(ldep0);
