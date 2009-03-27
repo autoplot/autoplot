@@ -10,24 +10,30 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.AbstractTableModel;
+import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.AsciiParser.RecordParser;
 
 /**
  *
  * @author jbf
  */
-public class AsciiTableTableModel extends DefaultTableModel implements ColSpanTableCellRenderer.ColSpanTableModel {
+public class AsciiTableTableModel extends AbstractTableModel implements ColSpanTableCellRenderer.ColSpanTableModel {
 
     String[] lines;
-    int lineStart;
-    int lineCount;
+    int lineStart; // line number of the first line.
+    int lineCount; // number of lines in the current buffer
+    List<Integer> recCountAtLineStart;  // the number of records at line / LINE_BUFFER_COUNT
     String[] fields;
+
     boolean[] isRecord;
     int lineNumber;
     int recCount;
+    int fieldCount;
+    private final static int LINE_BUFFER_COUNT=100;
 
     AsciiTableTableModel() {
         lines = null;
@@ -63,13 +69,14 @@ public class AsciiTableTableModel extends DefaultTableModel implements ColSpanTa
     @Override
     public synchronized Object getValueAt(int row, int column) {
         if (row < lineStart || row >= lineStart + lineCount) {
-            readLines(row / 10 * 10, 10);
+            readLines(row / LINE_BUFFER_COUNT * LINE_BUFFER_COUNT, LINE_BUFFER_COUNT );
         }
         if (lineCount == 0 || recParser == null) {
             return "";
         }
         if (lineNumber != row) {
             fields= new String[recParser.fieldCount()];
+            //if ( parser.isHeader( row, lines[Math.max(0,row-lineStart-1)], lines[row-lineStart], 1 ) ) {
             if ( recParser.splitRecord(lines[row-lineStart], fields) ) {
                 this.isRecord[row - lineStart] = true;
             } else {
@@ -89,7 +96,7 @@ public class AsciiTableTableModel extends DefaultTableModel implements ColSpanTa
     }
 
     public String getLine(int skip) {
-        readLines(skip, 20);
+        readLines( skip, LINE_BUFFER_COUNT );
         if (lineCount > 0) {
             return lines[skip - lineStart];
         } else {
@@ -97,7 +104,7 @@ public class AsciiTableTableModel extends DefaultTableModel implements ColSpanTa
         }
     }
 
-    private synchronized void readLines(int lineNumber, int count) {
+    private synchronized void readLines( int lineNumber, int count ) {
         if (file == null) {
             lines = null;
             lineCount = 0;
@@ -112,6 +119,7 @@ public class AsciiTableTableModel extends DefaultTableModel implements ColSpanTa
             }
             lines = new String[count];
             isRecord= new boolean[count];
+
             for (int i = 0; i < count; i++) {
                 lines[i] = reader.readLine();
             }
@@ -165,6 +173,7 @@ public class AsciiTableTableModel extends DefaultTableModel implements ColSpanTa
         }
         return -1;
     }
+
     protected RecordParser recParser = null;
     public static final String PROP_RECPARSER = "recParser";
 
@@ -175,8 +184,25 @@ public class AsciiTableTableModel extends DefaultTableModel implements ColSpanTa
     public void setRecParser(RecordParser recParser) {
         RecordParser oldRecParser = this.recParser;
         this.recParser = recParser;
+        fireTableDataChanged();
         propertyChangeSupport.firePropertyChange(PROP_RECPARSER, oldRecParser, recParser);
     }
+
+    protected AsciiParser parser = null;
+    public static final String PROP_PARSER = "parser";
+
+    public AsciiParser getParser() {
+        return parser;
+    }
+
+    public void setParser(AsciiParser parser) {
+        AsciiParser oldParser = this.parser;
+        this.parser = parser;
+        fireTableDataChanged();
+        propertyChangeSupport.firePropertyChange(PROP_PARSER, oldParser, parser);
+    }
+
+    
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
