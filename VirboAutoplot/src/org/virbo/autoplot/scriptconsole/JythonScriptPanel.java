@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -13,6 +14,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
+import javax.swing.text.StyledEditorKit;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -44,6 +46,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
         initComponents();
         
+        jPanel1.add( textArea, BorderLayout.CENTER );
+
         setContext(CONTEXT_APPLICATION);
         
         support = new ScriptPanelSupport(this, model, selector);
@@ -151,14 +155,24 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane1 = new javax.swing.JScrollPane();
+        textArea = new org.virbo.autoplot.scriptconsole.EditorTextPane();
         savePlotButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
         openButton = new javax.swing.JButton();
         fileNameLabel = new javax.swing.JLabel();
         contextSelector = new javax.swing.JComboBox();
         caretPositionLabel = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        textArea = new org.virbo.autoplot.scriptconsole.EditorTextPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
+
+        textArea.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+        textArea.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                textAreaFocusGained(evt);
+            }
+        });
+        jScrollPane1.setViewportView(textArea);
 
         savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
         savePlotButton.setText("execute");
@@ -192,13 +206,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         caretPositionLabel.setText("1,1");
 
-        textArea.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
-        textArea.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                textAreaFocusGained(evt);
-            }
-        });
-        jScrollPane1.setViewportView(textArea);
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        jScrollPane2.setViewportView(jPanel1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -210,14 +219,14 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 .add(saveAsButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(openButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 81, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 89, Short.MAX_VALUE)
                 .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 87, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -228,7 +237,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     .add(openButton)
                     .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(caretPositionLabel)
@@ -266,7 +275,9 @@ private void textAreaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:eve
     private javax.swing.JLabel caretPositionLabel;
     private javax.swing.JComboBox contextSelector;
     protected javax.swing.JLabel fileNameLabel;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
     private javax.swing.JButton savePlotButton;
