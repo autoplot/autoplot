@@ -50,19 +50,27 @@ public class DataSourceController {
      */
     private ProgressMonitor mon;
     private PropertyChangeListener updateSlicePropertyChangeListener = new PropertyChangeListener() {
+
         public String toString() {
             return "" + dsf + " controller";
         }
+
         public void propertyChange(PropertyChangeEvent e) {
-            if ( dataSet!=null && dataSet.rank() == 3) updateFillSoon();
+            if (dataSet != null && dataSet.rank() == 3) {
+                updateFillSoon();
+            }
         }
     };
     private PropertyChangeListener updateMePropertyChangeListener = new PropertyChangeListener() {
+
         public String toString() {
             return "" + dsf + " controller";
         }
+
         public void propertyChange(PropertyChangeEvent e) {
-            if ( dataSet!=null ) updateFillSoon();
+            if (dataSet != null) {
+                updateFillSoon();
+            }
         }
     };
 
@@ -70,17 +78,20 @@ public class DataSourceController {
     // to avoid the property change event.  This should probably be refactored so other clients can
     // listen for changes in dsf.uri.  TSB must reset the URI without triggering reset ranges,etc.
     private PropertyChangeListener resetMePropertyChangeListener = new PropertyChangeListener() {
+
         public String toString() {
             return "" + dsf + " controller";
         }
+
         public void propertyChange(PropertyChangeEvent e) {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
-                if ( !dom.getController().isValueAdjusting() ) {
+                if (!dom.getController().isValueAdjusting()) {
                     resolveDataSource(getMonitor("resetting data source", "resetting data source"));
                 } else {
-                    dom.getController().addPropertyChangeListener( ChangesSupport.PROP_VALUEADJUSTING, new PropertyChangeListener() {
+                    dom.getController().addPropertyChangeListener(ChangesSupport.PROP_VALUEADJUSTING, new PropertyChangeListener() {
+
                         public void propertyChange(PropertyChangeEvent evt) {
                             dom.getController().removePropertyChangeListener(this);
                             resolveDataSource(getMonitor("resetting data source", "resetting data source"));
@@ -90,7 +101,6 @@ public class DataSourceController {
             }
         }
     };
-    
     private TimeSeriesBrowseController timeSeriesBrowseController;
     private static final String PENDING_DATA_SOURCE = "dataSource";
     private static final String PENDING_FILL_DATASET = "fillDataSet";
@@ -100,7 +110,7 @@ public class DataSourceController {
 
         this.model = model;
         this.dom = model.getDocumentModel();
-        this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
+        this.changesSupport = new ChangesSupport(this.propertyChangeSupport, this);
         this.dsf = dsf;
         this.dsf.controller = this;
 
@@ -244,7 +254,7 @@ public class DataSourceController {
             for (String s : problems) {
                 message.append(s + "\n");
             }
-            if ( dom.getController().isHeadless() ) {
+            if (dom.getController().isHeadless()) {
                 throw new IllegalArgumentException(message.toString());
             } else {
                 JOptionPane.showMessageDialog(model.getCanvas(), message); //TODO: View code in controller
@@ -263,9 +273,11 @@ public class DataSourceController {
         if (this.dom.getController().isValueAdjusting()) {
             final QDataSet fds = ds;
             this.dom.getController().addPropertyChangeListener(ChangesSupport.PROP_VALUEADJUSTING, new PropertyChangeListener() {
+
                 public String toString() {
-                   return "" + dsf + " controller";
+                    return "" + dsf + " controller";
                 }
+
                 public void propertyChange(PropertyChangeEvent evt) {
                     dom.getController().removePropertyChangeListener(this);
                     setDataSetInternal(fds);
@@ -287,7 +299,7 @@ public class DataSourceController {
 
             extractProperties();
             doDimensionNames();
-            _setHistogram( new AutoHistogram().doit(ds, null) );
+            _setHistogram(new AutoHistogram().doit(ds, null));
             //doFillValidRange();  the QDataSet returned 
             updateFill();
         }
@@ -346,7 +358,8 @@ public class DataSourceController {
      */
     private void updateFillSoon() {
         changesSupport.performingChange(this, PENDING_FILL_DATASET);
-        RequestProcessor.invokeLater( new Runnable() {
+        RequestProcessor.invokeLater(new Runnable() {
+
             public void run() {
                 updateFill();
                 changesSupport.changePerformed(this, PENDING_FILL_DATASET);
@@ -463,27 +476,31 @@ public class DataSourceController {
         /*** here is the data load ***/
         setStatus("busy: loading dataset");
 
-        if (_getDataSource() != null) {
-            QDataSet dataset = loadDataSet();
-            setStatus("done loading dataset");
-            setDataSetInternal(dataset);
-        } else {
-            setDataSetInternal(null);
-        }
-
-        if (getTsb() != null) {
-            String oldsurl = dsf.getUri();
-            String newsurl = getTsb().getURL().toString();
-            URLSplit split = URLSplit.parse(newsurl);
-            if (oldsurl != null) {
-                URLSplit oldSplit = URLSplit.parse(oldsurl);
-                split.vapScheme = oldSplit.vapScheme;
+        try {
+            if (_getDataSource() != null) {
+                QDataSet dataset = loadDataSet();
+                setStatus("done loading dataset");
+                setDataSetInternal(dataset);
+            } else {
+                setDataSetInternal(null);
             }
-            newsurl = URLSplit.format(split);
-            dsf.uri= newsurl; // don't fire off event. TODO: should we?
-        }
 
-        setStatus("ready");
+            if (getTsb() != null) {
+                String oldsurl = dsf.getUri();
+                String newsurl = getTsb().getURL().toString();
+                URLSplit split = URLSplit.parse(newsurl);
+                if (oldsurl != null) {
+                    URLSplit oldSplit = URLSplit.parse(oldsurl);
+                    split.vapScheme = oldSplit.vapScheme;
+                }
+                newsurl = URLSplit.format(split);
+                dsf.uri = newsurl; // don't fire off event. TODO: should we?
+            }
+            setStatus("ready");
+        } catch ( RuntimeException ex ) {
+            setStatus("error: "+ex.toString());
+            throw ex;
+        }
 
     }
 
@@ -613,7 +630,6 @@ public class DataSourceController {
         this.fillDataSet = fillDataSet;
         propertyChangeSupport.firePropertyChange(PROP_FILLDATASET, oldFillDataSet, fillDataSet);
     }
-
     /**
      * when the dataset fails to load, then the exception thrown is here.
      */
@@ -629,8 +645,6 @@ public class DataSourceController {
         this.exception = exception;
         propertyChangeSupport.firePropertyChange(PROP_EXCEPTION, oldException, exception);
     }
-
-
     protected QDataSet histogram = null;
     public static final String PROP_HISTOGRAM = "histogram";
 
@@ -643,7 +657,6 @@ public class DataSourceController {
         this.histogram = histogram;
         propertyChangeSupport.firePropertyChange(PROP_HISTOGRAM, oldHistogram, histogram);
     }
-
     private List<String> depnames = Arrays.asList(new String[]{"first", "second", "last"});
     public static final String PROP_DEPNAMES = "depnames";
 
@@ -871,7 +884,9 @@ public class DataSourceController {
     }
 
     public boolean isPendingChanges() {
-        if ( timeSeriesBrowseController!=null && timeSeriesBrowseController.isPendingChanges() ) return true;
+        if (timeSeriesBrowseController != null && timeSeriesBrowseController.isPendingChanges()) {
+            return true;
+        }
         return changesSupport.isPendingChanges();
     }
 
