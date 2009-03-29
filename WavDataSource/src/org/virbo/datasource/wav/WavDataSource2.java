@@ -102,8 +102,7 @@ public class WavDataSource2 extends AbstractDataSource {
         BinaryDataSource bds= new BinaryDataSource( url );
         MutablePropertyDataSet result= (BufferDataSet) bds.getDataSet( new NullProgressMonitor() );
 
-        MutablePropertyDataSet timeTags= DataSetUtil.tagGenDataSet( frameCount, 0., 1./audioFormat.getSampleRate() );
-        timeTags.putProperty( QDataSet.UNITS, Units.seconds );
+        MutablePropertyDataSet timeTags= DataSetUtil.tagGenDataSet( frameCount, 0., 1./audioFormat.getSampleRate(), Units.seconds );
         result.putProperty( QDataSet.DEPEND_0, timeTags );
 
         return result;
