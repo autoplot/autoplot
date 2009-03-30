@@ -231,6 +231,10 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             return 1;
         }
 
+        public double value() {
+            throw new IllegalArgumentException("rank");
+        }
+
         public double value(int i) {
             HSSFRow row = null;
             HSSFCell cell = null;
