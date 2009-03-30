@@ -191,7 +191,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                         if (Units.cdfEpoch == c0.property(QDataSet.UNITS)) {
                             double value = ((RankZeroDataSet) c0).value();
                             double valueUs2000 = Units.cdfEpoch.convertDoubleTo(Units.us2000, value);
-                            c0 = CdfDataSetUtil.toRank0DataSet(Units.us2000.createDatum(valueUs2000));
+                            c0 = DataSetUtil.asDataSet(Units.us2000.createDatum(valueUs2000));
                         }
                     }
                     c0 = CdfDataSetUtil.add(c0, c1);
