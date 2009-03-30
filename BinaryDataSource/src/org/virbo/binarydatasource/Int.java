@@ -9,6 +9,10 @@ public class Int extends BufferDataSet implements WritableDataSet {
         super(rank, reclen, recoffs, len0, len1, len2, 4, back);
     }
 
+    public double value() {
+        return back.getInt(offset());
+    }
+
     public double value(int i0) {
         return back.getInt(offset(i0));
     }
@@ -19,6 +23,11 @@ public class Int extends BufferDataSet implements WritableDataSet {
 
     public double value(int i0, int i1, int i2) {
         return back.getInt(offset(i0, i1, i2));
+    }
+
+    public void putValue(double d) {
+        ensureWritable();
+        back.putInt( offset(), (int)d );
     }
     
     public void putValue(int i0, double d) {

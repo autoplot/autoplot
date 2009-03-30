@@ -9,6 +9,10 @@ public class Float extends BufferDataSet implements WritableDataSet {
         super( rank, reclen, recoffs, len0, len1, len2, 4, back );
     }
 
+    public double value() {
+        return back.getFloat(offset());
+    }
+
     public double value(int i0) {
         return back.getFloat(offset(i0));
     }
@@ -21,6 +25,11 @@ public class Float extends BufferDataSet implements WritableDataSet {
         return back.getFloat(offset(i0, i1, i2));
     }
     
+    public void putValue(double d) {
+        ensureWritable();
+        back.putFloat( offset(), (float)d );
+    }
+
     public void putValue(int i0, double d) {
         ensureWritable();
         back.putFloat( offset(i0), (float)d );

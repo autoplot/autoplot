@@ -8,6 +8,10 @@ public class Byte extends BufferDataSet {
         super(rank, reclen, recoffs, len0, len1, len2, 1, back );
     }
 
+    public double value() {
+        return back.get(offset());
+    }
+
     public double value(int i0) {
         return back.get(offset(i0));
     }
@@ -18,6 +22,11 @@ public class Byte extends BufferDataSet {
 
     public double value(int i0, int i1, int i2) {
         return back.get(offset(i0, i1, i2));
+    }
+
+    public void putValue(double d) {
+        ensureWritable();
+        back.put( offset(), (byte)d );
     }
 
     public void putValue(int i0, double d) {

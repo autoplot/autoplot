@@ -12,6 +12,11 @@ public class UShort extends BufferDataSet {
         super(rank, reclen, recoffs, len0, len1, len2, 2, back );
     }
 
+    public double value() {
+        double b= back.getShort(offset());
+        return b < 0 ? b + 65536 : b;
+    }
+
     public double value(int i0) {
         double b= back.getShort(offset(i0));
         return b < 0 ? b + 65536 : b;
@@ -27,6 +32,11 @@ public class UShort extends BufferDataSet {
         return b < 0 ? b + 65536 : b;
     }
     
+    public void putValue(double d) {
+        ensureWritable();
+        back.putShort( offset(), (short)( d > 32768 ? d - 65536 : d ) );
+    }
+
     public void putValue(int i0, double d) {
         ensureWritable();
         back.putShort( offset(i0), (short)( d > 32768 ? d - 65536 : d ) );

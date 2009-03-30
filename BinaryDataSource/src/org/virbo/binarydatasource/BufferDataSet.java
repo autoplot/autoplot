@@ -147,21 +147,27 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         }
 
     }
-    
+
+    /**
+     * return the offset, in bytes, of the element.
+     * @return the offset, in bytes, of the element.
+     */
+    protected int offset( ) {
+        return recoffset;
+    }
+
     /**
      * return the offset, in bytes, of the element.
      * @param i0
-     * @param i1
-     * @param i2
      * @return the offset, in bytes, of the element.
      */
-    protected int offset(int i0, int i1, int i2) {
+    protected int offset(int i0 ) {
         if (RANGE_CHECK) {
-            rangeCheck(i0, i1, i2);
+            rangeCheck(i0, 0, 0);
         }
-        return reclen * i0 + recoffset + i1 * fieldLen * len2  + i2 * fieldLen ;
+        return reclen * i0 + recoffset;
     }
-    
+        
     /**
      * return the offset, in bytes, of the element.
      * @param i0
@@ -178,14 +184,20 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     /**
      * return the offset, in bytes, of the element.
      * @param i0
+     * @param i1
+     * @param i2
      * @return the offset, in bytes, of the element.
      */
-    protected int offset(int i0 ) {
+    protected int offset(int i0, int i1, int i2) {
         if (RANGE_CHECK) {
-            rangeCheck(i0, 0, 0);
+            rangeCheck(i0, i1, i2);
         }
-        return reclen * i0 + recoffset;
+        return reclen * i0 + recoffset + i1 * fieldLen * len2  + i2 * fieldLen ;
     }
+
+
+    @Override
+    public abstract double value();
 
     @Override
     public abstract double value(int i0);

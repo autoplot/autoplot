@@ -8,6 +8,10 @@ public class Short extends BufferDataSet {
         super(rank, reclen, recoffs, len0, len1, len2, 2, back );
     }
 
+    public double value() {
+        return back.getShort(offset());
+    }
+
     public double value(int i0) {
         return back.getShort(offset(i0));
     }
@@ -18,6 +22,11 @@ public class Short extends BufferDataSet {
 
     public double value(int i0, int i1, int i2) {
         return back.getShort(offset(i0, i1, i2));
+    }
+
+    public void putValue(double d) {
+        ensureWritable();
+        back.putShort( offset(), (short)d );
     }
     
     public void putValue(int i0, double d) {
