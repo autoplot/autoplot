@@ -150,6 +150,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         }
         
 
+        public double value() {
+            throw new IllegalArgumentException("rank 0 not supported");
+        }
+
         public double value(int i) {
             return doubleValue(back[i]);
         }
@@ -168,6 +172,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         
         private final int putIntValue( double val ) {
             return (int)( ( val - addOffset ) / scaleFactor );
+        }
+
+        public void putValue(double d) {
+            throw new IllegalArgumentException("rank 0 not supported");
         }
 
         public void putValue(int i0, double d) {
@@ -221,6 +229,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             return r >= validMin && r <= validMax ? r : Units.dimensionless.getFillDouble();
         }
 
+        public double value() {
+            throw new IllegalArgumentException("rank 0 not supported");
+        }
+        
         public double value(int i) {
             return doubleValue(back[i]);
         }
@@ -239,6 +251,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
          
         private final short putIntValue( double val ) {
             return (short)( ( val - addOffset ) / scaleFactor );
+        }
+
+        public void putValue(double d) {
+            throw new IllegalArgumentException("rank 0 not supported");
         }
 
         public void putValue(int i0, double d) {
@@ -287,6 +303,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         private final float putFloatValue( double val ) {
             return (float)val;
         }
+
+        public double value() {
+            throw new IllegalArgumentException("rank 0 not supported");
+        }
         
         public double value(int i) {
             return doubleValue(back[i]);
@@ -303,6 +323,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public double value(int i0, int i1, int i2, int i3) {
             int index = i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[2] * dimSizes[3] + i2 * dimSizes[3] + i3;
             return doubleValue(back[index]);
+        }
+
+        public void putValue(double d) {
+            throw new IllegalArgumentException("rank 0 not supported");
         }
 
         public void putValue(int i0, double d) {
@@ -328,6 +352,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             this.properties.putAll(properties);
         }
 
+        public double value() {
+            throw new IllegalArgumentException("rank 0 not supported");
+        }
+        
         public double value(int i) {
             return back[i];
         }
@@ -342,6 +370,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
         public double value(int i0, int i1, int i2, int i3) {
             return back[i0 * dimSizes[1] * dimSizes[2] * dimSizes[3] + i1 * dimSizes[1] * dimSizes[2] + i2 * dimSizes[2] + i3];
+        }
+
+        public void putValue(double d) {
+            throw new IllegalArgumentException("rank 0 not supported");
         }
 
         public void putValue(int i0, double d) {
@@ -374,6 +406,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             this.properties.put(QDataSet.UNITS, u);
         }
 
+        public double value() {
+            throw new IllegalArgumentException("rank 0 not supported");
+        }
+        
         public double value(int i) {
             return u.createDatum(((DString) back[i]).getValue()).doubleValue(u);
         }
@@ -388,6 +424,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
         public double value(int i0, int i1, int i2, int i3) {
             throw new IllegalArgumentException("not supported");
+        }
+
+        public void putValue(double d) {
+            throw new IllegalArgumentException("rank 0 not supported");
         }
 
         public void putValue(int i0, double d) {
@@ -416,6 +456,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
             this.properties.put(QDataSet.UNITS, u);
         }
 
+        public double value() {
+            throw new IllegalArgumentException("rank 0 not supported");
+        }
+        
         public double value(int i) {
             try {
                 return u.parse(((DString) back[i]).getValue()).doubleValue(u);
@@ -434,6 +478,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
         public double value(int i0, int i1, int i2, int i3) {
             throw new IllegalArgumentException("not supported");
+        }
+
+        public void putValue(double d) {
+            throw new IllegalArgumentException("rank 0 not supported");
         }
 
         public void putValue(int i0, double d) {
