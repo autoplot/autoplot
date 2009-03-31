@@ -18,6 +18,8 @@ import org.virbo.autoplot.util.TransparentLogger;
  * the bean.
  * mutatorLock() is a way for a client to get exclusive, read-only access to a bean.  This also sets the valueAdjusting
  * property.
+ *
+ * See http://das2.org/wiki/index.php/Pending_changes
  * @author jbf
  */
 public class ChangesSupport {
