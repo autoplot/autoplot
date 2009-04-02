@@ -60,7 +60,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         URI resourceURI;     // optional resource URI that is argument to script, excluding script argument.
         
         if ( params.get( PARAM_SCRIPT )!=null ) {
-            jythonScript= DataSetURL.getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
+            jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
             mon.setProgressMessage( "loading "+url );
             resourceURI= url.toURI();
         } else {

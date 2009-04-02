@@ -55,7 +55,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
     }
 
     public QDataSet getDataSet(ProgressMonitor mon) throws IOException {
-        File file = DataSetURL.getFile(url, mon);
+        File file = getFile(mon);
         InputStream in = new FileInputStream(file);
         fs = new POIFSFileSystem(in);
         HSSFWorkbook wb = new HSSFWorkbook(fs);

@@ -24,7 +24,6 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
 
 /**
  *
@@ -39,7 +38,7 @@ public class WavDataSource extends AbstractDataSource {
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        File wavFile = DataSetURL.getFile(this.url, mon);
+        File wavFile = getFile(mon);
                 
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(wavFile);
         AudioFormat audioFormat = fileFormat.getFormat();

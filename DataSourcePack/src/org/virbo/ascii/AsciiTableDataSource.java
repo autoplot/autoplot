@@ -226,7 +226,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     private DDataSet doReadFile(final ProgressMonitor mon) throws NumberFormatException, IOException, FileNotFoundException {
 
         String o;
-        file = DataSetURL.getFile(url, mon);
+        file = getFile(mon);
 
         parser = new AsciiParser();
 
