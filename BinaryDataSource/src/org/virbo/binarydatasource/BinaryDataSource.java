@@ -12,11 +12,11 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.IndexGenDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
 
 /**
  *
@@ -50,7 +50,7 @@ public class BinaryDataSource extends AbstractDataSource {
 
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        File f = DataSetURL.getFile(url, mon);
+        File f = getFile(mon);
 
         FileChannel fc = new FileInputStream(f).getChannel();
 
@@ -96,7 +96,7 @@ public class BinaryDataSource extends AbstractDataSource {
             int first = 0;
             int last = -999;
             if (s.contains(":")) {
-                String[] ss = s.split(":");
+                String[] ss = s.split(":",-2);
                 if (ss[0].length() > 0) {
                     first = Integer.parseInt(ss[0]);
                 }
@@ -104,6 +104,7 @@ public class BinaryDataSource extends AbstractDataSource {
                     last = Integer.parseInt(ss[1]);
                 }
             }
+            if ( last==-999 ) last= fieldCount;
             rank2 = new int[]{first, last};
             col = first;
             if ( col<0 ) col= fieldCount + col;
@@ -150,7 +151,7 @@ public class BinaryDataSource extends AbstractDataSource {
                     return offset + finalRecOffset + i * finalRecSizeBytes;
                 }
             };
-            dep0ds.putProperty( QDataSet.CADENCE, (double)recSizeBytes );
+            dep0ds.putProperty( QDataSet.CADENCE, DataSetUtil.asDataSet((double)recSizeBytes) );
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         }
 
