@@ -90,14 +90,12 @@ public class CanvasController {
                     row.setEmMaximum(-1*emIn);
                 }
                 Timer timer = new Timer(100, new ActionListener() {
-
                     public void actionPerformed(ActionEvent e) {
                         dasCanvas.repaint();
                     }
                 });
                 timer.setRepeats(false);
                 timer.restart();
-
             }
         };
     }
