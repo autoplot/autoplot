@@ -32,6 +32,7 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.datasource.capability.Updating;
 import org.virbo.dsutil.AutoHistogram;
 
 /**
@@ -497,12 +498,24 @@ public class DataSourceController {
                 dsf.uri = newsurl; // don't fire off event. TODO: should we?
             }
             setStatus("ready");
-        } catch ( RuntimeException ex ) {
-            setStatus("error: "+ex.toString());
+        } catch (RuntimeException ex) {
+            setStatus("error: " + ex.toString());
             throw ex;
         }
 
     }
+    private Updating updating;
+    private PropertyChangeListener updatesListener = new PropertyChangeListener() {
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            QDataSet ds = (QDataSet) evt.getNewValue();
+            if (ds != null) {
+                setDataSetInternal(ds);
+            } else {
+                update(false, false);
+            }
+        }
+    };
 
     /**
      * update the model and view using the new DataSource to create a new dataset,
@@ -517,7 +530,18 @@ public class DataSourceController {
         Runnable run = new Runnable() {
 
             public void run() {
-                updateImmediately();
+                synchronized (DataSourceController.this) {
+                    updateImmediately();
+                    if (dataSource != null) {
+                        if (updating != null) {
+                            updating.removePropertyChangeListener(updatesListener);
+                        }
+                        updating = dataSource.getCapability(Updating.class);
+                        if (updating != null) {
+                            updating.addPropertyChangeListener(updatesListener);
+                        }
+                    }
+                }
                 changesSupport.changePerformed(this, PENDING_UPDATE);
             }
         };
@@ -709,19 +733,19 @@ public class DataSourceController {
     }
     private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
 
-    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
-    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
-    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
-    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
