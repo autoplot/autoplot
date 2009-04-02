@@ -198,11 +198,11 @@ public class ApplicationModel {
     }
 
 
-    public synchronized void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
+    public void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    public synchronized void removePropertyChangeListener(java.beans.PropertyChangeListener listener) {
+    public void removePropertyChangeListener(java.beans.PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
