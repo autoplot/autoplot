@@ -6,7 +6,6 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-
 package org.virbo.datasource;
 
 import org.das2.util.monitor.ProgressMonitor;
@@ -19,21 +18,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.capability.Updating;
 
 /**
  *
  * @author jbf
  */
 public abstract class AbstractDataSource implements DataSource {
-    
+
     protected URL url;
-    
     /**
      * available to subclasses for convenience.  This is the name of the file,
      * without the parameters.
      */
     protected URL resourceURL;
-    
+
     /**
      * returns the url's canonical extension for convenience.  
      * The extension does contain the initial period and is folded to lower case.  
@@ -44,101 +43,113 @@ public abstract class AbstractDataSource implements DataSource {
      * 
      * @return lower-case extension with a period, or empty string.
      */
-    protected String getExt( URL url ) {
-        String s= url.getFile();
-        int i= s.lastIndexOf("."); // URI okay
-        if ( i==-1 ) {
+    protected String getExt(URL url) {
+        String s = url.getFile();
+        int i = s.lastIndexOf("."); // URI okay
+        if (i == -1) {
             return "";
         } else {
             return s.substring(i).toLowerCase();
         }
     }
-    
     /**
      * available to subclasses for convenience.  
      */
-    protected Map<String,String> params;
-    
-    public AbstractDataSource( URL url ) {
+    protected Map<String, String> params;
+
+    public AbstractDataSource(URL url) {
         try {
             this.url = url;
-            String s= url.toString();
+            String s = url.toString();
             URLSplit split = URLSplit.parse(s);
-            
+
             params = URLSplit.parseParams(split.params);
             resourceURL = new URL(split.file);
         } catch (MalformedURLException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
+
     public abstract QDataSet getDataSet(ProgressMonitor mon) throws Exception;
-    
+
     public boolean asynchronousLoad() {
         return true;
     }
-    
+
     @Override
     public String toString() {
         return url.toString();
     }
-    
+
     public String getURL() {
         return url.toString();
     }
-    
+
+
+    FilePollUpdating pollingUpdater;
+
     /**
      * make the remote file available.
      */
-    protected File getFile( ProgressMonitor mon ) throws IOException {
-       return DataSetURL.getFile( url, mon ); 
+    protected File getFile(ProgressMonitor mon) throws IOException {
+        return getFile( resourceURL, mon );
     }
-    
+
+    /**
+     * make the remote file available.
+     */
+    protected File getFile( URL url, ProgressMonitor mon ) throws IOException {
+        File f = DataSetURL.getFile( url, mon );
+        if (params.containsKey("pollForUpdates")) {
+            pollingUpdater= new FilePollUpdating();
+            pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("pollForUpdates")) ) );
+            capabilities.put(Updating.class,pollingUpdater );
+        }
+        return f;
+    }
+
     /**
      * return the parameters from the URL.
      */
     protected Map getParams() {
-       return params; 
+        return params;
     }
-    
+
     /**
      * abstract class version returns an empty tree.  Override this method
      * to provide metadata.
      */
-    public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
-        return new HashMap<String,Object>();
+    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+        return new HashMap<String, Object>();
     }
-    
+
     public MetadataModel getMetadataModel() {
         return MetadataModel.createNullModel();
     }
-    
-    public Map<String,Object> getProperties() {
+
+    public Map<String, Object> getProperties() {
         try {
-            Map<String,Object> meta=  getMetaData( new NullProgressMonitor() );
-            return getMetadataModel().properties( meta );
+            Map<String, Object> meta = getMetaData(new NullProgressMonitor());
+            return getMetadataModel().properties(meta);
         } catch (Exception e) {
-	    e.printStackTrace();
-            return Collections.singletonMap( "Exception",  (Object)e );
+            e.printStackTrace();
+            return Collections.singletonMap("Exception", (Object) e);
         }
     }
-   
-    HashMap<Class,Object> capabilities= new HashMap<Class,Object>();
-    
+    HashMap<Class, Object> capabilities = new HashMap<Class, Object>();
+
     /**
      * attempt to get a capability.  null will be returned if the 
      * capability doesn't exist.
      */
-    public <T> T getCapability( Class<T> clazz ) {
+    public <T> T getCapability(Class<T> clazz) {
         return (T) capabilities.get(clazz);
     }
-    
+
     /**
      * attach a capability
      */
-    public <T> void addCability( Class<T> clazz, T o ) {
-        capabilities.put( clazz, o );
+    public <T> void addCability(Class<T> clazz, T o) {
+        capabilities.put(clazz, o);
     }
-    
-    
 }
