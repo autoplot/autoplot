@@ -12,6 +12,7 @@ import org.das2.datum.Units;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.MetadataModel;
@@ -136,7 +137,7 @@ public class IstpMetadataModel extends MetadataModel {
     public Map<String, Object> properties(Map<String, Object> meta) {
         Map attrs = meta;
 
-        HashMap<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
         if (attrs.containsKey("LABLAXIS")) {
             properties.put(QDataSet.LABEL, attrs.get("LABLAXIS"));
@@ -150,15 +151,6 @@ public class IstpMetadataModel extends MetadataModel {
             String type = (String) attrs.get("DISPLAY_TYPE");
             properties.put(QDataSet.RENDER_TYPE, type);
         }
-
-        for (int i = 0; i < 4; i++) {
-            String key = "DEPEND_" + i;
-            if (attrs.containsKey(key)) {
-                Map<String, Object> props = (Map<String, Object>) attrs.get(key);
-                properties.put(key, properties(props));
-            }
-        }
-
         Units units = Units.dimensionless;
         if (attrs.containsKey("UNITS")) {
             String sunits = (String) attrs.get("UNITS");
@@ -203,6 +195,14 @@ public class IstpMetadataModel extends MetadataModel {
         } catch (IllegalArgumentException ex) {
             ex.printStackTrace();
 
+        }
+
+        for (int i = 0; i < 4; i++) {
+            String key = "DEPEND_" + i;
+            if (attrs.containsKey(key)) {
+                Map<String, Object> props = (Map<String, Object>) attrs.get(key);
+                properties.put(key, properties(props));
+            }
         }
 
         return properties;
