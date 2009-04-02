@@ -96,13 +96,15 @@ public abstract class AbstractDataSource implements DataSource {
     }
 
     /**
-     * make the remote file available.
+     * make the remote file available.  If the parameter "filePollUpdates" is set to
+     * a float, a thread will be started to monitor the local file for updates.
+     * This is done by monitoring for file length and modification time changes.
      */
     protected File getFile( URL url, ProgressMonitor mon ) throws IOException {
         File f = DataSetURL.getFile( url, mon );
-        if (params.containsKey("pollForUpdates")) {
+        if (params.containsKey("filePollUpdates")) {
             pollingUpdater= new FilePollUpdating();
-            pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("pollForUpdates")) ) );
+            pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("filePollUpdates")) ) );
             capabilities.put(Updating.class,pollingUpdater );
         }
         return f;
