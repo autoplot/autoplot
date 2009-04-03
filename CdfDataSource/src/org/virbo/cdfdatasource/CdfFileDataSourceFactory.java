@@ -67,6 +67,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         }
         
         try {
+            // TODO: on Linux systems, may not be able to execute from plug-in media.
             if (cdfLib1 != null) System.loadLibrary(cdfLib1);
             if (cdfLib2 != null) System.loadLibrary(cdfLib2);
         } catch ( UnsatisfiedLinkError ex ) {
