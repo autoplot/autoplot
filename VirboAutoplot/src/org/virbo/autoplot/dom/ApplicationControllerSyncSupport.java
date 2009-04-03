@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
  * Support methods for synchronizing two Application trees with different
@@ -30,7 +31,7 @@ public class ApplicationControllerSyncSupport {
         Map<String,String> dsfIds= new HashMap<String,String>();
 
         while (application.plots.size() < plots.length) {
-            controller.addPlot();
+            controller.addPlot(LayoutConstants.BELOW);
         }
         while (application.plots.size() > plots.length) {
             Plot plott= application.plots.get(application.plots.size() - 1);
