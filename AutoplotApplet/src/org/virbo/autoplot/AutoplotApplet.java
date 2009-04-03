@@ -12,11 +12,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -57,6 +59,9 @@ public class AutoplotApplet extends JApplet {
     Application dom;
     static Logger logger = Logger.getLogger("virbo.autoplot.applet");
 
+    String statusCallback;
+    String timeCallback;
+
     private String getStringParameter(String name, String deft) {
         String result = getParameter(name);
         if (result == null) {
@@ -75,11 +80,31 @@ public class AutoplotApplet extends JApplet {
         }
     }
 
+    private void setInitializationStatus( String val ) {
+        if ( ! statusCallback.equals("") ) {
+            try {
+                getAppletContext().showDocument(new URL("javascript:" + statusCallback + "(\"" + val + "\")"));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    private void timeCallback( String val ) {
+        if ( ! timeCallback.equals("") ) {
+            try {
+                getAppletContext().showDocument(new URL("javascript:" + timeCallback + "(\"" + val + "\")"));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
     @Override
     public void init() {
         super.init();
 
-        System.err.println("AutoplotApplet 20090217.1");
+        System.err.println("AutoplotApplet 20090320.1");
 
         model = new ApplicationModel();
 
@@ -105,7 +130,7 @@ public class AutoplotApplet extends JApplet {
         Object request = null;
         int width = getIntParameter("width", 700);
         int height = getIntParameter("height", 400);
-        String font = getStringParameter("font", "");
+        String fontParam = getStringParameter("font", "");
         String column = getStringParameter("column", "");
         String row = getStringParameter("row", "");
         String scolor = getStringParameter("color", "");
@@ -127,6 +152,10 @@ public class AutoplotApplet extends JApplet {
         String zrange = getStringParameter("plot.zaxis.range", "");
         String zlog = getStringParameter("plot.zaxis.log", "");
         String zdrawTickLabels = getStringParameter("plot.zaxis.drawTickLabels", "");
+        statusCallback= getStringParameter("statusCallback","");
+        timeCallback= getStringParameter("timeCallback", "" );
+
+        setInitializationStatus("readParameters");
 
         dom.getOptions().setAutolayout("true".equals(getParameter("autolayout")));
         if (!dom.getOptions().isAutolayout()) {
@@ -138,8 +167,8 @@ public class AutoplotApplet extends JApplet {
             }
         }
 
-        if (!font.equals("")) {
-            appmodel.canvas.setBaseFont(Font.decode(font));
+        if (!fontParam.equals("")) {
+            appmodel.canvas.setBaseFont(Font.decode(fontParam));
         }
 
         appmodel.getCanvas().setSize(width, height);
@@ -172,6 +201,7 @@ public class AutoplotApplet extends JApplet {
             });
 
             add(select, BorderLayout.NORTH);
+
         }
 
 
@@ -204,6 +234,7 @@ public class AutoplotApplet extends JApplet {
             }
 
             appmodel.setDataSource(dsource);
+            setInitializationStatus("dataSourceSet");
 
             if (stimeRange != null && !stimeRange.equals("")) {
                 try {
@@ -215,7 +246,7 @@ public class AutoplotApplet extends JApplet {
                     dom.setTimeRange(timeRange);
                 }
             }
-
+            setInitializationStatus("dataSetLoaded");
         }
 
 
@@ -315,6 +346,14 @@ public class AutoplotApplet extends JApplet {
         if (surl != null) {
             setDataSetURL(surl);
         }
+
+        setInitializationStatus("ready");
+
+        dom.getController().getPlot().getXaxis().addPropertyChangeListener( Axis.PROP_RANGE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                timeCallback( String.valueOf(evt.getNewValue()) );
+            }
+        });
     }
 
     private void createAppletTester() {
