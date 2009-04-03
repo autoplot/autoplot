@@ -465,7 +465,7 @@ public class PanelController {
             legendLabel= (String)v;
         }
         if ( legendLabel!=null ) {
-            cpanel.setLegendLabel((String) v);
+            cpanel.setLegendLabel((String) legendLabel);
         }
 
         if (spec == RenderType.spectrogram) {
