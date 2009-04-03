@@ -114,7 +114,7 @@ public class AggregatingDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         String[] ss = getFsm().getNamesFor(viewRange);
 
-        Logger.getLogger("virbo.datasource.agg").info("aggregating " + ss.length + " files for " + viewRange);
+        Logger.getLogger("virbo.datasource.agg").fine("aggregating " + ss.length + " files for " + viewRange);
 
         DDataSet result = null;
 
