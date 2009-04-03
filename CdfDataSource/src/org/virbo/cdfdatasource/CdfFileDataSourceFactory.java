@@ -75,7 +75,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             System.err.println( System.getProperty("java.library.path" ));
             throw ex;
         }
-        logger.info("cdf binaries loaded");
+        logger.fine("cdf binaries loaded");
     }
     
     
