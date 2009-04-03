@@ -37,7 +37,6 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.dsops.Ops;
 
 /**
  * PanelController manages the Panel, for example resolving the datasource and loading the dataset.
@@ -120,14 +119,17 @@ public class PanelController {
         assert (panel.getDataSourceFilterId() != null);
         dsf = dom.getController().getDataSourceFilterFor(panel);
 
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
-        dsf.addPropertyChangeListener(Panel.PROP_RENDERTYPE, dsfListener);
-
+        if ( dsf==null ) {
+            throw new NullPointerException("couldn't find the data for this panel");
+        } else {
+            dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
+            dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
+            dsf.addPropertyChangeListener(Panel.PROP_RENDERTYPE, dsfListener);
+        }
         setDataSourceFilterController(getDataSourceFilter().getController());
     }
 
-    private Color deriveColor(Color color, int i) {
+    private Color deriveColor( Color color, int i ) {
 
         float[] colorHSV = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
         if (colorHSV[2] < 0.7f) {
@@ -262,25 +264,27 @@ public class PanelController {
 
             // add additional panels when it's a bundle of rank1 datasets.
             if (!dom.getController().isValueAdjusting()) {
-                if (panel.getRenderType() == RenderType.series && fillDs.rank() == 2 && fillDs.length(0) < 12) {
+                if ( fillDs.rank() == 2 && ( panel.getRenderType() != RenderType.spectrogram ) && fillDs.length(0) < 12) {
                     MutatorLock lock = dom.getController().mutatorLock();
                     lock.lock();
                     String[] labels = SemanticOps.getComponentLabels(fillDs);
                     Color c = panel.getStyle().getColor();
+                    Color fc= panel.getStyle().getFillColor();
                     Plot domPlot = dom.getController().getPlotFor(panel);
-                    renderer.setActive(false);
                     List<Panel> cp = new ArrayList<Panel>(fillDs.length(0));
                     for (int i = 0; i < fillDs.length(0); i++) {
                         Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsf);
                         cp.add(cpanel);
                         cpanel.getController().parentPanel = panel;
                         cpanel.getStyle().setColor(deriveColor(c, i));
+                        cpanel.getStyle().setFillColor( deriveColor(fc,i).brighter() );
                         cpanel.setComponent(labels[i]);
                         cpanel.setDisplayLegend(true);
-                        cpanel.setLegendLabel(labels[i]);
+                        cpanel.setLegendLabel(labels[i].trim());
                         cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
                         cpanel.getController().setDataSet(fillDs);
                     }
+                    renderer.setActive(false);
                     PanelController.this.childPanels = cp;
                     lock.unlock();
                 }
@@ -303,19 +307,19 @@ public class PanelController {
         dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
     }
 
-    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
-    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
-    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
-    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
     /**
