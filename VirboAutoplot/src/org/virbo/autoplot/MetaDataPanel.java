@@ -22,12 +22,14 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
+import org.virbo.dsutil.AutoHistogram;
 import org.virbo.dsutil.PropertiesTreeModel;
 import org.virbo.metatree.NameValueTreeModel;
 
@@ -41,7 +43,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
     Application dom;
     CombinedTreeModel tree;
     TreeModel dsTree;
-    DataSourceFilter bindToDataSourceFilter= null;  //TODO: these should be weak references or such.
+    DataSourceFilter bindToDataSourceFilter = null;  //TODO: these should be weak references or such.
     private QDataSet dsTreeDs;
 
     /** Creates new form MetaDataPanel */
@@ -49,20 +51,23 @@ public class MetaDataPanel extends javax.swing.JPanel {
         this.applicationModel = applicationModel;
         this.dom = applicationModel.getDocumentModel();
         initComponents();
-                
+
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 metaDataTree.setModel(null);
             }
         });
-        
+
         dom.getController().addPropertyChangeListener(ApplicationController.PROP_PANEL, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
                 bindToPanel();
             }
         });
 
         dom.getController().addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
                 bindToDataSourceFilter();
             }
@@ -78,7 +83,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
     private void bindToDataSourceFilter() {
         if (bindToDataSourceFilter != null) {
-            DataSourceController dsc= bindToDataSourceFilter.getController();
+            DataSourceController dsc = bindToDataSourceFilter.getController();
             dsc.removePropertyChangeListener(propertiesListener);
             dsc.removePropertyChangeListener(fillListener);
         }
@@ -87,16 +92,15 @@ public class MetaDataPanel extends javax.swing.JPanel {
         updateProperties();
         updateStatistics();
     }
-    
-    private void bindToPanel() {
 
+    private void bindToPanel() {
     }
 
     public void updateProperties() {
 
         try {
-            DataSourceFilter dsf= dom.getController().getDataSourceFilter();
-            
+            DataSourceFilter dsf = dom.getController().getDataSourceFilter();
+
             DataSource dsrc = null;
             if (dsf != null) {
                 dsrc = dsf.getController()._getDataSource();
@@ -107,7 +111,9 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 MetadataModel model = dsrc.getMetadataModel();
                 String root = "Metadata";
                 if (model != null) {
-                    if ( !model.getLabel().equals("") ) root = root+ "(" + model.getLabel() + ")";
+                    if (!model.getLabel().equals("")) {
+                        root = root + "(" + model.getLabel() + ")";
+                    }
                 }
 
                 final TreeModel dsrcMeta = NameValueTreeModel.create(root, meta);
@@ -121,12 +127,13 @@ public class MetaDataPanel extends javax.swing.JPanel {
                     });
                 }
             } else {
-                String label= "(no data source)";
-                if ( dsf.getController().getDataSet()!=null ) {  // findbugs indicates NP_GUARANTEED_DEREF, but I don't see it. JBF
-                    label= "dataset";
+                String label = "(no data source)";
+                if (dsf.getController().getDataSet() != null) {  // findbugs indicates NP_GUARANTEED_DEREF, but I don't see it. JBF
+                    label = "dataset";
                 }
                 tree = new CombinedTreeModel(label);
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         metaDataTree.setModel(tree);
                     }
@@ -170,33 +177,36 @@ public class MetaDataPanel extends javax.swing.JPanel {
     boolean statisticsDirty;
 
     private String histStr(QDataSet ds) {
-        QDataSet hist= Ops.histogram(ds, 20);
-        QDataSet dep0= (QDataSet) hist.property(QDataSet.DEPEND_0);
-        Datum res= DataSetUtil.asDatum((RankZeroDataSet)dep0.property(QDataSet.CADENCE));
-        Units u= (Units)dep0.property(QDataSet.UNITS);
-        if ( u==null ) u= Units.dimensionless;
-        
+        QDataSet hist = Ops.histogram(ds, 20);
+        QDataSet dep0 = (QDataSet) hist.property(QDataSet.DEPEND_0);
+        Datum res = DataSetUtil.asDatum((RankZeroDataSet) dep0.property(QDataSet.CADENCE));
+        Units u = (Units) dep0.property(QDataSet.UNITS);
+        if (u == null) {
+            u = Units.dimensionless;
+        }
+
         String scale;
-        if ( metaDataTree.getFont().canDisplay( (char)2581) ) {
-            scale= "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
+        if (metaDataTree.getFont().canDisplay((char) 2581)) {
+            scale = "\u2581\u2582\u2583\u2584\u2585\u2586\u2587\u2588";
         } else {
             scale = " .:!#";
         }
-        int scaleMax= scale.length();
-        
-        Integer max= (Integer) hist.property("max");
-        
-        StringBuffer s= new StringBuffer();
-        
-        s.append( "" + Datum.create( dep0.value(0), u, res.doubleValue(u.getOffsetUnits()) ) +" ");
-        for ( int i=0; i<hist.length(); i++ ) {
-            int norm= (int)hist.value(i) * scaleMax / max;
-            if ( norm==scaleMax ) norm=scaleMax-1; // make last bin inclusive
-            //s.append( (char)(2581+norm) );
-            s.append( scale.charAt(norm));
+        int scaleMax = scale.length();
+
+        Integer max = (Integer) hist.property("max");
+
+        StringBuffer s = new StringBuffer();
+
+        s.append("" + Datum.create(dep0.value(0), u, res.doubleValue(u.getOffsetUnits())) + " ");
+        for (int i = 0; i < hist.length(); i++) {
+            int norm = (int) hist.value(i) * scaleMax / max;
+            if (norm == scaleMax) {
+                norm = scaleMax - 1; // make last bin inclusive
+            }            //s.append( (char)(2581+norm) );
+            s.append(scale.charAt(norm));
         }
-        s.append(" "+ Datum.create( dep0.value(dep0.length()-1), u, res.doubleValue(u.getOffsetUnits()) ) );
-        if ( "log".equals( dep0.property( QDataSet.SCALE_TYPE ) ) ) {
+        s.append(" " + Datum.create(dep0.value(dep0.length() - 1), u, res.doubleValue(u.getOffsetUnits())));
+        if ("log".equals(dep0.property(QDataSet.SCALE_TYPE))) {
             s.append(" log");
         }
         return s.toString();
@@ -204,7 +214,8 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
     private void updateStatistics() {
         statisticsDirty = true;
-        Runnable run= new Runnable() {
+        Runnable run = new Runnable() {
+
             public void run() {
                 if (statisticsDirty) {
                     updateStatisticsImmediately();
@@ -216,35 +227,38 @@ public class MetaDataPanel extends javax.swing.JPanel {
     }
 
     private synchronized void updateDataSetPropertiesView() {
-        assert EventQueue.isDispatchThread()==false;
+        assert EventQueue.isDispatchThread() == false;
         final TreeModel unmount;
-        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
-        if ( dsf.getController().getDataSet() == null) {
+        DataSourceFilter dsf = dom.getController().getDataSourceFilter();
+        if (dsf.getController().getDataSet() == null) {
             //dsTree= NameValueTreeModel.create("dataset", Collections.singletonMap("dataset=", "no dataset") );
             //(PropertiesTreeModel( "no dataset", null );
             return;
         } else {
-            if ( dsf.getController().getDataSet() != this.dsTreeDs) {
-                unmount= dsTree;
-                dsTree = new PropertiesTreeModel("Dataset= ", dsf.getController().getDataSet(),20);
+            if (dsf.getController().getDataSet() != this.dsTreeDs) {
+                unmount = dsTree;
+                dsTree = new PropertiesTreeModel("Dataset= ", dsf.getController().getDataSet(), 20);
                 this.dsTreeDs = dsf.getController().getDataSet();
             } else {
-                unmount= null;
+                unmount = null;
             }
         }
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    if ( unmount!=null ) tree.unmountTree(unmount);
-                    tree.mountTree(dsTree, 30);
+
+            public void run() {
+                if (unmount != null) {
+                    tree.unmountTree(unmount);
                 }
+                tree.mountTree(dsTree, 30);
+            }
         });
     }
 
     @SuppressWarnings("unchecked")
     private synchronized void updateStatisticsImmediately() {
-        assert EventQueue.isDispatchThread()==false;
-        
-        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        assert EventQueue.isDispatchThread() == false;
+
+        DataSourceFilter dsf = dom.getController().getDataSourceFilter();
         final LinkedHashMap map = new LinkedHashMap();
 
         QDataSet ds = dsf.getController().getDataSet();
@@ -253,25 +267,48 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         } else {
 
-            AutoplotUtil.MomentDescriptor moments = AutoplotUtil.moment(ds);
+            RankZeroDataSet moments = DataSetOps.moment(ds);
 
-            map.put("# invalid", String.valueOf(moments.invalidCount) + " of " + String.valueOf(moments.validCount + moments.invalidCount));
+            long validCount = (Integer) moments.property("validCount");
+            long invalidCount = (Integer) moments.property("invalidCount");
+            map.put("# invalid", "" + invalidCount + " of " + String.valueOf(validCount + invalidCount));
             String s;
-            if (moments.validCount > 0) {
-                s = format(moments.moment[0]);
+            if (validCount > 0) {
+                s = String.valueOf(moments);
             } else {
                 s = "";
             }
             map.put("Mean", s);
 
-            if (moments.validCount > 1) {
-                s = format(moments.moment[1]);
+            if (validCount > 1) {
+                s = String.valueOf(DatumUtil.asOrderOneUnits(DataSetUtil.asDatum((RankZeroDataSet) moments.property("stddev"))));
             } else {
                 s = "";
             }
             map.put("Std Dev", s);
 
-            map.put("Histogram", dsf.getController().getHistogram() );
+            QDataSet hist = dsf.getController().getHistogram();
+            map.put("Histogram", hist);
+
+            if (hist != null) {
+                moments = AutoHistogram.moments(hist);
+                validCount = (Long) moments.property("validCount");
+                invalidCount = (Long) moments.property("invalidCount");
+
+                if (validCount > 0) {
+                    s = String.valueOf(moments);
+                } else {
+                    s = "";
+                }
+                map.put("AH_Mean", s);
+
+                if (validCount > 1) {
+                    s = String.valueOf(DatumUtil.asOrderOneUnits(DataSetUtil.asDatum((RankZeroDataSet) moments.property("stddev"))));
+                } else {
+                    s = "";
+                }
+                map.put("AH_Std Dev", s);
+            }
 
             QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
 
@@ -290,21 +327,22 @@ public class MetaDataPanel extends javax.swing.JPanel {
             }
 
             if (cadence != null) {
-                Datum d = DatumUtil.asOrderOneUnits( DataSetUtil.asDatum(cadence) );
+                Datum d = DatumUtil.asOrderOneUnits(DataSetUtil.asDatum(cadence));
                 Units u = d.getUnits();
                 map.put("Cadence", format(d.doubleValue(u)) + " " + u);
             } else {
                 map.put("Cadence", "null");
             }
-            
-            //s= histStr( ds );
-            //map.put( "Histogram", s );
+
+        //s= histStr( ds );
+        //map.put( "Histogram", s );
 
         }
 
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
-                tree.mountTree( NameValueTreeModel.create("Statistics", map), 20);
+                tree.mountTree(NameValueTreeModel.create("Statistics", map), 20);
             }
         });
 
