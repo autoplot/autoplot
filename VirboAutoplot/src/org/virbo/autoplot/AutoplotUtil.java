@@ -450,82 +450,6 @@ public class AutoplotUtil {
         }
     }
 
-    public static class MomentDescriptor {
-        double[] moment;
-        Units units;
-        int invalidCount;
-        int validCount;
-    }
-
-    static MomentDescriptor moment(QDataSet ds) {
-
-        MomentDescriptor result = new MomentDescriptor();
-
-        result.moment = new double[2];
-
-        Units u = (Units) ds.property(QDataSet.UNITS);
-        if (u == null) {
-            u = Units.dimensionless;
-        }
-        int validCount = 0;
-        int invalidCount = 0;
-
-        double approxMean = 0.;
-
-        OldDataSetIterator iter = OldDataSetIterator.create(ds);
-        int climit=0;
-        while ( climit<DS_LENGTH_LIMIT && iter.hasNext()) {
-            double d = iter.next();
-            climit++;
-            if (!u.isValid(d)) {
-                invalidCount++;
-            } else {
-                validCount++;
-                approxMean += d;
-            }
-        }
-
-        if (validCount > 0) {
-            approxMean /= validCount; // approximate--suseptible to number error.
-        }
-
-        result.invalidCount = invalidCount;
-        result.validCount = validCount;
-
-        double mean = 0;
-        double stddev = 0;
-
-        if (validCount > 0) {
-            iter = OldDataSetIterator.create(ds);
-            climit=0;
-            while ( climit<DS_LENGTH_LIMIT && iter.hasNext()) {
-                double d = iter.next();
-                climit++;
-                if (u.isValid(d)) {
-                    mean += (d - approxMean);
-                    stddev += Math.pow(d - approxMean, 2);
-                }
-            }
-
-            mean /= validCount;
-            mean += approxMean;
-
-            result.moment[0] = mean;
-
-            if (validCount > 1) {
-                stddev /= (validCount - 1); // this will be very close to result, even though correction should be made since approxMean != mean.
-                stddev = Math.sqrt(stddev);
-                result.moment[1] = stddev;
-            } else {
-                result.moment[1] = u.getFillDouble();
-            }
-
-        } else {
-            result.moment[0] = u.getFillDouble();
-        }
-
-        return result;
-    }
 
     public static Document readDoc(InputStream is) throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilder builder;
@@ -774,7 +698,11 @@ public class AutoplotUtil {
 
         if ( fillds.rank() >= 2 ) {
             if ( dep1 != null && isVectorOrBundleIndex(dep1) ) {
-                spec = RenderType.series;
+                if ( fillds.length()>200000 ) {
+                    spec= RenderType.hugeScatter;
+                } else {
+                    spec = RenderType.series;
+                }
             } else {
                 spec= RenderType.spectrogram;
             }
