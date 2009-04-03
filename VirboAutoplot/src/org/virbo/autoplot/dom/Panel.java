@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.virbo.autoplot.ApplicationModel.RenderType;
 
@@ -218,6 +219,18 @@ public class Panel extends DomNode {
             result.add( new PropertyChangeDiff( "legendLabel", that.legendLabel, this.legendLabel ) );
         }
 
+        if ( !that.displayLegend==this.displayLegend ) {
+            result.add( new PropertyChangeDiff( "displayLegend", that.displayLegend, this.displayLegend ) );
+        }
+
+        if ( !that.active==this.active ) {
+            result.add( new PropertyChangeDiff( "active", that.active, this.active ) );
+        }
+
+        if ( !that.renderType.equals(this.renderType) ) {
+            result.add( new PropertyChangeDiff( "renderType", that.renderType, this.renderType ) );
+        }
+
         if ( !that.dataSourceFilterId.equals( this.dataSourceFilterId ) ) {
             result.add( new PropertyChangeDiff( "dataSourceFilterId", that.dataSourceFilterId, this.dataSourceFilterId ) );
         }
@@ -233,13 +246,7 @@ public class Panel extends DomNode {
 
     public void syncTo(DomNode n) {
         super.syncTo(n);
-        Panel that = (Panel) n;
-        this.setPlotId(that.getPlotId());
-        this.setLegendLabel(that.getLegendLabel());
-        this.setDataSourceFilterId( that.getDataSourceFilterId() );
-        this.setComponent(that.getComponent());
-        this.style.syncTo(that.style);
-        this.plotDefaults.syncTo(that.plotDefaults);
+        syncTo( n, new ArrayList<String>() );
     }
     
     public void syncTo( DomNode n, List<String> exclude ) {
@@ -249,13 +256,21 @@ public class Panel extends DomNode {
         if ( !exclude.contains( PROP_DATASOURCEFILTERID ) ) this.setDataSourceFilterId(that.getDataSourceFilterId());
         if ( !exclude.contains( PROP_COMPONENT ) ) this.setComponent(that.getComponent());
         if ( !exclude.contains( PROP_LEGENDLABEL ) ) this.setLegendLabel(that.getLegendLabel());
+        if ( !exclude.contains( PROP_DISPLAYLEGEND ) ) this.setDisplayLegend(that.isDisplayLegend());
+        if ( !exclude.contains( PROP_ACTIVE ) ) this.setActive(that.isActive());
+        if ( !exclude.contains( PROP_RENDERTYPE ) ) this.setRenderType( that.getRenderType() );
         this.style.syncTo(that.style);
         this.plotDefaults.syncTo(that.plotDefaults);
+
     }
 
     @Override
     public String toString() {
-        String l= getLegendLabel().length()==0 ? "" : " ("+getLegendLabel()+")";
+        StringBuffer parenthetical= new StringBuffer( getLegendLabel()==null ? "" : getLegendLabel() );
+        if ( !this.active ) {
+            parenthetical.append( parenthetical.length()==0 ? "inactive" : ", inactive" );
+        }
+        String l= parenthetical.length()==0 ? "" : " ("+parenthetical.toString()+")";
         return super.toString() + l;
     }
 
