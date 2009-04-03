@@ -29,13 +29,16 @@ public class ChangesSupport {
 
     /**
      * if the propertyChangeSupport is provided, then change messages will be sent to
-     * it directly.  If null, then one is created.
+     * it directly.  If null, then one is created with the parent as the source.
      * @param pcs
      * @param parent  the object this is supporting, for debugging purposes.
      */
     ChangesSupport( PropertyChangeSupport pcs, Object parent ) {
         this.parent= parent;
         this.changesPending= new HashMap<Object,Object>(); // client->lock
+        if ( pcs==null ) {
+            pcs= new PropertyChangeSupport(parent);
+        }
         this.propertyChangeSupport= pcs;
     }
     
