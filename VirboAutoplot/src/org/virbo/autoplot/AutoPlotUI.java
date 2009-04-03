@@ -503,7 +503,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
     private void plotUrl() {
         try {
-            Logger.getLogger("ap").info("plotUrl()");
+            Logger.getLogger("ap").fine("plotUrl()");
             final String surl = (String) dataSetSelector.getValue();
             applicationModel.addRecent(surl);
             applicationModel.resetDataSetSourceURL(surl, new NullProgressMonitor() {
@@ -1259,7 +1259,7 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
 
         if (alm.getValue("URL") != null) {
             initialURL = alm.getValue("URL");
-            Logger.getLogger("ap").info("setting initial URL to >>>" + initialURL + "<<<");
+            Logger.getLogger("ap").fine("setting initial URL to >>>" + initialURL + "<<<");
 
             bookmarks = alm.getValue("bookmarks");
 

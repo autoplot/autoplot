@@ -248,7 +248,7 @@ class TsdsDataSource extends AbstractDataSource {
         int size = points * SIZE_DOUBLE;
 
         logit( "making url2 connection", t0 );
-        logger.info("" + url2);
+        logger.fine("" + url2);
         HttpURLConnection connect = (HttpURLConnection) url2.openConnection();
         connect.connect();
         String type = connect.getContentType();
