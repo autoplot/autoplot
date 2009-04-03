@@ -106,7 +106,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         }
         
         if ( isCoordinateVariable ) {
-            properties.put( QDataSet.CADENCE, DataSetUtil.guessCadence(this) );
+            properties.put( QDataSet.CADENCE, DataSetUtil.guessCadenceNew(this,null) );
         }
         
     }
