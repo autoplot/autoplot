@@ -53,7 +53,7 @@ import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.LayoutListener;
-import thredds.catalog.DatasetFilter;
+import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
  *
@@ -76,11 +76,13 @@ public class ApplicationController {
     private int dsfIdNum = 0;
     ChangesSupport changesSupport;
     ApplicationControllerSyncSupport syncSupport;
+    /** When non-null, we have the lock */
+    MutatorLock canvasLock;
 
     public ApplicationController(ApplicationModel model, Application application) {
         this.application = application;
         this.syncSupport = new ApplicationControllerSyncSupport(this);
-        this.changesSupport = new ChangesSupport(propertyChangeSupport,this);
+        this.changesSupport = new ChangesSupport(propertyChangeSupport, this);
         application.setId("app_0");
         application.getOptions().setId("options_0");
         this.model = model;
@@ -119,7 +121,7 @@ public class ApplicationController {
         }
     };
 
-    public void fillEditPlotMenu( JMenu editPlotMenu, final Plot domPlot ) {
+    public void fillEditPlotMenu(JMenu editPlotMenu, final Plot domPlot) {
         JMenuItem item;
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
 
@@ -230,9 +232,9 @@ public class ApplicationController {
         canvas.setId("canvas_0");
         new CanvasController(application, canvas).setDasCanvas(dasCanvas);
 
-        String[] ss= canvas.getRow().split(",");
-        outerRow = DasRow.create( dasCanvas, null, ss[0], ss[1] );
-        ss= canvas.getColumn().split(",");
+        String[] ss = canvas.getRow().split(",");
+        outerRow = DasRow.create(dasCanvas, null, ss[0], ss[1]);
+        ss = canvas.getColumn().split(",");
         outerColumn = DasColumn.create(dasCanvas, null, ss[0], ss[1]);
 
         layoutListener = new LayoutListener(model);
@@ -267,6 +269,8 @@ public class ApplicationController {
         unbind(panel);
         panel.getController().unbindDsf();
 
+        DataSourceFilter dsf = getDataSourceFilterFor(panel);
+
         ArrayList<Panel> panels = new ArrayList<Panel>(Arrays.asList(application.getPanels()));
         panels.remove(panel);
         if (!panels.contains(getPanel())) {  // reset the focus panelId
@@ -277,6 +281,12 @@ public class ApplicationController {
             }
         }
         application.setPanels(panels.toArray(new Panel[panels.size()]));
+
+        List<Panel> dsfPanels = getPanelsFor(dsf);
+        if (dsfPanels.size() == 0) {
+            deleteDataSourceFilter(dsf);
+        }
+
     }
 
     /**
@@ -321,7 +331,7 @@ public class ApplicationController {
 
         connectorImpls.remove(connector);
 
-        application.setConnectors( connectors.toArray(new Connector[connectors.size()]) );
+        application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
     }
 
     private void movePanel(Panel p, Plot src, Plot dst) {
@@ -356,7 +366,7 @@ public class ApplicationController {
      * @param dsf if null, create a DataSourceFilter.  If non-null, connect the panel to this data source.
      * @return
      */
-    public synchronized Panel addPanel(Plot domPlot, DataSourceFilter dsf) {
+    public Panel addPanel(Plot domPlot, DataSourceFilter dsf) {
         logger.fine("enter addPanel");
 
         final int fpanelIdNum = this.panelIdNum++;
@@ -372,7 +382,7 @@ public class ApplicationController {
         new PanelController(this.model, application, panel1);
 
         if (domPlot == null) {
-            domPlot = addPlot();
+            domPlot = addPlot(LayoutConstants.BELOW);
         }
 
         panel1.setId("panel_" + fpanelIdNum);
@@ -419,6 +429,9 @@ public class ApplicationController {
                     if (getPanelsFor(src).size() == 0) {
                         deletePlot(src);
                     }
+                    if (getPanelsFor(dst).size() == 1) {
+                        dst.syncTo(p.plotDefaults);
+                    }
                 }
             }
         });
@@ -426,11 +439,13 @@ public class ApplicationController {
         panel1.setPlotId(domPlot.getId());
         panel1.setDataSourceFilterId(dsf.getId());
 
-        List<Panel> panels = new ArrayList<Panel>(Arrays.asList(this.application.getPanels()));
-        panels.add(panel1);
-        this.application.setPanels(panels.toArray(new Panel[panels.size()]));
-        panel1.addPropertyChangeListener(application.childListener);
-        setPanel(panel1);
+        synchronized (this) {
+            List<Panel> panels = new ArrayList<Panel>(Arrays.asList(this.application.getPanels()));
+            panels.add(panel1);
+            this.application.setPanels(panels.toArray(new Panel[panels.size()]));
+            panel1.addPropertyChangeListener(application.childListener);
+            setPanel(panel1);
+        }
 
         return panel1;
     }
@@ -442,7 +457,15 @@ public class ApplicationController {
         plot.getYAxis().addFocusListener(focusAdapter);
     }
 
-    public synchronized Plot addPlot() {
+    /**
+     * add a plot to the canvas.  Direction is with respect to the current
+     * focus plot, and currently only LayoutConstants.ABOVE and LayoutConstants.BELOW
+     * are supported.
+     * 
+     * @param direction
+     * @return
+     */
+    public synchronized Plot addPlot(Object direction) {
         logger.fine("enter addPlot");
         final Plot domPlot = new Plot();
 
@@ -472,6 +495,14 @@ public class ApplicationController {
         final PlotController plotController = new PlotController(application, domPlot, plot, colorbar);
 
         DasCanvas canvas = getDasCanvas();
+
+        MutatorLock myCanvasLock = null;
+
+        if (canvasLock == null) {
+            myCanvasLock = canvas.mutatorLock();
+            myCanvasLock.lock();
+            canvasLock = myCanvasLock;
+        }
 
         canvas.add(plot, row, col);
 
@@ -505,6 +536,9 @@ public class ApplicationController {
 
         canvas.revalidate();
         canvas.repaint();
+        if (myCanvasLock != null) {
+            myCanvasLock.unlock();
+        }
 
         layoutListener.listenTo(plot);
         layoutListener.listenTo(colorbar);
@@ -545,7 +579,18 @@ public class ApplicationController {
         });
 
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
-        plots.add(domPlot);
+        Plot focus = getPlot();
+
+        if (focus != null) {
+            int idx = plots.indexOf(focus);
+            if (direction == LayoutConstants.BELOW) {
+                idx = idx + 1;
+            }
+            plots.add(idx, domPlot);
+        } else {
+            plots.add(domPlot);
+        }
+
         application.setPlots(plots.toArray(new Plot[plots.size()]));
 
         domPlot.addPropertyChangeListener(application.childListener);
@@ -583,10 +628,13 @@ public class ApplicationController {
      * @param dsf
      * @return
      */
-    protected Plot copyPlotAndPanels( Plot domPlot, DataSourceFilter dsf ,boolean bindx, boolean bindy) {
+    protected Plot copyPlotAndPanels(Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
         List<Panel> p = getPanelsFor(domPlot);
 
-        Plot newPlot = copyPlot(domPlot, bindx, bindy);
+        MutatorLock lock = mutatorLock();
+        lock.lock();
+
+        Plot newPlot = copyPlot(domPlot, bindx, bindy, false);
         if (p.size() == 0) {
             return newPlot;
         }
@@ -594,6 +642,9 @@ public class ApplicationController {
         for (Panel srcPanel : p) {
             Panel newp = copyPanel(srcPanel, newPlot, dsf);
         }
+
+        lock.unlock();
+
         return newPlot;
 
     }
@@ -630,23 +681,26 @@ public class ApplicationController {
      * @param bindx If true, X axes are bound.  If the srcPlot x axis is bound to the
      *    application timerange, then bind to that instead (kludge--handle higher)
      * @param bindy If true, Y axes are bound
+     * @param addPanel add a panel attached to the new plot as well.
      * @return The duplicate plot
      */
-    public synchronized Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy) {
-        Plot that = addPlot();
-        addPanel(that,null);
+    public Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy, boolean addPanel) {
+        Plot that = addPlot(LayoutConstants.BELOW);
+        if (addPanel) {
+            addPanel(that, null);
+        }
         that.syncTo(srcPlot);
 
         if (bindx) {
             BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
-            if ( bb==null ) {
+            if (bb == null) {
                 bind(srcPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
             } else {
                 bind(application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
             }
 
         }
-        
+
         if (bindy) {
             bind(srcPlot, "yaxis." + Axis.PROP_RANGE, that, "yaxis." + Axis.PROP_RANGE);
         }
@@ -654,7 +708,11 @@ public class ApplicationController {
         return that;
     }
 
-    public synchronized void deletePlot(Plot domPlot) {
+    /**
+     * delete the plot from the application.
+     * @param domPlot
+     */
+    public void deletePlot(Plot domPlot) {
 
         if (!application.plots.contains(domPlot)) {
             throw new IllegalArgumentException("plot is not in this application");
@@ -682,30 +740,32 @@ public class ApplicationController {
         DasColorBar cb = domPlot.getController().getDasColorBar();
         this.getDasCanvas().remove(cb);
 
-        List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
-        plots.remove(domPlot);
+        synchronized (this) {
+            List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
+            plots.remove(domPlot);
 
-        if (!plots.contains(getPlot())) {
-            if (plots.size() == 0) {
-                setPlot(null);
-            } else {
-                setPlot(plots.get(0));
+            if (!plots.contains(getPlot())) {
+                if (plots.size() == 0) {
+                    setPlot(null);
+                } else {
+                    setPlot(plots.get(0));
+                }
             }
+            application.setPlots(plots.toArray(new Plot[plots.size()]));
         }
-        application.setPlots(plots.toArray(new Plot[plots.size()]));
 
     }
 
     public synchronized void deleteDataSourceFilter(DataSourceFilter dsf) {
         if (!application.dataSourceFilters.contains(dsf)) {
-            throw new IllegalArgumentException("plot is not in this application");
+            throw new IllegalArgumentException("dsf is not in this application");
         }
         if (application.dataSourceFilters.size() < 2) {
             throw new IllegalArgumentException("last plot cannot be deleted");
         }
         List<Panel> panels = this.getPanelsFor(dsf);
         if (panels.size() > 0) {
-            throw new IllegalArgumentException("plot must not have panels before deleting");
+            throw new IllegalArgumentException("dsf must not have panels before deleting");
         }
         unbind(dsf);
 
@@ -765,7 +825,7 @@ public class ApplicationController {
             dstId = "das2:" + ((DasCanvasComponent) dst).getDasName();
         }
 
-        BindingModel bb = new BindingModel(srcId,srcId,srcProp,dstId,dstProp);
+        BindingModel bb = new BindingModel(srcId, srcId, srcProp, dstId, dstProp);
 
         if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
             List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
@@ -915,7 +975,7 @@ public class ApplicationController {
             item = new JMenuItem(new AbstractAction("Bound Plot Below") {
 
                 public void actionPerformed(ActionEvent e) {
-                    copyPlot(plot, true, false);
+                    copyPlot(plot, true, false, true);
                 }
             });
             item.setToolTipText("add a new plot below.  The plot's x axis will be bound to this plot's x axis");
@@ -937,10 +997,11 @@ public class ApplicationController {
 
         mouseAdapter.addMenuItem(bindingMenu);
 
-        if ( axis== plot.getXaxis() ) {
+        if (axis == plot.getXaxis()) {
             item = new JMenuItem(new AbstractAction("Bind to Application Time Range") {
+
                 public void actionPerformed(ActionEvent e) {
-                    bind( application, Application.PROP_TIMERANGE, axis, Axis.PROP_RANGE );
+                    bind(application, Application.PROP_TIMERANGE, axis, Axis.PROP_RANGE);
                 }
             });
             bindingMenu.add(item);
@@ -1024,7 +1085,7 @@ public class ApplicationController {
         item = new JMenuItem(new AbstractAction("Copy Panels") {
 
             public void actionPerformed(ActionEvent e) {
-                copyPlotAndPanels(domPlot, null,true, false);
+                copyPlotAndPanels(domPlot, null, true, false);
             }
         });
         item.setToolTipText("make a new plot, and copy the panels into it.  New plot is bound by the x axis.");
@@ -1033,7 +1094,7 @@ public class ApplicationController {
         item = new JMenuItem(new AbstractAction("Context Overview") {
 
             public void actionPerformed(ActionEvent e) {
-                Plot that = copyPlotAndPanels(domPlot, null,false, false);
+                Plot that = copyPlotAndPanels(domPlot, null, false, false);
                 bind(domPlot.zaxis, Axis.PROP_RANGE, that.zaxis, Axis.PROP_RANGE);
                 bind(domPlot.zaxis, Axis.PROP_LOG, that.zaxis, Axis.PROP_LOG);
                 bind(domPlot.zaxis, Axis.PROP_LABEL, that.zaxis, Axis.PROP_LABEL);
@@ -1048,7 +1109,7 @@ public class ApplicationController {
         JMenu editPlotMenu = new JMenu("Edit Plot");
         plot.getDasMouseInputAdapter().addMenuItem(editPlotMenu);
 
-        fillEditPlotMenu( editPlotMenu, domPlot );
+        fillEditPlotMenu(editPlotMenu, domPlot);
 
         JMenu panelMenu = new JMenu("Edit Panel");
 
@@ -1061,7 +1122,9 @@ public class ApplicationController {
                 Plot plot = getPlotFor(panel);
                 Plot dstPlot = getPlotAbove(plot);
                 if (dstPlot == null) {
-                    setStatus("warning: no plot above");
+                    dstPlot = addPlot(LayoutConstants.ABOVE);
+                    panel.setPlotId(dstPlot.getId());
+                    bind(plot.getXaxis(), Axis.PROP_RANGE, dstPlot.getXaxis(), Axis.PROP_RANGE);
                 } else {
                     panel.setPlotId(dstPlot.getId());
                 }
@@ -1076,8 +1139,9 @@ public class ApplicationController {
                 Plot plot = getPlotFor(panel);
                 Plot dstPlot = getPlotBelow(plot);
                 if (dstPlot == null) {
-                    dstPlot = addPlot();
+                    dstPlot = addPlot(LayoutConstants.BELOW);
                     panel.setPlotId(dstPlot.getId());
+                    bind(plot.getXaxis(), Axis.PROP_RANGE, dstPlot.getXaxis(), Axis.PROP_RANGE);
                 } else {
                     panel.setPlotId(dstPlot.getId());
                 }
@@ -1116,13 +1180,13 @@ public class ApplicationController {
         if (changesSupport.isPendingChanges()) {
             return true;
         }
-        for ( Canvas c : application.getCanvases() ) {
+        for (Canvas c : application.getCanvases()) {
             result = result | c.getController().isPendingChanges();
         }
-        for ( Panel p : application.getPanels() ) {
+        for (Panel p : application.getPanels()) {
             result = result | p.getController().isPendingChanges();
         }
-        for ( DataSourceFilter dsf : application.getDataSourceFilters() ) {
+        for (DataSourceFilter dsf : application.getDataSourceFilters()) {
             result = result | dsf.getController().isPendingChanges();
         }
         return result;
@@ -1136,7 +1200,7 @@ public class ApplicationController {
         return changesSupport.isValueAdjusting();
     }
 
-    protected synchronized MutatorLock mutatorLock() {
+    protected MutatorLock mutatorLock() {
         return changesSupport.mutatorLock();
     }
     protected String status = "";
@@ -1178,19 +1242,19 @@ public class ApplicationController {
     }
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
     }
 
-    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
-    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
-    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
@@ -1347,9 +1411,12 @@ public class ApplicationController {
         ac.bind(application, "options.canvasFont", canvas, "font");
     }
 
-    protected void syncTo(Application that) {
+    protected synchronized void syncTo(Application that) {
         MutatorLock lock = changesSupport.mutatorLock();
         lock.lock();
+
+        canvasLock = canvas.getController().getDasCanvas().mutatorLock();
+        canvasLock.lock();
 
         application.getOptions().syncTo(that.getOptions());
 
@@ -1357,6 +1424,8 @@ public class ApplicationController {
 
         syncSupport.syncBindings(that.getBindings());
         syncSupport.syncConnectors(that.getConnectors());
+        canvasLock.unlock();
+
         lock.unlock();
 
     }
