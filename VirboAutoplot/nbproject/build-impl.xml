@@ -171,7 +171,7 @@ is divided into following sections:
             <attribute default="${includes}" name="includes"/>
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="${javac.debug}" name="debug"/>
-            <attribute default="/does/not/exist" name="sourcepath"/>
+            <attribute default="" name="sourcepath"/>
             <element name="customize" optional="true"/>
             <sequential>
                 <javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" excludes="@{excludes}" includeantruntime="false" includes="@{includes}" source="${javac.source}" sourcepath="@{sourcepath}" srcdir="@{srcdir}" target="${javac.target}">
@@ -336,6 +336,7 @@ is divided into following sections:
                 ===================
             -->
     <target depends="init" name="deps-jar" unless="no.deps">
+        <ant antfile="${project.AudioSystemDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.CdfDataSource}/build.xml" inheritall="false" target="jar"/>
         <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="jar"/>
@@ -669,6 +670,7 @@ is divided into following sections:
                 ===============
             -->
     <target depends="init" name="deps-clean" unless="no.deps">
+        <ant antfile="${project.AudioSystemDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.CdfDataSource}/build.xml" inheritall="false" target="clean"/>
         <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="clean"/>
