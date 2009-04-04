@@ -599,12 +599,12 @@ public class ApplicationController {
         setPlot(domPlot);
 
         if (plots.size() == 1) {
-            bind(application, Application.PROP_TIMERANGE, domPlot, "xaxis." + Axis.PROP_RANGE);
+            bind(application, Application.PROP_TIMERANGE, domPlot.getXaxis(), Axis.PROP_RANGE);
         }
 
-        bind(application, "options." + Options.PROP_DRAWGRID, plot, "drawGrid");
-        bind(application, "options." + Options.PROP_DRAWMINORGRID, plot, "drawMinorGrid");
-        bind(application, "options." + Options.PROP_OVERRENDERING, plot, "overSize");
+        bind( application.getOptions(), Options.PROP_DRAWGRID, plot, "drawGrid");
+        bind( application.getOptions(), Options.PROP_DRAWMINORGRID, plot, "drawMinorGrid");
+        bind( application.getOptions(), Options.PROP_OVERRENDERING, plot, "overSize");
 
         return domPlot;
     }
