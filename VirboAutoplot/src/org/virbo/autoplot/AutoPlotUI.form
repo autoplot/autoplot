@@ -125,7 +125,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="optionsMenuActionPerformed"/>
           </Events>
           <SubComponents>
-            <Menu class="javax.swing.JMenu" name="overRenderingCheckBox">
+            <Menu class="javax.swing.JMenu" name="renderingOptionsMenu">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Rendering Options"/>
               </Properties>
@@ -157,7 +157,7 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="specialEffectsMenuItemActionPerformed"/>
                   </Events>
                 </MenuItem>
-                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="jCheckBoxMenuItem1">
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="overRenderingMenuItem">
                   <Properties>
                     <Property name="selected" type="boolean" value="true"/>
                     <Property name="text" type="java.lang.String" value="Over-Rendering"/>

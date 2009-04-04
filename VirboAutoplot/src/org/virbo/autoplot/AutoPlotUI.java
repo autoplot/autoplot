@@ -360,7 +360,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bind( bc, dom.getOptions(), Options.PROP_DRAWANTIALIAS, drawAntiAliasMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_TEXTANTIALIAS, textAntiAlias, "selected") ;
         bind( bc, dom.getOptions(), Options.PROP_SPECIALEFFECTS, specialEffectsMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_OVERRENDERING, overRenderingCheckBox, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_OVERRENDERING, overRenderingMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_DRAWGRID, drawGridCheckBox, "selected" );
         bc.bind();
 
@@ -715,11 +715,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
         zoomInMenuItem = new javax.swing.JMenuItem();
         zoomOutMenuItem = new javax.swing.JMenuItem();
         optionsMenu = new javax.swing.JMenu();
-        overRenderingCheckBox = new javax.swing.JMenu();
+        renderingOptionsMenu = new javax.swing.JMenu();
         textAntiAlias = new javax.swing.JCheckBoxMenuItem();
         drawAntiAliasMenuItem = new javax.swing.JCheckBoxMenuItem();
         specialEffectsMenuItem = new javax.swing.JCheckBoxMenuItem();
-        jCheckBoxMenuItem1 = new javax.swing.JCheckBoxMenuItem();
+        overRenderingMenuItem = new javax.swing.JCheckBoxMenuItem();
         drawGridCheckBox = new javax.swing.JCheckBoxMenuItem();
         plotStyleMenu = new javax.swing.JMenu();
         fontsAndColorsMenuItem = new javax.swing.JMenuItem();
@@ -855,7 +855,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        overRenderingCheckBox.setText("Rendering Options");
+        renderingOptionsMenu.setText("Rendering Options");
 
         textAntiAlias.setSelected(true);
         textAntiAlias.setText("Text Antialias");
@@ -864,7 +864,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 textAntiAliasActionPerformed(evt);
             }
         });
-        overRenderingCheckBox.add(textAntiAlias);
+        renderingOptionsMenu.add(textAntiAlias);
 
         drawAntiAliasMenuItem.setSelected(true);
         drawAntiAliasMenuItem.setText("Graphics Antialias");
@@ -873,7 +873,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 drawAntiAliasMenuItemActionPerformed(evt);
             }
         });
-        overRenderingCheckBox.add(drawAntiAliasMenuItem);
+        renderingOptionsMenu.add(drawAntiAliasMenuItem);
 
         specialEffectsMenuItem.setText("Special Effects");
         specialEffectsMenuItem.setToolTipText("Enable animated axes and other visual clues");
@@ -882,18 +882,18 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 specialEffectsMenuItemActionPerformed(evt);
             }
         });
-        overRenderingCheckBox.add(specialEffectsMenuItem);
+        renderingOptionsMenu.add(specialEffectsMenuItem);
 
-        jCheckBoxMenuItem1.setSelected(true);
-        jCheckBoxMenuItem1.setText("Over-Rendering");
-        jCheckBoxMenuItem1.setToolTipText("Render (and load) data outside plot bounds to improve appearance.");
-        overRenderingCheckBox.add(jCheckBoxMenuItem1);
+        overRenderingMenuItem.setSelected(true);
+        overRenderingMenuItem.setText("Over-Rendering");
+        overRenderingMenuItem.setToolTipText("Render (and load) data outside plot bounds to improve appearance.");
+        renderingOptionsMenu.add(overRenderingMenuItem);
 
         drawGridCheckBox.setSelected(true);
         drawGridCheckBox.setText("Draw Grid");
-        overRenderingCheckBox.add(drawGridCheckBox);
+        renderingOptionsMenu.add(drawGridCheckBox);
 
-        optionsMenu.add(overRenderingCheckBox);
+        optionsMenu.add(renderingOptionsMenu);
 
         plotStyleMenu.setText("Plot Style");
 
@@ -1390,7 +1390,6 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
     private javax.swing.JMenu fileMenu;
     private javax.swing.JMenuItem fontsAndColorsMenuItem;
     private javax.swing.JMenu helpMenu;
-    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
@@ -1404,10 +1403,11 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;
-    private javax.swing.JMenu overRenderingCheckBox;
+    private javax.swing.JCheckBoxMenuItem overRenderingMenuItem;
     private javax.swing.JMenuItem pasteDataSetURLMenuItem;
     private javax.swing.JMenu plotStyleMenu;
     private javax.swing.JMenuItem redoMenuItem;
+    private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem resetZoomMenuItem;
     private javax.swing.JCheckBoxMenuItem scriptPanelMenuItem;
     private javax.swing.JCheckBoxMenuItem serverCheckBoxMenuItem;
