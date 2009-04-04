@@ -295,10 +295,10 @@ public class Options extends DomNode {
     }
 
     public void setOverRendering(boolean overRendering) {
-        boolean oldOverRendering = this.overRendering;
+        boolean oldValue = this.overRendering;
         this.overRendering = overRendering;
         prefs.putBoolean(PROP_OVERRENDERING, overRendering);
-        propertyChangeSupport.firePropertyChange(PROP_OVERRENDERING, oldOverRendering, overRendering);
+        propertyChangeSupport.firePropertyChange(PROP_OVERRENDERING, oldValue, overRendering);
     }
 
  
