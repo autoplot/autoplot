@@ -124,7 +124,6 @@ public class PanelController {
         } else {
             dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
             dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
-            dsf.addPropertyChangeListener(Panel.PROP_RENDERTYPE, dsfListener);
         }
         setDataSourceFilterController(getDataSourceFilter().getController());
     }
