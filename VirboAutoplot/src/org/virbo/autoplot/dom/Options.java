@@ -371,11 +371,11 @@ public class Options extends DomNode {
 
         boolean b;
 
-        b = that.isAutolabelling();
+        b = that.isAutolabelling()==this.isAutolabelling();
         if (!b) result.add(new PropertyChangeDiff(PROP_AUTOLABELLING, that.isAutolabelling(), this.isAutolabelling()));
-        b = that.isAutolayout();
+        b = that.isAutolayout()==this.isAutolayout();
         if (!b) result.add(new PropertyChangeDiff(PROP_AUTOLAYOUT, that.isAutolayout(), this.isAutolayout()));
-        b = that.isAutoranging();
+        b = that.isAutoranging()==this.isAutoranging();
         if (!b) result.add(new PropertyChangeDiff(PROP_AUTORANGING, that.isAutoranging(), this.isAutoranging()));
         b = that.getBackground().equals(this.getBackground());
         if (!b) result.add(new PropertyChangeDiff(PROP_BACKGROUND, that.getBackground(), this.getBackground()));
@@ -383,11 +383,11 @@ public class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_CANVASFONT, that.getCanvasFont(), this.getCanvasFont()));
         b = that.getColor().equals(this.getColor());
         if (!b) result.add(new PropertyChangeDiff(PROP_COLOR, that.getColor(), this.getColor()));
-        b = that.isDrawAntiAlias();
+        b = that.isDrawAntiAlias()==this.isDrawAntiAlias();
         if (!b) result.add(new PropertyChangeDiff(PROP_DRAWANTIALIAS, that.isDrawAntiAlias(), this.isDrawAntiAlias()));
-        b = that.isDrawGrid();
+        b = that.isDrawGrid()==this.isDrawGrid();
         if (!b) result.add(new PropertyChangeDiff(PROP_DRAWGRID, that.isDrawGrid(), this.isDrawGrid()));
-        b = that.isDrawMinorGrid();
+        b = that.isDrawMinorGrid()==this.isDrawMinorGrid();
         if (!b) result.add(new PropertyChangeDiff(PROP_DRAWMINORGRID, that.isDrawMinorGrid(), this.isDrawMinorGrid()));
         b = that.getFillColor().equals(this.getFillColor());
         if (!b) result.add(new PropertyChangeDiff(PROP_FILLCOLOR, that.getFillColor(), this.getFillColor()));
@@ -403,9 +403,9 @@ public class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_SCRIPTVISIBLE, that.isScriptVisible(), this.isScriptVisible()));
         b = that.isServerEnabled() == this.isServerEnabled();
         if (!b) result.add(new PropertyChangeDiff(PROP_SERVERENABLED, that.isServerEnabled(), this.isServerEnabled()));
-        b = that.isSpecialEffects();
+        b = that.isSpecialEffects() == this.isSpecialEffects();
         if (!b) result.add(new PropertyChangeDiff(PROP_SPECIALEFFECTS, that.isSpecialEffects(), this.isSpecialEffects()));
-        b = that.isTextAntiAlias();
+        b = that.isTextAntiAlias() == this.isTextAntiAlias();
         if (!b) result.add(new PropertyChangeDiff(PROP_TEXTANTIALIAS, that.isTextAntiAlias(), this.isTextAntiAlias()));
         return result;
     }
