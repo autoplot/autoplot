@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -72,7 +73,7 @@ public class ApplicationController {
     final Map<Connector, ColumnColumnConnector> connectorImpls;
     private final static Logger logger = Logger.getLogger("virbo.controller");
     private int plotIdNum = 0;
-    private int panelIdNum = 0;
+    private AtomicInteger panelIdNum = new AtomicInteger(0);
     private int dsfIdNum = 0;
     ChangesSupport changesSupport;
     ApplicationControllerSyncSupport syncSupport;
@@ -102,8 +103,13 @@ public class ApplicationController {
         @Override
         public void focusGained(FocusEvent e) {
             super.focusGained(e);
+            
             Plot domPlot = getPlotFor(e.getComponent());
             if (domPlot == null) {
+                return;
+            }
+
+            if ( getPlot()==domPlot ) {
                 return;
             }
             List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
@@ -266,6 +272,7 @@ public class ApplicationController {
             }
         }
 
+        panel.removePropertyChangeListener(application.childListener);
         unbind(panel);
         panel.getController().unbindDsf();
 
@@ -352,13 +359,6 @@ public class ApplicationController {
 
     }
 
-    /**
-     * add a new panel, creating a new Plot and DataSourceFilter as well.
-     * @return
-     */
-    public synchronized Panel addPanel() {
-        return addPanel(null, null);
-    }
 
     /**
      * add a panel to the application, attaching it to the given Plot and DataSourceFilter.
@@ -369,7 +369,7 @@ public class ApplicationController {
     public Panel addPanel(Plot domPlot, DataSourceFilter dsf) {
         logger.fine("enter addPanel");
 
-        final int fpanelIdNum = this.panelIdNum++;
+        final int fpanelIdNum = this.panelIdNum.getAndIncrement();
         final Panel panel1 = new Panel();
 
         if (dsf == null) {
@@ -440,9 +440,11 @@ public class ApplicationController {
         panel1.setDataSourceFilterId(dsf.getId());
 
         synchronized (this) {
-            List<Panel> panels = new ArrayList<Panel>(Arrays.asList(this.application.getPanels()));
-            panels.add(panel1);
-            this.application.setPanels(panels.toArray(new Panel[panels.size()]));
+            Panel[] p= application.getPanels();
+            Panel[] temp= new Panel[p.length+1];
+            System.arraycopy( p, 0, temp, 0, p.length );
+            temp[p.length]= panel1;
+            this.application.setPanels(temp);
             panel1.addPropertyChangeListener(application.childListener);
             setPanel(panel1);
         }
@@ -730,6 +732,7 @@ public class ApplicationController {
             }
         }
 
+        domPlot.removePropertyChangeListener(application.childListener);
         unbind(domPlot);
         unbind(domPlot.getXaxis());
         unbind(domPlot.getYaxis());
