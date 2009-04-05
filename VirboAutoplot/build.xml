@@ -133,11 +133,11 @@
             <fileset file="${jnlp.dir}/lib/batik-svggen.jar" />
             <fileset file="${jnlp.dir}/lib/batik-util.jar" />
             <fileset file="${jnlp.dir}/lib/beansbinding.jar" />
-            <fileset file="${jnlp.dir}/lib/bufr.jar" />
             <fileset file="${jnlp.dir}/lib/cdfjava.jar" />
             <fileset file="${jnlp.dir}/lib/commons-codec-1.3.jar" />
             <fileset file="${jnlp.dir}/lib/commons-httpclient-3.0.jar" />
             <fileset file="${jnlp.dir}/lib/commons-logging-1.0.4.jar" />
+            <fileset file="${jnlp.dir}/lib/dods-1.1.7.jar" />
             <fileset file="${jnlp.dir}/lib/gnu-regexp-1.1.4.jar" />
             <fileset file="${jnlp.dir}/lib/grib-5.0.04.jar" />
             <fileset file="${jnlp.dir}/lib/itext-1.2.jar" />
@@ -145,20 +145,15 @@
             <fileset file="${jnlp.dir}/lib/jfits-0.93.jar" />
             <fileset file="${jnlp.dir}/lib/jpeg2000.jar" />
             <fileset file="${jnlp.dir}/lib/jython.jar" />
-            <fileset file="${jnlp.dir}/lib/lucene.jar" />
             <fileset file="${jnlp.dir}/lib/metadata-extractor-2.1.0.jar" />
             <fileset file="${jnlp.dir}/lib/netcdfUI-2.2.18.jar" />
             <fileset file="${jnlp.dir}/lib/nlog4j-1.2.21.jar" />
             <fileset file="${jnlp.dir}/lib/poi-3.1-FINAL-20080629.jar" />
             <fileset file="${jnlp.dir}/lib/poi-contrib-3.1-FINAL-20080629.jar" />
             <fileset file="${jnlp.dir}/lib/poi-scratchpad-3.1-FINAL-20080629.jar" />
-            <fileset file="${jnlp.dir}/lib/prefsAll.jar" />
-            <fileset file="${jnlp.dir}/lib/resourcesOptional.jar" />
+            <fileset file="${jnlp.dir}/lib/slf4j-jdk14.jar" />
             <fileset file="${jnlp.dir}/lib/swing-layout-1.0.3.jar" />
-            <fileset file="${jnlp.dir}/lib/visadNoDods.jar" />
-            <fileset file="${jnlp.dir}/lib/xercesImpl.jar" />
-            <fileset file="${jnlp.dir}/lib/xml-apis.jar" />
-        </delete>
+        </delete> 
         
         <signjar alias="virbo"
                  storepass="${storepass}"
