@@ -919,7 +919,7 @@ public class DataSourceController {
     }
 
     /**
-     * return a panel for this.
+     * return the first panel that is using this data source.
      * @return null or a panel.
      */
     private Panel getPanel() {
@@ -934,9 +934,12 @@ public class DataSourceController {
 
     private ProgressMonitor getMonitor(String label, String description) {
         Panel panel = getPanel();
-        if (panel != null) {
-            Plot plot = dom.getController().getPlotFor(panel);
-            DasPlot p = plot.getController().getDasPlot();
+        DasPlot p=null;
+        if ( panel!=null ) {
+            Plot plot= dom.getController().getPlotFor(panel);
+            if ( plot!=null ) p = plot.getController().getDasPlot();
+        }
+        if ( p!=null ) {
             return dom.getController().getMonitorFactory().getMonitor(p, label, description);
         } else {
             return dom.getController().getMonitorFactory().getMonitor(label, description);
