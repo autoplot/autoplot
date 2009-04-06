@@ -116,9 +116,18 @@ public class LayoutUI extends javax.swing.JPanel {
         item = new JMenuItem(new AbstractAction("Edit Plot Properties") {
 
             public void actionPerformed(ActionEvent e) {
-                Plot domPlot = app.getController().getPlot();
-                PropertyEditor edit = new PropertyEditor(domPlot);
-                edit.showDialog(LayoutUI.this);
+                DasPlot component= (DasPlot)canvasLayoutPanel1.getComponent();
+                Plot domPlot = app.getController().getPlotFor(component);
+                List<Object> components= canvasLayoutPanel1.getSelectedComponents();
+                Plot[] plots= new Plot[components.size()];
+                for ( int i=0; i<components.size(); i++ ) plots[i]= app.getController().getPlotFor( (Component) components.get(i) );
+                if ( components.size()>1 ) {
+                    PropertyEditor edit = PropertyEditor.createPeersEditor(domPlot,plots);
+                    edit.showDialog(LayoutUI.this);
+                } else {
+                    PropertyEditor edit = new PropertyEditor(domPlot);
+                    edit.showDialog(LayoutUI.this);
+                }
             }
         });
         plotContextMenu.add(item);
