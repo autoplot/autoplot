@@ -22,15 +22,11 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JSeparator;
 import org.das2.DasApplication;
-import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.event.BoxZoomMouseModule;
-import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
-import org.das2.event.PointSlopeDragRenderer;
 import org.das2.event.ZoomPanMouseModule;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasAxis;
@@ -52,7 +48,6 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
-import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.layout.LayoutConstants;
 
@@ -77,12 +72,14 @@ public class ApplicationController {
     private int dsfIdNum = 0;
     ChangesSupport changesSupport;
     ApplicationControllerSyncSupport syncSupport;
+    ApplicationControllerSupport support;
     /** When non-null, we have the lock */
     MutatorLock canvasLock;
 
     public ApplicationController(ApplicationModel model, Application application) {
         this.application = application;
         this.syncSupport = new ApplicationControllerSyncSupport(this);
+        this.support= new ApplicationControllerSupport(this);
         this.changesSupport = new ChangesSupport(propertyChangeSupport, this);
         application.setId("app_0");
         application.getOptions().setId("options_0");
@@ -98,6 +95,7 @@ public class ApplicationController {
 
         addListeners();
     }
+    
     FocusAdapter focusAdapter = new FocusAdapter() {
 
         @Override
@@ -178,6 +176,19 @@ public class ApplicationController {
         return plot;
     }
 
+    public void plot(Plot plot, Panel panel, String secondaryUri, String teriaryUri, String primaryUri) {
+        support.plot(plot, panel, secondaryUri, teriaryUri, primaryUri);
+    }
+
+    public void plot(Plot plot, Panel panel, String secondaryUri, String primaryUri) {
+        support.plot(plot, panel, secondaryUri, primaryUri);
+    }
+
+    public void plot(Plot plot, Panel panel, String primaryUri) {
+        support.plot(plot, panel, primaryUri);
+    }
+
+
     /**
      * block the calling thread until the application is idle.
      * @see isPendingChanges.
@@ -234,23 +245,23 @@ public class ApplicationController {
         logger.fine("enter addCanvas");
         //if ( canvas!=null ) throw new IllegalArgumentException("only one canvas for now");
         DasCanvas dasCanvas = new DasCanvas();
-        Canvas canvas = new Canvas();
-        canvas.setId("canvas_0");
-        new CanvasController(application, canvas).setDasCanvas(dasCanvas);
+        Canvas lcanvas = new Canvas();
+        lcanvas.setId("canvas_0");
+        new CanvasController(application, lcanvas).setDasCanvas(dasCanvas);
 
-        String[] ss = canvas.getRow().split(",");
+        String[] ss = lcanvas.getRow().split(",");
         outerRow = DasRow.create(dasCanvas, null, ss[0], ss[1]);
-        ss = canvas.getColumn().split(",");
+        ss = lcanvas.getColumn().split(",");
         outerColumn = DasColumn.create(dasCanvas, null, ss[0], ss[1]);
 
         layoutListener = new LayoutListener(model);
 
-        application.setCanvases(new Canvas[]{canvas});
-        setCanvas(canvas);
+        application.setCanvases(new Canvas[]{lcanvas});
+        setCanvas(lcanvas);
 
         bindTo(dasCanvas);
 
-        canvas.getController().bindTo(outerRow, outerColumn);
+        lcanvas.getController().bindTo(outerRow, outerColumn);
 
         dasCanvas.setPrintingTag("");
         return dasCanvas;
@@ -308,13 +319,13 @@ public class ApplicationController {
 
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
 
-        DasCanvas canvas = getDasCanvas();
+        DasCanvas lcanvas = getDasCanvas();
         DasPlot upper = domPlot.getController().getDasPlot();
         DasPlot lower = that.getController().getDasPlot();
 
         //overviewPlotConnector.getDasMouseInputAdapter().setPrimaryModule(overviewZoom);
         ColumnColumnConnector overviewPlotConnector =
-                new ColumnColumnConnector(canvas, upper,
+                new ColumnColumnConnector(lcanvas, upper,
                 DasRow.create(null, upper.getRow(), "0%", "100%+2em"), lower);
 
         connectorImpls.put(connector, overviewPlotConnector);
@@ -323,8 +334,8 @@ public class ApplicationController {
         overviewPlotConnector.setCurtainOpacityPercent(80);
 
         overviewPlotConnector.getDasMouseInputAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(upper, lower));
-        canvas.add(overviewPlotConnector);
-        canvas.revalidate();
+        lcanvas.add(overviewPlotConnector);
+        lcanvas.revalidate();
     //TODO: disconnect/delete if one plotId is deleted.
 
     }
@@ -386,19 +397,6 @@ public class ApplicationController {
         }
 
         panel1.setId("panel_" + fpanelIdNum);
-
-        /*  final Plot fplot = domPlot;
-        
-        // bind it to the common range if it looks compatible
-        panelId.getPlotDefaults().getXaxis().addPropertyChangeListener(Axis.PROP_RANGE, new PropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent evt) {
-        DatumRange dr = panelId.getPlotDefaults().getXaxis().getRange();
-        DatumRange appRange = application.getTimeRange();
-        if (appRange.getUnits().isConvertableTo(dr.getUnits()) && appRange.intersects(dr)) {
-        bind(application, Application.PROP_TIMERANGE, fplot, "xaxis." + Axis.PROP_RANGE);
-        }
-        }
-        }); */
 
         panel1.getStyle().setId("style_" + fpanelIdNum);
         panel1.getPlotDefaults().setId("plot_defaults_" + fpanelIdNum);
@@ -496,17 +494,17 @@ public class ApplicationController {
 
         final PlotController plotController = new PlotController(application, domPlot, plot, colorbar);
 
-        DasCanvas canvas = getDasCanvas();
+        DasCanvas dasCanvas = getDasCanvas();
 
         MutatorLock myCanvasLock = null;
 
         if (canvasLock == null) {
-            myCanvasLock = canvas.mutatorLock();
+            myCanvasLock = dasCanvas.mutatorLock();
             myCanvasLock.lock();
             canvasLock = myCanvasLock;
         }
 
-        canvas.add(plot, row, col);
+        dasCanvas.add(plot, row, col); //TODO: consider making room on canvas, and setting row precisely
 
         // the axes need to know about the plotId, so they can do reset axes units properly.
         plot.getXAxis().setPlot(plot);
@@ -517,7 +515,7 @@ public class ApplicationController {
 
         //plotId.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(plotId) ) ;
 
-        canvas.add(colorbar, plot.getRow(), DasColorBar.getColorBarColumn(plot.getColumn()));
+        dasCanvas.add(colorbar, plot.getRow(), DasColorBar.getColorBarColumn(plot.getColumn()));
         colorbar.setVisible(false);
 
         if (!headless) {
@@ -536,8 +534,8 @@ public class ApplicationController {
         MouseModule zoomPanZ = new ZoomPanMouseModule(colorbar, null, colorbar);
         colorbar.getDasMouseInputAdapter().setSecondaryModule(zoomPanZ);
 
-        canvas.revalidate();
-        canvas.repaint();
+        dasCanvas.revalidate();
+        dasCanvas.repaint();
         if (myCanvasLock != null) {
             myCanvasLock.unlock();
         }
@@ -552,10 +550,10 @@ public class ApplicationController {
         domPlot.getController().bindTo(plot);
         domPlot.getController().bindTo(colorbar);
 
-        addPlotContextMenuItems(plot, plotController, domPlot);
-        addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getXaxis());
-        addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getYaxis());
-        addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getZaxis());
+        support.addPlotContextMenuItems(plot, plotController, domPlot);
+        support.addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getXaxis());
+        support.addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getYaxis());
+        support.addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getZaxis());
 
         addPlotFocusListener(plot);
 
@@ -771,9 +769,21 @@ public class ApplicationController {
             throw new IllegalArgumentException("dsf must not have panels before deleting");
         }
         unbind(dsf);
+        dsf.getController().unbind();
+
+        DataSourceFilter[] parents= dsf.getController().getParentSources();
+        // look for orphaned parents
+        List<DataSourceFilter> alsoRemove= new ArrayList<DataSourceFilter>();
+        for ( DataSourceFilter pdf: parents ) {
+            String plotId= pdf.getId();
+            List<DomNode> usages= DomUtil.getDataSourceUsages(application, plotId);
+            usages.remove(dsf);
+            if ( usages.size()==0 ) alsoRemove.add(pdf);
+        }
 
         List<DataSourceFilter> dsfs = new ArrayList<DataSourceFilter>(Arrays.asList(application.getDataSourceFilters()));
         dsfs.remove(dsf);
+        dsfs.removeAll(alsoRemove);
 
         if (!dsfs.contains(getDataSourceFilter())) {
             if (dsfs.size() == 0) {
@@ -930,249 +940,6 @@ public class ApplicationController {
         return result.toArray(new BindingModel[result.size()]);
     }
 
-    /**
-     * support for binding two plot axes.
-     * @param dstPlot
-     * @param plot
-     * @param axis
-     * @throws java.lang.IllegalArgumentException
-     */
-    private void bindToPlotPeer(Plot dstPlot, Plot plot, Axis axis) throws IllegalArgumentException {
-        Axis targetAxis;
-        if (plot.getXaxis() == axis) {
-            targetAxis = dstPlot.getXaxis();
-        } else if (plot.getYaxis() == axis) {
-            targetAxis = dstPlot.getYaxis();
-        } else if (plot.getZaxis() == axis) {
-            targetAxis = dstPlot.getZaxis();
-        } else {
-            throw new IllegalArgumentException("this axis and plot don't go together");
-        }
-        bind(targetAxis, Axis.PROP_RANGE, axis, Axis.PROP_RANGE);
-        bind(targetAxis, Axis.PROP_LOG, axis, Axis.PROP_LOG);
-    }
-
-    private void addAxisContextMenuItems(final DasPlot dasPlot, final PlotController plotController, final Plot plot, final Axis axis) {
-
-        final DasAxis dasAxis = axis.getController().getDasAxis();
-        final DasMouseInputAdapter mouseAdapter = dasAxis.getDasMouseInputAdapter();
-
-        mouseAdapter.removeMenuItem("Properties");
-
-        JMenuItem item;
-
-        mouseAdapter.addMenuItem(new JMenuItem(new AbstractAction("Axis Properties") {
-
-            public void actionPerformed(ActionEvent e) {
-                PropertyEditor pp = new PropertyEditor(axis);
-                pp.showDialog(dasAxis.getCanvas());
-            }
-        }));
-
-        mouseAdapter.addMenuItem(new JSeparator());
-
-        if (axis == plot.getXaxis()) {
-            JMenu addPlotMenu = new JMenu("Add Plot");
-            mouseAdapter.addMenuItem(addPlotMenu);
-
-            item = new JMenuItem(new AbstractAction("Bound Plot Below") {
-
-                public void actionPerformed(ActionEvent e) {
-                    copyPlot(plot, true, false, true);
-                }
-            });
-            item.setToolTipText("add a new plot below.  The plot's x axis will be bound to this plot's x axis");
-            addPlotMenu.add(item);
-
-        }
-
-        item = new JMenuItem(new AbstractAction("Remove Bindings") {
-
-            public void actionPerformed(ActionEvent e) {
-                unbind(axis);  // TODO: check for application timerange
-            }
-        });
-        item.setToolTipText("remove any plot and panel property bindings");
-        mouseAdapter.addMenuItem(item);
-
-
-        JMenu bindingMenu = new JMenu("Add Binding");
-
-        mouseAdapter.addMenuItem(bindingMenu);
-
-        if (axis == plot.getXaxis()) {
-            item = new JMenuItem(new AbstractAction("Bind to Application Time Range") {
-
-                public void actionPerformed(ActionEvent e) {
-                    bind(application, Application.PROP_TIMERANGE, axis, Axis.PROP_RANGE);
-                }
-            });
-            bindingMenu.add(item);
-        }
-
-
-        item = new JMenuItem(new AbstractAction("Bind to Plot Above") {
-
-            public void actionPerformed(ActionEvent e) {
-                Plot dstPlot = getPlotAbove(plot);
-                if (dstPlot == null) {
-                    setStatus("warning: no plot above");
-                } else {
-                    bindToPlotPeer(dstPlot, plot, axis);
-                }
-            }
-        });
-        bindingMenu.add(item);
-        item = new JMenuItem(new AbstractAction("Bind to Plot Below") {
-
-            public void actionPerformed(ActionEvent e) {
-                Plot dstPlot = getPlotBelow(plot);
-                if (dstPlot == null) {
-                    setStatus("warning: no plot below");
-                } else {
-                    bindToPlotPeer(dstPlot, plot, axis);
-                }
-            }
-        });
-        bindingMenu.add(item);
-
-        JMenu connectorMenu = new JMenu("Add Connector");
-
-        mouseAdapter.addMenuItem(connectorMenu);
-
-        item = new JMenuItem(new AbstractAction("Connector to Plot Above") {
-
-            public void actionPerformed(ActionEvent e) {
-                Plot dstPlot = getPlotAbove(plot);
-                if (dstPlot == null) {
-                    setStatus("warning: no plot above");
-                } else {
-                    addConnector(dstPlot, plot);
-                }
-            }
-        });
-        connectorMenu.add(item);
-    }
-
-    private void addPlotContextMenuItems(final DasPlot plot, final PlotController plotController, final Plot domPlot) {
-
-        plot.getDasMouseInputAdapter().addMouseModule(new MouseModule(plot, new PointSlopeDragRenderer(plot, plot.getXAxis(), plot.getYAxis()), "Slope"));
-
-        plot.getDasMouseInputAdapter().removeMenuItem("Dump Data");
-        plot.getDasMouseInputAdapter().removeMenuItem("Properties");
-
-        JMenuItem item;
-
-        plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Plot Properties") {
-
-            public void actionPerformed(ActionEvent e) {
-                PropertyEditor pp = new PropertyEditor(domPlot);
-                pp.showDialog(plot.getCanvas());
-            }
-        }));
-
-        plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Panel Properties") {
-
-            public void actionPerformed(ActionEvent e) {
-                Panel p = getPanel();
-                PropertyEditor pp = new PropertyEditor(p);
-                pp.showDialog(plot.getCanvas());
-            }
-        }));
-
-        plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
-
-        JMenu addPlotMenu = new JMenu("Add Plot");
-        plot.getDasMouseInputAdapter().addMenuItem(addPlotMenu);
-
-        item = new JMenuItem(new AbstractAction("Copy Panels") {
-
-            public void actionPerformed(ActionEvent e) {
-                copyPlotAndPanels(domPlot, null, true, false);
-            }
-        });
-        item.setToolTipText("make a new plot, and copy the panels into it.  New plot is bound by the x axis.");
-        addPlotMenu.add(item);
-
-        item = new JMenuItem(new AbstractAction("Context Overview") {
-
-            public void actionPerformed(ActionEvent e) {
-                Plot that = copyPlotAndPanels(domPlot, null, false, false);
-                bind(domPlot.zaxis, Axis.PROP_RANGE, that.zaxis, Axis.PROP_RANGE);
-                bind(domPlot.zaxis, Axis.PROP_LOG, that.zaxis, Axis.PROP_LOG);
-                bind(domPlot.zaxis, Axis.PROP_LABEL, that.zaxis, Axis.PROP_LABEL);
-                addConnector(domPlot, that);
-            }
-        });
-
-        item.setToolTipText("make a new plot, and copy the panels into it.  The plot is not bound,\n" +
-                "and a connector is drawn between the two.  The panel uris are bound as well.");
-        addPlotMenu.add(item);
-
-        JMenu editPlotMenu = new JMenu("Edit Plot");
-        plot.getDasMouseInputAdapter().addMenuItem(editPlotMenu);
-
-        fillEditPlotMenu(editPlotMenu, domPlot);
-
-        JMenu panelMenu = new JMenu("Edit Panel");
-
-        plot.getDasMouseInputAdapter().addMenuItem(panelMenu);
-
-        item = new JMenuItem(new AbstractAction("Move to Plot Above") {
-
-            public void actionPerformed(ActionEvent e) {
-                Panel panel = getPanel();
-                Plot plot = getPlotFor(panel);
-                Plot dstPlot = getPlotAbove(plot);
-                if (dstPlot == null) {
-                    dstPlot = addPlot(LayoutConstants.ABOVE);
-                    panel.setPlotId(dstPlot.getId());
-                    bind(plot.getXaxis(), Axis.PROP_RANGE, dstPlot.getXaxis(), Axis.PROP_RANGE);
-                } else {
-                    panel.setPlotId(dstPlot.getId());
-                }
-            }
-        });
-        panelMenu.add(item);
-
-        item = new JMenuItem(new AbstractAction("Move to Plot Below") {
-
-            public void actionPerformed(ActionEvent e) {
-                Panel panel = getPanel();
-                Plot plot = getPlotFor(panel);
-                Plot dstPlot = getPlotBelow(plot);
-                if (dstPlot == null) {
-                    dstPlot = addPlot(LayoutConstants.BELOW);
-                    panel.setPlotId(dstPlot.getId());
-                    bind(plot.getXaxis(), Axis.PROP_RANGE, dstPlot.getXaxis(), Axis.PROP_RANGE);
-                } else {
-                    panel.setPlotId(dstPlot.getId());
-                }
-            }
-        });
-        panelMenu.add(item);
-
-        item = new JMenuItem(new AbstractAction("Delete Panel") {
-
-            public void actionPerformed(ActionEvent e) {
-                Panel panel = getPanel();
-                deletePanel(panel);
-            }
-        });
-        panelMenu.add(item);
-
-        plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
-
-        plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
-
-            public void actionPerformed(ActionEvent e) {
-                plotController.resetZoom();
-            }
-        }));
-
-
-        plot.getDasMouseInputAdapter().addMenuItem(GuiSupport.createEZAccessMenu(domPlot));
-    }
 
     /**
      * Some sort of processing is going on, so wait until idle.
@@ -1340,7 +1107,7 @@ public class ApplicationController {
         List<Panel> result = new ArrayList<Panel>();
         for (Panel p : application.getPanels()) {
             if (p.getDataSourceFilterId().equals(id)) {
-                result.add(p);
+                    result.add(p);
             }
         }
         return result;
