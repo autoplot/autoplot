@@ -638,11 +638,15 @@ public class PanelController {
     }
 
     public DasPlot getDasPlot() {
-        return dom.getController().getPlotFor(panel).getController().getDasPlot();
+        Plot p= dom.getController().getPlotFor(panel);
+        if ( p==null ) throw new IllegalArgumentException("no plot found for panel");
+        return p.getController().getDasPlot();
     }
 
     private DasColorBar getColorbar() {
-        return dom.getController().getPlotFor(panel).getController().getDasColorBar();
+        Plot p= dom.getController().getPlotFor(panel);
+        if ( p==null ) throw new IllegalArgumentException("no plot found for panel");
+        return p.getController().getDasColorBar();
     }
 
     /**
