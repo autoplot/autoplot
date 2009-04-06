@@ -8,6 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.InterruptedIOException;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -199,7 +201,7 @@ public class DataSourceController {
             _setCaching(null);
             _setTsb(null);
             _setTsbSuri(null);
-            dsf.setUri(null);
+            if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal" ) ) dsf.setUri("vap+internal:");
 
         } else {
 
@@ -252,6 +254,7 @@ public class DataSourceController {
 
         if (ds != null && !DataSetUtil.validate(ds, problems)) {
             StringBuffer message = new StringBuffer("data set is invalid:\n");
+            new Exception().printStackTrace();
             for (String s : problems) {
                 message.append(s + "\n");
             }
@@ -304,6 +307,114 @@ public class DataSourceController {
             //doFillValidRange();  the QDataSet returned 
             updateFill();
         }
+    }
+    
+    DataSourceFilter[] parentSources;
+
+    protected DataSourceFilter[] getParentSources() {
+        if ( parentSources==null ) {
+            return new DataSourceFilter[0];
+        } else {
+            DataSourceFilter[] parentSources1= new DataSourceFilter[parentSources.length];
+            System.arraycopy(parentSources, 0, parentSources1, 0, parentSources.length );
+            return parentSources1;
+        }
+    }
+
+    private synchronized void resolveParents() {
+        if ( dsf.getUri()==null ) return; //TODO: remove
+        URLSplit split= URLSplit.parse(dsf.getUri());
+        String[] ss = split.surl.split(",", -2);
+        for (int i = 0; i < ss.length; i++) {
+            DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
+            dsf.getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
+            parentSources[i] = dsf;
+        }
+        System.err.println( Arrays.asList(parentSources));
+    }
+    
+    /**
+     * check to see if all the parent sources have updated and have
+     * datasets that are compatible, so a new dataset can be created.
+     */
+    private synchronized boolean checkParents() {
+
+        QDataSet x;
+        QDataSet y = null;
+        QDataSet z = null;
+        x = parentSources[0].getController().getFillDataSet();
+        if (parentSources.length > 1) {
+            y = parentSources[1].getController().getFillDataSet();
+        }
+        if (parentSources.length > 2) {
+            z = parentSources[2].getController().getFillDataSet();
+        }
+        if (parentSources.length == 2) {
+            if (x == null || y == null) {
+                return false;
+            }
+            DDataSet yds = DDataSet.copy(y);
+            if (x != null) {
+                yds.putProperty(QDataSet.DEPEND_0, x);
+            }
+            if ( DataSetUtil.validate(yds, null ) ) {
+                setDataSetInternal(yds);
+            }
+        } else if (parentSources.length == 3) {
+            if (x == null || y == null || z == null) {
+                return false;
+            }
+            if (z.rank() == 1) {
+                DDataSet yds = DDataSet.copy(y);
+                yds.putProperty(QDataSet.DEPEND_0, x);
+                yds.putProperty(QDataSet.PLANE_0, z);
+                if ( DataSetUtil.validate(yds, null ) ) {
+                    setDataSetInternal(yds);
+                }
+            } else {
+                DDataSet zds = DDataSet.copy(z);
+                if (x != null) {
+                    zds.putProperty(QDataSet.DEPEND_0, x);
+                }
+                if (y != null) {
+                    zds.putProperty(QDataSet.DEPEND_1, y);
+                }
+                if ( DataSetUtil.validate(zds, null ) ) {
+                    setDataSetInternal(zds);
+                }
+            }
+        }
+        return true;
+    }
+    
+    PropertyChangeListener parentListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            checkParents();
+        }
+    };
+
+    PropertyChangeListener dsfListener= new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                resolveParents();
+            }
+        } ;
+
+    private synchronized void doInternal(String path) {
+        if ( parentSources!=null ) {
+            for ( int i=0; i<parentSources.length; i++ ) {
+                if ( parentSources[i]!=null ) parentSources[i].getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
+            }
+        }
+        if ( path.trim().length()==0 ) return;
+        String[] ss = path.split(",", -2);
+        parentSources = new DataSourceFilter[ss.length];
+        resolveParents();
+        checkParents();
+        dom.addPropertyChangeListener( Application.PROP_DATASOURCEFILTERS, dsfListener );
+    }
+
+    protected void unbind() {
+        dom.removePropertyChangeListener( Application.PROP_DATASOURCEFILTERS, dsfListener );
     }
 
     /**
@@ -831,8 +942,8 @@ public class DataSourceController {
             setDataSource(null);
             changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
         } else {
-            surl = URLSplit.format(URLSplit.parse(surl));
-            //surl = DataSetURL.maybeAddFile(surl);
+            URLSplit split = URLSplit.parse(surl);
+            surl = URLSplit.format(split);
 
             try {
                 mon.started();
@@ -846,8 +957,14 @@ public class DataSourceController {
                     }
                 }
 
-                DataSource source = DataSetURL.getDataSource(surl);
-                setDataSource(source);
+                if (split.vapScheme.equals("vap+internal")) {
+                    URI uri;
+                    doInternal(split.path);
+                    setDataSource(null);
+                } else {
+                    DataSource source = DataSetURL.getDataSource(surl);
+                    setDataSource(source);
+                }
                 changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
 
                 mon.setProgressMessage("done getting data source");
@@ -934,12 +1051,14 @@ public class DataSourceController {
 
     private ProgressMonitor getMonitor(String label, String description) {
         Panel panel = getPanel();
-        DasPlot p=null;
-        if ( panel!=null ) {
-            Plot plot= dom.getController().getPlotFor(panel);
-            if ( plot!=null ) p = plot.getController().getDasPlot();
+        DasPlot p = null;
+        if (panel != null) {
+            Plot plot = dom.getController().getPlotFor(panel);
+            if (plot != null) {
+                p = plot.getController().getDasPlot();
+            }
         }
-        if ( p!=null ) {
+        if (p != null) {
             return dom.getController().getMonitorFactory().getMonitor(p, label, description);
         } else {
             return dom.getController().getMonitorFactory().getMonitor(label, description);
