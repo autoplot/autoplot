@@ -4,12 +4,14 @@
  */
 package org.virbo.autoplot.util;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
@@ -17,8 +19,15 @@ import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.ListSelectionModel;
 import org.das2.util.ClassMap;
 
 /**
@@ -34,6 +43,7 @@ public class CanvasLayoutPanel extends JLabel {
         types = new ClassMap<Color>();
         addMouseListener(mouseListener);
     }
+
     transient MouseListener mouseListener = new MouseAdapter() {
 
         @Override
@@ -53,9 +63,24 @@ public class CanvasLayoutPanel extends JLabel {
                             bounds.width * mwidth / twidth,
                             bounds.height * mwidth / twidth);
                     if (mbounds.contains(e.getX(), e.getY())) {
-                        component = c;
+                        if ( e.getModifiersEx()==MouseEvent.CTRL_DOWN_MASK ) {
+                            if ( selectedComponents.contains(c) ) {
+                                selectedComponents.remove(c);
+                                component = null;
+                            } else {
+                                selectedComponents.add(c);
+                                component = c;
+                            }
+                        } else {
+                            component= c;
+                            selectedComponents.clear();
+                            selectedComponents.add(c);
+                        }
                         repaint();
                         firePropertyChange(PROP_COMPONENT, null, c);
+                        if ( e.getModifiers()==MouseEvent.CTRL_DOWN_MASK ) {
+                            firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
+                        }
                     }
                 }
             }
@@ -74,6 +99,20 @@ public class CanvasLayoutPanel extends JLabel {
         repaint();
         firePropertyChange(PROP_COMPONENT, oldComponent, component);
     }
+
+    protected List<Object> selectedComponents = new ArrayList();
+    public static final String PROP_SELECTEDCOMPONENTS = "selectedComponents";
+
+    public List<Object> getSelectedComponents() {
+        return new ArrayList(selectedComponents);
+    }
+
+    public void setSelectedComponents(List<Object> selectedComponents) {
+        List<Object> oldSelectedComponents = this.selectedComponents;
+        this.selectedComponents = selectedComponents;
+        propertyChangeSupport.firePropertyChange(PROP_SELECTEDCOMPONENTS, oldSelectedComponents, selectedComponents);
+    }
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     /**
      * get a translucent version of this color.
@@ -97,6 +136,9 @@ public class CanvasLayoutPanel extends JLabel {
         int twidth = target.getWidth();
         int mwidth = getWidth();
         g.fillRect(0, 0, mwidth, theight * mwidth / twidth);
+        Stroke selectedStroke= new BasicStroke( 3.f );
+        Stroke normalStroke= new BasicStroke( 1.f );
+
         for (int i = 0; i < target.getComponentCount(); i++) {
             Component c = target.getComponent(i);
             Color color = types.get(c.getClass());
@@ -110,9 +152,16 @@ public class CanvasLayoutPanel extends JLabel {
                     g.setColor(getTranslucentColor(color, 160));
                     g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
                     g.setColor(getTranslucentColor(color, 220));
+                    g.setStroke(selectedStroke);
+                    g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                    g.setStroke(normalStroke);
+                } else if ( selectedComponents.contains(c)) {
+                    g.setColor(getTranslucentColor(color, 130));
+                    g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                    g.setColor(getTranslucentColor(color, 220));
                     g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
                 } else {
-                    g.setColor(getTranslucentColor(color, 100));
+                    g.setColor(getTranslucentColor(color, 60));
                     g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
                     g.setColor(getTranslucentColor(color, 160));
                     g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
