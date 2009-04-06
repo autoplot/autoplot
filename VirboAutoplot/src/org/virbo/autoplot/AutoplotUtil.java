@@ -58,8 +58,8 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.ApplicationModel.RenderType;
+import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.dataset.DRank0DataSet;
-import org.virbo.dataset.OldDataSetIterator;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -184,6 +184,16 @@ public class AutoplotUtil {
         return result;
     }
 
+    public static List<String> getUrls( List<Bookmark> recent ) {
+        List<String> urls = new ArrayList<String>(recent.size());
+
+        for (Bookmark b : recent) {
+            if ( b instanceof  Bookmark.Item ) {
+                urls.add(((Bookmark.Item) b).getUrl());
+            }
+        }
+        return urls;
+    }
 
     public static class AutoRangeDescriptor {
 
