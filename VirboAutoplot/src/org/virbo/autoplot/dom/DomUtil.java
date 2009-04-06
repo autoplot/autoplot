@@ -6,10 +6,6 @@
 package org.virbo.autoplot.dom;
 
 import java.beans.PropertyEditor;
-import java.lang.Class;
-import java.lang.Class;
-import java.lang.Class;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,6 +41,29 @@ public class DomUtil {
         for ( String e: exclude ) {
             if ( e.startsWith(string+".") ) {
                 result.add(e.substring(n));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * return a list of nodes (panels and dataSourceFilters) that use the DataSourceFilter.
+     * @param app
+     * @param plotId
+     * @return
+     */
+    static List<DomNode> getDataSourceUsages( Application app, String id ) {
+        List<DomNode> result= new ArrayList<DomNode>();
+        for ( Panel p: app.getPanels() ) {
+            if ( p.getDataSourceFilterId().equals(id) ) {
+                result.add(p);
+            }
+        }
+        for ( DataSourceFilter dsf: app.getDataSourceFilters() ) {
+            for ( DataSourceFilter dsfp: dsf.getController().getParentSources() ) {
+                if ( dsfp.getId().equals(id) ) {
+                    result.add(dsf);
+                }
             }
         }
         return result;
@@ -115,7 +134,7 @@ public class DomUtil {
     }
     
     /**
-     * return the node with this id.
+     * return the node with this id, or null if the id is not found.
      * @param root
      * @param id
      * @return
@@ -182,5 +201,5 @@ public class DomUtil {
         }
         return result;
     }
-        
+    
 }
