@@ -100,11 +100,15 @@ public class URLSplit {
 
         if (scheme.startsWith("vap")) {
             String resourcePart = surl.substring(i0 + 1);
-            URLSplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));
-            result.surl = resourceSplit.surl;
             result.vapScheme = scheme;
-            result.formatCarotPos = (carotPos > i0) ? resourceSplit.carotPos + (i0 + 1) : carotPos;
-            result.carotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
+            if (scheme.equals("vap+internal")) { // leave the resourcePart alone. TODO: jdbc and other non-file URIs.
+                result.surl= resourcePart;
+            } else {
+                URLSplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));
+                result.surl = resourceSplit.surl;
+                result.formatCarotPos = (carotPos > i0) ? resourceSplit.carotPos + (i0 + 1) : carotPos;
+                result.carotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
+            }
 
         } else {
             result.surl = surl;
@@ -162,7 +166,7 @@ public class URLSplit {
 
     /**
      * interpret the scheme part to vapScheme and scheme.  If the resource URI is
-     * valid, then this will be set as well.  surl maybe modified.
+     * valid, then this will be set as well.  surl may be modified.
      * @param result
      */
     private static void parseScheme(URLSplit result) throws URISyntaxException {
@@ -231,7 +235,9 @@ public class URLSplit {
         URLSplit result = maybeAddFile(surl, carotPos);
 
         try {
-            parseScheme(result);
+            if ( result.vapScheme==null || !result.vapScheme.equals("vap+internal") ) {
+                parseScheme(result);
+            }
         } catch (URISyntaxException ex) {
             result.surl = uriEncode(result.surl); //TODO: move carotPos
             try {
@@ -253,8 +259,11 @@ public class URLSplit {
 
         file = result.resourceUri == null ? null : result.resourceUri.getPath();
         if (file == null) {
-            if (iquery == -1) file = rsurl;
-            else file = rsurl.substring(0, iquery);
+            if (iquery == -1) {
+                file = rsurl;
+            } else {
+                file = rsurl.substring(0, iquery);
+            }
         }
 
         String ext = null;
