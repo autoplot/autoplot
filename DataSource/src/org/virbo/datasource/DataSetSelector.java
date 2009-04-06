@@ -119,6 +119,11 @@ public class DataSetSelector extends javax.swing.JPanel {
             return;
         }
 
+        if ( surl.startsWith("vap+internal:") ) {
+            firePlotDataSetURL();
+            return;
+        }
+
         for (String actionTriggerRegex : actionTriggers.keySet()) {
             if (Pattern.matches(actionTriggerRegex, surl)) {
                 logger.finest("matches action trigger");
