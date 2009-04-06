@@ -23,6 +23,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.PersistentStateSupport;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -42,9 +43,11 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -70,6 +73,7 @@ import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
+import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
 import org.virbo.autoplot.util.TickleTimer;
@@ -405,10 +409,59 @@ public class AutoPlotUI extends javax.swing.JFrame {
         }
     }
 
+    private Action getAddPanelAction() {
+        return new AbstractAction("Add Panel...") {
+            public void actionPerformed(ActionEvent e) {
+                AddPanelDialog dia= new AddPanelDialog( (Frame)SwingUtilities.getWindowAncestor(AutoPlotUI.this), true );
+                dia.getPrimaryDataSetSelector().setValue(dataSetSelector.getValue());
+                dia.getSecondaryDataSetSelector().setValue(dataSetSelector.getValue());
+                dia.getTertiaryDataSetSelector().setValue(dataSetSelector.getValue());
+                dia.getPrimaryDataSetSelector().setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
+                dia.getSecondaryDataSetSelector().setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
+                dia.getTertiaryDataSetSelector().setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
+
+                dia.setVisible(true);
+                if ( dia.isCancelled() ) return;
+
+                Plot plot=null;
+                Panel panel= null;
+
+                int modifiers= dia.getModifiers();
+                if ( (modifiers & KeyEvent.CTRL_MASK)==KeyEvent.CTRL_MASK ) { // new plot
+                    plot=null;
+                    panel= null;
+                    //nothing
+                } else if ( (modifiers&KeyEvent.SHIFT_MASK)==KeyEvent.SHIFT_MASK ) {  // overplot
+                    plot= dom.getController().getPlot();
+                } else {
+                    panel= dom.getController().getPanel();
+                }
+
+                if ( dia.getDepCount()==0 ) {
+                    dom.getController().plot( plot, panel,
+                            dia.getPrimaryDataSetSelector().getValue() );
+                } else if ( dia.getDepCount()==1 ) {
+                    dom.getController().plot( plot, panel,
+                            dia.getSecondaryDataSetSelector().getValue(),
+                            dia.getPrimaryDataSetSelector().getValue() );
+                } else if ( dia.getDepCount()==2 ) {
+                    dom.getController().plot( plot, panel,
+                            dia.getSecondaryDataSetSelector().getValue(),
+                            dia.getTertiaryDataSetSelector().getValue(),
+                            dia.getPrimaryDataSetSelector().getValue() );
+                }
+
+            }
+        };
+    }
+
     private void fillFileMenu() {
 
         fileMenu.add(dataSetSelector.getOpenLocalAction());
         fileMenu.add(dataSetSelector.getRecentMenu());
+
+        fileMenu.add( getAddPanelAction() );
+
         fileMenu.add(stateSupport.createSaveAsAction());
 
         fileMenu.add(stateSupport.createSaveAction());
@@ -501,21 +554,29 @@ public class AutoPlotUI extends javax.swing.JFrame {
         rlistener.stopListening();
     }
 
-    private void plotUrl() {
-        try {
-            Logger.getLogger("ap").fine("plotUrl()");
-            final String surl = (String) dataSetSelector.getValue();
-            applicationModel.addRecent(surl);
-            applicationModel.resetDataSetSourceURL(surl, new NullProgressMonitor() {
+
+    private ProgressMonitor getStatusBarProgressMonitor( final String finishMessage ) {
+        return new NullProgressMonitor() {
                 public void setProgressMessage(String message) {
                     setStatus(BUSY_ICON,message);
                 }
                 @Override
                 public void finished() {
-                    setStatus(IDLE_ICON,"finished "+surl);
+                    setStatus(IDLE_ICON,finishMessage);
                 }
-                
-            });
+
+            };
+    }
+
+    private void plotUrl() {
+        plotUrl( (String) dataSetSelector.getValue() );
+    }
+
+    private void plotUrl(final String surl) {
+        try {
+            Logger.getLogger("ap").fine("plotUrl("+surl+")");
+            applicationModel.addRecent(surl);
+            applicationModel.resetDataSetSourceURL(surl, getStatusBarProgressMonitor("Finished "+surl) );
         } catch (RuntimeException ex) {
             applicationModel.application.getExceptionHandler().handle(ex);
             setStatus(ERROR_ICON,ex.getMessage());
@@ -527,11 +588,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
      * add a new plot and panel.  This is attached to control-enter.
      */
     private void plotAnotherUrl() {
+        plotAnotherUrl( (String) dataSetSelector.getValue() );
+    }
+
+    private void plotAnotherUrl( final String surl ) {
         try {
-            Logger.getLogger("ap").fine("plotAnotherUrl()");
-            final String surl = (String) dataSetSelector.getValue();
+            Logger.getLogger("ap").fine("plotAnotherUrl("+surl+")");
             applicationModel.addRecent(surl);
-            Panel panel= dom.getController().addPanel( null ,null );
+            Panel panel= dom.getController().addPanel( null,null );
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
             
         } catch (RuntimeException ex) {
@@ -544,9 +608,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
      * add a panel to the focus plot.  This is attached to shift-enter.
      */
     private void overplotAnotherUrl() {
+        overplotAnotherUrl( (String) dataSetSelector.getValue() );
+    }
+
+    private void overplotAnotherUrl( final String surl ) {
         try {
-            Logger.getLogger("ap").fine("overplotAnotherUrl()");
-            final String surl = (String) dataSetSelector.getValue();
+            Logger.getLogger("ap").fine("overplotAnotherUrl("+surl+")");
             applicationModel.addRecent(surl);
             Panel panel= dom.getController().addPanel( dom.getController().getPlot() ,null );
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
