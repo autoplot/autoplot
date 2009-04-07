@@ -25,6 +25,13 @@ public class DataSourceEditorDialog extends javax.swing.JDialog {
         this.validate();
     }
 
+    public DataSourceEditorDialog( java.awt.Dialog parent, Component message, boolean modal ) {
+        super(parent, modal);
+        initComponents();
+        this.jPanel1.add(message,BorderLayout.CENTER);
+        this.validate();
+    }
+
     protected boolean cancelled = true;
     public static final String PROP_CANCELLED = "cancelled";
 
