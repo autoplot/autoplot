@@ -293,7 +293,6 @@ public class MetaDataPanel extends javax.swing.JPanel {
             if (hist != null) {
                 moments = AutoHistogram.moments(hist);
                 validCount = (Long) moments.property("validCount");
-                invalidCount = (Long) moments.property("invalidCount");
 
                 if (validCount > 0) {
                     s = String.valueOf(moments);
@@ -313,17 +312,11 @@ public class MetaDataPanel extends javax.swing.JPanel {
             QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
 
             RankZeroDataSet cadence;
-            Units xunits;
 
             if (dep0 == null) {
-                xunits = Units.dimensionless;
                 cadence = DataSetUtil.asDataSet(1);
             } else {
                 cadence = (RankZeroDataSet) dep0.property(QDataSet.CADENCE);
-                xunits = (Units) dep0.property(QDataSet.UNITS);
-            }
-            if (xunits == null) {
-                xunits = Units.dimensionless;
             }
 
             if (cadence != null) {
