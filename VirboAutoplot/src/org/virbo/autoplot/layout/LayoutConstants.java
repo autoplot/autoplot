@@ -10,7 +10,7 @@ package org.virbo.autoplot.layout;
  * @author jbf
  */
 public class LayoutConstants {
-    public static final Object ABOVE= new String("above");
-    public static final Object BELOW= new String("below");
+    public static final Object ABOVE= "above";
+    public static final Object BELOW= "below";
 
 }
