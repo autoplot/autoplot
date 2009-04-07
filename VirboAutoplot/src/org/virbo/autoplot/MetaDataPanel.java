@@ -267,32 +267,46 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         } else {
 
-            RankZeroDataSet moments = DataSetOps.moment(ds);
-
-            long validCount = (Integer) moments.property("validCount");
-            long invalidCount = (Integer) moments.property("invalidCount");
-            map.put("# invalid", "" + invalidCount + " of " + String.valueOf(validCount + invalidCount));
+            int nelements= DataSetUtil.totalLength( ds );
+            RankZeroDataSet moments ;
+            long validCount;
+            long invalidCount;
             String s;
-            if (validCount > 0) {
-                s = String.valueOf(moments);
-            } else {
-                s = "";
-            }
-            map.put("Mean", s);
+            if ( nelements < 50000 ) {
 
-            if (validCount > 1) {
-                s = String.valueOf(DatumUtil.asOrderOneUnits(DataSetUtil.asDatum((RankZeroDataSet) moments.property("stddev"))));
+                moments = DataSetOps.moment(ds);
+
+                validCount = (Integer) moments.property("validCount");
+                invalidCount = (Integer) moments.property("invalidCount");
+                map.put("# invalid", "" + invalidCount + " of " + String.valueOf(validCount + invalidCount));
+                
+                if (validCount > 0) {
+                    s = String.valueOf(moments);
+                } else {
+                    s = "";
+                }
+                map.put("Mean", s);
+
+                if (validCount > 1) {
+                    s = String.valueOf(DatumUtil.asOrderOneUnits(DataSetUtil.asDatum((RankZeroDataSet) moments.property("stddev"))));
+                } else {
+                    s = "";
+                }
+                map.put("Std Dev", s);
             } else {
-                s = "";
+                map.put("Legacy Stats", "Data Set too large");
             }
-            map.put("Std Dev", s);
 
             QDataSet hist = dsf.getController().getHistogram();
             map.put("Histogram", hist);
 
             if (hist != null) {
                 moments = AutoHistogram.moments(hist);
+
                 validCount = (Long) moments.property("validCount");
+                invalidCount= (Long) moments.property("invalidCount");
+                
+                map.put("# invalid", "" + invalidCount + " of " + String.valueOf(validCount + invalidCount));
 
                 if (validCount > 0) {
                     s = String.valueOf(moments);
