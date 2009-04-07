@@ -523,11 +523,6 @@ public class PanelController {
 
     private void guessCadence(MutablePropertyDataSet xds, QDataSet fillDs) {
         if ( xds.length()<2 ) return;
-        
-        Units xunits = (Units) xds.property(QDataSet.UNITS);
-        if (xunits == null) {
-            xunits = Units.dimensionless;
-        }
 
         RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
         if ( cadence!=null && "log".equals(cadence.property(QDataSet.SCALE_TYPE) ) ) {
