@@ -113,7 +113,7 @@ public class TimeSeriesBrowseController {
             CacheTag newCacheTag = new CacheTag(newRange, newResolution);
 
             if (tag == null || !tag.contains(newCacheTag)) {
-                if (plot.isOverSize()) {
+                if (plot.isOverSize() && autorange==false ) {
                     visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3);
                 }
                 dataSourceController.getTsb().setTimeRange(visibleRange);
