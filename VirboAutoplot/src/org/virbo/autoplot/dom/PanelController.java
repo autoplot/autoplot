@@ -103,6 +103,7 @@ public class PanelController {
         }
 
         public void propertyChange(PropertyChangeEvent evt) {
+            logger.fine("panelListener: "+evt.getPropertyName()+" "+evt.getOldValue()+"->"+evt.getNewValue());
             if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) {
                 setRenderType(panel.getRenderType());
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
@@ -113,10 +114,12 @@ public class PanelController {
 
     private void resetDataSource() {
         if (dsf != null) {
-            unbindDsf();
+            unbindDsf();  //TODO: we may want to dispose of orphaned datasources at this point
         }
 
         assert (panel.getDataSourceFilterId() != null);
+        if ( panel.getDataSourceFilterId().equals("") ) return;
+        
         dsf = dom.getController().getDataSourceFilterFor(panel);
 
         if ( dsf==null ) {
@@ -632,9 +635,13 @@ public class PanelController {
         }
     }
 
+    /**
+     * return the plot containing this panel's renderer, or null.
+     * @return the plot containing this panel's renderer, or null.
+     */
     public DasPlot getDasPlot() {
         Plot p= dom.getController().getPlotFor(panel);
-        if ( p==null ) throw new IllegalArgumentException("no plot found for panel");
+        if ( p==null ) return null;
         return p.getController().getDasPlot();
     }
 
