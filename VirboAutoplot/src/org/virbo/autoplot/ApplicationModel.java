@@ -130,7 +130,7 @@ public class ApplicationModel {
 
 
     public void setDataSource(DataSource dataSource) {
-        dom.getController().getDataSourceFilter().getController().setDataSource(dataSource);
+        dom.getController().getDataSourceFilter().getController().setDataSource(false,dataSource);
     }
 
     public DataSource dataSource() {
