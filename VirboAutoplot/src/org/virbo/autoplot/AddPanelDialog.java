@@ -26,6 +26,9 @@ public class AddPanelDialog extends javax.swing.JDialog {
         secondaryDataSetSelector.setVisible(secondaryCheckBox.isSelected());
         tertiaryCheckBox.setVisible(secondaryCheckBox.isSelected());
         tertiaryDataSetSelector.setVisible(secondaryCheckBox.isSelected()&&tertiaryCheckBox.isSelected());
+        primaryDataSetSelector.setPlotItButtonVisible(false);
+        secondaryDataSetSelector.setPlotItButtonVisible(false);
+        tertiaryDataSetSelector.setPlotItButtonVisible(false);
     }
 
     /** This method is called from within the constructor to
@@ -79,6 +82,7 @@ public class AddPanelDialog extends javax.swing.JDialog {
             }
         });
 
+        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
         plotButton.setText("Plot");
         plotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -90,9 +94,9 @@ public class AddPanelDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, primaryDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, primaryDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
-                .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
                 .addContainerGap())
             .add(layout.createSequentialGroup()
                 .add(secondaryCheckBox)
@@ -109,7 +113,7 @@ public class AddPanelDialog extends javax.swing.JDialog {
                 .add(tertiaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(452, Short.MAX_VALUE)
+                .addContainerGap(432, Short.MAX_VALUE)
                 .add(overplotButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotBelowButton)
@@ -163,6 +167,7 @@ public class AddPanelDialog extends javax.swing.JDialog {
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
         cancelled= false;
+        setModifiers( evt.getModifiers() );
         setVisible(false);
 }//GEN-LAST:event_plotButtonActionPerformed
 
