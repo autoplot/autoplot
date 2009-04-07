@@ -106,6 +106,7 @@ public class PanelController {
             logger.fine("panelListener: "+evt.getPropertyName()+" "+evt.getOldValue()+"->"+evt.getNewValue());
             if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) {
                 setRenderType(panel.getRenderType());
+                setResetRenderer(false);
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
                 resetDataSource();
             }
@@ -223,11 +224,17 @@ public class PanelController {
             }
             QDataSet fillDs = dsf.getController().getFillDataSet();
 
-            if (resetRanges && fillDs != null) {
-                RenderType renderType = AutoplotUtil.getRenderType(fillDs);
-                panel.setRenderType(renderType);
+            if ( fillDs!=null ) {
+                if ( resetRanges ) {
+                    RenderType renderType = AutoplotUtil.getRenderType(fillDs);
+                    panel.setRenderType(renderType);
 
-                resetPanel(fillDs);
+                    resetPanel(fillDs);
+
+                } else if ( resetRenderer ) {
+                    setRenderType(panel.getRenderType());
+                    setResetRenderer(false);
+                }
             }
 
             if (fillDs == null) {
@@ -293,6 +300,14 @@ public class PanelController {
             } //!dom.getController().isValueAdjusting()
         } //fillDs != null
     }
+
+    /**
+     * When the data source changes, we will need to autorange so that the axis
+     * units are set correctly and things are in a consistent state.  One exception
+     * to this is when we are doing state transistions with save/load redo/undo, where
+     * we need to avoid autoranging.  Note a kludge in ApplicationController sync
+     * sets resetRanges to false after the load.
+     */
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
 
         public String toString() {
@@ -334,15 +349,30 @@ public class PanelController {
         return resetRanges;
     }
 
-    /**
-     * if true, then the next time we get a new dataset, we will autorange.
-     * @param resetRanges
-     */
     public void setResetRanges(boolean resetRanges) {
         boolean oldResetRanges = this.resetRanges;
         this.resetRanges = resetRanges;
         propertyChangeSupport.firePropertyChange(PROP_RESETRANGES, oldResetRanges, resetRanges);
     }
+
+    /**
+     * true indicates the controller should install a new renderer to implement the
+     * renderType selection.
+     */
+    public static final String PROP_RESETRENDERER = "resetRenderer";
+    protected boolean resetRenderer = false;
+
+    public boolean isResetRenderer() {
+        return resetRenderer;
+    }
+
+    public void setResetRenderer(boolean resetRenderer) {
+        boolean oldResetRenderer = this.resetRenderer;
+        this.resetRenderer = resetRenderer;
+        propertyChangeSupport.firePropertyChange(PROP_RESETRENDERER, oldResetRenderer, resetRenderer);
+    }
+
+
     protected Renderer renderer = null;
 
     public Renderer getRenderer() {
@@ -369,12 +399,12 @@ public class PanelController {
         ac.bind(panel, Panel.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
     }
 
-    private synchronized void doResetRanges(boolean autorange) {
+    private synchronized void doResetRanges( boolean autorange ) {
 
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
         setRenderType(panel.getRenderType());
-
+        setResetRenderer(false);
         Plot plot = dom.getController().getPlotFor(panel);
 
         Panel panelCopy = (Panel) panel.copy();
