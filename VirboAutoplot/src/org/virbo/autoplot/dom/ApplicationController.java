@@ -1207,7 +1207,10 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         canvasLock.unlock();
 
         lock.unlock();
-
+        for ( Panel p: application.getPanels() ) {  // kludge to avoid reset range
+            p.getController().setResetRanges(false);
+            p.getController().setResetRenderer(true);
+        }
     }
 
     /**
