@@ -84,6 +84,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         defaultCellRenderer = jTable1.getDefaultRenderer(Object.class);
         jTable1.setDefaultRenderer(Object.class, new ColSpanTableCellRenderer());
 
+        jScrollPane1.setRowHeaderView( new TableRowHeader(jTable1) );
+
         model.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent e) {
