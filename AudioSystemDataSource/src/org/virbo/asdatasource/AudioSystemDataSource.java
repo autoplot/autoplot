@@ -19,7 +19,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.TargetDataLine;
-import javax.swing.text.html.HTMLEditorKit;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
@@ -29,7 +28,7 @@ import org.virbo.datasource.capability.Updating;
 import org.virbo.dsops.Ops;
 
 /**
- *
+ * provide a dataset by grabbing data from the desktop's audio system.
  * @author jbf
  */
 public class AudioSystemDataSource extends AbstractDataSource implements Updating {
