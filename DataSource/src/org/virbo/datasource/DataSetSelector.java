@@ -5,6 +5,7 @@
  */
 package org.virbo.datasource;
 
+import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
 import org.das2.DasApplication;
@@ -233,10 +234,13 @@ public class DataSetSelector extends javax.swing.JPanel {
             String title= "Editing "+surl;
             if (window instanceof Frame) {
                 dialog = new DataSourceEditorDialog( (Frame)window, edit.getPanel(), true);	
+            } else if ( window instanceof Dialog ) {  // TODO: Java 1.6 ModalityType.
+                dialog = new DataSourceEditorDialog( (Dialog)window, edit.getPanel(), true);
             } else {
-                dialog = new DataSourceEditorDialog( (Frame)window, edit.getPanel(), true);	
-            }            
+                throw new RuntimeException("parent windowAncestor type is not supported.");
+            }
             dialog.setVisible(true);
+            dialog.setTitle(title);
             
             if ( ! dialog.isCancelled() ) {
                 dataSetSelector.setSelectedItem(edit.getUrl());
@@ -493,8 +497,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     /**
-     * THIS MUST BE CALLED AFTER THE COMPONENT IS ADDED.  This is so ENTER
-     * works properly
+     * THIS MUST BE CALLED AFTER THE COMPONENT IS ADDED.  
+     * This is so ENTER works properly.
      */
     public void addCompletionKeys() {
 
@@ -665,8 +669,6 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         String context = (String) dataSetSelector.getSelectedItem();
-
-        URLSplit split = URLSplit.parse(context);
 
         String ext= DataSetURL.getExt(context);
         if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) { 
@@ -857,6 +859,20 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         firePropertyChange(PROPERTY_MESSAGE, oldMessage, message);
     }
     HashMap<String, Action> actionTriggers = new LinkedHashMap<String, Action>();
+
+    protected boolean plotItButtonVisible = true;
+    public static final String PROP_PLOTITBUTTONVISIBLE = "plotItButtonVisible";
+
+    public boolean isPlotItButtonVisible() {
+        return plotItButtonVisible;
+    }
+
+    public void setPlotItButtonVisible(boolean plotItButtonVisible) {
+        boolean oldPlotItButtonVisible = this.plotItButtonVisible;
+        this.plotItButtonVisible = plotItButtonVisible;
+        this.plotItButton.setVisible(plotItButtonVisible);
+        firePropertyChange(PROP_PLOTITBUTTONVISIBLE, oldPlotItButtonVisible, plotItButtonVisible);
+    }
 
     /**
      * This is how we allow .vap files to be in the datasetSelector.  We register
