@@ -311,7 +311,7 @@ public class DataSourceController {
     
     DataSourceFilter[] parentSources;
 
-    protected DataSourceFilter[] getParentSources() {
+    protected synchronized DataSourceFilter[] getParentSources() {
         if ( parentSources==null ) {
             return new DataSourceFilter[0];
         } else {
@@ -327,8 +327,12 @@ public class DataSourceController {
         String[] ss = split.surl.split(",", -2);
         for (int i = 0; i < ss.length; i++) {
             DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
-            dsf.getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
-            parentSources[i] = dsf;
+            if ( dsf!=null ) {
+                dsf.getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
+                parentSources[i] = dsf;
+            }else {
+                parentSources[i] = null;
+            }
         }
         System.err.println( Arrays.asList(parentSources));
     }
@@ -903,7 +907,7 @@ public class DataSourceController {
      * @param uri
      * @param mon
      */
-    public void setSuri(String suri, ProgressMonitor mon) {
+    public synchronized void setSuri(String suri, ProgressMonitor mon) {
         dsf.setUri(suri);
     }
 
@@ -912,7 +916,7 @@ public class DataSourceController {
      * @param surl
      * @param mon
      */
-    public void resetSuri(String suri, ProgressMonitor mon) {
+    public synchronized void resetSuri(String suri, ProgressMonitor mon) {
         String old = dsf.getUri();
         if (old != null && old.equals(suri)) {
             dsf.setUri(null);
@@ -1025,7 +1029,8 @@ public class DataSourceController {
     }
 
     public boolean isPendingChanges() {
-        if (timeSeriesBrowseController != null && timeSeriesBrowseController.isPendingChanges()) {
+        TimeSeriesBrowseController tsbc= timeSeriesBrowseController;
+        if (tsbc != null && tsbc.isPendingChanges()) {
             return true;
         }
         return changesSupport.isPendingChanges();
