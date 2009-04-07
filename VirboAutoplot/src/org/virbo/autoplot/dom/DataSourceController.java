@@ -23,6 +23,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.autoplot.util.RunLaterListener;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -55,7 +56,7 @@ public class DataSourceController {
     private PropertyChangeListener updateSlicePropertyChangeListener = new PropertyChangeListener() {
 
         public String toString() {
-            return "" + dsf + " controller";
+            return "" + dsf + " controller updateSlicePropertyChangeListener";
         }
 
         public void propertyChange(PropertyChangeEvent e) {
@@ -67,7 +68,7 @@ public class DataSourceController {
     private PropertyChangeListener updateMePropertyChangeListener = new PropertyChangeListener() {
 
         public String toString() {
-            return "" + dsf + " controller";
+            return "" + dsf + " controller updateMePropertyChangeListener";
         }
 
         public void propertyChange(PropertyChangeEvent e) {
@@ -83,23 +84,23 @@ public class DataSourceController {
     private PropertyChangeListener resetMePropertyChangeListener = new PropertyChangeListener() {
 
         public String toString() {
-            return "" + dsf + " controller";
+            return "" + dsf + " controller resetMePropertyChangeListener";
         }
 
         public void propertyChange(PropertyChangeEvent e) {
+            logger.fine( "resetMe: "+e.getPropertyName()+ " "+e.getOldValue()+"->"+e.getNewValue());
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
                 if (!dom.getController().isValueAdjusting()) {
                     resolveDataSource(getMonitor("resetting data source", "resetting data source"));
                 } else {
-                    dom.getController().addPropertyChangeListener(ChangesSupport.PROP_VALUEADJUSTING, new PropertyChangeListener() {
-
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            dom.getController().removePropertyChangeListener(this);
+                    new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.getController()) {
+                        @Override
+                        public void run() {
                             resolveDataSource(getMonitor("resetting data source", "resetting data source"));
                         }
-                    });
+                    };
                 }
             }
         }
@@ -274,19 +275,16 @@ public class DataSourceController {
             }
         }
 
-        if (this.dom.getController().isValueAdjusting()) {
+        ApplicationController ac= this.dom.getController();
+
+        if (ac.isValueAdjusting()) {
             final QDataSet fds = ds;
-            this.dom.getController().addPropertyChangeListener(ChangesSupport.PROP_VALUEADJUSTING, new PropertyChangeListener() {
-
-                public String toString() {
-                    return "" + dsf + " controller";
-                }
-
-                public void propertyChange(PropertyChangeEvent evt) {
-                    dom.getController().removePropertyChangeListener(this);
+            new RunLaterListener( ChangesSupport.PROP_VALUEADJUSTING, ac ) {
+                @Override
+                public void run() {
                     setDataSetInternal(fds);
                 }
-            });
+            };
         } else {
             _setDataSet(ds);
             setRawProperties(null);  // TODO: what if this is from a datasource?  We might want to avoid null in raw properties tree view.
