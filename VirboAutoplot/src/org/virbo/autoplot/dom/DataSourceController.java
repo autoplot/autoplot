@@ -93,12 +93,12 @@ public class DataSourceController {
                 return;
             } else {
                 if (!dom.getController().isValueAdjusting()) {
-                    resolveDataSource(getMonitor("resetting data source", "resetting data source"));
+                    resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
                 } else {
                     new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.getController()) {
                         @Override
                         public void run() {
-                            resolveDataSource(getMonitor("resetting data source", "resetting data source"));
+                            resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
                         }
                     };
                 }
@@ -190,7 +190,7 @@ public class DataSourceController {
         }
     }
 
-    public synchronized void setDataSource(DataSource dataSource) {
+    public synchronized void setDataSource(boolean valueWasAdjusting,DataSource dataSource) {
 
         if (timeSeriesBrowseController != null) {
             timeSeriesBrowseController.release();
@@ -222,7 +222,7 @@ public class DataSourceController {
                 List<Panel> ps = dom.getController().getPanelsFor(dsf);
                 if (ps.size() > 0) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(ps.get(0));
-                    timeSeriesBrowseController.setup();
+                    timeSeriesBrowseController.setup(valueWasAdjusting);
                 }
 
             } else {
@@ -934,14 +934,14 @@ public class DataSourceController {
      *   update is called to start the download, unless 
      *   if this is headless, then the dataset has been loaded sychronously.
      */
-    public void resolveDataSource(ProgressMonitor mon) {
+    private void resolveDataSource( boolean valueWasAdjusting, ProgressMonitor mon ) {
         changesSupport.performingChange(this, PENDING_DATA_SOURCE);
 
         Caching caching = getCaching();
 
         String surl = dsf.getUri();
         if (surl == null) {
-            setDataSource(null);
+            setDataSource(valueWasAdjusting,null);
             changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
         } else {
             URLSplit split = URLSplit.parse(surl);
@@ -962,10 +962,10 @@ public class DataSourceController {
                 if (split.vapScheme.equals("vap+internal")) {
                     URI uri;
                     doInternal(split.path);
-                    setDataSource(null);
+                    setDataSource(valueWasAdjusting,null);
                 } else {
                     DataSource source = DataSetURL.getDataSource(surl);
-                    setDataSource(source);
+                    setDataSource(valueWasAdjusting,source);
                 }
                 changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
 
