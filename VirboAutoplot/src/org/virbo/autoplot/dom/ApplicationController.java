@@ -50,12 +50,13 @@ import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.layout.LayoutConstants;
+import org.virbo.autoplot.util.RunLaterListener;
 
 /**
  *
  * @author jbf
  */
-public class ApplicationController {
+public class ApplicationController implements RunLaterListener.PropertyChange {
 
     Application application;
     ApplicationModel model;
@@ -79,7 +80,7 @@ public class ApplicationController {
     public ApplicationController(ApplicationModel model, Application application) {
         this.application = application;
         this.syncSupport = new ApplicationControllerSyncSupport(this);
-        this.support= new ApplicationControllerSupport(this);
+        this.support = new ApplicationControllerSupport(this);
         this.changesSupport = new ChangesSupport(propertyChangeSupport, this);
         application.setId("app_0");
         application.getOptions().setId("options_0");
@@ -95,13 +96,13 @@ public class ApplicationController {
 
         addListeners();
     }
-    
+
     FocusAdapter focusAdapter = new FocusAdapter() {
 
         @Override
         public void focusGained(FocusEvent e) {
             super.focusGained(e);
-            
+
             Plot domPlot = getPlotFor(e.getComponent());
             if (domPlot == null) {
                 return;
@@ -300,9 +301,11 @@ public class ApplicationController {
         }
         application.setPanels(panels.toArray(new Panel[panels.size()]));
 
-        List<Panel> dsfPanels = getPanelsFor(dsf);
-        if (dsfPanels.size() == 0) {
-            deleteDataSourceFilter(dsf);
+        if (dsf != null) {
+            List<Panel> dsfPanels = getPanelsFor(dsf);
+            if (dsfPanels.size() == 0) {
+                deleteDataSourceFilter(dsf);
+            }
         }
 
     }
@@ -771,14 +774,16 @@ public class ApplicationController {
         unbind(dsf);
         dsf.getController().unbind();
 
-        DataSourceFilter[] parents= dsf.getController().getParentSources();
+        DataSourceFilter[] parents = dsf.getController().getParentSources();
         // look for orphaned parents
-        List<DataSourceFilter> alsoRemove= new ArrayList<DataSourceFilter>();
-        for ( DataSourceFilter pdf: parents ) {
-            String plotId= pdf.getId();
-            List<DomNode> usages= DomUtil.getDataSourceUsages(application, plotId);
+        List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
+        for (DataSourceFilter pdf : parents) {
+            String plotId = pdf.getId();
+            List<DomNode> usages = DomUtil.getDataSourceUsages(application, plotId);
             usages.remove(dsf);
-            if ( usages.size()==0 ) alsoRemove.add(pdf);
+            if (usages.size() == 0) {
+                alsoRemove.add(pdf);
+            }
         }
 
         List<DataSourceFilter> dsfs = new ArrayList<DataSourceFilter>(Arrays.asList(application.getDataSourceFilters()));
@@ -1091,6 +1096,11 @@ public class ApplicationController {
         return result;
     }
 
+    /**
+     * return the DataSourceFilter for the panel, or null if none exists.
+     * @param panel
+     * @return
+     */
     public DataSourceFilter getDataSourceFilterFor(Panel panel) {
         String id = panel.getDataSourceFilterId();
         DataSourceFilter result = null;
@@ -1107,7 +1117,7 @@ public class ApplicationController {
         List<Panel> result = new ArrayList<Panel>();
         for (Panel p : application.getPanels()) {
             if (p.getDataSourceFilterId().equals(id)) {
-                    result.add(p);
+                result.add(p);
             }
         }
         return result;
