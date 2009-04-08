@@ -40,7 +40,6 @@ public class AddPanelDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
         primaryDataSetSelector = new org.virbo.datasource.DataSetSelector();
         secondaryCheckBox = new javax.swing.JCheckBox();
         secondaryDataSetSelector = new org.virbo.datasource.DataSetSelector();
@@ -49,19 +48,19 @@ public class AddPanelDialog extends javax.swing.JDialog {
         overplotButton = new javax.swing.JButton();
         plotBelowButton = new javax.swing.JButton();
         plotButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
+        primaryCheckBox = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jLabel1.setText("Enter the data set URI, such as the name of an ascii file:");
-
-        secondaryCheckBox.setText("Plot Against:");
+        secondaryCheckBox.setText("Plot Against (X):");
         secondaryCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 secondaryCheckBoxActionPerformed(evt);
             }
         });
 
-        tertiaryCheckBox.setText("And Against:");
+        tertiaryCheckBox.setText("And Against (Y):");
         tertiaryCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tertiaryCheckBoxActionPerformed(evt);
@@ -90,14 +89,26 @@ public class AddPanelDialog extends javax.swing.JDialog {
             }
         });
 
+        cancelButton.setText("Cancel");
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
+
+        primaryCheckBox.setSelected(true);
+        primaryCheckBox.setText("Plot the Data Set URI:");
+        primaryCheckBox.setToolTipText("<html>Enter the data set URI, such as the name of an ascii text file and parameters for parsing.  \nPossible completions are displayed when CTRL-Space is pressed, and the folder icon \nmay invoke an editor depending on the data source type.\n\nUncheck this to add an empty panel.\n</html>");
+        primaryCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                primaryCheckBoxActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, primaryDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
-            .add(layout.createSequentialGroup()
-                .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE)
-                .addContainerGap())
             .add(layout.createSequentialGroup()
                 .add(secondaryCheckBox)
                 .addContainerGap())
@@ -113,20 +124,28 @@ public class AddPanelDialog extends javax.swing.JDialog {
                 .add(tertiaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(432, Short.MAX_VALUE)
+                .addContainerGap(371, Short.MAX_VALUE)
+                .add(cancelButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(overplotButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotBelowButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotButton)
                 .addContainerGap())
+            .add(layout.createSequentialGroup()
+                .add(primaryCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 572, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(83, Short.MAX_VALUE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .add(primaryDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .add(7, 7, 7)
+                .add(primaryCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(primaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(secondaryCheckBox)
@@ -140,7 +159,8 @@ public class AddPanelDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(plotButton)
                     .add(plotBelowButton)
-                    .add(overplotButton))
+                    .add(overplotButton)
+                    .add(cancelButton))
                 .addContainerGap())
         );
 
@@ -148,6 +168,9 @@ public class AddPanelDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void secondaryCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_secondaryCheckBoxActionPerformed
+        if ( secondaryCheckBox.isSelected() ) {
+            secondaryDataSetSelector.setValue(primaryDataSetSelector.getValue());
+        }
         secondaryDataSetSelector.setVisible(secondaryCheckBox.isSelected());
         tertiaryCheckBox.setVisible(secondaryCheckBox.isSelected());
         tertiaryDataSetSelector.setVisible(secondaryCheckBox.isSelected()&&tertiaryCheckBox.isSelected());
@@ -172,8 +195,24 @@ public class AddPanelDialog extends javax.swing.JDialog {
 }//GEN-LAST:event_plotButtonActionPerformed
 
     private void tertiaryCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tertiaryCheckBoxActionPerformed
+        if ( tertiaryCheckBox.isSelected() ) {
+            tertiaryDataSetSelector.setValue(primaryDataSetSelector.getValue());
+        }
         tertiaryDataSetSelector.setVisible(tertiaryCheckBox.isSelected());
     }//GEN-LAST:event_tertiaryCheckBoxActionPerformed
+
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
+        setVisible(false);
+}//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void primaryCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_primaryCheckBoxActionPerformed
+        primaryDataSetSelector.setVisible(primaryCheckBox.isSelected());
+        plotButton.setEnabled(primaryCheckBox.isSelected());
+        secondaryCheckBox.setVisible(primaryCheckBox.isSelected());
+        secondaryDataSetSelector.setVisible(primaryCheckBox.isSelected()&&secondaryCheckBox.isSelected());
+        tertiaryCheckBox.setVisible(primaryCheckBox.isSelected()&&secondaryCheckBox.isSelected());
+        tertiaryDataSetSelector.setVisible(primaryCheckBox.isSelected()&&secondaryCheckBox.isSelected()&&tertiaryCheckBox.isSelected());
+    }//GEN-LAST:event_primaryCheckBoxActionPerformed
 
     protected int modifiers = 0;
     public static final String PROP_MODIFIERS = "modifiers";
@@ -188,13 +227,20 @@ public class AddPanelDialog extends javax.swing.JDialog {
         firePropertyChange(PROP_MODIFIERS, oldModifiers, modifiers);
     }
 
+    /**
+     * return the number of depend datasets added, 0, or -1 if no dataset
+     * should be plotted.
+     * @return
+     */
     public int getDepCount() {
         if ( tertiaryCheckBox.isSelected() ) {
             return 2;
         } else if (  secondaryCheckBox.isSelected() ) {
             return 1;
-        } else {
+        } else if ( primaryCheckBox.isSelected() ) {
             return 0;
+        } else {
+            return -1;
         }
     }
 
@@ -245,10 +291,11 @@ public class AddPanelDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton cancelButton;
     private javax.swing.JButton overplotButton;
     private javax.swing.JButton plotBelowButton;
     private javax.swing.JButton plotButton;
+    private javax.swing.JCheckBox primaryCheckBox;
     private org.virbo.datasource.DataSetSelector primaryDataSetSelector;
     private javax.swing.JCheckBox secondaryCheckBox;
     private org.virbo.datasource.DataSetSelector secondaryDataSetSelector;
