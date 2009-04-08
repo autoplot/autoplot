@@ -412,53 +412,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private Action getAddPanelAction() {
         return new AbstractAction("Add Panel...") {
             public void actionPerformed(ActionEvent e) {
-                AddPanelDialog dia= new AddPanelDialog( (Frame)SwingUtilities.getWindowAncestor(AutoPlotUI.this), true );
-                dia.getPrimaryDataSetSelector().setValue(dataSetSelector.getValue());
-                dia.getSecondaryDataSetSelector().setValue(dataSetSelector.getValue());
-                dia.getTertiaryDataSetSelector().setValue(dataSetSelector.getValue());
-                dia.getPrimaryDataSetSelector().setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
-                dia.getSecondaryDataSetSelector().setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
-                dia.getTertiaryDataSetSelector().setRecent( AutoplotUtil.getUrls(applicationModel.getRecent()) );
-
-                dia.setVisible(true);
-                if ( dia.isCancelled() ) return;
-
-                Plot plot=null;
-                Panel panel= null;
-
-                int modifiers= dia.getModifiers();
-                if ( (modifiers & KeyEvent.CTRL_MASK)==KeyEvent.CTRL_MASK ) { // new plot
-                    plot=null;
-                    panel= null;
-                    //nothing
-                } else if ( (modifiers&KeyEvent.SHIFT_MASK)==KeyEvent.SHIFT_MASK ) {  // overplot
-                    plot= dom.getController().getPlot();
-                } else {
-                    panel= dom.getController().getPanel();
-                }
-
-                if ( dia.getDepCount()==0 ) {
-                    applicationModel.addRecent( dia.getPrimaryDataSetSelector().getValue() );
-                    dom.getController().plot( plot, panel,
-                            dia.getPrimaryDataSetSelector().getValue() );
-                } else if ( dia.getDepCount()==1 ) {
-                    applicationModel.addRecent( dia.getPrimaryDataSetSelector().getValue() );
-                    applicationModel.addRecent( dia.getSecondaryDataSetSelector().getValue() );
-                    dom.getController().plot( plot, panel,
-                            dia.getSecondaryDataSetSelector().getValue(),
-                            dia.getPrimaryDataSetSelector().getValue() );
-                } else if ( dia.getDepCount()==2 ) {
-                    applicationModel.addRecent( dia.getPrimaryDataSetSelector().getValue() );
-                    applicationModel.addRecent( dia.getSecondaryDataSetSelector().getValue() );
-                    applicationModel.addRecent( dia.getTertiaryDataSetSelector().getValue() );
-                    dom.getController().plot( plot, panel,
-                            dia.getSecondaryDataSetSelector().getValue(),
-                            dia.getTertiaryDataSetSelector().getValue(),
-                            dia.getPrimaryDataSetSelector().getValue() );
-                } else if ( dia.getDepCount()==-1 ) {
-                    if (panel==null) panel = dom.getController().addPanel(plot, null ); 
-                }
-
+                support.addPanel();
             }
         };
     }
