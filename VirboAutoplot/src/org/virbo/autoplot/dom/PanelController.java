@@ -185,8 +185,8 @@ public class PanelController {
                     }
                 }
             }
-            if (label == null) {
-                throw new IllegalArgumentException("not supported: " + panel.getComponent());
+            if (label == null && !isPendingChanges() ) {
+                throw new IllegalArgumentException("component not found: " + panel.getComponent());
             }
         }
 
@@ -228,9 +228,8 @@ public class PanelController {
                 if ( resetRanges ) {
                     RenderType renderType = AutoplotUtil.getRenderType(fillDs);
                     panel.setRenderType(renderType);
-
-                    resetPanel(fillDs);
-
+                    resetPanel(fillDs,renderType);
+                    
                 } else if ( resetRenderer ) {
                     setRenderType(panel.getRenderType());
                     setResetRenderer(false);
@@ -248,10 +247,11 @@ public class PanelController {
         }
     };
 
-    private void resetPanel(QDataSet fillDs) {
+    private void resetPanel(QDataSet fillDs,RenderType renderType) {
 
         //TODO: see if there's a way to preserve the component panels
         if (parentPanel != null) {
+            dom.getController().deletePanel(panel);
             return;
         } else {
             if (renderer != null) {
@@ -273,7 +273,7 @@ public class PanelController {
 
             // add additional panels when it's a bundle of rank1 datasets.
             if (!dom.getController().isValueAdjusting()) {
-                if ( fillDs.rank() == 2 && ( panel.getRenderType() != RenderType.spectrogram ) && fillDs.length(0) < 12) {
+                if ( fillDs.rank() == 2 && ( renderType != RenderType.spectrogram ) && fillDs.length(0) < 12) {
                     MutatorLock lock = dom.getController().mutatorLock();
                     lock.lock();
                     String[] labels = SemanticOps.getComponentLabels(fillDs);
@@ -707,7 +707,7 @@ public class PanelController {
 
                 this.childPanels = null;
                 this.setResetRanges(true);
-                this.resetPanel(dsf.getController().getFillDataSet());
+                this.resetPanel(dsf.getController().getFillDataSet(),renderType);
 
             } else {
                 for (Panel p : this.childPanels) {
