@@ -9,9 +9,9 @@
 package org.virbo.autoplot;
 
 import java.awt.Component;
+import java.awt.Frame;
 import org.das2.components.DasProgressPanel;
 import org.das2.graph.DasCanvas;
-import org.das2.graph.PsymConnector;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -38,17 +38,18 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.virbo.autoplot.bookmarks.Bookmark;
-import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceRegistry;
-import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -114,6 +115,65 @@ public class GuiSupport {
             }
         };
         new Thread(run, "CopyDataSetToClipboardThread").start();
+    }
+
+    void addPanel() {
+
+        ApplicationModel applicationModel= parent.applicationModel;
+        DataSetSelector dataSetSelector= parent.dataSetSelector;
+        Application dom= applicationModel.dom;
+
+        AddPanelDialog dia = new AddPanelDialog((Frame) SwingUtilities.getWindowAncestor(parent), true);
+        dia.getPrimaryDataSetSelector().setValue(dataSetSelector.getValue());
+        dia.getSecondaryDataSetSelector().setValue(dataSetSelector.getValue());
+        dia.getTertiaryDataSetSelector().setValue(dataSetSelector.getValue());
+        dia.getPrimaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+        dia.getSecondaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+        dia.getTertiaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+
+        dia.setVisible(true);
+        if (dia.isCancelled()) {
+            return;
+        }
+
+        Plot plot = null;
+        Panel panel = null;
+
+        int modifiers = dia.getModifiers();
+        if ((modifiers & KeyEvent.CTRL_MASK) == KeyEvent.CTRL_MASK) { // new plot
+            plot = null;
+            panel = null;
+        //nothing
+        } else if ((modifiers & KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK) {  // overplot
+            plot = dom.getController().getPlot();
+        } else {
+            panel = dom.getController().getPanel();
+        }
+
+        if (dia.getDepCount() == 0) {
+            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
+            dom.getController().plot(plot, panel,
+                    dia.getPrimaryDataSetSelector().getValue());
+        } else if (dia.getDepCount() == 1) {
+            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
+            applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
+            dom.getController().plot(plot, panel,
+                    dia.getSecondaryDataSetSelector().getValue(),
+                    dia.getPrimaryDataSetSelector().getValue());
+        } else if (dia.getDepCount() == 2) {
+            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
+            applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
+            applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
+            dom.getController().plot(plot, panel,
+                    dia.getSecondaryDataSetSelector().getValue(),
+                    dia.getTertiaryDataSetSelector().getValue(),
+                    dia.getPrimaryDataSetSelector().getValue());
+        } else if (dia.getDepCount() == -1) {
+            if (panel == null) {
+                panel = dom.getController().addPanel(plot, null);
+            }
+        }
+
     }
 
     Action getDumpDataAction() {
@@ -224,6 +284,7 @@ public class GuiSupport {
         }));
 
         result.add(new JMenuItem(new AbstractAction("colorScatter") {
+
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
                 panel.setRenderType(ApplicationModel.RenderType.colorScatter);
@@ -307,7 +368,7 @@ public class GuiSupport {
 
     }
 
-    protected void exportRecent( Component c ) {
+    protected void exportRecent(Component c) {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
@@ -322,9 +383,11 @@ public class GuiSupport {
         int r = chooser.showSaveDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
             try {
-                File f= chooser.getSelectedFile();
-                if ( !f.toString().endsWith(".xml") ) f= new File( f.toString()+".xml" );
-                String format = Bookmark.formatBooks( parent.applicationModel.getRecent() );
+                File f = chooser.getSelectedFile();
+                if (!f.toString().endsWith(".xml")) {
+                    f = new File(f.toString() + ".xml");
+                }
+                String format = Bookmark.formatBooks(parent.applicationModel.getRecent());
                 FileOutputStream out = new FileOutputStream(f);
                 out.write(format.getBytes());
                 out.close();
