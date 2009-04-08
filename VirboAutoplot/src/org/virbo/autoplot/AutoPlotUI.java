@@ -438,17 +438,25 @@ public class AutoPlotUI extends javax.swing.JFrame {
                 }
 
                 if ( dia.getDepCount()==0 ) {
+                    applicationModel.addRecent( dia.getPrimaryDataSetSelector().getValue() );
                     dom.getController().plot( plot, panel,
                             dia.getPrimaryDataSetSelector().getValue() );
                 } else if ( dia.getDepCount()==1 ) {
+                    applicationModel.addRecent( dia.getPrimaryDataSetSelector().getValue() );
+                    applicationModel.addRecent( dia.getSecondaryDataSetSelector().getValue() );
                     dom.getController().plot( plot, panel,
                             dia.getSecondaryDataSetSelector().getValue(),
                             dia.getPrimaryDataSetSelector().getValue() );
                 } else if ( dia.getDepCount()==2 ) {
+                    applicationModel.addRecent( dia.getPrimaryDataSetSelector().getValue() );
+                    applicationModel.addRecent( dia.getSecondaryDataSetSelector().getValue() );
+                    applicationModel.addRecent( dia.getTertiaryDataSetSelector().getValue() );
                     dom.getController().plot( plot, panel,
                             dia.getSecondaryDataSetSelector().getValue(),
                             dia.getTertiaryDataSetSelector().getValue(),
                             dia.getPrimaryDataSetSelector().getValue() );
+                } else if ( dia.getDepCount()==-1 ) {
+                    if (panel==null) panel = dom.getController().addPanel(plot, null ); 
                 }
 
             }
