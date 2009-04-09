@@ -8,8 +8,6 @@
  */
 package org.virbo.ascii;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
@@ -24,11 +22,9 @@ import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.dsutil.AsciiParser;
 import org.das2.util.TimeParser;
 import java.text.ParseException;
-import java.util.regex.Matcher;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dsops.Ops;
