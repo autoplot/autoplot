@@ -49,6 +49,7 @@ import org.virbo.datasource.datasource.DataSourceFormat;
  */
 public class DataSetURL {
 
+    private static Logger logger= Logger.getLogger("virbo.datasource");
     static {
         DataSourceRegistry registry = DataSourceRegistry.getInstance();
         discoverFactories(registry);
@@ -385,7 +386,9 @@ public class DataSetURL {
             FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
             FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
             if (!fo.isLocal()) {
-                Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
+                logger.fine("downloading file " + fo.getNameExt());
+            } else {
+                logger.fine("using local copy of "+fo.getNameExt());
             }
             File tfile = fo.getFile(mon);
             return tfile;
