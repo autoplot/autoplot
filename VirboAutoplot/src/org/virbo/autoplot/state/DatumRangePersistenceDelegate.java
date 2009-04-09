@@ -15,6 +15,7 @@ import java.beans.DefaultPersistenceDelegate;
 import java.beans.Encoder;
 import java.beans.Expression;
 import java.beans.PersistenceDelegate;
+import java.text.ParseException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
@@ -75,8 +76,19 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
         return DatumRange.newDatumRange( min, max, u );
     }
 
+    /**
+     * create a time DatumRange from the string.  Since persistent file may be
+     * hacked by humans, check for parse exceptions.
+     * @param stimeRange
+     * @return
+     */
     public static DatumRange newTimeRange( String stimeRange ) {
-        return DatumRangeUtil.parseTimeRangeValid(stimeRange);
+        try {
+            return DatumRangeUtil.parseTimeRange(stimeRange);
+        } catch ( ParseException e ) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e);
+        }
     }
 
     protected void initialize(Class<?> type, Object oldInstance, Object newInstance, Encoder out) {
