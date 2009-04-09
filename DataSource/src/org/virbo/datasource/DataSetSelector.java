@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -120,7 +121,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             return;
         }
 
-        if ( surl.startsWith("vap+internal:") ) {
+        if (surl.startsWith("vap+internal:")) {
             firePlotDataSetURL();
             return;
         }
@@ -163,11 +164,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                         setValue(surl);
                         setMessage("busy: url ambiguous, inspecting resource for parameters");
                         browseSourceType();
-                        //int carotpos = surl.indexOf("?") + 1;
-                       
-                        //showCompletions(surl, carotpos);
+                    //int carotpos = surl.indexOf("?") + 1;
+
+                    //showCompletions(surl, carotpos);
                     } else {
-                        setMessage("resolving uri to data set as " + DataSourceRegistry.getInstance().getExtensionFor(f) );
+                        setMessage("resolving uri to data set as " + DataSourceRegistry.getInstance().getExtensionFor(f));
                         firePlotDataSetURL();
                     }
                 } catch (DataSetURL.NonResourceException ex) { // see if it's a folder.
@@ -231,23 +232,23 @@ public class DataSetSelector extends javax.swing.JPanel {
             edit.setUrl(surl);
             DataSourceEditorDialog dialog;
             Window window = SwingUtilities.getWindowAncestor(this);
-            String title= "Editing "+surl;
+            String title = "Editing " + surl;
             if (window instanceof Frame) {
-                dialog = new DataSourceEditorDialog( (Frame)window, edit.getPanel(), true);	
-            } else if ( window instanceof Dialog ) {  // TODO: Java 1.6 ModalityType.
-                dialog = new DataSourceEditorDialog( (Dialog)window, edit.getPanel(), true);
+                dialog = new DataSourceEditorDialog((Frame) window, edit.getPanel(), true);
+            } else if (window instanceof Dialog) {  // TODO: Java 1.6 ModalityType.
+                dialog = new DataSourceEditorDialog((Dialog) window, edit.getPanel(), true);
             } else {
                 throw new RuntimeException("parent windowAncestor type is not supported.");
             }
             dialog.setVisible(true);
             dialog.setTitle(title);
-            
-            if ( ! dialog.isCancelled() ) {
+
+            if (!dialog.isCancelled()) {
                 dataSetSelector.setSelectedItem(edit.getUrl());
-                keyModifiers= dialog.getModifiers();
+                keyModifiers = dialog.getModifiers();
                 maybePlot(true);
             }
-            
+
         } else {
             int carotpos = surl.indexOf("?");
             if (carotpos == -1) {
@@ -375,7 +376,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                 List<CompletionResult> completions = null;
 
-                final String labelPrefix = surl.substring(0,carotpos);
+                final String labelPrefix = surl.substring(0, carotpos);
 
                 try {
                     completions = DataSetURL.getFileSystemCompletions(surl, carotpos, mon);
@@ -407,7 +408,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                     public void run() {
                         try {
-                            
+
                             int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
                             BoundedRangeModel model = editor.getHorizontalVisibility();
 
@@ -670,18 +671,23 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         String context = (String) dataSetSelector.getSelectedItem();
 
-        String ext= DataSetURL.getExt(context);
-        if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) { 
+        String ext = DataSetURL.getExt(context);
+        if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
             browseSourceType();
 
         } else {
             try {
-                URL url = DataSourceUtil.newURL(new URL("file://"), context);
+                URL url = DataSourceUtil.newURL(new URL("file://"), context); //TODO: old code needs to account for URIs
                 if (url.getProtocol().equals("file")) {
-                    JFileChooser chooser = new JFileChooser(url.getPath());
-                    int result = chooser.showOpenDialog(this);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        dataSetSelector.setSelectedItem(chooser.getSelectedFile().toString());
+                    File f = new File(url.getPath());
+                    if (f.exists()) {
+                        browseSourceType();
+                    } else {
+                        JFileChooser chooser = new JFileChooser(url.getPath());
+                        int result = chooser.showOpenDialog(this);
+                        if (result == JFileChooser.APPROVE_OPTION) {
+                            dataSetSelector.setSelectedItem(chooser.getSelectedFile().toString());
+                        }
                     }
                 } else {
                     showCompletions();
@@ -718,12 +724,13 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     private javax.swing.JComboBox dataSetSelector;
     private javax.swing.JButton plotItButton;
     // End of variables declaration//GEN-END:variables
+
     /**
      * Getter for property value.
      * @return Value of property value.
      */
     public String getValue() {
-        return ((String) this.dataSetSelector.getSelectedItem() ).trim();
+        return ((String) this.dataSetSelector.getSelectedItem()).trim();
     }
     private boolean doItemStateChange = false;
 
@@ -732,7 +739,9 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
      * @param value New value of property value.
      */
     public void setValue(String value) {
-        if ( value==null ) throw new NullPointerException("value must not be null");
+        if (value == null) {
+            throw new NullPointerException("value must not be null");
+        }
         doItemStateChange = false;
         this.dataSetSelector.setSelectedItem(value);
         this.dataSetSelector.repaint();
@@ -859,7 +868,6 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         firePropertyChange(PROPERTY_MESSAGE, oldMessage, message);
     }
     HashMap<String, Action> actionTriggers = new LinkedHashMap<String, Action>();
-
     protected boolean plotItButtonVisible = true;
     public static final String PROP_PLOTITBUTTONVISIBLE = "plotItButtonVisible";
 
