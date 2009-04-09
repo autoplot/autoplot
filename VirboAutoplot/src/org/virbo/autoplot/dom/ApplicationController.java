@@ -1198,7 +1198,11 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         canvasLock = canvas.getController().getDasCanvas().mutatorLock();
         canvasLock.lock();
 
-        application.getOptions().syncTo(that.getOptions());
+        application.getOptions().syncTo(that.getOptions(),
+                Arrays.asList( Options.PROP_OVERRENDERING,
+                Options.PROP_LOGCONSOLEVISIBLE,
+                Options.PROP_SCRIPTVISIBLE,
+                Options.PROP_SERVERENABLED ) );
 
         syncSupport.syncToPlotsAndPanels(that.getPlots(), that.getPanels(), that.getDataSourceFilters());
 
