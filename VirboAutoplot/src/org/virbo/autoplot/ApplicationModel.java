@@ -49,6 +49,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
+import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
@@ -476,6 +477,14 @@ public class ApplicationModel {
      * @param forceFill, force a data load
      */
     public void restoreState( Application state, boolean deep, boolean forceFill) {
+        if ( forceFill ) {
+            for ( DataSourceFilter dsf: this.dom.getDataSourceFilters() ) {
+                if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal:") ) {
+                    dsf.setUri(null);
+                    dsf.getController().setDataSource(true,null);
+                }
+            }
+        }
         this.dom.syncTo(state);
     }
 
@@ -486,7 +495,7 @@ public class ApplicationModel {
 
     void doOpen(File f) throws IOException {
         Application state = (Application) StatePersistence.restoreState(f);
-        logger.fine( "" + this.dom.diffs(state) );
+        logger.fine( "" + state.diffs(this.dom) );
         restoreState(state, true, true);
         setUseEmbeddedDataSet(false);
         propertyChangeSupport.firePropertyChange("file", null, f);
