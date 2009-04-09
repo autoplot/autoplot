@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
+import org.das2.system.MutatorLock;
 
 /**
  *
@@ -81,6 +82,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
     }
 
     private boolean copyFile(File partFile, File targetFile) throws IOException {
+        logger.finer( "ftpBeanFilesystem copyFile(" + partFile + ","+ targetFile );
         WritableByteChannel dest = Channels.newChannel(new FileOutputStream(targetFile));
         ReadableByteChannel src = Channels.newChannel(new FileInputStream(partFile));
         final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
@@ -299,6 +301,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
     }
 
     protected synchronized void downloadFile(String filename, java.io.File targetFile, File partFile, final ProgressMonitor mon) throws java.io.IOException {
+
+        MutatorLock lock= getDownloadLock( filename, targetFile, mon );
+
+        if ( lock==null ) return;
+
         FileOutputStream out = null;
         InputStream is = null;
         try {
@@ -354,7 +361,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 if (ex.getCause() instanceof IOException) {
                     throw (IOException) ex.getCause();
                 } else {
-                    throw new IOException(ex.getMessage());
+                    throw new IOException(ex);
                 }
             } catch (FtpException ex) {
                 throw new IOException(ex.getMessage());
@@ -375,6 +382,8 @@ public class FTPBeanFileSystem extends WebFileSystem {
             throw e;
         }
 
+        lock.unlock();
+        
     }
 
     @Override
