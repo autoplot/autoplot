@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.prefs.Preferences;
 import org.das2.system.NullPreferences;
@@ -344,24 +345,30 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_AUTOLAYOUT, oldAutolayout, autolayout);
     }
 
-    public void syncTo(DomNode n) {
+
+    public void syncTo( DomNode n,List<String> exclude ) {
         super.syncTo(n);
         Options that = (Options) n;
-        this.setBackground(that.getBackground());
-        this.setForeground(that.getForeground());
-        this.setColor(that.getColor());
-        this.setFillColor(that.getFillColor());
-        this.setCanvasFont(that.getCanvasFont());
-        this.setLogConsoleVisible(that.isLogConsoleVisible());
-        this.setScriptVisible(that.isScriptVisible());
-        this.setServerEnabled(that.isServerEnabled());
-        this.setDrawGrid(that.isDrawGrid());
-        this.setDrawMinorGrid(that.isDrawMinorGrid());
-        this.setDrawAntiAlias(that.drawAntiAlias);
-        this.setTextAntiAlias(that.textAntiAlias);
-        this.setOverRendering(that.overRendering);
-        this.setAutolabelling(that.autolabelling);
-        this.setAutoranging(that.autoranging);
+        if ( !exclude.contains(PROP_BACKGROUND) ) this.setBackground(that.getBackground());
+        if ( !exclude.contains(PROP_FOREGROUND) ) this.setForeground(that.getForeground());
+        if ( !exclude.contains(PROP_COLOR) )this.setColor(that.getColor());
+        if ( !exclude.contains(PROP_FILLCOLOR) )this.setFillColor(that.getFillColor());
+        if ( !exclude.contains(PROP_CANVASFONT) )this.setCanvasFont(that.getCanvasFont());
+        if ( !exclude.contains(PROP_LOGCONSOLEVISIBLE) )this.setLogConsoleVisible(that.isLogConsoleVisible());
+        if ( !exclude.contains(PROP_SCRIPTVISIBLE) )this.setScriptVisible(that.isScriptVisible());
+        if ( !exclude.contains(PROP_SERVERENABLED) )this.setServerEnabled(that.isServerEnabled());
+        if ( !exclude.contains(PROP_DRAWGRID) )this.setDrawGrid(that.isDrawGrid());
+        if ( !exclude.contains(PROP_DRAWMINORGRID) )this.setDrawMinorGrid(that.isDrawMinorGrid());
+        if ( !exclude.contains(PROP_DRAWANTIALIAS) )this.setDrawAntiAlias(that.drawAntiAlias);
+        if ( !exclude.contains(PROP_TEXTANTIALIAS) )this.setTextAntiAlias(that.textAntiAlias);
+        if ( !exclude.contains(PROP_OVERRENDERING) )this.setOverRendering(that.overRendering);
+        if ( !exclude.contains(PROP_AUTOLABELLING) )this.setAutolabelling(that.autolabelling);
+        if ( !exclude.contains(PROP_AUTORANGING) )this.setAutoranging(that.autoranging);
+        if ( !exclude.contains(PROP_AUTOLAYOUT) )this.setAutolayout(that.autolayout);
+    }
+
+    public void syncTo(DomNode n) {
+        this.syncTo(n, new ArrayList<String>() );
     }
 
     public List<Diff> diffs(DomNode node) {
