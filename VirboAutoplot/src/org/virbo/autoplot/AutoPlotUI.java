@@ -220,6 +220,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     String vap = dataSetSelector.getValue();
+                    applicationModel.addRecent(vap);
                     setStatus(BUSY_ICON,"opening .vap file " + vap + "...");
                     applicationModel.doOpen(DataSetURL.getFile(DataSetURL.getURL(vap), new NullProgressMonitor()));
                     dataSetSelector.setValue(vap);
