@@ -396,11 +396,16 @@ public class DataSourceController {
     };
 
     PropertyChangeListener dsfListener= new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                resolveParents();
-            }
-        } ;
+        public void propertyChange(PropertyChangeEvent evt) {
+            resolveParents();
+        }
+    };
 
+    
+    /**
+     * resolve a URI like vap+internal:data_0,data_1.
+     * @param path
+     */
     private synchronized void doInternal(String path) {
         if ( parentSources!=null ) {
             for ( int i=0; i<parentSources.length; i++ ) {
@@ -588,10 +593,11 @@ public class DataSourceController {
      */
     private synchronized void updateImmediately() {
         /*** here is the data load ***/
-        setStatus("busy: loading dataset");
-
+        
         try {
             if (_getDataSource() != null) {
+                setStatus("busy: loading dataset");
+                logger.fine("loading dataset "+_getDataSource() );
                 QDataSet dataset = loadDataSet();
                 setStatus("done loading dataset");
                 setDataSetInternal(dataset);
