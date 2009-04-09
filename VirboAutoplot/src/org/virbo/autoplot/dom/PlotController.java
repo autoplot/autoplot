@@ -80,6 +80,11 @@ public class PlotController {
         return dasPlot;
     }
 
+    /**
+     * set the zoom so that all of the panels' data is visible.  Thie means finding
+     * the "union" of each panels' plotDefault ranges.  If any panel's default log
+     * is false, then the new setting will be false.
+     */
     public void resetZoom() {
         List<Panel> panels = dom.getController().getPanelsFor(domPlot);
         Plot newSettings = null;
@@ -96,7 +101,12 @@ public class PlotController {
                 newSettings.zaxis.log = newSettings.zaxis.log & plot1.zaxis.log;
             }
         }
-        domPlot.syncTo(newSettings);
+        domPlot.getXaxis().setRange(newSettings.getXaxis().getRange());
+        domPlot.getXaxis().setLog( newSettings.getXaxis().isLog() );
+        domPlot.getYaxis().setRange(newSettings.getYaxis().getRange());
+        domPlot.getYaxis().setLog( newSettings.getYaxis().isLog() );
+        domPlot.getZaxis().setRange(newSettings.getZaxis().getRange());
+        domPlot.getZaxis().setLog( newSettings.getZaxis().isLog() );
     }
 
     private void checkIsotropic(DasAxis axis) {
