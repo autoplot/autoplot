@@ -396,10 +396,14 @@ public class AutoplotUtil {
                         d2 = DatumRangeUtil.normalize(range, result.range.max());
                     }
                 }
-                if ( d2 - d1 > 0.1) {
+                if ( d2 - d1 > 0.1    // the stats range occupies 10% of the typical range
+                        && d2 > 0.    // and the stats max is greater than the typical range min()
+                        && d1 < 1. ) {  // and the stats min is less then the typical range max().
                     result.range = range;
                     // just use the metadata settings.
-                    return result; 
+
+                    return result; // DANGER--EXIT POINT
+                    
                 }
             }
         }
