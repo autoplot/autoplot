@@ -209,9 +209,15 @@ public class AutoplotUtil {
     }
 
     private static DatumRange getRange( Double min, Double max, Units units ) {
-        if ( min==null ) min= Double.NEGATIVE_INFINITY;
-        if ( max==null ) max= Double.POSITIVE_INFINITY;
-        if ( units==null ) units= Units.dimensionless;
+        if ( units!=null && UnitsUtil.isTimeLocation(units) ) {
+            if ( min==null ) min= Units.mj1958.convertDoubleTo(units, -100000);
+            if ( max==null ) max= Units.mj1958.convertDoubleTo(units, 100000);
+            if ( units==null ) units= Units.dimensionless;
+        } else {
+            if ( min==null ) min= Double.NEGATIVE_INFINITY;
+            if ( max==null ) max= Double.POSITIVE_INFINITY;
+            if ( units==null ) units= Units.dimensionless;
+        }
         return new DatumRange( min, max, units );
     }
 
@@ -491,6 +497,9 @@ public class AutoplotUtil {
     private static double[] simpleRange(QDataSet ds) {
         QDataSet max = ds;
         QDataSet min = ds;
+        Units u= (Units) ds.property(QDataSet.UNITS);
+        if ( u==null ) u=Units.dimensionless;
+        
         QDataSet delta;
         delta = (QDataSet) ds.property(QDataSet.DELTA_PLUS);
         if (delta != null) {
@@ -515,8 +524,13 @@ public class AutoplotUtil {
         }
         
         if (result[0] == Double.POSITIVE_INFINITY) {  // no valid data!
-            result[0] = 0.;
-            result[1] = 1.;
+            if ( UnitsUtil.isTimeLocation(u) ) {
+                result[0] = Units.t2000.convertDoubleTo( u,0. );
+                result[1] = Units.t2000.convertDoubleTo( u, 86400 ); // avoid bug where rounding error in formatting of newDatumRange(0,1,t2000) resulted in invalid datm
+            } else {
+                result[0] = 0.;
+                result[1] = 1.;
+            }
         }
         return result;
     }
