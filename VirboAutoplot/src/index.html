@@ -6,7 +6,7 @@
     <H3>ViRBO Autoplot Application (#{tag})</H3>
         <p><a href="autoplot-#{tag}.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
-        <p><small>The first vap file transmitted over email showed a number of bugs.</small></p>
+        <p><small>"Add Panel..." dialog makes it easier to have multiple panels and correlation plots.</small></p>
 
 	<p>This demonstration application attempts to allow plotting of data from many data sources, including local files and dods servers.  
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
@@ -19,16 +19,18 @@ be applied to the data, for example, specifying valid range and fill data.
         
         <p>Recent changes include:</p>
 
-        <ul><li>bugfixes for Jan's bugs</li>
-            <li> numerous bugfixes
+<ul><li>bugfixes for Jan's bugs</li>
+<li> numerous bugfixes<li>
 <ul><li> focus doesn't flip back to first panel of plot when it gets focus.
 </li><li> clipped spectrograms after resize ("missing repaint triggers")
 </li><li> switching focus panel caused moments (mean,variance) to be run with each selection.
 </li><li> problems loading vap files with TimeSeriesBrowse capable URIs.
 </li><li> rank zero dataset properties (like cadence) are serialized in QStreams.
 </li><li> colorScatter works again.
+</li><li> reset zoom doens't reset labels
+</li><li> vap file that specifies log but not range would result in marching axes
 </li></ul>
-</li><li> File-&gt; add panel dialog
+<li> File-&gt; Add Panel... dialog
 
 </li><li> support for correlative plots in DOM.
 </li><li> Jython improvements:
@@ -37,8 +39,14 @@ be applied to the data, for example, specifying valid range and fill data.
 </li><li> minor bugfixes.
 </li></ol>
 <li> improve ascii table output of rank 1 data
+<li> improvements to ASCII Table URI editor.
 </li></ul>
 
+<p>This completes the feature set for the new production branch.  No major features will be
+added before branching this version.  A production branch will be started in a couple
+of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this
+version. <b>Feedback on the function and quality of this release is greatly appreciated!</b>
+</p>
 
 	<p>data is input from: 
 	<li>ASCII files (.dat,.txt)</li>
