@@ -300,12 +300,14 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
     }
 
-    protected synchronized void downloadFile(String filename, java.io.File targetFile, File partFile, final ProgressMonitor mon) throws java.io.IOException {
+    protected void downloadFile( String filename, File targetFile, File partFile, final ProgressMonitor mon) throws java.io.IOException {
 
         MutatorLock lock= getDownloadLock( filename, targetFile, mon );
 
         if ( lock==null ) return;
 
+        logger.fine("ftpfs downloadFile(" + filename + ")");
+        
         FileOutputStream out = null;
         InputStream is = null;
         try {
@@ -380,9 +382,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
             }
             partFile.delete();
             throw e;
-        }
+            
+        } finally {
 
-        lock.unlock();
+            lock.unlock();
+        }
         
     }
 
