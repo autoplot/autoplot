@@ -363,7 +363,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 if (ex.getCause() instanceof IOException) {
                     throw (IOException) ex.getCause();
                 } else {
-                    throw new IOException(ex);
+                    throw new IOException(ex.toString());
                 }
             } catch (FtpException ex) {
                 throw new IOException(ex.getMessage());
