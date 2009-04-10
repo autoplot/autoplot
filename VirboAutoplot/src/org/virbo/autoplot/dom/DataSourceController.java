@@ -618,7 +618,8 @@ public class DataSourceController {
             }
             setStatus("ready");
         } catch (RuntimeException ex) {
-            setStatus("error: " + ex.toString());
+            ex.printStackTrace();
+            setStatus("error: " + ex);
             throw ex;
         }
 
