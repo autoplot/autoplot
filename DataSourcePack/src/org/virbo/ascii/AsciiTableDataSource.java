@@ -96,7 +96,6 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 for (int j = 0; j < timeColumns; j++) {
                     double d = ds.value(i, timeColumn + j);
                     double fp = d - (int) Math.floor(d);
-                    timeParser.setDigit(timeFormats[j], (int) d);
                     if (fp == 0) {
                         timeParser.setDigit(timeFormats[j], (int) d);
                     } else {
@@ -124,6 +123,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     icol = Integer.parseInt(column);
                 } else {
                     throw new IllegalArgumentException("bad column parameter: " + column + ", should be field1, or 1, or <name>");
+                }
+                int fieldCount= parser.getRecordParser().fieldCount();
+                if ( icol>=fieldCount ) {
+                    throw new IllegalArgumentException("bad column parameter: the record parser only expects "+fieldCount+" columns");
                 }
             }
             vds = DDataSet.copy(DataSetOps.slice1(ds, icol));
@@ -391,17 +394,28 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 timeFormats = timeFormat.split(delim, -2);
                 timeColumns = timeFormats.length;
                 int ib = timeFormat.indexOf("%b"); // real trouble: months are strings.  We can deal with this.
-                if (ib != -1) {
+                while (ib != -1) {
                     int monthColumn = timeFormat.substring(0, ib).split("%", -2).length - 1;
                     AsciiParser.FieldParser monthNameFieldParser = new AsciiParser.FieldParser() {
-
                         public double parseField(String field, int columnIndex) throws ParseException {
                             return TimeUtil.monthNumber(field);
                         }
                     };
                     parser.setFieldParser(monthColumn, monthNameFieldParser);
+                    timeFormat= timeFormat.replaceFirst("%b","%m");
+                    ib = timeFormat.indexOf("%b");  // support multiple
                 }
 
+                ib = timeFormat.indexOf("%{ignore"); // arbitary skip must not have fields following but before delimiter
+                if (ib != -1) {
+                    int column = timeFormat.substring(0, ib).split("%", -2).length - 1; 
+                    AsciiParser.FieldParser nullFieldParser = new AsciiParser.FieldParser() {
+                        public double parseField(String field, int columnIndex) throws ParseException {
+                            return -1e31;
+                        }
+                    };
+                    parser.setFieldParser(column, nullFieldParser);
+                }
             } else {
                 timeParser = TimeParser.create(timeFormat);
                 final Units u = Units.t2000;
