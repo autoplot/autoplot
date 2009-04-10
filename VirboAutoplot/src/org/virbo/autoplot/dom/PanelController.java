@@ -165,7 +165,7 @@ public class PanelController {
 
         String label = null;
 
-        if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
+        if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2 && fillDs.property(QDataSet.DEPEND_1)!=null ) {
             String[] labels = SemanticOps.getComponentLabels(fillDs);
 
             if (panel.getComponent().equals("X")) {
@@ -226,9 +226,13 @@ public class PanelController {
 
             if ( fillDs!=null ) {
                 if ( resetRanges ) {
-                    RenderType renderType = AutoplotUtil.getRenderType(fillDs);
-                    panel.setRenderType(renderType);
-                    resetPanel(fillDs,renderType);
+                    if ( parentPanel==null ) {
+                        RenderType renderType = AutoplotUtil.getRenderType(fillDs);
+                        panel.setRenderType(renderType);
+                        resetPanel(fillDs,renderType);
+                    } else {
+                        dom.getController().deletePanel(panel);
+                    }
                     
                 } else if ( resetRenderer ) {
                     setRenderType(panel.getRenderType());
@@ -249,16 +253,10 @@ public class PanelController {
 
     private void resetPanel(QDataSet fillDs,RenderType renderType) {
 
-        //TODO: see if there's a way to preserve the component panels
-        if (parentPanel != null) {
-            dom.getController().deletePanel(panel);
-            return;
-        } else {
-            if (renderer != null) {
-                renderer.setActive(true);
-            }
+        if (renderer != null) {
+            renderer.setActive(true);
         }
-
+        
         if (childPanels != null) {
             for (Panel p : this.childPanels) {
                 if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
@@ -276,6 +274,7 @@ public class PanelController {
                 if ( fillDs.rank() == 2 && ( renderType != RenderType.spectrogram ) && fillDs.length(0) < 12) {
                     MutatorLock lock = dom.getController().mutatorLock();
                     lock.lock();
+                    renderer.setActive(false);
                     String[] labels = SemanticOps.getComponentLabels(fillDs);
                     Color c = panel.getStyle().getColor();
                     Color fc= panel.getStyle().getFillColor();
@@ -283,6 +282,7 @@ public class PanelController {
                     List<Panel> cp = new ArrayList<Panel>(fillDs.length(0));
                     for (int i = 0; i < fillDs.length(0); i++) {
                         Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsf);
+                        cpanel.getController().getRenderer().setActive(false);
                         cp.add(cpanel);
                         cpanel.getController().parentPanel = panel;
                         cpanel.getStyle().setColor(deriveColor(c, i));
@@ -292,6 +292,9 @@ public class PanelController {
                         cpanel.setLegendLabel(labels[i].trim());
                         cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
                         cpanel.getController().setDataSet(fillDs);
+                    }
+                    for ( Panel cpanel: cp ) {
+                        cpanel.getController().getRenderer().setActive(true);
                     }
                     renderer.setActive(false);
                     PanelController.this.childPanels = cp;
