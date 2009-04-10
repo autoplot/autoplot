@@ -267,7 +267,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jLabel2.setText("time format:");
 
-        timeFormatFieldsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "select field type...", "iso8601: the times should be iso8601, and do not span a delimiter", "$Y: four digit year", "$y: two digit year", "$m: two-digit month", "$b: month name", "$d: two-digit day of month", "$j: three-digit day of year", "$H: two-digit hour", "$M: two-digit minute", "$S: two-digit second", "${milli}: three-digit milliseconds", "${micro}: three-digit microseconds", "${ignore}: ignore this field", " " }));
+        timeFormatFieldsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "select field type...", "iso8601: the times should be iso8601, and do not span a delimiter", "$Y: four digit year", "$y: two digit year", "$m: two-digit month", "$b: month name", "$d: two-digit day of month", "$j: three-digit day of year", "$H: two-digit hour", "$M: two-digit minute", "$S: two-digit second", "$(milli): three-digit milliseconds", "$(micro): three-digit microseconds", "$(ignore): ignore this field", " " }));
         timeFormatFieldsComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 timeFormatFieldsComboBoxActionPerformed(evt);
@@ -291,12 +291,12 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .addContainerGap()
                 .add(jLabel2)
                 .add(2, 2, 2)
-                .add(timeFormatTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 115, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(timeFormatTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 231, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeFormatFieldsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 167, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeFormatToggleButton)
-                .addContainerGap(351, Short.MAX_VALUE))
+                .addContainerGap(235, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)

@@ -127,12 +127,12 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
-                      <Component id="timeFormatTextField" min="-2" pref="115" max="-2" attributes="0"/>
+                      <Component id="timeFormatTextField" min="-2" pref="231" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="timeFormatFieldsComboBox" min="-2" pref="167" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="timeFormatToggleButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="351" max="32767" attributes="0"/>
+                      <EmptySpace pref="235" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -173,9 +173,9 @@
                     <StringItem index="8" value="$H: two-digit hour"/>
                     <StringItem index="9" value="$M: two-digit minute"/>
                     <StringItem index="10" value="$S: two-digit second"/>
-                    <StringItem index="11" value="${milli}: three-digit milliseconds"/>
-                    <StringItem index="12" value="${micro}: three-digit microseconds"/>
-                    <StringItem index="13" value="${ignore}: ignore this field"/>
+                    <StringItem index="11" value="$(milli): three-digit milliseconds"/>
+                    <StringItem index="12" value="$(micro): three-digit microseconds"/>
+                    <StringItem index="13" value="$(ignore): ignore this field"/>
                     <StringItem index="14" value=" "/>
                   </StringArray>
                 </Property>
