@@ -235,17 +235,23 @@ public class Application extends DomNode {
         
         result.options = (Options) this.getOptions().copy();
         
-        Panel[] panelsCopy= this.getPanels();
-        for ( int i=0; i<panelsCopy.length; i++ ) {
-            panelsCopy[i]= (Panel) panelsCopy[i].copy();
+        DataSourceFilter[] DataSourceFiltersCopy= this.getDataSourceFilters();
+        for ( int i=0; i<DataSourceFiltersCopy.length; i++ ) {
+            DataSourceFiltersCopy[i]= (DataSourceFilter) DataSourceFiltersCopy[i].copy();
         }
-        result.setPanels( panelsCopy );
-        
+        result.setDataSourceFilters( DataSourceFiltersCopy );
+
         Plot[] plotsCopy= this.getPlots();
         for ( int i=0; i<plotsCopy.length; i++ ) {
             plotsCopy[i]= (Plot) plotsCopy[i].copy();
         }
         result.setPlots( plotsCopy );
+
+        Panel[] panelsCopy= this.getPanels();
+        for ( int i=0; i<panelsCopy.length; i++ ) {
+            panelsCopy[i]= (Panel) panelsCopy[i].copy();
+        }
+        result.setPanels( panelsCopy );
 
         Connector[] connectorsCopy= this.getConnectors();
         for ( int i=0; i<connectorsCopy.length; i++ ) {
@@ -306,7 +312,9 @@ public class Application extends DomNode {
         Application that = (Application) node;
         
         List<Diff> result = new ArrayList<Diff>();
-        
+
+        addArrayDiffs( "dataSourceFilters", that.getDataSourceFilters(), this.getDataSourceFilters(), result );
+
         addArrayDiffs( "panels", that.getPanels(), this.getPanels(), result );
 
         addArrayDiffs( "plots", that.getPlots(), this.getPlots(), result );
@@ -315,6 +323,12 @@ public class Application extends DomNode {
 
         addArrayDiffs( "connectors", that.getConnectors(), this.getConnectors(), result );
         
+        for ( int i=0; i<Math.min(this.dataSourceFilters.size(),that.dataSourceFilters.size()); i++ ) {
+            DataSourceFilter thisDataSourceFilter= this.dataSourceFilters.get(i);
+            DataSourceFilter thatDataSourceFilter= that.dataSourceFilters.get(i);
+            result.addAll( DomUtil.childDiffs( "dataSourceFilters["+i+"]", thatDataSourceFilter.diffs( thisDataSourceFilter ) ) );
+        }
+
         for ( int i=0; i<Math.min(this.plots.size(),that.plots.size()); i++ ) {
             Plot thisPlot= this.plots.get(i);
             Plot thatPlot= that.plots.get(i);
