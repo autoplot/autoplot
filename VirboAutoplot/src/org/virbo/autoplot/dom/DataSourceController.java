@@ -304,6 +304,11 @@ public class DataSourceController {
             _setHistogram(new AutoHistogram().doit(ds, null));
             //doFillValidRange();  the QDataSet returned 
             updateFill();
+
+            List<Panel> panels= dom.getController().getPanelsFor(dsf);
+            if ( panels.size()==0 ) {
+                setStatus("warning: done loading data but no panels are listening");
+            }
         }
     }
     
