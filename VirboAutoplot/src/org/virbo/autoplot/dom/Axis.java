@@ -55,7 +55,7 @@ public class Axis extends DomNode {
             changed= true;
         }
         if (min.doubleValue(u) <= 0.) {
-            min = max.divide(1000);
+            min = u.createDatum( max.doubleValue(u)/1000 );
             changed= true;
         }
         if ( changed ) {
