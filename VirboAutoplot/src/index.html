@@ -18,35 +18,33 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-
-<ul><li>bugfixes for Jan's bugs</li>
-<li> numerous bugfixes<li>
-<ul><li> focus doesn't flip back to first panel of plot when it gets focus.
+<ol><li> Numerous bugfixes:
+<ol><li> focus doesn't flip back to first panel of plot when it gets focus.
 </li><li> clipped spectrograms after resize ("missing repaint triggers")
 </li><li> switching focus panel caused moments (mean,variance) to be run with each selection.
 </li><li> problems loading vap files with TimeSeriesBrowse capable URIs.
 </li><li> rank zero dataset properties (like cadence) are serialized in QStreams.
 </li><li> colorScatter works again.
-</li><li> reset zoom doens't reset labels
-</li><li> vap file that specifies log but not range would result in marching axes
-</li></ul>
-<li> File-&gt; Add Panel... dialog
+</li><li> URI changes go into undo/redo
+</li><li> extra dataSourceFilter nodes after vap loads
+</li><li> FTP FileSystem multiple threads needing the same file is properly coordinated.
+</li><li> ascii table parse automatic guessing of delimiter is improved.
+</li><li> reset zoom doesn't reset labels
+</li><li> vap files could create state with log and zero for range minimum, result in marching axes.
+</li></ol>
+</li><li> File-&gt; Add Panel... dialog makes it easier to add multiple panels and correlative plots.
 
-</li><li> support for correlative plots in DOM.
+</li><li> Support for correlative plots in DOM and "internal" DataSourceFilter nodes.
 </li><li> Jython improvements:
 <ol><li> clean up old problem with Jython having to do with overloading of &lt;,==,!=, etc.
-</li><li> introduce python infix lt,eq,etc.
+</li><li> introduce python infix gt(), lt(), eq(), ne(), and(), or() etc.
 </li><li> minor bugfixes.
 </li></ol>
-<li> improve ascii table output of rank 1 data
-<li> improvements to ASCII Table URI editor.
-</li></ul>
+</li><li> Improve ascii table output of rank 1 data
+</li><li> Improvements to ASCII URI editor.
+</li></ol>
 
-<p>This completes the feature set for the new production branch.  No major features will be
-added before branching this version.  A production branch will be started in a couple
-of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this
-version. <b>Feedback on the function and quality of this release is greatly appreciated!</b>
-</p>
+<p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
 	<p>data is input from: 
 	<li>ASCII files (.dat,.txt)</li>
