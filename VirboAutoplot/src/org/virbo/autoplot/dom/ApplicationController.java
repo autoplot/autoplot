@@ -212,7 +212,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         List<DataSourceFilter> dataSourceFilters = new ArrayList<DataSourceFilter>(Arrays.asList(this.application.getDataSourceFilters()));
         dataSourceFilters.add(dsf);
         this.application.setDataSourceFilters(dataSourceFilters.toArray(new DataSourceFilter[dataSourceFilters.size()]));
-
+        dsf.addPropertyChangeListener(application.childListener);
         return dsf;
     }
 
@@ -224,12 +224,14 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             }
 
             public void propertyChange(PropertyChangeEvent evt) {
-                Panel p = getPanel();
-                if (p != null) {
-                    setDataSourceFilter(getDataSourceFilterFor(p));
-                    setPlot(getPlotFor(p));
-                } else {
-                    setDataSourceFilter(null);
+                if ( !isValueAdjusting() ) {
+                    Panel p = getPanel();
+                    if (p != null) {
+                        setDataSourceFilter(getDataSourceFilterFor(p));
+                        setPlot(getPlotFor(p));
+                    } else {
+                        setDataSourceFilter(null);
+                    }
                 }
             }
         });
@@ -388,9 +390,6 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
 
         if (dsf == null) {
             dsf = addDataSourceFilter();
-
-            setDataSourceFilter(dsf);
-
         }
 
         new PanelController(this.model, application, panel1);
@@ -771,6 +770,8 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         if (panels.size() > 0) {
             throw new IllegalArgumentException("dsf must not have panels before deleting");
         }
+        
+        dsf.removePropertyChangeListener(application.childListener);
         unbind(dsf);
         dsf.getController().unbind();
 
