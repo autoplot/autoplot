@@ -165,7 +165,7 @@ public class DataSourceFilter extends DomNode {
         
         boolean b;
         
-        b = (that.uri == this.uri || (that.uri != null && that.uri.equals(this.uri)));
+        b = (that.uri == this.uri || (that.uri != null && that.uri.equals(this.uri))); // null==null 
         if (!b) result.add( new PropertyChangeDiff( "uri", that.uri, this.uri ) );
         
         b = that.validRange.equals(this.validRange);
