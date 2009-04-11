@@ -115,7 +115,11 @@ public class PanelController {
 
     private void resetDataSource() {
         if (dsf != null) {
-            unbindDsf();  //TODO: we may want to dispose of orphaned datasources at this point
+            unbindDsf();  
+            List<DomNode> usages= DomUtil.getDataSourceUsages(dom, dsf.getId() );
+            if ( usages.size()==0 ) {
+                dom.getController().deleteDataSourceFilter(dsf);
+            }
         }
 
         assert (panel.getDataSourceFilterId() != null);
