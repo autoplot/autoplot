@@ -125,6 +125,7 @@ public class ApplicationModel {
     void setDataSet(QDataSet ds) {
         dom.getController().getPanel().getController().setResetRanges(true);
         dom.getController().getDataSourceFilter().getController()._setDataSource(null);
+        dom.getController().getDataSourceFilter().setUri("vap+internal:");
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(null); // clear out properties and metadata
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds);
     }
