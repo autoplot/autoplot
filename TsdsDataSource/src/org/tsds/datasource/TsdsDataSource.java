@@ -508,7 +508,7 @@ class TsdsDataSource extends AbstractDataSource {
                 mon.setProgressMessage("loading mean");
                 URL dataUrl = new URL(surl);
                 HttpURLConnection connect = (HttpURLConnection) dataUrl.openConnection();
-                connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
+                connect.setRequestProperty("Accept-Encoding", "gzip, deflate"); 
                 logger.fine("loading " + dataUrl);
                 data = dataUrl(connect, size, points,-1, mon);
                 logit("done loading mean", t0);
