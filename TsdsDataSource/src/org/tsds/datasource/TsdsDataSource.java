@@ -26,6 +26,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -54,42 +57,42 @@ import org.xml.sax.SAXException;
  */
 class TsdsDataSource extends AbstractDataSource {
 
-    long t0= System.currentTimeMillis();
-    
+    long t0 = System.currentTimeMillis();
+
     public TsdsDataSource(URL url) {
         super(url);
         try {
             addCability(TimeSeriesBrowse.class, getTimeSeriesBrowse());
 
             setTSBParameters();  // we don't yet know the parameter resolution, but the time extent is set.
-            
+
             ProgressMonitor mon = new NullProgressMonitor();
 
-            URL url0= new URL( "" + this.resourceURL + "?" +URLSplit.formatParams(params) );
-            logger.fine( "tsds url= "+url0 );
-            
-            if ( params.get("out")==null ) {
-                exceptionFromConstruct= new IllegalArgumentException("url must contain out=");
-                return; 
+            URL url0 = new URL("" + this.resourceURL + "?" + URLSplit.formatParams(params));
+            logger.fine("tsds url= " + url0);
+
+            if (params.get("out") == null) {
+                exceptionFromConstruct = new IllegalArgumentException("url must contain out=");
+                return;
             }
-            
+
             mon.setProgressMessage("loading parameter metadata");
             LinkedHashMap<String, String> params3 = new LinkedHashMap<String, String>(params);
-            
+
             params3.put("out", "tsml");
             params3.remove("ppd");
 
-            String sparams= URLSplit.formatParams(params3);
-            sparams= sparams.replace( "out=tsml", "out=tsml&ext="+params.get("out") );
-                    
-            logit( "post first request in construct TsdsDataSource", t0 );
-            URL url3 = new URL("" + this.resourceURL + "?" + sparams );
-            logger.fine( "opening "+url3 );
+            String sparams = URLSplit.formatParams(params3);
+            sparams = sparams.replace("out=tsml", "out=tsml&ext=" + params.get("out"));
+
+            logit("post first request in construct TsdsDataSource", t0);
+            URL url3 = new URL("" + this.resourceURL + "?" + sparams);
+            logger.fine("opening " + url3);
             initialTsml(url3.openStream());
 
-            logit( "read initial tsml", t0 );
+            logit("read initial tsml", t0);
             haveInitialTsml = true;
-            
+
             setTSBParameters();
             // limit the resolution accessible by this data source to that specified by the URL.
             parameterPpd = currentPpd;
@@ -98,7 +101,7 @@ class TsdsDataSource extends AbstractDataSource {
             Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
-            exceptionFromConstruct= ex;
+            exceptionFromConstruct = ex;
         } catch (SAXException ex) {
             Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -121,21 +124,22 @@ class TsdsDataSource extends AbstractDataSource {
     DatumRange parameterRange = null; // extent of the parameter.
     int parameterPpd = -1; // max resolution of the parameter.
     boolean haveInitialTsml = false;
-
-    Exception exceptionFromConstruct=null;
+    Exception exceptionFromConstruct = null;
 
     private void logit(String string, long t0) {
         //System.err.println( "  ### "+string + ": "+ (System.currentTimeMillis()-t0) );
     }
-    
+
     private DatumRange quantizeTimeRange(DatumRange timeRange) {
         timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
         return timeRange;
     }
 
     private int quantizePpd(Datum resolution) {
-        int[] ppds = new int[]{1,8,24,96,144,4320,17280,86400, 864000};
-        if (resolution == null) return 1;
+        int[] ppds = new int[]{1, 8, 24, 96, 144, 4320, 17280, 86400, 864000};
+        if (resolution == null) {
+            return 1;
+        }
         double resdays = resolution.doubleValue(Units.days);
         double dppd = 1 / resdays;
         int ppd = ppds[ppds.length - 1];
@@ -172,13 +176,12 @@ class TsdsDataSource extends AbstractDataSource {
         }
 
     }
-
     boolean inRequest = false;
 
     @Override
     @SuppressWarnings("unchecked")
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        logit( "enter getDataSet", t0 );
+        logit("enter getDataSet", t0);
         if (inRequest) {
             System.err.println("came back again");
 
@@ -218,19 +221,21 @@ class TsdsDataSource extends AbstractDataSource {
 
         mon.setTaskSize(-1);
         mon.started();
-        
+
         if (!haveInitialTsml) {
-            
-            if ( exceptionFromConstruct!=null ) throw exceptionFromConstruct;
+
+            if (exceptionFromConstruct != null) {
+                throw exceptionFromConstruct;
+            }
             mon.setProgressMessage("loading parameter metadata");
             LinkedHashMap params3 = new LinkedHashMap(params2);
             params3.remove("ppd");
             params3.put("out", "tsml");
             URL url3 = new URL("" + this.resourceURL + "?" + URLSplit.formatParams(params3));
-            logger.fine( "opening "+url3 );
+            logger.fine("opening " + url3);
             initialTsml(url3.openStream());
             haveInitialTsml = true;
-            logit( "got initial tsml", t0 );
+            logit("got initial tsml", t0);
         }
 
         if (currentPpd == -1) {
@@ -247,20 +252,20 @@ class TsdsDataSource extends AbstractDataSource {
         int points = (int) Math.ceil(timeRange.width().doubleValue(Units.days)) * ppd;
         int size = points * SIZE_DOUBLE;
 
-        logit( "making url2 connection", t0 );
+        logit("making url2 connection", t0);
         logger.fine("" + url2);
         HttpURLConnection connect = (HttpURLConnection) url2.openConnection();
         connect.connect();
         String type = connect.getContentType();
-        logit( "made url2 connection", t0 );
-        
+        logit("made url2 connection", t0);
+
         BufferDataSet result;
         if (type.startsWith("text/xml")) {
             result = tsml(connect.getInputStream(), mon);
-            logit( "done text/xml from url2", t0 );
+            logit("done text/xml from url2", t0);
         } else {
-            result = dataUrl(connect.getInputStream(), size, points, mon);
-            logit( "done dataUrl from url2", t0 );
+            result = dataUrl(connect, size, points,-1, mon);
+            logit("done dataUrl from url2", t0);
         }
 
         mon.finished();
@@ -314,12 +319,22 @@ class TsdsDataSource extends AbstractDataSource {
      * @param in
      * @param size number of bytes to read.  The stream is consumed up to this point, or to the end of the stream.
      * @param points number of data points.
+     * @param len1 >-1 indicates the length on rank2 dataset, -1 indicates rank 1.
      * @param ProgressMonitor in started state.  finished should not be called here.
      * @return
      * @throws java.io.IOException
      */
-    private BufferDataSet dataUrl(InputStream in, int size, int points, ProgressMonitor mon) throws IOException {
+    private BufferDataSet dataUrl(HttpURLConnection connection, int size, int points, int len1, ProgressMonitor mon) throws IOException {
 
+        InputStream in = connection.getInputStream();
+        String encoding = connection.getContentEncoding();
+        if ( encoding!=null && encoding.equalsIgnoreCase("gzip")) {
+            in = new GZIPInputStream(in);
+        } else if ( encoding!=null && encoding.equalsIgnoreCase("deflate")) {
+            in = new InflaterInputStream(in, new Inflater(true));
+        }
+
+        //TODO: check encoding
         ReadableByteChannel bin = Channels.newChannel(in);
 
         ByteBuffer bbuf = ByteBuffer.allocate(size);
@@ -331,7 +346,9 @@ class TsdsDataSource extends AbstractDataSource {
         while (bytesRead >= 0 && (bytesRead + totalBytesRead) < size) {
             totalBytesRead += bytesRead;
             bytesRead = bin.read(bbuf);
-            if (mon.isCancelled()) break;
+            if (mon.isCancelled()) {
+                break;
+            }
             mon.setTaskProgress(totalBytesRead);
         }
 
@@ -339,10 +356,14 @@ class TsdsDataSource extends AbstractDataSource {
 
         bbuf.flip();
         bbuf.order(ByteOrder.LITTLE_ENDIAN);
-        
+
         points = bbuf.limit() / SIZE_DOUBLE;
-        
-        return new org.virbo.binarydatasource.Double( 1, SIZE_DOUBLE, 0, points, 1, 1, bbuf );
+
+        if ( len1==-1 ) {
+            return new org.virbo.binarydatasource.Double( 1, SIZE_DOUBLE, 0, points, 1, 1, bbuf );
+        } else {
+            return new org.virbo.binarydatasource.Double( 2, len1*SIZE_DOUBLE, 0, points, len1, 1, bbuf );
+        }
     }
 
     private QDataSet ttags(String sStartTime, int ppd, int points, String sTimePos) {
@@ -350,8 +371,9 @@ class TsdsDataSource extends AbstractDataSource {
         Datum startTime = TimeUtil.createValid(sStartTime);
         Datum endTime = startTime.add(Units.days.createDatum((1. * points) / ppd));
         Datum t0 = startTime;
-        if (sTimePos.equals("center"))
+        if (sTimePos.equals("center")) {
             t0 = t0.add(cadence.divide(2));
+        }
 
         try {
             DDataSet result = DDataSet.copy(Ops.timegen(String.valueOf(t0), String.valueOf(cadence), points));
@@ -455,33 +477,67 @@ class TsdsDataSource extends AbstractDataSource {
 
             String title = xpath.evaluate("//TSML/Name/text()", document);
             String name = xpath.evaluate("//TSML/DataKey/text()", document);
-            name= name.replaceAll("-", "_"); // make c/java style identifier
+            name = name.replaceAll("-", "_"); // make c/java style identifier
 
-            URL dataUrl = new URL(surl);
+            logit("done parse tsml", t0);
 
-            logit("done parse tsml",t0);
-            mon.setProgressMessage("loading mean");
-            logger.fine("loading " + dataUrl);
-            BufferDataSet data = dataUrl(dataUrl.openStream(), size, points, mon);
-            logit("done loading mean",t0);
-            
             boolean minMax = ppd < parameterPpd;
-            if (minMax && surl.contains("-filter_0-")) {
+            boolean useFilter4= true;
+
+            BufferDataSet data;
+
+            if ( minMax && useFilter4 && surl.contains("-filter_0-") ) {
+                String surl4= surl.replace("-filter_0-", "-filter_4-");
+                mon.setProgressMessage("loading data and ranges");
+                URL dataUrl = new URL(surl4);
+                HttpURLConnection connect = (HttpURLConnection) dataUrl.openConnection();
+                connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
+                logger.fine("loading " + surl4);
+                org.virbo.binarydatasource.Double data3 = (org.virbo.binarydatasource.Double)dataUrl(connect, 3*size, 3*points, -1, mon);
+                logit("done loading mean", t0);
+
+                data= data3.trim( 0, points );
+                BufferDataSet dataMin= data3.trim( 2*points, 3*points );
+                dataMin.putProperty( QDataSet.NAME, "binmin" );
+                BufferDataSet dataMax= data3.trim( 1*points, 2*points );
+                dataMax.putProperty( QDataSet.NAME, "binmax" );
+                data.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(dataMax, data));
+                data.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(data, dataMin));
+                
+            } else {
+                mon.setProgressMessage("loading mean");
+                URL dataUrl = new URL(surl);
+                HttpURLConnection connect = (HttpURLConnection) dataUrl.openConnection();
+                connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
+                logger.fine("loading " + dataUrl);
+                data = dataUrl(connect, size, points,-1, mon);
+                logit("done loading mean", t0);
+            }
+            
+            if ( !useFilter4 && minMax && surl.contains("-filter_0-")) {
+                HttpURLConnection connect;
                 String sDataMax = surl.replace("-filter_0-", "-filter_2-");
                 logger.fine("loading " + sDataMax);
                 mon.setProgressMessage("loading max");
-                BufferDataSet dataMax = dataUrl(new URL(sDataMax).openStream(), size, points, mon);
-                logit("done loading max",t0);
-                dataMax.putProperty( QDataSet.NAME, "binmax" );
+                URL maxUrl = new URL(sDataMax);
+                connect = (HttpURLConnection) maxUrl.openConnection();
+                connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
+                BufferDataSet dataMax = dataUrl(connect, size, points,-1, mon);
+                logit("done loading max", t0);
+                dataMax.putProperty(QDataSet.NAME, "binmax");
                 String sDataMin = surl.replace("-filter_0-", "-filter_3-");
                 logger.fine("loading " + sDataMin);
                 mon.setProgressMessage("loading min");
-                BufferDataSet dataMin = dataUrl(new URL(sDataMin).openStream(), size, points, mon);
-                logit("done loading min",t0);
-                dataMin.putProperty( QDataSet.NAME, "binmin" );
+                URL minUrl = new URL(sDataMin);
+                connect = (HttpURLConnection) minUrl.openConnection();
+                connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
+                BufferDataSet dataMin = dataUrl(connect, size, points,-1, mon);
+                logit("done loading min", t0);
+                dataMin.putProperty(QDataSet.NAME, "binmin");
                 data.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(dataMax, data));
                 data.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(data, dataMin));
             }
+
             data.putProperty(QDataSet.UNITS, MetadataUtil.lookupUnits(sunits));
             data.putProperty(QDataSet.DEPEND_0, ttags);
             data.putProperty(QDataSet.NAME, name);
@@ -504,15 +560,14 @@ class TsdsDataSource extends AbstractDataSource {
     public String getURL() {
         TimeParser tp = TimeParser.create("%Y%m%d");
 
-        String sparams = 
-                "StartDate=" + tp.format(timeRange.min(), null) 
-                + "&EndDate=" + tp.format(timeRange.max(), null) +
+        String sparams =
+                "StartDate=" + tp.format(timeRange.min(), null) + "&EndDate=" + tp.format(timeRange.max(), null) +
                 "&ppd=" + currentPpd +
                 "&ext=" + params.get("ext") +
-                "&out=" + params.get("out") + 
+                "&out=" + params.get("out") +
                 "&param1=" + params.get("param1");
-        
+
         return this.resourceURL.toString() + "?" + sparams;
-       
+
     }
 }
