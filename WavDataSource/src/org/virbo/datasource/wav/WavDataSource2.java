@@ -97,9 +97,9 @@ public class WavDataSource2 extends AbstractDataSource {
         params.put( "type", type );
         params.put( "byteOrder", byteOrder );
 
-        URL url= new URL( ""+wavFile.toURI().toURL() + "?" + URLSplit.formatParams(params) );
+        URL lurl= new URL( ""+wavFile.toURI().toURL() + "?" + URLSplit.formatParams(params) );
 
-        BinaryDataSource bds= new BinaryDataSource( url );
+        BinaryDataSource bds= new BinaryDataSource( lurl );
         MutablePropertyDataSet result= (BufferDataSet) bds.getDataSet( new NullProgressMonitor() );
 
         MutablePropertyDataSet timeTags= DataSetUtil.tagGenDataSet( frameCount, 0., 1./audioFormat.getSampleRate(), Units.seconds );
