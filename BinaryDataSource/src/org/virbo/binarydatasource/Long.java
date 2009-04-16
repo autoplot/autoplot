@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 public class Long extends BufferDataSet {
 
     public Long(int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer back ) {
-        super(rank, reclen, recoffs, len0, len1, len2, 8, back );
+        super(rank, reclen, recoffs, len0, len1, len2, LONG, back );
     }
 
     public double value() {

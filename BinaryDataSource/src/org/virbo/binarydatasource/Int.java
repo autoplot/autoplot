@@ -6,7 +6,7 @@ import org.virbo.dataset.WritableDataSet;
 public class Int extends BufferDataSet implements WritableDataSet {
 
     public Int(int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer back) {
-        super(rank, reclen, recoffs, len0, len1, len2, 4, back);
+        super(rank, reclen, recoffs, len0, len1, len2, INT, back);
     }
 
     public double value() {

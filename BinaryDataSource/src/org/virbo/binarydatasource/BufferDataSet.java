@@ -37,6 +37,11 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     int fieldLen;
     
     /**
+     * the field type
+     */
+    String type;
+
+    /**
      * the array backing the data
      */
     protected ByteBuffer back;
@@ -108,7 +113,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         }
     }
 
-    public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, int fieldLen, ByteBuffer back  ) {
+    public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, String type, ByteBuffer back  ) {
         this.back= back;
         this.rank = rank;
         this.reclen= reclen;
@@ -116,7 +121,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         this.len0 = len0;
         this.len1 = len1;
         this.len2 = len2;
-        this.fieldLen= fieldLen;
+        this.type= type;
+        this.fieldLen= byteCount(type);
     }
 
     public int rank() {
@@ -165,7 +171,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         if (RANGE_CHECK) {
             rangeCheck(i0, 0, 0);
         }
-        return reclen * i0 + recoffset;
+        return recoffset + reclen * i0;
     }
         
     /**
@@ -178,7 +184,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         if (RANGE_CHECK) {
             rangeCheck(i0, i1, 0);
         }        
-        return reclen * i0 + recoffset + i1 * fieldLen ;
+        return  recoffset + reclen * i0 + i1 * fieldLen;
     }
 
     /**
@@ -192,7 +198,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         if (RANGE_CHECK) {
             rangeCheck(i0, i1, i2);
         }
-        return reclen * i0 + recoffset + i1 * fieldLen * len2  + i2 * fieldLen ;
+        return recoffset + reclen * i0 + i1 * fieldLen * len2  + i2 * fieldLen ;
     }
 
 
@@ -207,7 +213,18 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
 
     @Override
     public abstract double value(int i0, int i1, int i2);
-    
+
+    public BufferDataSet trim( int ist, int ien ) {
+        return makeDataSet( rank, reclen, offset(ist), ien-ist, len1, len2, back, type );
+    }
+
+    /*public BufferDataSet slice( int i0 ) {
+        if ( rank==0 ) {
+            throw new IllegalArgumentException("rank limit, can't slice rank zero");
+        } else {
+            return makeDataSet( rank-1, reclen, recoffset, len1, len2, 1, back, type );
+        }
+    }*/
     /**
      * copy the data to a writable buffer if it's not already writable.
      */

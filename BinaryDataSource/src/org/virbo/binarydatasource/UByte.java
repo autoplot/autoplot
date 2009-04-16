@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 public class UByte extends BufferDataSet {
 
     public UByte(int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer back ) {
-        super(rank, reclen, recoffs, len0, len1, len2, 1, back );
+        super(rank, reclen, recoffs, len0, len1, len2, UBYTE, back );
     }
 
     public double value() {
