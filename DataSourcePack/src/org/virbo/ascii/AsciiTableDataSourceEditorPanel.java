@@ -26,8 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellRenderer;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -469,12 +467,6 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
 
     public Map<Integer, String> getColumnNames() throws IOException {
 
-        if (skipLines > 0) {
-            parser.setSkipLines(skipLines);
-        }
-
-        String line = parser.readFirstRecord(file.toString());
-        DelimParser dp = parser.guessDelimParser(line);
         String[] columns = parser.getFieldNames();
         Map<Integer, String> result = new LinkedHashMap<Integer, String>();
         for (int i = 0; i < columns.length; i++) {
@@ -491,6 +483,7 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
         int oldRow = this.skipLines;
         this.skipLines = row;
         Rectangle rect = jTable1.getCellRect(Math.max(0, getSkipLines() - 3), 0, true);
+        parser.setSkipLines(skipLines);
         update();
         jTable1.scrollRectToVisible(rect);
         firePropertyChange(PROP_FIRST_ROW, oldRow, row);
@@ -651,12 +644,12 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
 
     private void update() {
         try {
-            String line = model.getLine(this.skipLines);
-            if (line == null || parser == null) {
+            AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
+            if ( parser == null) {
                 //               throw new IllegalArgumentException("no records found");
                 return;
             }
-            AsciiParser.DelimParser p = parser.guessDelimParser(line);
+            
             model.setRecParser(p);
             columns = getColumnNames();
 
