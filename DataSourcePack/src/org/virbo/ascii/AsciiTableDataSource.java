@@ -25,6 +25,7 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.dsutil.AsciiParser;
 import org.das2.util.TimeParser;
 import java.text.ParseException;
+import java.util.StringTokenizer;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dsops.Ops;
@@ -273,11 +274,10 @@ public class AsciiTableDataSource extends AbstractDataSource {
             delim = null;
         }
         if (delim == null) {
-            String line = parser.readFirstRecord(file.toString());
-            if (line == null) {
+            AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
+            if ( p == null) {
                 throw new IllegalArgumentException("no records found");
             }
-            AsciiParser.DelimParser p = parser.guessDelimParser(line);
             columnCount = p.fieldCount();
             delim = p.getDelim();
         } else {
@@ -484,9 +484,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if (idep0 != -1) { // deal with -1 later
                     String field = fields[idep0];
                     try {
-                        Units.us2000.parse(field);
-                        parser.setUnits(idep0, Units.us2000);
-                        parser.setFieldParser(idep0, parser.UNITS_PARSER);
+                        TimeUtil.parseTime(field);
+                        if ( new StringTokenizer( field, ":T-/" ).countTokens()>1 ) {
+                            parser.setUnits(idep0, Units.us2000);
+                            parser.setFieldParser(idep0, parser.UNITS_PARSER);
+                        }
                     } catch (ParseException ex) {
                     }
                 }
