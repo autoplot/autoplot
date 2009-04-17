@@ -232,6 +232,10 @@ public class DataSourceController {
 
     }
 
+    public synchronized void setDataSetInternal( QDataSet ds ) {
+        setDataSetInternal( ds, null );
+    }
+
     /**
      * set the new dataset, do autoranging and autolabelling.
      * 
@@ -249,7 +253,7 @@ public class DataSourceController {
      * @param autorange if false, autoranging will not be done.  if false, autoranging
      *   might be done.
      */
-    public synchronized void setDataSetInternal(QDataSet ds) {
+    public synchronized void setDataSetInternal(QDataSet ds, Map<String,Object> rawProperties) {
 
         List<String> problems = new ArrayList<String>();
 
@@ -287,7 +291,7 @@ public class DataSourceController {
             };
         } else {
             _setDataSet(ds);
-            setRawProperties(null);  // TODO: what if this is from a datasource?  We might want to avoid null in raw properties tree view.
+            setRawProperties(rawProperties); 
 
             if (ds == null) {
                 _setDataSet(null);
@@ -603,9 +607,8 @@ public class DataSourceController {
             if (_getDataSource() != null) {
                 setStatus("busy: loading dataset");
                 logger.fine("loading dataset "+_getDataSource() );
-                QDataSet dataset = loadDataSet();
+                loadDataSet();
                 setStatus("done loading dataset");
-                setDataSetInternal(dataset);
             } else {
                 setDataSetInternal(null);
             }
@@ -886,8 +889,8 @@ public class DataSourceController {
         this.mon = mymon;
         try {
             result = _getDataSource().getDataSet(mymon);
-            setRawProperties(_getDataSource().getMetaData(new NullProgressMonitor()));
-
+            Map<String,Object> props= _getDataSource().getMetaData(new NullProgressMonitor());
+            setDataSetInternal(result,props);
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
             setException(ex);
