@@ -36,7 +36,6 @@ import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URLSplit;
 import org.virbo.dsutil.AsciiParser;
-import org.virbo.dsutil.AsciiParser.DelimParser;
 
 /**
  *
@@ -54,6 +53,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         NONE, SKIPLINES, COLUMN, DEPEND_0, TIMEFORMAT,
     }
 
+    private final static String PARAMS_KEY_COMMENT="comment";
+    
     Tool currentTool = Tool.NONE;
     JToggleButton currentToolButton;
 
@@ -207,6 +208,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel1 = new javax.swing.JLabel();
         skipLinesTextField = new javax.swing.JFormattedTextField();
         jToggleButton1 = new javax.swing.JToggleButton();
+        jLabel5 = new javax.swing.JLabel();
+        commentComboBox = new javax.swing.JComboBox();
         jPanel3 = new javax.swing.JPanel();
         timeFormatTextField = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -239,17 +242,32 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jToggleButton1.setText("Select");
         jToggleButton1.setToolTipText("select the first row to parse as data or column headers");
 
+        jLabel5.setText("Comment Prefix:");
+
+        commentComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "none", "# hash", "; semicolon", " " }));
+        commentComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                commentComboBoxActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jToggleButton1)
-                .addContainerGap(618, Short.MAX_VALUE))
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel2Layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 35, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jToggleButton1))
+                    .add(jPanel2Layout.createSequentialGroup()
+                        .add(jLabel5)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 109, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(563, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -258,7 +276,11 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
                     .add(jLabel1)
                     .add(skipLinesTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jToggleButton1))
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel5)
+                    .add(commentComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("header", jPanel2);
@@ -449,7 +471,24 @@ private void timeFormatFieldsComboBoxActionPerformed(java.awt.event.ActionEvent 
 private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFormatToggleButtonActionPerformed
     // TODO add your handling code here:
 }//GEN-LAST:event_timeFormatToggleButtonActionPerformed
+
+private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commentComboBoxActionPerformed
+    String value=  (String)commentComboBox.getSelectedItem();
+    if ( value.trim().length()==0 ) {
+        params.remove(PARAMS_KEY_COMMENT);
+        parser.setCommentPrefix(null);
+    } else {
+        int i= value.indexOf(" ");
+        String prefix= (i==-1) ? value : value.substring(0,i);
+        params.put( PARAMS_KEY_COMMENT, prefix );
+        parser.setCommentPrefix(prefix);
+        update();
+    }
+}//GEN-LAST:event_commentComboBoxActionPerformed
+
     URLSplit split = null;
+    Map<String,String> params;
+
     protected File file = null;
     public static final String PROP_FILE = "file";
 
@@ -520,7 +559,7 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
     public void setUrl(String url) {
         try {
             split = URLSplit.parse(url);
-            Map<String, String> params = URLSplit.parseParams(split.params);
+            params = URLSplit.parseParams(split.params);
 
             File f = DataSetURL.getFile(new URL(split.file), new NullProgressMonitor());
             setFile(f);
@@ -566,7 +605,7 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
     }
 
     public String getUrl() {
-        Map<String, String> params = URLSplit.parseParams(split.params);
+
         String args = "";
         if ( skipLines > 0 ) {
             params.put("skipLines", "" + skipLines);
@@ -607,12 +646,14 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox columnsComboBox;
+    public javax.swing.JComboBox commentComboBox;
     public javax.swing.JComboBox dep0Columns;
     public javax.swing.JCheckBox dep0timeCheckBox;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
+    public javax.swing.JLabel jLabel5;
     public javax.swing.JPanel jPanel1;
     public javax.swing.JPanel jPanel2;
     public javax.swing.JPanel jPanel3;
@@ -670,6 +711,11 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
             dep0Values.add(0, "");
             dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
             dep0Columns.setSelectedItem(ldep0);
+
+            if ( params.containsKey( PARAMS_KEY_COMMENT ) ) {
+                commentComboBox.setSelectedItem( params.get( PARAMS_KEY_COMMENT ) );
+            }
+
         } catch (IOException ex) {
             Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
