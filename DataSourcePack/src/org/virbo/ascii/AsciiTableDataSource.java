@@ -267,50 +267,51 @@ public class AsciiTableDataSource extends AbstractDataSource {
             parser.setHeaderDelimiter(o);
         }
 
-        o = params.get("delim");
-        if (o != null) {
-            delim = o;
-        } else {
-            delim = null;
-        }
-        if (delim == null) {
-            AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
-            if ( p == null) {
-                throw new IllegalArgumentException("no records found");
-            }
-            columnCount = p.fieldCount();
-            delim = p.getDelim();
-        } else {
-            if (delim.equals("+")) {
-                delim = " ";
-            }
-            columnCount = parser.setDelimParser(file.toString(), delim).fieldCount();
-        }
-        //parser.setPropertyPattern( Pattern.compile("^#\\s*(.+)\\s*\\:\\s*(.+)\\s*") );
-        parser.setPropertyPattern(AsciiParser.NAME_COLON_VALUE_PATTERN);
+        delim = params.get("delim");
+        String sFixedColumns = params.get("fixedColumns");
 
-        o = params.get("fixedColumns");
-        if (o != null) {
-            String s = o;
-            AsciiParser.RecordParser p = parser.setFixedColumnsParser(file.toString(), "\\s+");
-            if (o.equals("")) {
-                columnCount = p.fieldCount();
-            } else if (s.contains(",")) { // 0-10,20-34
-                String[] ss = s.split(",");
-                int[] starts = new int[ss.length];
-                int[] widths = new int[ss.length];
-                AsciiParser.FieldParser[] fparsers = new AsciiParser.FieldParser[ss.length];
-                for (int i = 0; i < ss.length; i++) {
-                    String[] ss2 = ss[i].split("-");
-                    starts[i] = Integer.parseInt(ss2[0]);
-                    widths[i] = Integer.parseInt(ss2[1]) - starts[i];
-                    fparsers[i] = AsciiParser.DOUBLE_PARSER;
+        if (sFixedColumns == null) {
+            if (delim == null) {
+                AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
+                if ( p == null) {
+                    throw new IllegalArgumentException("no records found");
                 }
-                p = parser.setFixedColumnsParser(starts, widths, fparsers);
-
+                columnCount = p.fieldCount();
+                delim = p.getDelim();
             } else {
-                columnCount = Integer.parseInt(o);
+                if (delim.equals("+")) {
+                    delim = " ";
+                }
+                columnCount = parser.setDelimParser(file.toString(), delim).fieldCount();
             }
+            //parser.setPropertyPattern( Pattern.compile("^#\\s*(.+)\\s*\\:\\s*(.+)\\s*") );
+            parser.setPropertyPattern(AsciiParser.NAME_COLON_VALUE_PATTERN);
+        }
+
+        if (sFixedColumns != null) {
+            String s = sFixedColumns;
+            AsciiParser.RecordParser p = parser.setFixedColumnsParser(file.toString(), "\\s+");
+            try {
+                columnCount = Integer.parseInt(sFixedColumns);
+            } catch ( NumberFormatException ex ) {
+                if (sFixedColumns.equals("")) {
+                    columnCount = p.fieldCount();
+                } else { // 0-10,20-34
+                    String[] ss = s.split(",");
+                    int[] starts = new int[ss.length];
+                    int[] widths = new int[ss.length];
+                    AsciiParser.FieldParser[] fparsers = new AsciiParser.FieldParser[ss.length];
+                    for (int i = 0; i < ss.length; i++) {
+                        String[] ss2 = ss[i].split("-");
+                        starts[i] = Integer.parseInt(ss2[0]);
+                        widths[i] = Integer.parseInt(ss2[1]) - starts[i] + 1;
+                        fparsers[i] = AsciiParser.DOUBLE_PARSER;
+                    }
+                    p = parser.setFixedColumnsParser(starts, widths, fparsers);
+                    columnCount= p.fieldCount();
+                }
+            }
+
             parser.setPropertyPattern(null); // don't look for these for speed
             fixedColumns = true;
             delim = null;
@@ -408,7 +409,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
                 ib = timeFormat.indexOf("%{ignore"); // arbitary skip must not have fields following but before delimiter
                 if (ib != -1) {
-                    int column = timeFormat.substring(0, ib).split("%", -2).length - 1; 
+                    int column = timeFormat.substring(0, ib).split("%", -2).length - 1;
                     AsciiParser.FieldParser nullFieldParser = new AsciiParser.FieldParser() {
                         public double parseField(String field, int columnIndex) throws ParseException {
                             return -1e31;
