@@ -259,7 +259,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         o = params.get("comment");
         if (o != null) {
-            parser.setCommentPrefix(o);
+            if ( o.equals("") ) {
+                parser.setCommentPrefix(null);
+            } else {
+                parser.setCommentPrefix(o);
+            }
         }
 
         o = params.get("headerDelim");
