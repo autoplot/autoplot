@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
@@ -474,9 +475,10 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
 
 private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commentComboBoxActionPerformed
     String value=  (String)commentComboBox.getSelectedItem();
-    if ( value.trim().length()==0 ) {
-        params.remove(PARAMS_KEY_COMMENT);
+    if ( value.equals("none") ) {
+        params.put(PARAMS_KEY_COMMENT,"");
         parser.setCommentPrefix(null);
+        update();
     } else {
         int i= value.indexOf(" ");
         String prefix= (i==-1) ? value : value.substring(0,i);
@@ -712,8 +714,19 @@ private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
             dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
             dep0Columns.setSelectedItem(ldep0);
 
+            String comment="#";
             if ( params.containsKey( PARAMS_KEY_COMMENT ) ) {
-                commentComboBox.setSelectedItem( params.get( PARAMS_KEY_COMMENT ) );
+              comment=   params.get( PARAMS_KEY_COMMENT );
+              if ( comment.trim().length()==0 ) {
+                  comment= "none";
+              }
+            }
+
+            ComboBoxModel model= commentComboBox.getModel();
+            for ( int i=0; i<model.getSize(); i++ ) {
+                if ( ((String)model.getElementAt(i)).startsWith(comment) ) {
+                    commentComboBox.setSelectedIndex(i);
+                }
             }
 
         } catch (IOException ex) {
