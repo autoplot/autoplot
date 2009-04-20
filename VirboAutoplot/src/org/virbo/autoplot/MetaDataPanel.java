@@ -107,7 +107,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
             }
             if (dsrc != null) {
                 tree = new CombinedTreeModel("" + dsrc.getURL());
-                Map<String, Object> meta = dsf.getController().getRawProperties();  // findbugs NP_GUARANTEED_DEREF okay
+                Map<String, Object> meta = dsf.getController().getRawProperties();
                 MetadataModel model = dsrc.getMetadataModel();
                 String root = "Metadata";
                 if (model != null) {
@@ -128,7 +128,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 }
             } else {
                 String label = "(no data source)";
-                if (dsf.getController().getDataSet() != null) {  // findbugs indicates NP_GUARANTEED_DEREF, but I don't see it. JBF
+                if (dsf.getController().getDataSet() != null) {  // findbugs NP_GUARANTEED_DEREF okay
                     label = "dataset";
                 }
                 tree = new CombinedTreeModel(label);
