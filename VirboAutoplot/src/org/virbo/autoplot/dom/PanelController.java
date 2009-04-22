@@ -16,8 +16,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.das2.datum.Units;
-import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
@@ -227,7 +225,7 @@ public class PanelController {
                 return;  // TODO: kludge, I was deleted.
             }
             QDataSet fillDs = dsf.getController().getFillDataSet();
-
+            logger.fine( "got new dataset: "+fillDs);
             if ( fillDs!=null ) {
                 if ( resetRanges ) {
                     if ( parentPanel==null ) {
@@ -256,7 +254,7 @@ public class PanelController {
     };
 
     private void resetPanel(QDataSet fillDs,RenderType renderType) {
-
+        logger.finest("resetPanel..."+fillDs+" "+renderType);
         if (renderer != null) {
             renderer.setActive(true);
         }
@@ -407,7 +405,7 @@ public class PanelController {
     }
 
     private synchronized void doResetRanges( boolean autorange ) {
-
+        logger.finest("doResetRanges...");
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
         setRenderType(panel.getRenderType());
@@ -725,7 +723,6 @@ public class PanelController {
 
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
-
         if (oldRenderer != newRenderer) {
             setRenderer(newRenderer);
 
@@ -735,6 +732,7 @@ public class PanelController {
                 plot.removeRenderer(oldRenderer);
             }
             plot.addRenderer(newRenderer);
+            logger.finest("plot.addRenderer "+plot+" "+newRenderer);
 
             if (getDataSourceFilter().getController().getFillDataSet() != null) {
                 setDataSet(getDataSourceFilter().getController().getFillDataSet());
