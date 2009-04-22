@@ -26,6 +26,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.AbstractDataSource;
@@ -194,19 +195,19 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         return inextRow;
     }
 
-    class ExcelSpreadsheetDataSet implements QDataSet {
+    class ExcelSpreadsheetDataSet extends AbstractDataSet {
 
         short columnNumber;
         int firstRow;
         int length;
         boolean isDate;
-        Map properties = new HashMap();
-
+        
         /**
          * @param firstRow is the first row to read.  0 is the first row.
          * @param lastRow is the last row number, exclusive.
          */
         ExcelSpreadsheetDataSet( short columnNumber, int firstRow, int lastRow, boolean firstRowIsLabels ) {
+            
             if ( firstRowIsLabels ) {
                 firstRow= findFirstRow(sheet, firstRow);
             }
@@ -231,10 +232,6 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             return 1;
         }
 
-        public double value() {
-            throw new IllegalArgumentException("rank");
-        }
-
         public double value(int i) {
             HSSFRow row = null;
             HSSFCell cell = null;
@@ -254,44 +251,9 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             }
         }
 
-        public double value(int i0, int i1) {
-            throw new IllegalArgumentException("rank");
-        }
-
-        public double value(int i0, int i1, int i2) {
-            throw new IllegalArgumentException("rank");
-        }
-
-        public Object property(String name) {
-            return properties.get(name);
-        }
-
-        public Object property(String name, int i) {
-            return properties.get(name);
-        }
-
-        public Object property(String name, int i0, int i1) {
-            return properties.get(name);
-        }
-
-        public void putProperty(String name, Object value) {
-            properties.put(name, value);
-        }
-
         public int length() {
             return length;
         }
 
-        public int length(int i) {
-            throw new IllegalArgumentException("ranklimit");
-        }
-
-        public int length(int i, int j) {
-            throw new IllegalArgumentException("ranklimit");
-        }
-
-        public String toString() {
-            return DataSetUtil.toString(this);
-        }
     }
 }
