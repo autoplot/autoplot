@@ -75,6 +75,15 @@ public class CdfUtil {
         }
     }
 
+    private static void flatten(double[][][] data, double[] back, int offset, int nx, int ny, int nz) {
+        offset = 0;
+        for (int i = 0; i < nx; i++) {
+            double[][] ff = data[i];
+            flatten(ff, back, offset, ny, nz);
+            offset += ny * nz;
+        }
+    }
+
     private static void flatten(float[][][] data, float[] back, int offset, int nx, int ny, int nz) {
         offset = 0;
         for (int i = 0; i < nx; i++) {
@@ -169,7 +178,15 @@ public class CdfUtil {
 
     private static WritableDataSet wrapRank3(long varType, Object odata, Variable variable) throws RuntimeException {
         WritableDataSet result;
-        if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
+        if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE ) {
+            double[][][] data = (double[][][]) odata;
+            int nx = data.length;
+            int ny = data[0].length;
+            int nz = data[0][0].length;
+            double[] back = new double[nx * ny * nz];
+            flatten(data, back, 0, nx, ny, nz);
+            result = DDataSet.wrap(back, new int[] { nx, ny, nz } );
+        } else if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
             float[][][] data = (float[][][]) odata;
             int nx = data.length;
             int ny = data[0].length;
