@@ -14,8 +14,10 @@ import javax.swing.JOptionPane;
 public class EditorTest {
     public static void main(String[] args ) {
         AsciiTableDataSourceEditorPanel panel= new AsciiTableDataSourceEditorPanel();
-        
-        panel.setUrl("file:///media/mini/data.backup/examples/dat/A1050412.TXT?skip=23");
+
+        //String url= "file:///media/mini/data.backup/examples/dat/omni2_1965.dat?timeFormat=$Y+$j&skip=22";
+        String url= "file:///media/mini/data.backup/examples/dat/A1050412.TXT";
+        panel.setUrl(url);
 
         JOptionPane.showConfirmDialog( null, panel );
         
