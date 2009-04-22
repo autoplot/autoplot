@@ -5,14 +5,17 @@
 
 package org.virbo.jythonsupport;
 
+import org.python.core.Py;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.python.core.PyFloat;
 import org.python.core.PyFunction;
+import org.python.core.PyInteger;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.RankZeroDataSet;
 
 /**
  * Contains operations that are only available to Jython code, and is dependent
@@ -66,7 +69,18 @@ public class JythonOps {
      * @return
      */
     public static QDataSet coerce( PyObject arg0 ) {
-        return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
+        if ( arg0 instanceof PyQDataSet ) {
+            return ((PyQDataSet)arg0).ds;
+        } else if ( arg0 instanceof PyList ) {
+            return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
+        } else if ( arg0 instanceof PyInteger ) {
+            return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
+        } else if ( arg0 instanceof PyFloat ) {
+            return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
+        } else {
+            throw Py.TypeError("unable to coerce "+arg0+" to QDataSet");
+        }
+        
     }
     
     /**
