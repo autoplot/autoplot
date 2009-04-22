@@ -212,7 +212,6 @@ public class AutoplotUtil {
         if ( units!=null && UnitsUtil.isTimeLocation(units) ) {
             if ( min==null ) min= Units.mj1958.convertDoubleTo(units, -100000);
             if ( max==null ) max= Units.mj1958.convertDoubleTo(units, 100000);
-            if ( units==null ) units= Units.dimensionless;
         } else {
             if ( min==null ) min= Double.NEGATIVE_INFINITY;
             if ( max==null ) max= Double.POSITIVE_INFINITY;
