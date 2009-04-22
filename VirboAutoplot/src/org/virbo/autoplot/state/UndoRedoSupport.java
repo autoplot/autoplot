@@ -60,7 +60,7 @@ public class UndoRedoSupport {
         }
     }
 
-    class StateStackElement {
+    static class StateStackElement {
 
         Application state;
         String deltaDesc;
