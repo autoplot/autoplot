@@ -4,7 +4,11 @@
  */
 package org.virbo.jythonsupport;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.IndexListDataSetIterator;
@@ -15,10 +19,11 @@ import org.python.core.PyIterator;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyList;
 import org.python.core.PyObject;
+import org.python.core.PyReflectedFunction;
 import org.python.core.PySequence;
 import org.python.core.PySlice;
+import org.python.core.PyString;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -50,6 +55,7 @@ public class PyQDataSet extends PyJavaInstance {
             this.ds = DDataSet.copy(ds);
         }
         this.rods = ds;
+
     }
 
     /* plus, minus, multiply, divide */
@@ -156,79 +162,96 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.pow(that, rods));
     }
 
-    /* compare operators */
-    @Override
-    public PyObject __eq__(
-            PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.eq(rods, that));
+    private static Map<String,PyReflectedFunction> binaryInfixMethods;
+    static {
+        binaryInfixMethods= new HashMap<String, PyReflectedFunction>();
+        binaryInfixMethods.put( "gt", new PyReflectedFunction("gt") );
+        
+        for ( Method m: BinaryInfixOps.class.getMethods() ) {
+            PyReflectedFunction func= binaryInfixMethods.get(m.getName());
+            if ( func==null ) {
+                func= new PyReflectedFunction(m.getName());
+                binaryInfixMethods.put( m.getName(), func );
+            }
+            if ( func!=null ) {
+                func.addMethod(m);
+            }
+        }
     }
 
     @Override
-    public PyObject __gt__(
-            PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.gt(rods, that));
+    public PyObject __findattr__(String name) {
+        PyReflectedFunction func= binaryInfixMethods.get(name);
+        if ( func!=null ) {
+            return func;
+        } else {
+            return super.__findattr__(name);
+        }
     }
 
     @Override
-    public PyObject __ge__(PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.ge(rods, that));
+    public void __delattr__(String attr) {
+        if ( binaryInfixMethods.remove(attr)==null ) {
+            super.__delattr__(attr);
+        }
     }
 
     @Override
-    public PyObject __le__(PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.le(rods, that));
+    public void __setattr__(String name, PyObject value) {
+        if ( binaryInfixMethods.containsKey(name) ) {
+            binaryInfixMethods.remove(name);
+        }
+        super.__setattr__(name, value);
     }
 
     @Override
-    public PyObject __lt__(PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.lt(rods, that));
+    public PyObject invoke(String name) {
+        PyReflectedFunction func= binaryInfixMethods.get(name);
+        if ( func!=null ) {
+            return func.__call__(this);
+        } else {
+            return super.invoke(name);
+        }
     }
 
     @Override
-    public PyObject __ne__(PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.ne(rods, that));
-    }
-
-    /* logic operators
-     * There's a problem here, that you can't override "and" "or" and "not." 
-     * We use the symbols ~ for not, | for or, and & for and.
-     * These use the object's __nonzero__ method.
-     * TODO: I don't like these any more than C-style booleans.  This should
-     * require nominal units that convert the values to boolean.
-     */
-    @Override
-    public PyObject __and__(PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.and(rods, that));
+    public PyObject invoke(String name, PyObject arg1) {
+        PyReflectedFunction func= binaryInfixMethods.get(name);
+        if ( func!=null ) {
+            return func.__call__(this,arg1);
+        } else {
+            return super.invoke(name,arg1);
+        }
     }
 
     @Override
-    public PyObject __or__(PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.or(rods, that));
+    public PyObject invoke(String name, PyObject arg1, PyObject arg2) {
+        PyReflectedFunction func= binaryInfixMethods.get(name);
+        if ( func!=null ) {
+            return func.__call__(this,arg1,arg2);
+        } else {
+            return super.invoke(name,arg1,arg2);
+        }
     }
 
     @Override
-    public PyObject __rand__(PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.and(that, rods));
+    public PyObject invoke(String name, PyObject[] args, String[] keywords) {
+        PyReflectedFunction func= binaryInfixMethods.get(name);
+        if ( func!=null ) {
+            return func.__call__(this,args,keywords);
+        } else {
+            return super.invoke(name,args,keywords);
+        }
     }
 
     @Override
-    public PyObject __ror__(PyObject arg0) {
-        QDataSet that = coerce_ds(arg0);
-        return new PyQDataSet(Ops.or(that, rods));
-    }
-
-    @Override
-    public PyObject __invert__() {
-        return new PyQDataSet(Ops.not(rods));
+    public PyObject invoke(String name, PyObject[] args) {
+        PyReflectedFunction func= binaryInfixMethods.get(name);
+        if ( func!=null ) {
+            return func.__call__(this);
+        } else {
+            return super.invoke(name);
+        }
     }
 
     /* accessor and mutator */
@@ -271,8 +294,9 @@ public class PyQDataSet extends PyJavaInstance {
                 return new PyQDataSet(result);
 
             } else if (arg0.isNumberType()) {
-                int idx = (Integer) arg0.__tojava__(Integer.class);
+                int idx = ((Number) arg0.__tojava__(Number.class)).intValue();
                 return Py.java2py(rods.value(idx));
+                
             } else if (arg0.isSequenceType()) {
                 QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 PySequence slices = (PySequence) arg0;
@@ -462,6 +486,11 @@ public class PyQDataSet extends PyJavaInstance {
             }
         }
 
+    }
+
+    public QDataSet gt( Object o ) {
+        System.err.println(o);
+        return null;
     }
 
 // coerce logic doesn't seem to kick in, so I do it!
