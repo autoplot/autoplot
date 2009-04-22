@@ -21,6 +21,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -224,9 +225,13 @@ public class DataSetSelector extends javax.swing.JPanel {
      */
     private void browseSourceType() {
         String surl = (String) dataSetSelector.getEditor().getItem();
-        String ext = DataSetURL.getExt(surl);
 
-        DataSourceEditorPanel edit = DataSourceRegistry.getInstance().getEditorByExt(ext);
+        DataSourceEditorPanel edit=null;
+        try {
+            edit = DataSetURL.getDataSourceEditorPanel(new URI(surl));
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         if (edit != null) {
             edit.setUrl(surl);
