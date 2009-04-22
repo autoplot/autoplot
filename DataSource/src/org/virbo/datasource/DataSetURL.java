@@ -36,6 +36,8 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import org.das2.DasApplication;
 import org.das2.util.filesystem.FileSystemSettings;
+import org.das2.util.filesystem.LocalFileSystem;
+import org.virbo.aggragator.AggregatingDataSourceEditorPanel;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -180,7 +182,7 @@ public class DataSetURL {
         }
     }
 
-    private static boolean isAggregating(String surl) {
+    public static boolean isAggregating(String surl) {
         int iquest = surl.indexOf("?");
         if (iquest == -1) iquest = surl.length();
         int ipercy = surl.lastIndexOf("%Y", iquest);
@@ -265,6 +267,22 @@ public class DataSetURL {
         }
         return DataSourceRegistry.getInstance().getFormatByExt(ext);
 
+    }
+
+    /**
+     * @param uri
+     * @return an EditorPanel or null if one is not found.
+     */
+    public static DataSourceEditorPanel getDataSourceEditorPanel( URI uri ) {
+        String surl= uri.toString();
+        String ext = DataSetURL.getExt(surl);
+
+        if (isAggregating(uri.toString())) {
+            return new AggregatingDataSourceEditorPanel();
+        } 
+        
+        DataSourceEditorPanel edit = DataSourceRegistry.getInstance().getEditorByExt(ext);
+        return edit;
     }
 
     /**
@@ -384,7 +402,9 @@ public class DataSetURL {
 
         try {
             FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
-            FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
+            String filename= split.file.substring(split.path.length());
+            if ( fs instanceof LocalFileSystem ) filename= DataSourceUtil.unescape( filename );
+            FileObject fo = fs.getFileObject(filename);
             if (!fo.isLocal()) {
                 logger.fine("downloading file " + fo.getNameExt());
             } else {
