@@ -64,6 +64,7 @@ public class ExcelUtil {
      * @param ssheet the sheet name
      * @return
      * @throws java.io.IOException
+     * @throws IllegalArgumentException when the sheet contains no records
      */
     public static Map<Integer,String> getColumns( HSSFWorkbook wb, String ssheet, String firstRowString, ProgressMonitor mon) throws IOException {
         
