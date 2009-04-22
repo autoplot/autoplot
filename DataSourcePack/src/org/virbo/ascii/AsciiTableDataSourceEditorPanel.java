@@ -5,6 +5,7 @@
  */
 package org.virbo.ascii;
 
+import org.virbo.datasource.ui.TableRowHeader;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
