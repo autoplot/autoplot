@@ -229,7 +229,11 @@ public class DataSetURL {
         try {
             URL rurl = getResourceURI(url).toURL();
             String surl = rurl.toString();
-            surl = surl.replaceAll("%20", "+");
+            if ( rurl.getProtocol().equals("file") ) {
+            	// do nothing
+            } else {
+            	surl = surl.replaceAll("%20", "+");
+            }
             return new URL(surl);
 
         } catch (MalformedURLException ex) {
@@ -379,7 +383,10 @@ public class DataSetURL {
         URLSplit split = URLSplit.parse(url.toString());
 
         try {
-            FileSystem fs = FileSystem.create(getWebURL(new URI(split.path)));
+        	URL spath= getWebURL(new URI(split.path));
+            FileSystem fs = FileSystem.create(spath);
+            String filename= split.file.substring(split.path.length());
+            if ( fs instanceof LocalFileSystem ) filename= DataSourceUtil.unescape( filename );
             FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
             if (!fo.isLocal()) {
                 Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
@@ -942,6 +949,13 @@ public class DataSetURL {
 
     /** call this to trigger initialization */
     public static void init() {
+    }
+    
+    public static void main( String[] args ) {
+    	File f= new File( "c:\\documents and settings\\" );
+    	System.err.println( f.exists() );
+    	System.err.println( f.toURI().toString() );
+    	
     }
 }
 
