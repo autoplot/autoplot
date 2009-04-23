@@ -136,6 +136,9 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
                     unbind(pan);
                 }
                 unbind(domPlot);
+                unbind(domPlot.xaxis);
+                unbind(domPlot.yaxis);
+                unbind(domPlot.zaxis);
             }
         });
         item.setToolTipText("remove any plot and panel property bindings");
@@ -979,6 +982,20 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
     protected MutatorLock mutatorLock() {
         return changesSupport.mutatorLock();
     }
+
+    public void registerPendingChange(Object client, Object lockObject) {
+        changesSupport.registerPendingChange(client, lockObject);
+    }
+
+    public void performingChange(Object client, Object lockObject) {
+        changesSupport.performingChange(client, lockObject);
+    }
+
+    public void changePerformed(Object client, Object lockObject) {
+        changesSupport.changePerformed(client, lockObject);
+    }
+
+
     protected String status = "";
     public static final String PROP_STATUS = "status";
 
