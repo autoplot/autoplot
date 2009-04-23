@@ -349,6 +349,10 @@ public class Application extends DomNode {
         
         result.addAll( DomUtil.childDiffs( "options", this.getOptions().diffs(  that.getOptions()) ));
 
+        if ( !that.timeRange.equals( this.timeRange ) ) {
+            result.add( new PropertyChangeDiff( "timeRange", that.timeRange, this.timeRange ) );
+        }
+
         return result;
     }
 
