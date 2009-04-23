@@ -1226,6 +1226,9 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
 
         syncSupport.syncBindings(that.getBindings());
         syncSupport.syncConnectors(that.getConnectors());
+
+        application.setTimeRange(that.getTimeRange());
+        
         canvasLock.unlock();
 
         lock.unlock();
