@@ -319,14 +319,22 @@ public class Application extends DomNode {
 
         addArrayDiffs( "plots", that.getPlots(), this.getPlots(), result );
 
+        addArrayDiffs( "canvases", that.getCanvases(), this.getCanvases(), result );
+
         addArrayDiffs( "bindings", that.getBindings(), this.getBindings(), result );
 
         addArrayDiffs( "connectors", that.getConnectors(), this.getConnectors(), result );
-        
+
         for ( int i=0; i<Math.min(this.dataSourceFilters.size(),that.dataSourceFilters.size()); i++ ) {
             DataSourceFilter thisDataSourceFilter= this.dataSourceFilters.get(i);
             DataSourceFilter thatDataSourceFilter= that.dataSourceFilters.get(i);
             result.addAll( DomUtil.childDiffs( "dataSourceFilters["+i+"]", thatDataSourceFilter.diffs( thisDataSourceFilter ) ) );
+        }
+        
+        for ( int i=0; i<Math.min(this.canvases.size(),that.canvases.size()); i++ ) {
+            Canvas thisCanvas= this.canvases.get(i);
+            Canvas thatCanvas= that.canvases.get(i);
+            result.addAll( DomUtil.childDiffs( "Canvases["+i+"]", thatCanvas.diffs( thisCanvas ) ) );
         }
 
         for ( int i=0; i<Math.min(this.plots.size(),that.plots.size()); i++ ) {
@@ -340,7 +348,7 @@ public class Application extends DomNode {
         }
         
         result.addAll( DomUtil.childDiffs( "options", this.getOptions().diffs(  that.getOptions()) ));
-        
+
         return result;
     }
 
