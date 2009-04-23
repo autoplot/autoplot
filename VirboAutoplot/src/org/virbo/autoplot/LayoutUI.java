@@ -215,10 +215,12 @@ public class LayoutUI extends javax.swing.JPanel {
 
         public void valueChanged(ListSelectionEvent e) {
             if (panelListComponent.getSelectedValues().length == 1) {
-                Panel p = (Panel) panelListComponent.getSelectedValue();
-                Plot plot = app.getController().getPlotFor(p);
-                app.getController().setPlot(plot);
-                app.getController().setPanel(p);
+                if ( ! app.getController().isValueAdjusting() ) {
+                    Panel p = (Panel) panelListComponent.getSelectedValue();
+                    Plot plot = app.getController().getPlotFor(p);
+                    app.getController().setPlot(plot);
+                    app.getController().setPanel(p);
+                }
             }
         }
     };
@@ -233,7 +235,11 @@ public class LayoutUI extends javax.swing.JPanel {
     transient private PropertyChangeListener plotListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
-            List<Panel> p = app.getController().getPanelsFor(app.getController().getPlot());
+            Plot plot= app.getController().getPlot();
+            if ( plot==null ) {
+                return;
+            }
+            List<Panel> p = app.getController().getPanelsFor(plot);
             List<Panel> allPanels = Arrays.asList(app.getPanels());
             int[] indices = new int[p.size()];
             for (int i = 0; i < p.size(); i++) {
