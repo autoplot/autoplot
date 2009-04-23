@@ -77,13 +77,13 @@ public class TickleTimer {
     }
     
     public synchronized void tickle(){
-        tickleTime= System.currentTimeMillis();
-        if ( !running ) startTimer();
+        tickle(null);
     }
 
     public synchronized void tickle( String message ) {
-        tickle();
-        messages.add(message);
+        tickleTime= System.currentTimeMillis();
+        if ( !running ) startTimer();
+        if ( message!=null ) messages.add(message);
     }
     
     private java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport(this);
