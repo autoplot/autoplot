@@ -8,6 +8,7 @@
  */
 package org.virbo.autoplot;
 
+import java.text.ParseException;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
 import org.das2.DasApplication;
@@ -71,21 +72,18 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class ApplicationModel {
-    private static final String PENDING_VAPDELTAS = "pendingVapDeltas";
 
+    private static final String PENDING_VAPDELTAS = "pendingVapDeltas";
     DasApplication application;
     DasCanvas canvas;
-    
     Timer tickleTimer;
-
     Application dom;
 
     public enum RenderType {
+
         spectrogram, hugeScatter, series, scatter, colorScatter, histogram, fill_to_zero,
     }
-
     static final Logger logger = Logger.getLogger("virbo.autoplot");
-    
     /**
      * dataset with fill data has been recalculated
      */
@@ -93,32 +91,28 @@ public class ApplicationModel {
     public static final String PROPERTY_FILE = "file";
     public static final String PROPERTY_RECENT = "recent";
     public static final String PROPERTY_BOOKMARKS = "bookmarks";
-    
     private static final int MAX_RECENT = 20;
 
     public ApplicationModel() {
 
-        BeansUtil.registerEditor( RenderType.class, EnumerationEditor.class );
-        
+        BeansUtil.registerEditor(RenderType.class, EnumerationEditor.class);
+
         DataSetURL.init();
 
-        dom= new Application();
-        new ApplicationController( this, dom );
-        
+        dom = new Application();
+        new ApplicationController(this, dom);
+
         canvas = dom.getController().addCanvas();
 
         this.application = canvas.getApplication();
 
-        dom.getController().addPanel(null,null);
+        dom.getController().addPanel(null, null);
 
     }
-
-
 
     public DasCanvas getCanvas() {
         return dom.getController().getDasCanvas();
     }
-    
     PropertyChangeListener timeSeriesBrowseListener;
     Caching caching = null;
     ProgressMonitor mon = null;
@@ -136,9 +130,8 @@ public class ApplicationModel {
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds);
     }
 
-
     public void setDataSource(DataSource dataSource) {
-        dom.getController().getDataSourceFilter().getController().setDataSource(false,dataSource);
+        dom.getController().getDataSourceFilter().getController().setDataSource(false, dataSource);
     }
 
     public DataSource dataSource() {
@@ -205,7 +198,6 @@ public class ApplicationModel {
 
     }
 
-
     public void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
@@ -229,57 +221,36 @@ public class ApplicationModel {
      * @param mon progress monitor which is just used to convey messages.
      */
     protected void resetDataSetSourceURL(String surl, ProgressMonitor mon) {
-        
+
         if (surl == null) {
             return;
         }  // not really supported
 
-        URLSplit split= URLSplit.parse(surl);
+        URLSplit split = URLSplit.parse(surl);
         surl = URLSplit.format(split);
         //surl = DataSetURL.maybeAddFile(surl);
 
         try {
-            if ( split.file.endsWith(".vap") ) {
+            if (split.file.endsWith(".vap")) {
                 try {
                     URL url = DataSetURL.getURL(surl);
                     mon.started();
                     mon.setProgressMessage("loading vap file");
-                    File openable = DataSetURL.getFile(url, application.getMonitorFactory().getMonitor( canvas, "loading vap", ""));
-                    doOpen(openable);
-                    mon.setProgressMessage("done loading vap file");
-                    if ( split.params!=null ) {
-                        dom.getController().registerPendingChange( this,PENDING_VAPDELTAS );
-                        //waitUntilIdle(true);
-                        dom.getController().performingChange( this,PENDING_VAPDELTAS );
-                        LinkedHashMap<String,String> paramz= URLSplit.parseParams(split.params);
-                        for ( Entry<String,String> e: paramz.entrySet() ) {
-                            logger.finest("applying to vap "+e.getKey()+"="+e.getValue());
-                            String node= e.getKey();
-                            String sval= e.getValue();
-                            BeanProperty prop = BeanProperty.create(node);
-                            if ( !prop.isWriteable(dom) ) {
-                                logger.warning("the node "+node+" of "+dom+ " is not writable");
-                                continue;
-                            }
-                            Class c = prop.getWriteType(dom);
-                            SerializeDelegate sd = SerializeRegistry.getDelegate(c);
-                            if ( sd==null ) {
-                                System.err.println("unable to find serialize delegate for "+c.getCanonicalName() );
-                                continue;
-                            }
-                            Object val = sd.parse(sd.typeId(c), sval);
-                            prop.setValue(dom, val);
-                            
-                        }
-                        dom.getController().changePerformed( this,PENDING_VAPDELTAS );
+                    File openable = DataSetURL.getFile(url, application.getMonitorFactory().getMonitor(canvas, "loading vap", ""));
+                    if (split.params != null) {
+                        LinkedHashMap<String, String> params = URLSplit.parseParams(split.params);
+                        doOpen(openable, params);
+                    } else {
+                        doOpen(openable);
                     }
+                    mon.setProgressMessage("done loading vap file");
                     mon.finished();
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(canvas, "<html>Unable to open resource: <br>" + surl);
                 }
             } else {
-                getDataSourceFilterController().resetSuri(surl, mon );
-                
+                getDataSourceFilterController().resetSuri(surl, mon);
+
             }
 
         } catch (Exception e) {
@@ -293,7 +264,7 @@ public class ApplicationModel {
      */
     public void setDataSourceURL(String surl) {
         String oldVal = dom.getController().getDataSourceFilter().getUri();
-        if ( surl == null && oldVal == null) {
+        if (surl == null && oldVal == null) {
             return;
         }
 
@@ -307,8 +278,6 @@ public class ApplicationModel {
     public String getDataSourceURL() {
         return dom.getController().getDataSourceFilter().getUri();
     }
-
-    
     protected List<Bookmark> recent = null;
     protected List<Bookmark> bookmarks = null;
 
@@ -450,8 +419,8 @@ public class ApplicationModel {
         List<Bookmark> newValue = new ArrayList<Bookmark>(bookmarks);
 
         if (newValue.contains(item)) { // move it to the front of the list
-            Bookmark.Item old= (Bookmark.Item) newValue.get( newValue.indexOf(item) );
-            item= old;  // preserve titles and other future metadata.
+            Bookmark.Item old = (Bookmark.Item) newValue.get(newValue.indexOf(item));
+            item = old;  // preserve titles and other future metadata.
             newValue.remove(old);
         }
 
@@ -491,7 +460,6 @@ public class ApplicationModel {
         this.dom.getOptions().setCanvasFont(f);
     }
 
-    
     /**
      * creates an ApplicationState object representing the current state.
      * @param deep if true, do a deeper, more expensive gathering of state.  In the initial implementation, this calculates the embededded dataset.
@@ -510,12 +478,12 @@ public class ApplicationModel {
      * @param deep if true, then unpack the dataset as well.
      * @param forceFill, force a data load
      */
-    public void restoreState( Application state, boolean deep, boolean forceFill) {
-        if ( forceFill ) {
-            for ( DataSourceFilter dsf: this.dom.getDataSourceFilters() ) {
-                if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal:") ) {
+    public void restoreState(Application state, boolean deep, boolean forceFill) {
+        if (forceFill) {
+            for (DataSourceFilter dsf : this.dom.getDataSourceFilters()) {
+                if (dsf.getUri() != null && !dsf.getUri().startsWith("vap+internal:")) {
                     dsf.setUri(null);
-                    dsf.getController().setDataSource(true,null);
+                    dsf.getController().setDataSource(true, null);
                 }
             }
         }
@@ -527,14 +495,53 @@ public class ApplicationModel {
         setUseEmbeddedDataSet(false);
     }
 
-    void doOpen(File f) throws IOException {
+    /**
+     * open the serialized DOM, apply additional modifications to the DOM, then
+     * sync the application to this.
+     * @param f
+     * @param paramz
+     * @throws java.io.IOException
+     */
+    void doOpen(File f, LinkedHashMap<String, String> deltas) throws IOException {
         Application state = (Application) StatePersistence.restoreState(f);
-        logger.fine( "" + state.diffs(this.dom) );
+
+        if (deltas != null) {
+            for (Entry<String, String> e : deltas.entrySet()) {
+                logger.finest("applying to vap " + e.getKey() + "=" + e.getValue());
+                String node = e.getKey();
+                String sval = e.getValue();
+                BeanProperty prop = BeanProperty.create(node);
+                if (!prop.isWriteable(state)) {
+                    logger.warning("the node " + node + " of " + state + " is not writable");
+                    continue;
+                }
+                Class c = prop.getWriteType(state);
+                SerializeDelegate sd = SerializeRegistry.getDelegate(c);
+                if (sd == null) {
+                    System.err.println("unable to find serialize delegate for " + c.getCanonicalName());
+                    continue;
+                }
+                Object val;
+                try {
+                    val = sd.parse(sd.typeId(c), sval);
+                    prop.setValue(state, val);
+                } catch (ParseException ex) {
+                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+        logger.fine("" + state.diffs(this.dom));
         restoreState(state, true, true);
         setUseEmbeddedDataSet(false);
+
         propertyChangeSupport.firePropertyChange("file", null, f);
     }
-    
+
+    void doOpen(File f) throws IOException {
+        doOpen(f,null);
+    }
+
     /**
      * Holds value of property autoRangeSuppress.
      */
@@ -580,9 +587,9 @@ public class ApplicationModel {
     }
 
     private void packEmbeddedDataSet() {
-        
+
         try {
-            if ( dom.getController().getDataSourceFilter().getController().getDataSet() == null) {
+            if (dom.getController().getDataSourceFilter().getController().getDataSet() == null) {
                 embedDs = "";
                 return;
             }
@@ -673,24 +680,23 @@ public class ApplicationModel {
      */
     private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
 
-   
     /**
      * wait for autoplot to settle.
      */
     public void waitUntilIdle(boolean runtimeException) throws InterruptedException {
-        logger.fine("enter waitUntilIdle, pendingChanges="+ dom.getController().isPendingChanges() );
-        while ( dom.getController().isPendingChanges() ) {
+        logger.fine("enter waitUntilIdle, pendingChanges=" + dom.getController().isPendingChanges());
+        while (dom.getController().isPendingChanges()) {
             Thread.sleep(30);
         }
-        logger.fine("waiting for canvas" );
+        logger.fine("waiting for canvas");
         canvas.waitUntilIdle();
-        logger.fine("done waiting" );
+        logger.fine("done waiting");
     }
-    
+
     public Application getDocumentModel() {
         return dom;
     }
-    
+
     /**
      * see ScriptPanelSupport
      * @return
