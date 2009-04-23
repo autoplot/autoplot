@@ -35,7 +35,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -46,6 +48,7 @@ import org.das2.beans.BeansUtil;
 import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
+import org.jdesktop.beansbinding.BeanProperty;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
@@ -58,6 +61,8 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.qstream.QDataSetStreamHandler;
+import org.virbo.qstream.SerializeDelegate;
+import org.virbo.qstream.SerializeRegistry;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.xml.sax.SAXException;
 
@@ -66,6 +71,7 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class ApplicationModel {
+    private static final String PENDING_VAPDELTAS = "pendingVapDeltas";
 
     DasApplication application;
     DasCanvas canvas;
@@ -228,11 +234,12 @@ public class ApplicationModel {
             return;
         }  // not really supported
 
-        surl = URLSplit.format(URLSplit.parse(surl));
+        URLSplit split= URLSplit.parse(surl);
+        surl = URLSplit.format(split);
         //surl = DataSetURL.maybeAddFile(surl);
 
         try {
-            if (surl.endsWith(".vap")) {
+            if ( split.file.endsWith(".vap") ) {
                 try {
                     URL url = DataSetURL.getURL(surl);
                     mon.started();
@@ -240,6 +247,32 @@ public class ApplicationModel {
                     File openable = DataSetURL.getFile(url, application.getMonitorFactory().getMonitor( canvas, "loading vap", ""));
                     doOpen(openable);
                     mon.setProgressMessage("done loading vap file");
+                    if ( split.params!=null ) {
+                        dom.getController().registerPendingChange( this,PENDING_VAPDELTAS );
+                        //waitUntilIdle(true);
+                        dom.getController().performingChange( this,PENDING_VAPDELTAS );
+                        LinkedHashMap<String,String> paramz= URLSplit.parseParams(split.params);
+                        for ( Entry<String,String> e: paramz.entrySet() ) {
+                            logger.finest("applying to vap "+e.getKey()+"="+e.getValue());
+                            String node= e.getKey();
+                            String sval= e.getValue();
+                            BeanProperty prop = BeanProperty.create(node);
+                            if ( !prop.isWriteable(dom) ) {
+                                logger.warning("the node "+node+" of "+dom+ " is not writable");
+                                continue;
+                            }
+                            Class c = prop.getWriteType(dom);
+                            SerializeDelegate sd = SerializeRegistry.getDelegate(c);
+                            if ( sd==null ) {
+                                System.err.println("unable to find serialize delegate for "+c.getCanonicalName() );
+                                continue;
+                            }
+                            Object val = sd.parse(sd.typeId(c), sval);
+                            prop.setValue(dom, val);
+                            
+                        }
+                        dom.getController().changePerformed( this,PENDING_VAPDELTAS );
+                    }
                     mon.finished();
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(canvas, "<html>Unable to open resource: <br>" + surl);
