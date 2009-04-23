@@ -14,6 +14,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,6 +31,7 @@ import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.xml.parsers.ParserConfigurationException;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
@@ -37,6 +39,7 @@ import org.das2.system.RequestProcessor;
 import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.JythonUtil;
+import org.xml.sax.SAXException;
 
 /**
  * GUI for graphically handling log records.  This defines a Handler, and has
@@ -61,14 +64,16 @@ public class LogConsole extends javax.swing.JPanel {
     /** Creates new form LogConsole */
     public LogConsole() {
         initComponents();
-        
-        commandLineTextPane1.addActionListener( new ActionListener() {
+
+        commandLineTextPane1.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 final String s = commandLineTextPane1.getText();
                 RequestProcessor.invokeLater(new Runnable() {
+
                     public void run() {
                         try {
-                            System.out.println("AP> "+s);
+                            System.out.println("AP> " + s);
                             if (interp == null) {
                                 commandLineTextPane1.setText("initializing interpretter...");
                                 interp = JythonUtil.createInterpreter(true, false);
@@ -79,27 +84,28 @@ public class LogConsole extends javax.swing.JPanel {
                         } catch (IOException ex) {
                             Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
                             commandLineTextPane1.setText("");
-                        } catch ( PyException ex ) {
+                        } catch (PyException ex) {
                             System.err.println(ex.toString());
                             commandLineTextPane1.setText("");
                         }
                     }
-                } );
+                });
             }
         });
 
 
         this.commandLineTextPane1.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
-                public PythonInterpreter createInterpreter() throws java.io.IOException {
-                    if ( interp==null ) {
-                        String s= commandLineTextPane1.getText();
-                        commandLineTextPane1.setText("initializing interpretter...");
-                        interp = JythonUtil.createInterpreter(true, false);
-                        commandLineTextPane1.setText(s);
-                    }
-                    return interp;
+
+            public PythonInterpreter createInterpreter() throws java.io.IOException {
+                if (interp == null) {
+                    String s = commandLineTextPane1.getText();
+                    commandLineTextPane1.setText("initializing interpretter...");
+                    interp = JythonUtil.createInterpreter(true, false);
+                    commandLineTextPane1.setText(s);
                 }
-            });
+                return interp;
+            }
+        });
 
         timer2 = new Timer(100, new ActionListener() {
 
@@ -458,22 +464,47 @@ private void loggerIDCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//
 }//GEN-LAST:event_loggerIDCheckBoxActionPerformed
 
 private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-    JFileChooser chooser = new JFileChooser();
-    if (JFileChooser.APPROVE_OPTION == chooser.showSaveDialog(this)) {
-        FileOutputStream fo = null;
-        try {
-            fo = new FileOutputStream(chooser.getSelectedFile());
-            LogConsoleUtil.serializeLogRecords(records, fo);
-            fo.close();
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
+    if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
+        JFileChooser chooser = new JFileChooser();
+        if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(this)) {
+            FileInputStream fo = null;
             try {
-                fo.close();
+                fo = new FileInputStream(chooser.getSelectedFile());
+                records = LogConsoleUtil.deserializeLogRecords(fo);
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SAXException ex) {
+                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
                 Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    fo.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+    } else {
+        JFileChooser chooser = new JFileChooser();
+        if (JFileChooser.APPROVE_OPTION == chooser.showSaveDialog(this)) {
+            FileOutputStream fo = null;
+            try {
+                fo = new FileOutputStream(chooser.getSelectedFile());
+                LogConsoleUtil.serializeLogRecords(records, fo);
+                fo.close();
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    fo.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }
@@ -497,8 +528,8 @@ private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_copyButtonActionPerformed
 
 private void commandLineTextPane1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_commandLineTextPane1FocusGained
-     CompletionImpl impl = CompletionImpl.get();
-     impl.startPopup(this.commandLineTextPane1);
+    CompletionImpl impl = CompletionImpl.get();
+    impl.startPopup(this.commandLineTextPane1);
 }//GEN-LAST:event_commandLineTextPane1FocusGained
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
