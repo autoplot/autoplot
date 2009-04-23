@@ -215,23 +215,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         autoLayout = new LayoutListener(model);
 
-        dataSetSelector.registerActionTrigger(".*\\.vap", new AbstractAction("load vap") {
-
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    String vap = dataSetSelector.getValue();
-                    applicationModel.addRecent(vap);
-                    setStatus(BUSY_ICON,"opening .vap file " + vap + "...");
-                    applicationModel.doOpen(DataSetURL.getFile(DataSetURL.getURL(vap), new NullProgressMonitor()));
-                    dataSetSelector.setValue(vap);
-                    setStatus("opening .vap file " + vap + "... done");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    setStatus(ERROR_ICON,ex.getMessage());
-                }
-            }
-        });
-
         addBindings();
 
         dataSetSelector.addPropertyChangeListener(DataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
