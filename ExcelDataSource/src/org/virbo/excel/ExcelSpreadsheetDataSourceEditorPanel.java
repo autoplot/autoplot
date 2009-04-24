@@ -74,7 +74,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                     int col = jTable1.getColumnModel().getSelectedColumns()[0];
                     String name = columns.get(col);
                     if (name == null) {
-                        name = String.valueOf('A' + col);
+                        name = String.valueOf((char)('A' + col));
                     }
                     if (currentTool == Tool.DEPEND_0) {
                         params.put(PROP_DEP0, name);
