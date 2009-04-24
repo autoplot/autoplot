@@ -482,8 +482,13 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
             File f = DataSetURL.getFile(new URL(split.file), new NullProgressMonitor());
             setFile(f);
 
+            if ( params.get(PROP_SHEET)!=null ) {
+                sheetComboBox.setSelectedItem( params.get(PROP_SHEET) );
+                setSheet( params.get(PROP_SHEET) );
+            }
+
             if ( params.get(PROP_COLUMN)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_COLUMN) );
-            if ( params.get(PROP_DEP0)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_DEP0) );
+            if ( params.get(PROP_DEP0)!=null ) dep0Columns.setSelectedItem( params.get(PROP_DEP0) );
 
             firstRowTextField.setValue(getIntValue(PROP_FIRST_ROW, 1));
 
