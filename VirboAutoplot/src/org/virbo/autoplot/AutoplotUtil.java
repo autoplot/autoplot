@@ -254,18 +254,21 @@ public class AutoplotUtil {
 
         double[] dd;
 
-        boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC));
+        boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC)) || null!=ds.property(QDataSet.CADENCE);
 
         if (mono) {
             RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds,null);
             if ( cadence==null || cadence.value() > Double.MAX_VALUE / 100 ) cadence= DRank0DataSet.create(0.);
             if (ds.length() > 1) {
+                double min= Math.min( ds.value(0), ds.value(ds.length()-1) );
+                double max= Math.max( ds.value(0), ds.value(ds.length()-1) );
+                double dcadence= Math.abs(cadence.value());
                 if ( "log".equals(cadence.property(QDataSet.SCALE_TYPE) ) ) {
                     Units cu= (Units) cadence.property(QDataSet.UNITS);
-                    double factor= ( cu.convertDoubleTo( Units.percentIncrease, cadence.value() ) + 100 ) / 100.;
-                    dd = new double[]{ ds.value(0)/ factor, ds.value(ds.length() - 1) * factor};
+                    double factor= ( cu.convertDoubleTo( Units.percentIncrease, dcadence ) + 100 ) / 100.;
+                    dd = new double[]{ min/factor, max*factor };
                 } else {
-                    dd = new double[]{ds.value(0) - cadence.value(), ds.value(ds.length() - 1) + cadence.value()};
+                    dd = new double[]{ min - dcadence, max + dcadence };
                 }
             } else {
                 if (UnitsUtil.isTimeLocation(u)) {
