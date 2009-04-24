@@ -267,12 +267,12 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
         } else {
 
-            int nelements= DataSetUtil.totalLength( ds );
+            //int nelements= DataSetUtil.totalLength( ds );
             RankZeroDataSet moments ;
             long validCount;
             long invalidCount;
             String s;
-            if ( nelements < 50000 ) {
+            /*if ( nelements < 50000 ) {
 
                 moments = DataSetOps.moment(ds);
 
@@ -295,7 +295,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 map.put("Std Dev", s);
             } else {
                 map.put("Legacy Stats", "Data Set too large");
-            }
+            }*/
 
             QDataSet hist = dsf.getController().getHistogram();
             map.put("Histogram", hist);
@@ -313,14 +313,14 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 } else {
                     s = "";
                 }
-                map.put("AH_Mean", s);
+                map.put("Mean", s);
 
                 if (validCount > 1) {
                     s = String.valueOf(DatumUtil.asOrderOneUnits(DataSetUtil.asDatum((RankZeroDataSet) moments.property("stddev"))));
                 } else {
                     s = "";
                 }
-                map.put("AH_Std Dev", s);
+                map.put("Std Dev", s);
             }
 
             QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
