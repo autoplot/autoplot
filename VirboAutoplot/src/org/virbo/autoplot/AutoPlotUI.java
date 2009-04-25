@@ -424,15 +424,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
         JMenu printToMenu = new JMenu("Print to");
         fileMenu.add(printToMenu);
 
-        JMenuItem item = new JMenuItem(applicationModel.getCanvas().SAVE_AS_PDF_ACTION);
+        JMenuItem item = new JMenuItem( GuiSupport.getPrintAction(dom, "pdf" ) );
         item.setText("PDF...");
         printToMenu.add(item);
 
-        item = new JMenuItem(applicationModel.getCanvas().SAVE_AS_SVG_ACTION);
+        item = new JMenuItem( GuiSupport.getPrintAction(dom, "svg" ) );
         item.setText("SVG...");
         printToMenu.add(item);
 
-        item = new JMenuItem(applicationModel.getCanvas().SAVE_AS_PNG_ACTION);
+        item = new JMenuItem( GuiSupport.getPrintAction(dom, "png" ) );
         item.setText("PNG...");
         printToMenu.add(item);
 

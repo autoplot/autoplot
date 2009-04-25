@@ -119,9 +119,9 @@ public class GuiSupport {
 
     void addPanel() {
 
-        ApplicationModel applicationModel= parent.applicationModel;
-        DataSetSelector dataSetSelector= parent.dataSetSelector;
-        Application dom= applicationModel.dom;
+        ApplicationModel applicationModel = parent.applicationModel;
+        DataSetSelector dataSetSelector = parent.dataSetSelector;
+        Application dom = applicationModel.dom;
 
         AddPanelDialog dia = new AddPanelDialog((Frame) SwingUtilities.getWindowAncestor(parent), true);
         dia.getPrimaryDataSetSelector().setValue(dataSetSelector.getValue());
@@ -260,7 +260,7 @@ public class GuiSupport {
                         }
                         format.formatData(new File(s), new java.util.HashMap<String, String>(),
                                 dsc.getFillDataSet(), new DasProgressPanel("formatting data"));
-                        parent.setStatus("created file " + s);
+                        parent.setStatus("Wrote file " + s);
 
                     } catch (IOException ex) {
                         parent.applicationModel.application.getExceptionHandler().handle(ex);
@@ -395,5 +395,63 @@ public class GuiSupport {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static FileFilter getFileNameExtensionFilter(final String description, final String ext) {
+        return new FileFilter() {
+
+            public boolean accept(File f) {
+                return f.isDirectory() || f.toString().endsWith(ext);
+            }
+
+            public String getDescription() {
+                return description;
+            }
+        };
+    }
+
+    private static File currentFile;
+
+    public static Action getPrintAction( final Application app,final String ext) {
+        return new AbstractAction("Print as "+ext.toUpperCase()) {
+            public void actionPerformed(ActionEvent e) {
+                final DasCanvas canvas = app.getController().getDasCanvas();
+                final JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setDialogTitle("Print to "+ext.toUpperCase());
+                fileChooser.setFileFilter(getFileNameExtensionFilter( ext + " files", ext ));
+                Preferences prefs = Preferences.userNodeForPackage(DasCanvas.class);
+                String savedir = prefs.get("savedir", null);
+                if (savedir != null)
+                    fileChooser.setCurrentDirectory(new File(savedir));
+                if (currentFile != null)
+                    fileChooser.setSelectedFile(currentFile);
+                int choice = fileChooser.showSaveDialog(canvas);
+                if (choice == JFileChooser.APPROVE_OPTION) {
+
+                    String fname = fileChooser.getSelectedFile().toString();
+                    if (!fname.toLowerCase().endsWith("."+ext)) fname += "."+ext;
+                    final String ffname = fname;
+                    prefs.put("savedir", new File(ffname).getParent());
+                    currentFile = new File(ffname.substring(0, ffname.length() - 4));
+                    Runnable run = new Runnable() {
+                        public void run() {
+                            try {
+                                if ( ext.equals("png") ) {
+                                    canvas.writeToPng(ffname);
+                                } else if ( ext.equals("pdf") ) {
+                                    canvas.writeToPDF(ffname);
+                                } else if ( ext.equals("svg") ) {
+                                    canvas.writeToSVG(ffname);
+                                }
+                                app.getController().setStatus("wrote to " + ffname);
+                            } catch (java.io.IOException ioe) {
+                                org.das2.util.DasExceptionHandler.handle(ioe);
+                            }
+                        }
+                    };
+                    new Thread(run, "writePrint").start();
+                }
+            }
+        };
     }
 }
