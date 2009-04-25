@@ -103,6 +103,9 @@ public class PanelController {
         public void propertyChange(PropertyChangeEvent evt) {
             logger.fine("panelListener: "+evt.getPropertyName()+" "+evt.getOldValue()+"->"+evt.getNewValue());
             if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) {
+                if ( !dom.panels.contains(panel) ) {  //TODO: I think this can be removed. The applicationController was preventing the panel/panelController from being garbage collected.
+                    return;
+                }
                 setRenderType(panel.getRenderType());
                 setResetRenderer(false);
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
@@ -222,7 +225,7 @@ public class PanelController {
         public synchronized void propertyChange(PropertyChangeEvent evt) {
             changesSupport.performingChange( this, PENDING_SET_DATASET );
             if (!Arrays.asList(dom.getPanels()).contains(panel)) {
-                return;  // TODO: kludge, I was deleted.
+                return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
             QDataSet fillDs = dsf.getController().getFillDataSet();
             logger.fine( "got new dataset: "+fillDs);
