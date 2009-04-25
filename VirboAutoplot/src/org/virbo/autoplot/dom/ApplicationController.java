@@ -107,12 +107,34 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
                 return;
             }
 
+            DasPlot plot = domPlot.getController().getDasPlot();
+
             if (getPlot() == domPlot) {
+                setStatus("" + domPlot + " selected");
                 return;
             }
+
+            Panel p=null;
+
+            Renderer r = plot.getFocusRenderer();
+            if (r != null) {
+                p = findPanel(r);
+            }
+
             List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
             if (ps.size() > 0) {
-                Panel p = ApplicationController.this.getPanelsFor(domPlot).get(0);
+                int ip = 0;
+                while (ip < ps.size() && ps.get(ip).isActive() == false) {
+                    ip++;
+                }
+                if (ip < ps.size()) {
+                    p = ps.get(ip);
+                }
+            }
+
+            setPlot(domPlot);
+            
+            if (p != null) {
                 logger.fine("focus to " + p);
                 setFocusUri(p.getController().getDataSourceFilter().getUri());
                 if (getPanel() != p) {
@@ -120,7 +142,6 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
                     setPanel(p);
                 }
             }
-            setPlot(domPlot);
 
         }
     };
@@ -382,7 +403,6 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         p.getController().setRenderType(rt);
 
     }
-
     PropertyChangeListener plotIdListener = new PropertyChangeListener() {
 
         public String toString() {
@@ -467,28 +487,26 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         plot.getXAxis().addFocusListener(focusAdapter);
         plot.getYAxis().addFocusListener(focusAdapter);
     }
+    PropertyChangeListener rendererFocusListener = new PropertyChangeListener() {
 
+        public String toString() {
+            return "" + ApplicationController.this;
+        }
 
-    PropertyChangeListener rendererFocusListener= new PropertyChangeListener() {
-
-            public String toString() {
-                return "" + ApplicationController.this;
+        public void propertyChange(PropertyChangeEvent evt) {
+            DasPlot plot = (DasPlot) evt.getSource();
+            Renderer r = plot.getFocusRenderer();
+            if (r == null) {
+                return;
+            }
+            Panel p = findPanel(r);
+            if (getPanel() != p) {
+                setStatus(p + " selected");
+                setPanel(p);
             }
 
-            public void propertyChange(PropertyChangeEvent evt) {
-                DasPlot plot= (DasPlot)evt.getSource();
-                Renderer r = plot.getFocusRenderer();
-                if (r == null) {
-                    return;
-                }
-                Panel p = findPanel(r);
-                if (getPanel() != p) {
-                    setStatus( p + " selected" );
-                    setPanel(p);
-                }
-
-            }
-        };
+        }
+    };
 
     /**
      * add a plot to the canvas.  Direction is with respect to the current
@@ -590,7 +608,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
 
         addPlotFocusListener(plot);
 
-        plot.addPropertyChangeListener(DasPlot.PROP_FOCUSRENDERER, rendererFocusListener );
+        plot.addPropertyChangeListener(DasPlot.PROP_FOCUSRENDERER, rendererFocusListener);
 
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
         Plot focus = getPlot();
