@@ -999,12 +999,12 @@ public class AutoplotUtil {
                 result.setPsymConnector(PsymConnector.NONE);
                 result.setFillToReference(false);
 
-            } else if (renderType == RenderType.histogram) {
+            } else if (renderType == RenderType.stairSteps) {
                 result.setPsymConnector(PsymConnector.SOLID);
                 result.setFillToReference(true);
                 result.setHistogram(true);
 
-            } else if (renderType == RenderType.fill_to_zero) {
+            } else if (renderType == RenderType.fillToZero) {
                 result.setPsymConnector(PsymConnector.SOLID);
                 result.setFillToReference(true);
                 result.setHistogram(false);
@@ -1100,12 +1100,12 @@ public class AutoplotUtil {
                     seriesRend.setPsymConnector(PsymConnector.NONE);
                     seriesRend.setFillToReference(false);
 
-                } else if (renderType == RenderType.histogram) {
+                } else if (renderType == RenderType.stairSteps) {
                     seriesRend.setPsymConnector(PsymConnector.SOLID);
                     seriesRend.setFillToReference(true);
                     seriesRend.setHistogram(true);
 
-                } else if (renderType == RenderType.fill_to_zero) {
+                } else if (renderType == RenderType.fillToZero) {
                     seriesRend.setPsymConnector(PsymConnector.SOLID);
                     seriesRend.setFillToReference(true);
                     seriesRend.setHistogram(false);
