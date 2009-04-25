@@ -341,7 +341,10 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         overviewPlotConnector.setBottomCurtain(true);
         overviewPlotConnector.setCurtainOpacityPercent(80);
 
-        overviewPlotConnector.getDasMouseInputAdapter().setSecondaryModule(new ColumnColumnConnectorMouseModule(upper, lower));
+        MouseModule mm= new ColumnColumnConnectorMouseModule(upper, lower);
+        overviewPlotConnector.getDasMouseInputAdapter().setSecondaryModule(mm);
+        overviewPlotConnector.getDasMouseInputAdapter().setPrimaryModule(mm);
+
         lcanvas.add(overviewPlotConnector);
         lcanvas.revalidate();
     //TODO: disconnect/delete if one plotId is deleted.
