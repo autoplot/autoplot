@@ -268,7 +268,7 @@ public class AutoplotUtil {
                     double factor= ( cu.convertDoubleTo( Units.percentIncrease, dcadence ) + 100 ) / 100.;
                     dd = new double[]{ min/factor, max*factor };
                 } else {
-                    dd = new double[]{ min - dcadence, max + dcadence };
+                    dd = new double[]{ min-dcadence, max+dcadence };
                 }
             } else {
                 if (UnitsUtil.isTimeLocation(u)) {
