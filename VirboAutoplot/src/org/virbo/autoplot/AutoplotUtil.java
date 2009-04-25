@@ -423,7 +423,7 @@ public class AutoplotUtil {
      */
     public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties) {
 
-        log.fine("enter autoRange");
+        log.fine("enter autoRange "+ds);
 
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
@@ -438,11 +438,16 @@ public class AutoplotUtil {
 
         if (mono) {
             RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds, null);
+            QDataSet wds= DataSetUtil.weightsDataSet(ds);
             if (cadence == null || cadence.value() > Double.MAX_VALUE / 100)
                 cadence = DRank0DataSet.create(0.);
             if (ds.length() > 1) {
-                double min = Math.min(ds.value(0), ds.value(ds.length() - 1));
-                double max = Math.max(ds.value(0), ds.value(ds.length() - 1));
+                int firstValid=0;
+                while ( firstValid<wds.length() && wds.value(firstValid)==0 ) firstValid++;
+                int lastValid=wds.length()-1;
+                while ( lastValid>=0 && wds.value(lastValid)==0 ) lastValid--;
+                double min = Math.min(ds.value(firstValid), ds.value(lastValid));
+                double max = Math.max(ds.value(firstValid), ds.value(lastValid));
                 double dcadence = Math.abs(cadence.value());
                 if ("log".equals(cadence.property(QDataSet.SCALE_TYPE))) {
                     Units cu = (Units) cadence.property(QDataSet.UNITS);
