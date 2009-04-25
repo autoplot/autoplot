@@ -274,8 +274,8 @@ public class GuiSupport {
 
     public static JMenu createEZAccessMenu(final Plot plot) {
 
-        JMenu result = new JMenu("plot style");
-        result.add(new JMenuItem(new AbstractAction("scatter") {
+        JMenu result = new JMenu("Plot Style");
+        result.add(new JMenuItem(new AbstractAction("Scatter") {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
@@ -283,7 +283,7 @@ public class GuiSupport {
             }
         }));
 
-        result.add(new JMenuItem(new AbstractAction("colorScatter") {
+        result.add(new JMenuItem(new AbstractAction("Color Scatter") {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
@@ -291,7 +291,7 @@ public class GuiSupport {
             }
         }));
 
-        result.add(new JMenuItem(new AbstractAction("series") {
+        result.add(new JMenuItem(new AbstractAction("Series") {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
@@ -299,23 +299,23 @@ public class GuiSupport {
             }
         }));
 
-        result.add(new JMenuItem(new AbstractAction("histogram") {
+        result.add(new JMenuItem(new AbstractAction("Stair Steps") {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.histogram);
+                panel.setRenderType(ApplicationModel.RenderType.stairSteps);
             }
         }));
 
-        result.add(new JMenuItem(new AbstractAction("fill to zero") {
+        result.add(new JMenuItem(new AbstractAction("Fill To Zero") {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.fill_to_zero);
+                panel.setRenderType(ApplicationModel.RenderType.fillToZero);
             }
         }));
 
-        result.add(new JMenuItem(new AbstractAction("huge scatter") {
+        result.add(new JMenuItem(new AbstractAction("Huge Scatter") {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
@@ -323,7 +323,7 @@ public class GuiSupport {
             }
         }));
 
-        result.add(new JMenuItem(new AbstractAction("spectrogram") {
+        result.add(new JMenuItem(new AbstractAction("Spectrogram") {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
