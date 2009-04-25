@@ -32,8 +32,8 @@ public class AsciiTableDataSetSourceTest {
         QDataSet d= ds.getDataSet( new NullProgressMonitor() );
          */
         //url= "file:///N:/data/examples/asciitable/omni2_1965.dat?fixedColumns=0to11,54to60&time=field0&timeFormat=%Y %j %H";
-        url= "file:///N:/data/examples/asciitable/omni2_1965.dat?timeFormat=%Y %j %H&time=field0&column=field27";
-        
+        //url= "file:///N:/data/examples/asciitable/omni2_1965.dat?timeFormat=%Y %j %H&time=field0&column=field27";
+        url= "file:///media/mini/data.backup/examples/dat/omni2_1965.dat?timeFormat=$Y+$j&skip=22";
         ds= new AsciiTableDataSourceFactory().getDataSource( new URL(url) );
         d= ds.getDataSet( new NullProgressMonitor() );
         
