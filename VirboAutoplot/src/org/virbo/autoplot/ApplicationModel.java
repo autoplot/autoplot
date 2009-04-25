@@ -73,16 +73,15 @@ import org.xml.sax.SAXException;
  */
 public class ApplicationModel {
 
-    private static final String PENDING_VAPDELTAS = "pendingVapDeltas";
     DasApplication application;
     DasCanvas canvas;
     Timer tickleTimer;
     Application dom;
 
     public enum RenderType {
-
-        spectrogram, hugeScatter, series, scatter, colorScatter, histogram, fill_to_zero,
+        spectrogram, hugeScatter, series, scatter, colorScatter, stairSteps, fillToZero,
     }
+    
     static final Logger logger = Logger.getLogger("virbo.autoplot");
     /**
      * dataset with fill data has been recalculated
