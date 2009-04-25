@@ -18,29 +18,31 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-<ul><li>autohistogram has nice bin boundaries.
+<ul><li> AutoHistogram has nice bin boundaries.
 </li><li> don't display legacy stats, only display stats from autohistogram.
 </li><li> vap file URIs can have modifying parameters, like c:/foo.vap?timeRange=2009-04-24
 </li><li> various bugfixes.
 </li><li> bugfix 2620792: metadata shows up again.
 </li><li> bugfixes in Excel file support, GUI editor.
 </li><li> bugfix in autorange when CADENCE is set but MONOTONIC is not.
+
 </li><li> introduce "slide right" feature to "TearOffTabbedPane" component that allows easy side-by-side views.
 </li><li> bugfix 2771492: improve handling of spaces in URIs.
 </li><li> clean up legend label, etc.
 </li><li> bugfix 2769878: echo wrote to pdf
 </li><li> remove extra das2 context menu actions (print to SVG, etc).
-</li>
 </li></ul>
 <p>Known Bugs:
 </p>
-<ul><li> 2769881 delete parent panel, then switch to spectrogram
+<ul><li> 2781154  	 guessCadence isn't invoked on vap load
+</li><li> 2781151  	 panel selection as plot focus is changed
+</li><li> 2769881 delete parent panel, then switch to spectrogram
 </li><li> 2769879 export data needs to remember last output
-</li><li> 2769878 echo wrote to pdf
 </li><li> 2712135 FileSystemCompletions needs to account for wildcards
 </li><li> 2702937 dataset URI in selector needs to update with panel focus
 </li><li> 2771492 spaces in Windows filenames causing problems again
 </li></ul>
+
 
 <p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
