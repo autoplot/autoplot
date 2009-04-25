@@ -8,7 +8,7 @@
 	<img src="screen.png">
         <p><small>"Add Panel..." dialog makes it easier to have multiple panels and correlation plots.</small></p>
 
-	<p>This demonstration application attempts to allow plotting of data from many data sources, including local files and dods servers.  
+	<p>This demonstration application attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.  Additional metadata can then 
 be applied to the data, for example, specifying valid range and fill data.
@@ -18,16 +18,19 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-<ul><li> ascii data source: automatic skip lines in ascii file parser
-</li><li> ascii data source: bugfix: two column ascii table works again.
-</li><li> ascii data source: bugfix: time column detected again.
-</li><li> cdf data source: rank 3 double arrays supported.
-</li><li> bugfix: metadata panel shows data source metadata again.
+<ul>autohistogram has nice bin boundaries.
+<li> don't display legacy stats, only display stats from autohistogram.
+</li><li> vap file URIs can have modifying parameters, like c:/foo.vap?timeRange=2009-04-24
+</li><li> various bugfixes.
+</li><li> bugfix 2620792: metadata shows up again.
+</li><li> bugfixes in Excel file support, GUI editor.
+</li><li> bugfix in autorange when CADENCE is set but MONOTONIC is not.
+</li><li> introduce "slide right" feature to "TearOffTabbedPane" component that allows easy side-by-side views.
+</li><li> bugfix 2771492: improve handling of spaces in URIs.
 </li></ul>
 <p>Known Bugs:
 </p>
 <ul><li> 2769881 delete parent panel, then switch to spectrogram
-
 </li><li> 2769879 export data needs to remember last output
 </li><li> 2769878 echo wrote to pdf
 </li><li> 2712135 FileSystemCompletions needs to account for wildcards
