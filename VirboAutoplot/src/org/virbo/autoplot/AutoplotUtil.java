@@ -69,6 +69,7 @@ import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dsops.Ops;
+import org.virbo.dsutil.AutoHistogram;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -80,11 +81,10 @@ import org.xml.sax.SAXException;
 public class AutoplotUtil {
 
     private final static Logger log = Logger.getLogger("virbo.autoplot.AutoRangeDescriptor.autoRange");
-
     /**
      * absolute length limit for plots.  This is used to limit the elements used in autoranging, etc.
      */
-    public final static int DS_LENGTH_LIMIT= 10000000;
+    public final static int DS_LENGTH_LIMIT = 10000000;
 
     /**
      * this is not used.  It is called from createIcon, which is not used.
@@ -94,25 +94,25 @@ public class AutoplotUtil {
      * @param cb
      * @return
      */
-    static DasPlot createPlot( DasCanvas c, QDataSet ds, DasPlot recyclable, DasColorBar cb ) {
-        DasRow row= DasRow.create(c);            
-        DasColumn col= DasColumn.create(c);
+    static DasPlot createPlot(DasCanvas c, QDataSet ds, DasPlot recyclable, DasColorBar cb) {
+        DasRow row = DasRow.create(c);
+        DasColumn col = DasColumn.create(c);
         DasPlot result;
-        if ( recyclable!=null ) {
-            result= recyclable;
+        if (recyclable != null) {
+            result = recyclable;
         } else {
-            result= DasPlot.createDummyPlot();
+            result = DasPlot.createDummyPlot();
         }
-        List<Renderer> recycleRends= Arrays.asList( result.getRenderers() );
-        
-        ApplicationModel.RenderType type= AutoplotUtil.getRenderType(ds);
-        List<Renderer> rends= AutoplotUtil.getRenderers( ds, type, recycleRends, cb);
-        
-        for ( Renderer rend1: rends ) {
-            result.addRenderer( rend1 );
+        List<Renderer> recycleRends = Arrays.asList(result.getRenderers());
+
+        ApplicationModel.RenderType type = AutoplotUtil.getRenderType(ds);
+        List<Renderer> rends = AutoplotUtil.getRenderers(ds, type, recycleRends, cb);
+
+        for (Renderer rend1 : rends) {
+            result.addRenderer(rend1);
         }
-        
-        c.add( result, row, col );
+
+        c.add(result, row, col);
         c.revalidate();
         c.validate();
         System.err.println(c.getBounds());
@@ -121,7 +121,7 @@ public class AutoplotUtil {
         System.err.println(result.getBounds());
         return result;
     }
-    
+
     /**
      * creates an icon for the dataset.  Presently this just grabs the autoplot canvas image,
      * but it should really create a small canvas and let das2 reduce the data before
@@ -130,21 +130,21 @@ public class AutoplotUtil {
      * @param surl
      * @return
      */
-    public static ImageIcon createIcon( ApplicationModel model, String surl ) {
+    public static ImageIcon createIcon(ApplicationModel model, String surl) {
         try {
-            QDataSet ds= org.virbo.jythonsupport.Util.getDataSet(surl);
-            DasCanvas c= new DasCanvas( 320, 320 );
-            c.setSize(320,320);
-            DasPlot p= AutoplotUtil.createPlot( c, ds, null, null );
+            QDataSet ds = org.virbo.jythonsupport.Util.getDataSet(surl);
+            DasCanvas c = new DasCanvas(320, 320);
+            c.setSize(320, 320);
+            DasPlot p = AutoplotUtil.createPlot(c, ds, null, null);
             p.getRow().setMinimum(0);
             p.getRow().setMaximum(1);
             p.getColumn().setMinimum(0);
             p.getColumn().setMaximum(1);
-            JFrame f= new JFrame();
+            JFrame f = new JFrame();
             f.getContentPane().add(c);
-            BufferedImage image = (BufferedImage) c.getImage( 320, 320 );
-            return scaleIcon( new ImageIcon( image ), 64, 48 );
-        } catch ( Exception e ) {
+            BufferedImage image = (BufferedImage) c.getImage(320, 320);
+            return scaleIcon(new ImageIcon(image), 64, 48);
+        } catch (Exception e) {
             BufferedImage image;
             try {
                 image = ImageIO.read(AutoplotUtil.class.getResource("/org/virbo/autoplot/resources/error-icon.png"));
@@ -152,7 +152,7 @@ public class AutoplotUtil {
                 Logger.getLogger(AutoplotUtil.class.getName()).log(Level.SEVERE, null, ex);
                 throw new RuntimeException(ex);
             }
-            return new ImageIcon( image );
+            return new ImageIcon(image);
         }
     }
 
@@ -164,31 +164,31 @@ public class AutoplotUtil {
      * @param h
      * @return
      */
-    public static ImageIcon scaleIcon(ImageIcon icon, int w, int h ) {
-        double aspect= icon.getIconHeight() / (double)icon.getIconWidth();
-        if ( h==-1 ) {
-            h= (int)( w * aspect );
-        } else if ( w==-1 ) {
-            w= (int)( h / aspect );
+    public static ImageIcon scaleIcon(ImageIcon icon, int w, int h) {
+        double aspect = icon.getIconHeight() / (double) icon.getIconWidth();
+        if (h == -1) {
+            h = (int) (w * aspect);
+        } else if (w == -1) {
+            w = (int) (h / aspect);
         }
-        BufferedImage image = (BufferedImage)icon.getImage();
-        return new ImageIcon( scaleImage( image, w, h ) );
+        BufferedImage image = (BufferedImage) icon.getImage();
+        return new ImageIcon(scaleImage(image, w, h));
     }
-    
-    public static BufferedImage scaleImage( BufferedImage image, int w, int h ) {
-        BufferedImage result= new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
-        Graphics2D g2= (Graphics2D)result.getGraphics();
-        g2.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
-        g2.setTransform( AffineTransform.getScaleInstance( w/(double)image.getWidth(), h/(double)image.getHeight() ) );
-        g2.drawImage( image, 0, 0, null  );
+
+    public static BufferedImage scaleImage(BufferedImage image, int w, int h) {
+        BufferedImage result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = (Graphics2D) result.getGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setTransform(AffineTransform.getScaleInstance(w / (double) image.getWidth(), h / (double) image.getHeight()));
+        g2.drawImage(image, 0, 0, null);
         return result;
     }
 
-    public static List<String> getUrls( List<Bookmark> recent ) {
+    public static List<String> getUrls(List<Bookmark> recent) {
         List<String> urls = new ArrayList<String>(recent.size());
 
         for (Bookmark b : recent) {
-            if ( b instanceof  Bookmark.Item ) {
+            if (b instanceof Bookmark.Item) {
                 urls.add(((Bookmark.Item) b).getUrl());
             }
         }
@@ -208,16 +208,16 @@ public class AutoplotUtil {
         }
     }
 
-    private static DatumRange getRange( Double min, Double max, Units units ) {
-        if ( units!=null && UnitsUtil.isTimeLocation(units) ) {
-            if ( min==null ) min= Units.mj1958.convertDoubleTo(units, -100000);
-            if ( max==null ) max= Units.mj1958.convertDoubleTo(units, 100000);
+    private static DatumRange getRange(Double min, Double max, Units units) {
+        if (units != null && UnitsUtil.isTimeLocation(units)) {
+            if (min == null) min = Units.mj1958.convertDoubleTo(units, -100000);
+            if (max == null) max = Units.mj1958.convertDoubleTo(units, 100000);
         } else {
-            if ( min==null ) min= Double.NEGATIVE_INFINITY;
-            if ( max==null ) max= Double.POSITIVE_INFINITY;
-            if ( units==null ) units= Units.dimensionless;
+            if (min == null) min = Double.NEGATIVE_INFINITY;
+            if (max == null) max = Double.POSITIVE_INFINITY;
+            if (units == null) units = Units.dimensionless;
         }
-        return new DatumRange( min, max, units );
+        return new DatumRange(min, max, units);
     }
 
     private static DatumRange makeDimensionless(DatumRange dr) {
@@ -225,6 +225,186 @@ public class AutoplotUtil {
         return new DatumRange(dr.min().doubleValue(u),
                 dr.max().doubleValue(u),
                 Units.dimensionless);
+    }
+
+    public static AutoRangeDescriptor autoRange(QDataSet hist, QDataSet ds, Map properties) {
+
+        log.fine("enter autoRange");
+
+        Units u = (Units) ds.property(QDataSet.UNITS);
+        if (u == null) {
+            u = Units.dimensionless;
+        }
+
+        AutoRangeDescriptor result = new AutoRangeDescriptor();
+
+        double[] dd;
+
+        boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC)) || null != ds.property(QDataSet.CADENCE);
+
+        long total = (Long) ((Map) hist.property(QDataSet.USER_PROPERTIES)).get(AutoHistogram.USER_PROP_TOTAL);
+
+        double median = Double.NaN;
+
+        if (mono) {
+            RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds, null);
+            if (cadence == null || cadence.value() > Double.MAX_VALUE / 100)
+                cadence = DRank0DataSet.create(0.);
+            if (ds.length() > 1) {
+                double min = Math.min(ds.value(0), ds.value(ds.length() - 1));
+                double max = Math.max(ds.value(0), ds.value(ds.length() - 1));
+                double dcadence = Math.abs(cadence.value());
+                if ("log".equals(cadence.property(QDataSet.SCALE_TYPE))) {
+                    Units cu = (Units) cadence.property(QDataSet.UNITS);
+                    double factor = (cu.convertDoubleTo(Units.percentIncrease, dcadence) + 100) / 100.;
+                    dd = new double[]{min / factor, max * factor};
+                } else {
+                    dd = new double[]{min - dcadence, max + dcadence};
+                }
+            } else {
+                if (UnitsUtil.isTimeLocation(u)) {
+                    dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
+                } else {
+                    dd = new double[]{0, 1};
+                }
+            }
+            median = (dd[0] + dd[1]) / 2;
+        } else {
+            dd = new double[]{Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY};
+            QDataSet dep0 = (QDataSet) hist.property(QDataSet.DEPEND_0);
+            QDataSet cadence = DataSetUtil.guessCadenceNew(dep0, null);
+            int tot = 0;
+            for (int i = 0; i < hist.length(); i++) {
+                tot += hist.value(i);
+                if (dd[0] == Double.NEGATIVE_INFINITY && hist.value(i) > 0) {
+                    dd[0] = dep0.value(i);
+                }
+                if (hist.value(i) > 0) {
+                    dd[1] = dep0.value(i) + cadence.value();  // TODO: log10
+                }
+                if (tot >= total / 2) {
+                    median = dep0.value(i);
+                }
+            }
+        }
+
+        if (total < 3) {
+            result.median = median;
+            result.range = DatumRange.newDatumRange(dd[0], dd[1], u);
+            result.robustMin = dd[0];
+            result.robustMax = dd[1];
+
+        } else {
+            result.median = median;
+            result.robustMin = dd[0];
+            result.robustMax = dd[1];
+
+            double nomMin, nomMax;
+            if (mono) {
+                nomMin = ds.value(0);
+                nomMax = ds.value(ds.length() - 1);
+            } else {
+                nomMin = dd[0];
+                nomMax = dd[1];
+            }
+
+            // lin/log logic: in which space is ( median - min5 ) more equal to ( max5 - median )?  Also, max5 / min5 > 1e3
+            double clin = (nomMax - result.median) / (result.median - nomMin);
+            if (clin > 1.0) {
+                clin = 1 / clin;
+            }
+            double clog = (nomMax / result.median) / Math.abs(result.median / nomMin);
+            if (clog > 1.0) {
+                clog = 1 / clog;
+            }
+
+            if (clog > clin && nomMax / nomMin > 1e2) {
+                result.log = true;
+            }
+
+            result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
+
+        }
+
+        if ("log".equals(ds.property(QDataSet.SCALE_TYPE))) {
+            result.log = true;
+        }
+
+        // interpret properties, looking for hints about scale type and ranges.
+        if (properties != null) {
+            String log1 = (String) properties.get(QDataSet.SCALE_TYPE);
+            if (log1 != null) {
+                result.log = log1.equals("log");
+            }
+            Double tmin = (Double) properties.get(QDataSet.TYPICAL_MIN);
+            Double tmax = (Double) properties.get(QDataSet.TYPICAL_MAX);
+            DatumRange range = getRange(
+                    (Double) properties.get(QDataSet.TYPICAL_MIN),
+                    (Double) properties.get(QDataSet.TYPICAL_MAX),
+                    (Units) properties.get(QDataSet.UNITS));
+            // see if the typical extent is consistent with extent seen.  If the
+            // typical extent won't hide the data's structure, then use it.
+            if ((tmin != null || tmax != null)) {
+                double d1, d2;
+                if (result.log) {
+                    try {
+                        Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
+                        Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
+                        d1 = DatumRangeUtil.normalizeLog(range, dd1);
+                        d2 = DatumRangeUtil.normalizeLog(range, dd2);
+                    } catch (InconvertibleUnitsException ex) {
+                        range = makeDimensionless(range);
+                        result.range = makeDimensionless(result.range);
+                        Datum dd1 = result.range.min().ge(range.min()) ? result.range.min() : range.min();
+                        Datum dd2 = result.range.max().ge(range.min()) ? result.range.max() : range.min();
+                        d1 = DatumRangeUtil.normalizeLog(range, dd1);
+                        d2 = DatumRangeUtil.normalizeLog(range, dd2);
+                    }
+                } else {
+                    try {
+                        d1 = DatumRangeUtil.normalize(range, result.range.min());
+                        d2 = DatumRangeUtil.normalize(range, result.range.max());
+                    } catch (InconvertibleUnitsException ex) {
+                        range = makeDimensionless(range);
+                        result.range = makeDimensionless(result.range);
+                        d1 = DatumRangeUtil.normalize(range, result.range.min());
+                        d2 = DatumRangeUtil.normalize(range, result.range.max());
+                    }
+                }
+                if (d2 - d1 > 0.1 // the stats range occupies 10% of the typical range
+                        && d2 > 0. // and the stats max is greater than the typical range min()
+                        && d1 < 1.) {  // and the stats min is less then the typical range max().
+                    result.range = range;
+                    // just use the metadata settings.
+
+                    return result; // DANGER--EXIT POINT
+
+                }
+            }
+
+        }
+        
+         // round out to frame the data with empty space, so that the data extent is known.
+        if (UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u)) {
+            if (result.log) {
+                if (result.robustMin <= 0.0)
+                    result.robustMin = result.robustMax / 1e3;
+                result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
+                        DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
+            } else {
+                result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
+                if (result.robustMin < result.robustMax)
+                    result.range = DatumRangeUtil.rescale(result.range, -0.05, 1.05);
+                if (result.robustMin == 0 && result.robustMax == 0)
+                    result.range = DatumRange.newDatumRange(-0.1, 1.0, u);
+            }
+        } else {
+            result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
+        }
+
+        log.fine("exit autoRange");
+
+        return result;
     }
 
     /**
@@ -241,7 +421,7 @@ public class AutoplotUtil {
      * @param properties
      * @return
      */
-    public static AutoRangeDescriptor autoRange( QDataSet ds, Map properties ) {
+    public static AutoRangeDescriptor autoRange(QDataSet ds, Map properties) {
 
         log.fine("enter autoRange");
 
@@ -254,21 +434,22 @@ public class AutoplotUtil {
 
         double[] dd;
 
-        boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC)) || null!=ds.property(QDataSet.CADENCE);
+        boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC)) || null != ds.property(QDataSet.CADENCE);
 
         if (mono) {
-            RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds,null);
-            if ( cadence==null || cadence.value() > Double.MAX_VALUE / 100 ) cadence= DRank0DataSet.create(0.);
+            RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds, null);
+            if (cadence == null || cadence.value() > Double.MAX_VALUE / 100)
+                cadence = DRank0DataSet.create(0.);
             if (ds.length() > 1) {
-                double min= Math.min( ds.value(0), ds.value(ds.length()-1) );
-                double max= Math.max( ds.value(0), ds.value(ds.length()-1) );
-                double dcadence= Math.abs(cadence.value());
-                if ( "log".equals(cadence.property(QDataSet.SCALE_TYPE) ) ) {
-                    Units cu= (Units) cadence.property(QDataSet.UNITS);
-                    double factor= ( cu.convertDoubleTo( Units.percentIncrease, dcadence ) + 100 ) / 100.;
-                    dd = new double[]{ min/factor, max*factor };
+                double min = Math.min(ds.value(0), ds.value(ds.length() - 1));
+                double max = Math.max(ds.value(0), ds.value(ds.length() - 1));
+                double dcadence = Math.abs(cadence.value());
+                if ("log".equals(cadence.property(QDataSet.SCALE_TYPE))) {
+                    Units cu = (Units) cadence.property(QDataSet.UNITS);
+                    double factor = (cu.convertDoubleTo(Units.percentIncrease, dcadence) + 100) / 100.;
+                    dd = new double[]{min / factor, max * factor};
                 } else {
-                    dd = new double[]{ min-dcadence, max+dcadence };
+                    dd = new double[]{min - dcadence, max + dcadence};
                 }
             } else {
                 if (UnitsUtil.isTimeLocation(u)) {
@@ -355,12 +536,12 @@ public class AutoplotUtil {
                 result.log = true;
             }
 
-            result.range= DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
-            
+            result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
+
         }
 
-        if ( "log".equals( ds.property( QDataSet.SCALE_TYPE ) ) ) {
-            result.log= true;
+        if ("log".equals(ds.property(QDataSet.SCALE_TYPE))) {
+            result.log = true;
         }
 
         // interpret properties, looking for hints about scale type and ranges.
@@ -404,14 +585,14 @@ public class AutoplotUtil {
                         d2 = DatumRangeUtil.normalize(range, result.range.max());
                     }
                 }
-                if ( d2 - d1 > 0.1    // the stats range occupies 10% of the typical range
-                        && d2 > 0.    // and the stats max is greater than the typical range min()
-                        && d1 < 1. ) {  // and the stats min is less then the typical range max().
+                if (d2 - d1 > 0.1 // the stats range occupies 10% of the typical range
+                        && d2 > 0. // and the stats max is greater than the typical range min()
+                        && d1 < 1.) {  // and the stats min is less then the typical range max().
                     result.range = range;
                     // just use the metadata settings.
 
                     return result; // DANGER--EXIT POINT
-                    
+
                 }
             }
         }
@@ -424,9 +605,11 @@ public class AutoplotUtil {
                 result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
                         DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
             } else {
-                result.range= DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
-                if ( result.robustMin < result.robustMax ) result.range = DatumRangeUtil.rescale( result.range, -0.05, 1.05);
-                if ( result.robustMin==0 && result.robustMax==0 ) result.range= DatumRange.newDatumRange( -0.1, 1.0, u);
+                result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
+                if (result.robustMin < result.robustMax)
+                    result.range = DatumRangeUtil.rescale(result.range, -0.05, 1.05);
+                if (result.robustMin == 0 && result.robustMax == 0)
+                    result.range = DatumRange.newDatumRange(-0.1, 1.0, u);
             }
         } else {
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
@@ -472,7 +655,6 @@ public class AutoplotUtil {
         }
     }
 
-
     public static Document readDoc(InputStream is) throws SAXException, IOException, ParserConfigurationException {
         DocumentBuilder builder;
         builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -499,9 +681,9 @@ public class AutoplotUtil {
     private static double[] simpleRange(QDataSet ds) {
         QDataSet max = ds;
         QDataSet min = ds;
-        Units u= (Units) ds.property(QDataSet.UNITS);
-        if ( u==null ) u=Units.dimensionless;
-        
+        Units u = (Units) ds.property(QDataSet.UNITS);
+        if (u == null) u = Units.dimensionless;
+
         QDataSet delta;
         delta = (QDataSet) ds.property(QDataSet.DELTA_PLUS);
         if (delta != null) {
@@ -517,18 +699,20 @@ public class AutoplotUtil {
         QDataSet wmax = DataSetUtil.weightsDataSet(max);
         QubeDataSetIterator it = new QubeDataSetIterator(ds);
         double[] result = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
-        int i=0;
-        while ( i<DS_LENGTH_LIMIT && it.hasNext()) {
+        int i = 0;
+        while (i < DS_LENGTH_LIMIT && it.hasNext()) {
             it.next();
             i++;
-            if (it.getValue(wmin) > 0.) result[0] = Math.min(result[0], it.getValue(min));
-            if (it.getValue(wmax) > 0.) result[1] = Math.max(result[1], it.getValue(max));
+            if (it.getValue(wmin) > 0.)
+                result[0] = Math.min(result[0], it.getValue(min));
+            if (it.getValue(wmax) > 0.)
+                result[1] = Math.max(result[1], it.getValue(max));
         }
-        
+
         if (result[0] == Double.POSITIVE_INFINITY) {  // no valid data!
-            if ( UnitsUtil.isTimeLocation(u) ) {
-                result[0] = Units.t2000.convertDoubleTo( u,0. );
-                result[1] = Units.t2000.convertDoubleTo( u, 86400 ); // avoid bug where rounding error in formatting of newDatumRange(0,1,t2000) resulted in invalid datm
+            if (UnitsUtil.isTimeLocation(u)) {
+                result[0] = Units.t2000.convertDoubleTo(u, 0.);
+                result[1] = Units.t2000.convertDoubleTo(u, 86400); // avoid bug where rounding error in formatting of newDatumRange(0,1,t2000) resulted in invalid datm
             } else {
                 result[0] = 0.;
                 result[1] = 1.;
@@ -536,7 +720,6 @@ public class AutoplotUtil {
         }
         return result;
     }
-
 
     /**
      * Rewrite the dataset so that fill values are set by the valid extent and fill
@@ -546,42 +729,45 @@ public class AutoplotUtil {
      * Old values of vmin, vmax, and fill are ignored.
      * 
      */
-    public static void applyFillValidRange( MutablePropertyDataSet ds, double vmin, double vmax, double fill) {
-        
-        Double ovmin= (Double) ds.property( QDataSet.VALID_MIN );
-        Double ovmax= (Double) ds.property( QDataSet.VALID_MAX );
-        
-        boolean needToCopy= false;
+    public static void applyFillValidRange(MutablePropertyDataSet ds, double vmin, double vmax, double fill) {
+
+        Double ovmin = (Double) ds.property(QDataSet.VALID_MIN);
+        Double ovmax = (Double) ds.property(QDataSet.VALID_MAX);
+
+        boolean needToCopy = false;
         // if the old valid range contains the new range, then we simply reset the range.
-        if ( ovmax!=null && ovmax<vmax ) needToCopy= true;
-        if ( ovmin!=null && ovmin>vmin ) needToCopy= true;
-        
-        Double oldFill= (Double) ds.property( QDataSet.FILL_VALUE );
-        
-        if ( oldFill!=null && Double.isNaN(fill)==false && oldFill!=fill ) needToCopy= true;
-                
+        if (ovmax != null && ovmax < vmax) needToCopy = true;
+        if (ovmin != null && ovmin > vmin) needToCopy = true;
+
+        Double oldFill = (Double) ds.property(QDataSet.FILL_VALUE);
+
+        if (oldFill != null && Double.isNaN(fill) == false && oldFill != fill)
+            needToCopy = true;
+
         // always clobber old fill values.  This allows for fill data itself to be plotted.
-        needToCopy= false;
-        
-        if ( needToCopy==false ) {
-            if ( vmin>(-1*Double.MAX_VALUE) ) ds.putProperty(QDataSet.VALID_MIN, vmin );
-            if ( vmax<Double.MAX_VALUE ) ds.putProperty(QDataSet.VALID_MAX, vmax );
-            if ( !Double.isNaN(fill) ) ds.putProperty(QDataSet.FILL_VALUE, fill );
-            
+        needToCopy = false;
+
+        if (needToCopy == false) {
+            if (vmin > (-1 * Double.MAX_VALUE))
+                ds.putProperty(QDataSet.VALID_MIN, vmin);
+            if (vmax < Double.MAX_VALUE)
+                ds.putProperty(QDataSet.VALID_MAX, vmax);
+            if (!Double.isNaN(fill)) ds.putProperty(QDataSet.FILL_VALUE, fill);
+
         } else {
             /*Units u = (Units) ds.property(QDataSet.UNITS);
 
             if (u == null) {
-                u = Units.dimensionless;
+            u = Units.dimensionless;
             }
 
             QubeDataSetIterator it= new QubeDataSetIterator(ds);
             while ( it.hasNext() ) {
-                it.next();
-                double d = it.getValue(ds);
-                if (d == fill || d < vmin || d > vmax) {
-                    it.putValue(ds, u.getFillDouble());
-                }
+            it.next();
+            double d = it.getValue(ds);
+            if (d == fill || d < vmin || d > vmax) {
+            it.putValue(ds, u.getFillDouble());
+            }
             }
 
             ds.putProperty(QDataSet.UNITS, u);*/
@@ -630,7 +816,7 @@ public class AutoplotUtil {
         if (deflt == null)
             return properties;
         HashMap<String, Object> result = new HashMap<String, Object>(deflt);
-        for ( Entry<String,Object> entry : properties.entrySet()) {
+        for (Entry<String, Object> entry : properties.entrySet()) {
             Object val = entry.getValue();
             String key = entry.getKey();
             if (val instanceof Map) {
@@ -685,25 +871,26 @@ public class AutoplotUtil {
             return deft;
         }
     }
-    
+
     /**
      * set the device position, using spec string like "+5em,80%-5em"
      */
-    public static void setDevicePosition( DasDevicePosition row, String spec ) throws ParseException {
-        int i= spec.indexOf(",");
-        if ( i==-1 ) throw new IllegalArgumentException("spec must contain one comma");
-        double[] ddmin= DasDevicePosition.parseFormatStr(spec.substring(0,i));
-        double[] ddmax= DasDevicePosition.parseFormatStr(spec.substring(i+1));
+    public static void setDevicePosition(DasDevicePosition row, String spec) throws ParseException {
+        int i = spec.indexOf(",");
+        if (i == -1)
+            throw new IllegalArgumentException("spec must contain one comma");
+        double[] ddmin = DasDevicePosition.parseFormatStr(spec.substring(0, i));
+        double[] ddmax = DasDevicePosition.parseFormatStr(spec.substring(i + 1));
         row.setMinimum(ddmin[0]);
         row.setEmMinimum(ddmin[1]);
-        row.setPtMinimum((int)ddmin[2]);
+        row.setPtMinimum((int) ddmin[2]);
         row.setMaximum(ddmax[0]);
         row.setEmMaximum(ddmax[1]);
-        row.setPtMaximum((int)ddmax[2]);        
-    }    
-    
-    public static String formatDevicePosition( DasDevicePosition pos ) {
-        return DasDevicePosition.formatLayoutStr( pos, true ) + ", "+DasDevicePosition.formatLayoutStr( pos, false );
+        row.setPtMaximum((int) ddmax[2]);
+    }
+
+    public static String formatDevicePosition(DasDevicePosition pos) {
+        return DasDevicePosition.formatLayoutStr(pos, true) + ", " + DasDevicePosition.formatLayoutStr(pos, false);
     }
 
     private static boolean isVectorOrBundleIndex(QDataSet dep1) {
@@ -719,41 +906,41 @@ public class AutoplotUtil {
 
         return result;
     }
-    
+
     public static RenderType getRenderType(QDataSet fillds) {
         RenderType spec;
 
         QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
-        QDataSet plane0= (QDataSet) fillds.property(QDataSet.PLANE_0);
+        QDataSet plane0 = (QDataSet) fillds.property(QDataSet.PLANE_0);
 
-        if ( fillds.rank() >= 2 ) {
-            if ( dep1 != null && isVectorOrBundleIndex(dep1) ) {
-                if ( fillds.length()>200000 ) {
-                    spec= RenderType.hugeScatter;
+        if (fillds.rank() >= 2) {
+            if (dep1 != null && isVectorOrBundleIndex(dep1)) {
+                if (fillds.length() > 200000) {
+                    spec = RenderType.hugeScatter;
                 } else {
                     spec = RenderType.series;
                 }
             } else {
-                spec= RenderType.spectrogram;
+                spec = RenderType.spectrogram;
             }
         } else {
-            if ( fillds.length()>200000 ) {
-               spec= RenderType.hugeScatter;
+            if (fillds.length() > 200000) {
+                spec = RenderType.hugeScatter;
             } else {
-               spec= RenderType.series;
+                spec = RenderType.series;
             }
 
-            if ( plane0 !=null ) {
-                Units u= (Units) plane0.property(QDataSet.UNITS);
-                if ( u!=null && ( UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u) ) ) {
-                    spec= RenderType.colorScatter;
+            if (plane0 != null) {
+                Units u = (Units) plane0.property(QDataSet.UNITS);
+                if (u != null && (UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u))) {
+                    spec = RenderType.colorScatter;
                 }
             }
         }
-        
+
         return spec;
     }
-    
+
     /**
      * return a renderer that is configured for this renderType.
      * @param renderType
@@ -761,10 +948,10 @@ public class AutoplotUtil {
      * @param colorbar
      * @return
      */
-    public static Renderer maybeCreateRenderer( RenderType renderType,
-            Renderer recyclable, DasColorBar colorbar ) {
+    public static Renderer maybeCreateRenderer(RenderType renderType,
+            Renderer recyclable, DasColorBar colorbar) {
         if (renderType == RenderType.spectrogram) {
-            if ( recyclable != null && recyclable instanceof SpectrogramRenderer) {
+            if (recyclable != null && recyclable instanceof SpectrogramRenderer) {
                 return recyclable;
             } else {
                 Renderer result = new SpectrogramRenderer(null, colorbar);
@@ -772,59 +959,59 @@ public class AutoplotUtil {
                 colorbar.setVisible(true);
                 return result;
             }
-        } else if ( renderType==RenderType.hugeScatter ) {
-            if ( recyclable != null && recyclable instanceof ImageVectorDataSetRenderer ) {
+        } else if (renderType == RenderType.hugeScatter) {
+            if (recyclable != null && recyclable instanceof ImageVectorDataSetRenderer) {
                 return recyclable;
             } else {
-                Renderer result = new ImageVectorDataSetRenderer( null );
+                Renderer result = new ImageVectorDataSetRenderer(null);
                 result.setDataSetLoader(null);
                 colorbar.setVisible(false);
                 return result;
             }
         } else {
-                SeriesRenderer result;
-                if (recyclable != null && recyclable instanceof SeriesRenderer) {
-                    result = (SeriesRenderer) recyclable;
-                } else {
-                    result= new SeriesRenderer();
-                    result.setDataSetLoader(null);
-                }
+            SeriesRenderer result;
+            if (recyclable != null && recyclable instanceof SeriesRenderer) {
+                result = (SeriesRenderer) recyclable;
+            } else {
+                result = new SeriesRenderer();
+                result.setDataSetLoader(null);
+            }
 
-                if ( renderType==RenderType.colorScatter ) {
-                    result.setColorBar(colorbar);
-                    result.setColorByDataSetId( QDataSet.PLANE_0 ); //schema
-                    colorbar.setVisible(true);
-                } else {
-                    result.setColorByDataSetId( "" ); //schema
-                    colorbar.setVisible(false);
-                }
-            
-                if (renderType == RenderType.series) {
-                    result.setPsymConnector(PsymConnector.SOLID);
-                    result.setHistogram(false);
-                    result.setFillToReference(false);
+            if (renderType == RenderType.colorScatter) {
+                result.setColorBar(colorbar);
+                result.setColorByDataSetId(QDataSet.PLANE_0); //schema
+                colorbar.setVisible(true);
+            } else {
+                result.setColorByDataSetId(""); //schema
+                colorbar.setVisible(false);
+            }
 
-                } else if (renderType == RenderType.scatter) {
-                    result.setPsymConnector(PsymConnector.NONE);
-                    result.setFillToReference(false);
+            if (renderType == RenderType.series) {
+                result.setPsymConnector(PsymConnector.SOLID);
+                result.setHistogram(false);
+                result.setFillToReference(false);
 
-                } else if ( renderType==RenderType.colorScatter ) {
-                    result.setPsymConnector(PsymConnector.NONE);
-                    result.setFillToReference(false);
+            } else if (renderType == RenderType.scatter) {
+                result.setPsymConnector(PsymConnector.NONE);
+                result.setFillToReference(false);
 
-                } else if (renderType == RenderType.histogram) {
-                    result.setPsymConnector(PsymConnector.SOLID);
-                    result.setFillToReference(true);
-                    result.setHistogram(true);
+            } else if (renderType == RenderType.colorScatter) {
+                result.setPsymConnector(PsymConnector.NONE);
+                result.setFillToReference(false);
 
-                } else if (renderType == RenderType.fill_to_zero) {
-                    result.setPsymConnector(PsymConnector.SOLID);
-                    result.setFillToReference(true);
-                    result.setHistogram(false);
+            } else if (renderType == RenderType.histogram) {
+                result.setPsymConnector(PsymConnector.SOLID);
+                result.setFillToReference(true);
+                result.setHistogram(true);
 
-                }
+            } else if (renderType == RenderType.fill_to_zero) {
+                result.setPsymConnector(PsymConnector.SOLID);
+                result.setFillToReference(true);
+                result.setHistogram(false);
 
-              return result;
+            }
+
+            return result;
         }
 
     }
@@ -839,7 +1026,7 @@ public class AutoplotUtil {
      * @param recyclable Reuse these if possible to reduce jitter.  May be null.
      * @return
      */
-    public static List<Renderer> getRenderers( QDataSet ds, RenderType renderType, 
+    public static List<Renderer> getRenderers(QDataSet ds, RenderType renderType,
             List<Renderer> recyclable, DasColorBar colorbar) {
         if (recyclable == null) recyclable = Collections.emptyList();
         if (renderType == RenderType.spectrogram) {
@@ -859,20 +1046,20 @@ public class AutoplotUtil {
                 SeriesRenderer result1;
                 if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SeriesRenderer) {
                     result = recyclable;
-                    result1= (SeriesRenderer) result.get(0);
+                    result1 = (SeriesRenderer) result.get(0);
                 } else {
-                    result1= new SeriesRenderer();
+                    result1 = new SeriesRenderer();
                     result1.setDataSetLoader(null);
-                    result = Collections.singletonList( (Renderer) result1  );
+                    result = Collections.singletonList((Renderer) result1);
                 }
                 result.get(0).setDataSet(VectorDataSetAdapter.create(ds));
-                
-                if ( renderType==RenderType.colorScatter ) {
+
+                if (renderType == RenderType.colorScatter) {
                     result1.setColorBar(colorbar);
-                    result1.setColorByDataSetId( QDataSet.PLANE_0 ); //schema
+                    result1.setColorByDataSetId(QDataSet.PLANE_0); //schema
                     colorbar.setVisible(true);
                 } else {
-                    result1.setColorByDataSetId( "" ); //schema
+                    result1.setColorByDataSetId(""); //schema
                     colorbar.setVisible(false);
                 }
             } else {
@@ -909,10 +1096,10 @@ public class AutoplotUtil {
                     seriesRend.setPsymConnector(PsymConnector.NONE);
                     seriesRend.setFillToReference(false);
 
-                } else if ( renderType==RenderType.colorScatter ) {
+                } else if (renderType == RenderType.colorScatter) {
                     seriesRend.setPsymConnector(PsymConnector.NONE);
                     seriesRend.setFillToReference(false);
-                    
+
                 } else if (renderType == RenderType.histogram) {
                     seriesRend.setPsymConnector(PsymConnector.SOLID);
                     seriesRend.setFillToReference(true);
@@ -928,5 +1115,4 @@ public class AutoplotUtil {
             return result;
         }
     }
-
 }
