@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -241,11 +242,13 @@ public class LayoutUI extends javax.swing.JPanel {
             }
             List<Panel> p = app.getController().getPanelsFor(plot);
             List<Panel> allPanels = Arrays.asList(app.getPanels());
-            int[] indices = new int[p.size()];
+            List<Integer> indices = new ArrayList<Integer>();
             for (int i = 0; i < p.size(); i++) {
-                indices[i] = allPanels.indexOf(p.get(i));
+                if ( p.get(i).isActive() ) indices.add( allPanels.indexOf(p.get(i)) );
             }
-            panelListComponent.setSelectedIndices(indices);
+            int[] iindices= new int[indices.size()];
+            for ( int i=0; i<indices.size(); i++ ) iindices[i]= indices.get(i);
+            panelListComponent.setSelectedIndices(iindices);
             DasPlot dasPlot = app.getController().getPlot().getController().getDasPlot();
             canvasLayoutPanel1.setComponent(dasPlot);
         }
