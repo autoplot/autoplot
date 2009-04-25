@@ -229,7 +229,7 @@ public class AutoplotUtil {
 
     public static AutoRangeDescriptor autoRange(QDataSet hist, QDataSet ds, Map properties) {
 
-        log.fine("enter autoRange");
+        log.fine("enter autoRange "+ds );
 
         Units u = (Units) ds.property(QDataSet.UNITS);
         if (u == null) {
