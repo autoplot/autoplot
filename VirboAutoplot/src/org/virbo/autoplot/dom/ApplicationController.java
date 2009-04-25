@@ -249,6 +249,9 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
      */
     public synchronized DasCanvas addCanvas() {
         logger.fine("enter addCanvas");
+
+        DasCanvas.setDisableActions(true);
+        
         //if ( canvas!=null ) throw new IllegalArgumentException("only one canvas for now");
         DasCanvas dasCanvas = new DasCanvas();
         Canvas lcanvas = new Canvas();
