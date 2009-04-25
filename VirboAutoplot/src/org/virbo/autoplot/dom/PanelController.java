@@ -605,7 +605,13 @@ public class PanelController {
 
             AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, (Map) props.get(QDataSet.DEPEND_1));
 
-            AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs, props);
+            QDataSet hist= getDataSourceFilter().getController().getHistogram();
+            AutoplotUtil.AutoRangeDescriptor desc;
+            if ( false && hist!=null ) {
+                desc= AutoplotUtil.autoRange( hist, fillDs, props );
+            } else {
+                desc = AutoplotUtil.autoRange( fillDs, props );
+            }
 
             panelCopy.getPlotDefaults().getZaxis().setRange(desc.range);
             panelCopy.getPlotDefaults().getZaxis().setLog(desc.log);
@@ -627,8 +633,14 @@ public class PanelController {
 
             panelCopy.getStyle().setLineWidth(1.0f);
 
-            AutoplotUtil.AutoRangeDescriptor desc = AutoplotUtil.autoRange(fillDs, props);
-
+            QDataSet hist= getDataSourceFilter().getController().getHistogram();
+            AutoplotUtil.AutoRangeDescriptor desc;
+            if ( false && hist!=null ) {
+                desc= AutoplotUtil.autoRange( hist, fillDs, props );
+            } else {
+                desc = AutoplotUtil.autoRange( fillDs, props );
+            }
+            
             panelCopy.getPlotDefaults().getYaxis().setLog(desc.log);
             panelCopy.getPlotDefaults().getYaxis().setRange(desc.range);
 
