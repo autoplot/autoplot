@@ -28,6 +28,7 @@ import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.IDataSet;
+import org.virbo.dataset.LDataSet;
 import org.virbo.dataset.SDataSet;
 import org.virbo.dataset.WritableDataSet;
 
@@ -383,9 +384,12 @@ public class CdfUtil {
             } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE ) {
                 result = DDataSet.wrap((double[]) odata);
 
-            } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT4) {
+            } else if (varType == Variable.CDF_INT4  ) {
                 result = IDataSet.wrap((int[]) odata);
 
+            } else if (varType == Variable.CDF_UINT4 ) {
+                result = LDataSet.wrap((long[])odata);
+                
             } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
                 result = SDataSet.wrap((short[]) odata);
 
