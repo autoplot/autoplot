@@ -49,6 +49,8 @@ public class IstpMetadataModel extends MetadataModel {
             return ((Short) o).doubleValue();
         } else if (o instanceof Integer) {
             return ((Integer) o).doubleValue();
+        } else if (o instanceof Long) {
+            return ((Long) o).doubleValue();
         } else if (o instanceof Byte) {
             return ((Byte) o).doubleValue();
         } else if (o instanceof String) {
