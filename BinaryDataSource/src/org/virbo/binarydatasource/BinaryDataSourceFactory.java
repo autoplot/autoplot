@@ -73,8 +73,11 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "double") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "float") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "long") ); 
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "int") ); 
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "short") ); 
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "int") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "uint") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "truncatedFloat") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "short") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") ); 
                 return result;
@@ -85,9 +88,12 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "double") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "float") ); 
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "long") ); 
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "int") ); 
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "int") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "uint") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "truncatedFloat") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "short") ); 
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") ); 
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ushort") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "byte") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "ubyte") ); 
                 return result;
             } else if ( paramName.equals("byteOrder") ) {
