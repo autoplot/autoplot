@@ -39,7 +39,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     /**
      * the field type
      */
-    String type;
+    Object type;
 
     /**
      * the array backing the data
@@ -48,16 +48,18 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     
     private static final boolean RANGE_CHECK = true;
 
-    public final static String DOUBLE= "double";
-    public final static String FLOAT= "float";
-    public final static String LONG= "long";
-    public final static String INT= "int";
-    public final static String SHORT= "short";
-    public final static String USHORT= "ushort";
-    public final static String BYTE= "byte";
-    public final static String UBYTE= "ubyte";
+    public final static Object DOUBLE= "double";
+    public final static Object FLOAT= "float";
+    public final static Object TRUNCATEDFLOAT= "truncatedfloat";
+    public final static Object LONG= "long";
+    public final static Object INT= "int";
+    public final static Object UINT= "uint";
+    public final static Object SHORT= "short";
+    public final static Object USHORT= "ushort";
+    public final static Object BYTE= "byte";
+    public final static Object UBYTE= "ubyte";
     
-    public static int byteCount(String type) {
+    public static int byteCount(Object type) {
         if (type.equals(DOUBLE)) {
             return 8;
         } else if (type.equals(FLOAT)) {
@@ -66,6 +68,10 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
             return 8;
         } else if (type.equals(INT)) {
             return 4;
+        } else if (type.equals(UINT)) {
+            return 4;
+        } else if (type.equals(TRUNCATEDFLOAT)) {
+            return 2;
         } else if (type.equals(SHORT)) {
             return 2;
         } else if (type.equals(USHORT)) {
@@ -91,7 +97,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
      * @return
      */
-    public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, String type ) {
+    public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, Object type ) {
         if ( type.equals(DOUBLE) ) {
             return new Double( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(FLOAT) ) {
@@ -100,10 +106,14 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
             return new  Long( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(INT) ) {
             return new  Int( rank, reclen, recoffs, len0, len1, len2, buf );
+        } else if ( type.equals(UINT) ) {
+            return new  UInt( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(SHORT) ) {
             return new  Short( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(USHORT) ) {
             return new  UShort( rank, reclen, recoffs, len0, len1, len2, buf );
+        } else if ( type.equals(TRUNCATEDFLOAT) ) {
+            return new  TruncatedFloat( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(BYTE) ) {
             return new  Byte( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if (type.equals(UBYTE) ) {
@@ -113,7 +123,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         }
     }
 
-    public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, String type, ByteBuffer back  ) {
+    public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, Object type, ByteBuffer back  ) {
         this.back= back;
         this.rank = rank;
         this.reclen= reclen;
@@ -123,6 +133,10 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         this.len2 = len2;
         this.type= type;
         this.fieldLen= byteCount(type);
+    }
+
+    public Object getType() {
+        return this.type;
     }
 
     public int rank() {
@@ -225,6 +239,19 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
             return makeDataSet( rank-1, reclen, recoffset, len1, len2, 1, back, type );
         }
     }*/
+    
+    /**
+     * dump the contents to this buffer.
+     * @param buf
+     */
+    public void copyTo( ByteBuffer buf ) {
+        this.back.position( recoffset );
+        this.back.mark();
+        this.back.limit( recoffset + reclen * len0 );
+        buf.put( this.back );
+        this.back.reset();
+    }
+
     /**
      * copy the data to a writable buffer if it's not already writable.
      */
