@@ -561,6 +561,14 @@ public class DataSetURL {
         URLSplit split = URLSplit.parse(surl.substring(0, carotpos));
         String prefix = URLSplit.uriDecode( split.file.substring(split.path.length()) );
         String surlDir = URLSplit.uriDecode(split.path);
+        String params= null; // possibly the params, not with question mark.
+        int iq= surl.indexOf("?");
+        if ( iq>-1 ) {
+            int islash= surl.lastIndexOf("/");
+            if ( islash<=carotpos ) {
+                params= surl.substring(iq+1);
+            }
+        }
 
         mon.setLabel("getting remote listing");
 
@@ -588,7 +596,20 @@ public class DataSetURL {
                 // Hack for .zip archives:
                 if (s[j].endsWith(".zip")) s[j] = s[j] + "/";
                 String uriSafe = s[j].replaceAll(" ", "%20");
-                completions.add(new DataSetURL.CompletionResult(surlDir + uriSafe, s[j], null, surl.substring(0, carotpos), true));
+
+                String completion=  surlDir + uriSafe;
+                boolean dataSourceSame= split.vapScheme.contains("+");
+                if ( surl.startsWith(split.vapScheme) ) {
+                    completion= split.vapScheme + ":" + completion;
+                }
+                if ( dataSourceSame && params!=null ) {
+                    completion+= "?" + params;
+                }
+                
+                String label= s[j];
+                String completable= surl.substring(0, carotpos);
+
+                completions.add(new DataSetURL.CompletionResult( completion, label, null, completable, true) );
             }
         }
 
