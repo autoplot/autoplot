@@ -96,13 +96,13 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             String fileName= cdfFile.toString();
             //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
-            logger.fine("opening cdf file "+fileName);
+            logger.finest("opening cdf file "+fileName);
             CDF cdf= CDF.open( fileName, CDF.READONLYoff );
             
-            logger.fine("inspect cdf for plottable parameters");
+            logger.finest("inspect cdf for plottable parameters");
             Map<String,String> result= CdfUtil.getPlottable( cdf, true , 3);
             
-            logger.fine("close cdf");
+            logger.finest("close cdf");
             cdf.close();
             
             List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
