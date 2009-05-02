@@ -63,7 +63,7 @@ public class DataSourceFilter extends DomNode {
     }    
     
     
-    private int sliceDimension = 2;
+    private int sliceDimension = 0;
     public static final String PROP_SLICEDIMENSION = "sliceDimension";
 
     public int getSliceDimension() {
