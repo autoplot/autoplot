@@ -23,14 +23,6 @@ import org.virbo.datasource.AbstractDataSource;
  * @author jbf
  */
 public class BinaryDataSource extends AbstractDataSource {
-
-    public final static String DOUBLE = "double";
-    public final static String FLOAT = "float";
-    public final static String LONG = "long";
-    public final static String INT = "int";
-    public final static String SHORT = "short";
-    public final static String BYTE = "byte";
-    public final static String UBYTE = "ubyte";
     
     public BinaryDataSource(URL url) {
         super(url);
@@ -78,7 +70,7 @@ public class BinaryDataSource extends AbstractDataSource {
             }
         }
 
-        String columnType = getParameter("type", UBYTE );
+        String columnType = getParameter("type", (String)BufferDataSet.UBYTE );
 
         int recSizeBytes= getIntParameter("recLength", -1 );
         if ( recSizeBytes==-1 ) recSizeBytes= BufferDataSet.byteCount(columnType) * fieldCount;
