@@ -111,7 +111,32 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ISOTROPIC, oldIsotropic, isotropic);
     }
     
-    
+    protected String rowId;
+    public static final String PROP_ROWID = "rowId";
+
+    public String getRowId() {
+        return rowId;
+    }
+
+    public void setRowId(String rowId) {
+        String oldRowId = this.rowId;
+        this.rowId = rowId;
+        propertyChangeSupport.firePropertyChange(PROP_ROWID, oldRowId, rowId);
+    }
+
+    protected String columnId;
+    public static final String PROP_COLUMNID = "columnId";
+
+    public String getColumnId() {
+        return columnId;
+    }
+
+    public void setColumnId(String columnId) {
+        String oldColumnId = this.columnId;
+        this.columnId = columnId;
+        propertyChangeSupport.firePropertyChange(PROP_COLUMNID, oldColumnId, columnId);
+    }
+
     
     protected PlotController controller;
     
