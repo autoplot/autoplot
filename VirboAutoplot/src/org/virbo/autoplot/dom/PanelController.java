@@ -117,7 +117,7 @@ public class PanelController {
     private void resetDataSource() {
         if (dsf != null) {
             unbindDsf();  
-            List<DomNode> usages= DomUtil.getDataSourceUsages(dom, dsf.getId() );
+            List<DomNode> usages= DomUtil.dataSourceUsages(dom, dsf.getId() );
             if ( usages.size()==0 ) {
                 dom.getController().deleteDataSourceFilter(dsf);
             }
