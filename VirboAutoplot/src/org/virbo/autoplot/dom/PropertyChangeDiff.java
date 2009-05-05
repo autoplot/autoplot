@@ -27,14 +27,15 @@ public class PropertyChangeDiff implements Diff {
         this.oldVal= oldVal;
         this.newVal= newVal;
     }
-    
-    public void doDiff(DomNode node) {
-        try {
+
+
+    private static void doSet(DomNode node, String propertyName, Object oldVal1, Object newVal ) {
+        try { 
             BeanInfo info = Introspector.getBeanInfo(node.getClass());
             for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
                 if ( pd.getName().equals(propertyName) ) {
                     Object oldVal= pd.getReadMethod().invoke(node);
-                    if ( !( oldVal==this.oldVal || oldVal.equals(this.oldVal) ) ) {
+                    if ( !( oldVal==oldVal1 || oldVal.equals(oldVal1) ) ) {
                         throw new IllegalArgumentException("old value");
                     }
                     pd.getWriteMethod().invoke(node, newVal);
@@ -51,27 +52,17 @@ public class PropertyChangeDiff implements Diff {
         }
     }
 
+
+    public void doDiff( DomNode node ) {
+        doSet( node, propertyName, oldVal, newVal );
+    }
+
     public void undoDiff(DomNode node) {
-        try {
-            BeanInfo info = Introspector.getBeanInfo(node.getClass());
-            for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
-                if ( pd.getName().equals(propertyName) ) {
-                    Object newVal= pd.getReadMethod().invoke(node);
-                    if ( !( newVal==this.newVal || newVal.equals(this.newVal) ) ) {
-                        throw new IllegalArgumentException("new value");
-                    }
-                    pd.getWriteMethod().invoke(node, oldVal);
-                }
-            }
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(PropertyChangeDiff.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalArgumentException ex) {
-            Logger.getLogger(PropertyChangeDiff.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InvocationTargetException ex) {
-            Logger.getLogger(PropertyChangeDiff.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IntrospectionException ex) {
-            Logger.getLogger(PropertyChangeDiff.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        doSet( node, propertyName, newVal, oldVal );
+    }
+
+    public String propertyName() {
+        return propertyName;
     }
     
     public String toString() {
