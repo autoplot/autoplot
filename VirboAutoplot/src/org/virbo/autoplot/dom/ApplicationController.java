@@ -109,11 +109,6 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
 
             DasPlot plot = domPlot.getController().getDasPlot();
 
-            if (getPlot() == domPlot) {
-                setStatus("" + domPlot + " selected");
-                return;
-            }
-
             Panel p=null;
 
             Renderer r = plot.getFocusRenderer();
@@ -122,7 +117,9 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             }
 
             List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
-            if (ps.size() > 0) {
+            if ( ps.size()==1 ) {
+                p= ps.get(0);
+            } else if  ( ps.size() > 1 ) {
                 int ip = 0;
                 while (ip < ps.size() && ps.get(ip).isActive() == false) {
                     ip++;
