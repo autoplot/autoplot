@@ -5,7 +5,11 @@
 
 package org.virbo.autoplot.dom;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,8 +21,30 @@ public class Canvas extends DomNode {
     protected CanvasController controller;
     public static final String PROP_CONTROLLER = "controller";
 
+     PropertyChangeListener childListener = new PropertyChangeListener() {
+        public String toString() {
+           return ""+Canvas.this;
+        }
+        public void propertyChange(PropertyChangeEvent evt) {
+            Canvas.this.propertyChangeSupport.firePropertyChange(promoteChild(evt));
+        }
+    };
+
+    private PropertyChangeEvent promoteChild(PropertyChangeEvent ev) {
+        String childName;
+        final Object source = ev.getSource();
+        if (Canvas.this.rows.contains(source)) {
+            childName = "rows[" + rows.indexOf(source) + "]";
+        } else if (columns.contains(source)) {
+            childName = "columns[" + columns.indexOf(source) + "]";
+        } else {
+            throw new IllegalArgumentException("child not found: "+source);
+        }
+        return new PropertyChangeEvent(this, childName + "." + ev.getPropertyName(), ev.getOldValue(), ev.getNewValue());
+    }
+
     public Canvas() {
-        //childListener
+        
     }
     
     
@@ -52,7 +78,53 @@ public class Canvas extends DomNode {
         this.fitted = fitted;
         propertyChangeSupport.firePropertyChange(PROP_FITTED, oldfitted, fitted);
     }
-    
+
+    public static final String PROP_ROWS = "rows";
+    protected List<Row> rows = new LinkedList<Row>();
+
+    public Row[] getRows() {
+        return rows.toArray(new Row[rows.size()]);
+    }
+
+    public void setRows(Row[] rows) {
+        Row[] oldRows = this.rows.toArray(new Row[this.rows.size()]);
+        this.rows = Arrays.asList(rows);
+        propertyChangeSupport.firePropertyChange(PROP_ROWS, oldRows, rows);
+    }
+
+    public Row getRows(int index) {
+        return this.rows.get(index);
+    }
+
+    public void setRows(int index, Row newRows) {
+        Row oldRows = this.rows.get(index);
+        this.rows.set(index, newRows);
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_ROWS, index, oldRows, newRows);
+    }
+
+    public static final String PROP_COLUMNS = "columns";
+    protected List<Column> columns = new LinkedList<Column>();
+
+    public Column[] getColumns() {
+        return columns.toArray(new Column[columns.size()]);
+    }
+
+    public void setColumns(Column[] columns) {
+        Column[] oldColumns = this.columns.toArray(new Column[this.columns.size()]);
+        this.columns = Arrays.asList(columns);
+        propertyChangeSupport.firePropertyChange(PROP_COLUMNS, oldColumns, columns);
+    }
+
+    public Column getColumns(int index) {
+        return this.columns.get(index);
+    }
+
+    public void setColumns(int index, Column newColumns) {
+        Column oldColumns = this.columns.get(index);
+        this.columns.set(index, newColumns);
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_COLUMNS, index, oldColumns, newColumns);
+    }
+
     /**
      * outer column for the canvas
      */
@@ -100,40 +172,27 @@ public class Canvas extends DomNode {
     }
 
     @Override
+    public List<DomNode> childNodes() {
+        ArrayList<DomNode> result = new ArrayList<DomNode>();
+        result.addAll( rows );
+        result.addAll( columns );
+        return result;
+    }
+
+
+    @Override
     public DomNode copy() {
         Canvas that= (Canvas)super.copy();
         that.controller= null;
         return that;
     }
     
-    
-
     public void syncTo(DomNode n) {
-        super.syncTo(n);
-        Canvas that= (Canvas)n;
-        this.setFitted(that.isFitted());
-        this.setSize(that.getSize());
-        this.setRow(that.getRow());
-        this.setColumn(that.getColumn());        
+        DomUtil.syncTo( this, n );     
     }
 
     public List<Diff> diffs(DomNode node) {
-        List<Diff> result = new ArrayList<Diff>();
-        Canvas that= (Canvas)node;
-        boolean b;
-        b=  that.fitted==this.fitted ;
-        if ( !b ) result.add( new PropertyChangeDiff( "fitted", that.fitted , this.fitted ) );
-
-        b=  that.size.equals(this.size) ;
-        if ( !b ) result.add( new PropertyChangeDiff( "size", that.size , this.size ) );
-
-        b=  that.row.equals(this.row) ;
-        if ( !b ) result.add( new PropertyChangeDiff( "row", that.row , this.row ) );
-
-        b=  that.column.equals(this.column) ;
-        if ( !b ) result.add( new PropertyChangeDiff( "column", that.column , this.column ) );
-
-        return result;
+        return DomUtil.getDiffs( this, node );
     }
 
 
