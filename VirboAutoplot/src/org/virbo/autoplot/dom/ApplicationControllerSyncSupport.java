@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
@@ -53,9 +54,8 @@ public class ApplicationControllerSyncSupport {
             DataSourceFilter dsf= application.dataSourceFilters.get(application.dataSourceFilters.size() - 1);
             List<Panel> panelss= controller.getPanelsFor(dsf);
             for ( Panel panell:panelss ) {
-                panell.setDataSourceFilterId(""); // make it an orphan
+                panell.setDataSourceFilterId(""); // make it an orphan -- it should get deleted
             }
-            controller.deleteDataSourceFilter( dsf );
         }
         for (int i = 0; i < dataSourceFilters.length; i++) {
             application.dataSourceFilters.get(i).syncTo(dataSourceFilters[i]);
@@ -76,8 +76,10 @@ public class ApplicationControllerSyncSupport {
         }
 
         for (int i = 0; i < panels.length; i++) {
-            application.panels.get(i).syncTo(panels[i], Arrays.asList( "plotId", "dataSourceFilterId" ) );
+            application.panels.get(i).syncTo(panels[i], 
+                    Arrays.asList( Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE ) );
             application.panels.get(i).setPlotId( plotIds.get(panels[i].getPlotId() ) );
+            application.panels.get(i).setRenderType( panels[i].getRenderType() );
             application.panels.get(i).setDataSourceFilterId(dsfIds.get(panels[i].getDataSourceFilterId()) );
         }
 
@@ -131,7 +133,11 @@ public class ApplicationControllerSyncSupport {
         for ( BindingModel c:addBindings ) {
             DomNode src= DomUtil.getElementById(application,c.srcId);
             DomNode dst= DomUtil.getElementById(application,c.dstId);
-            controller.bind( src, c.srcProperty, dst, c.dstProperty  );
+            if ( src==null || dst==null ) {
+                Logger.getLogger( ApplicationControllerSupport.class.getName() ).finer("node was null");
+            } else {
+                controller.bind( src, c.srcProperty, dst, c.dstProperty  );
+            }
         }
 
         for ( BindingModel c:deleteBindings ) {
