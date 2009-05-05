@@ -738,6 +738,13 @@ public class PanelController {
 
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
+
+        QDataSet fillDs= dsf.getController().getFillDataSet();
+        if ( newRenderer instanceof SeriesRenderer && fillDs!=null ) {
+            QDataSet d= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            ((SeriesRenderer)newRenderer).setCadenceCheck( (d.property(QDataSet.CADENCE)!=null ) );
+        }
+
         if (oldRenderer != newRenderer) {
             setRenderer(newRenderer);
 
