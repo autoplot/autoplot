@@ -8,6 +8,7 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Dimension;
 import java.text.ParseException;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
@@ -50,6 +51,7 @@ import org.das2.components.propertyeditor.EnumerationEditor;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.BeanProperty;
+import org.netbeans.beaninfo.editors.DimensionEditor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
@@ -95,7 +97,8 @@ public class ApplicationModel {
     public ApplicationModel() {
 
         BeansUtil.registerEditor(RenderType.class, EnumerationEditor.class);
-
+        BeansUtil.registerEditor(Dimension.class, DimensionEditor.class);
+        
         DataSetURL.init();
 
         dom = new Application();
