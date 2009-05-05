@@ -56,6 +56,7 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.Diff;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
@@ -505,6 +506,9 @@ public class ApplicationModel {
      * @throws java.io.IOException
      */
     void doOpen(File f, LinkedHashMap<String, String> deltas) throws IOException {
+
+        if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
+        
         Application state = (Application) StatePersistence.restoreState(f);
 
         if (deltas != null) {
