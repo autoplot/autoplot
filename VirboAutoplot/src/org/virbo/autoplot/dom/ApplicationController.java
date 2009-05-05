@@ -393,9 +393,10 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         DasPlot dstPlot = dst.getController().getDasPlot();
 
         Renderer rr = p.getController().getRenderer();
-
-        srcPlot.removeRenderer(rr);
-        dstPlot.addRenderer(rr);
+        if ( rr!=null ) {
+            srcPlot.removeRenderer(rr);
+            dstPlot.addRenderer(rr);
+        }
 
         p.setPlotId(dst.getId());
 
@@ -525,7 +526,19 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         DatumRange y = DatumRange.newDatumRange(0, 1000, Units.dimensionless);
         DasAxis xaxis = new DasAxis(x.min(), x.max(), DasAxis.HORIZONTAL);
         DasAxis yaxis = new DasAxis(y.min(), y.max(), DasAxis.VERTICAL);
-        DasRow row = new DasRow(null, outerRow, 0, 1, 0, 0, 0, 0);
+
+        Row domRow;
+        if ( canvas.getRows().length==0 ) {
+            domRow= canvas.getController().addRow();
+        } else {
+            domRow= canvas.getController().addInsertRow( canvas.getController().getRowFor(getPlot()), direction );
+        }
+
+        domPlot.setRowId(domRow.getId());
+        domPlot.setColumnId(canvas.getController().MARGINCOLUMNID);
+
+        DasRow row = domRow.getController().getDasRow();
+
         DasColumn col = outerColumn; //new DasColumn( null, outerColumn, 0, 1, 0, 0, 0, 0); //only stack for now
         final DasPlot plot = new DasPlot(xaxis, yaxis);
 
@@ -762,6 +775,14 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             }
         }
 
+        Row deleteRow=null; // if non-null, delete this row.
+        Row row= (Row) DomUtil.getElementById(application,domPlot.getRowId());
+        List<DomNode> plotsUsingRow= DomUtil.rowUsages(application,row.getId());
+        plotsUsingRow.remove(domPlot);
+        if ( plotsUsingRow.size()==0 ) {
+            deleteRow= row;
+        }
+
         domPlot.removePropertyChangeListener(application.childListener);
         unbind(domPlot);
         unbind(domPlot.getXaxis());
@@ -785,13 +806,20 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
                 }
             }
             application.setPlots(plots.toArray(new Plot[plots.size()]));
+
+            if ( deleteRow!=null ) {
+                CanvasController cc= row.controller.getCanvas().getController();
+                cc.deleteRow(deleteRow);
+                cc.removeGaps();
+            }
         }
 
     }
 
     public synchronized void deleteDataSourceFilter(DataSourceFilter dsf) {
         if (!application.dataSourceFilters.contains(dsf)) {
-            throw new IllegalArgumentException("dsf is not in this application");
+            logger.fine( "dsf wasn't part of the application" );
+            return;
         }
         if (application.dataSourceFilters.size() < 2) {
             throw new IllegalArgumentException("last plot cannot be deleted");
@@ -810,7 +838,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
         for (DataSourceFilter pdf : parents) {
             String plotId = pdf.getId();
-            List<DomNode> usages = DomUtil.getDataSourceUsages(application, plotId);
+            List<DomNode> usages = DomUtil.dataSourceUsages(application, plotId);
             usages.remove(dsf);
             if (usages.size() == 0) {
                 alsoRemove.add(pdf);
