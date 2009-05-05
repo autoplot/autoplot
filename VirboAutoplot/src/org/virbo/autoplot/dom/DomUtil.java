@@ -74,6 +74,14 @@ public class DomUtil {
         return result;
     }
 
+    static boolean hasProperty(DomNode result, String propertyName) {
+        return BeanProperty.create(propertyName).isReadable(result);
+    }
+
+    static void setProperty( DomNode result, String propertyName, Object value ) {
+        BeanProperty.create(propertyName).setValue( result, value );
+    }
+
     /**
      * return the list of nodes (Plots) that is this row.
      */
