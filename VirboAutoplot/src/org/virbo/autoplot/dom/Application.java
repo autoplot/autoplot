@@ -293,13 +293,13 @@ public class Application extends DomNode {
         try {
         if ( thata.length > thisa.length ) {
             for ( int i=thata.length-1; i>=thisa.length; i-- ) {
-                result.add( new DeleteNodeDiff( property, thata[i], i ) );
+                result.add( new ArrayNodeDiff( property, ArrayNodeDiff.Action.Delete, thata[i], i ) );
             }
          }
 
         if ( thata.length < thisa.length ) {
             for ( int i=thisa.length-1; i<thisa.length; i++ ) {
-                result.add( new InsertNodeDiff( property, thisa[i], i ) );
+                result.add( new ArrayNodeDiff( property, ArrayNodeDiff.Action.Insert, thisa[i], i ) );
             }        
         }
         } catch ( ArrayIndexOutOfBoundsException ex ) {
