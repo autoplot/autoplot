@@ -137,8 +137,10 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
 
         try {
-            if (surl.endsWith("/") || surl.endsWith(".zip")) {
-                int carotpos = surl.length();
+
+            if ( surl.endsWith("/") || surl.contains("/?") || surl.endsWith(".zip") || surl.contains(".zip?") ) {
+                int carotpos= editor.getCaretPosition();
+                //int carotpos = surl.contains("?") surl.length();
                 setMessage("Getting filesystem completions.");
                 showCompletions(surl, carotpos);
 
@@ -677,21 +679,23 @@ public class DataSetSelector extends javax.swing.JPanel {
         String context = (String) dataSetSelector.getSelectedItem();
 
         String ext = DataSetURL.getExt(context);
-        if (context.contains("?") || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
+        if ( ( !context.contains("/?") && context.contains("?") ) || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
             browseSourceType();
 
         } else {
             try {
-                URL url = DataSourceUtil.newURL(new URL("file://"), context); //TODO: old code needs to account for URIs
+                URLSplit split= URLSplit.parse(context);
+                URL url= new URL( split.file );
                 if (url.getProtocol().equals("file")) {
                     File f = new File(url.getPath());
-                    if (f.exists()) {
+                    if ( f.exists() && f.isFile() ) {
                         browseSourceType();
                     } else {
                         JFileChooser chooser = new JFileChooser(url.getPath());
                         int result = chooser.showOpenDialog(this);
                         if (result == JFileChooser.APPROVE_OPTION) {
-                            dataSetSelector.setSelectedItem(chooser.getSelectedFile().toString());
+                            String suri= DataSetURL.newUri( context,chooser.getSelectedFile().toString() );
+                            dataSetSelector.setSelectedItem(suri);
                         }
                     }
                 } else {
