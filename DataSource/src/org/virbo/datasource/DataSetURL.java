@@ -242,6 +242,22 @@ public class DataSetURL {
 
     }
 
+    /**
+     * creates a new URI from the new URI, in the context of the old URI.  For
+     * example, if the old URI had parameters and the new is just a file, then
+     * use the old URI but replace the file.
+     * @param context
+     * @param newUri
+     * @return
+     */
+    static String newUri(String context, String newUri ) {
+        URLSplit scontext= URLSplit.parse(context);
+        URLSplit newURLSplit= URLSplit.parse(newUri);
+        if ( newURLSplit.file!=null && !newURLSplit.file.equals("") ) scontext.file=newURLSplit.file;
+        if ( newURLSplit.params!=null && !newURLSplit.params.equals("") ) scontext.params= newURLSplit.params;
+        return URLSplit.format(scontext);
+    }
+
     // mark the special case where a resource is actually a folder.
     public static class NonResourceException extends IllegalArgumentException {
 
@@ -598,18 +614,14 @@ public class DataSetURL {
                 String uriSafe = s[j].replaceAll(" ", "%20");
 
                 String completion=  surlDir + uriSafe;
-                boolean dataSourceSame= split.vapScheme.contains("+");
-                if ( surl.startsWith(split.vapScheme) ) {
-                    completion= split.vapScheme + ":" + completion;
-                }
-                if ( dataSourceSame && params!=null ) {
-                    completion+= "?" + params;
-                }
+                completion= DataSetURL.newUri( surl, completion );
                 
                 String label= s[j];
                 String completable= surl.substring(0, carotpos);
 
-                completions.add(new DataSetURL.CompletionResult( completion, label, null, completable, true) );
+                boolean maybePlot= true;
+                //if ( completion.contains("/?") ) maybePlot= false;
+                completions.add(new DataSetURL.CompletionResult( completion, label, null, completable, maybePlot ) );
             }
         }
 
