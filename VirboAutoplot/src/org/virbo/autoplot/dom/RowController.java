@@ -24,13 +24,13 @@ public class RowController {
 
     RowController( Row row ) {
         this.row= row;
+        row.controller= this;
     }
 
     protected void createDasPeer( Canvas canvas, DasRow parent ) {
         DasCanvas c= canvas.getController().getDasCanvas();
         dasRow= DasRow.create( c, parent, row.getTop(), row.getBottom() );
         PropertyChangeListener list= new PropertyChangeListener() {
-            @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( evt.getPropertyName().equals( DasDevicePosition.PROP_DMAXIMUM ) ) {
                     row.setBottom( DasDevicePosition.formatLayoutStr(dasRow, false ) );
