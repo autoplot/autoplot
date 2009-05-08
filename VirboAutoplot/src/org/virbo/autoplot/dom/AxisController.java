@@ -58,7 +58,6 @@ public class AxisController {
             }
         }
 
-        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
             if ( valueIsAdjusting() ) return;
