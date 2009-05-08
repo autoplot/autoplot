@@ -32,7 +32,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     boolean[] isRecord;
     int lineNumber;
     int recCount;
-    int fieldCount;
+    int fieldCount=12;
     private final static int LINE_BUFFER_COUNT=100;
 
     AsciiTableTableModel() {
@@ -41,7 +41,7 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     }
 
     public int getColumnCount() {
-        return 12;
+        return fieldCount;
     }
 
     public int getRowCount() {
@@ -181,6 +181,8 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
     public void setRecParser(RecordParser recParser) {
         RecordParser oldRecParser = this.recParser;
         this.recParser = recParser;
+        this.fieldCount= recParser.fieldCount();
+        fireTableStructureChanged();
         fireTableDataChanged();
         propertyChangeSupport.firePropertyChange(PROP_RECPARSER, oldRecParser, recParser);
     }
