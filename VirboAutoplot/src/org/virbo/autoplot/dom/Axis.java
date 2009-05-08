@@ -6,7 +6,6 @@ package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 
@@ -45,25 +44,6 @@ public class Axis extends DomNode {
         return log;
     }
 
-    private DatumRange logCheckRange(DatumRange range, boolean log) {
-        Datum min = this.range.min();
-        Datum max = this.range.max();
-        Units u = range.getUnits();
-        boolean changed=false;
-        if (max.doubleValue(u) <= 0.) {
-            max = u.createDatum(100);
-            changed= true;
-        }
-        if (min.doubleValue(u) <= 0.) {
-            min = u.createDatum( max.doubleValue(u)/1000 );
-            changed= true;
-        }
-        if ( changed ) {
-            return new DatumRange(min, max);
-        } else {
-            return range;
-        }
-    }
 
     /**
      * set the log property.  If the value makes the range invalid (log and zero),
@@ -74,14 +54,6 @@ public class Axis extends DomNode {
     public void setLog(boolean log) {
         boolean oldLog = this.log;
         this.log = log;
-        // ensure that log doesn't make axis invalid.
-        if (log) {
-            DatumRange oldRange = this.range;
-            this.range = logCheckRange(this.range,log);
-            if ( this.range.equals(oldRange) ) {
-                propertyChangeSupport.firePropertyChange(PROP_RANGE, oldRange, range);
-            }
-        }
         propertyChangeSupport.firePropertyChange(PROP_LOG, oldLog, log);
     }
     protected String label = "";
@@ -125,6 +97,15 @@ public class Axis extends DomNode {
         this.setLabel(that.getLabel());
 
     }
+
+    @Override
+    public DomNode copy() {
+        Axis result= (Axis) super.copy();
+        result.controller= null;
+        return result;
+    }
+
+
 
     public List<Diff> diffs(DomNode node) {
         Axis that = (Axis) node;
