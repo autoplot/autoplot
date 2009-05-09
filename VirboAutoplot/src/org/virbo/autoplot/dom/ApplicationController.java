@@ -4,13 +4,16 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.AWTEventMulticaster;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,13 +26,8 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.das2.DasApplication;
-import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
-import org.das2.event.BoxZoomMouseModule;
 import org.das2.event.MouseModule;
-import org.das2.event.ZoomPanMouseModule;
 import org.das2.graph.ColumnColumnConnector;
-import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
@@ -56,7 +54,7 @@ import org.virbo.autoplot.util.RunLaterListener;
  *
  * @author jbf
  */
-public class ApplicationController implements RunLaterListener.PropertyChange {
+public class ApplicationController extends DomNodeController implements RunLaterListener.PropertyChange {
 
     Application application;
     ApplicationModel model;
@@ -71,31 +69,105 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
     private int plotIdNum = 0;
     private AtomicInteger panelIdNum = new AtomicInteger(0);
     private int dsfIdNum = 0;
-    ChangesSupport changesSupport;
+    
     ApplicationControllerSyncSupport syncSupport;
     ApplicationControllerSupport support;
     /** When non-null, we have the lock */
     MutatorLock canvasLock;
+    ActionListener eventListener;
 
     public ApplicationController(ApplicationModel model, Application application) {
+        super( application );
+        
         this.application = application;
         this.syncSupport = new ApplicationControllerSyncSupport(this);
         this.support = new ApplicationControllerSupport(this);
-        this.changesSupport = new ChangesSupport(propertyChangeSupport, this);
+
         application.setId("app_0");
         application.getOptions().setId("options_0");
+
+        application.addPropertyChangeListener(domListener);
+        for ( DomNode n: application.childNodes() ) {
+            n.addPropertyChangeListener(domListener);
+        }
+
         this.model = model;
         application.controller = this;
         this.headless = "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false"));
         if (!headless && DasApplication.hasAllPermission()) {
             application.getOptions().loadPreferences();
         }
-        bindingContexts = new HashMap<Object, BindingGroup>();
-        bindingImpls = new HashMap<BindingModel, Binding>();
-        connectorImpls = new HashMap<Connector, ColumnColumnConnector>();
+        //bindingContexts = new HashMap<Object, BindingGroup>();
+        bindingContexts = new HashMap();
+        bindingImpls = new HashMap();
+        connectorImpls = new HashMap();
 
         addListeners();
     }
+
+    public void addActionListener(ActionListener list) {
+        eventListener = AWTEventMulticaster.add(eventListener, list);
+    }
+
+    public void removeActionListener(ActionListener list) {
+        AWTEventMulticaster.remove(eventListener, list);
+    }
+
+    private void fireActionEvent(ActionEvent e) {
+        ActionListener listener = eventListener;
+        if (listener != null) {
+            listener.actionPerformed(e);
+        }
+    }
+    AtomicInteger eventId = new AtomicInteger();
+
+    PropertyChangeListener domListener = new PropertyChangeListener() {
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            logger.finest("dom change: " + evt.getPropertyName() + evt.getOldValue() + "->" + evt.getNewValue());
+
+            Object src = evt.getSource();
+            if ( src instanceof DomNode ) {
+                DomNodeController c= DomNodeController.getController((DomNode)src);
+                if ( c!=null && c.isValueAdjusting()) return;
+            }
+
+            fireActionEvent(new ActionEvent(evt.getSource(), eventId.incrementAndGet(), evt.getPropertyName()));
+            
+            Object oldValue = evt.getOldValue();
+            if (oldValue != null) {
+                if (oldValue instanceof DomNode) {
+                    final DomNode d = (DomNode) oldValue;
+                    d.removePropertyChangeListener(domListener);
+                    for ( DomNode k: d.childNodes() ) k.removePropertyChangeListener(domListener);
+                } else if (oldValue.getClass().isArray() && DomNode.class.isAssignableFrom(oldValue.getClass().getComponentType())) {
+                    for (int i = 0; i < Array.getLength(oldValue); i++) {
+                        final DomNode d= ((DomNode) Array.get(oldValue, i));
+                        d.removePropertyChangeListener(domListener);
+                        for ( DomNode k: d.childNodes() ) k.removePropertyChangeListener(domListener);
+                    }
+                }
+            }
+
+            Object newValue = evt.getNewValue();
+            if (newValue != null) {
+                if (newValue instanceof DomNode) {
+                    final DomNode d = (DomNode) newValue;
+                    d.addPropertyChangeListener(domListener);
+                    for ( DomNode k: d.childNodes() ) k.addPropertyChangeListener(domListener);
+                } else if (newValue.getClass().isArray() && DomNode.class.isAssignableFrom(newValue.getClass().getComponentType())) {
+                    for (int i = 0; i < Array.getLength(newValue); i++) {
+                        final DomNode d= ((DomNode) Array.get(newValue, i));
+                        d.addPropertyChangeListener(domListener);
+                        for ( DomNode k: d.childNodes() ) k.addPropertyChangeListener(domListener);
+                    }
+                }
+            }
+
+        // TODO: check for children, add to children
+        }
+    };
     FocusAdapter focusAdapter = new FocusAdapter() {
 
         @Override
@@ -107,9 +179,9 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
                 return;
             }
 
-            DasPlot plot = domPlot.getController().getDasPlot();
+            DasPlot plot = domPlot.controller.getDasPlot();
 
-            Panel p=null;
+            Panel p = null;
 
             Renderer r = plot.getFocusRenderer();
             if (r != null) {
@@ -117,9 +189,9 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             }
 
             List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
-            if ( ps.size()==1 ) {
-                p= ps.get(0);
-            } else if  ( ps.size() > 1 ) {
+            if (ps.size() == 1) {
+                p = ps.get(0);
+            } else if (ps.size() > 1) {
                 int ip = 0;
                 while (ip < ps.size() && ps.get(ip).isActive() == false) {
                     ip++;
@@ -130,10 +202,10 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             }
 
             setPlot(domPlot);
-            
+
             if (p != null) {
                 logger.fine("focus to " + p);
-                setFocusUri(p.getController().getDataSourceFilter().getUri());
+                setFocusUri(p.controller.getDataSourceFilter().getUri());
                 if (getPanel() != p) {
                     setStatus("" + domPlot + ", " + p + " selected");
                     setPanel(p);
@@ -184,12 +256,12 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
     public Plot getPlotFor(Component c) {
         Plot plot = null;
         for (Plot p : application.getPlots()) {
-            DasPlot p1 = p.getController().getDasPlot();
+            DasPlot p1 = p.controller.getDasPlot();
             if (p1 == c || p1.getXAxis() == c || p1.getYAxis() == c) {
                 plot = p;
                 break;
             }
-            if (p.getController().getDasColorBar() == c) {
+            if (p.controller.getDasColorBar() == c) {
                 plot = p;
                 break;
             }
@@ -231,7 +303,8 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         List<DataSourceFilter> dataSourceFilters = new ArrayList<DataSourceFilter>(Arrays.asList(this.application.getDataSourceFilters()));
         dataSourceFilters.add(dsf);
         this.application.setDataSourceFilters(dataSourceFilters.toArray(new DataSourceFilter[dataSourceFilters.size()]));
-        dsf.addPropertyChangeListener(application.childListener);
+        //dsf.addPropertyChangeListener(application.childListener);
+        dsf.addPropertyChangeListener(domListener);
         return dsf;
     }
 
@@ -271,6 +344,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         //if ( canvas!=null ) throw new IllegalArgumentException("only one canvas for now");
         DasCanvas dasCanvas = new DasCanvas();
         Canvas lcanvas = new Canvas();
+
         lcanvas.setId("canvas_0");
         new CanvasController(application, lcanvas).setDasCanvas(dasCanvas);
 
@@ -286,7 +360,10 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
 
         bindTo(dasCanvas);
 
-        lcanvas.getController().bindTo(outerRow, outerColumn);
+        //lcanvas.addPropertyChangeListener(application.childListener);
+        lcanvas.addPropertyChangeListener(this.domListener);
+
+        ((CanvasController)lcanvas.controller).bindTo(outerRow, outerColumn);
 
         dasCanvas.setPrintingTag("");
         return dasCanvas;
@@ -300,17 +377,18 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         if (application.panels.size() < 2) {
             throw new IllegalArgumentException("last panel may not be deleted");
         }
-        DasPlot p = panel.getController().getDasPlot();
+        DasPlot p = panel.controller.getDasPlot();
         if (p != null) {
-            Renderer r = panel.getController().getRenderer();
+            Renderer r = panel.controller.getRenderer();
             if (r != null) {
                 p.removeRenderer(r);
             }
         }
 
-        panel.removePropertyChangeListener(application.childListener);
+        //panel.removePropertyChangeListener(application.childListener);
+        panel.removePropertyChangeListener(domListener);
         unbind(panel);
-        panel.getController().unbindDsf();
+        panel.controller.unbindDsf();
         panel.removePropertyChangeListener(plotIdListener);
 
         DataSourceFilter dsf = getDataSourceFilterFor(panel);
@@ -348,8 +426,8 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
 
         DasCanvas lcanvas = getDasCanvas();
-        DasPlot upper = domPlot.getController().getDasPlot();
-        DasPlot lower = that.getController().getDasPlot();
+        DasPlot upper = domPlot.controller.getDasPlot();
+        DasPlot lower = that.controller.getDasPlot();
 
         //overviewPlotConnector.getDasMouseInputAdapter().setPrimaryModule(overviewZoom);
         ColumnColumnConnector overviewPlotConnector =
@@ -386,11 +464,11 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
     private void movePanel(Panel p, Plot src, Plot dst) {
         assert (p.getPlotId().equals(src.getId()) || p.getPlotId().equals(dst.getId()));
 
-        DasPlot srcPlot = src.getController().getDasPlot();
-        DasPlot dstPlot = dst.getController().getDasPlot();
+        DasPlot srcPlot = src.controller.getDasPlot();
+        DasPlot dstPlot = dst.controller.getDasPlot();
 
-        Renderer rr = p.getController().getRenderer();
-        if ( rr!=null ) {
+        Renderer rr = p.controller.getRenderer();
+        if (rr != null) {
             srcPlot.removeRenderer(rr);
             dstPlot.addRenderer(rr);
         }
@@ -398,7 +476,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         p.setPlotId(dst.getId());
 
         ApplicationModel.RenderType rt = p.getRenderType();
-        p.getController().setRenderType(rt);
+        p.controller.setRenderType(rt);
 
     }
     PropertyChangeListener plotIdListener = new PropertyChangeListener() {
@@ -472,7 +550,8 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             System.arraycopy(p, 0, temp, 0, p.length);
             temp[p.length] = panel1;
             this.application.setPanels(temp);
-            panel1.addPropertyChangeListener(application.childListener);
+            //panel1.addPropertyChangeListener(application.childListener);
+            panel1.addPropertyChangeListener(domListener);
             setPanel(panel1);
         }
 
@@ -518,33 +597,13 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         logger.fine("enter addPlot");
         final Plot domPlot = new Plot();
 
-        domPlot.getXaxis().setRange(application.getTimeRange());
-        DatumRange x = application.getTimeRange();
-        DatumRange y = DatumRange.newDatumRange(0, 1000, Units.dimensionless);
-        DasAxis xaxis = new DasAxis(x.min(), x.max(), DasAxis.HORIZONTAL);
-        DasAxis yaxis = new DasAxis(y.min(), y.max(), DasAxis.VERTICAL);
-
+        CanvasController ccontroller=  ((CanvasController)canvas.controller);
         Row domRow;
-        if ( canvas.getRows().length==0 ) {
-            domRow= canvas.getController().addRow();
+        if (canvas.getRows().length == 0) {
+            domRow = ccontroller.addRow();
         } else {
-            domRow= canvas.getController().addInsertRow( canvas.getController().getRowFor(getPlot()), direction );
+            domRow = ccontroller.addInsertRow( ccontroller.getRowFor(getPlot()), direction);
         }
-
-        domPlot.setRowId(domRow.getId());
-        domPlot.setColumnId(canvas.getController().MARGINCOLUMNID);
-
-        DasRow row = domRow.getController().getDasRow();
-
-        DasColumn col = outerColumn; //new DasColumn( null, outerColumn, 0, 1, 0, 0, 0, 0); //only stack for now
-        final DasPlot plot = new DasPlot(xaxis, yaxis);
-
-        plot.setPreviewEnabled(true);
-
-        DatumRange colorRange = new DatumRange(0, 100, Units.dimensionless);
-        DasColorBar colorbar = new DasColorBar(colorRange.min(), colorRange.max(), false);
-        colorbar.addFocusListener(focusAdapter);
-        colorbar.setFillColor(new java.awt.Color(0, true));
 
         int num = plotIdNum++;
 
@@ -553,72 +612,10 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         domPlot.getYaxis().setId("yaxis_" + num);
         domPlot.getZaxis().setId("zaxis_" + num);
 
-        final PlotController plotController = new PlotController(application, domPlot, plot, colorbar);
+        new PlotController(application, domPlot).createDasPeer(canvas, domRow ,null);
 
-        DasCanvas dasCanvas = getDasCanvas();
-
-        MutatorLock myCanvasLock = null;
-
-        if (canvasLock == null) {
-            myCanvasLock = dasCanvas.mutatorLock();
-            myCanvasLock.lock();
-            canvasLock = myCanvasLock;
-        }
-
-        dasCanvas.add(plot, row, col); //TODO: consider making room on canvas, and setting row precisely
-
-        // the axes need to know about the plotId, so they can do reset axes units properly.
-        plot.getXAxis().setPlot(plot);
-        plot.getYAxis().setPlot(plot);
-
-        BoxZoomMouseModule boxmm = (BoxZoomMouseModule) plot.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
-        plot.getDasMouseInputAdapter().setPrimaryModule(boxmm);
-
-        //plotId.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(plotId) ) ;
-
-        dasCanvas.add(colorbar, plot.getRow(), DasColorBar.getColorBarColumn(plot.getColumn()));
-        colorbar.setVisible(false);
-
-        if (!headless) {
-            boxmm.setAutoUpdate(true);
-        }
-
-        MouseModule zoomPan = new ZoomPanMouseModule(plot, plot.getXAxis(), plot.getYAxis());
-        plot.getDasMouseInputAdapter().setSecondaryModule(zoomPan);
-
-        MouseModule zoomPanX = new ZoomPanMouseModule(plot.getXAxis(), plot.getXAxis(), null);
-        plot.getXAxis().getDasMouseInputAdapter().setSecondaryModule(zoomPanX);
-
-        MouseModule zoomPanY = new ZoomPanMouseModule(plot.getYAxis(), null, plot.getYAxis());
-        plot.getYAxis().getDasMouseInputAdapter().setSecondaryModule(zoomPanY);
-
-        MouseModule zoomPanZ = new ZoomPanMouseModule(colorbar, null, colorbar);
-        colorbar.getDasMouseInputAdapter().setSecondaryModule(zoomPanZ);
-
-        dasCanvas.revalidate();
-        dasCanvas.repaint();
-        if (myCanvasLock != null) {
-            myCanvasLock.unlock();
-        }
-
-        layoutListener.listenTo(plot);
-        layoutListener.listenTo(colorbar);
-
-        new AxisController(application, domPlot.getXaxis(), xaxis);
-        new AxisController(application, domPlot.getYaxis(), yaxis);
-        new AxisController(application, domPlot.getZaxis(), colorbar);
-
-        domPlot.getController().bindTo(plot);
-        domPlot.getController().bindTo(colorbar);
-
-        support.addPlotContextMenuItems(plot, plotController, domPlot);
-        support.addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getXaxis());
-        support.addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getYaxis());
-        support.addAxisContextMenuItems(plot, plotController, domPlot, domPlot.getZaxis());
-
-        addPlotFocusListener(plot);
-
-        plot.addPropertyChangeListener(DasPlot.PROP_FOCUSRENDERER, rendererFocusListener);
+        domPlot.setRowId(domRow.getId());
+        domPlot.setColumnId( CanvasController.MARGINCOLUMNID);
 
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
         Plot focus = getPlot();
@@ -635,16 +632,13 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
 
         application.setPlots(plots.toArray(new Plot[plots.size()]));
 
-        domPlot.addPropertyChangeListener(application.childListener);
+        //domPlot.addPropertyChangeListener(application.childListener);
+        domPlot.addPropertyChangeListener(domListener);
         setPlot(domPlot);
 
         if (plots.size() == 1) {
             bind(application, Application.PROP_TIMERANGE, domPlot.getXaxis(), Axis.PROP_RANGE);
         }
-
-        bind(application.getOptions(), Options.PROP_DRAWGRID, plot, "drawGrid");
-        bind(application.getOptions(), Options.PROP_DRAWMINORGRID, plot, "drawMinorGrid");
-        bind(application.getOptions(), Options.PROP_OVERRENDERING, plot, "overSize");
 
         return domPlot;
     }
@@ -656,7 +650,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
      */
     private Panel findPanel(Renderer rend) {
         for (Panel p : application.getPanels()) {
-            PanelController pc = p.getController();
+            PanelController pc = p.controller;
             if (pc.getRenderer() == rend) {
                 return p;
             }
@@ -702,11 +696,11 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         Panel newp = addPanel(domPlot, dsf);
         newp.syncTo(srcPanel, Arrays.asList("plotId", "dataSourceFilterId"));
         if (dsf == null) { // new DataSource, but with the same URI.
-            DataSourceFilter dsfnew = newp.getController().getDataSourceFilter();
-            DataSourceFilter dsfsrc = srcPanel.getController().getDataSourceFilter();
-            dsfnew.getController().setRawProperties(dsfsrc.getController().getRawProperties());
-            dsfnew.getController()._setProperties(dsfsrc.getController().getProperties());
-            dsfnew.getController().setDataSetInternal(dsfsrc.getController().getDataSet());
+            DataSourceFilter dsfnew = newp.controller.getDataSourceFilter();
+            DataSourceFilter dsfsrc = srcPanel.controller.getDataSourceFilter();
+            dsfnew.controller.setRawProperties(dsfsrc.controller.getRawProperties());
+            dsfnew.controller._setProperties(dsfsrc.controller.getProperties());
+            dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet());
             if (dsfsrc.getUri() != null) {
                 dsfnew.setUri(dsfsrc.getUri());
             }
@@ -772,23 +766,24 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             }
         }
 
-        Row deleteRow=null; // if non-null, delete this row.
-        Row row= (Row) DomUtil.getElementById(application,domPlot.getRowId());
-        List<DomNode> plotsUsingRow= DomUtil.rowUsages(application,row.getId());
+        Row deleteRow = null; // if non-null, delete this row.
+        Row row = (Row) DomUtil.getElementById(application, domPlot.getRowId());
+        List<DomNode> plotsUsingRow = DomUtil.rowUsages(application, row.getId());
         plotsUsingRow.remove(domPlot);
-        if ( plotsUsingRow.size()==0 ) {
-            deleteRow= row;
+        if (plotsUsingRow.size() == 0) {
+            deleteRow = row;
         }
 
-        domPlot.removePropertyChangeListener(application.childListener);
+        //domPlot.removePropertyChangeListener(application.childListener);
+        domPlot.removePropertyChangeListener(domListener);
         unbind(domPlot);
         unbind(domPlot.getXaxis());
         unbind(domPlot.getYaxis());
         unbind(domPlot.getZaxis());
 
-        DasPlot p = domPlot.getController().getDasPlot();
+        DasPlot p = domPlot.controller.getDasPlot();
         this.getDasCanvas().remove(p);
-        DasColorBar cb = domPlot.getController().getDasColorBar();
+        DasColorBar cb = domPlot.controller.getDasColorBar();
         this.getDasCanvas().remove(cb);
 
         synchronized (this) {
@@ -804,8 +799,8 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             }
             application.setPlots(plots.toArray(new Plot[plots.size()]));
 
-            if ( deleteRow!=null ) {
-                CanvasController cc= row.controller.getCanvas().getController();
+            if (deleteRow != null) {
+                CanvasController cc = row.controller.getCanvas().controller;
                 cc.deleteRow(deleteRow);
                 cc.removeGaps();
             }
@@ -815,7 +810,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
 
     public synchronized void deleteDataSourceFilter(DataSourceFilter dsf) {
         if (!application.dataSourceFilters.contains(dsf)) {
-            logger.fine( "dsf wasn't part of the application" );
+            logger.fine("dsf wasn't part of the application");
             return;
         }
         if (application.dataSourceFilters.size() < 2) {
@@ -826,11 +821,12 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
             throw new IllegalArgumentException("dsf must not have panels before deleting");
         }
 
-        dsf.removePropertyChangeListener(application.childListener);
+        //dsf.removePropertyChangeListener(application.childListener);
+        dsf.removePropertyChangeListener(domListener);
         unbind(dsf);
-        dsf.getController().unbind();
+        dsf.controller.unbind();
 
-        DataSourceFilter[] parents = dsf.getController().getParentSources();
+        DataSourceFilter[] parents = dsf.controller.getParentSources();
         // look for orphaned parents
         List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
         for (DataSourceFilter pdf : parents) {
@@ -1001,50 +997,8 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         return result.toArray(new BindingModel[result.size()]);
     }
 
-    /**
-     * Some sort of processing is going on, so wait until idle.
-     * @return
-     */
-    public boolean isPendingChanges() {
-        boolean result = false;
-        if (changesSupport.isPendingChanges()) {
-            return true;
-        }
-        for (Canvas c : application.getCanvases()) {
-            result = result | c.getController().isPendingChanges();
-        }
-        for (Panel p : application.getPanels()) {
-            result = result | p.getController().isPendingChanges();
-        }
-        for (DataSourceFilter dsf : application.getDataSourceFilters()) {
-            result = result | dsf.getController().isPendingChanges();
-        }
-        return result;
-    }
 
-    /**
-     * the application state is rapidly changing.
-     * @return
-     */
-    public boolean isValueAdjusting() {
-        return changesSupport.isValueAdjusting();
-    }
 
-    protected MutatorLock mutatorLock() {
-        return changesSupport.mutatorLock();
-    }
-
-    public void registerPendingChange(Object client, Object lockObject) {
-        changesSupport.registerPendingChange(client, lockObject);
-    }
-
-    public void performingChange(Object client, Object lockObject) {
-        changesSupport.performingChange(client, lockObject);
-    }
-
-    public void changePerformed(Object client, Object lockObject) {
-        changesSupport.changePerformed(client, lockObject);
-    }
     protected String status = "";
     public static final String PROP_STATUS = "status";
 
@@ -1081,23 +1035,6 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         String oldFocusUri = this.focusUri;
         this.focusUri = focusUri;
         propertyChangeSupport.firePropertyChange(PROP_FOCUSURI, oldFocusUri, focusUri);
-    }
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     /**
@@ -1262,7 +1199,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
         MutatorLock lock = changesSupport.mutatorLock();
         lock.lock();
 
-        canvasLock = canvas.getController().getDasCanvas().mutatorLock();
+        canvasLock = canvas.controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
 
         application.getOptions().syncTo(that.getOptions(),
@@ -1271,19 +1208,22 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
                 Options.PROP_SCRIPTVISIBLE,
                 Options.PROP_SERVERENABLED));
 
+        syncSupport.syncToCanvases(that.getCanvases());
+
         syncSupport.syncToPlotsAndPanels(that.getPlots(), that.getPanels(), that.getDataSourceFilters());
+
+        application.setTimeRange(that.getTimeRange());
 
         syncSupport.syncBindings(that.getBindings());
         syncSupport.syncConnectors(that.getConnectors());
 
-        application.setTimeRange(that.getTimeRange());
 
         canvasLock.unlock();
 
         lock.unlock();
         for (Panel p : application.getPanels()) {  // kludge to avoid reset range
-            p.getController().setResetRanges(false);
-            p.getController().setResetRenderer(true);
+            p.controller.setResetRanges(false);
+            p.controller.setResetRenderer(true);
         }
     }
 
@@ -1295,7 +1235,7 @@ public class ApplicationController implements RunLaterListener.PropertyChange {
     }
 
     public DasCanvas getDasCanvas() {
-        return getCanvas().getController().getDasCanvas();
+        return ((CanvasController)getCanvas().controller).getDasCanvas();
     }
 
     public DasRow getRow() {
