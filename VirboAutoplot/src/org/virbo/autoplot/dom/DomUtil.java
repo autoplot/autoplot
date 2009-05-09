@@ -7,11 +7,14 @@ package org.virbo.autoplot.dom;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.beans.BeansUtil;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -74,21 +77,89 @@ public class DomUtil {
         return result;
     }
 
+    /**
+     * Either sets or gets the property at the expression.
+     * Expressions like:
+     *    timeRange
+     *    plots[0].range
+     * @param node
+     * @param propertyName the value, (or the old value if we were setting it.)
+     * @return propertyDescriptor or null.
+     */
+    private static Object setGetPropertyInt( DomNode node, String propertyName, boolean setit, Object value ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        String[] props= propertyName.split("\\.",-2);
+        int iprop=0;
+        Pattern indexedPattern= Pattern.compile("([a-zA-Z_]+)\\[(\\d+)\\]");
+        Object thisNode= node;
+        PropertyDescriptor result=null;
+        while ( iprop< props.length ) {
+            String prop1= props[iprop];
+            Matcher m= indexedPattern.matcher(prop1);
+            PropertyDescriptor[] pds= BeansUtil.getPropertyDescriptors(thisNode.getClass());
+            PropertyDescriptor prop;
+            if ( m.matches() ) {
+                String name= m.group(1);
+                int idx= Integer.valueOf(m.group(2));
+                for ( int i=0; i<pds.length; i++ ) {
+                    if ( pds[i].getName().equals(name) ) {
+                        Object thisValue= ((IndexedPropertyDescriptor)pds[i]).getIndexedReadMethod().invoke( thisNode, idx );
+                        if ( iprop==props.length-1 ) {
+                            if ( setit ) {
+                                ((IndexedPropertyDescriptor)pds[i]).getIndexedWriteMethod().invoke( thisNode, idx, value );
+                            }
+                            return thisValue;
+                        }
+                        thisNode= thisValue;
+                        break;
+                    }
+                }
+            } else {
+                String name= prop1;
+                for ( int i=0; i<pds.length; i++ ) {
+                    if ( pds[i].getName().equals(name) ) {
+                        Object thisValue= (pds[i]).getReadMethod().invoke( thisNode );
+                        if ( iprop==props.length-1 ) {
+                            if ( setit ) {
+                                (pds[i]).getWriteMethod().invoke( thisNode, value );
+                            }
+                            return thisValue;
+                        }
+                        thisNode= thisValue;
+                        break;
+                    }
+                }
+            }
+            iprop++;
+        }
+
+        return result;
+    }
+
+    static Object getPropertyValue(DomNode node, String propertyName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        return setGetPropertyInt( node, propertyName, false, null );
+    }
+
+    static void setPropertyValue(DomNode node, String propertyName, Object val ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        setGetPropertyInt( node, propertyName, true, val );
+    }
+
+
+
     static boolean hasProperty(DomNode result, String propertyName) {
         return BeanProperty.create(propertyName).isReadable(result);
     }
 
-    static void setProperty( DomNode result, String propertyName, Object value ) {
-        BeanProperty.create(propertyName).setValue( result, value );
+    static void setProperty(DomNode result, String propertyName, Object value) {
+        BeanProperty.create(propertyName).setValue(result, value);
     }
 
     /**
      * return the list of nodes (Plots) that is this row.
      */
-    static List<DomNode> rowUsages( Application app, String rowId ) {
+    static List<DomNode> rowUsages(Application app, String rowId) {
         List<DomNode> result = new ArrayList<DomNode>();
-        for ( Plot p: app.getPlots() ) {
-            if ( p.getRowId().equals(rowId) ) {
+        for (Plot p : app.getPlots()) {
+            if (p.getRowId().equals(rowId)) {
                 result.add(p);
             }
         }
@@ -202,9 +273,9 @@ public class DomUtil {
         if (diff instanceof PropertyChangeDiff) {
             PropertyChangeDiff pcd = (PropertyChangeDiff) diff;
             return new PropertyChangeDiff(childName + "." + pcd.propertyName, pcd.oldVal, pcd.newVal);
-        } else if (diff instanceof ArrayNodeDiff ) {
+        } else if (diff instanceof ArrayNodeDiff) {
             ArrayNodeDiff d = (ArrayNodeDiff) diff;
-            return new ArrayNodeDiff( childName + "." + d.propertyName, d.action, d.node, d.index, d.toIndex );
+            return new ArrayNodeDiff(childName + "." + d.propertyName, d.action, d.node, d.index, d.toIndex);
         } else {
             return null;
         }
@@ -233,13 +304,18 @@ public class DomUtil {
      * @param node
      * @return the index or -1.
      */
-    public static int indexOf( List<DomNode> nodes, DomNode node ) {
-        for ( int i=0; i<nodes.size(); i++ ) {
-            DomNode n1= nodes.get(i);
-            if ( n1==node ) return i;
-            String id= n1.getId();
-            if ( !id.equals("") && id.equals(node.id) ) {
-                return i;
+    public static int indexOf(List<Object> nodes, Object node) {
+        boolean isDomNode = node instanceof DomNode;
+        if (!isDomNode) {
+            return nodes.indexOf(node);
+        } else {
+            for (int i = 0; i < nodes.size(); i++) {
+                DomNode n1 = (DomNode) nodes.get(i);
+                if (n1 == node) return i;
+                String id = n1.getId();
+                if (!id.equals("") && id.equals(((DomNode) node).id)) {
+                    return i;
+                }
             }
         }
         return -1;
@@ -247,82 +323,97 @@ public class DomUtil {
 
     /**
      * list the differences in two arrays of the same type of object.
-     * Presently this just identies inserts and deletes.
+     * This is the diffs that will make nodes2 look like nodes1.
+     * Presently this just identies inserts and deletes.  If the objects
+     * are DomNodes, then ids are used to match nodes.
      * @param property
      * @param node1
      * @param node2
      * @return
      */
-    public static List<Diff> getArrayDiffs(String property, DomNode[] nodes1, DomNode[] nodes2) {
+    public static List<Diff> getArrayDiffs(String property, Object[] nodes1, Object[] nodes2) {
         List<Diff> result = new LinkedList<Diff>();
 
-        int i1= 0;
-        int i2= 0;
+        List<Object> node1List = new ArrayList<Object>(Arrays.asList(nodes1));
+        List<Object> node2List = new ArrayList<Object>(Arrays.asList(nodes2));
 
-        List<DomNode> deleteList= new ArrayList<DomNode>( Arrays.asList(nodes1) );
-        deleteList.removeAll(Arrays.asList(nodes2));
+        List<Object> deleteList = new ArrayList<Object>();
+        for ( Object o: nodes2 ) {
+            if ( indexOf( node1List, o )==-1 ) deleteList.add( o );
+        }
 
-        List<DomNode> node1List= new ArrayList<DomNode>( Arrays.asList(nodes1) );
-        List<DomNode> node2List= new ArrayList<DomNode>( Arrays.asList(nodes2) );
+        boolean isDomNode = DomNode.class.isAssignableFrom(nodes1.getClass().getComponentType());
+
+        for (int i = 0; i < deleteList.size(); i++) {
+            int idx = indexOf(node2List, deleteList.get(i));
+            result.add(new ArrayNodeDiff(property, ArrayNodeDiff.Action.Delete, nodes2[idx], idx));
+            node2List.remove(idx);
+        }
+
+        List<Object> addList = new ArrayList<Object>();
+        for ( Object o: nodes1 ) {
+            if ( indexOf( node2List, o )==-1 ) addList.add( o );
+        }
+
+        for (int i = 0; i < addList.size(); i++) {
+            int idx=-1;
+            idx = indexOf(node1List, addList.get(i));
+            if (nodes1[idx] instanceof DomNode) {
+                result.add(new ArrayNodeDiff(property, ArrayNodeDiff.Action.Insert, ((DomNode) nodes1[idx]).copy(), idx));
+            } else {
+                result.add(new ArrayNodeDiff(property, ArrayNodeDiff.Action.Insert, nodes1[idx], idx));
+            }
+            node2List.add(idx, nodes1[idx]);
+        }
+
+        //TODO: handle resort with Action.Move
         
-        for ( int i=0; i<deleteList.size(); i++ ) {
-            int idx= indexOf( node1List, deleteList.get(i) );
-            result.add( new ArrayNodeDiff( property, ArrayNodeDiff.Action.Delete, nodes1[idx].copy(), idx ) );
-            node1List.remove(idx);
+        if (isDomNode) {
+            for (int i = 0; i < node1List.size(); i++) {
+                result.addAll(childDiffs(property + "[" + i + "]", getDiffs((DomNode)node1List.get(i), (DomNode)nodes2[i])));
+            }
         }
 
-        List<DomNode> addList= new ArrayList<DomNode>( Arrays.asList(nodes2) );
-        addList.removeAll(Arrays.asList(nodes1));
-
-        for ( int i=0; i<addList.size(); i++ ) {
-            int idx= indexOf( node2List, addList.get(i) );
-            result.add( new ArrayNodeDiff( property, ArrayNodeDiff.Action.Insert, nodes2[idx].copy(), idx ) );
-            node1List.add(idx,nodes2[idx]);
-        }
-
-        for ( int i=0; i<node1List.size(); i++ ) {
-            result.addAll( childDiffs( property+"["+i+"]", getDiffs( node1List.get(i), nodes2[i] ) ) );
-        }
-        
         return result;
     }
 
     /**
      * automatically detect the diffs between two DomNodes of the same type.
+     * return the list of diffs that will make node2 look like node1.
      * The property "controller" is ignored.
      * @param node1
      * @param node2
      * @return
      */
     public static List<Diff> getDiffs(DomNode node1, DomNode node2) {
-        return getDiffs( node1, node2, null );
+        return getDiffs(node1, node2, null);
     }
 
     /**
-     *
+     *return the list of diffs that will make node2 look like node1.
      * @param node1
      * @param node2
      * @param exclude if non-null, exclude these properties.
      * @return
      */
-    public static List<Diff> getDiffs( DomNode node1, DomNode node2, List<String> exclude) {
+    public static List<Diff> getDiffs(DomNode node1, DomNode node2, List<String> exclude) {
         String[] props = BeansUtil.getPropertyNames(node1.getClass());
-        PropertyDescriptor[] pds= BeansUtil.getPropertyDescriptors(node1.getClass());
+        PropertyDescriptor[] pds = BeansUtil.getPropertyDescriptors(node1.getClass());
 
         List<Diff> diffs = new ArrayList<Diff>();
         for (int i = 0; i < props.length; i++) {
-            if ( props[i].equals("controller") ) continue;
-            if ( exclude!=null && exclude.contains(props[i]) ) continue;
+            if (props[i].equals("controller")) continue;
+            if (exclude != null && exclude.contains(props[i])) continue;
             try {
-                Object val1 = pds[i].getReadMethod().invoke(node1, new Object[0] );
-                Object val2 = pds[i].getReadMethod().invoke(node2, new Object[0] );
-                if ( pds[i] instanceof IndexedPropertyDescriptor ) {
+                Object val1 = pds[i].getReadMethod().invoke(node1, new Object[0]);
+                Object val2 = pds[i].getReadMethod().invoke(node2, new Object[0]);
+                if (pds[i] instanceof IndexedPropertyDescriptor) {
                     diffs.addAll( getArrayDiffs(props[i], (DomNode[]) val1, (DomNode[]) val2) );
-                } else if ( DomNode.class.isAssignableFrom( pds[i].getReadMethod().getReturnType() ) ) {
-                    diffs.addAll( DomUtil.childDiffs( props[i], ((DomNode)val1).diffs((DomNode)val2) ) );
+                } else if (DomNode.class.isAssignableFrom(pds[i].getReadMethod().getReturnType())) {
+                    diffs.addAll( DomUtil.childDiffs(props[i], ((DomNode) val1).diffs((DomNode) val2)) );
                 } else {
-                    if ( val1!=val2 && ( val1==null || !val1.equals(val2) ) ) {
-                        diffs.add(new PropertyChangeDiff(props[i], val1, val2));
+                    if (val1 != val2 && (val1 == null || !val1.equals(val2))) {
+                        diffs.add(new PropertyChangeDiff(props[i], val2, val1));
                     }
                 }
             } catch (Exception ex) {
@@ -334,7 +425,10 @@ public class DomUtil {
     }
 
     /**
-     * sync node1 to node2 through introspection.
+     * sync node1 to node2 through introspection.  This only works for nodes
+     * without controllers, etc.  It would be really nice to figure out how
+     * to generalize this to include inserted nodes,etc.
+     *
      * @param node1
      * @param node2
      * @return
@@ -349,8 +443,7 @@ public class DomUtil {
     public static void syncTo(DomNode node1, DomNode node2, List<String> exclude) {
         List<Diff> diffs = node1.diffs(node2);
         for (Diff d : diffs) {
-            if ( !exclude.contains( d.propertyName() ) ) d.doDiff(node1);
+            if (!exclude.contains(d.propertyName())) d.doDiff(node1);
         }
     }
-
 }
