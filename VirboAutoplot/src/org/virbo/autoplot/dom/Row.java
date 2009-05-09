@@ -15,11 +15,17 @@ public class Row extends DomNode {
 
     protected String parent;
 
+    protected RowController controller;
+    
     /**
      * the parent Row, or the canvas id.
      */
     public static final String PROP_PARENT = "parent";
 
+    public Row() {
+
+    }
+    
     public String getParent() {
         return parent;
     }
@@ -30,7 +36,7 @@ public class Row extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_PARENT, oldParent, parent);
     }
 
-    protected String top = "2em";
+    protected String top = "+2em";
     public static final String PROP_TOP = "top";
 
     public String getTop() {
@@ -44,34 +50,22 @@ public class Row extends DomNode {
     }
 
 
-    protected String bottom = "100%-3em";
+    protected String bottom = "+100%-3em";
     public static final String PROP_BOTTOM = "bottom";
 
     public String getBottom() {
         return bottom;
     }
 
-    public void setBottom(String bottom) {
-        System.err.println("setBottom("+bottom+")");
+    public void setBottom(String bottom) {        
         String oldBottom = this.bottom;
         this.bottom = bottom;
         propertyChangeSupport.firePropertyChange(PROP_BOTTOM, oldBottom, bottom);
     }
 
-    protected RowController controller = new RowController(this);
-
-    public RowController getController() {
-        return controller;
-    }
-
-    public void setController(RowController controller) {
-        this.controller = controller;
-    }
-
     @Override
     public DomNode copy() {
         Row that= (Row)super.copy();
-        that.controller= null;
         return that;
     }
 
