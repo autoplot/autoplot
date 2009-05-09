@@ -11,11 +11,11 @@ package org.virbo.autoplot.state;
 
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
-import java.beans.DefaultPersistenceDelegate;
 import java.beans.Encoder;
 import java.beans.Expression;
 import java.beans.PersistenceDelegate;
 import java.text.ParseException;
+import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
@@ -26,9 +26,11 @@ import org.virbo.metatree.MetadataUtil;
  * @author jbf
  */
 public class DatumRangePersistenceDelegate extends PersistenceDelegate {
-    
+
     public DatumRangePersistenceDelegate()  {
     }
+
+    private static final Logger logger= Logger.getLogger( DatumRangePersistenceDelegate.class.getName() );
 
     private Datum abs( Datum w ) {
         return w.getUnits().createDatum( Math.abs(w.doubleValue(w.getUnits() )) );
@@ -47,30 +49,36 @@ public class DatumRangePersistenceDelegate extends PersistenceDelegate {
         if ( w.doubleValue( w.getUnits() )==0 ) {
             return dr1.equals(dr2) && dr2.width()==w;
         } else {
-            Datum err= w.divide(1000);
-            return abs( dr1.min().subtract(dr2.min()) ).lt( err ) && abs( dr1.min().subtract(dr2.min()) ).lt(err) ;
+            Datum err= w.divide(100000);
+            return abs( dr1.min().subtract(dr2.min()) ).lt( err ) && abs( dr1.max().subtract(dr2.max()) ).lt(err) ;
         }
 
     }
 
     @Override
     protected boolean mutatesTo(Object oldInstance, Object newInstance) {
+        logger.finest("mutatesTo("+oldInstance+","+newInstance+")");
         // super checks for non-null and same class type.
         return super.mutatesTo(oldInstance, newInstance) && sloppyEquals( oldInstance,newInstance);
     }
 
 
-    protected Expression instantiate(Object oldInstance, Encoder out) {        
+    protected Expression instantiate(Object oldInstance, Encoder out) {
+        logger.finest("instantiate("+oldInstance+")");
         DatumRange field= (DatumRange)oldInstance;
         Units u= field.getUnits();
-        if ( UnitsUtil.isTimeLocation(u) ) {
+        if ( false && UnitsUtil.isTimeLocation(u) ) {
             return new Expression( field, this.getClass(), "newTimeRange", new Object[] { field.toString() } );
         } else {
             return new Expression( field, this.getClass(), "newDatumRange", new Object[] { field.min().doubleValue(u), field.max().doubleValue(u), u.toString() } );
-        }
-        
+        }        
     }
-    
+
+    @Override
+    public void writeObject(Object oldInstance, Encoder out) {
+        super.writeObject(oldInstance, out);
+    }
+
     public static DatumRange newDatumRange( double min, double max, String units ) {
         Units u= MetadataUtil.lookupUnits(units);
         return DatumRange.newDatumRange( min, max, u );
