@@ -16,6 +16,7 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,7 +42,7 @@ public class PngWalkCanvas extends JPanel {
     public PngWalkCanvas() {
         super();
         addMouseListener(mlistener);
-        addMouseWheelListener(mlistener);
+        addMouseWheelListener(wlistener);
     }
     public static final int NOMINAL_HEIGHT = 600;
     public static final int NOMINAL_WIDTH = 800;
@@ -67,6 +68,17 @@ public class PngWalkCanvas extends JPanel {
         int y = ypos - h / 2;
         return new Rectangle(x, y, w, h);
     }
+
+    MouseWheelListener wlistener= new MouseWheelListener() {
+        public void mouseWheelMoved(MouseWheelEvent e) {
+            int current = getCurrentIndex();
+            current += e.getWheelRotation();
+            if (current < 0) current = 0;
+            if (current >= images.size()) current = images.size();
+            setCurrentIndex(current);
+        }
+    };
+
     MouseAdapter mlistener = new MouseAdapter() {
 
         public void mouseClicked(MouseEvent e) {
@@ -88,13 +100,6 @@ public class PngWalkCanvas extends JPanel {
             }
         }
 
-        public void mouseWheelMoved(MouseWheelEvent e) {
-            int current = getCurrentIndex();
-            current += e.getWheelRotation();
-            if (current < 0) current = 0;
-            if (current >= images.size()) current = images.size();
-            setCurrentIndex(current);
-        }
     };
 
     // keep track of the last drawn image to avoid flicker
