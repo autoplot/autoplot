@@ -90,11 +90,15 @@ public class Axis extends DomNode {
     }
 
     public void syncTo(DomNode n) {
-        super.syncTo(n);
-        Axis that = (Axis) n;
-        this.setLog(that.isLog());
-        this.setRange(that.getRange());
-        this.setLabel(that.getLabel());
+        if ( controller!=null ) {
+            controller.syncTo(n);
+        } else {
+            super.syncTo(n);
+            Axis that = (Axis) n;
+            this.setLog(that.isLog());
+            this.setRange(that.getRange());
+            this.setLabel(that.getLabel());
+        }
 
     }
 
