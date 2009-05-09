@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
  * Support methods for synchronizing two Application trees with different
@@ -26,26 +25,67 @@ public class ApplicationControllerSyncSupport {
         this.controller= controller;
         this.application= controller.application;
     }
-        
+
+    protected void syncToCanvases( Canvas[] canvases ) {
+        if ( canvases.length!=application.canvases.size() ) throw new IllegalArgumentException("not implemented");
+       /* while (application.canvases.size() < canvases.length) {
+            controller.addCanvas();
+        }
+        while (application.canvases.size() > canvases.length) {
+            //controller.deleteCanvas( plott );
+        }*/
+        for (int i = 0; i < canvases.length; i++) {
+            application.canvases.get(i).syncTo(canvases[i]);
+        }
+    }
+
+    protected void syncToPlots( Plot[] plots, Map<String,String> plotIds ) {
+        List<Diff> diffs= DomUtil.getArrayDiffs( "plots", plots, application.getPlots() );
+        for ( Diff d: diffs ) {
+            if ( d instanceof ArrayNodeDiff ) {
+                ArrayNodeDiff and= (ArrayNodeDiff)d;
+                if ( and.getAction()==ArrayNodeDiff.Action.Delete ) {
+                    // disconnect from das2 peer
+                    Plot domPlot= (Plot) and.getNode();
+                    if ( domPlot.controller!=null ) {
+                        domPlot.controller.deleteDasPeer( );
+                    }
+                    controller.unbind(domPlot);
+                    controller.unbind(domPlot.getXaxis());
+                    controller.unbind(domPlot.getYaxis());
+                    controller.unbind(domPlot.getZaxis());
+                }
+            }
+            // TODO: this bypasses the child nodes' sync to method.
+            if ( !(d instanceof PropertyChangeDiff ) ) {
+                d.doDiff(application);
+            }
+        }
+
+        for ( int i=0; i<application.getPlots().length; i++ ) {
+            application.getPlots(i).syncTo(plots[i]);
+        }
+
+        for ( Plot p: application.getPlots() ) {
+            if ( p.controller==null ) {
+                Row row= (Row) DomUtil.getElementById( application, p.getRowId() );
+                Column col;
+                if ( p.getColumnId().equals( CanvasController.MARGINCOLUMNID ) ) {
+                    col= null;
+                } else {
+                    col=  (Column) DomUtil.getElementById( application, p.getColumnId() );
+                }
+                new PlotController( application, p ).createDasPeer( row.controller.getCanvas(), row, col );
+            }
+            plotIds.put( p.getId(), p.getId() );
+        }
+    }
+
     protected void syncToPlotsAndPanels( Plot[] plots, Panel[] panels, DataSourceFilter[] dataSourceFilters ) {
         Map<String,String> plotIds= new HashMap<String,String>();
         Map<String,String> dsfIds= new HashMap<String,String>();
 
-        while (application.plots.size() < plots.length) {
-            controller.addPlot(LayoutConstants.BELOW);
-        }
-        while (application.plots.size() > plots.length) {
-            Plot plott= application.plots.get(application.plots.size() - 1);
-            List<Panel> panelss= controller.getPanelsFor(plott);
-            for ( Panel panell:panelss ) {
-                panell.setPlotId(""); // make it an orphan
-            }
-            controller.deletePlot( plott );
-        }
-        for (int i = 0; i < plots.length; i++) {
-            application.plots.get(i).syncTo(plots[i]);
-            plotIds.put( plots[i].getId(), application.plots.get(i).getId() );
-        }
+        syncToPlots(plots,plotIds);
 
         while (application.dataSourceFilters.size() < dataSourceFilters.length) {
             controller.addDataSourceFilter();
@@ -114,8 +154,35 @@ public class ApplicationControllerSyncSupport {
     }
 
 
+    protected void syncBindingsNew( BindingModel[] bindings ) {
+        List<Diff> diffs= DomUtil.getArrayDiffs( "bindings", bindings, application.getBindings() );
+        for ( Diff d: diffs ) {
+            if ( d instanceof ArrayNodeDiff ) {
+                ArrayNodeDiff and= (ArrayNodeDiff)d;
+                if ( and.getAction()==ArrayNodeDiff.Action.Delete ) {
+                    // disconnect from das2 peer
+                    BindingModel domBinding= (BindingModel) and.getNode();
+                    controller.deleteBinding(domBinding);
+                } if ( and.getAction()==ArrayNodeDiff.Action.Insert ) {
+                    BindingModel c= (BindingModel) and.getNode();
+                    DomNode src= DomUtil.getElementById(application,c.srcId);
+                    DomNode dst= DomUtil.getElementById(application,c.dstId);
+                    if ( src==null || dst==null ) {
+                        Logger.getLogger( ApplicationControllerSupport.class.getName() ).finer("node was null");
+                    } else {
+                        controller.bind( src, c.srcProperty, dst, c.dstProperty  );
+                    }
+                }
+            } else {
+                d.doDiff(application);
+            }
+        }
+        System.err.println( application.getBindings() );
+    }
+    
     protected void syncBindings( BindingModel[] bindings ) {
-
+        syncBindingsNew(bindings);
+        /*
         List<BindingModel> addBindings= new ArrayList<BindingModel>();
         List<BindingModel> deleteBindings= new ArrayList<BindingModel>();
 
@@ -145,6 +212,7 @@ public class ApplicationControllerSyncSupport {
             DomNode dst= DomUtil.getElementById(application,c.dstId);
             controller.deleteBinding( controller.findBinding( src, c.srcProperty, dst, c.dstProperty  ) );
         }
+         */
 
     }
 
