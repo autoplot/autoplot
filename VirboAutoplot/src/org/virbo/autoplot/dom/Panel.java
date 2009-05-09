@@ -18,28 +18,7 @@ import org.virbo.autoplot.ApplicationModel.RenderType;
 public class Panel extends DomNode {
 
     public Panel() {
-        PropertyChangeListener childListener = new PropertyChangeListener() {
-            public String toString() {
-               return ""+Panel.this;
-            }
-            public void propertyChange(PropertyChangeEvent evt) {
-                Panel.this.propertyChangeSupport.firePropertyChange(promoteChild(evt));
-            }
-        };
-        style.addPropertyChangeListener(childListener);
 
-    }
-
-    private PropertyChangeEvent promoteChild(PropertyChangeEvent ev) {
-        String childName;
-        if (ev.getSource() == style) {
-            childName = "style";
-        } else if (ev.getSource() == plotDefaults) {
-            childName = "plotDefaults";
-        } else {
-            throw new IllegalArgumentException("child not found");
-        }
-        return new PropertyChangeEvent(this, childName + "." + ev.getPropertyName(), ev.getOldValue(), ev.getNewValue());
     }
 
     /**
