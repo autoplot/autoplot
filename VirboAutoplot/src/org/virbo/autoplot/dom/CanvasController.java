@@ -4,11 +4,8 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,11 +13,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
-import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.system.MutatorLock;
 import org.virbo.autoplot.layout.LayoutConstants;
@@ -29,54 +24,38 @@ import org.virbo.autoplot.layout.LayoutConstants;
  *
  * @author jbf
  */
-public class CanvasController {
-    public final String MARGINROWID = "marginRow";
-    public final String MARGINCOLUMNID = "marginColumn";
+public class CanvasController extends DomNodeController {
+    public static final String MARGINROWID = "marginRow";
+    public static final String MARGINCOLUMNID = "marginColumn";
 
     DasCanvas dasCanvas;
     private Application application;
     private Canvas canvas;
-    private ChangesSupport changesSupport;
 
-    private AtomicInteger rowIdNum = new AtomicInteger(0);
-    private AtomicInteger columnIdNum = new AtomicInteger(0);
+    private static AtomicInteger rowIdNum = new AtomicInteger(0);
+    private static AtomicInteger columnIdNum = new AtomicInteger(0);
 
     public CanvasController(Application dom, Canvas canvas) {
+        super( canvas );
         this.application = dom;
         this.canvas = canvas;
-        canvas.setController(this);
-        changesSupport = new ChangesSupport(propertyChangeSupport,this);
+        canvas.controller= this;
     }
 
     protected void setDasCanvas(DasCanvas canvas) {
         assert (dasCanvas != null);
         this.dasCanvas = canvas;
 
-        ApplicationController ac = application.getController();
+        ApplicationController ac = application.controller;
 
-        ac.bind(this.canvas, Canvas.PROP_SIZE, dasCanvas, "size"); //TODO: check this
+        ac.bind(this.canvas, Canvas.PROP_WIDTH, dasCanvas, "preferredWidth");
+        ac.bind(this.canvas, Canvas.PROP_HEIGHT, dasCanvas, "preferredHeight");
         ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
 
     }
 
     public DasCanvas getDasCanvas() {
         return dasCanvas;
-    }
-
-    public synchronized void registerPendingChange(Object client, Object lockObject) {
-        changesSupport.registerPendingChange(client, lockObject);
-    }
-
-    public synchronized void performingChange(Object client, Object lockObject) {
-        changesSupport.performingChange(client, lockObject);
-    }
-
-    public boolean isPendingChanges() {
-        return changesSupport.isPendingChanges();
-    }
-
-    public synchronized void changePerformed(Object client, Object lockObject) {
-        changesSupport.changePerformed(client, lockObject);
     }
 
     Row getRowFor(Plot domPlot) {
@@ -125,7 +104,7 @@ public class CanvasController {
 
         for ( int idx=0; idx<weights.length; idx++ ) {
             DasRow dasRow;
-            dasRow= rows.get(idx).getController().getDasRow();
+            dasRow= rows.get(idx).controller.getDasRow();
             dasRow.setMinimum( 1.* t / totalWeight );
             dasRow.setMaximum( 1.* (t+weights[idx]) / totalWeight );
             t+= weights[idx];
@@ -179,8 +158,9 @@ public class CanvasController {
         lock.lock();
 
         final Row row = new Row();
+        
         row.setParent(MARGINROWID);
-        row.getController().createDasPeer(this.canvas,application.getController().outerRow);
+        new RowController(row).createDasPeer(this.canvas,application.controller.outerRow);
 
         insertGapFor( row, trow, position );
 
@@ -197,7 +177,6 @@ public class CanvasController {
         canvas.setRows( rows.toArray( new Row[rows.size()] ) );
 
         row.setId( "row_"+rowIdNum.getAndIncrement() );
-        row.addPropertyChangeListener( canvas.childListener );
 
         lock.unlock();
         
@@ -211,14 +190,13 @@ public class CanvasController {
 
         List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
         final Row row = new Row();
+        new RowController(row).createDasPeer(this.canvas,application.controller.outerRow);
         
-        row.getController().createDasPeer(this.canvas,application.getController().outerRow);
         row.setParent(MARGINROWID);
         rows.add(row);
 
         canvas.setRows( rows.toArray(new Row[rows.size()]) );
         row.setId( "row_"+rowIdNum.getAndIncrement() );
-        row.addPropertyChangeListener( canvas.childListener );
 
         lock.unlock();
         return row;
@@ -234,6 +212,27 @@ public class CanvasController {
 
         canvas.setRows(rows.toArray(new Row[rows.size()]));
         lock.unlock();
+    }
+
+    protected void syncTo( Canvas canvas ) {
+
+        List<Diff> diffs =  this.canvas.diffs(canvas);
+        for (Diff d : diffs) {
+            if ( d instanceof ArrayNodeDiff ) {
+                ArrayNodeDiff and= (ArrayNodeDiff)d;
+            }
+            d.doDiff(this.canvas);
+        }
+        for ( Row r: this.canvas.getRows() ) {
+            if ( r.controller==null ) {
+                new RowController(r).createDasPeer( this.canvas, application.controller.outerRow );
+            }
+        }
+        for ( Column r: this.canvas.getColumns() ) {
+            if ( r.controller==null ) {
+                new ColumnController(r).createDasPeer( this.canvas, application.controller.outerColumn );
+            }
+        }
     }
 
     protected void bindTo(final DasRow outerRow, final DasColumn outerColumn) {
@@ -286,15 +285,6 @@ public class CanvasController {
                 }
             }
         });
-    }
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
     public String toString() {

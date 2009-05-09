@@ -17,18 +17,19 @@ import org.das2.graph.DasRow;
  *
  * @author jbf
  */
-public class RowController {
+public class RowController extends DomNodeController {
     Row row;
     DasRow dasRow;
     Canvas canvas;
 
     RowController( Row row ) {
+        super(row);
         this.row= row;
         row.controller= this;
     }
 
     protected void createDasPeer( Canvas canvas, DasRow parent ) {
-        DasCanvas c= canvas.getController().getDasCanvas();
+        DasCanvas c= canvas.controller.getDasCanvas();
         dasRow= DasRow.create( c, parent, row.getTop(), row.getBottom() );
         PropertyChangeListener list= new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {

@@ -6,7 +6,6 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.InterruptedIOException;
 import java.net.URI;
 import java.text.ParseException;
@@ -42,13 +41,13 @@ import org.virbo.dsutil.AutoHistogram;
  *
  * @author jbf
  */
-public class DataSourceController {
+public class DataSourceController extends DomNodeController {
 
     Logger logger = Logger.getLogger("vap.dataSourceController");
     DataSourceFilter dsf;
     private ApplicationModel model;
     private Application dom;
-    private ChangesSupport changesSupport;
+
     /**
      * the current load being monitored.
      */
@@ -92,10 +91,10 @@ public class DataSourceController {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
-                if (!dom.getController().isValueAdjusting()) {
+                if (!dom.controller.isValueAdjusting()) {
                     resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
                 } else {
-                    new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.getController()) {
+                    new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller) {
                         @Override
                         public void run() {
                             resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
@@ -111,7 +110,8 @@ public class DataSourceController {
     private static final String PENDING_UPDATE = "update";
 
     public DataSourceController(ApplicationModel model, DataSourceFilter dsf) {
-
+        super( dsf );
+        
         this.model = model;
         this.dom = model.getDocumentModel();
         this.changesSupport = new ChangesSupport(this.propertyChangeSupport, this);
@@ -219,7 +219,7 @@ public class DataSourceController {
         if (oldSource == null || !oldSource.equals(dataSource)) {
             if (getTsb() != null) {
                 _setDataSet(null);
-                List<Panel> ps = dom.getController().getPanelsFor(dsf);
+                List<Panel> ps = dom.controller.getPanelsFor(dsf);
                 if (ps.size() > 0) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(ps.get(0));
                     timeSeriesBrowseController.setup(valueWasAdjusting);
@@ -263,7 +263,7 @@ public class DataSourceController {
             for (String s : problems) {
                 message.append(s + "\n");
             }
-            if (dom.getController().isHeadless()) {
+            if (dom.controller.isHeadless()) {
                 throw new IllegalArgumentException(message.toString());
             } else {
                 JOptionPane.showMessageDialog(model.getCanvas(), message); //TODO: View code in controller
@@ -279,7 +279,7 @@ public class DataSourceController {
             }
         }
 
-        ApplicationController ac= this.dom.getController();
+        ApplicationController ac= this.dom.controller;
 
         if (ac.isValueAdjusting()) {
             final QDataSet fds = ds;
@@ -309,7 +309,7 @@ public class DataSourceController {
             //doFillValidRange();  the QDataSet returned 
             updateFill();
 
-            List<Panel> panels= dom.getController().getPanelsFor(dsf);
+            List<Panel> panels= dom.controller.getPanelsFor(dsf);
             if ( panels.size()==0 ) {
                 setStatus("warning: done loading data but no panels are listening");
             }
@@ -335,7 +335,7 @@ public class DataSourceController {
         for (int i = 0; i < ss.length; i++) {
             DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
             if ( dsf!=null ) {
-                dsf.getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
+                dsf.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
                 parentSources[i] = dsf;
             }else {
                 parentSources[i] = null;
@@ -353,12 +353,12 @@ public class DataSourceController {
         QDataSet x;
         QDataSet y = null;
         QDataSet z = null;
-        x = parentSources[0].getController().getFillDataSet();
+        x = parentSources[0].controller.getFillDataSet();
         if (parentSources.length > 1) {
-            y = parentSources[1].getController().getFillDataSet();
+            y = parentSources[1].controller.getFillDataSet();
         }
         if (parentSources.length > 2) {
-            z = parentSources[2].getController().getFillDataSet();
+            z = parentSources[2].controller.getFillDataSet();
         }
         if (parentSources.length == 2) {
             if (x == null || y == null) {
@@ -418,7 +418,7 @@ public class DataSourceController {
     private synchronized void doInternal(String path) {
         if ( parentSources!=null ) {
             for ( int i=0; i<parentSources.length; i++ ) {
-                if ( parentSources[i]!=null ) parentSources[i].getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
+                if ( parentSources[i]!=null ) parentSources[i].controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
             }
         }
         if ( path.trim().length()==0 ) return;
@@ -674,7 +674,7 @@ public class DataSourceController {
             }
         };
 
-        if (_getDataSource() != null && _getDataSource().asynchronousLoad() && !dom.getController().isHeadless()) {
+        if (_getDataSource() != null && _getDataSource().asynchronousLoad() && !dom.controller.isHeadless()) {
             logger.info("invoke later do load");
             if (mon != null) {
                 System.err.println("double load!");
@@ -859,23 +859,6 @@ public class DataSourceController {
         this.reduceDataSetString = reduceDataSetString;
         propertyChangeSupport.firePropertyChange(PROP_REDUCEDATASETSTRING, oldReduceDataSetString, reduceDataSetString);
     }
-    private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
-
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
 
     /**
      * load the data set from the DataSource.
@@ -1041,12 +1024,14 @@ public class DataSourceController {
         return timeSeriesBrowseController;
     }
 
+
+    @Override
     public boolean isPendingChanges() {
         TimeSeriesBrowseController tsbc= timeSeriesBrowseController;
         if (tsbc != null && tsbc.isPendingChanges()) {
             return true;
         }
-        return changesSupport.isPendingChanges();
+        return super.isPendingChanges();
     }
 
     private void handleException(Exception e) {
@@ -1058,7 +1043,7 @@ public class DataSourceController {
      * @return null or a panel.
      */
     private Panel getPanel() {
-        List<Panel> panels = dom.getController().getPanelsFor(dsf);
+        List<Panel> panels = dom.controller.getPanelsFor(dsf);
         if (panels.size() == 0) {
             return null;
         } else {
@@ -1071,20 +1056,20 @@ public class DataSourceController {
         Panel panel = getPanel();
         DasPlot p = null;
         if (panel != null) {
-            Plot plot = dom.getController().getPlotFor(panel);
+            Plot plot = dom.controller.getPlotFor(panel);
             if (plot != null) {
-                p = plot.getController().getDasPlot();
+                p = plot.controller.getDasPlot();
             }
         }
         if (p != null) {
-            return dom.getController().getMonitorFactory().getMonitor(p, label, description);
+            return dom.controller.getMonitorFactory().getMonitor(p, label, description);
         } else {
-            return dom.getController().getMonitorFactory().getMonitor(label, description);
+            return dom.controller.getMonitorFactory().getMonitor(label, description);
         }
 
     }
 
     private void setStatus(String string) {
-        dom.getController().setStatus(string);
+        dom.controller.setStatus(string);
     }
 }

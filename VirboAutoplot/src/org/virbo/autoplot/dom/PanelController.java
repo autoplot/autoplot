@@ -7,7 +7,6 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,7 +39,7 @@ import org.virbo.dataset.SemanticOps;
  * PanelController manages the Panel, for example resolving the datasource and loading the dataset.
  * @author jbf
  */
-public class PanelController {
+public class PanelController extends DomNodeController {
 
     private static final String PENDING_RESET_RANGE = "resetRanges";
     private static final String PENDING_SET_DATASET= "setDataSet";
@@ -54,8 +53,7 @@ public class PanelController {
      */
     private Panel parentPanel;
     private List<Panel> childPanels;
-    private ChangesSupport changesSupport;
-    private PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
+    
     private DataSourceFilter dsf; // This is the one we are listening to.
     /**
      * switch over between fine and course points.
@@ -64,11 +62,12 @@ public class PanelController {
     public static final int LARGE_DATASET_COUNT = 30000;
 
     public PanelController(final ApplicationModel model, final Application dom, final Panel panel) {
+        super(panel);
         panel.controller = this;
         this.dom = dom;
         this.panel = panel;
         this.appmodel = model;
-        this.changesSupport = new ChangesSupport(this.propertyChangeSupport,this);
+        
         panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, panelListener);
         panel.addPropertyChangeListener(Panel.PROP_DATASOURCEFILTERID, panelListener);
     }
@@ -79,8 +78,8 @@ public class PanelController {
     void unbindDsf() {
         dsf.removePropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
         dsf.removePropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
-        dsf.getController().removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
-        dsf.getController().removePropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
+        dsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
+        dsf.controller.removePropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
     }
     PropertyChangeListener dsfListener = new PropertyChangeListener() {
 
@@ -119,14 +118,14 @@ public class PanelController {
             unbindDsf();  
             List<DomNode> usages= DomUtil.dataSourceUsages(dom, dsf.getId() );
             if ( usages.size()==0 ) {
-                dom.getController().deleteDataSourceFilter(dsf);
+                dom.controller.deleteDataSourceFilter(dsf);
             }
         }
 
         assert (panel.getDataSourceFilterId() != null);
         if ( panel.getDataSourceFilterId().equals("") ) return;
         
-        dsf = dom.getController().getDataSourceFilterFor(panel);
+        dsf = dom.controller.getDataSourceFilterFor(panel);
 
         if ( dsf==null ) {
             throw new NullPointerException("couldn't find the data for this panel");
@@ -134,7 +133,7 @@ public class PanelController {
             dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
             dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
         }
-        setDataSourceFilterController(getDataSourceFilter().getController());
+        setDataSourceFilterController(getDataSourceFilter().controller);
     }
 
     private Color deriveColor( Color color, int i ) {
@@ -204,10 +203,10 @@ public class PanelController {
         }
 
         final DataSourceFilter dsf = getDataSourceFilter();
-        String reduceRankString = dsf.getController().getReduceDataSetString();
-        if (dsf.getController().getReduceDataSetString() != null) {
+        String reduceRankString = dsf.controller.getReduceDataSetString();
+        if (dsf.controller.getReduceDataSetString() != null) {
             // kludge to update title
-            String title = dom.getController().getPlot().getTitle(); //TODO: fix
+            String title = dom.controller.getPlot().getTitle(); //TODO: fix
             Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
             Matcher m = p.matcher(title);
             if (m.matches()) {
@@ -227,7 +226,7 @@ public class PanelController {
             if (!Arrays.asList(dom.getPanels()).contains(panel)) {
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
-            QDataSet fillDs = dsf.getController().getFillDataSet();
+            QDataSet fillDs = dsf.controller.getFillDataSet();
             logger.fine( "got new dataset: "+fillDs);
             if ( fillDs!=null ) {
                 if ( resetRanges ) {
@@ -236,7 +235,7 @@ public class PanelController {
                         panel.setRenderType(renderType);
                         resetPanel(fillDs,renderType);
                     } else {
-                        dom.getController().deletePanel(panel);
+                        dom.controller.deletePanel(panel);
                     }
                     
                 } else if ( resetRenderer ) {
@@ -265,7 +264,7 @@ public class PanelController {
         if (childPanels != null) {
             for (Panel p : this.childPanels) {
                 if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
-                    dom.getController().deletePanel(p);
+                    dom.controller.deletePanel(p);
                 }
             }
         }
@@ -275,37 +274,37 @@ public class PanelController {
             setResetRanges(false);
 
             // add additional panels when it's a bundle of rank1 datasets.
-            if (!dom.getController().isValueAdjusting()) {
+            if (!dom.controller.isValueAdjusting()) {
                 if ( fillDs.rank() == 2 && ( renderType != RenderType.spectrogram ) && fillDs.length(0) < 12) {
-                    MutatorLock lock = dom.getController().mutatorLock();
+                    MutatorLock lock = dom.controller.mutatorLock();
                     lock.lock();
                     renderer.setActive(false);
                     String[] labels = SemanticOps.getComponentLabels(fillDs);
                     Color c = panel.getStyle().getColor();
                     Color fc= panel.getStyle().getFillColor();
-                    Plot domPlot = dom.getController().getPlotFor(panel);
+                    Plot domPlot = dom.controller.getPlotFor(panel);
                     List<Panel> cp = new ArrayList<Panel>(fillDs.length(0));
                     for (int i = 0; i < fillDs.length(0); i++) {
-                        Panel cpanel = dom.getController().copyPanel(panel, domPlot, dsf);
-                        cpanel.getController().getRenderer().setActive(false);
+                        Panel cpanel = dom.controller.copyPanel(panel, domPlot, dsf);
+                        cpanel.controller.getRenderer().setActive(false);
                         cp.add(cpanel);
-                        cpanel.getController().parentPanel = panel;
+                        cpanel.controller.parentPanel = panel;
                         cpanel.getStyle().setColor(deriveColor(c, i));
                         cpanel.getStyle().setFillColor( deriveColor(fc,i).brighter() );
                         cpanel.setComponent(labels[i]);
                         cpanel.setDisplayLegend(true);
                         cpanel.setLegendLabel(labels[i].trim());
                         cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
-                        cpanel.getController().setDataSet(fillDs);
+                        cpanel.controller.setDataSet(fillDs);
                     }
                     for ( Panel cpanel: cp ) {
-                        cpanel.getController().getRenderer().setActive(true);
+                        cpanel.controller.getRenderer().setActive(true);
                     }
                     renderer.setActive(false);
                     PanelController.this.childPanels = cp;
                     lock.unlock();
                 }
-            } //!dom.getController().isValueAdjusting()
+            } //!dom.controller.isValueAdjusting()
         } //fillDs != null
     }
 
@@ -332,21 +331,6 @@ public class PanelController {
         dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
     }
 
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
-    }
     /**
      * true indicates the controller should autorange next time the fillDataSet is changed.
      */
@@ -401,7 +385,7 @@ public class PanelController {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
         }
-        ApplicationController ac = this.dom.getController();
+        ApplicationController ac = this.dom.controller;
         ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL);
         ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
         ac.bind(panel, Panel.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
@@ -413,7 +397,7 @@ public class PanelController {
 
         setRenderType(panel.getRenderType());
         setResetRenderer(false);
-        Plot plot = dom.getController().getPlotFor(panel);
+        Plot plot = dom.controller.getPlotFor(panel);
 
         Panel panelCopy = (Panel) panel.copy();
         panelCopy.getPlotDefaults().syncTo(plot);
@@ -447,8 +431,8 @@ public class PanelController {
      */
     private void doMetadata(Panel panelCopy, boolean autorange, boolean interpretMetadata) {
         final DataSourceFilter dsf = getDataSourceFilter();
-        QDataSet fillDs = dsf.getController().getFillDataSet();
-        Map<String, Object> properties = dsf.getController().getFillProperties();
+        QDataSet fillDs = dsf.controller.getFillDataSet();
+        Map<String, Object> properties = dsf.controller.getFillProperties();
 
         RenderType renderType = panel.getRenderType();
 
@@ -465,8 +449,8 @@ public class PanelController {
 
             doInterpretMetadata(panelCopy, properties, panel.getRenderType());
 
-            String reduceRankString = getDataSourceFilter().getController().getReduceDataSetString();
-            if (dsf.getController().getReduceDataSetString() != null) {
+            String reduceRankString = getDataSourceFilter().controller.getReduceDataSetString();
+            if (dsf.controller.getReduceDataSetString() != null) {
                 String title = panelCopy.getPlotDefaults().getTitle();
                 title += "!c" + reduceRankString;
                 panelCopy.getPlotDefaults().setTitle(title);
@@ -479,7 +463,7 @@ public class PanelController {
         } else {
             // kludge to support updating slice location report without autoranging.
             // I don't think it's coming into this dead code.
-            if (dsf.getController().getReduceDataSetString() != null) {
+            if (dsf.controller.getReduceDataSetString() != null) {
                 panelCopy.getPlotDefaults().setTitle("");
                 doInterpretMetadata(panelCopy, properties, renderType);
 
@@ -580,14 +564,14 @@ public class PanelController {
      * @param spec
      */
     private void doAutoranging(Panel panelCopy) {
-        Map props = getDataSourceFilter().getController().getFillProperties();
+        Map props = getDataSourceFilter().controller.getFillProperties();
         RenderType spec = panelCopy.getRenderType();
 
         if (props == null) {
             props = Collections.EMPTY_MAP;
         }
 
-        QDataSet fillDs = getDataSourceFilter().getController().getFillDataSet();
+        QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
 
         if (spec == RenderType.spectrogram) {
 
@@ -608,7 +592,7 @@ public class PanelController {
 
             AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, (Map) props.get(QDataSet.DEPEND_1));
 
-            QDataSet hist= getDataSourceFilter().getController().getHistogram();
+            QDataSet hist= getDataSourceFilter().controller.getHistogram();
             AutoplotUtil.AutoRangeDescriptor desc;
             if ( false && hist!=null ) {
                 desc= AutoplotUtil.autoRange( hist, fillDs, props );
@@ -636,7 +620,7 @@ public class PanelController {
 
             panelCopy.getStyle().setLineWidth(1.0f);
 
-            QDataSet hist= getDataSourceFilter().getController().getHistogram();
+            QDataSet hist= getDataSourceFilter().controller.getHistogram();
             AutoplotUtil.AutoRangeDescriptor desc;
             if ( false && hist!=null ) {
                 desc= AutoplotUtil.autoRange( hist, fillDs, props );
@@ -690,15 +674,15 @@ public class PanelController {
      * @return the plot containing this panel's renderer, or null.
      */
     public DasPlot getDasPlot() {
-        Plot p= dom.getController().getPlotFor(panel);
+        Plot p= dom.controller.getPlotFor(panel);
         if ( p==null ) return null;
-        return p.getController().getDasPlot();
+        return p.controller.getDasPlot();
     }
 
     private DasColorBar getColorbar() {
-        Plot p= dom.getController().getPlotFor(panel);
+        Plot p= dom.controller.getPlotFor(panel);
         if ( p==null ) throw new IllegalArgumentException("no plot found for panel");
-        return p.getController().getDasColorBar();
+        return p.controller.getDasColorBar();
     }
 
     /**
@@ -727,7 +711,7 @@ public class PanelController {
 
                 this.childPanels = null;
                 this.setResetRanges(true);
-                this.resetPanel(dsf.getController().getFillDataSet(),renderType);
+                this.resetPanel(dsf.controller.getFillDataSet(),renderType);
 
             } else {
                 for (Panel p : this.childPanels) {
@@ -739,10 +723,14 @@ public class PanelController {
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
 
-        QDataSet fillDs= dsf.getController().getFillDataSet();
+        QDataSet fillDs= dsf.controller.getFillDataSet();
         if ( newRenderer instanceof SeriesRenderer && fillDs!=null ) {
             QDataSet d= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-            ((SeriesRenderer)newRenderer).setCadenceCheck( (d.property(QDataSet.CADENCE)!=null ) );
+            if ( d!=null ) {
+                ((SeriesRenderer)newRenderer).setCadenceCheck( (d.property(QDataSet.CADENCE)!=null ) );
+            } else {
+                ((SeriesRenderer)newRenderer).setCadenceCheck( true );
+            }
         }
 
         if (oldRenderer != newRenderer) {
@@ -756,15 +744,15 @@ public class PanelController {
             plot.addRenderer(newRenderer);
             logger.finest("plot.addRenderer "+plot+" "+newRenderer);
 
-            if (getDataSourceFilter().getController().getFillDataSet() != null) {
-                setDataSet(getDataSourceFilter().getController().getFillDataSet());
+            if (getDataSourceFilter().controller.getFillDataSet() != null) {
+                setDataSet(getDataSourceFilter().controller.getFillDataSet());
             }
         }
 
     }
 
     public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
-        ApplicationController ac = this.dom.getController();
+        ApplicationController ac = this.dom.controller;
 
         ac.bind(panel, "style.lineWidth", seriesRenderer, "lineWidth");
         ac.bind(panel, "style.color", seriesRenderer, "color");
@@ -779,7 +767,7 @@ public class PanelController {
     }
 
     public void bindToSpectrogramRenderer(SpectrogramRenderer spectrogramRenderer) {
-        ApplicationController ac = this.dom.getController();
+        ApplicationController ac = this.dom.controller;
 
         ac.bind(panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
         ac.bind(panel, "style.colortable", spectrogramRenderer, "colorBar.type");
@@ -787,22 +775,18 @@ public class PanelController {
     }
 
     public void bindToImageVectorDataSetRenderer(ImageVectorDataSetRenderer renderer) {
-        ApplicationController ac = this.dom.getController();
+        ApplicationController ac = this.dom.controller;
         ac.bind(panel, "style.color", renderer, "color");
         ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL);
         ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
     }
 
-    public boolean isValueAdjusting() {
-        return changesSupport.isValueAdjusting();
-    }
-
     public boolean isPendingChanges() {
-        return getDataSourceFilter().getController().isPendingChanges() || changesSupport.isPendingChanges();
+        return getDataSourceFilter().controller.isPendingChanges() || super.isPendingChanges();
     }
 
     private void setStatus(String string) {
-        this.dom.getController().setStatus(string);
+        this.dom.controller.setStatus(string);
     }
 
     public String toString() {
