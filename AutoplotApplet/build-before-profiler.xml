@@ -12,8 +12,7 @@
 <project name="AutoplotApplet" default="default" basedir=".">
     <description>Builds, tests, and runs the project AutoplotApplet.</description>
     <import file="nbproject/build-impl.xml"/>
-
-    <import file="nbproject/profiler-build-impl.xml"/>    <target name="applet-release" depends="jar,rejar-jars" description="copy the html files out" >
+    <target name="applet-release" depends="jar,rejar-jars" description="copy the html files out" >
         <copy file="${build.classes.dir}/AutoplotApplet.html" todir="${dist.dir}" />
         <copy file="${build.classes.dir}/TwoPanelApplet.html" todir="${dist.dir}" />
         <copy file="${build.classes.dir}/GarageTemps.html" todir="${dist.dir}" />
