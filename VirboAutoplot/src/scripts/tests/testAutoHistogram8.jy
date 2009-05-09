@@ -1,0 +1,12 @@
+dom= getDocumentModel()
+
+# Total check fails here with new code from rescale and expand
+ds= getDataSet('vap+dat:ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_1999.dat?time=field0&timeFormat=%Y %j %H&column=field8&fill=999.9')
+ah= autoHistogram(ds)
+dom.controller.setPlot( dom.plots[1] )
+plot(ah)
+
+ds= getDataSet('vap:file:/home/jbf/autoplot_data/http/cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-16+through+2000-01-18')
+ah= autoHistogram(ds)
+dom.controller.setPlot( dom.plots[0] )
+plot(ah)  #InconvertableUnitsException--why doesn't it autorange?

@@ -1,0 +1,4 @@
+# This demonstrates where NaNs are showing up in the variance.
+ds= getDataSet('vap:http://www.sarahandjeremy.net/jeremy/1wire/data/$Y/0D0008004437CF10.$Y$m$d.d2s?timerange=2007-02-15')
+hist= autoHistogram( ds )
+

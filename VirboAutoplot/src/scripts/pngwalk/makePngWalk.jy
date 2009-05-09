@@ -1,0 +1,43 @@
+def myWriteToPng( filename, appmodel, dom, width, height ): 
+   appmodel.waitUntilIdle(False);
+   from org.das2.util import DasPNGEncoder, DasPNGConstants
+   out= java.io.FileOutputStream( filename )
+   image = dom.canvases[0].controller.dasCanvas.getImage(width, height);
+   encoder = DasPNGEncoder();
+   encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, java.util.Date().toString() );
+   encoder.write(image, out)
+   out.close();
+
+uri= 'http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109'
+outputFolder= '/home/jbf/temp/'
+product= 'product'
+
+times= getTimeRangesFor( uri, '2007-nov through 2007-dec', '%Y%m%d' )
+
+n= len(times)
+
+appmodel= ApplicationModel()
+dom= appmodel.getDocumentModel()
+dom.syncTo( getDocumentModel() )
+dom.syncTo( getDocumentModel() )
+
+from org.virbo.autoplot.state import StatePersistence
+StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom );
+
+dom.canvases[0].fitted=False
+w0= dom.canvases[0].width
+h0= dom.canvases[0].height
+
+dom.getController().waitUntilIdle();
+
+count= 0
+for i in times:
+   count= count+1
+   print '%d of %d' % (count, n )
+   dom.timeRange= DatumRangeUtil.parseTimeRangeValid(i)
+   myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom, w0, h0 )
+#   myWriteToPng( outputFolder + product + '_%s_th.png' % i, appmodel, dom, w0/4, h0/4 )
+
+
+
+

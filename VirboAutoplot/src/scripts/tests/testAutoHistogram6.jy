@@ -1,0 +1,12 @@
+# this demonstrates a runtime exception caused by roundoff error in autohistogram
+#d= findgen( 1000 ) * 0.03 + 0.04
+#d= ( findgen( 1000 ) * 0.03 + 0.04 ) * 1000
+d= ( randn( 1000 ) * 0.0003 + 0.04 ) 
+ah= autoHistogram(d)
+
+try:
+   plot(ah)
+
+except java.lang.Exception:
+   print 'error'
+

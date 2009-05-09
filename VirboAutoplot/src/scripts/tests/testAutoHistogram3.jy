@@ -1,0 +1,11 @@
+# this demonstrates a failure in AutoHistogram, where we get NaNs.  
+len= 100000
+
+dist1= randomu( 0, len )
+#dist1= coerce( [1.5,1,2,1,2,1,2] )
+
+from org.virbo.dsutil import AutoHistogram
+ah= AutoHistogram()
+ds= ah.doit(dist1)
+
+plot(dist1)

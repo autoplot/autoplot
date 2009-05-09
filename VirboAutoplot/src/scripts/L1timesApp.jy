@@ -1,0 +1,46 @@
+fp=  open( '/home/jbf/L1times.2.dat', 'r' )
+import org
+
+dom= getDocumentModel()
+dasPlot= dom.controller.plot.controller.dasPlot
+
+ddmm= dasPlot.dasMouseInputAdapter.getModuleByLabel("Display Data")
+ddmm.yclip= True
+dasPlot.dasMouseInputAdapter.setPrimaryModule(ddmm)
+
+timeparser= TimeParser.create( TimeParser.iso8601String('2007-05-03T15:04:02') )
+filetimeparser= TimeParser.create( '%y%m%d' )
+timetags= org.virbo.dsutil.DataSetBuilder( 1, 100 )
+timetags.putProperty( QDataSet.LABEL, 'file modification time' )
+filetime= org.virbo.dsutil.DataSetBuilder( 1, 100 )
+filetime.putProperty( QDataSet.LABEL, 'time in filename' )
+filename= org.virbo.dsutil.DataSetBuilder( 1, 100 )
+
+#2007-05-03T15:04:02  ./0010/00101148.6C2
+
+from org.das2.datum import EnumerationUnits
+filenameUnits= EnumerationUnits.create("filenames")
+
+for line in fp:
+   ttag2000= timeparser.parse( line[0:19] ).getTime( Units.t2000 )
+   ftag2000= filetimeparser.parse( line[28:34] ).getTime( Units.t2000 )
+   ftag2000= ftag2000 + int(line[34:36], 16) * 86400 / 256  # fractional part of day
+   timetags.putValue( -1, ttag2000 )
+   filetime.putValue( -1, ftag2000 )
+   filename.putValue( -1, filenameUnits.createDatum( line[21:40] ).doubleValue( filenameUnits ) )
+   timetags.nextRecord()
+   filetime.nextRecord()
+   filename.nextRecord()
+
+timetags.putProperty( QDataSet.UNITS, Units.t2000 )
+filetime.putProperty( QDataSet.UNITS, Units.t2000 )
+filename.putProperty( QDataSet.UNITS, filenameUnits )
+
+timetags.putProperty( QDataSet.DEPEND_0, filetime.getDataSet() )
+timetags.putProperty( QDataSet.PLANE_0, filename.getDataSet() )
+
+result= timetags.getDataSet()
+diff= result - result.property( QDataSet.DEPEND_0 )
+diff.putProperty( QDataSet.DEPEND_0, result )
+
+plot( result )

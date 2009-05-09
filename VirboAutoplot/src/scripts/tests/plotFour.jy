@@ -1,0 +1,4 @@
+ds= transpose( accum( randn( 4, 3000000 ) ) )
+ds.putProperty(QDataSet.DEPEND_1, labels( ['Alpha','Beta','Delta','Gamma'] ) )
+
+plot(ds)

@@ -1,0 +1,6 @@
+
+ds= randn(10)
+for i in ds:
+   print i
+
+print max(ds)

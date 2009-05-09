@@ -1,0 +1,26 @@
+theplot= getApplicationModel().plot
+
+from org.das2.graph import Renderer
+from math import cos, sin
+from java.awt.geom import Line2D
+class MyRenderer( Renderer ):
+    def render( self, g, xAxis, yAxis, mon ):
+         g.setColor( Color.GRAY )
+         orx= xAxis.transform( Units.dimensionless.createDatum( 0.0 ) )
+         ory= yAxis.transform( Units.dimensionless.createDatum( 0.0 ) )
+         for i in xrange( 0, 12 ):
+              radx= xAxis.transform( Units.dimensionless.createDatum( 100 * cos( i*30.*PI/180 ) ) )
+              rady= yAxis.transform( Units.dimensionless.createDatum( 100 * sin( i*30.*PI/180 ) ) )
+              g.draw( Line2D.Double( orx, ory, radx, rady ) )
+   
+myRend= MyRenderer()
+
+theplot.removeRenderer( theplot.getRenderer(2) )
+theplot.addRenderer( myRend )
+
+from org.virbo.dsops.Ops import cos as dscos
+from org.virbo.dsops.Ops import sin as dssin
+
+angle= linspace( 0, 360, 360 ) * PI / 180
+radius= dscos( angle*5 )
+plot( radius * dscos( angle ) , radius * dssin(angle) )

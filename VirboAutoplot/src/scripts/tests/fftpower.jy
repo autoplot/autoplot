@@ -1,0 +1,8 @@
+sps= 1024
+t = dindgen(sps) * (1./sps)
+ds=  2.0* sin(2*PI*t*200);
+ds.putProperty( QDataSet.DEPEND_0, t )
+
+#plot( ds )
+plot( fftPower(ds) )
+

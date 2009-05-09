@@ -1,0 +1,5 @@
+ds= getDataSet( 'http://goes.ngdc.noaa.gov/data/avg/2004/A1050402.TXT' )
+ah= autoHistogram( ds )
+
+plot(ah)
+

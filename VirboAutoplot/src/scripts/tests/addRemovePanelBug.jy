@@ -1,0 +1,5 @@
+plot( None, labels( ['X', 'Y', 'Z'] ), accum( findgen( 100,3 ) ) )
+
+plot( None, findgen( 100 ) )
+
+
