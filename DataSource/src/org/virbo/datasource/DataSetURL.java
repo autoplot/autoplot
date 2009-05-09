@@ -298,7 +298,18 @@ public class DataSetURL {
         String ext = DataSetURL.getExt(surl);
 
         if (isAggregating(uri.toString())) {
-            return new AggregatingDataSourceEditorPanel();
+            String eext= DataSetURL.getExplicitExt(uri.toString());
+            if ( eext!=null ) {
+                AggregatingDataSourceEditorPanel result= new AggregatingDataSourceEditorPanel();
+                DataSourceEditorPanel edit = DataSourceRegistry.getInstance().getEditorByExt(eext);
+                if ( edit!=null ) {
+                    result.setDelegateEditorPanel(edit);
+                }
+                return result;
+            } else {
+                return new AggregatingDataSourceEditorPanel();
+            }
+            
         } 
         
         DataSourceEditorPanel edit = DataSourceRegistry.getInstance().getEditorByExt(ext);
@@ -312,7 +323,15 @@ public class DataSetURL {
             URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
 
         if (isAggregating(uri.toString())) {
-            return new AggregatingDataSourceFactory();
+            String eext= DataSetURL.getExplicitExt(uri.toString());
+            if ( eext!=null ) {
+                DataSourceFactory delegateFactory= DataSourceRegistry.getInstance().getSource(eext);
+                AggregatingDataSourceFactory factory= new AggregatingDataSourceFactory();
+                factory.setDelegateDataSourceFactory(delegateFactory);
+                return factory;
+            } else {
+                return new AggregatingDataSourceFactory();
+            }
         }
 
         String ext = DataSetURL.getExplicitExt(uri.toString());
