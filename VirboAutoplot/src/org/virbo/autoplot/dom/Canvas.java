@@ -5,8 +5,6 @@
 
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -19,49 +17,36 @@ import java.util.List;
 public class Canvas extends DomNode {
 
     protected CanvasController controller;
-    public static final String PROP_CONTROLLER = "controller";
-
-     PropertyChangeListener childListener = new PropertyChangeListener() {
-        public String toString() {
-           return ""+Canvas.this;
-        }
-        public void propertyChange(PropertyChangeEvent evt) {
-            Canvas.this.propertyChangeSupport.firePropertyChange(promoteChild(evt));
-        }
-    };
-
-    private PropertyChangeEvent promoteChild(PropertyChangeEvent ev) {
-        String childName;
-        final Object source = ev.getSource();
-        if (Canvas.this.rows.contains(source)) {
-            childName = "rows[" + rows.indexOf(source) + "]";
-        } else if (columns.contains(source)) {
-            childName = "columns[" + columns.indexOf(source) + "]";
-        } else {
-            throw new IllegalArgumentException("child not found: "+source);
-        }
-        return new PropertyChangeEvent(this, childName + "." + ev.getPropertyName(), ev.getOldValue(), ev.getNewValue());
-    }
 
     public Canvas() {
         
     }
     
     
-    private java.awt.Dimension size = new java.awt.Dimension(640, 480);
-    public static final String PROP_SIZE = "size";
+    protected int height = 480;
+    public static final String PROP_HEIGHT = "height";
 
-    public java.awt.Dimension getSize() {
-        return this.size;
+    public int getHeight() {
+        return height;
     }
 
-    public void setSize(java.awt.Dimension newCanvasSize) {
-        java.awt.Dimension oldcanvasSize = size;
-        this.size = newCanvasSize;
-        propertyChangeSupport.firePropertyChange(PROP_SIZE, oldcanvasSize, newCanvasSize);
+    public void setHeight(int height) {
+        int oldHeight = this.height;
+        this.height = height;
+        propertyChangeSupport.firePropertyChange(PROP_HEIGHT, oldHeight, height);
     }
-    
-    
+    protected int width = 640;
+    public static final String PROP_WIDTH = "width";
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        int oldWidth = this.width;
+        this.width = width;
+        propertyChangeSupport.firePropertyChange(PROP_WIDTH, oldWidth, width);
+    }
     
     protected boolean fitted = true;
     /**
@@ -160,15 +145,9 @@ public class Canvas extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_ROW, oldRow1, row1);
     }
 
-    
+
     public CanvasController getController() {
         return controller;
-    }
-
-    protected void setController(CanvasController controller) {
-        CanvasController oldController = this.controller;
-        this.controller = controller;
-        propertyChangeSupport.firePropertyChange(PROP_CONTROLLER, oldController, controller);
     }
 
     @Override
@@ -184,13 +163,32 @@ public class Canvas extends DomNode {
     public DomNode copy() {
         Canvas that= (Canvas)super.copy();
         that.controller= null;
+
+        Row[] rowsCopy= this.getRows();
+        for ( int i=0; i<rowsCopy.length; i++ ) {
+            rowsCopy[i]= (Row) rowsCopy[i].copy();
+        }
+        that.setRows( rowsCopy );
+
+        Column[] columnsCopy= this.getColumns();
+        for ( int i=0; i<columnsCopy.length; i++ ) {
+            columnsCopy[i]= (Column) columnsCopy[i].copy();
+        }
+        that.setColumns( columnsCopy );
+
         return that;
     }
     
+    @Override
     public void syncTo(DomNode n) {
-        DomUtil.syncTo( this, n );     
+        if ( controller!=null ) {
+            controller.syncTo((Canvas)n);
+        } else {
+            DomUtil.syncTo( this, n );
+        }
     }
 
+    @Override
     public List<Diff> diffs(DomNode node) {
         return DomUtil.getDiffs( this, node );
     }
