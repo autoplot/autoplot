@@ -86,7 +86,7 @@
 
     </target>
 
-    <target name="do-tag" depends="init"  unless="no.deps" description="timetag the jar files">
+    <target name="do-tag" depends="init"  description="timetag the jar files">
         <property name="das2.dotag" value="true" />
         <!-- copied from build-impl.xml.  This must be updated by hand. -->
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="do-tag"/>
