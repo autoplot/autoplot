@@ -6,26 +6,29 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
+import org.das2.graph.DasAxis.Lock;
+import org.das2.system.MutatorLock;
 
 /**
  *
  * @author jbf
  */
-public class AxisController {
+public class AxisController extends DomNodeController {
 
     DasAxis dasAxis;
     private Application dom;
     Axis axis;
 
     public AxisController(Application dom, Axis axis, DasAxis dasAxis) {
+        super( axis );
         this.dom = dom;
         this.dasAxis = dasAxis;
         this.axis = axis;
         axis.controller = this;
+        bindTo(dasAxis);
         axis.addPropertyChangeListener(invalidRangeListener);
     }
 
@@ -60,7 +63,7 @@ public class AxisController {
 
         public void propertyChange(PropertyChangeEvent evt) {
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
-            if ( valueIsAdjusting() ) return;
+            if ( dom.controller.isValueAdjusting() || valueIsAdjusting() ) return;
             DatumRange oldRange = axis.range;
             DatumRange range = logCheckRange(axis.range, axis.log);
             if (!range.equals(oldRange)) {
@@ -69,12 +72,13 @@ public class AxisController {
         }
     };
 
+    //TODO: this will confuse with isValueAdjusting
     public boolean valueIsAdjusting() {
-        return dasAxis.valueIsAdjusting();
+        return super.isValueAdjusting() || dasAxis.valueIsAdjusting();
     }
 
     public synchronized void bindTo(DasAxis p) {
-        ApplicationController ac = dom.getController();
+        ApplicationController ac = dom.controller;
         ac.bind(axis, "range", p, "datumRange");
         ac.bind(axis, "log", p, "log");
         ac.bind(axis, "label", p, "label");
@@ -84,5 +88,17 @@ public class AxisController {
 
     public DasAxis getDasAxis() {
         return dasAxis;
+    }
+
+    void syncTo(DomNode n) {
+        Lock lock = null;
+        if ( dasAxis!=null ) lock= dasAxis.mutatorLock();
+        lock.lock();
+        //TODO: should call ((DomNode)n).syncTo(n);
+        Axis that = (Axis) n;
+        axis.setLog(that.isLog());
+        axis.setRange(that.getRange());
+        axis.setLabel(that.getLabel());
+        if ( lock!=null ) lock.unlock();
     }
 }
