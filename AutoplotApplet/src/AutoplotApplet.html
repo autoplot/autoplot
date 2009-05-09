@@ -2,16 +2,29 @@
 
 <html>
   <head>
-    <title></title>
+    <title>Autoplot Applet</title>
   </head>
+  <script>
+      function f( evt ) {
+          alert( evt );
+      }
+      function go() {
+          eval(consoleIn.value)
+          consoleOut.value= 'executed >>'+consoleIn.value+'<<'
+      }
+    </script>
   <body>
-    
-    <SCRIPT language="javascript" src="FORMDATA.JS" defer></script>
-    <applet  width="800" height="600" id="applet1" 
-          code="org.virbo.autoplot.AutoplotApplet" archive="AutoplotAppletAll.jar">
-                <param name="dataSetURL" value="http://192.168.0.203/jeremy/1wire/data/2008/0B000800408DD710.20080106.d2s">
+    This demonstrates the parameters that control the initial settings of the applet.
+    The parameter dataSetURL specifies the initial dataset URI.  AutoplotApplet.jar
+    should contain a manifest that loads the jar files the application needs.  This
+    is still a new use mode for Autoplot and funky behavior should be expected.
+    <br>
+    <applet  width="600" height="200" id="applet1"
+          code="org.virbo.autoplot.AutoplotApplet" archive="AutoplotApplet.jar"
+          onpropertychange="f">
+                <param name="dataSetURL" value="tsds.http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0">
                 <param name="column" value="5em,100%-10em">
-                <param name="font" value="sans-8">
+                <param name="font" value="sans-italic-10">
                 <param name="row" value="3em,100%-3em">
                 <param name="renderType" value="fill_to_zero">
                 <param name="color" value="#0000ff">
@@ -19,23 +32,10 @@
                 <param name="foregroundColor" value="#ffffff">
                 <param name="backgroundColor" value="#000000">
           
-    </applet>
-    <form onsubmit="doTextArea()">
-         Enter a dataset URL here:<br>
-        <textarea id="datasetID" cols="100" rows="1" ">file:/media/mini/data.backup/examples/jpg/Capture_00158.jpg?channel=red</textarea><br>
-         for example, L:/fun/realEstate/to1960.latlon.xls?column=M[1:]<br>
-         http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density
-         <input type="submit">GO</input>
-    </form>
-    <script language="javascript">
-      formdata= createRequestObject();
-      if ( formdata.url ) {
-         document.getElementById('datasetID').value= formdata.url;
-         document.getElementById('applet1').setDataSetURL( formdata.url );
-      }
-      
-      function doTextArea() {
-         document.getElementById('applet1').setDataSetURL( document.getElementById('datasetID').value );
-      }
-    </script>
+    </applet><br>
+    <textarea name="consoleOut" id="consoleOut" rows="4" cols="40">
+    </textarea><br>
+    <input type="text" name="consoleIn" id="consoleIn" value="applet1.setTimeRange('2008-01-01')" size="40" /><br>
+    <input type="submit" value="GO" name="goButton" onclick="go()" /><br>
+    <br>
   </body>
