@@ -1,0 +1,62 @@
+[00]000067<?xml version="1.0" encoding="UTF-8"?>
+<stream dataset_id="ds_0"/>
+[01]002329<?xml version="1.0" encoding="UTF-8"?>
+<packet>
+    <qdataset id="ds_1" rank="1">
+        <properties>
+            <property name="UNITS" type="units" value=""/>
+            <property name="CADENCE" type="rank0dataset" value="1.0"/>
+            <property name="MONOTONIC" type="Boolean" value="true"/>
+        </properties>
+        <values encoding="ascii10" length=""/>
+    </qdataset>
+    <qdataset id="means" rank="1">
+        <properties>
+            <property name="UNITS" type="units" value=""/>
+            <property name="NAME" type="String" value="means"/>
+        </properties>
+        <values encoding="ascii10" length=""/>
+    </qdataset>
+    <qdataset id="stddevs" rank="1">
+        <properties>
+            <property name="UNITS" type="units" value=""/>
+            <property name="NAME" type="String" value="stddevs"/>
+        </properties>
+        <values encoding="ascii10" length=""/>
+    </qdataset>
+    <qdataset id="ds_0" rank="1">
+        <properties>
+            <property name="DEPEND_0" type="qdataset" value="ds_1"/>
+            <property name="PLANE_0" type="qdataset" value="means"/>
+            <property name="PLANE_1" type="qdataset" value="stddevs"/>
+            <property name="USER_PROPERTIES" type="map" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4gCjxqYXZhIHZlcnNpb249IjEu&#xa;Ni4wXzEwIiBjbGFzcz0iamF2YS5iZWFucy5YTUxEZWNvZGVyIj4gCiA8b2JqZWN0IGNsYXNzPSJq&#xa;YXZhLnV0aWwuSGFzaE1hcCI+IAogIDx2b2lkIG1ldGhvZD0icHV0Ij4gCiAgIDxzdHJpbmc+dG90&#xa;YWw8L3N0cmluZz4gCiAgIDxsb25nPjk8L2xvbmc+IAogIDwvdm9pZD4gCiAgPHZvaWQgbWV0aG9k&#xa;PSJwdXQiPiAKICAgPHN0cmluZz5pbnZhbGlkQ291bnQ8L3N0cmluZz4gCiAgIDxsb25nPjA8L2xv&#xa;bmc+IAogIDwvdm9pZD4gCiAgPHZvaWQgbWV0aG9kPSJwdXQiPiAKICAgPHN0cmluZz5vdXRsaWVy&#xa;czwvc3RyaW5nPiAKICAgPG9iamVjdCBjbGFzcz0iamF2YS51dGlsLlRyZWVNYXAiLz4gCiAgPC92&#xa;b2lkPiAKICA8dm9pZCBtZXRob2Q9InB1dCI+IAogICA8c3RyaW5nPm91dGxpZXJDb3VudDwvc3Ry&#xa;aW5nPiAKICAgPGludD4wPC9pbnQ+IAogIDwvdm9pZD4gCiAgPHZvaWQgbWV0aG9kPSJwdXQiPiAK&#xa;ICAgPHN0cmluZz5iaW5XaWR0aDwvc3RyaW5nPiAKICAgPGRvdWJsZT4xLjA8L2RvdWJsZT4gCiAg&#xa;PC92b2lkPiAKICA8dm9pZCBtZXRob2Q9InB1dCI+IAogICA8c3RyaW5nPmJpblN0YXJ0PC9zdHJp&#xa;bmc+IAogICA8ZG91YmxlPjIwMDEuMDwvZG91YmxlPiAKICA8L3ZvaWQ+IAogPC9vYmplY3Q+IAo8&#xa;L2phdmE+IAo="/>
+        </properties>
+        <values encoding="ascii10" length=""/>
+    </qdataset>
+</packet>
+:01:     2001      2001         0         3
+:01:     2002         0         0         0
+:01:     2003         0         0         0
+:01:     2004         0         0         0
+:01:     2005         0         0         0
+:01:     2006      2006         0         3
+:01:     2007         0         0         0
+:01:     2008         0         0         0
+:01:     2009         0         0         0
+:01:     2010         0         0         0
+:01:     2011         0         0         0
+:01:     2012         0         0         0
+:01:     2013         0         0         0
+:01:     2014         0         0         0
+:01:     2015         0         0         0
+:01:     2016         0         0         0
+:01:     2017         0         0         0
+:01:     2018         0         0         0
+:01:     2019         0         0         0
+:01:     2020         0         0         0
+:01:     2021         0         0         0
+:01:     2022         0         0         0
+:01:     2023         0         0         0
+:01:     2024      2024         0         3
+:01:     2025         0         0         0
+:01:     2026         0         0         0

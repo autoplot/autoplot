@@ -1,0 +1,91 @@
+[00]000067<?xml version="1.0" encoding="UTF-8"?>
+<stream dataset_id="ds_0"/>
+[01]002348<?xml version="1.0" encoding="UTF-8"?>
+<packet>
+    <qdataset id="ds_1" rank="1">
+        <properties>
+            <property name="UNITS" type="units" value=""/>
+            <property name="CADENCE" type="rank0dataset" value="1000.0"/>
+            <property name="MONOTONIC" type="Boolean" value="true"/>
+        </properties>
+        <values encoding="ascii10" length=""/>
+    </qdataset>
+    <qdataset id="means" rank="1">
+        <properties>
+            <property name="UNITS" type="units" value=""/>
+            <property name="NAME" type="String" value="means"/>
+        </properties>
+        <values encoding="ascii10" length=""/>
+    </qdataset>
+    <qdataset id="stddevs" rank="1">
+        <properties>
+            <property name="UNITS" type="units" value=""/>
+            <property name="NAME" type="String" value="stddevs"/>
+        </properties>
+        <values encoding="ascii10" length=""/>
+    </qdataset>
+    <qdataset id="ds_0" rank="1">
+        <properties>
+            <property name="DEPEND_0" type="qdataset" value="ds_1"/>
+            <property name="PLANE_0" type="qdataset" value="means"/>
+            <property name="PLANE_1" type="qdataset" value="stddevs"/>
+            <property name="USER_PROPERTIES" type="map" value="PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4gCjxqYXZhIHZlcnNpb249IjEu&#xa;Ni4wXzEwIiBjbGFzcz0iamF2YS5iZWFucy5YTUxEZWNvZGVyIj4gCiA8b2JqZWN0IGNsYXNzPSJq&#xa;YXZhLnV0aWwuSGFzaE1hcCI+IAogIDx2b2lkIG1ldGhvZD0icHV0Ij4gCiAgIDxzdHJpbmc+dG90&#xa;YWw8L3N0cmluZz4gCiAgIDxsb25nPjUyNjA4PC9sb25nPiAKICA8L3ZvaWQ+IAogIDx2b2lkIG1l&#xa;dGhvZD0icHV0Ij4gCiAgIDxzdHJpbmc+aW52YWxpZENvdW50PC9zdHJpbmc+IAogICA8bG9uZz4x&#xa;NzUyMDwvbG9uZz4gCiAgPC92b2lkPiAKICA8dm9pZCBtZXRob2Q9InB1dCI+IAogICA8c3RyaW5n&#xa;Pm91dGxpZXJzPC9zdHJpbmc+IAogICA8b2JqZWN0IGNsYXNzPSJqYXZhLnV0aWwuVHJlZU1hcCIv&#xa;PiAKICA8L3ZvaWQ+IAogIDx2b2lkIG1ldGhvZD0icHV0Ij4gCiAgIDxzdHJpbmc+b3V0bGllckNv&#xa;dW50PC9zdHJpbmc+IAogICA8aW50PjA8L2ludD4gCiAgPC92b2lkPiAKICA8dm9pZCBtZXRob2Q9&#xa;InB1dCI+IAogICA8c3RyaW5nPmJpbldpZHRoPC9zdHJpbmc+IAogICA8ZG91YmxlPjEwMDAuMDwv&#xa;ZG91YmxlPiAKICA8L3ZvaWQ+IAogIDx2b2lkIG1ldGhvZD0icHV0Ij4gCiAgIDxzdHJpbmc+Ymlu&#xa;U3RhcnQ8L3N0cmluZz4gCiAgIDxkb3VibGU+OTY0MDkuMDwvZG91YmxlPiAKICA8L3ZvaWQ+IAog&#xa;PC9vYmplY3Q+IAo8L2phdmE+IAo="/>
+        </properties>
+        <values encoding="ascii10" length=""/>
+    </qdataset>
+</packet>
+:01: +9.64E04  +9.69E04 288.81944      1000
+:01: +9.74E04  +9.79E04 288.81944      1000
+:01: +9.84E04  +9.89E04 288.81944      1000
+:01: +9.94E04  +9.99E04 288.81944      1000
+:01: +1.00E05  +1.01E05 288.81944      1000
+:01: +1.01E05  +1.02E05 288.81944      1000
+:01: +1.02E05  +1.03E05 288.81944      1000
+:01: +1.03E05  +1.04E05 288.81944      1000
+:01: +1.04E05  +1.05E05 288.81944      1000
+:01: +1.05E05  +1.06E05 288.81944      1000
+:01: +1.06E05  +1.07E05 288.81944      1000
+:01: +1.07E05  +1.08E05 288.81944      1000
+:01: +1.08E05  +1.09E05 288.81944      1000
+:01: +1.09E05  +1.10E05 288.81944      1000
+:01: +1.10E05  +1.11E05 288.81944      1000
+:01: +1.11E05  +1.12E05 288.81944      1000
+:01: +1.12E05  +1.13E05 288.81944      1000
+:01: +1.13E05  +1.14E05 288.81944      1000
+:01: +1.14E05  +1.15E05 288.81944      1000
+:01: +1.15E05  +1.16E05 288.81944      1000
+:01: +1.16E05  +1.17E05 288.81944      1000
+:01: +1.17E05  +1.18E05 288.81944      1000
+:01: +1.18E05  +1.19E05 288.81944      1000
+:01: +1.19E05  +1.20E05 288.81944      1000
+:01: +1.20E05  +1.21E05 288.81944      1000
+:01: +1.21E05  +1.22E05 288.81944      1000
+:01: +1.22E05  +1.23E05 288.81944      1000
+:01: +1.23E05  +1.24E05 288.81944      1000
+:01: +1.24E05  +1.25E05 288.81944      1000
+:01: +1.25E05  +1.26E05 288.81944      1000
+:01: +1.26E05  +1.27E05 288.81944      1000
+:01: +1.27E05  +1.28E05 288.81944      1000
+:01: +1.28E05  +1.29E05 288.81944      1000
+:01: +1.29E05  +1.30E05 288.81944      1000
+:01: +1.30E05  +1.31E05 288.81944      1000
+:01: +1.31E05  +1.32E05 288.81944      1000
+:01: +1.32E05  +1.33E05 288.81944      1000
+:01: +1.33E05  +1.34E05 288.81944      1000
+:01: +1.34E05  +1.35E05 288.81944      1000
+:01: +1.35E05  +1.36E05 288.81944      1000
+:01: +1.36E05  +1.37E05 288.81944      1000
+:01: +1.37E05  +1.38E05 288.81944      1000
+:01: +1.38E05  +1.39E05 288.81944      1000
+:01: +1.39E05  +1.40E05 288.81944      1000
+:01: +1.40E05  +1.41E05 288.81944      1000
+:01: +1.41E05  +1.42E05 288.81944      1000
+:01: +1.42E05  +1.43E05 288.81944      1000
+:01: +1.43E05  +1.44E05 288.81944      1000
+:01: +1.44E05  +1.45E05 288.81944      1000
+:01: +1.45E05  +1.46E05 288.81944      1000
+:01: +1.46E05  +1.47E05 288.81944      1000
+:01: +1.47E05  +1.48E05 288.81944      1000
+:01: +1.48E05  +1.49E05 175.65876       608
+:01: +1.49E05  +0.00E00         0         0
+:01: +1.50E05  +0.00E00         0         0
