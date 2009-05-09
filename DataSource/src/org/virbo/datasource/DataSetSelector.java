@@ -230,7 +230,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         DataSourceEditorPanel edit=null;
         try {
-            edit = DataSetURL.getDataSourceEditorPanel(new URI(surl));
+            edit = DataSetURL.getDataSourceEditorPanel( DataSetURL.getURI(surl) );
         } catch (URISyntaxException ex) {
             Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
         }
