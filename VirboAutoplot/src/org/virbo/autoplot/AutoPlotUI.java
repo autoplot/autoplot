@@ -25,6 +25,7 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
@@ -271,7 +272,17 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        applicationModel.dom.addPropertyChangeListener(new PropertyChangeListener() {
+        applicationModel.dom.getController().addActionListener( new ActionListener() {
+            public void actionPerformed( ActionEvent evt ) {
+                if ( dom.getController().isValueAdjusting() ) return;
+                logger.finer( "state change: "+evt );
+                if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState()) { // TODO: list the props we want!
+                    tickleTimer.tickle( evt.getActionCommand() + " from " + evt.getSource() );
+                }
+            }
+        } );
+
+/*        applicationModel.dom.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if ( dom.getController().isValueAdjusting() ) return;
                 logger.finer( "state change: "+evt.getPropertyName() );
@@ -279,7 +290,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
                     tickleTimer.tickle(evt.getPropertyName() + " from " + evt.getSource());
                 }
             }
-        });
+        }); */
 
         //TODO: perhaps keep a track of dirty URI in dataset selector
         applicationModel.dom.getController().addPropertyChangeListener( ApplicationController.PROP_DATASOURCEFILTER,
@@ -1262,6 +1273,15 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
         alm.addBooleanSwitchArgument("scriptPanel", "s", "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
+        alm.addOptionalSwitchArgument("open", "o", "open", "", "open this URI");
+        alm.addOptionalSwitchArgument("print", "x", "print", "", "print this URI");
+
+       for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
+           System.err.println("args["+i+"]"+args[i]);
+           if ( args[i].equals("-print") ) args[i]="--print";
+             if ( args[i].equals("-open") ) args[i]="--open";
+        }
+
         alm.process(args);
 
         System.err.println("welcome to autoplot");
@@ -1275,7 +1295,11 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
             Logger.getLogger("ap").fine("setting initial URL to >>>" + initialURL + "<<<");
 
             bookmarks = alm.getValue("bookmarks");
-
+        } else if ( alm.getValue("open") !=null ) {
+            initialURL = alm.getValue("open");
+            Logger.getLogger("ap").fine("setting initial URL to >>>" + initialURL + "<<<");
+            bookmarks= null;
+            
         } else {
             initialURL = null;
             bookmarks = null;
