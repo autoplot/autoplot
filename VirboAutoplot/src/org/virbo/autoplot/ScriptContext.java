@@ -36,6 +36,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.python.core.PyJavaInstance;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
@@ -195,6 +196,24 @@ public class ScriptContext extends PyJavaInstance {
         setStatus("wrote to "+filename);
     }
 
+    public static void writeToPng( String filename, int width, int height ) throws InterruptedException, IOException {
+        final FileOutputStream out = new FileOutputStream(filename);
+
+        Image image = model.canvas.getImage( width, height );
+
+        DasPNGEncoder encoder = new DasPNGEncoder();
+        encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
+        try {
+            encoder.write((BufferedImage) image, out);
+        } catch (IOException ioe) {
+        } finally {
+            try {
+                out.close();
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
+            }
+        }
+    }
     public static void peekAt(Object o) throws IOException {
         out.write(o.toString().getBytes());
         return;
@@ -407,5 +426,15 @@ public class ScriptContext extends PyJavaInstance {
     public static Application getDocumentModel() {
         maybeInitModel();
         return dom;
+    }
+
+    /**
+     * save the current state as a vap file
+     * @param filename
+     */
+    public static void save( String filename ) throws IOException {
+        maybeInitModel();
+        if ( ! filename.endsWith(".vap") ) throw new IllegalArgumentException("filename must end in vap");
+        model.doSave( new File( filename ) );
     }
 }
