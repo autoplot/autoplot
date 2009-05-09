@@ -37,6 +37,11 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         initComponents();
     }
 
+
+    public void setDelegateEditorPanel(DataSourceEditorPanel edit) {
+        delegateEditorPanel= edit;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -116,7 +121,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             timeRangeTextField.setText( params.get("timerange") );
 
             String delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUrl(url);
-            delegateEditorPanel = DataSetURL.getDataSourceEditorPanel(new URI(delegateUrl));
+            if ( delegateEditorPanel==null ) {
+                delegateEditorPanel = DataSetURL.getDataSourceEditorPanel(new URI(delegateUrl));
+            }
             if ( delegateEditorPanel==null ) {
                 JPanel delegateP= new JPanel(new BorderLayout());
                 delegateDataSetSelector= new DataSetSelector();

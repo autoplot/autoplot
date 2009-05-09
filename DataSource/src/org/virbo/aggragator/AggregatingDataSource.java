@@ -71,11 +71,11 @@ public class AggregatingDataSource extends AbstractDataSource {
     }
 
     /** Creates a new instance of AggregatingDataSource */
-    public AggregatingDataSource(URL url) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
+    public AggregatingDataSource(URL url,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(url);
         String surl = url.toString();
         surl= surl.replaceAll( "%25", "%");
-        delegateDataSourceFactory = AggregatingDataSourceFactory.getDelegateDataSourceFactory(surl);
+        this.delegateDataSourceFactory = delegateFactory;
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
         String stimeRange= super.params.get("timerange");
         viewRange= DatumRangeUtil.parseTimeRange( stimeRange );

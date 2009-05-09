@@ -35,12 +35,17 @@ import org.virbo.datasource.URLSplit;
  */
 public class AggregatingDataSourceFactory implements DataSourceFactory {
 
+    private DataSourceFactory delegateFactory=null;
+
     /** Creates a new instance of AggregatingDataSourceFactory */
     public AggregatingDataSourceFactory() {
     }
 
     public DataSource getDataSource(URL url) throws Exception {
-        AggregatingDataSource ads = new AggregatingDataSource(url);
+        if ( delegateFactory==null ) {
+            delegateFactory= AggregatingDataSourceFactory.getDelegateDataSourceFactory(url.toString());
+        }
+        AggregatingDataSource ads = new AggregatingDataSource(url,delegateFactory);
         String surl = url.toString();
         surl= surl.replaceAll("%25","%");
         FileStorageModel fsm = getFileStorageModel(surl);
@@ -182,7 +187,10 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
 
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
-        DataSourceFactory f = getDelegateDataSourceFactory(cc.surl);
+        if ( delegateFactory==null ) {
+            delegateFactory= getDelegateDataSourceFactory(cc.surl);
+        }
+        DataSourceFactory f = delegateFactory;
         List<CompletionContext> result = new ArrayList<CompletionContext>();
         String afile = getDelegateDataSourceFactoryUrl(cc.surl);
         CompletionContext delegatecc = getDelegateDataSourceCompletionContext(cc);
@@ -216,7 +224,10 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
                 return true;
             }
             String delegateSurl = getDelegateDataSourceFactoryUrl(surl);
-            return getDelegateDataSourceFactory(surl).reject( delegateSurl, mon );
+            if ( delegateFactory==null ) {
+                delegateFactory= getDelegateDataSourceFactory(surl);
+            }
+            return delegateFactory.reject( delegateSurl, mon );
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -224,6 +235,10 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             e.printStackTrace();
             return true;
         }
+    }
+
+    public void setDelegateDataSourceFactory(DataSourceFactory delegateFactory) {
+        this.delegateFactory= delegateFactory;
     }
 
 }
