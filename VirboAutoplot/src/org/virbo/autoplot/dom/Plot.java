@@ -4,8 +4,6 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,33 +14,8 @@ import java.util.List;
 public class Plot extends DomNode {
 
     public Plot() {
-        PropertyChangeListener childListener = new PropertyChangeListener() {
-            public String toString() {
-                return ""+ Plot.this;
-            }
-            public void propertyChange(PropertyChangeEvent evt) {
-                Plot.this.propertyChangeSupport.firePropertyChange( promoteChild(evt) );
-            }
-        };
-        xaxis.addPropertyChangeListener(childListener);
-        yaxis.addPropertyChangeListener(childListener);
-        zaxis.addPropertyChangeListener(childListener);
     }
-    
-    private PropertyChangeEvent promoteChild( PropertyChangeEvent ev ) {
-        String childName;
-        if ( ev.getSource()==xaxis ) {
-            childName= "xaxis";
-        } else if ( ev.getSource()==yaxis ) {
-            childName= "yaxis";
-        } else if ( ev.getSource()==zaxis ) {
-            childName= "zaxis";
-        } else {
-            throw new IllegalArgumentException("child not found");
-        }
-        return new PropertyChangeEvent( this, childName+"."+ev.getPropertyName(), ev.getOldValue(), ev.getNewValue() );
-    }
-    
+        
     protected Axis xaxis = new Axis();
     public static final String PROP_XAXIS = "xaxis";
 
@@ -139,7 +112,7 @@ public class Plot extends DomNode {
 
     
     protected PlotController controller;
-    
+
     public PlotController getController() {
         return controller;
     }
