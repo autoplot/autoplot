@@ -20,7 +20,9 @@
             <desktop />
             <menu submenu="virbo-autoplot" />
         </shortcut>
-        <offline-allowed/> 
+        <offline-allowed/>
+        <association mime-type="application/x-netcdf" extensions="cdf"/>
+        <association mime-type="application/autoplot+xml" extensions="vap"/>
     </information>
     
     <security>
