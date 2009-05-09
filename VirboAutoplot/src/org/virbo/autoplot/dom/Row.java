@@ -36,6 +36,10 @@ public class Row extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_PARENT, oldParent, parent);
     }
 
+    public RowController getController() {
+        return controller;
+    }
+
     protected String top = "+2em";
     public static final String PROP_TOP = "top";
 
