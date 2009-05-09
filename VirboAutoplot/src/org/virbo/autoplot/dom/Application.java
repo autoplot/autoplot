@@ -4,8 +4,6 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,36 +18,7 @@ import org.das2.datum.Units;
  */
 public class Application extends DomNode {
 
-    PropertyChangeListener childListener = new PropertyChangeListener() {
-        public String toString() {
-           return ""+Application.this;
-        }
-        public void propertyChange(PropertyChangeEvent evt) {
-            Application.this.propertyChangeSupport.firePropertyChange(promoteChild(evt));
-        }
-    };
-
     public Application() {
-        options.addPropertyChangeListener(childListener);
-    }
-
-    private PropertyChangeEvent promoteChild(PropertyChangeEvent ev) {
-        String childName;
-        final Object source = ev.getSource();
-        if (Application.this.panels.contains(source)) {
-            childName = "panels[" + panels.indexOf(source) + "]";
-        } else if (source == options) {
-            childName = "options";
-        } else if (plots.contains(source)) { //TODO: change plots to array from list.
-            childName = "plots[" + plots.indexOf(source) + "]";
-        } else if ( dataSourceFilters.contains(source)) {
-            childName = "dataSourceFilters[" + dataSourceFilters.indexOf(source) + "]";
-        } else if ( canvases.contains(source) ) {
-            childName = "canvases["+canvases.indexOf(source)+"]";
-        } else {
-            throw new IllegalArgumentException("child not found: "+source);
-        }
-        return new PropertyChangeEvent(this, childName + "." + ev.getPropertyName(), ev.getOldValue(), ev.getNewValue());
     }
     
     protected List<DataSourceFilter> dataSourceFilters= Arrays.asList( new DataSourceFilter[0] );
