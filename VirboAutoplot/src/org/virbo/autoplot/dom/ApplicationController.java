@@ -123,7 +123,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     PropertyChangeListener domListener = new PropertyChangeListener() {
 
-        @Override
         public void propertyChange(PropertyChangeEvent evt) {
             logger.finest("dom change: " + evt.getPropertyName() + evt.getOldValue() + "->" + evt.getNewValue());
 
