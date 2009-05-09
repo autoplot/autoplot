@@ -104,6 +104,8 @@ public class DataSourceUtil {
     public static String makeAggregation( String surl ) {
         String yyyy= "/\\d{4}/";
         String yyyymmdd= "(?<!\\d)(\\d{8})(?!\\d)"; //"(\\d{8})";
+        String yyyy_mm_dd= "\\d{4}([\\-_])\\d{2}\\1\\d{2}";
+
         String version= "([Vv])\\d{2}";
         String result= surl;
         
@@ -112,11 +114,17 @@ public class DataSourceUtil {
         if ( m.find() ) {
             timeRange= m.group(0);
         } else {
-            return null;
+            m= Pattern.compile(yyyy_mm_dd).matcher(surl);
+            if ( m.find() ) {
+                timeRange= m.group(0);
+            } else {
+                return null;
+            }
         }
 
         result= result.replaceFirst(yyyy, "/\\$Y/");               
         result= result.replaceFirst(yyyymmdd, "\\$Y\\$m\\$d");
+        result= result.replaceFirst(yyyy_mm_dd, "\\$Y$1\\$m$1\\$d" );
                 
         result= result.replaceFirst(version, "$1..");
         
