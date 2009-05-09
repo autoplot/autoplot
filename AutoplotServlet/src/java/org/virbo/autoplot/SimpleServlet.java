@@ -171,7 +171,8 @@ public class SimpleServlet extends HttpServlet {
                 if ( width==-1 && height!=-1 ) width= (int)( height * aspect );
                 if ( height==-1 && width!=-1 ) height= (int)( width / aspect );
             }
-            dom.getController().getCanvas().setSize( new Dimension( width, height) );
+            dom.getController().getCanvas().setWidth( width );
+            dom.getController().getCanvas().setHeight( height );
 
             logit("set canvas parameters",t0,uniq);
             
