@@ -56,6 +56,12 @@ public class Column extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_RIGHT, oldRight, right);
     }
 
+    protected ColumnController controller = null;
+
+    public ColumnController getController() {
+        return controller;
+    }
+
     @Override
     List<Diff> diffs(DomNode node) {
         return DomUtil.getDiffs( this, node );
