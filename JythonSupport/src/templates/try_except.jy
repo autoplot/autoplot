@@ -1,0 +1,7 @@
+try:
+   continue
+
+except java.lang.Exception:
+   print 'error'
+
+
