@@ -121,8 +121,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                 Units pu= (Units) istpProps.get(QDataSet.UNITS);
                 Units u= (Units) result.property( QDataSet.UNITS );
                 UnitsConverter uc= UnitsConverter.getConverter( pu, u );
-                result.putProperty(QDataSet.VALID_MAX, uc.convert((Double)istpProps.get(QDataSet.VALID_MAX)) );
-                result.putProperty(QDataSet.VALID_MIN, uc.convert((Double)istpProps.get(QDataSet.VALID_MIN)) );
+                Number nn= (Number)istpProps.get(QDataSet.VALID_MAX);
+                if ( nn!=null ) result.putProperty(QDataSet.VALID_MAX, uc.convert(nn) );
+                nn= (Number)istpProps.get(QDataSet.VALID_MIN);
+                if ( nn!=null ) result.putProperty(QDataSet.VALID_MIN, uc.convert(nn) );
                 result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
             // apply properties.
             }
@@ -218,7 +220,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             if (thisAttributes.containsKey("UNITS")) {
                 String sunits= (String) thisAttributes.get("UNITS");
                 Units mu;
-                if ( sunits.equalsIgnoreCase("row number") || sunits.equalsIgnoreCase("column number" ) ) {
+                if ( sunits.equalsIgnoreCase("row number") || sunits.equalsIgnoreCase("column number" ) ) { // kludge for POLAR/VIS
                     mu= Units.dimensionless;
                 } else {
                     mu = MetadataUtil.lookupUnits(sunits);
