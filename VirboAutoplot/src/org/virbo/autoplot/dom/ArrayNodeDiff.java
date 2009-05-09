@@ -26,7 +26,7 @@ public class ArrayNodeDiff implements Diff {
     int index;
     int toIndex;
 
-    enum Action { Insert, Delete, Move }
+    public enum Action { Insert, Delete, Move }
 
     Action action;
     
@@ -55,7 +55,7 @@ public class ArrayNodeDiff implements Diff {
         Class c= o.getClass();
         if ( !c.isArray() ) throw new IllegalArgumentException("expected an array: "+o );
         final int length = Array.getLength(o);
-        Object result= Array.newInstance(c,length-1);
+        Object result= Array.newInstance( c.getComponentType(),length-1);
         for ( int i=0; i<index; i++ ) {
             Array.set( result, i, Array.get(o, i) );
         }
@@ -77,7 +77,7 @@ public class ArrayNodeDiff implements Diff {
         Class c= o.getClass();
         if ( !c.isArray() ) throw new IllegalArgumentException("expected an array: "+o );
         final int length = Array.getLength(o);
-        Object result= Array.newInstance(c,length+1);
+        Object result= Array.newInstance(c.getComponentType(),length+1);
         for ( int i=0; i<index; i++ ) {
             Array.set( result, i, Array.get(o, i) );
         }
@@ -147,7 +147,15 @@ public class ArrayNodeDiff implements Diff {
     public String propertyName() {
         return propertyName;
     }
-    
+
+    public Action getAction() {
+        return action;
+    }
+
+    public Object getNode() {
+        return node;
+    }
+
     public String toString() {
         if ( action==Action.Delete ) {
             return "delete "+node + " from "+propertyName+" @ " +index;
