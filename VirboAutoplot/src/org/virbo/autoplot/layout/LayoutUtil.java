@@ -122,19 +122,6 @@ public class LayoutUtil {
         changed = changed | maybeSetMaximum(r, need, 1.0, -need / em, 0);
 
         if (changed) {
-            /*Runnable run = new Runnable() {
-            public void run() {
-            while (true) {
-            try {
-            Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-            Logger.getLogger(LayoutUtil.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            c.getParent().repaint();
-            }
-            }
-            };
-            new Thread(run).start();*/
             c.getParent().resizeAllComponents();
         }
 
