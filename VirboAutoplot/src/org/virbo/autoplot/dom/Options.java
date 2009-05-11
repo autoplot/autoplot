@@ -5,7 +5,6 @@
 package org.virbo.autoplot.dom;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -21,14 +20,6 @@ public class Options extends DomNode {
     public static final String PROP_FILLCOLOR = "fillColor";
     Preferences prefs;
 
-    public static String encodeColor(Color c) {
-        return "#" + Integer.toHexString(c.getRGB() & 0xFFFFFF);
-    }
-
-    public static String encodeFont(Font f) {
-        return f.getFontName() + "-" + f.getSize();
-    }
-
     public Options() {
         prefs = new NullPreferences(); //applet support
     }
@@ -38,35 +29,20 @@ public class Options extends DomNode {
         autolabelling = prefs.getBoolean(PROP_AUTOLABELLING, autolabelling);
         autolayout = prefs.getBoolean(PROP_AUTOLAYOUT, autolayout);
         autoranging = prefs.getBoolean(PROP_AUTORANGING, autoranging);
-        background = Color.decode(prefs.get(PROP_BACKGROUND, encodeColor(background)));
-        canvasFont = Font.decode(prefs.get(PROP_CANVASFONT, encodeFont(canvasFont)));
-        color = Color.decode(prefs.get(PROP_COLOR, encodeColor(color)));
+        background = Color.decode(prefs.get(PROP_BACKGROUND, DomUtil.encodeColor(background)));
+        canvasFont = prefs.get(PROP_CANVASFONT, canvasFont);
+        color = Color.decode(prefs.get(PROP_COLOR, DomUtil.encodeColor(color)));
         drawAntiAlias = prefs.getBoolean(PROP_DRAWANTIALIAS, drawAntiAlias);
         drawGrid = prefs.getBoolean(PROP_DRAWGRID, drawGrid);
         drawMinorGrid = prefs.getBoolean(PROP_DRAWMINORGRID, drawMinorGrid);
-        fillColor = Color.decode(prefs.get(PROP_FILLCOLOR, encodeColor(fillColor)));
-        foreground = Color.decode(prefs.get(PROP_FOREGROUND, encodeColor(foreground)));
-        guiFont = Font.decode(prefs.get(PROP_GUIFONT, encodeFont(guiFont)));
+        fillColor = Color.decode(prefs.get(PROP_FILLCOLOR, DomUtil.encodeColor(fillColor)));
+        foreground = Color.decode(prefs.get(PROP_FOREGROUND, DomUtil.encodeColor(foreground)));
         logConsoleVisible = prefs.getBoolean(PROP_LOGCONSOLEVISIBLE, logConsoleVisible);
         overRendering = prefs.getBoolean(PROP_OVERRENDERING, overRendering);
         scriptVisible = prefs.getBoolean(PROP_SCRIPTVISIBLE, scriptVisible);
         serverEnabled = prefs.getBoolean(PROP_SERVERENABLED, serverEnabled);
         specialEffects = prefs.getBoolean(PROP_SPECIALEFFECTS, specialEffects);
         textAntiAlias = prefs.getBoolean(PROP_TEXTANTIALIAS, textAntiAlias);
-    }
-
-    protected Font guiFont = Font.decode("sans-12");
-    public static final String PROP_GUIFONT = "guiFont";
-
-    public Font getGuiFont() {
-        return guiFont;
-    }
-
-    public void setGuiFont(Font guiFont) {
-        Font oldGuiFont = this.guiFont;
-        this.guiFont = guiFont;
-        prefs.put(PROP_GUIFONT, encodeFont(guiFont));
-        propertyChangeSupport.firePropertyChange(PROP_GUIFONT, oldGuiFont, guiFont);
     }
 
     protected boolean scriptVisible = false;
@@ -111,17 +87,17 @@ public class Options extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_SERVERENABLED, oldServerEnabled, serverEnabled);
     }
 
-    protected Font canvasFont = Font.decode("sans-12");
+    protected String canvasFont = "sans-12";
     public static final String PROP_CANVASFONT = "canvasFont";
 
-    public Font getCanvasFont() {
+    public String getCanvasFont() {
         return canvasFont;
     }
 
-    public void setCanvasFont(Font canvasFont) {
-        Font oldCanvasFont = this.canvasFont;
+    public void setCanvasFont(String canvasFont) {
+        String oldCanvasFont = this.canvasFont;
         this.canvasFont = canvasFont;
-        prefs.put(PROP_CANVASFONT, encodeFont(canvasFont));
+        prefs.put(PROP_CANVASFONT, canvasFont);
         propertyChangeSupport.firePropertyChange(PROP_CANVASFONT, oldCanvasFont, canvasFont);
     }
 
@@ -135,7 +111,7 @@ public class Options extends DomNode {
     public void setForeground(Color foreground) {
         Color oldForeground = this.foreground;
         this.foreground = new Color(foreground.getRGB()); //otherwise can't serialize
-        prefs.put(PROP_FOREGROUND, encodeColor(foreground));
+        prefs.put(PROP_FOREGROUND, DomUtil.encodeColor(foreground));
         propertyChangeSupport.firePropertyChange(PROP_FOREGROUND, oldForeground, foreground);
     }
 
@@ -149,7 +125,7 @@ public class Options extends DomNode {
     public void setBackground(Color background) {
         Color oldBackground = this.background;
         this.background = new Color(background.getRGB()); //otherwise can't serialize
-        prefs.put(PROP_BACKGROUND, encodeColor(background));
+        prefs.put(PROP_BACKGROUND, DomUtil.encodeColor(background));
         propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
     }
 
@@ -173,7 +149,7 @@ public class Options extends DomNode {
     public void setColor(Color color) {
         Color oldColor = this.color;
         this.color = new Color(color.getRGB()); //otherwise can't serialize
-        prefs.put(PROP_COLOR, encodeColor(color));
+        prefs.put(PROP_COLOR, DomUtil.encodeColor(color));
         propertyChangeSupport.firePropertyChange(PROP_COLOR, oldColor, color);
     }
 
@@ -197,7 +173,7 @@ public class Options extends DomNode {
     public void setFillColor(Color fillColor) {
         Color oldFillColor = this.fillColor;
         this.fillColor = new Color(fillColor.getRGB()); //otherwise can't serialize
-        prefs.put(PROP_FILLCOLOR, encodeColor(fillColor));
+        prefs.put(PROP_FILLCOLOR, DomUtil.encodeColor(fillColor));
         propertyChangeSupport.firePropertyChange(PROP_FILLCOLOR, oldFillColor, fillColor);
     }
 
@@ -399,8 +375,6 @@ public class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_FILLCOLOR, that.getFillColor(), this.getFillColor()));
         b = that.getForeground().equals(this.getForeground());
         if (!b) result.add(new PropertyChangeDiff(PROP_FOREGROUND, that.getForeground(), this.getForeground()));
-        b = that.getGuiFont().equals(this.getGuiFont());
-        if (!b) result.add(new PropertyChangeDiff(PROP_GUIFONT, that.getGuiFont(), this.getGuiFont()));
         b = that.isLogConsoleVisible() == this.isLogConsoleVisible();
         if (!b) result.add(new PropertyChangeDiff(PROP_LOGCONSOLEVISIBLE, that.isLogConsoleVisible(), this.isLogConsoleVisible()));
         b = that.isOverRendering() == this.isOverRendering();
