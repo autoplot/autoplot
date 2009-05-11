@@ -10,7 +10,6 @@ import java.beans.PropertyEditor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -23,6 +22,7 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Converter;
 
 /**
  *
@@ -370,7 +370,7 @@ public class DomUtil {
         
         if (isDomNode) {
             for (int i = 0; i < node1List.size(); i++) {
-                result.addAll(childDiffs(property + "[" + i + "]", getDiffs((DomNode)node1List.get(i), (DomNode)nodes2[i])));
+                result.addAll(childDiffs(property + "[" + i + "]", getDiffs((DomNode)node1List.get(i), (DomNode)node2List.get(i))));
             }
         }
 
@@ -446,4 +446,41 @@ public class DomUtil {
             if (!exclude.contains(d.propertyName())) d.doDiff(node1);
         }
     }
+
+    public static String encodeColor(java.awt.Color c) {
+        return "#" + Integer.toHexString(c.getRGB() & 0xFFFFFF);
+    }
+
+    public static String encodeFont(java.awt.Font f) {
+        String style="-";
+        if ( f.isBold() ) style+="bold";
+        if ( f.isItalic() ) style+="italic";
+        String result= f.getFamily();
+        if ( style.length()>1 ) result+= style;
+        return result + "-" + f.getSize();
+    }
+
+    public static Converter STRING_TO_FONT= new Converter() {
+        @Override
+        public Object convertForward(Object value) {
+            return java.awt.Font.decode((String)value);
+        }
+
+        @Override
+        public Object convertReverse(Object value) {
+            return encodeFont((java.awt.Font)value);
+        }
+    };
+
+    public static Converter STRING_TO_COLOR= new Converter() {
+        @Override
+        public Object convertForward(Object value) {
+            return java.awt.Color.decode((String)value);
+        }
+
+        @Override
+        public Object convertReverse(Object value) {
+            return encodeColor( (java.awt.Color)value);
+        }
+    };
 }
