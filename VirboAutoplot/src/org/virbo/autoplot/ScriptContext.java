@@ -56,6 +56,7 @@ public class ScriptContext extends PyJavaInstance {
     private static synchronized void maybeInitModel() {
         if (model == null) {
             model = new ApplicationModel();
+            model.addDasPeersToApp();
             dom= model.getDocumentModel();
         }
     }

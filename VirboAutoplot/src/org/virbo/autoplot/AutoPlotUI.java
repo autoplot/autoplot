@@ -58,6 +58,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
+import org.das2.system.DasLogger;
 import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -112,7 +113,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         }
     };
     
-    private Logger logger = Logger.getLogger("virbo.autoplot");
+    private static final Logger logger = Logger.getLogger("org.virbo.autoplot");
     private JythonScriptPanel scriptPanel;
     private LogConsole logConsole;
     private RequestListener rlistener;
@@ -1277,7 +1278,6 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
         alm.addOptionalSwitchArgument("print", "x", "print", "", "print this URI");
 
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
-           System.err.println("args["+i+"]"+args[i]);
            if ( args[i].equals("-print") ) args[i]="--print";
              if ( args[i].equals("-open") ) args[i]="--open";
         }
@@ -1285,19 +1285,19 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
         alm.process(args);
 
         System.err.println("welcome to autoplot");
-        Logger.getLogger("ap").info("welcome to autoplot ");
+        logger.info("welcome to autoplot ");
         final ApplicationModel model = new ApplicationModel();
         final String initialURL;
         final String bookmarks;
 
         if (alm.getValue("URL") != null) {
             initialURL = alm.getValue("URL");
-            Logger.getLogger("ap").fine("setting initial URL to >>>" + initialURL + "<<<");
+            logger.fine("setting initial URL to >>>" + initialURL + "<<<");
 
             bookmarks = alm.getValue("bookmarks");
         } else if ( alm.getValue("open") !=null ) {
             initialURL = alm.getValue("open");
-            Logger.getLogger("ap").fine("setting initial URL to >>>" + initialURL + "<<<");
+            logger.fine("setting initial URL to >>>" + initialURL + "<<<");
             bookmarks= null;
             
         } else {
@@ -1306,14 +1306,17 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
         }
 
         if (alm.getBooleanValue("scriptPanel")) {
+            logger.fine("enable scriptPanel");
             model.getDocumentModel().getOptions().setScriptVisible(true);
         }
 
         if (alm.getBooleanValue("logConsole")) {
+            logger.fine("enable scriptPanel");
             model.getDocumentModel().getOptions().setLogConsoleVisible(true);
         }
 
         if (alm.getBooleanValue("nativeLAF")) {
+            logger.fine("nativeLAF");
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
@@ -1321,9 +1324,15 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
             }
         }
 
+        logger.fine("invokeLater()");
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
+                System.err.println("enter invokeLater");
+                
+                model.addDasPeersToApp();
+
                 final AutoPlotUI app = new AutoPlotUI(model);
 
                 if (!alm.getValue("port").equals("-1")) {
@@ -1347,6 +1356,7 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
                     }
                 });
 
+                System.err.println("UI.setVisible(true)");
                 app.setVisible(true);
                 if (initialURL != null) {
                     app.dataSetSelector.setValue(initialURL);

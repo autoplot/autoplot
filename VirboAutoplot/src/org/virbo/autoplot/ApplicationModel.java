@@ -57,6 +57,7 @@ import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Diff;
+import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
@@ -98,11 +99,17 @@ public class ApplicationModel {
     public ApplicationModel() {
 
         BeansUtil.registerEditor(RenderType.class, EnumerationEditor.class);
-        BeansUtil.registerEditor(Dimension.class, DimensionEditor.class);
         
         DataSetURL.init();
 
         dom = new Application();
+
+    }
+
+    /**
+     * better if called from swing thread
+     */
+    public void addDasPeersToApp() {
         new ApplicationController(this, dom);
 
         canvas = dom.getController().addCanvas();
@@ -110,7 +117,6 @@ public class ApplicationModel {
         this.application = canvas.getApplication();
 
         dom.getController().addPanel(null, null);
-
     }
 
     public DasCanvas getCanvas() {
@@ -450,17 +456,32 @@ public class ApplicationModel {
         dom.getController().getPlot().getController().resetZoom();
     }
 
+    private int stepForSize( int size ) {
+        int step;
+        if ( size<20 ) {
+            step=1;
+        } else if ( size<40 ) {
+            step=2;
+        } else {
+            step=4;
+        }
+        return step;
+    }
     void increaseFontSize() {
-        Font f = this.dom.getOptions().getCanvasFont();
-        f = f.deriveFont(f.getSize2D() * 1.1f);
-        this.dom.getOptions().setCanvasFont(f);
+        Font f = Font.decode( this.dom.getOptions().getCanvasFont() );
+        int size= f.getSize();
+        int step= stepForSize(size);
+        f = f.deriveFont((float)size+step);
+        this.dom.getOptions().setCanvasFont(DomUtil.encodeFont(f));
 
     }
 
     void decreaseFontSize() {
-        Font f = this.dom.getOptions().getCanvasFont();
-        f = f.deriveFont(f.getSize2D() / 1.1f);
-        this.dom.getOptions().setCanvasFont(f);
+        Font f = Font.decode( this.dom.getOptions().getCanvasFont() );
+        int size= f.getSize();
+        int step= stepForSize(size);
+        f = f.deriveFont((float)size-step);
+        this.dom.getOptions().setCanvasFont(DomUtil.encodeFont(f));
     }
 
     /**
@@ -537,7 +558,7 @@ public class ApplicationModel {
             }
         }
 
-        logger.fine("" + state.diffs(this.dom));
+        //logger.fine("" + state.diffs(this.dom));
         restoreState(state, true, true);
         setUseEmbeddedDataSet(false);
 
