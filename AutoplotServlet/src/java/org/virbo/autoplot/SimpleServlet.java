@@ -146,6 +146,7 @@ public class SimpleServlet extends HttpServlet {
             System.setProperty("java.awt.headless", "true");
 
             ApplicationModel appmodel = new ApplicationModel();
+            appmodel.addDasPeersToApp();
 
             logit("create application model",t0,uniq);
 
@@ -155,8 +156,8 @@ public class SimpleServlet extends HttpServlet {
                 dom.getOptions().setAutolayout(true);
             } else {
                 dom.getOptions().setAutolayout(false);
-                if (!row.equals("")) dom.getController().getCanvas().setRow(row);
-                if (!column.equals("")) dom.getController().getCanvas().setColumn(column);
+                if (!row.equals("")) dom.getController().getCanvas().getController().setRow(row);
+                if (!column.equals("")) dom.getController().getCanvas().getController().setColumn(column);
             }
 
             if (!font.equals("")) appmodel.getCanvas().setBaseFont(Font.decode(font));
