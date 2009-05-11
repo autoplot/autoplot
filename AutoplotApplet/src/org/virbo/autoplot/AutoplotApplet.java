@@ -113,6 +113,7 @@ public class AutoplotApplet extends JApplet {
         System.err.println("init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
 
         model = new ApplicationModel();
+        model.addDasPeersToApp();
 
         setLayout(new BorderLayout());
         add(model.getCanvas(), BorderLayout.CENTER);
@@ -166,10 +167,10 @@ public class AutoplotApplet extends JApplet {
         dom.getOptions().setAutolayout("true".equals(getParameter("autolayout")));
         if (!dom.getOptions().isAutolayout()) {
             if (!row.equals("")) {
-                dom.getController().getCanvas().setRow(row);
+                dom.getController().getCanvas().getController().setRow(row);
             }
             if (!column.equals("")) {
-                dom.getController().getCanvas().setColumn(column);
+                dom.getController().getCanvas().getController().setColumn(column);
             }
         }
 
