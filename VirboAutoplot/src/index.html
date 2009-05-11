@@ -18,10 +18,24 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-<ul><li>more bugfixes
-</li><li> uint,truncatedFloat support in BinaryDataSource
-</li>
-</ul>
+<ul><li><a href="http://www.autoplot.org/jnlp/20090511/" class="external free" title="http://www.autoplot.org/jnlp/20090511/" rel="nofollow">http://www.autoplot.org/jnlp/20090511/</a>
+</li><li> bugfixes including:
+<ul><li> aggregation with vap+dat fixed.
+</li><li> cadence check disabled when guessCadence fails.
+</li><li> 2702937 dataset URI in selector needs to update with panel focus
+</li><li> 2787550 log Axis datumRanges in vap files
+</li><li> 2778701 editor panels don't work with aggregation
+</li><li> 2789482 aggregation ignores vap+ext scheme
+</li></ul>
+</li><li> introduce layout model into dom.  This should not affect the user interface, but will ensure .vap forward compatibility.
+</li><li> row,column property of canvas node is replaces with marginRow, marginColumn.
+</li><li> font properties of options node replaced with String for 2790172 XmlEncoder stack overflowbugfix.
+</li><li> support for png walk tool introduced.
+</li><li> cdf editor introduced.
+</li><li> ascii table editor resets the number of columns displayed with the record parser is changed.
+</li><li> greatly reduce boilerplate code in dom tree with new state change mechanism and DomUtil.diffs and DomUtil.syncTo.
+
+</li></ul>
 <p>Known Bugs:
 </p>
 <ul><li> 2781154  	 guessCadence isn't invoked on vap load
@@ -29,7 +43,6 @@ be applied to the data, for example, specifying valid range and fill data.
 </li><li> 2769881 delete parent panel, then switch to spectrogram
 </li><li> 2769879 export data needs to remember last output
 </li><li> 2712135 FileSystemCompletions needs to account for wildcards
-</li><li> 2702937 dataset URI in selector needs to update with panel focus
 </li><li> 2771492 spaces in Windows filenames causing problems again
 </li></ul>
 
