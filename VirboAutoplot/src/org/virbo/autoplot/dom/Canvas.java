@@ -19,7 +19,12 @@ public class Canvas extends DomNode {
     protected CanvasController controller;
 
     public Canvas() {
-        
+        marginRow= new Row();
+        marginRow.setTop("2em");
+        marginRow.setBottom("100%-3em");
+        marginColumn= new Column();
+        marginColumn.setLeft("5em");
+        marginColumn.setRight("100%-3em");
     }
     
     
@@ -110,41 +115,31 @@ public class Canvas extends DomNode {
         propertyChangeSupport.fireIndexedPropertyChange(PROP_COLUMNS, index, oldColumns, newColumns);
     }
 
-    /**
-     * outer column for the canvas
-     */
-    protected String column = "5em,100%-3em";
+    protected Row marginRow;
+    public static final String PROP_MARGINROW = "marginRow";
 
-    public static final String PROP_COLUMN = "column";
-
-    public String getColumn() {
-        return column;
+    public Row getMarginRow() {
+        return marginRow;
     }
 
-    public void setColumn(String column) {
-        String oldColumn = this.column;
-        this.column = column;
-        propertyChangeSupport.firePropertyChange(PROP_COLUMN, oldColumn, column);
-    }
-    
-    
-    /**
-     * outer row for the canvas.
-     */
-    public static final String PROP_ROW = "row";
-
-    protected String row = "2em,100%-3em";
-    
-    public String getRow() {
-        return row;
+    public void setMarginRow(Row marginRow) {
+        Row oldMarginRow = this.marginRow;
+        this.marginRow = marginRow;
+        propertyChangeSupport.firePropertyChange(PROP_MARGINROW, oldMarginRow, marginRow);
     }
 
-    public void setRow(String row1) {
-        String oldRow1 = this.row;
-        this.row = row1;
-        propertyChangeSupport.firePropertyChange(PROP_ROW, oldRow1, row1);
+    protected Column marginColumn;
+    public static final String PROP_MARGINCOLUMN = "marginColumn";
+
+    public Column getMarginColumn() {
+        return marginColumn;
     }
 
+    public void setMarginColumn(Column marginColumn) {
+        Column oldMarginColumn = this.marginColumn;
+        this.marginColumn = marginColumn;
+        propertyChangeSupport.firePropertyChange(PROP_MARGINCOLUMN, oldMarginColumn, marginColumn);
+    }
 
     public CanvasController getController() {
         return controller;
@@ -153,6 +148,8 @@ public class Canvas extends DomNode {
     @Override
     public List<DomNode> childNodes() {
         ArrayList<DomNode> result = new ArrayList<DomNode>();
+        result.add( marginRow );
+        result.add( marginColumn );
         result.addAll( rows );
         result.addAll( columns );
         return result;
@@ -163,6 +160,9 @@ public class Canvas extends DomNode {
     public DomNode copy() {
         Canvas that= (Canvas)super.copy();
         that.controller= null;
+
+        that.marginRow= (Row) this.marginRow.copy();
+        that.marginColumn= (Column) this.marginColumn.copy();
 
         Row[] rowsCopy= this.getRows();
         for ( int i=0; i<rowsCopy.length; i++ ) {

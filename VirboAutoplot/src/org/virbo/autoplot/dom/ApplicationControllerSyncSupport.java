@@ -70,11 +70,7 @@ public class ApplicationControllerSyncSupport {
             if ( p.controller==null ) {
                 Row row= (Row) DomUtil.getElementById( application, p.getRowId() );
                 Column col;
-                if ( p.getColumnId().equals( CanvasController.MARGINCOLUMNID ) ) {
-                    col= null;
-                } else {
-                    col=  (Column) DomUtil.getElementById( application, p.getColumnId() );
-                }
+                col=  (Column) DomUtil.getElementById( application, p.getColumnId() );
                 new PlotController( application, p ).createDasPeer( row.controller.getCanvas(), row, col );
             }
             plotIds.put( p.getId(), p.getId() );

@@ -12,7 +12,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +42,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
@@ -347,10 +347,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         lcanvas.setId("canvas_0");
         new CanvasController(application, lcanvas).setDasCanvas(dasCanvas);
 
-        String[] ss = lcanvas.getRow().split(",");
-        outerRow = DasRow.create(dasCanvas, null, ss[0], ss[1]);
-        ss = lcanvas.getColumn().split(",");
-        outerColumn = DasColumn.create(dasCanvas, null, ss[0], ss[1]);
+        new RowController( lcanvas.getMarginRow() ).createDasPeer( lcanvas, null );
+        new ColumnController( lcanvas.getMarginColumn() ).createDasPeer( lcanvas, null );
 
         layoutListener = new LayoutListener(model);
 
@@ -361,8 +359,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         //lcanvas.addPropertyChangeListener(application.childListener);
         lcanvas.addPropertyChangeListener(this.domListener);
-
-        ((CanvasController)lcanvas.controller).bindTo(outerRow, outerColumn);
 
         dasCanvas.setPrintingTag("");
         return dasCanvas;
@@ -611,10 +607,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         domPlot.getYaxis().setId("yaxis_" + num);
         domPlot.getZaxis().setId("zaxis_" + num);
 
-        new PlotController(application, domPlot).createDasPeer(canvas, domRow ,null);
+        new PlotController(application, domPlot).createDasPeer(canvas, domRow ,canvas.getMarginColumn() );
 
-        domPlot.setRowId(domRow.getId());
-        domPlot.setColumnId( CanvasController.MARGINCOLUMNID);
+        domPlot.setRowId( domRow.getId() );
+        domPlot.setColumnId( canvas.getMarginColumn().getId() );
 
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
         Plot focus = getPlot();
@@ -869,7 +865,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param dst java bean such as model.getPlotDefaults().getXAxis()
      * @param dstProp a property name such as "label"
      */
-    public void bind(DomNode src, String srcProp, Object dst, String dstProp) {
+    public void bind(DomNode src, String srcProp, Object dst, String dstProp, Converter converter ) {
         BindingGroup bc;
         synchronized (bindingContexts) {
             bc = bindingContexts.get(src);
@@ -882,6 +878,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         Binding b;
 
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
+        if ( converter!=null ) b.setConverter( converter );
+        
         bc.addBinding(b);
 
         String srcId = src.getId();
@@ -905,6 +903,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         b.bind();
 
         this.bindingImpls.put(bb, b);
+    }
+
+    public void bind( DomNode src, String srcProp, Object dst, String dstProp) {
+        bind(src, srcProp, dst, dstProp, null );
     }
 
     /**
@@ -1189,9 +1191,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     private void bindTo(DasCanvas canvas) {
         ApplicationController ac = this;
-        ac.bind(application, "options.background", canvas, "background");
-        ac.bind(application, "options.foreground", canvas, "foreground");
-        ac.bind(application, "options.canvasFont", canvas, "font");
+        ac.bind(application, "options.background", canvas, "background" );
+        ac.bind(application, "options.foreground", canvas, "foreground" );
+        ac.bind(application, "options.canvasFont", canvas, "font", DomUtil.STRING_TO_FONT );
     }
 
     protected synchronized void syncTo(Application that) {
@@ -1238,11 +1240,11 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public DasRow getRow() {
-        return this.outerRow;
+        return getCanvas().getMarginRow().getController().getDasRow();
     }
 
     public DasColumn getColumn() {
-        return this.outerColumn;
+        return getCanvas().getMarginColumn().getController().getDasColumn();
     }
 
     public MonitorFactory getMonitorFactory() {

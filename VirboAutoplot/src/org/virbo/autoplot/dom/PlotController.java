@@ -83,14 +83,8 @@ public class PlotController extends DomNodeController {
         domPlot.addPropertyChangeListener( Plot.PROP_ROWID, rowColListener );
         domPlot.addPropertyChangeListener( Plot.PROP_COLUMNID, rowColListener );
 
-        DasColumn col;
-        if ( domColumn==null ) {
-            domPlot.setColumnId(canvas.controller.MARGINCOLUMNID);
-            col= application.controller.outerColumn;
-        } else {
-            col= domColumn.controller.getDasColumn();
-        }
-
+        DasColumn col= domColumn.controller.getDasColumn();
+        
         final DasPlot plot = new DasPlot(xaxis, yaxis);
 
         plot.setPreviewEnabled(true);
