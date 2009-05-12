@@ -23,7 +23,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -219,7 +218,15 @@ public class PngWalkCanvas extends JPanel {
             int minIndex = currentIndex - columns;
             int maxIndex = currentIndex + columns;
 
-            for (int index = minIndex; index <= maxIndex; index++) {
+            for ( int i = 0; i< columns*2 + 1; i++ ) {
+
+                int index;
+                int d= columns - i/2;
+                if ( i%2==0 ) {
+                    index= currentIndex - d;
+                } else {
+                    index= currentIndex + d;
+                }
                 if (index < 0) continue;
                 if (index >= images.size()) continue;
 
@@ -303,12 +310,12 @@ public class PngWalkCanvas extends JPanel {
                 int irow = (index - minIndex) / columns;
                 int icol = (index - minIndex) % columns;
 
-                ylow = targetWidth * irow;
+                ylow = ( targetHeight + CELL_PAD ) * irow;
 
                 Rectangle bounds = bounds(0, 0, width, height, targetWidth, targetHeight, 1.0);
 
                 int x = CELL_PAD + targetWidth / 2 + (CELL_PAD + targetWidth) * icol;
-                int y = ylow + CELL_PAD + targetWidth / 2;
+                int y = ylow + CELL_PAD + targetHeight / 2;
 
                 bounds = bounds(x, y, width, height, targetWidth, targetHeight, 1.0);
                 nextYLow = Math.max(nextYLow, bounds.y + bounds.height);
