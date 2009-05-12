@@ -1,3 +1,15 @@
+uri= 'vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/$Y/po_k0_hyd_$Y$m$d_v...cdf?ELE_MEAN_ENERGY&timerange=2001-01-05'
+outputFolder= '/tmp/pngwalk/'
+product= 'product'
+timeFormat= '%Y%m%d'
+times= getTimeRangesFor( uri, '2001', timeFormat )
+
+java.io.File(outputFolder).mkdirs()
+
+from org.das2.components import DasProgressPanel
+
+mon= DasProgressPanel.createFramed("running batch")
+
 def myWriteToPng( filename, appmodel, dom, width, height ): 
    appmodel.waitUntilIdle(False);
    from org.das2.util import DasPNGEncoder, DasPNGConstants
@@ -8,18 +20,16 @@ def myWriteToPng( filename, appmodel, dom, width, height ):
    encoder.write(image, out)
    out.close();
 
-uri= 'http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109'
-outputFolder= '/home/jbf/temp/'
-product= 'product'
-
-times= getTimeRangesFor( uri, '2007-nov through 2007-dec', '%Y%m%d' )
-
 n= len(times)
+mon.setTaskSize( n )
+mon.started()
 
 appmodel= ApplicationModel()
+appmodel.addDasPeersToApp()
+
 dom= appmodel.getDocumentModel()
 dom.syncTo( getDocumentModel() )
-dom.syncTo( getDocumentModel() )
+
 
 from org.virbo.autoplot.state import StatePersistence
 StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom );
@@ -30,14 +40,18 @@ h0= dom.canvases[0].height
 
 dom.getController().waitUntilIdle();
 
+
 count= 0
 for i in times:
    count= count+1
+   mon.setTaskProgress(count)
+   #if ( mon.isCancelled ): break
    print '%d of %d' % (count, n )
    dom.timeRange= DatumRangeUtil.parseTimeRangeValid(i)
    myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom, w0, h0 )
-#   myWriteToPng( outputFolder + product + '_%s_th.png' % i, appmodel, dom, w0/4, h0/4 )
 
+mon.finished()
 
-
+from org.autoplot.pngwalk import DemoPngWalk
+DemoPngWalk.start( 'file:' + outputFolder + product + '_' + timeFormat + '.png', getViewWindow() )
 
