@@ -14,6 +14,7 @@ import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.util.TimeParser;
 import java.awt.Image;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -79,6 +80,15 @@ public class ScriptContext extends PyJavaInstance {
     protected static void setView(AutoPlotUI v) {
         view = v;
     }
+
+    /**
+     * return the Window for the application, to be used for dialogs.
+     * @return
+     */
+    public static Window getViewWindow() {
+        return view;
+    }
+
     private static OutputStream out = System.out;
 
     /**
