@@ -6,6 +6,7 @@
 package org.autoplot.pngwalk;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModel;
 import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 
 /**
@@ -33,12 +35,25 @@ public class WalkUtil {
         return i0==Integer.MAX_VALUE ? -1 : i0;
     }
 
+    /**
+     * returns the last index of slash, splitting the FileSystem part from the template part.
+     * @param surl
+     * @return
+     */
     private static int splitIndex(String surl) {
         int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y",".*") );
         if ( i!=-1 ) {
             i = surl.lastIndexOf('/', i);
+        } else {
+            i = surl.lastIndexOf('/');
         }
         return i;
+    }
+
+    public static boolean fileExists(String surl) throws FileSystemOfflineException, MalformedURLException {
+        int i= splitIndex( surl );
+        FileSystem fs = FileSystem.create( new URL(surl.substring(0,i+1) ) );
+        return fs.getFileObject(surl.substring(i+1)).exists();
     }
 
     /**

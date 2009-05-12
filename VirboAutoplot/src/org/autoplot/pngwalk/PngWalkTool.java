@@ -37,7 +37,7 @@ public class PngWalkTool extends javax.swing.JPanel {
         canvas.addPropertyChangeListener( PngWalkCanvas.PROP_CURRENTITEM, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 String item= canvas.getCurrentItem();
-                boolean actionEnabled= actionMatch!=null && actionMatch.matcher(item).matches();
+                boolean actionEnabled= actionEnabler.isActionEnabled(item);
                 addFileActionButton.setEnabled(actionEnabled);
                 if ( actionEnabled ) {
                     addFileActionButton.setActionCommand(actionCommand+" "+item);
@@ -55,8 +55,14 @@ public class PngWalkTool extends javax.swing.JPanel {
         return canvas.getTemplate();
     }
 
-    void addFileAction( String match, String actionCommand, AbstractAction abstractAction ) {
-        actionMatch= Pattern.compile(match);
+    static interface ActionEnabler {
+        boolean isActionEnabled( String filename );
+    }
+
+    ActionEnabler actionEnabler;
+
+    void addFileAction( ActionEnabler match, String actionCommand, AbstractAction abstractAction ) {
+        this.actionEnabler= match;
         this.actionCommand= actionCommand;
         addFileActionButton.setAction(abstractAction);
     }

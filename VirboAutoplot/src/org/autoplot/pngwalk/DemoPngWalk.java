@@ -5,11 +5,13 @@
 package org.autoplot.pngwalk;
 
 import java.awt.event.ActionEvent;
+import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import org.das2.util.ArgumentList;
+import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
 
 /**
@@ -32,27 +34,48 @@ public class DemoPngWalk {
             }
         }
 
-        String template = "file:/tmp/pngwalk/product_$Y$m$d.png"; // One Slash!!
-        //final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
+        //String template = "file:/tmp/pngwalk/product_$Y$m$d.png"; // One Slash!!
+        final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
         //final String template=  "file:/net/spot3/home/jbf/fun/pics/2001minnesota/.*JPG" ;
         //final String template= "file:/home/jbf/public_html/voyager/VGPW_0201/BROWSE/V1/.*.PNG";
         //final String template= "file:///net/spot3/home/jbf/fun/pics/20080315_tenerife_masca_hike/IMG_.*.JPG";
         //final String template= "http://www.swpc.noaa.gov/ftpdir/lists/hpi/plots/pmap_$Y_$m_$d_...._S_.*_.*_.*_.*.gif";
 
         tool.setTemplate(template);
-        tool.addFileAction("file:/home/jbf/temp/product_.*.png", "autoplot", new AbstractAction("Launch Autoplot") {
 
+        PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
+            public boolean isActionEnabled(String filename) {
+                String s = filename;
+                String template = tool.getTemplate();
+                int i0 = template.indexOf("_$Y");
+                int i1 = s.indexOf(".png");
+                if ( i1==-1 ) return false;
+                String timeRange = s.substring(i0 + 1, i1);
+                String productFile = template.substring(0, i0) + ".vap";
+                try {
+                    return WalkUtil.fileExists(productFile);
+                } catch (FileSystemOfflineException ex) {
+                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    return false;
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                    return false;
+                }
+            }
+        };
+
+        tool.addFileAction( enabler, "autoplot", new AbstractAction("Launch Autoplot") {
             public void actionPerformed(ActionEvent e) {
                 String s = tool.getSelectedFile();
                 String template = tool.getTemplate();
                 int i0 = template.indexOf("_$Y");
                 int i1 = s.indexOf(".png");
+                if ( i1==-1 ) return;
                 String timeRange = s.substring(i0 + 1, i1);
                 String productFile = template.substring(0, i0) + ".vap";
 
                 final String suri = productFile + "?timeRange=" + timeRange;
                 Runnable run = new Runnable() {
-
                     public void run() {
                         try {
                             ScriptContext.plot(suri);

@@ -458,10 +458,12 @@ public class PngWalkCanvas extends JPanel {
 
     public void setCurrentIndex(int currentIndex) {
         int oldCurrentIndex = this.currentIndex;
+        String oldItem= getCurrentItem();
         if (currentIndex >= 0 && currentIndex < this.images.size()) {
             this.currentIndex = currentIndex;
             repaint();
             firePropertyChange(PROP_CURRENTINDEX, oldCurrentIndex, currentIndex);
+            firePropertyChange(PROP_CURRENTITEM, oldItem, getCurrentItem() );
         }
     }
 
