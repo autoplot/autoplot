@@ -65,7 +65,7 @@ public class DemoPngWalk {
             }
         });
 
-        JFrame frame = new JFrame("png walk demo");
+        JFrame frame = new JFrame("PNG Walk Tool");
         frame.getContentPane().add(tool);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

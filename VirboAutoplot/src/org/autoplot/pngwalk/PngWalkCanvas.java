@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasExceptionHandler;
 
 /**
@@ -116,6 +117,14 @@ public class PngWalkCanvas extends JPanel {
 
         imagebounds = new HashMap<Rectangle, Integer>();
 
+        if ( exception!=null ) {
+            g.drawString( exception.toString(), 100, 100 );
+            return;
+        }
+        if ( images.size()==0 ) {
+            g.drawString( "no matching images found", getWidth()/2 - 100, getHeight()/2 );
+            return;
+        }
         if (mode == DisplayMode.day) {
             boolean usedLastImage = false;
             Image image = images.get(currentIndex);
@@ -130,7 +139,6 @@ public class PngWalkCanvas extends JPanel {
             if (height == -1) height = NOMINAL_HEIGHT;
             if (width == -1) width = NOMINAL_WIDTH;
 
-            System.err.printf("%d %d %d %d \n", height, width, getHeight(), getWidth());
             Rectangle bounds = bounds(getWidth() / 2, getHeight() / 2, width, height, getWidth() * 80 / 100, getHeight() * 80 / 100, 1.0);
             if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 lastImage = image;
@@ -362,19 +370,18 @@ public class PngWalkCanvas extends JPanel {
     private synchronized void updateImages() {
         try {
             ranges = new ArrayList<DatumRange>();
-            urls = WalkUtil.getFilesFor(template, null, ranges);
+            urls = WalkUtil.getFilesFor(template, timeRange, ranges);
             images = new ArrayList<Image>();
             for (int i = 0; i < urls.size(); i++) {
                 images.add(i, getToolkit().createImage(urls.get(i)));
             }
-        } catch (IOException ex) {
+            exception= null;
+        } catch ( Exception ex ) {
             DasExceptionHandler.handle(ex);
-            Logger.getLogger(PngWalkCanvas.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
             DasExceptionHandler.handle(ex);
-            Logger.getLogger(PngWalkCanvas.class.getName()).log(Level.SEVERE, null, ex);
+            exception= ex;
         }
-
+        repaint();
     }
 
     public enum DisplayMode {
@@ -454,6 +461,10 @@ public class PngWalkCanvas extends JPanel {
     // for 35-up;
     private int minIndex = 0;
     private int maxIndex = 0;
+
+
+    private Exception exception=null;
+
     protected String template = null;
     /**
      * template string identifying the images
@@ -466,12 +477,16 @@ public class PngWalkCanvas extends JPanel {
     }
 
     public void setTemplate(String template) {
+        template= template.trim();
+        if ( template.startsWith("file:///") ) {
+            template= "file:/" + template.substring(8);
+        }
         String oldTemplate = this.template;
         this.template = template;
         firePropertyChange(PROP_TEMPLATE, oldTemplate, template);
         updateImages();
-        repaint();
     }
+
     public static final String PROP_CURRENTITEM = "currentItem";
 
     public String getCurrentItem() {
@@ -494,4 +509,26 @@ public class PngWalkCanvas extends JPanel {
             Logger.getLogger(PngWalkCanvas.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    protected String timeRange = "";
+    public static final String PROP_TIMERANGE = "timeRange";
+
+    public String getTimeRange() {
+        return timeRange;
+    }
+
+    public void setTimeRange(String timeRange) {
+        String oldTimeRange = this.timeRange;
+        this.timeRange = timeRange;
+        if ( timeRange.trim().length()>0 ) {
+            try {
+                DatumRange tr = DatumRangeUtil.parseTimeRange(timeRange);
+            } catch (ParseException ex) {
+                this.timeRange= oldTimeRange;
+            }
+        }
+        firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
+        updateImages();
+    }
+
 }

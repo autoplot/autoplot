@@ -52,7 +52,7 @@ public class WalkUtil {
      */
     public static List<URL> getFilesFor( String surl, String timeRange, List<DatumRange> timeRanges ) throws IOException, ParseException {
         DatumRange dr = null;
-        if ( timeRange!=null ) dr= DatumRangeUtil.parseTimeRange(timeRange);
+        if ( timeRange!=null && timeRange.trim().length()>0 ) dr= DatumRangeUtil.parseTimeRange(timeRange);
 
         int i = surl.indexOf('?');
 
