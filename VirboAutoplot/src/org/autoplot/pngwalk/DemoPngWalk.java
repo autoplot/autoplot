@@ -31,8 +31,9 @@ public class DemoPngWalk {
                 e.printStackTrace();
             }
         }
-        
-        final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
+
+        final String template=  "file:/tmp/pngwalk/product_$Y$m$d.png" ; // One Slash!!
+        //final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
         //final String template=  "file:/net/spot3/home/jbf/fun/pics/2001minnesota/.*JPG" ;
         //final String template= "file:/home/jbf/public_html/voyager/VGPW_0201/BROWSE/V1/.*.PNG";
         //final String template= "file:///net/spot3/home/jbf/fun/pics/20080315_tenerife_masca_hike/IMG_.*.JPG";
@@ -42,9 +43,11 @@ public class DemoPngWalk {
         tool.addFileAction( "file:/home/jbf/temp/product_.*.png", "autoplot", new AbstractAction( "launch Autoplot" ) {
             public void actionPerformed(ActionEvent e) {
                     String s = tool.getSelectedFile();
-                    int i = template.indexOf("$Y");
-                    String timeRange = s.substring(i, i + 8);
-                    String productFile = "file:/home/jbf/temp/product.vap";
+                    int i0 = template.indexOf("_$Y");
+                    int i1= s.indexOf(".png");
+                    String timeRange = s.substring(i0+1,  i1);
+                    String productFile = template.substring(0,i0)+".vap";
+
                     final String suri = productFile + "?timeRange=" + timeRange;
                     Runnable run= new Runnable() {
                         public void run() {
