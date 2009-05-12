@@ -9,11 +9,13 @@ import java.beans.ExceptionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -180,19 +182,29 @@ public class ScriptPanelSupport {
         return uri1.equals(uri2);
     }
 
-    private void annotateError(PyException ex) throws BadLocationException {
+    /**
+     *
+     * @param ex
+     * @param offset line offset from beginning of file where execution began.
+     * @throws javax.swing.text.BadLocationException
+     */
+    private void annotateError(PyException ex,int offset) throws BadLocationException {
         if (ex instanceof PySyntaxError) {
             Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-            int lineno = ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
+            int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
             annotationsSupport.annotateLine(lineno, "error", ex.toString());
         } else {
             Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-            annotationsSupport.annotateLine(ex.traceback.tb_lineno, "error", ex.toString());
+            annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString());
         }
     }
 
     protected void executeScript() {
+        executeScript(false);
+    }
+
+    protected void executeScript( final boolean trace) {
 
         try {
             if (panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE) {
@@ -204,7 +216,7 @@ public class ScriptPanelSupport {
                             public void exceptionThrown(Exception e) {
                                 if (e instanceof PyException) {
                                     try {
-                                        annotateError((PyException) e);
+                                        annotateError((PyException) e,0);
                                     } catch (BadLocationException ex) {
                                         Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
                                     }
@@ -251,6 +263,7 @@ public class ScriptPanelSupport {
                 Runnable run = new Runnable() {
 
                     public void run() {
+                        int offset= 0;
                         try {
                             if (file != null) {
                                 save();
@@ -260,13 +273,39 @@ public class ScriptPanelSupport {
                                 boolean dirty0 = panel.isDirty();
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
-                                interp.exec(panel.getEditorPanel().getText());
+                                if ( trace ) {
+                                    String text= panel.getEditorPanel().getText();
+                                    int i0= 0;
+                                    while ( i0<text.length() ) {
+                                        int i1= text.indexOf("\n",i0);
+                                        while ( i1<text.length()-1 && Character.isWhitespace(text.charAt(i1+1 )) ) {
+                                             i1= text.indexOf("\n",i1+1);
+                                        }
+                                        String s;
+                                        if ( i1!=-1 ) {
+                                            i1=i1+1;
+                                            s= text.substring(i0, i1);
+                                        } else {
+                                            s= text.substring(i0);
+                                        }
+                                        try {
+                                            interp.exec(s);
+                                        } catch ( PyException ex ) {
+                                            throw ex;
+                                        }
+                                        i0= i1;
+                                        offset+=1;
+                                        System.err.println(s);
+                                    }
+                                } else {
+                                    interp.exec(panel.getEditorPanel().getText());
+                                }
                                 applicationController.setStatus("done executing script");
                             } catch (IOException ex) {
                                 Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
                                 applicationController.setStatus("error: I/O exception: " + ex.toString());
                             } catch (PyException ex) {
-                                annotateError(ex);
+                                annotateError(ex,offset);
                                 ex.printStackTrace();
                                 applicationController.setStatus("error: " + ex.toString());
                             }

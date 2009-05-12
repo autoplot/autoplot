@@ -6,6 +6,7 @@
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.BorderLayout;
+import java.awt.Event;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -250,7 +251,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     }// </editor-fold>//GEN-END:initComponents
     private void savePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePlotButtonActionPerformed
-        support.executeScript();
+        if ( ( evt.getModifiers() & Event.CTRL_MASK ) ==Event.CTRL_MASK ) {
+            support.executeScript(true);
+        } else {
+            support.executeScript();
+        }
     }//GEN-LAST:event_savePlotButtonActionPerformed
 
     private void saveAsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveAsButtonActionPerformed
