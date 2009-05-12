@@ -57,10 +57,11 @@ public class PngWalkCanvas extends JPanel {
         return new Point(xpos - size.width / 2, ypos - size.height / 2);
     }
 
-    private static Rectangle bounds(int xpos, int ypos, int width, int height, int targetWidth, int targetHeight, double aspectFactor) {
+    private static Rectangle bounds(int xpos, int ypos, int width, int height, int targetWidth, int targetHeight, double aspectFactor,boolean debug) {
         double aspect = 1. * width / height;
         int target = 1. * targetWidth / targetHeight > aspect ? targetHeight : targetWidth;
 
+        if ( debug ) System.err.printf( "tw=%d th=%d rat=%5.2f asp=%5.2f  target=%d\n", targetWidth, targetHeight, 1. * targetWidth / targetHeight, aspect, target );
         double sqrtAspect = Math.sqrt(aspect * aspectFactor);
         int w = (int) (target * sqrtAspect);
         int h = (int) (target / sqrtAspect);
@@ -139,7 +140,7 @@ public class PngWalkCanvas extends JPanel {
             if (height == -1) height = NOMINAL_HEIGHT;
             if (width == -1) width = NOMINAL_WIDTH;
 
-            Rectangle bounds = bounds(getWidth() / 2, getHeight() / 2, width, height, getWidth() * 80 / 100, getHeight() * 80 / 100, 1.0);
+            Rectangle bounds = bounds(getWidth() / 2, getHeight() / 2, width, height, getWidth() * 80 / 100, getHeight() * 80 / 100, 1.0,false);
             if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 lastImage = image;
             }
@@ -159,6 +160,7 @@ public class PngWalkCanvas extends JPanel {
             int columns = 7;
             int targetSize = (getWidth() - CELL_PAD) / columns - CELL_PAD;
 
+            int ylow=0;
             for (int index = minIndex; index <= maxIndex; index++) {
                 if (index < 0) continue;
                 if (index >= images.size()) continue;
@@ -175,10 +177,12 @@ public class PngWalkCanvas extends JPanel {
                 int x = CELL_PAD + targetSize / 2 + (CELL_PAD + targetSize) * icol;
                 int y = CELL_PAD + targetSize / 2;
 
-                Rectangle bounds = bounds(x, y, width, height, targetSize, targetSize, 1.0);
+                Rectangle bounds = bounds(x, y, width, height, targetSize, targetSize, 1.0,false);
                 if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 }
                 g.draw(bounds);
+                ylow= Math.max( bounds.y+bounds.height, ylow );
+
                 maybeTimeStamp(g, bounds, index);
 
                 imagebounds.put(bounds, index);
@@ -198,11 +202,14 @@ public class PngWalkCanvas extends JPanel {
             if (height == -1) height = NOMINAL_HEIGHT;
             if (width == -1) width = NOMINAL_WIDTH;
 
-            Dimension size = resize(width, height, getWidth() * 60 / 100);
+            //int widthLimit= getWidth()-CELL_PAD*2;
+            int widthLimit= 100000;
+            int heightLimit = getHeight() - ylow - CELL_PAD;
+            Rectangle size =  bounds( 0, 0, width, height, widthLimit,heightLimit, 1.0 ,false);
 
-            Rectangle bounds = bounds(getWidth() / 2, CELL_PAD + targetSize + CELL_PAD + size.height / 2, width, height,
-                    getWidth() * 60 / 100, getHeight() * 60 / 100, 1.0);
-
+            Rectangle bounds = bounds( getWidth() / 2, ylow + Math.max( size.height, getHeight() - ylow ) / 2,
+                    width, height,
+                    widthLimit, heightLimit, 1.0,true);
             if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 lastImage = image;
             }
@@ -255,7 +262,7 @@ public class PngWalkCanvas extends JPanel {
 
                 if (index < currentIndex) {
                     int x = xm - 200 + (index - currentIndex) * targetSize / 4;
-                    bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1);
+                    bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1,false);
                     if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                     }
                     g.draw(bounds);
@@ -263,7 +270,7 @@ public class PngWalkCanvas extends JPanel {
 
                 } else if (index == currentIndex) {
                     int x = xm;
-                    bounds = bounds(x, y, width, height, 360, height, 1.0);
+                    bounds = bounds(x, y, width, height, 360, height, 1.0,false);
                     if ( g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                         lastImage= image;
                     }
@@ -272,7 +279,7 @@ public class PngWalkCanvas extends JPanel {
                     if ( usedLastImage ) drawMomentStr( g, bounds);
                 } else {
                     int x = xm + 200 + (index - currentIndex) * targetSize / 4;
-                    bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1);
+                    bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1,false);
                     if ( g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                     }
                     g.draw(bounds);
@@ -320,12 +327,12 @@ public class PngWalkCanvas extends JPanel {
 
                 ylow = ( targetHeight + CELL_PAD ) * irow;
 
-                Rectangle bounds = bounds(0, 0, width, height, targetWidth, targetHeight, 1.0);
+                Rectangle bounds = bounds(0, 0, width, height, targetWidth, targetHeight, 1.0,false);
 
                 int x = CELL_PAD + targetWidth / 2 + (CELL_PAD + targetWidth) * icol;
                 int y = ylow + CELL_PAD + targetHeight / 2;
 
-                bounds = bounds(x, y, width, height, targetWidth, targetHeight, 1.0);
+                bounds = bounds(x, y, width, height, targetWidth, targetHeight, 1.0,false);
                 nextYLow = Math.max(nextYLow, bounds.y + bounds.height);
 
                 if (index == currentIndex) {
