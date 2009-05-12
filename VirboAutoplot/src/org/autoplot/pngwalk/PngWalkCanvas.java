@@ -209,7 +209,7 @@ public class PngWalkCanvas extends JPanel {
 
             Rectangle bounds = bounds( getWidth() / 2, ylow + Math.max( size.height, getHeight() - ylow ) / 2,
                     width, height,
-                    widthLimit, heightLimit, 1.0,true);
+                    widthLimit, heightLimit, 1.0, false );
             if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 lastImage = image;
             }
