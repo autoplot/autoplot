@@ -4,6 +4,7 @@
  */
 package org.autoplot.pngwalk;
 
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
@@ -21,7 +22,6 @@ import org.virbo.autoplot.ScriptContext;
 public class DemoPngWalk {
 
     public static void main(String[] args) {
-        final PngWalkTool tool = new PngWalkTool();
 
         final ArgumentList alm = new ArgumentList("AutoPlotUI");
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
@@ -41,6 +41,14 @@ public class DemoPngWalk {
         //final String template= "file:///net/spot3/home/jbf/fun/pics/20080315_tenerife_masca_hike/IMG_.*.JPG";
         //final String template= "http://www.swpc.noaa.gov/ftpdir/lists/hpi/plots/pmap_$Y_$m_$d_...._S_.*_.*_.*_.*.gif";
 
+        start( template, null );
+
+    }
+
+    public static PngWalkTool start( String template, Window parent ) {
+
+        final PngWalkTool tool = new PngWalkTool();
+
         tool.setTemplate(template);
 
         PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
@@ -48,6 +56,7 @@ public class DemoPngWalk {
                 String s = filename;
                 String template = tool.getTemplate();
                 int i0 = template.indexOf("_$Y");
+                if ( i0==-1 ) i0= template.indexOf("_%Y");
                 int i1 = s.indexOf(".png");
                 if ( i1==-1 ) return false;
                 String timeRange = s.substring(i0 + 1, i1);
@@ -69,6 +78,7 @@ public class DemoPngWalk {
                 String s = tool.getSelectedFile();
                 String template = tool.getTemplate();
                 int i0 = template.indexOf("_$Y");
+                if ( i0==-1 ) i0= template.indexOf("_%Y");
                 int i1 = s.indexOf(".png");
                 if ( i1==-1 ) return;
                 String timeRange = s.substring(i0 + 1, i1);
@@ -91,10 +101,16 @@ public class DemoPngWalk {
         JFrame frame = new JFrame("PNG Walk Tool");
         frame.getContentPane().add(tool);
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        if ( parent==null ) {
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } else {
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        }
+
         frame.pack();
 
         frame.setVisible(true);
 
+        return tool;
     }
 }
