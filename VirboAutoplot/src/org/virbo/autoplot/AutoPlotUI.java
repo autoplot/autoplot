@@ -1329,7 +1329,7 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                System.err.println("enter invokeLater");
+                logger.fine("enter invokeLater");
                 
                 model.addDasPeersToApp();
 
@@ -1356,8 +1356,10 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
                     }
                 });
 
-                System.err.println("UI.setVisible(true)");
+                logger.fine("UI.setVisible(true)");
                 app.setVisible(true);
+                logger.fine("UI is visible");
+                
                 if (initialURL != null) {
                     app.dataSetSelector.setValue(initialURL);
                     app.dataSetSelector.maybePlot(false);
