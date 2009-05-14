@@ -53,6 +53,7 @@
         <jar href="http://www.autoplot.org/jnlp-lib/netcdf-2.2.22.jar"/>
         <jar href="http://www.autoplot.org/jnlp-lib/slf4j-jdk14.jar" />
         <jar href="http://www.autoplot.org/jnlp-lib/poi-3.1-FINAL-20080629.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/poi-contrib-3.1-FINAL-20080629.jar" />
         <jar href="http://www.autoplot.org/jnlp-lib/resourcesOptional.jar" />
         <jar href="http://www.autoplot.org/jnlp-lib/swing-layout-1.0.3.jar" />
         <jar href="http://www.autoplot.org/jnlp-lib/jython.jar" />
