@@ -53,7 +53,7 @@ public class PanelController extends DomNodeController {
      */
     private Panel parentPanel;
     private List<Panel> childPanels;
-    
+
     private DataSourceFilter dsf; // This is the one we are listening to.
     /**
      * switch over between fine and course points.
@@ -67,7 +67,7 @@ public class PanelController extends DomNodeController {
         this.dom = dom;
         this.panel = panel;
         this.appmodel = model;
-        
+
         panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, panelListener);
         panel.addPropertyChangeListener(Panel.PROP_DATASOURCEFILTERID, panelListener);
     }
@@ -115,7 +115,7 @@ public class PanelController extends DomNodeController {
 
     private void resetDataSource() {
         if (dsf != null) {
-            unbindDsf();  
+            unbindDsf();
             List<DomNode> usages= DomUtil.dataSourceUsages(dom, dsf.getId() );
             if ( usages.size()==0 ) {
                 dom.controller.deleteDataSourceFilter(dsf);
@@ -124,7 +124,7 @@ public class PanelController extends DomNodeController {
 
         assert (panel.getDataSourceFilterId() != null);
         if ( panel.getDataSourceFilterId().equals("") ) return;
-        
+
         dsf = dom.controller.getDataSourceFilterFor(panel);
 
         if ( dsf==null ) {
@@ -237,7 +237,7 @@ public class PanelController extends DomNodeController {
                     } else {
                         dom.controller.deletePanel(panel);
                     }
-                    
+
                 } else if ( resetRenderer ) {
                     setRenderType(panel.getRenderType());
                     setResetRenderer(false);
@@ -260,7 +260,7 @@ public class PanelController extends DomNodeController {
         if (renderer != null) {
             renderer.setActive(true);
         }
-        
+
         if (childPanels != null) {
             for (Panel p : this.childPanels) {
                 if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
@@ -627,7 +627,7 @@ public class PanelController extends DomNodeController {
             } else {
                 desc = AutoplotUtil.autoRange( fillDs, props );
             }
-            
+
             panelCopy.getPlotDefaults().getYaxis().setLog(desc.log);
             panelCopy.getPlotDefaults().getYaxis().setRange(desc.range);
 
@@ -637,6 +637,16 @@ public class PanelController extends DomNodeController {
             }
 
             guessCadence((MutablePropertyDataSet) xds, fillDs);
+
+            Renderer newRenderer = getRenderer();
+            if (newRenderer instanceof SeriesRenderer && fillDs != null) {
+                QDataSet d = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                if (d != null) {
+                    ((SeriesRenderer) newRenderer).setCadenceCheck((d.property(QDataSet.CADENCE) != null));
+                } else {
+                    ((SeriesRenderer) newRenderer).setCadenceCheck(true);
+                }
+            }
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
@@ -723,15 +733,7 @@ public class PanelController extends DomNodeController {
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
 
-        QDataSet fillDs= dsf.controller.getFillDataSet();
-        if ( newRenderer instanceof SeriesRenderer && fillDs!=null ) {
-            QDataSet d= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-            if ( d!=null ) {
-                ((SeriesRenderer)newRenderer).setCadenceCheck( (d.property(QDataSet.CADENCE)!=null ) );
-            } else {
-                ((SeriesRenderer)newRenderer).setCadenceCheck( true );
-            }
-        }
+        QDataSet fillDs = dsf.controller.getFillDataSet();
 
         if (oldRenderer != newRenderer) {
             setRenderer(newRenderer);
