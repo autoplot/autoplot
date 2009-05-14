@@ -163,8 +163,6 @@ public class ApplicationController extends DomNodeController implements RunLater
                     }
                 }
             }
-
-        // TODO: check for children, add to children
         }
     };
     FocusAdapter focusAdapter = new FocusAdapter() {
@@ -184,7 +182,14 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             Renderer r = plot.getFocusRenderer();
             if (r != null) {
-                p = findPanel(r);
+                try {
+                    p = findPanel(r);
+                } catch ( RuntimeException ex ) {
+                    System.err.println("here where i couldn't find the panel for "+r);
+                    ex.printStackTrace();
+                    //TODO: track this down, it's probably a left over listener.
+                    return;
+                }
             }
 
             List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
@@ -641,7 +646,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * find the panelId using this renderer.
      * @param rend
-     * @return
+     * @return 
      */
     private Panel findPanel(Renderer rend) {
         for (Panel p : application.getPanels()) {
