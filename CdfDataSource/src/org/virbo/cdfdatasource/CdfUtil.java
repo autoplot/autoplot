@@ -439,6 +439,9 @@ public class CdfUtil {
         return result;
     }
 
+    public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit ) throws CDFException {
+        return getPlottable( cdf, dataOnly, rankLimit, false );
+    }
     /**
      * keys are the names of the variables. values are descriptions.
      * @param cdf
@@ -447,7 +450,7 @@ public class CdfUtil {
      * @return map of parameter name to short description
      * @throws gsfc.nssdc.cdf.CDFException
      */
-    public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws CDFException {
+    public static Map<String, String> getPlottable( CDF cdf, boolean dataOnly, int rankLimit, boolean deep ) throws CDFException {
 
         Map<String, String> result = new LinkedHashMap<String, String>();
         
@@ -456,6 +459,7 @@ public class CdfUtil {
         logger.fine("got "+v.size()+" variables");
         
         Attribute aAttr = null, bAttr = null, cAttr = null;
+        Attribute catDesc= null;
 
         logger.fine("getting CDF attributes");
         try {
@@ -470,12 +474,18 @@ public class CdfUtil {
             cAttr = cdf.getAttribute("DEPEND_2");  // check for too many dimensions
         } catch (CDFException e) {
         }
+        try {
+            catDesc = cdf.getAttribute("CATDESC");
+        } catch (CDFException e) {
+        }
 
         for (int i = 0; i < v.size(); i++) {
             Variable var = (Variable) v.get(i);
             if (var.getDataType() == Variable.CDF_CHAR) {
                 continue;
             }
+
+            long maxRec= var.getMaxWrittenRecord();
 
             int rank;
             long[] dims = var.getDimSizes();
@@ -493,17 +503,20 @@ public class CdfUtil {
                 result.put(var.getName(), null);
             } else {
 
-                Vector attr = var.getAttributes();
-
                 Variable xDependVariable = null;
+                long xMaxRec= -1;
                 Variable yDependVariable = null;
+                long yMaxRec= -1;
                 Variable zDependVariable = null;
+                long zMaxRec= -1;
+                String scatDesc= null;
 
                 try {
                     if (aAttr != null) {  // check for metadata for DEPEND_1
                         logger.fine("get attribute "+aAttr.getName()+" entry for "+var.getName());
                         Entry xEntry = aAttr.getEntry(var);
-                        xDependVariable = cdf.getVariable((String) xEntry.getData());
+                        xDependVariable = cdf.getVariable( String.valueOf( xEntry.getData()) );
+                        xMaxRec= xDependVariable.getMaxWrittenRecord();
                     }
                 } catch (CDFException e) {
                     //e.printStackTrace();
@@ -514,12 +527,8 @@ public class CdfUtil {
                     if (bAttr != null) {  // check for metadata for DEPEND_1
                         logger.fine("get attribute "+bAttr.getName()+" entry for "+var.getName());
                         Entry yEntry = bAttr.getEntry(var);
-                        yDependVariable = cdf.getVariable((String) yEntry.getData());
-                    /*Attribute varType = cdf.getAttribute("VAR_TYPE");
-                    Entry e = varType.getEntry(yDependVariable);
-                    if (e.getData().equals("metadata")) {
-                    continue;
-                    }*/
+                        yDependVariable = cdf.getVariable( String.valueOf(yEntry.getData()) );
+                        yMaxRec= yDependVariable.getMaxWrittenRecord();
                     }
                 } catch (CDFException e) {
                     //e.printStackTrace();
@@ -530,32 +539,45 @@ public class CdfUtil {
                     if (cAttr != null) { // check for existence of DEPEND_2, dimensionality too high
                         logger.fine("get attribute "+cAttr.getName()+" entry for "+var.getName());
                         Entry zEntry = cAttr.getEntry(var);
-                        zDependVariable = cdf.getVariable((String) zEntry.getData());
-                    /*Attribute varType = cdf.getAttribute("VAR_TYPE");
-                    Entry e = varType.getEntry(zDependVariable);
-                    if (e.getData().equals("metadata")) {
-                    continue;
-                    }*/
+                        zDependVariable = cdf.getVariable( String.valueOf(zEntry.getData()) );
+                        zMaxRec= zDependVariable.getMaxWrittenRecord();
                     }
                 } catch (CDFException e) {
                     //e.printStackTrace();
                 }
 
+                if ( deep ) {
+                    try {
+                        if (catDesc != null) {
+                            logger.fine("get attribute "+catDesc.getName()+" entry for "+var.getName());
+                            Entry entry = catDesc.getEntry(var);
+                            scatDesc = String.valueOf( entry.getData() );
+                        }
+                    } catch (CDFException e) {
+                        //e.printStackTrace();
+                    }
+                }
 
                 String desc = "" + var.getName();
                 if (xDependVariable != null) {
-                    desc += "(" + xDependVariable.getName();
+                    desc += "(" + xDependVariable.getName()+"="+xMaxRec;
                     if (yDependVariable != null) {
-                        desc += "," + yDependVariable.getName();
+                        desc += "," + yDependVariable.getName()+"="+yMaxRec;
                         if (zDependVariable != null) {
-                            desc += "," + zDependVariable.getName();
+                            desc += "," + zDependVariable.getName()+"="+zMaxRec;
                         }
                     }
                     desc += ")";
                 }
-
-
-                result.put(var.getName(), desc);
+                if ( deep ) {
+                    StringBuffer descbuf= new StringBuffer( "<html><b>"+desc+"</b><br>" );
+                    if ( maxRec!=xMaxRec ) descbuf.append(""+maxRec+" records<br>");
+                    if ( scatDesc!=null ) descbuf.append(""+scatDesc+"<br>");
+                    descbuf.append("</html>");
+                    result.put(var.getName(), descbuf.toString() );
+                } else {
+                    result.put(var.getName(), desc);
+                }
 
             }
         } // for
