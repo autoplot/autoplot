@@ -467,6 +467,8 @@ public class AutoplotUtil {
             // find min and max of three-point medians
             try {
                 dd = simpleRange(ds);
+                if ( Units.dimensionless.isFill(dd[0]) ) dd[0]= dd[0] / 10; // kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FEDO
+                if ( Units.dimensionless.isFill(dd[1]) ) dd[1]= dd[1] / 10;
             } catch (IllegalArgumentException ex) {
                 if (UnitsUtil.isTimeLocation(u)) {
                     dd = new double[]{0, Units.days.createDatum(1).doubleValue(u.getOffsetUnits())};
