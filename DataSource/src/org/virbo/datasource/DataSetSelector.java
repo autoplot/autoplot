@@ -247,8 +247,8 @@ public class DataSetSelector extends javax.swing.JPanel {
             } else {
                 throw new RuntimeException("parent windowAncestor type is not supported.");
             }
-            dialog.setVisible(true);
             dialog.setTitle(title);
+            dialog.setVisible(true);
 
             if (!dialog.isCancelled()) {
                 dataSetSelector.setSelectedItem(edit.getUrl());
@@ -727,7 +727,6 @@ private void dataSetSelectorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-F
 }//GEN-LAST:event_dataSetSelectorMouseClicked
 
 private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuCanceled
-    System.err.println("popup cancelled");
     popupCancelled = true;
 }//GEN-LAST:event_dataSetSelectorPopupMenuCanceled
     // Variables declaration - do not modify//GEN-BEGIN:variables
