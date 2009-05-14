@@ -129,10 +129,12 @@ public class ApplicationController extends DomNodeController implements RunLater
             Object src = evt.getSource();
             if ( src instanceof DomNode ) {
                 DomNodeController c= DomNodeController.getController((DomNode)src);
-                if ( c!=null && c.isValueAdjusting()) return;
+                //if ( c!=null && c.isValueAdjusting()) return;
             }
 
-            fireActionEvent(new ActionEvent(evt.getSource(), eventId.incrementAndGet(), evt.getPropertyName()));
+            if ( !isValueAdjusting() ) {
+                fireActionEvent(new ActionEvent(evt.getSource(), eventId.incrementAndGet(), evt.getPropertyName()));
+            }
             
             Object oldValue = evt.getOldValue();
             if (oldValue != null) {
