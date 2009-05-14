@@ -603,6 +603,8 @@ private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
 
         } catch (IOException ex) {
             Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
         }
 
     }
