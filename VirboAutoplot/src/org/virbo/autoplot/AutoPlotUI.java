@@ -418,9 +418,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private void fillFileMenu() {
 
         fileMenu.add(dataSetSelector.getOpenLocalAction());
-        fileMenu.add(dataSetSelector.getRecentMenu());
 
-        fileMenu.add( getAddPanelAction() );
+        fileMenu.add(getAddPanelAction());
+
+        fileMenu.add(dataSetSelector.getRecentMenu());
 
         fileMenu.add(stateSupport.createSaveAsAction());
 
