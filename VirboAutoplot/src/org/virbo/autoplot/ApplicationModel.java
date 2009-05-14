@@ -8,7 +8,6 @@
  */
 package org.virbo.autoplot;
 
-import java.awt.Dimension;
 import java.text.ParseException;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
@@ -48,17 +47,16 @@ import javax.swing.Timer;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.beans.BeansUtil;
 import org.das2.components.propertyeditor.EnumerationEditor;
+import org.das2.system.ExceptionHandler;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.BeanProperty;
-import org.netbeans.beaninfo.editors.DimensionEditor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.dom.Diff;
 import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
@@ -81,11 +79,16 @@ public class ApplicationModel {
     DasCanvas canvas;
     Timer tickleTimer;
     Application dom;
+    ExceptionHandler exceptionHandler;
+
+    public ExceptionHandler getExceptionHandler() {
+        return exceptionHandler;
+    }
 
     public enum RenderType {
         spectrogram, hugeScatter, series, scatter, colorScatter, stairSteps, fillToZero,
     }
-    
+
     static final Logger logger = Logger.getLogger("virbo.autoplot");
     /**
      * dataset with fill data has been recalculated
@@ -99,11 +102,17 @@ public class ApplicationModel {
     public ApplicationModel() {
 
         BeansUtil.registerEditor(RenderType.class, EnumerationEditor.class);
-        
+
         DataSetURL.init();
 
         dom = new Application();
 
+        if ( DasApplication.getDefaultApplication().isHeadless() ) {
+            exceptionHandler= DasApplication.getDefaultApplication().getExceptionHandler();
+        } else {
+            exceptionHandler= new GuiExceptionHandler();
+            DasApplication.getDefaultApplication().setExceptionHandler(exceptionHandler);
+        }
     }
 
     /**
@@ -147,66 +156,6 @@ public class ApplicationModel {
         return dom.getController().getDataSourceFilter().getController()._getDataSource();
     }
 
-    /**
-     * set the plot range, minding the isotropic property.
-     * TODO: the DasAxis.Lock never worked its way into the MVC version.  Find it, then delete this.
-     * @param plot
-     * @param xdesc
-     * @param ydesc
-     */
-    private void setPlotRange(DasPlot plot,
-            AutoplotUtil.AutoRangeDescriptor xdesc, AutoplotUtil.AutoRangeDescriptor ydesc) {
-
-        if (dom.getController().getPlot().isIsotropic() && xdesc.range.getUnits().isConvertableTo(ydesc.range.getUnits()) && xdesc.log == false && ydesc.log == false) {
-
-            DasAxis axis;
-            AutoplotUtil.AutoRangeDescriptor desc; // controls the range
-
-            DasAxis otherAxis;
-            AutoplotUtil.AutoRangeDescriptor otherDesc; // controls the range
-
-            if (plot.getXAxis().getDLength() < plot.getYAxis().getDLength()) {
-                axis = plot.getXAxis();
-                desc = xdesc; // controls the range
-
-                otherAxis = plot.getYAxis();
-                otherDesc = ydesc; // controls the range
-
-            } else {
-                axis = plot.getYAxis();
-                desc = ydesc; // controls the range
-
-                otherAxis = plot.getXAxis();
-                otherDesc = xdesc; // controls the range                
-
-            }
-
-            axis.setLog(false);
-            otherAxis.setLog(false);
-            Datum ratio = desc.range.width().divide(axis.getDLength());
-            DatumRange otherRange = otherDesc.range;
-            Datum otherRatio = otherRange.width().divide(otherAxis.getDLength());
-            DasAxis.Lock lock = otherAxis.mutatorLock(); // prevent other isotropic code from kicking in.
-
-            lock.lock();
-            double expand = (ratio.divide(otherRatio).doubleValue(Units.dimensionless) - 1) / 2;
-            if (Math.abs(expand) > 0.0001) {
-                DatumRange newOtherRange = DatumRangeUtil.rescale(otherRange, 0 - expand, 1 + expand);
-                otherAxis.resetRange(newOtherRange);
-            } else {
-                otherAxis.resetRange(otherRange);
-            }
-            axis.resetRange(desc.range);
-            lock.unlock();
-        } else {
-            plot.getXAxis().setLog(xdesc.log);
-            plot.getXAxis().resetRange(xdesc.range);
-            plot.getYAxis().setLog(ydesc.log);
-            plot.getYAxis().resetRange(ydesc.range);
-        }
-
-    }
-
     public void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
@@ -220,12 +169,12 @@ public class ApplicationModel {
      * A dataSource object is created by DataSetURL._getDataSource, which looks
      * at registered data sources to get a factory object, then the datasource is
      * created with the factory object.
-     * 
+     *
      * Preconditions: Any or no datasource is set.
      * Postconditions: A dataSource object is created and autoplot is set to
      *  plot the datasource.  A thread has been started that will load the dataset.
      *  In headless mode, the dataset has been loaded sychronously.
-     * 
+     *
      * @param surl the new data source URL.
      * @param mon progress monitor which is just used to convey messages.
      */
@@ -529,7 +478,7 @@ public class ApplicationModel {
     void doOpen(File f, LinkedHashMap<String, String> deltas) throws IOException {
 
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
-        
+
         Application state = (Application) StatePersistence.restoreState(f);
 
         if (deltas != null) {

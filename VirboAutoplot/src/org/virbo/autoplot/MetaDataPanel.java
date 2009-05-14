@@ -22,7 +22,6 @@ import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
@@ -141,7 +140,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
             }
         } catch (Exception e) {
             tree = new CombinedTreeModel("Exception: " + e);
-            applicationModel.application.getExceptionHandler().handle(e);
+            applicationModel.getExceptionHandler().handle(e);
         }
     }
     transient PropertyChangeListener propertiesListener = new PropertyChangeListener() {

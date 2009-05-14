@@ -18,13 +18,12 @@ import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
-import org.das2.DasApplication;
+import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -432,7 +431,7 @@ private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
-            DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
+            new GuiExceptionHandler().handle(ex);
         } catch (IOException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {

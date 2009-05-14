@@ -628,7 +628,7 @@ public class DataSourceController extends DomNodeController {
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             setStatus("error: " + ex);
-            throw ex;
+            model.getExceptionHandler().handleUncaught(ex);
         }
 
     }
@@ -1035,7 +1035,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     private void handleException(Exception e) {
-        model.getCanvas().getApplication().getExceptionHandler().handle(e);
+        model.getExceptionHandler().handle(e);
     }
 
     /**

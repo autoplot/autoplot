@@ -263,9 +263,9 @@ public class GuiSupport {
                         parent.setStatus("Wrote file " + s);
 
                     } catch (IOException ex) {
-                        parent.applicationModel.application.getExceptionHandler().handle(ex);
+                        parent.applicationModel.getExceptionHandler().handle(ex);
                     } catch (Exception ex) {
-                        parent.applicationModel.application.getExceptionHandler().handle(ex);
+                        parent.applicationModel.getExceptionHandler().handle(ex);
                     }
                 }
             }

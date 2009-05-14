@@ -59,6 +59,7 @@ import javax.swing.SwingUtilities;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
 import org.das2.system.DasLogger;
+import org.das2.system.ExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -76,6 +77,7 @@ import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
 import org.virbo.autoplot.util.TickleTimer;
@@ -499,6 +501,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         tabs.addTab("console", logConsole);
         applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(true);
 
+        if ( applicationModel.getExceptionHandler() instanceof GuiExceptionHandler ) {
+            ((GuiExceptionHandler)applicationModel.getExceptionHandler()).setLogConsole(logConsole);
+        }
         logConsoleMenuItem.setSelected(true);
     }
 
@@ -536,7 +541,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             applicationModel.addRecent(surl);
             applicationModel.resetDataSetSourceURL(surl, getStatusBarProgressMonitor("Finished "+surl) );
         } catch (RuntimeException ex) {
-            applicationModel.application.getExceptionHandler().handle(ex);
+            applicationModel.getExceptionHandler().handle(ex);
             setStatus(ERROR_ICON,ex.getMessage());
         }
     }
@@ -557,7 +562,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
             
         } catch (RuntimeException ex) {
-            applicationModel.application.getExceptionHandler().handle(ex);
+            applicationModel.getExceptionHandler().handle(ex);
             setStatus(ERROR_ICON,ex.getMessage());
         }
     }
@@ -577,7 +582,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
 
         } catch (RuntimeException ex) {
-            applicationModel.application.getExceptionHandler().handle(ex);
+            applicationModel.getExceptionHandler().handle(ex);
             setStatus(ERROR_ICON,ex.getMessage());
         }
     }
@@ -1352,7 +1357,7 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
                             // do nothing!!!  this is associated with the state change
                             return;
                         }
-                        model.application.getExceptionHandler().handleUncaught(e);
+                        model.getExceptionHandler().handleUncaught(e);
                     }
                 });
 
@@ -1375,7 +1380,7 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
                                 model.setBookmarks(book);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
-                                model.getCanvas().getApplication().getExceptionHandler().handle(ex);
+                                model.getExceptionHandler().handle(ex);
                             }
                         }
                     };

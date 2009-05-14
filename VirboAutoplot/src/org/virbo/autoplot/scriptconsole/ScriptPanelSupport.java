@@ -321,7 +321,7 @@ public class ScriptPanelSupport {
             }
 
         } catch (IOException iOException) {
-            model.getCanvas().getApplication().getExceptionHandler().handle(iOException);
+            model.getExceptionHandler().handle(iOException);
         }
 
     }
@@ -361,7 +361,7 @@ public class ScriptPanelSupport {
             }
 
         } catch (IOException iOException) {
-            model.getCanvas().getApplication().getExceptionHandler().handle(iOException);
+            model.getExceptionHandler().handle(iOException);
         } finally {
             try {
                 if (out != null) {
@@ -408,7 +408,7 @@ public class ScriptPanelSupport {
             }
 
         } catch (IOException ex) {
-            model.getCanvas().getApplication().getExceptionHandler().handle(ex);
+            model.getExceptionHandler().handle(ex);
         }
     }
 }
