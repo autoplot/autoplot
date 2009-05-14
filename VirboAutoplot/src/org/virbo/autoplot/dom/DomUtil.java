@@ -434,14 +434,14 @@ public class DomUtil {
      * @return
      */
     public static void syncTo(DomNode node1, DomNode node2) {
-        List<Diff> diffs = node1.diffs(node2);
+        List<Diff> diffs = node2.diffs(node1);
         for (Diff d : diffs) {
             d.doDiff(node1);
         }
     }
 
     public static void syncTo(DomNode node1, DomNode node2, List<String> exclude) {
-        List<Diff> diffs = node1.diffs(node2);
+        List<Diff> diffs = node2.diffs(node1);
         for (Diff d : diffs) {
             if (!exclude.contains(d.propertyName())) d.doDiff(node1);
         }
