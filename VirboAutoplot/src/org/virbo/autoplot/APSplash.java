@@ -123,7 +123,7 @@ public class APSplash extends JWindow {
         try {
             for ( int i=0; i<6; i++ ) {
                 Thread.sleep(500);
-                Logger.getLogger("").info("i="+i);
+                Logger.getLogger("").warning("i="+i);
                 //Splash.getInstance().messageLabel.setText( "ii-="+i );
             }
         } catch ( java.lang.InterruptedException e ) {}
