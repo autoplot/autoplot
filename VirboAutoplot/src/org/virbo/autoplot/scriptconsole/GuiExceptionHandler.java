@@ -361,7 +361,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         String report= formatReport(t, bis, recs);
 
         String url =
-         "http://aurora.gmu.edu:8080/RTEReceiver/LargeUpload.jsp";
+         "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
 
         HttpClient client = new HttpClient();
         PostMethod postMethod = new PostMethod(url);
