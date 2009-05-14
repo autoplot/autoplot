@@ -208,7 +208,7 @@ public class AutoplotUtil {
         }
     }
 
-    private static DatumRange getRange(Double min, Double max, Units units) {
+    private static DatumRange getRange(Number min, Number max, Units units) {
         if (units != null && UnitsUtil.isTimeLocation(units)) {
             if (min == null) min = Units.mj1958.convertDoubleTo(units, -100000);
             if (max == null) max = Units.mj1958.convertDoubleTo(units, 100000);
@@ -217,7 +217,7 @@ public class AutoplotUtil {
             if (max == null) max = Double.POSITIVE_INFINITY;
             if (units == null) units = Units.dimensionless;
         }
-        return new DatumRange(min, max, units);
+        return new DatumRange(min.doubleValue(), max.doubleValue(), units);
     }
 
     private static DatumRange makeDimensionless(DatumRange dr) {
@@ -336,11 +336,11 @@ public class AutoplotUtil {
             if (log1 != null) {
                 result.log = log1.equals("log");
             }
-            Double tmin = (Double) properties.get(QDataSet.TYPICAL_MIN);
-            Double tmax = (Double) properties.get(QDataSet.TYPICAL_MAX);
+            Number tmin = (Number) properties.get(QDataSet.TYPICAL_MIN);
+            Number tmax = (Number) properties.get(QDataSet.TYPICAL_MAX);
             DatumRange range = getRange(
-                    (Double) properties.get(QDataSet.TYPICAL_MIN),
-                    (Double) properties.get(QDataSet.TYPICAL_MAX),
+                    (Number) properties.get(QDataSet.TYPICAL_MIN),
+                    (Number) properties.get(QDataSet.TYPICAL_MAX),
                     (Units) properties.get(QDataSet.UNITS));
             // see if the typical extent is consistent with extent seen.  If the
             // typical extent won't hide the data's structure, then use it.
@@ -557,11 +557,11 @@ public class AutoplotUtil {
             if (log1 != null) {
                 result.log = log1.equals("log");
             }
-            Double tmin = (Double) properties.get(QDataSet.TYPICAL_MIN);
-            Double tmax = (Double) properties.get(QDataSet.TYPICAL_MAX);
+            Number tmin = (Number) properties.get(QDataSet.TYPICAL_MIN);
+            Number tmax = (Number) properties.get(QDataSet.TYPICAL_MAX);
             DatumRange range = getRange(
-                    (Double) properties.get(QDataSet.TYPICAL_MIN),
-                    (Double) properties.get(QDataSet.TYPICAL_MAX),
+                    (Number) properties.get(QDataSet.TYPICAL_MIN),
+                    (Number) properties.get(QDataSet.TYPICAL_MAX),
                     (Units) properties.get(QDataSet.UNITS));
             // see if the typical extent is consistent with extent seen.  If the
             // typical extent won't hide the data's structure, then use it.
@@ -738,17 +738,17 @@ public class AutoplotUtil {
      */
     public static void applyFillValidRange(MutablePropertyDataSet ds, double vmin, double vmax, double fill) {
 
-        Double ovmin = (Double) ds.property(QDataSet.VALID_MIN);
-        Double ovmax = (Double) ds.property(QDataSet.VALID_MAX);
+        Number ovmin = (Number) ds.property(QDataSet.VALID_MIN);
+        Number ovmax = (Number) ds.property(QDataSet.VALID_MAX);
 
         boolean needToCopy = false;
         // if the old valid range contains the new range, then we simply reset the range.
-        if (ovmax != null && ovmax < vmax) needToCopy = true;
-        if (ovmin != null && ovmin > vmin) needToCopy = true;
+        if (ovmax != null && ovmax.doubleValue() < vmax) needToCopy = true;
+        if (ovmin != null && ovmin.doubleValue() > vmin) needToCopy = true;
 
-        Double oldFill = (Double) ds.property(QDataSet.FILL_VALUE);
+        Number oldFill = (Number) ds.property(QDataSet.FILL_VALUE);
 
-        if (oldFill != null && Double.isNaN(fill) == false && oldFill != fill)
+        if (oldFill != null && Double.isNaN(fill) == false && oldFill.doubleValue() != fill)
             needToCopy = true;
 
         // always clobber old fill values.  This allows for fill data itself to be plotted.

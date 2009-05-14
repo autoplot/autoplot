@@ -466,8 +466,8 @@ public class DataSourceController extends DomNodeController {
             dsf.setFill(String.valueOf(v));
         }
 
-        Double vmin = (Double) properties.get(QDataSet.VALID_MIN);
-        Double vmax = (Double) properties.get(QDataSet.VALID_MAX);
+        Number vmin = (Number) properties.get(QDataSet.VALID_MIN);
+        Number vmax = (Number) properties.get(QDataSet.VALID_MAX);
         if (vmin != null || vmax != null) {
             if (vmin == null) {
                 vmin = -1e38;
