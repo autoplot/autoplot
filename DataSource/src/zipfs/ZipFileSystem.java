@@ -3,10 +3,13 @@ package zipfs;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -27,12 +30,20 @@ public class ZipFileSystem extends FileSystem {
         if ( !("file".equals(root.getProtocol()) ) ) {
             throw new IllegalArgumentException("Cannot access non-local zip file: "+root);
         }
-        //System.err.println("ZipFileSystem starting with URL " + root);
-        // We'll assume the url ends in ".zip"; that's why we're here
-        String split[] = FileSystem.splitUrl(root.toString());
+        if ( !root.toString().endsWith(".zip") ) {
+            throw new IllegalArgumentException("expected zip file to end with zip: "+root.toString() );
+        }
+
+        File f;
+        try {
+            f = new File(root.toURI());
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ZipFileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IOException(ex);
+        }
 
         // This may throw ZipException, IOException, or SecurityException
-        zipFile = new ZipFile(split[3].substring(split[0].length()));
+        zipFile = new ZipFile( f );
 
         // First create the root FileObject, which has no corresponding ZipEntry
         filemap.put("/", new ZipFileObject(this, null, null));
