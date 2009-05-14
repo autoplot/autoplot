@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.UnitsConverter;
@@ -46,6 +47,8 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     HashMap properties;
     HashMap<String, Object> attributes;
+
+    private final static Logger logger= Logger.getLogger(CdfFileDataSource.class.getName());
 
     /** Creates a new instance of CdfFileDataSource */
     public CdfFileDataSource(URL url) {
@@ -236,6 +239,10 @@ public class CdfFileDataSource extends AbstractDataSource {
         for (int idep = 0; idep < 3; idep++) {
             Map dep = (Map) thisAttributes.get("DEPEND_" + idep);
             String labl = (String) thisAttributes.get("LABL_PTR_" + idep);
+            if ( dep != null && qubeDims.length<=idep ) {
+                logger.info("DEPEND_"+idep+" found but data is lower rank");
+                continue;
+            }
             if (dep != null && ( qubeDims[idep]>6 || labl == null) ) {
                 try {
                     WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, idep > 0);
