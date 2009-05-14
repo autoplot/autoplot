@@ -1338,8 +1338,6 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
 
                 logger.addHandler( APSplash.getInstance().getLogHandler() );
                 APSplash.getInstance().showSplash();
-
-                logger.warning("initializing");
                 
                 model.addDasPeersToApp();
 
