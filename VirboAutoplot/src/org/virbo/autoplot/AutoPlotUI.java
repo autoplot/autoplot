@@ -1335,6 +1335,11 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
 
             public void run() {
                 logger.fine("enter invokeLater");
+
+                logger.addHandler( APSplash.getInstance().getLogHandler() );
+                APSplash.getInstance().showSplash();
+
+                logger.warning("initializing");
                 
                 model.addDasPeersToApp();
 
@@ -1364,6 +1369,7 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
                 logger.fine("UI.setVisible(true)");
                 app.setVisible(true);
                 logger.fine("UI is visible");
+                APSplash.getInstance().setVisible(false);
                 
                 if (initialURL != null) {
                     app.dataSetSelector.setValue(initialURL);

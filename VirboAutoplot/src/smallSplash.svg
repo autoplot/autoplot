@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   width="600"
+   height="300"
+   id="svg1946"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="smallSplash.svg"
+   sodipodi:docbase="N:\nbprojects\virbo\VirboAutoplot\src"
+   inkscape:export-filename="/media/mini/nbprojects/virbo/autoplot/VirboAutoplot/src/splash.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <metadata
+     id="metadata11">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:window-height="936"
+     inkscape:window-width="1504"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     guidetolerance="10.0"
+     gridtolerance="10.0"
+     objecttolerance="10.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base"
+     inkscape:zoom="6.95973"
+     inkscape:cx="195.93347"
+     inkscape:cy="157.27641"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:current-layer="svg1946"
+     showgrid="false" />
+  <defs
+     id="defs1958">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 150 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="600 : 150 : 1"
+       inkscape:persp3d-origin="300 : 100 : 1"
+       id="perspective31" />
+  </defs>
+  <rect
+     style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.25669974;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect2226"
+     width="87.69091"
+     height="18.793434"
+     x="105.32668"
+     y="111.41091"
+     inkscape:export-filename="N:\nbprojects\virbo\VirboAutoplot\src\splash.png"
+     inkscape:export-xdpi="300.00009"
+     inkscape:export-ydpi="300.00009" />
+  <path
+     id="path2166"
+     style="fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.35280001;stroke-linecap:round;stroke-linejoin:bevel"
+     d="M 120.11029,116.72661 L 118.72473,118.69637 L 117.13728,117.52315 L 109.88453,127.83464 L 108.43235,126.85584 L 115.97115,116.71126 L 113.80045,115.34877 L 116.41472,114.13206 L 120.11029,116.72661 z" />
+  <flowRoot
+     xml:space="preserve"
+     id="flowRoot2184"><flowRegion
+       id="flowRegion2186"><rect
+         id="rect2188"
+         width="793.6073"
+         height="162.55708"
+         x="28.310503"
+         y="15.068493" /></flowRegion><flowPara
+       id="flowPara2190" /></flowRoot>  <path
+     id="path5304"
+     style="fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.35280001;stroke-linecap:round;stroke-linejoin:bevel"
+     d="M 112.7465,116.76376 L 114.13205,118.73352 L 115.7195,117.5603 L 122.97225,127.87179 L 124.42443,126.89299 L 116.88564,116.74841 L 119.05633,115.38593 L 116.44206,114.16921 L 112.7465,116.76376 z" />
+  <path
+     style="fill:none;fill-rule:evenodd;stroke:#ffff00;stroke-width:0.28406942;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="M 113.06935,122.42882 C 113.07154,122.4303 113.07849,122.98419 113.16178,123.13362 C 113.29136,123.3661 113.30146,123.46621 113.48529,123.63112 C 113.68487,123.81017 113.75015,123.76664 113.90122,123.63112 C 114.05572,123.49252 114.05407,124.05522 114.08608,124.17008 C 114.15949,124.43348 114.23667,124.62751 114.31715,124.91633 C 114.39042,125.17923 114.45657,125.28997 114.64066,125.41383 C 114.80614,125.52517 114.88286,125.62362 115.0566,125.66258 C 115.27593,125.71177 115.24146,125.12284 115.24146,125.04071 C 115.24146,124.766 115.48647,124.81581 115.74982,124.87487 C 115.77797,124.88119 115.74982,125.5397 115.74982,125.62113 C 115.74982,125.8837 115.74982,126.14627 115.74982,126.40884 C 115.74982,126.69162 115.7519,126.7405 116.07333,126.7405 C 116.18807,126.7405 116.16576,126.20109 116.16576,126.11863 C 116.16576,125.84932 116.1489,125.64129 116.3044,125.45529 C 116.36258,125.38571 116.35062,124.92238 116.35062,124.83341 C 116.35062,124.69125 116.57227,124.51864 116.62791,124.41883 C 116.71848,124.25633 116.86417,124.253 117.13627,124.253 C 117.51666,124.253 117.41356,124.06565 117.41356,123.75549 C 117.41356,123.53438 117.41356,123.31327 117.41356,123.09216 C 117.41356,122.86615 117.45978,122.68534 117.45978,122.47028 C 117.45978,122.24166 117.70881,122.14264 117.87571,122.18007 C 117.90114,122.18577 117.87571,122.81783 117.87571,122.88487 C 117.87571,123.10598 117.87571,123.32709 117.87571,123.5482 C 117.87571,123.85826 117.95293,123.94914 118.153,124.12862 C 118.38419,124.33601 118.29165,124.07834 118.29165,123.83841 C 118.29165,123.52694 118.33786,123.24167 118.33786,122.92632 C 118.33786,122.65373 118.37322,122.50924 118.43029,122.30445 C 118.53676,121.9224 118.92079,122.49572 119.03109,122.59466 C 119.1613,122.71146 119.0773,123.25525 119.0773,123.42383 C 119.0773,123.74371 119.19366,123.71108 119.26216,123.46529 C 119.32575,123.23712 119.23947,123.04996 119.35459,122.84341 C 119.54259,122.50611 119.65626,122.79693 119.77053,122.96778 C 119.88276,123.13558 119.86296,123.41321 119.86296,123.67258 C 119.86296,123.90523 119.75596,124.17008 120.04782,124.17008 C 120.39312,124.17008 120.41754,124.20053 120.41754,124.50175 C 120.41754,124.90748 120.46375,124.31739 120.46375,124.17008 C 120.46375,124.1148 120.46375,124.05952 120.46375,124.00424"
+     id="path4232" />
+  <text
+     xml:space="preserve"
+     style="font-size:5.80585241px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     x="127.96388"
+     y="121.00819"
+     id="text8128"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan1942"
+       x="127.96388"
+       y="121.00819"
+       style="font-size:9px">Autoplot</tspan><tspan
+       sodipodi:role="line"
+       id="tspan1944"
+       x="127.96388"
+       y="132.25818" /><tspan
+       sodipodi:role="line"
+       id="tspan1948"
+       x="127.96388"
+       y="143.50818" /></text>
+  <text
+     xml:space="preserve"
+     style="font-size:4px;font-style:normal;font-weight:normal;fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     x="127.4142"
+     y="126.68292"
+     id="text2008"><tspan
+       sodipodi:role="line"
+       id="tspan2010"
+       x="127.4142"
+       y="126.68292">a browser for data on the web</tspan></text>
+</svg>

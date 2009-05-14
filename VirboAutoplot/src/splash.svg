@@ -2,7 +2,7 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:cc="http://creativecommons.org/ns#"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
@@ -13,12 +13,13 @@
    height="300"
    id="svg1946"
    sodipodi:version="0.32"
-   inkscape:version="0.44.1"
+   inkscape:version="0.46"
    sodipodi:docname="splash.svg"
    sodipodi:docbase="N:\nbprojects\virbo\VirboAutoplot\src"
-   inkscape:export-filename="N:\nbprojects\virbo\VirboAutoplot\src\splash.png"
+   inkscape:export-filename="/media/mini/nbprojects/virbo/autoplot/VirboAutoplot/src/splash.png"
    inkscape:export-xdpi="300"
-   inkscape:export-ydpi="300">
+   inkscape:export-ydpi="300"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
   <metadata
      id="metadata11">
     <rdf:RDF>
@@ -42,14 +43,23 @@
      bordercolor="#666666"
      pagecolor="#ffffff"
      id="base"
-     inkscape:zoom="9.8425445"
-     inkscape:cx="177.33415"
-     inkscape:cy="160.29797"
+     inkscape:zoom="6.95973"
+     inkscape:cx="195.93347"
+     inkscape:cy="157.27641"
      inkscape:window-x="0"
-     inkscape:window-y="26"
-     inkscape:current-layer="svg1946" />
+     inkscape:window-y="25"
+     inkscape:current-layer="svg1946"
+     showgrid="false" />
   <defs
-     id="defs1958" />
+     id="defs1958">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 150 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="600 : 150 : 1"
+       inkscape:persp3d-origin="300 : 100 : 1"
+       id="perspective31" />
+  </defs>
   <rect
      style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.58425862;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect2226"
@@ -124,7 +134,7 @@
        id="tspan1974" /></text>
   <text
      xml:space="preserve"
-     style="font-size:3px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:yellow;font-family:Bitstream Vera Sans"
+     style="font-size:3px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;font-family:Bitstream Vera Sans"
      x="168.54324"
      y="149.21513"
      id="text1976"
@@ -139,12 +149,12 @@
        y="152.96513">library created at the University of Iowa [das2.org]</tspan><tspan
        sodipodi:role="line"
        x="168.54324"
-       y="156.71513"
-       id="tspan1900">Autoplot was developed with support from </tspan><tspan
+       y="160.46513"
+       id="tspan2672">Autoplot was developed with support from NASA</tspan><tspan
        sodipodi:role="line"
        x="168.54324"
        y="160.46513"
-       id="tspan1902">NASA grant 05-S3CVO05-11</tspan><tspan
+       id="tspan2670">Space and Solar Physics Virtual Observatories</tspan><tspan
        sodipodi:role="line"
        x="168.54324"
        y="164.21513"
