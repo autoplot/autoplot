@@ -388,10 +388,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                 try {
                     completions = DataSetURL.getFileSystemCompletions(surl, carotpos, mon);
                 } catch (IOException ex) {
+                    ex.printStackTrace();
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
                 } catch (URISyntaxException ex) {
+                    ex.printStackTrace();
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
                     return;
