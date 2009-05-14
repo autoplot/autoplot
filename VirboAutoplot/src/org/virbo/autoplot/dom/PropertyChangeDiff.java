@@ -29,7 +29,8 @@ public class PropertyChangeDiff implements Diff {
         try {
             Object oldVal =  DomUtil.getPropertyValue(node, propertyName);
             if (!(oldVal == oldVal1 || oldVal.equals(oldVal1))) {
-                throw new IllegalArgumentException("old value");
+                //throw new IllegalArgumentException("old value");
+                //let's be loosey goosey on this because sometimes setting one property resets another
             }
             DomUtil.setPropertyValue( node, propertyName, newVal );
         } catch (IllegalAccessException ex) {
