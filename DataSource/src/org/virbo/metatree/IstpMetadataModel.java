@@ -11,7 +11,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import java.lang.reflect.Array;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.virbo.dataset.QDataSet;
@@ -92,6 +91,7 @@ public class IstpMetadataModel extends MetadataModel {
     private DatumRange getValidRange(Map attrs, Units units) {
         double max = doubleValue(attrs.get("VALIDMAX"), units);
         double min = doubleValue(attrs.get("VALIDMIN"), units);
+        if ( units.isFill(min) ) min= min / 100; // kludge because DatumRanges cannot contain fill.
         return DatumRange.newDatumRange(min, max, units);
     }
 
@@ -119,6 +119,7 @@ public class IstpMetadataModel extends MetadataModel {
         if ("log".equals(getScaleType(attrs)) && min <= 0) {
             min = max / 10000;
         }
+        if ( units.isFill(min) ) min= min / 100 ;  // kludge because DatumRanges cannot contain -1e31
         range = new DatumRange(min, max, units);
         return range;
     }
