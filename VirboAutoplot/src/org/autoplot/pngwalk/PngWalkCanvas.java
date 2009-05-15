@@ -6,18 +6,15 @@ package org.autoplot.pngwalk;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -47,15 +44,6 @@ public class PngWalkCanvas extends JPanel {
     public static final int NOMINAL_HEIGHT = 600;
     public static final int NOMINAL_WIDTH = 800;
 
-    private static Dimension resize(int width, int height, int target) {
-        double aspect = 1. * width / height;
-        double sqrtAspect = Math.sqrt(aspect);
-        return new Dimension((int) (target * sqrtAspect), (int) (target / sqrtAspect));
-    }
-
-    private static Point position(Dimension size, int xpos, int ypos) {
-        return new Point(xpos - size.width / 2, ypos - size.height / 2);
-    }
 
     private static Rectangle bounds(int xpos, int ypos, int width, int height, int targetWidth, int targetHeight, double aspectFactor,boolean debug) {
         double aspect = 1. * width / height;
