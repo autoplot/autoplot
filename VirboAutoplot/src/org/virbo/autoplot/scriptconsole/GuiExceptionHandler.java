@@ -271,6 +271,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 	    sb.append("    <message>");
 	    escape(sb, th.toString() );
 	    sb.append("</message>\n");
+        StackTraceElement ste= th.getStackTrace()[0];
+        sb.append("    <location>\n");
+        sb.append("       <class>"+ste.getClassName()+"</class>\n");
+        sb.append("       <method>"+ste.getMethodName()+"</method>\n");
+        sb.append("       <file>"+ste.getFileName()+"</file>\n");
+        sb.append("       <lineNumber>"+ste.getLineNumber()+"</lineNumber>\n");
+        sb.append("    </location>\n");
         sb.append("    <toString><![CDATA[\n");
         StringWriter sw= new StringWriter();
         th.printStackTrace( new PrintWriter( sw ) );
@@ -317,9 +324,11 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         buf.append("<exceptionReport>\n");
 
+        buf.append("  <applicationId>autoplot</applicationId>\n" );
+        
         formatException( buf, t );
 
-        buf.append("  <uncaught>"+uncaught+"</uncaught>" );
+        buf.append("  <uncaught>"+uncaught+"</uncaught>\n" );
         
         formatBuildInfos( buf, bis );
 
