@@ -391,6 +391,18 @@ public class PanelController extends DomNodeController {
         ac.bind(panel, Panel.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
     }
 
+    /**
+     * Do initialization to get the panel and attached plot to have reasonable
+     * settings.
+     * preconditions:
+     *   renderType has been identified for the panel.
+     * postconditions:
+     *   panel's plotDefaults are set based on metadata and autoranging.
+     *   plot is synced to plotDefaults.
+     *
+     * TODO: I think this is invoked for overplots.
+     * @param autorange
+     */
     private synchronized void doResetRanges( boolean autorange ) {
         logger.finest("doResetRanges...");
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
