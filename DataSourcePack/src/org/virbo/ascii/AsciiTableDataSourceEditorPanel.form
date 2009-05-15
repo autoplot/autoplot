@@ -77,7 +77,7 @@
                               <Component id="commentComboBox" min="-2" pref="109" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace pref="563" max="32767" attributes="0"/>
+                      <EmptySpace pref="559" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -179,7 +179,7 @@
                           <Component id="timeFormatFieldsComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="timeFormatToggleButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="40" max="32767" attributes="0"/>
+                      <EmptySpace pref="36" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -251,8 +251,8 @@
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="dep0Columns" pref="175" max="32767" attributes="2"/>
-                          <Component id="columnsComboBox" alignment="0" pref="175" max="32767" attributes="2"/>
+                          <Component id="dep0Columns" pref="177" max="32767" attributes="2"/>
+                          <Component id="columnsComboBox" alignment="0" pref="177" max="32767" attributes="2"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
