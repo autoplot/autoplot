@@ -65,6 +65,8 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
 
             public void actionPerformed(ActionEvent e) {
                 if ( e.getSource() instanceof JToggleButton ) {
+                    jTable1.getSelectionModel().clearSelection();
+                    jTable1.getColumnModel().getSelectionModel().clearSelection();
                     currentToolButton= ( JToggleButton ) e.getSource();
                     currentTool = t;
                 }
@@ -476,8 +478,8 @@ private void timeFormatToggleButtonActionPerformed(java.awt.event.ActionEvent ev
 
 private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_commentComboBoxActionPerformed
     String value=  (String)commentComboBox.getSelectedItem();
-    if ( value.equals("none") ) {
-        params.put(PARAMS_KEY_COMMENT,"");
+    if ( value.equals("none") || value.trim().equals("") ) {
+        params.remove(PARAMS_KEY_COMMENT);
         parser.setCommentPrefix(null);
         update();
     } else {
@@ -717,7 +719,7 @@ private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
             dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
             dep0Columns.setSelectedItem(ldep0);
 
-            String comment="#";
+            String comment="";
             if ( params.containsKey( PARAMS_KEY_COMMENT ) ) {
               comment=   params.get( PARAMS_KEY_COMMENT );
               if ( comment.trim().length()==0 ) {
