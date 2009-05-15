@@ -18,32 +18,37 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-<ul><li><a href="http://www.autoplot.org/jnlp/20090511/" class="external free" title="http://www.autoplot.org/jnlp/20090511/" rel="nofollow">http://www.autoplot.org/jnlp/20090511/</a>
-</li><li> bugfixes including:
-<ul><li> aggregation with vap+dat fixed.
-</li><li> cadence check disabled when guessCadence fails.
-</li><li> 2702937 dataset URI in selector needs to update with panel focus
-</li><li> 2787550 log Axis datumRanges in vap files
-</li><li> 2778701 editor panels don't work with aggregation
-</li><li> 2789482 aggregation ignores vap+ext scheme
-</li></ul>
-</li><li> introduce layout model into dom.  This should not affect the user interface, but will ensure .vap forward compatibility.
-</li><li> row,column property of canvas node is replaces with marginRow, marginColumn.
-</li><li> font properties of options node replaced with String for 2790172 XmlEncoder stack overflowbugfix.
-</li><li> support for png walk tool introduced.
-</li><li> cdf editor introduced.
-</li><li> ascii table editor resets the number of columns displayed with the record parser is changed.
-</li><li> greatly reduce boilerplate code in dom tree with new state change mechanism and DomUtil.diffs and DomUtil.syncTo.
+<ul><li> bugfixes:
+<ul><li> various bugs with the CDF panel editor pointed out by bob
+</li><li> non-double values for validmin, validmax would cause runtime exception
+</li><li> spaces in zip file names
+</li><li> 2791340: Excel spreadsheet editor works in webstart release
+</li><li> runtime exception for "java.lang.IllegalArgumentException: unable to find panel for das renderer" fixed
 
+</li><li> panel height weights messed up after two panels.
+</li><li> panel heights properly bind to das objects and are properly loaded and saved in vap files.
+</li><li> cadence check disabling is done *after* we try to guess cadence.
+</li><li> Excel and Ascii table GUIs [select] buttons clear the current selection so that any column can be selected.
+</li><li> NullPointerException when export to Excel when dataset doesn't have units.
+</li><li> many events didn't add to undo/redo list
 </li></ul>
-<p>Known Bugs:
+</li><li> cdf panel displays parameter descriptions.
+</li><li> bug 2790177: splash screen added to help with long startup time (7sec) issue.
+</li><li> ascii table parser supports quotes in csv's (1,2,"help",3)
+</li><li> ascii table parser can parse array of times (before times had to be depend_0)
+</li><li>Runtime Exception dialog allows exception reports to be submitted to Jeremy's server
+</li></ul>
+<p>Known issues:
 </p>
-<ul><li> 2781154  	 guessCadence isn't invoked on vap load
-</li><li> 2781151  	 panel selection as plot focus is changed
+<ul><li> 2769881 delete parent panel, then switch to spectrogram
+</li><li> completion with aggregation doens't work
+</li><li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
+</li><li> bug: aggregation sometimes still jumps when you adjust the z-axis. Demo 2.
+</li><li> last recent URI is not added to DataSetSelector when Autoplot starts up.
 </li><li> 2769881 delete parent panel, then switch to spectrogram
-</li><li> 2769879 export data needs to remember last output
-</li><li> 2712135 FileSystemCompletions needs to account for wildcards
-</li><li> 2771492 spaces in Windows filenames causing problems again
+</li><li> 2712135 FileSystemCompletions must account for aggregation wildcards
+</li><li> 2792362 aggregation and context overview resets zoom
+</li><li> 2792363 add overplot resets zoom
 </li></ul>
 
 
