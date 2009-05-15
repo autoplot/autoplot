@@ -264,6 +264,10 @@ public class GuiSupport {
 
                     } catch (IOException ex) {
                         parent.applicationModel.getExceptionHandler().handle(ex);
+                    } catch ( IllegalArgumentException ex ) {
+                        parent.applicationModel.getExceptionHandler().handle(ex);
+                    } catch (RuntimeException ex ) {
+                        parent.applicationModel.getExceptionHandler().handleUncaught(ex);
                     } catch (Exception ex) {
                         parent.applicationModel.getExceptionHandler().handle(ex);
                     }
