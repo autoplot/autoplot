@@ -6,6 +6,7 @@
 package org.virbo.jythonsupport;
 
 import org.python.core.Py;
+import org.python.core.PyArray;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.python.core.PyFloat;
 import org.python.core.PyFunction;
@@ -73,6 +74,8 @@ public class JythonOps {
             return ((PyQDataSet)arg0).ds;
         } else if ( arg0 instanceof PyList ) {
             return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
+        } else if ( arg0 instanceof PyArray ) {
+            return PyQDataSetAdapter.adaptArray( (PyArray) arg0 );
         } else if ( arg0 instanceof PyInteger ) {
             return DataSetUtil.asDataSet( ((Double)arg0.__tojava__( Double.class )).doubleValue() );
         } else if ( arg0 instanceof PyFloat ) {
