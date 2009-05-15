@@ -59,7 +59,7 @@ public class DemoPngWalk {
                 if ( i0==-1 ) i0= template.indexOf("_%Y");
                 int i1 = s.indexOf(".png");
                 if ( i1==-1 ) return false;
-                String timeRange = s.substring(i0 + 1, i1);
+                //String timeRange = s.substring(i0 + 1, i1);
                 String productFile = template.substring(0, i0) + ".vap";
                 try {
                     return WalkUtil.fileExists(productFile);
