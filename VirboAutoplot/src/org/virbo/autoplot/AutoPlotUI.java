@@ -542,7 +542,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             applicationModel.addRecent(surl);
             applicationModel.resetDataSetSourceURL(surl, getStatusBarProgressMonitor("Finished "+surl) );
         } catch (RuntimeException ex) {
-            applicationModel.getExceptionHandler().handle(ex);
+            applicationModel.getExceptionHandler().handleUncaught(ex);
             setStatus(ERROR_ICON,ex.getMessage());
         }
     }
@@ -563,7 +563,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
             
         } catch (RuntimeException ex) {
-            applicationModel.getExceptionHandler().handle(ex);
+            applicationModel.getExceptionHandler().handleUncaught(ex);
             setStatus(ERROR_ICON,ex.getMessage());
         }
     }
@@ -583,7 +583,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
 
         } catch (RuntimeException ex) {
-            applicationModel.getExceptionHandler().handle(ex);
+            applicationModel.getExceptionHandler().handleUncaught(ex);
             setStatus(ERROR_ICON,ex.getMessage());
         }
     }
@@ -1385,7 +1385,7 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
                                 model.setBookmarks(book);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
-                                model.getExceptionHandler().handle(ex);
+                                model.getExceptionHandler().handleUncaught(ex);
                             }
                         }
                     };
