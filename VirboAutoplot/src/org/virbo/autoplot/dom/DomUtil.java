@@ -460,7 +460,7 @@ public class DomUtil {
         return result + "-" + f.getSize();
     }
 
-    public static Converter STRING_TO_FONT= new Converter() {
+    public static final Converter STRING_TO_FONT= new Converter() {
         @Override
         public Object convertForward(Object value) {
             return java.awt.Font.decode((String)value);
@@ -472,7 +472,7 @@ public class DomUtil {
         }
     };
 
-    public static Converter STRING_TO_COLOR= new Converter() {
+    public static final Converter STRING_TO_COLOR= new Converter() {
         @Override
         public Object convertForward(Object value) {
             return java.awt.Color.decode((String)value);
