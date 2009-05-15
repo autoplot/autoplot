@@ -130,6 +130,7 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
             }
         }
         Units u = (Units) data.property(QDataSet.UNITS);
+        if ( u==null ) u= Units.dimensionless;
         
         mon.setTaskSize(data.length());
         mon.started();
