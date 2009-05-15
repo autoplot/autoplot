@@ -105,11 +105,14 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
     }
 
-    private void showExceptionDialog(final Throwable t, String extraInfo) {
+    private void showExceptionDialog( final Throwable t, String extraInfo ) {
+
+        final boolean uncaught= extraInfo.equals(UNCAUGHT);
+
         String errorMessage = extraInfo + t.getClass().getName() + "\n"
             + (t.getMessage() == null ? "" : t.getMessage());        
         final JDialog dialog = new JDialog( DasApplication.getDefaultApplication().getMainFrame() );        
-        if ( extraInfo.length()==0 ) {
+        if ( !uncaught ) {
             dialog.setTitle("Error Notification");
         } else {
             dialog.setTitle("Runtime Error Occurred");
@@ -215,7 +218,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         submit.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    submitRuntimeException(t);
+                    submitRuntimeException(t,uncaught);
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog( stackPane, "Unable to send the data! "+ex );
                 }
@@ -303,7 +306,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         buf.append("  </platform>\n");
     }
     
-    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs ) {
+    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs ,boolean uncaught ) {
         StringBuffer buf= new StringBuffer();
         buf.append("<?xml version=\"1.0\"");
 
@@ -317,6 +320,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         formatException( buf, t );
 
+        buf.append("  <uncaught>"+uncaught+"</uncaught>" );
+        
         formatBuildInfos( buf, bis );
 
         formatPlatform( buf );
@@ -333,7 +338,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         return buf.toString();
     }
 
-    public void submitRuntimeException( Throwable t) throws IOException {
+    private void submitRuntimeException( Throwable t, boolean uncaught ) throws IOException {
         int rteHash= 0;
         StackTraceElement[] ee= t.getStackTrace();
         for ( int i=ee.length-1; i>=0 && i>ee.length-5; i-- ) {
@@ -356,7 +361,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         if ( lc!=null ) recs= lc.records;
 
-        String report= formatReport(t, bis, recs);
+        String report= formatReport(t, bis, recs, uncaught );
 
         String url =
          "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
