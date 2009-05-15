@@ -254,6 +254,14 @@ public class PyQDataSet extends PyJavaInstance {
         }
     }
 
+    private Number getNumber( PyObject po ) {
+        Object result=  po.__tojava__( Number.class );
+        if ( result==Py.NoConversion ) {
+            throw Py.TypeError("can't convert to number: "+po.__repr__() );
+        }
+        return (Number) result;
+    }
+
     /* accessor and mutator */
     /**
      * This implements the Python indexing, such as data[4,:,3:5].  Note this
@@ -273,9 +281,9 @@ public class PyQDataSet extends PyJavaInstance {
                 PySlice slice = (PySlice) arg0;
                 QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 QubeDataSetIterator.DimensionIteratorFactory fit;
-                Integer start = (Integer) slice.start.__tojava__(Integer.class);
-                Integer stop = (Integer) slice.stop.__tojava__(Integer.class);
-                Integer step = (Integer) slice.step.__tojava__(Integer.class);
+                Number start = (Number) getNumber( slice.start  );
+                Number stop = (Number) getNumber(slice.stop  );
+                Number step = (Number) getNumber(slice.step  );
                 fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
                 iter.setIndexIteratorFactory(0, fit);
 
@@ -306,9 +314,9 @@ public class PyQDataSet extends PyJavaInstance {
                     QubeDataSetIterator.DimensionIteratorFactory fit;
                     if (a instanceof PySlice) {
                         PySlice slice = (PySlice) a;
-                        Integer start = (Integer) slice.start.__tojava__(Integer.class);
-                        Integer stop = (Integer) slice.stop.__tojava__(Integer.class);
-                        Integer step = (Integer) slice.step.__tojava__(Integer.class);
+                        Number start = (Number) getNumber(slice.start);
+                        Number stop = (Number)  getNumber(slice.stop);
+                        Number step = (Number)  getNumber(slice.step);
                         fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
 
                     } else if (a.isNumberType()) {
@@ -346,7 +354,7 @@ public class PyQDataSet extends PyJavaInstance {
                 }
                 return new PyQDataSet(result);
             } else {
-                return null;
+                throw Py.TypeError("invalid index type: "+arg0);
             }
         } else {
             QDataSet that = (QDataSet) o;
