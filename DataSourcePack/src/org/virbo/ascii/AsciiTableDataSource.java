@@ -479,22 +479,38 @@ public class AsciiTableDataSource extends AbstractDataSource {
             depend1Values = parseRangeStr(o, columnCount);
         }
 
-        // check to see if the depend0 column appears to be times.  I Promise I won't open the file again until it's read in.
-        if (timeColumn == -1 && depend0 != null) {
+        // check to see if the depend0 or data column appear to be times.  I Promise I won't open the file again until it's read in.
+        if ( timeColumn == -1 ) {
             String s = parser.readFirstParseableRecord(file.toString());
             if (s != null) {
                 String[] fields = new String[parser.getRecordParser().fieldCount()];
                 parser.getRecordParser().splitRecord(s,fields);
-                int idep0 = parser.getFieldIndex(depend0);
-                if (idep0 != -1) { // deal with -1 later
-                    String field = fields[idep0];
-                    try {
-                        TimeUtil.parseTime(field);
-                        if ( new StringTokenizer( field, ":T-/" ).countTokens()>1 ) {
-                            parser.setUnits(idep0, Units.us2000);
-                            parser.setFieldParser(idep0, parser.UNITS_PARSER);
+                if ( depend0!=null ) {
+                    int idep0 = parser.getFieldIndex(depend0);
+                    if (idep0 != -1) { // deal with -1 later
+                        String field = fields[idep0];
+                        try {
+                            TimeUtil.parseTime(field);
+                            if ( new StringTokenizer( field, ":T-/" ).countTokens()>1 ) {
+                                parser.setUnits(idep0, Units.us2000);
+                                parser.setFieldParser(idep0, parser.UNITS_PARSER);
+                            }
+                        } catch (ParseException ex) {
                         }
-                    } catch (ParseException ex) {
+                    }
+                }
+                if ( column!=null ) {
+                    int icol = parser.getFieldIndex(column);
+                    if (icol != -1) { // deal with -1 later
+                        String field = fields[icol];
+                        try {
+                            TimeUtil.parseTime(field);
+                            if ( new StringTokenizer( field, ":T-/" ).countTokens()>1 ) {
+                                parser.setUnits(icol, Units.us2000);
+                                parser.setFieldParser(icol, parser.UNITS_PARSER);
+                            }
+                        } catch (ParseException ex) {
+                        }
                     }
                 }
             }
