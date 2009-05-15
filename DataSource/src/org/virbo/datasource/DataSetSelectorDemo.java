@@ -31,6 +31,7 @@ public class DataSetSelectorDemo extends javax.swing.JFrame {
             }       
         } );
         this.dataSetSelector1.setRecent(Arrays.asList( new String[] { "x.dat", "y.dat", "z.dat" } ) );
+        this.dataSetSelector1.setValue("http://192.168.0.203/jeremy/1wire/data/2007/0B000800408DD710.20070213.d2s");
         DataSetURL.init(); // discover factories
     }
     
