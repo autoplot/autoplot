@@ -10,14 +10,15 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -38,6 +39,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.graph.DasCanvas;
 import org.das2.util.AboutUtil;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
@@ -45,12 +47,16 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.dsutil.AsciiParser;
 import org.virbo.qstream.SerializeDelegate;
 import org.virbo.qstream.SerializeRegistry;
 
@@ -62,11 +68,12 @@ public class AutoplotApplet extends JApplet {
 
     ApplicationModel model;
     Application dom;
+    boolean initializing = false;
     static Logger logger = Logger.getLogger("virbo.autoplot.applet");
     String statusCallback;
     String timeCallback;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090421.3";
+    public static final String VERSION = "20090515.1";
 
     private String getStringParameter(String name, String deft) {
         String result = getParameter(name);
@@ -106,25 +113,48 @@ public class AutoplotApplet extends JApplet {
         }
     }
 
+    public void paint(Graphics g) {
+        if (initializing) {
+            super.paint(g);
+            g.drawString("initializing", 20, getHeight() / 2);
+        } else {
+            super.paint(g);
+        }
+    }
+
     @Override
     public void init() {
         super.init();
-
+        initializing = true;
         System.err.println("init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
 
-        model = new ApplicationModel();
-        model.addDasPeersToApp();
-
         setLayout(new BorderLayout());
-        add(model.getCanvas(), BorderLayout.CENTER);
-        validate();
+
         System.err.println("done init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+    }
+
+    @Override
+    public void stop() {
+        remove(model.getCanvas());
+        this.model = null;
     }
 
     @Override
     public void start() {
         System.err.println("start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
         super.start();
+
+        model = new ApplicationModel();
+
+        model.addDasPeersToApp();
+        add(model.getCanvas(), BorderLayout.CENTER);
+        validate();
+
         try {
             System.err.println("Formatters: " + DataSourceRegistry.getInstance().getFormatterExtensions());
         } catch (Exception ex) {
@@ -182,20 +212,21 @@ public class AutoplotApplet extends JApplet {
         appmodel.getCanvas().revalidate();
         appmodel.getCanvas().setPrintingTag("");
 
-        JMenuItem item= new JMenuItem( new AbstractAction( "Edit DOM" ) {
+        JMenuItem item = new JMenuItem(new AbstractAction("Edit DOM") {
+
             public void actionPerformed(ActionEvent e) {
                 new PropertyEditor(dom).showDialog(AutoplotApplet.this);
             }
         });
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item);
 
-/*        item= new JMenuItem( new AbstractAction( "Execute DOM command..." ) {
-            public void actionPerformed(ActionEvent e) {
-                String command= JOptionPane.showInputDialog("enter command prop=val");
-                if ( command==null ) return;
-                String[] ss= command.split("=");
-                setDomNode(ss[0], ss[1]);
-            }
+        /*        item= new JMenuItem( new AbstractAction( "Execute DOM command..." ) {
+        public void actionPerformed(ActionEvent e) {
+        String command= JOptionPane.showInputDialog("enter command prop=val");
+        if ( command==null ) return;
+        String[] ss= command.split("=");
+        setDomNode(ss[0], ss[1]);
+        }
         });
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item); */
 
@@ -343,27 +374,42 @@ public class AutoplotApplet extends JApplet {
 
 
         if (srenderType != null && !srenderType.equals("")) {
-            ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
-            dom.getController().getPanel().setRenderType(renderType);
-        }
-
-        if (!srenderType.equals("")) {
-            ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
-            dom.getController().getPanel().setRenderType(renderType);
+            try {
+                ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
+                dom.getController().getPanel().setRenderType(renderType);
+            } catch (IllegalArgumentException ex) {
+                ex.printStackTrace();
+            }
         }
 
         if (!scolor.equals("")) {
-            dom.getController().getPanel().getStyle().setColor(Color.decode(scolor));
+            try {
+                dom.getController().getPanel().getStyle().setColor(Color.decode(scolor));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
         if (!sfillColor.equals("")) {
-            dom.getController().getPanel().getStyle().setFillColor(Color.decode(sfillColor));
+            try {
+                dom.getController().getPanel().getStyle().setFillColor(Color.decode(sfillColor));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         if (!sforegroundColor.equals("")) {
-            dom.getOptions().setForeground(Color.decode(sforegroundColor));
+            try {
+                dom.getOptions().setForeground(Color.decode(sforegroundColor));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         if (!sbackgroundColor.equals("")) {
-            dom.getOptions().setBackground(Color.decode(sbackgroundColor));
+            try {
+                dom.getOptions().setBackground(Color.decode(sbackgroundColor));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
 
         surl = getParameter("dataSetURL");
@@ -495,7 +541,7 @@ public class AutoplotApplet extends JApplet {
                     String oldv = getTimeRange();
                     dom.getController().getPlot().getController().getDasPlot().getXAxis().setDatumRange(DatumRangeUtil.parseTimeRangeValid(timeRange));
                     //dom.setTimeRange(DatumRangeUtil.parseTimeRangeValid(timeRange));
-                    propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldv, timeRange);
+                    firePropertyChange(PROP_TIMERANGE, oldv, timeRange);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -518,7 +564,7 @@ public class AutoplotApplet extends JApplet {
                     String oldFont = getCanvasFont();
                     model.getCanvas().setBaseFont(Font.decode(font));
                     model.getCanvas().repaint();
-                    propertyChangeSupport.firePropertyChange(PROP_FONT, oldFont, font);
+                    firePropertyChange(PROP_FONT, oldFont, font);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -533,8 +579,8 @@ public class AutoplotApplet extends JApplet {
             public void run() {
                 try {
                     BeanProperty prop = BeanProperty.create(node);
-                     if ( !prop.isReadable(dom) ) {
-                        System.err.println("the node "+node+" of "+dom+ " is not readable");
+                    if (!prop.isReadable(dom)) {
+                        System.err.println("the node " + node + " of " + dom + " is not readable");
                         return;
                     }
                     System.err.println("dom." + node + "=" + prop.getValue(dom));
@@ -553,14 +599,14 @@ public class AutoplotApplet extends JApplet {
             public void run() {
                 try {
                     BeanProperty prop = BeanProperty.create(node);
-                    if ( !prop.isWriteable(dom) ) {
-                        System.err.println("the node "+node+" of "+dom+ " is not writable");
+                    if (!prop.isWriteable(dom)) {
+                        System.err.println("the node " + node + " of " + dom + " is not writable");
                         return;
                     }
                     Class c = prop.getWriteType(dom);
                     SerializeDelegate sd = SerializeRegistry.getDelegate(c);
-                    if ( sd==null ) {
-                        System.err.println("unable to find serialize delegate for "+c.getCanonicalName() );
+                    if (sd == null) {
+                        System.err.println("unable to find serialize delegate for " + c.getCanonicalName());
                         return;
                     }
                     Object val = sd.parse(sd.typeId(c), sval);
@@ -575,15 +621,49 @@ public class AutoplotApplet extends JApplet {
         };
         SwingUtilities.invokeLater(run);
     }
-    
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
+    /**
+     * reset the plot zoom to the initial settings.
+     */
+    public void resetZoom() {
+        Runnable run = new Runnable() {
+
+            public void run() {
+                dom.getController().getPlot().getController().resetZoom();
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
+    /**
+     * plot the data in the string.
+     * @param sdata
+     */
+    public void plotData(final String fsdata) {
+        Runnable run = new Runnable() {
+
+            public void run() {
+                try {
+                    String sdata = fsdata;
+                    AsciiParser p = new AsciiParser();
+                    int i = sdata.indexOf(";");
+                    if (i != -1) {
+                        sdata = sdata.replaceAll(";", "\n");
+                        i = sdata.indexOf("\n");
+                    }
+                    p.guessDelimParser(sdata.substring(0, i));
+                    DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
+                    QDataSet data = p.readStream(new StringReader(sdata), dom.getController().getMonitorFactory().getMonitor(c, "reading data", "reading data"));
+                    MutablePropertyDataSet y= DataSetOps.slice1(data,1);
+                    y.putProperty(QDataSet.DEPEND_0, DataSetOps.slice1(data,0) );
+                    model.setDataSet(y);
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
 
     public static void main(String[] args) {
