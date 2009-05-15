@@ -23,11 +23,18 @@
 
 package org.virbo.autoplot;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.io.IOException;
-import java.util.logging.*;
-import javax.swing.*;
-import java.awt.*;
 import java.net.URL;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JWindow;
 import org.das2.util.AboutUtil;
 
 /**
@@ -36,7 +43,7 @@ import org.das2.util.AboutUtil;
  */
 public class APSplash extends JWindow {
 
-    public static APSplash instance=null;
+    private static APSplash instance=null;
 
     private Handler handler;
     private JLabel messageLabel;
