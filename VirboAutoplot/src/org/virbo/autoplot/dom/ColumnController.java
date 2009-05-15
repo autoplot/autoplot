@@ -53,7 +53,7 @@ public class ColumnController extends DomNodeController {
                     }
                     DasDevicePosition.parseLayoutStr( dasColumn, column.getLeft() + "," + column.getRight() );
                 } catch (ParseException ex) {
-                    Logger.getLogger(ColumnController.class.getName().toString()).warning("parse exception: "+ex);
+                    Logger.getLogger(ColumnController.class.getName()).warning("parse exception: "+ex);
                     column.setLeft( DasDevicePosition.formatLayoutStr(dasColumn, true) );
                     column.setRight( DasDevicePosition.formatLayoutStr(dasColumn, false ) );
                 }
