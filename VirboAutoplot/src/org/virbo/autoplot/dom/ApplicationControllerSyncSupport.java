@@ -173,7 +173,6 @@ public class ApplicationControllerSyncSupport {
                 d.doDiff(application);
             }
         }
-        System.err.println( application.getBindings() );
     }
     
     protected void syncBindings( BindingModel[] bindings ) {
