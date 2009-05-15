@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -142,6 +140,8 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
 
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() instanceof JToggleButton) {
+                    jTable1.getSelectionModel().clearSelection();
+                    jTable1.getColumnModel().getSelectionModel().clearSelection();
                     currentToolButton = (JToggleButton) e.getSource();
                     currentTool = t;
                 }
