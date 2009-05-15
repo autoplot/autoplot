@@ -39,7 +39,7 @@ public class ZipFileSystem extends FileSystem {
             f = new File(root.toURI());
         } catch (URISyntaxException ex) {
             Logger.getLogger(ZipFileSystem.class.getName()).log(Level.SEVERE, null, ex);
-            throw new IOException(ex);
+            throw new IOException("URI Syntax Exception: "+ex.getMessage());
         }
 
         // This may throw ZipException, IOException, or SecurityException
