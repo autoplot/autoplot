@@ -107,7 +107,7 @@ public class PngWalkCanvas extends JPanel {
     Image lastImage;
 
     @Override
-    protected void paintComponent(Graphics g1) {
+    protected synchronized void paintComponent(Graphics g1) {
         super.paintComponent(g1);
         Graphics2D g = (Graphics2D) g1;
 
@@ -145,7 +145,7 @@ public class PngWalkCanvas extends JPanel {
                 lastImage = image;
             }
             g.draw(bounds);
-            maybeTimeStamp( g, bounds, currentIndex );
+            maybeTimeStamp( g, bounds, ranges.get(currentIndex) );
 
             if (usedLastImage) {
                 drawMomentStr(g,bounds);
@@ -183,7 +183,7 @@ public class PngWalkCanvas extends JPanel {
                 g.draw(bounds);
                 ylow= Math.max( bounds.y+bounds.height, ylow );
 
-                maybeTimeStamp(g, bounds, index);
+                maybeTimeStamp(g, bounds, ranges.get(index) );
 
                 imagebounds.put(bounds, index);
 
@@ -215,7 +215,7 @@ public class PngWalkCanvas extends JPanel {
             }
             g.draw(bounds);
 
-            maybeTimeStamp( g, bounds, currentIndex );
+            maybeTimeStamp( g, bounds, ranges.get(currentIndex) );
             if (usedLastImage) {
                 drawMomentStr(g,bounds);
             }
@@ -275,7 +275,7 @@ public class PngWalkCanvas extends JPanel {
                         lastImage= image;
                     }
                     g.draw(bounds);
-                    maybeTimeStamp( g, bounds, index );
+                    maybeTimeStamp( g, bounds, ranges.get(index) );
                     if ( usedLastImage ) drawMomentStr( g, bounds);
                 } else {
                     int x = xm + 200 + (index - currentIndex) * targetSize / 4;
@@ -346,7 +346,7 @@ public class PngWalkCanvas extends JPanel {
                 if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 }
                 g.draw(bounds);
-                maybeTimeStamp( g, bounds, index );
+                maybeTimeStamp( g, bounds, ranges.get(index) );
 
                 imagebounds.put(bounds, index);
 
@@ -366,10 +366,10 @@ public class PngWalkCanvas extends JPanel {
         g.setColor(Color.black);
     }
 
-    private void maybeTimeStamp(Graphics2D g, Rectangle bounds, int index ) {
+    private synchronized void maybeTimeStamp(Graphics2D g, Rectangle bounds, DatumRange dr ) {
         int fmh= 14; // font metrics height
-        if (ranges.get(index) != null) {
-            String rangestr = ranges.get(index).toString();
+        if (dr != null) {
+            String rangestr = dr.toString();
             g.drawString(rangestr, bounds.x, bounds.y + bounds.height + fmh );
         }
     }
@@ -456,7 +456,7 @@ public class PngWalkCanvas extends JPanel {
         return currentIndex;
     }
 
-    public void setCurrentIndex(int currentIndex) {
+    public synchronized void setCurrentIndex(int currentIndex) {
         int oldCurrentIndex = this.currentIndex;
         String oldItem= getCurrentItem();
         if (currentIndex >= 0 && currentIndex < this.images.size()) {
@@ -506,7 +506,7 @@ public class PngWalkCanvas extends JPanel {
         }
     }
 
-    public void setCurrentItem(String currentItem) {
+    public synchronized void setCurrentItem(String currentItem) {
         try {
             String oldCurrentItem = getCurrentItem();
             int idx = this.urls.indexOf(new URL(currentItem));
@@ -531,7 +531,7 @@ public class PngWalkCanvas extends JPanel {
         this.timeRange = timeRange;
         if ( timeRange.trim().length()>0 ) {
             try {
-                DatumRange tr = DatumRangeUtil.parseTimeRange(timeRange);
+                DatumRangeUtil.parseTimeRange(timeRange);
             } catch (ParseException ex) {
                 this.timeRange= oldTimeRange;
             }
