@@ -10,7 +10,6 @@
         function doTime() {
             applet1.setTimeRange( timetextarea.value );
             applet2.setTimeRange( timetextarea.value );
-            applet3.setTimeRange( timetextarea.value );
         }
 
         function doScript() {
@@ -23,9 +22,6 @@
 
         function appletTimeCallback( val ) {
             document.getElementById("timeRange").innerHTML= val;
-            applet1.setTimeRange( val );
-            applet2.setTimeRange( val );
-            applet3.setTimeRange( val );
         }
         
     </script>
@@ -55,23 +51,14 @@
                 <param name="foregroundColor" value="#ffffff">
                 <param name="color" value="#ffffff">
     </applet>
-    <h1>workshop A (upper)</h1>
-
-    <applet  width="800" height="200" id="applet3"
-          code="org.virbo.autoplot.AutoplotApplet" archive="AutoplotApplet.jar,AutoplotAppletAll.jar">
-                <param name="dataSetURL" value="http://192.168.0.203/jeremy/1wire/data/$Y/8500080044259C10.$Y$m$d.d2s?timerange=jan-17-2009">
-                <param name="font" value="sans-italic-10">
-                <param name="backgroundColor" value="#000000">
-                <param name="foregroundColor" value="#ffffff">
-                <param name="color" value="#ffffff">
-
-    </applet>
 
     <h1>Control From Javascript</h1>
 
+Enter a time range here, both plots should go to the time:
 <textarea id="timetextarea" cols="40" rows="1" >2009-02-06</textarea>
     <input type="button" onClick="doTime();" value="go">
 
+Enter javascript here to run:
 <textarea id="scriptarea" cols="40" rows="1" >appletStatus()</textarea>
     <input type="button" onClick="doScript();" value="go">
 
