@@ -592,13 +592,13 @@ public class PanelController extends DomNodeController {
 
             AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, (Map) props.get(QDataSet.DEPEND_1));
 
-            QDataSet hist= getDataSourceFilter().controller.getHistogram();
+            //QDataSet hist= getDataSourceFilter().controller.getHistogram();
             AutoplotUtil.AutoRangeDescriptor desc;
-            if ( false && hist!=null ) {
-                desc= AutoplotUtil.autoRange( hist, fillDs, props );
-            } else {
+            //if ( false && hist!=null ) {
+            //    desc= AutoplotUtil.autoRange( hist, fillDs, props );
+            //} else {
                 desc = AutoplotUtil.autoRange( fillDs, props );
-            }
+            //}
 
             panelCopy.getPlotDefaults().getZaxis().setRange(desc.range);
             panelCopy.getPlotDefaults().getZaxis().setLog(desc.log);
@@ -732,8 +732,6 @@ public class PanelController extends DomNodeController {
 
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
-
-        QDataSet fillDs = dsf.controller.getFillDataSet();
 
         if (oldRenderer != newRenderer) {
             setRenderer(newRenderer);
