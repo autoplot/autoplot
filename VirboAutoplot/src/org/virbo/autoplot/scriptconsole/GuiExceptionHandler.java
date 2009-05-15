@@ -32,21 +32,15 @@ import org.das2.DasApplication;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.XMLEncoder;
 import java.io.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.LogRecord;
 import java.util.logging.XMLFormatter;
 import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
@@ -57,6 +51,18 @@ import org.das2.system.ExceptionHandler;
 import org.das2.util.AboutUtil;
 
 /**
+ * This is the original das2 Exception handler dialog, but modified to
+ * support submitting an error report to a server.
+ *
+ * The server is hard-coded to be http://www.papco.org:8080/RTEReceiver/LargeUpload.jsp,
+ * TODO: add runtime property to set this.  This client will submit a file containing the
+ * report to the server.  The filename is a client-side calculated hash of the stack trace
+ * and timestamp.  The server is expecting a multi-part post, containing:
+ *   "secret"="secret"
+ *   "todo"="upload"
+ *   "uploadfile"= the file to upload.
+ * TODO: refactor the error reporting stuff because it should be useful for headless
+ * applications as well.
  *
  * @author  jbf
  */
@@ -65,10 +71,15 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     //private static JDialog dialog;
     //private static JTextArea messageArea;
     //private static JTextArea traceArea;
-    private static final String UNCAUGHT = "An unexpected error has occurred.  " +
+    private static final String UNCAUGHT = "<html><p>An unexpected error has occurred.  " +
         "The system may not be able to recover properly.  You can inspect" +
-        "information about the crash with the Show Details button, and" +
-        "submit an automatic bug entry.";
+        "information about the crash with the Show Details button, and " +
+        "submit an automatic bug entry.</p>" +
+        "<p>This submission will include information about the program state " +
+        "when the crash occurred, source code version tags, and platform information." +
+        "If log messages are available, they will be sent as well.</p>" +
+        "" +
+        "</html>";
 
     private JButton submitButton;
     
@@ -98,7 +109,11 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         String errorMessage = extraInfo + t.getClass().getName() + "\n"
             + (t.getMessage() == null ? "" : t.getMessage());        
         final JDialog dialog = new JDialog( DasApplication.getDefaultApplication().getMainFrame() );        
-        dialog.setTitle("Error in das2");
+        if ( extraInfo.length()==0 ) {
+            dialog.setTitle("Error Notification");
+        } else {
+            dialog.setTitle("Runtime Error Occurred");
+        }
         dialog.setModal(false);
         dialog.setResizable(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -135,9 +150,10 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         stackPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
         JPanel buttonPanel2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel2.setBorder(new javax.swing.border.EmptyBorder(10, 0, 0, 0));
-        JButton dump = new JButton("Dump to STDERR");
-        JButton save = new JButton("Save to file");
-        JButton submit= new JButton("Submit RTE");
+        JButton dump = new JButton("Dump to Console");
+        JButton save = new JButton("Save to File");
+        JButton submit= new JButton("Submit Error Report");
+        submit.setToolTipText("<html>Submit exception, platform information, source tags, and possibly log records to RTE server</html>");
 
         buttonPanel2.add(dump);
         buttonPanel2.add(save);
@@ -183,7 +199,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 try {
                     JFileChooser chooser = new JFileChooser();
                     int result = chooser.showSaveDialog(dialog);
-                    if (result == chooser.APPROVE_OPTION) {
+                    if (result == JFileChooser.APPROVE_OPTION) {
                         File selected = chooser.getSelectedFile();
                         PrintWriter out = new PrintWriter(new FileOutputStream(selected));
                         t.printStackTrace(out);
@@ -249,28 +265,10 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 	    sb.append("  <exception>\n");
         sb.append("    <type>" );
         escape( sb, th.getClass().getName() );
-        sb.append("    </type>" );
+        sb.append("</type>\n" );
 	    sb.append("    <message>");
 	    escape(sb, th.toString() );
 	    sb.append("</message>\n");
-	    StackTraceElement trace[] = th.getStackTrace();
-	    for (int i = 0; i < trace.length; i++) {
-	 	StackTraceElement frame = trace[i];
-		sb.append("    <frame>\n");
-		sb.append("      <class>");
-		escape(sb, frame.getClassName());
-		sb.append("</class>\n");
-		sb.append("      <method>");
-		escape(sb, frame.getMethodName());
-		sb.append("</method>\n");
- 	        // Check for a line number.
-		if (frame.getLineNumber() >= 0) {
-		    sb.append("      <line>");
-		    sb.append(frame.getLineNumber());
-		    sb.append("</line>\n");
-		}
-	        sb.append("    </frame>\n");
-	    }
         sb.append("    <toString><![CDATA[\n");
         StringWriter sw= new StringWriter();
         th.printStackTrace( new PrintWriter( sw ) );
@@ -324,12 +322,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         formatPlatform( buf );
         
         if ( recs!=null ) {
-            buf.append( "  <log>");
+            buf.append( "  <log>\n");
             XMLFormatter formatter= new XMLFormatter();
             for ( LogRecord lr: recs ) {
                 buf.append( formatter.format(lr) );
             }
-            buf.append( "  </log>");
+            buf.append( "  </log>\n");
         }
         buf.append("</exceptionReport>\n");
         return buf.toString();
