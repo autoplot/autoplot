@@ -52,7 +52,7 @@ public class RowController extends DomNodeController {
                     }
                     DasDevicePosition.parseLayoutStr( dasRow, row.getTop() + "," + row.getBottom() );
                 } catch (ParseException ex) {
-                    Logger.getLogger(RowController.class.getName().toString()).warning("parse exception: "+ex);
+                    Logger.getLogger(RowController.class.getName()).warning("parse exception: "+ex);
                     row.setTop( DasDevicePosition.formatLayoutStr(dasRow, true) );
                     row.setBottom( DasDevicePosition.formatLayoutStr(dasRow, false ) );
                 }
