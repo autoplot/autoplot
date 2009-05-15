@@ -71,15 +71,14 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     //private static JDialog dialog;
     //private static JTextArea messageArea;
     //private static JTextArea traceArea;
-    private static final String UNCAUGHT = "<html><p>An unexpected error has occurred.  " +
-        "The system may not be able to recover properly.  You can inspect" +
-        "information about the crash with the Show Details button, and " +
-        "submit an automatic bug entry.</p>" +
-        "<p>This submission will include information about the program state " +
-        "when the crash occurred, source code version tags, and platform information." +
-        "If log messages are available, they will be sent as well.</p>" +
-        "" +
-        "</html>";
+    private static final String UNCAUGHT = "An unexpected error has occurred. " +
+        "The system may not be able to recover properly.  You can inspect " +
+        "information about the crash with the Show Details button below, and " +
+        "submit an automatic bug entry.\n\n" +
+        "This submission will include information about the program state " +
+        "when the crash occurred, source code version tags, and platform information. " +
+        "If log messages are available, they will be sent as well.\n\n" +
+        "";
 
     private JButton submitButton;
     
