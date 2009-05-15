@@ -92,8 +92,10 @@ public class AxisController extends DomNodeController {
 
     void syncTo(DomNode n) {
         Lock lock = null;
-        if ( dasAxis!=null ) lock= dasAxis.mutatorLock();
-        lock.lock();
+        if ( dasAxis!=null ) {
+            lock= dasAxis.mutatorLock();
+            lock.lock();
+        }
         //TODO: should call ((DomNode)n).syncTo(n);
         Axis that = (Axis) n;
         axis.setLog(that.isLog());
