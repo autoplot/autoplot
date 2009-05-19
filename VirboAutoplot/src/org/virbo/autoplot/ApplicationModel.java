@@ -80,7 +80,16 @@ public class ApplicationModel {
     Timer tickleTimer;
     Application dom;
     ExceptionHandler exceptionHandler;
+    boolean applet= false;
 
+    public void setApplet( boolean v ) {
+        this.applet= v;
+    }
+
+    public boolean isApplet() {
+        return this.applet;
+    }
+    
     public ExceptionHandler getExceptionHandler() {
         return exceptionHandler;
     }
