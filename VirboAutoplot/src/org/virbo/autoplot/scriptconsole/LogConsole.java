@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -28,9 +29,17 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -55,6 +64,10 @@ public class LogConsole extends javax.swing.JPanel {
     List<LogRecord> records = new LinkedList<LogRecord>();
     int eventThreadId = -1;
     int level = Level.INFO.intValue();
+    boolean showLoggerId = false;
+    boolean showTimeStamps = false;
+    boolean showLevel = false;
+    LogConsoleSettingsDialog settingsDialog = null;
     NumberFormat nf = new DecimalFormat("00.000");
     private Timer timer2;
     PrintStream oldStdOut;
@@ -114,6 +127,27 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
         timer2.setRepeats(false);
+
+    }
+    protected String searchText = "";
+    public static final String PROP_SEARCHTEXT = "searchText";
+
+    public String getSearchText() {
+        return searchText;
+    }
+
+    public void setSearchText(String searchText) {
+        String oldSearchText = this.searchText;
+        this.searchText = searchText;
+        update();
+        firePropertyChange(PROP_SEARCHTEXT, oldSearchText, searchText);
+    }
+
+    private synchronized LogConsoleSettingsDialog getSettingsDialog() {
+        if (this.settingsDialog == null) {
+            settingsDialog = new LogConsoleSettingsDialog((JFrame) SwingUtilities.getWindowAncestor(this), false, this);
+        }
+        return settingsDialog;
     }
 
     /**
@@ -196,52 +230,73 @@ public class LogConsole extends javax.swing.JPanel {
         }
     }
 
-    private synchronized void update() {
-        final StringBuffer buf = new StringBuffer();
+    public synchronized void update() {
+        try {
+            final StringBuffer buf = new StringBuffer();
+            int n = records.size();
+            long t = n == 0 ? 0 : records.get(n - 1).getMillis();
+            boolean timeStamps = showTimeStamps;
+            boolean logLevels = showLevel;
+            String st = searchText;
+            if (st != null && st.length() == 0) st = null;
+            Pattern p = null;
+            if (st != null) p = Pattern.compile(st);
+            StyledDocument doc = logTextArea.getStyledDocument();
+            doc.remove(0, doc.getLength());
+            long lastT = 0;
 
-        int n = records.size();
-        long t = n == 0 ? 0 : records.get(n - 1).getMillis();
+            MutableAttributeSet highlistAttr= new SimpleAttributeSet();
+            StyleConstants.setBackground( highlistAttr, Color.ORANGE );
+            
+            for (LogRecord rec : records) {
+                if (rec.getLevel().intValue() >= level) {
+                    if (lastT != 0 && rec.getMillis() - lastT > 5000) {
+                        //buf.append("\n");
+                        doc.insertString(doc.getLength(), "\n", null);
+                    }
+                    lastT = rec.getMillis();
+                    String recMsg = rec.getMessage();
+                    String prefix = "";
+                    if (showLoggerId) {
+                        prefix += rec.getLoggerName() + " ";
+                    }
+                    if (timeStamps) {
+                        prefix += nf.format((rec.getMillis() - t) / 1000.) + " ";
+                    }
+                    if (logLevels) {
+                        prefix += rec.getLevel() + " ";
+                    }
+                    if (rec.getThreadID() == eventThreadId) {
+                        prefix += "(GUI) ";
+                    }
+                    if (!prefix.equals("")) {
+                        recMsg = prefix.trim() + ": " + recMsg;
+                    }
 
-        boolean timeStamps = timeStampsCheckBox.isSelected();
-        boolean logLevels = logLevelCheckBox.isSelected();
-
-        long lastT = 0;
-        for (LogRecord rec : records) {
-            if (rec.getLevel().intValue() >= level) {
-                if (lastT != 0 && rec.getMillis() - lastT > 5000) {
-                    buf.append("\n");
+                    AttributeSet attr= null;
+                    if (st != null && p.matcher(recMsg).find()) {
+                        attr= highlistAttr;
+                    }
+                    try {
+                        //buf.append(recMsg).append("\n");
+                        recMsg+= "\n";
+                        doc.insertString(doc.getLength(), recMsg, attr );
+                    } catch (BadLocationException ex) {
+                        Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
-                lastT = rec.getMillis();
-                String recMsg = rec.getMessage();
-                String prefix = "";
-                if (loggerIDCheckBox.isSelected()) {
-                    prefix += rec.getLoggerName() + " ";
-                }
-                if (timeStamps) {
-                    prefix += nf.format((rec.getMillis() - t) / 1000.) + " ";
-                }
-                if (logLevels) {
-                    prefix += rec.getLevel() + " ";
-                }
-                if (rec.getThreadID() == eventThreadId) {
-                    prefix += "(GUI) ";
-                }
-                if (!prefix.equals("")) {
-                    recMsg = prefix.trim() + ": " + recMsg;
-                }
-                buf.append(recMsg).append("\n");
             }
-        }
+            SwingUtilities.invokeLater(new Runnable() {
 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                logTextArea.setText(buf.toString());
+                public void run() {
+                    //logTextArea.setText(buf.toString());
+                }
+            });
+            while (records.size() > RECORD_SIZE_LIMIT) {
+                records.remove(0);
             }
-        });
-
-        while (records.size() > RECORD_SIZE_LIMIT) {
-            records.remove(0);
+        } catch (BadLocationException ex) {
+            Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -254,27 +309,17 @@ public class LogConsole extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        logTextArea = new javax.swing.JTextArea();
         actionsPanel = new javax.swing.JPanel();
         clearButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         copyButton = new javax.swing.JButton();
         verbosityPanel = new javax.swing.JPanel();
-        loggerIDCheckBox = new javax.swing.JCheckBox();
-        logLevelCheckBox = new javax.swing.JCheckBox();
-        timeStampsCheckBox = new javax.swing.JCheckBox();
-        verbositySelect = new javax.swing.JComboBox();
-        jLabel1 = new javax.swing.JLabel();
+        jToggleButton1 = new javax.swing.JToggleButton();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         commandLineTextPane1 = new org.virbo.autoplot.scriptconsole.CommandLineTextPane();
-
-        jScrollPane1.setAutoscrolls(true);
-
-        logTextArea.setColumns(20);
-        logTextArea.setRows(5);
-        jScrollPane1.setViewportView(logTextArea);
+        jScrollPane1 = new javax.swing.JScrollPane();
+        logTextArea = new javax.swing.JTextPane();
 
         clearButton.setText("clear");
         clearButton.setToolTipText("clear all messages.  ");
@@ -321,71 +366,26 @@ public class LogConsole extends javax.swing.JPanel {
                 .add(copyButton))
         );
 
-        loggerIDCheckBox.setText("logger ID");
-        loggerIDCheckBox.setToolTipText("identifies the logger posting the message");
-        loggerIDCheckBox.addActionListener(new java.awt.event.ActionListener() {
+        jToggleButton1.setText("console settings....");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loggerIDCheckBoxActionPerformed(evt);
+                jToggleButton1ActionPerformed(evt);
             }
         });
-
-        logLevelCheckBox.setText("log levels");
-        logLevelCheckBox.setToolTipText("show the log level (verbosity) of the messages.");
-        logLevelCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                logLevelCheckBoxActionPerformed(evt);
-            }
-        });
-
-        timeStampsCheckBox.setText("timing");
-        timeStampsCheckBox.setToolTipText("Show time of the message, in seconds before the most recent message.");
-        timeStampsCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                timeStampsCheckBoxActionPerformed(evt);
-            }
-        });
-
-        verbositySelect.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "warnings", "informational", "debug", "all" }));
-        verbositySelect.setSelectedIndex(1);
-        verbositySelect.setToolTipText("filter messages by verbosity.");
-        verbositySelect.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                verbositySelectActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setText("verbosity:");
 
         org.jdesktop.layout.GroupLayout verbosityPanelLayout = new org.jdesktop.layout.GroupLayout(verbosityPanel);
         verbosityPanel.setLayout(verbosityPanelLayout);
         verbosityPanelLayout.setHorizontalGroup(
             verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(verbosityPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
-                        .add(loggerIDCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeStampsCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(logLevelCheckBox))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 147, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
+                .addContainerGap(132, Short.MAX_VALUE)
+                .add(jToggleButton1))
         );
         verbosityPanelLayout.setVerticalGroup(
             verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(verbosityPanelLayout.createSequentialGroup()
-                .add(verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(verbositySelect, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(timeStampsCheckBox)
-                    .add(logLevelCheckBox)
-                    .add(loggerIDCheckBox)))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
+                .addContainerGap(35, Short.MAX_VALUE)
+                .add(jToggleButton1))
         );
 
         jLabel2.setText("AP>");
@@ -396,6 +396,8 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
         jScrollPane2.setViewportView(commandLineTextPane1);
+
+        jScrollPane1.setViewportView(logTextArea);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -416,8 +418,8 @@ public class LogConsole extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 315, Short.MAX_VALUE)
-                .add(11, 11, 11)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(layout.createSequentialGroup()
@@ -433,35 +435,6 @@ private void clearButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     records.clear();
     update();
 }//GEN-LAST:event_clearButtonActionPerformed
-
-private void verbositySelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verbositySelectActionPerformed
-    String o = (String) verbositySelect.getSelectedItem();
-
-    if (o.equals("warnings")) {
-        level = Level.WARNING.intValue();
-    } else if (o.equals("informational")) {
-        level = Level.INFO.intValue();
-    } else if (o.equals("debug")) {
-        level = Level.FINER.intValue();
-    } else if (o.equals("all")) {
-        level = Level.ALL.intValue();
-    } else {
-        throw new RuntimeException("bad level string: " + o);
-    }
-    update();
-}//GEN-LAST:event_verbositySelectActionPerformed
-
-private void timeStampsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeStampsCheckBoxActionPerformed
-    update();
-}//GEN-LAST:event_timeStampsCheckBoxActionPerformed
-
-private void logLevelCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logLevelCheckBoxActionPerformed
-    update();
-}//GEN-LAST:event_logLevelCheckBoxActionPerformed
-
-private void loggerIDCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loggerIDCheckBoxActionPerformed
-    update();
-}//GEN-LAST:event_loggerIDCheckBoxActionPerformed
 
 private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
     if ((evt.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK) {
@@ -532,21 +505,21 @@ private void commandLineTextPane1FocusGained(java.awt.event.FocusEvent evt) {//G
     impl.startPopup(this.commandLineTextPane1);
 }//GEN-LAST:event_commandLineTextPane1FocusGained
 
+private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    getSettingsDialog().setVisible(jToggleButton1.isSelected());
+}//GEN-LAST:event_jToggleButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionsPanel;
     private javax.swing.JButton clearButton;
     private org.virbo.autoplot.scriptconsole.CommandLineTextPane commandLineTextPane1;
     private javax.swing.JButton copyButton;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JCheckBox logLevelCheckBox;
-    private javax.swing.JTextArea logTextArea;
-    private javax.swing.JCheckBox loggerIDCheckBox;
+    private javax.swing.JToggleButton jToggleButton1;
+    private javax.swing.JTextPane logTextArea;
     private javax.swing.JButton saveButton;
-    private javax.swing.JCheckBox timeStampsCheckBox;
     private javax.swing.JPanel verbosityPanel;
-    private javax.swing.JComboBox verbositySelect;
     // End of variables declaration//GEN-END:variables
 }
