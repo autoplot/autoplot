@@ -73,6 +73,39 @@ public class PanelController extends DomNodeController {
     }
 
     /**
+     * return child panels, which are panels that share a datasource but pull out
+     * a component of the data.
+     * @return
+     */
+    public List<Panel> getChildPanels() {
+        if (childPanels == null) {
+            return Collections.emptyList();
+        } else {
+            return Collections.unmodifiableList(childPanels);
+        }
+    }
+
+    /**
+     * set the child panels.
+     * @param panels
+     */
+    protected void setChildPanels(List<Panel> panels) {
+        this.childPanels = panels;
+    }
+
+    /**
+     * set the parent panel.  this is used when copying.
+     * @param p
+     */
+    protected void setParentPanel(Panel p) {
+        this.parentPanel = p;
+    }
+
+    public Panel getParentPanel() {
+        return this.parentPanel;
+    }
+
+    /**
      * remove any bindings and listeners
      */
     void unbindDsf() {
@@ -100,20 +133,28 @@ public class PanelController extends DomNodeController {
         }
 
         public void propertyChange(PropertyChangeEvent evt) {
-            logger.fine("panelListener: "+evt.getPropertyName()+" "+evt.getOldValue()+"->"+evt.getNewValue());
+            logger.fine("panelListener: " + evt.getPropertyName() + " " + evt.getOldValue() + "->" + evt.getNewValue());
             if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) {
-                if ( !dom.panels.contains(panel) ) {  //TODO: I think this can be removed. The applicationController was preventing the panel/panelController from being garbage collected.
-                    return;
+                RenderType newRenderType = (RenderType) evt.getNewValue();
+                RenderType oldRenderType = (RenderType) evt.getOldValue();
+                if (parentPanel != null) {
+                    parentPanel.setRenderType(newRenderType);
+                } else {
+                    if (!dom.panels.contains(panel)) {  //TODO: I think this can be removed. The applicationController was preventing the panel/panelController from being garbage collected.
+                        throw new IllegalArgumentException("we shouldn't get here any more");
+                    }
+                    if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
+                        resetPanel(getDataSourceFilter().getController().getFillDataSet(), panel.getRenderType());
+                    }
+                    setResetPanel(false);
                 }
-                setRenderType(panel.getRenderType());
-                setResetRenderer(false);
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
-                resetDataSource();
+                resetDataSourceFilter();
             }
         }
     };
 
-    private void resetDataSource() {
+    private void resetDataSourceFilter() {
         if (dsf != null) {
             unbindDsf();
             List<DomNode> usages= DomUtil.dataSourceUsages(dom, dsf.getId() );
@@ -169,7 +210,7 @@ public class PanelController extends DomNodeController {
 
         String label = null;
 
-        if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2 && fillDs.property(QDataSet.DEPEND_1)!=null ) {
+        if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
             String[] labels = SemanticOps.getComponentLabels(fillDs);
 
             if (panel.getComponent().equals("X")) {
@@ -186,6 +227,7 @@ public class PanelController extends DomNodeController {
                     if (labels[i].equals(panel.getComponent())) {
                         fillDs = DataSetOps.slice1(fillDs, i);
                         label = labels[i];
+                        break;
                     }
                 }
             }
@@ -217,30 +259,21 @@ public class PanelController extends DomNodeController {
     }
     PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
 
-        public String toString() {
-            return "" + PanelController.this;
-        }
-
         public synchronized void propertyChange(PropertyChangeEvent evt) {
             changesSupport.performingChange( this, PENDING_SET_DATASET );
             if (!Arrays.asList(dom.getPanels()).contains(panel)) {
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
             QDataSet fillDs = dsf.controller.getFillDataSet();
-            logger.fine( "got new dataset: "+fillDs);
-            if ( fillDs!=null ) {
-                if ( resetRanges ) {
-                    if ( parentPanel==null ) {
-                        RenderType renderType = AutoplotUtil.getRenderType(fillDs);
-                        panel.setRenderType(renderType);
-                        resetPanel(fillDs,renderType);
-                    } else {
-                        dom.controller.deletePanel(panel);
-                    }
-
-                } else if ( resetRenderer ) {
-                    setRenderType(panel.getRenderType());
-                    setResetRenderer(false);
+            logger.fine("got new dataset: " + fillDs);
+            if (fillDs != null) {
+                if (resetPanel) {
+                    RenderType renderType = AutoplotUtil.getRenderType(fillDs);
+                    panel.renderType= renderType;
+                    resetPanel(fillDs, renderType);
+                    setResetPanel(false);
+                } else if (resetRanges) {
+                    doResetRanges(true);
                 }
             }
 
@@ -253,10 +286,44 @@ public class PanelController extends DomNodeController {
             }
             changesSupport.changePerformed( this, PENDING_SET_DATASET );
         }
+
+        public String toString() {
+            return "" + PanelController.this;
+        }
     };
 
-    private void resetPanel(QDataSet fillDs,RenderType renderType) {
-        logger.finest("resetPanel..."+fillDs+" "+renderType);
+    /**
+     * true indicates that the new renderType makes the axis dimensions change.
+     * For example, switching from spectrogram to series (to get a stack of components)
+     * causes the z axis to become the yaxis.
+     * @param oldRenderType
+     * @param newRenderType
+     */
+    private boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
+        if ( oldRenderType==newRenderType ) return false;
+        if ( newRenderType==RenderType.spectrogram ) {
+            return true;
+        } else {
+            if ( oldRenderType==RenderType.spectrogram ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * preconditions:
+     *   the new renderType has been identified.
+     *   The dataset to be rendered has been identified.
+     * postconditions:
+     *   old child panels have been deleted.
+     *   child panels have been added when needed.
+     * @param fillDs
+     * @param renderType
+     */
+    private void resetPanel(QDataSet fillDs, RenderType renderType) {
+        logger.finest("resetPanel..." + fillDs + " " + renderType);
         if (renderer != null) {
             renderer.setActive(true);
         }
@@ -270,7 +337,11 @@ public class PanelController extends DomNodeController {
         }
 
         if (fillDs != null) {
+            resetRenderType(panel.getRenderType());
+            setResetPanel(false);
+
             doResetRanges(true);
+
             setResetRanges(false);
 
             // add additional panels when it's a bundle of rank1 datasets.
@@ -301,7 +372,7 @@ public class PanelController extends DomNodeController {
                         cpanel.controller.getRenderer().setActive(true);
                     }
                     renderer.setActive(false);
-                    PanelController.this.childPanels = cp;
+                    setChildPanels(cp);
                     lock.unlock();
                 }
             } //!dom.controller.isValueAdjusting()
@@ -322,7 +393,7 @@ public class PanelController extends DomNodeController {
         }
 
         public void propertyChange(PropertyChangeEvent evt) {
-            setResetRanges(true);
+            setResetPanel(true);
         }
     };
 
@@ -330,7 +401,6 @@ public class PanelController extends DomNodeController {
         dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
         dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
     }
-
     /**
      * true indicates the controller should autorange next time the fillDataSet is changed.
      */
@@ -351,17 +421,17 @@ public class PanelController extends DomNodeController {
      * true indicates the controller should install a new renderer to implement the
      * renderType selection.
      */
-    public static final String PROP_RESETRENDERER = "resetRenderer";
-    protected boolean resetRenderer = false;
+    protected boolean resetPanel = true;
+    public static final String PROP_RESETPANEL = "resetPanel";
 
-    public boolean isResetRenderer() {
-        return resetRenderer;
+    public boolean isResetPanel() {
+        return resetPanel;
     }
 
-    public void setResetRenderer(boolean resetRenderer) {
-        boolean oldResetRenderer = this.resetRenderer;
-        this.resetRenderer = resetRenderer;
-        propertyChangeSupport.firePropertyChange(PROP_RESETRENDERER, oldResetRenderer, resetRenderer);
+    public void setResetPanel(boolean resetPanel) {
+        boolean oldResetPanel = this.resetPanel;
+        this.resetPanel = resetPanel;
+        propertyChangeSupport.firePropertyChange(PROP_RESETPANEL, oldResetPanel, resetPanel);
     }
 
 
@@ -403,12 +473,10 @@ public class PanelController extends DomNodeController {
      * TODO: I think this is invoked for overplots.
      * @param autorange
      */
-    private synchronized void doResetRanges( boolean autorange ) {
+    private synchronized void doResetRanges(boolean autorange) {
         logger.finest("doResetRanges...");
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
-        setRenderType(panel.getRenderType());
-        setResetRenderer(false);
         Plot plot = dom.controller.getPlotFor(panel);
 
         Panel panelCopy = (Panel) panel.copy();
@@ -718,29 +786,32 @@ public class PanelController extends DomNodeController {
     /**
      * used to explicitly set the rendering type.  This installs a das2 renderer
      * into the plot to implement the render type.
+     *
+     * preconditions:
+     *   renderer type has been identified.
+     * postconditions:
+     *   das2 renderer peer is created and bindings made.
      * @param renderType
      */
-    public void setRenderType(RenderType renderType) {
+    public void resetRenderType(RenderType renderType) {
         if (this.parentPanel != null && !this.parentPanel.renderType.equals(renderType)) {
             this.parentPanel.setRenderType(renderType);
             return;
         }
 
-        if (childPanels != null) { // kludge
-            if (renderType == RenderType.spectrogram) {
-                //RenderType.spectrogram changes the rank of the view, so we need to
-                //treat it specially.
+        /*if (childPanels != null) { // kludge
+        if (renderType == RenderType.spectrogram) {
+        //RenderType.spectrogram changes the rank of the view, so we need to
+        //treat it specially.
+        this.setResetRanges(true);
+        this.resetPanel(dsf.controller.getFillDataSet(),renderType);
 
-                this.childPanels = null;
-                this.setResetRanges(true);
-                this.resetPanel(dsf.controller.getFillDataSet(),renderType);
-
-            } else {
-                for (Panel p : this.childPanels) {
-                    p.setRenderType(renderType);
-                }
-            }
+        } else {
+        for (Panel p : this.childPanels) {
+        p.setRenderType(renderType);
         }
+        }
+        }*/
 
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
