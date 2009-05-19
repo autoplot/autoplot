@@ -69,7 +69,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     private int plotIdNum = 0;
     private AtomicInteger panelIdNum = new AtomicInteger(0);
     private int dsfIdNum = 0;
-    
+
     ApplicationControllerSyncSupport syncSupport;
     ApplicationControllerSupport support;
     /** When non-null, we have the lock */
@@ -78,7 +78,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     public ApplicationController(ApplicationModel model, Application application) {
         super( application );
-        
+
         this.application = application;
         this.syncSupport = new ApplicationControllerSyncSupport(this);
         this.support = new ApplicationControllerSupport(this);
@@ -124,18 +124,19 @@ public class ApplicationController extends DomNodeController implements RunLater
     PropertyChangeListener domListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
-            logger.finest("dom change: " + evt.getPropertyName() + evt.getOldValue() + "->" + evt.getNewValue());
+
+            logger.finest("dom change: " + evt.getSource() + "." + evt.getPropertyName() + " (" + evt.getOldValue() + "->" + evt.getNewValue() +")");
 
             Object src = evt.getSource();
             if ( src instanceof DomNode ) {
                 DomNodeController c= DomNodeController.getController((DomNode)src);
-                //if ( c!=null && c.isValueAdjusting()) return;
+            //if ( c!=null && c.isValueAdjusting()) return;
             }
 
             if ( !isValueAdjusting() ) {
                 fireActionEvent(new ActionEvent(evt.getSource(), eventId.incrementAndGet(), evt.getPropertyName()));
             }
-            
+
             Object oldValue = evt.getOldValue();
             if (oldValue != null) {
                 if (oldValue instanceof DomNode) {
@@ -147,9 +148,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                         final DomNode d= ((DomNode) Array.get(oldValue, i));
                         d.removePropertyChangeListener(domListener);
                         for ( DomNode k: d.childNodes() ) k.removePropertyChangeListener(domListener);
+                        }
                     }
                 }
-            }
 
             Object newValue = evt.getNewValue();
             if (newValue != null) {
@@ -162,10 +163,10 @@ public class ApplicationController extends DomNodeController implements RunLater
                         final DomNode d= ((DomNode) Array.get(newValue, i));
                         d.addPropertyChangeListener(domListener);
                         for ( DomNode k: d.childNodes() ) k.addPropertyChangeListener(domListener);
+                        }
                     }
                 }
             }
-        }
     };
     FocusAdapter focusAdapter = new FocusAdapter() {
 
@@ -372,6 +373,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public void deletePanel(Panel panel) {
+        logger.fine("deletePanel("+panel+")");
         int currentIdx = application.panels.indexOf(panel);
         if (currentIdx == -1) {
             throw new IllegalArgumentException("deletePanel but panel isn't part of application");
@@ -420,7 +422,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param domPlot
      */
     protected void addConnector(Plot domPlot, Plot that) {
-
+        logger.fine( "addConnector("+domPlot+","+that+")" );
         List<Connector> connectors = new ArrayList<Connector>(Arrays.asList(application.getConnectors()));
         final Connector connector = new Connector(domPlot.getId(), that.getId());
         connectors.add(connector);
@@ -452,6 +454,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public void deleteConnector(Connector connector) {
+        logger.fine( "deleteConnector("+connector+")" );
         ColumnColumnConnector impl = connectorImpls.get(connector);
         getDasCanvas().remove(impl);
 
@@ -478,7 +481,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         p.setPlotId(dst.getId());
 
         ApplicationModel.RenderType rt = p.getRenderType();
-        p.controller.setRenderType(rt);
+        p.controller.resetRenderType(rt);
 
     }
     PropertyChangeListener plotIdListener = new PropertyChangeListener() {
@@ -518,7 +521,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     public Panel addPanel(Plot domPlot, DataSourceFilter dsf) {
-        logger.fine("enter addPanel");
+        logger.fine("enter addPanel("+domPlot+","+dsf+")");
 
         final int fpanelIdNum = this.panelIdNum.getAndIncrement();
         final Panel panel1 = new Panel();
@@ -677,11 +680,34 @@ public class ApplicationController extends DomNodeController implements RunLater
             return newPlot;
         }
 
+        List<Panel> newPanels = new ArrayList<Panel>();
         for (Panel srcPanel : p) {
-            Panel newp = copyPanel(srcPanel, newPlot, dsf);
+            if (!srcPanel.getComponent().equals("")) {
+                // parent should have copied it.
+            } else {
+                Panel newp = copyPanel(srcPanel, newPlot, dsf);
+                newPanels.add(newp);
+                List<Panel> kids = srcPanel.controller.getChildPanels();
+                List<Panel> newKids = new ArrayList();
+                DataSourceFilter dsf1 = getDataSourceFilterFor(newp);
+                for (Panel k : kids) {
+                    if (p.contains(k)) {
+                        Panel kidp = copyPanel(k, newPlot, dsf1);
+                        kidp.getController().setParentPanel(newp);
+                        newPanels.add(kidp);
+                        newKids.add(kidp);
+                    }
+                }
+                newp.getController().setChildPanels(newKids);
+            }
         }
 
         lock.unlock();
+
+        for (Panel newp : newPanels) {
+            newp.getController().setResetRanges(false);
+            newp.getController().setResetPanel(false);
+        }
 
         return newPlot;
 
@@ -695,17 +721,13 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     protected Panel copyPanel(Panel srcPanel, Plot domPlot, DataSourceFilter dsf) {
+        logger.finer( "copyPanel("+srcPanel+","+domPlot+","+dsf+")");
         Panel newp = addPanel(domPlot, dsf);
         newp.syncTo(srcPanel, Arrays.asList("plotId", "dataSourceFilterId"));
         if (dsf == null) { // new DataSource, but with the same URI.
             DataSourceFilter dsfnew = newp.controller.getDataSourceFilter();
             DataSourceFilter dsfsrc = srcPanel.controller.getDataSourceFilter();
-            dsfnew.controller.setRawProperties(dsfsrc.controller.getRawProperties());
-            dsfnew.controller._setProperties(dsfsrc.controller.getProperties());
-            dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet());
-            if (dsfsrc.getUri() != null) {
-                dsfnew.setUri(dsfsrc.getUri());
-            }
+            copyDataSourceFilter(dsfsrc, dsfnew);
         }
         return newp;
     }
@@ -744,6 +766,21 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         return that;
+    }
+
+    /**
+     * copy the dataSourceFilter, including its controller and loaded data.
+     * @param dsf
+     */
+    protected void copyDataSourceFilter(DataSourceFilter dsfsrc, DataSourceFilter dsfnew) {
+        dsfnew.controller.setRawProperties(dsfsrc.controller.getRawProperties());
+        dsfnew.controller._setProperties(dsfsrc.controller.getProperties());
+        dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet());
+        if (dsfsrc.getUri() != null) {
+            dsfnew.setUri(dsfsrc.getUri());
+        }
+        dsfnew.controller.setDataSource(false,dsfsrc.controller._getDataSource());
+        dsfnew.controller.setUriNeedsResolution(false);
     }
 
     /**
@@ -886,7 +923,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
         if ( converter!=null ) b.setConverter( converter );
-        
+
         bc.addBinding(b);
 
         String srcId = src.getId();
@@ -1004,9 +1041,6 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
         return result.toArray(new BindingModel[result.size()]);
     }
-
-
-
     protected String status = "";
     public static final String PROP_STATUS = "status";
 
@@ -1231,7 +1265,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         lock.unlock();
         for (Panel p : application.getPanels()) {  // kludge to avoid reset range
             p.controller.setResetRanges(false);
-            p.controller.setResetRenderer(true);
+            p.controller.setResetPanel(true);
         }
     }
 
