@@ -4,10 +4,7 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.virbo.autoplot.ApplicationModel.RenderType;
 
@@ -213,6 +210,7 @@ public class Panel extends DomNode {
         if ( !that.dataSourceFilterId.equals( this.dataSourceFilterId ) ) {
             result.add( new PropertyChangeDiff( "dataSourceFilterId", that.dataSourceFilterId, this.dataSourceFilterId ) );
         }
+
         if ( !that.component.equals( this.component ) ) {
             result.add( new PropertyChangeDiff(  PROP_COMPONENT, that.component, this.component ) );
         }
