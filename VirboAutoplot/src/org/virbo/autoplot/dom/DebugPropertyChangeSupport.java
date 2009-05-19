@@ -8,6 +8,7 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
 import java.beans.PropertyChangeSupport;
+import java.util.Arrays;
 
 /**
  *
@@ -18,6 +19,16 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
     public DebugPropertyChangeSupport( Object bean ) {
         super(bean);
     }
+
+    @Override
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
+        //TODO: danger--remove this from production code.
+        if ( Arrays.asList(getPropertyChangeListeners()).contains( listener ) ) {
+            return;
+        }
+        super.addPropertyChangeListener(listener);
+    }
+
     
     @Override
     public String toString() {
