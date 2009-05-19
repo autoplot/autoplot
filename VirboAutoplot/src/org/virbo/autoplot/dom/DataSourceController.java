@@ -91,13 +91,14 @@ public class DataSourceController extends DomNodeController {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
+                setUriNeedsResolution(true);
                 if (!dom.controller.isValueAdjusting()) {
                     resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
                 } else {
                     new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller) {
                         @Override
                         public void run() {
-                            resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
+                            if ( uriNeedsResolution ) resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
                         }
                     };
                 }
@@ -905,6 +906,7 @@ public class DataSourceController extends DomNodeController {
      */
     public synchronized void setSuri(String suri, ProgressMonitor mon) {
         dsf.setUri(suri);
+        setUriNeedsResolution(true);
     }
 
     /**
@@ -940,6 +942,7 @@ public class DataSourceController extends DomNodeController {
         String surl = dsf.getUri();
         if (surl == null) {
             setDataSource(valueWasAdjusting,null);
+            setUriNeedsResolution(false);
             changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
         } else {
             URLSplit split = URLSplit.parse(surl);
@@ -965,6 +968,8 @@ public class DataSourceController extends DomNodeController {
                     DataSource source = DataSetURL.getDataSource(surl);
                     setDataSource(valueWasAdjusting,source);
                 }
+                setUriNeedsResolution(false);
+                
                 changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
 
                 mon.setProgressMessage("done getting data source");
@@ -975,6 +980,22 @@ public class DataSourceController extends DomNodeController {
                 mon.finished();
             }
         }
+    }
+
+    protected boolean uriNeedsResolution = false;
+    /**
+     * true if the URI has been changed, and must be resolved into a DataSource.
+     */
+    public static final String PROP_URINEEDSRESOLUTION = "uriNeedsResolution";
+
+    public boolean isUriNeedsResolution() {
+        return uriNeedsResolution;
+    }
+
+    public void setUriNeedsResolution(boolean uriNeedsResolution) {
+        boolean oldUriNeedsResolution = this.uriNeedsResolution;
+        this.uriNeedsResolution = uriNeedsResolution;
+        propertyChangeSupport.firePropertyChange(PROP_URINEEDSRESOLUTION, oldUriNeedsResolution, uriNeedsResolution);
     }
 
     /**
