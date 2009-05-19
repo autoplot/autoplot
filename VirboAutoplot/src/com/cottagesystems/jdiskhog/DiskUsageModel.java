@@ -81,7 +81,7 @@ public class DiskUsageModel {
             }
             dirUsage.put(f, totalSizeKB);
         } catch (NullPointerException ex) {
-            System.err.println("here");
+            System.err.println("here NullPointerException in DiskUsageModel");
         }
 
 
