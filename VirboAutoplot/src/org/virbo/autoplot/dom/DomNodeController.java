@@ -24,7 +24,7 @@ public class DomNodeController {
 
     DomNode node;
 
-    protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    protected PropertyChangeSupport propertyChangeSupport = new DebugPropertyChangeSupport(this);
     protected ChangesSupport changesSupport = new ChangesSupport(propertyChangeSupport, this);
 
     public DomNodeController( DomNode node ) {
