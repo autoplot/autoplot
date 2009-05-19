@@ -25,26 +25,34 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
     String propertyName;
 
     int invocationCount=0;
+    private static int instanceCount=0;
 
     public RunLaterListener( String propertyName, PropertyChange node ) {
-        if ( propertyName!=null ) {
-            node.addPropertyChangeListener( propertyName, this );
-        } else {
-            node.addPropertyChangeListener( this );
-        }
+        instanceCount++;
+
         this.node= node;
         this.propertyName= propertyName;
+
+        if ( propertyName!=null ) {
+            this.node.addPropertyChangeListener( propertyName, this );
+        } else {
+            this.node.addPropertyChangeListener( this );
+        }
+        
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
+        invocationCount++;
+        if ( invocationCount>1 ) {
+            //throw new IllegalArgumentException("this doesn't work");
+        }
         if ( propertyName!=null ) {
             node.removePropertyChangeListener(propertyName,this);
         } else {
             node.removePropertyChangeListener(this);
         }
-        invocationCount++;
         if ( invocationCount>1 ) {
-            throw new IllegalArgumentException("this doesn't work");
+            return;
         }
         run();
     }
