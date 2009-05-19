@@ -338,6 +338,14 @@ public class DomUtil {
         List<Object> node2List = new ArrayList<Object>(Arrays.asList(nodes2));
 
         List<Object> deleteList = new ArrayList<Object>();
+        int i2=0;
+        for ( Object o: nodes2 ) {
+            if ( indexOf( node2List, o )!=i2 ) {
+                deleteList.add( o );
+                new IllegalArgumentException("two nodes have the same ID: "+o).printStackTrace();
+            } // throw IllegalArgumentException("two nodes have the same ID: "+o);
+            i2++;
+        }
         for ( Object o: nodes2 ) {
             if ( indexOf( node1List, o )==-1 ) deleteList.add( o );
         }
