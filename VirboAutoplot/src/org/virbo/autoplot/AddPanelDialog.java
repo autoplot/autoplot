@@ -110,35 +110,29 @@ public class AddPanelDialog extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(secondaryCheckBox)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(secondaryCheckBox)
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(secondaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .add(tertiaryCheckBox)
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(tertiaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap(371, Short.MAX_VALUE)
+                        .add(cancelButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(overplotButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(plotBelowButton)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(plotButton))
+                    .add(primaryCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 572, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(primaryDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE)))
                 .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(secondaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .add(tertiaryCheckBox)
-                .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(tertiaryDataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(371, Short.MAX_VALUE)
-                .add(cancelButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(overplotButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(plotBelowButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(plotButton)
-                .addContainerGap())
-            .add(layout.createSequentialGroup()
-                .add(primaryCheckBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 572, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(83, Short.MAX_VALUE))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(primaryDataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 643, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -242,6 +236,17 @@ public class AddPanelDialog extends javax.swing.JDialog {
         } else {
             return -1;
         }
+    }
+
+    public void setDepCount(int i) {
+        primaryCheckBox.setSelected( i>-1 );
+        primaryDataSetSelector.setVisible(i>-1);
+        secondaryCheckBox.setVisible(i>-1);
+        secondaryCheckBox.setSelected( i>0 );
+        secondaryDataSetSelector.setVisible(i>0);
+        tertiaryCheckBox.setVisible(i>0);
+        tertiaryCheckBox.setSelected( i>1 );
+        tertiaryDataSetSelector.setVisible(i>1);
     }
 
     protected boolean cancelled = true;
