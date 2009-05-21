@@ -48,12 +48,6 @@ public class PanelController extends DomNodeController {
     private Application dom;
     private ApplicationModel appmodel;  //TODO: get rid of this
     private Panel panel;
-    /** when additional panels are automatically added, this panel keeps the original and 
-     * perhaps default settings for the child panels.
-     */
-    private Panel parentPanel;
-    private List<Panel> childPanels;
-
     private DataSourceFilter dsf; // This is the one we are listening to.
     /**
      * switch over between fine and course points.
@@ -78,11 +72,11 @@ public class PanelController extends DomNodeController {
      * @return
      */
     public List<Panel> getChildPanels() {
-        if (childPanels == null) {
-            return Collections.emptyList();
-        } else {
-            return Collections.unmodifiableList(childPanels);
+        ArrayList<Panel> result= new ArrayList();
+        for ( Panel pp: dom.panels ) {
+            if ( pp.getParentPanel().equals( panel.getId() ) ) result.add(pp);
         }
+        return result;
     }
 
     /**
@@ -90,7 +84,9 @@ public class PanelController extends DomNodeController {
      * @param panels
      */
     protected void setChildPanels(List<Panel> panels) {
-        this.childPanels = panels;
+        for ( Panel p: panels ) {
+            p.setParentPanel(panel.getId());
+        }
     }
 
     /**
@@ -98,11 +94,18 @@ public class PanelController extends DomNodeController {
      * @param p
      */
     protected void setParentPanel(Panel p) {
-        this.parentPanel = p;
+        panel.setParentPanel( p.getId() );
     }
 
     public Panel getParentPanel() {
-        return this.parentPanel;
+        if ( panel.getParentPanel().equals("") ) {
+            return null;
+        } else {
+            for ( Panel pp: dom.panels ) {
+                if ( pp.getId().equals( panel.getParentPanel() ) ) return pp;
+            }
+            return null; // TODO: maybe throw exception!
+        }
     }
 
     /**
@@ -137,6 +140,7 @@ public class PanelController extends DomNodeController {
             if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) {
                 RenderType newRenderType = (RenderType) evt.getNewValue();
                 RenderType oldRenderType = (RenderType) evt.getOldValue();
+                Panel parentPanel= getParentPanel();
                 if (parentPanel != null) {
                     parentPanel.setRenderType(newRenderType);
                 } else {
@@ -153,6 +157,17 @@ public class PanelController extends DomNodeController {
             }
         }
     };
+
+    private boolean needNewChildren(String[] labels, List<Panel> childPanels) {
+        if ( childPanels.size()==0 ) return true;
+        List<String> ll= Arrays.asList(labels);
+        for ( Panel p: childPanels ) {
+            if ( !ll.contains( p.getComponent() ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private void resetDataSourceFilter() {
         if (dsf != null) {
@@ -232,7 +247,12 @@ public class PanelController extends DomNodeController {
                 }
             }
             if (label == null && !isPendingChanges() ) {
-                throw new IllegalArgumentException("component not found: " + panel.getComponent());
+                RuntimeException ex= new RuntimeException("component not found " + panel.getComponent() );
+                if ( getRenderer()!=null ) {
+                    getRenderer().setException( ex );
+                } else {
+                    throw ex;
+                }
             }
         }
 
@@ -257,6 +277,7 @@ public class PanelController extends DomNodeController {
             }
         }
     }
+
     PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
 
         public synchronized void propertyChange(PropertyChangeEvent evt) {
@@ -268,10 +289,16 @@ public class PanelController extends DomNodeController {
             logger.fine("got new dataset: " + fillDs);
             if (fillDs != null) {
                 if (resetPanel) {
-                    RenderType renderType = AutoplotUtil.getRenderType(fillDs);
-                    panel.renderType= renderType;
-                    resetPanel(fillDs, renderType);
-                    setResetPanel(false);
+                    if ( panel.getComponent().equals("") ) {
+                        RenderType renderType = AutoplotUtil.getRenderType(fillDs);
+                        panel.renderType= renderType;
+                        resetPanel(fillDs, renderType);
+                        setResetPanel(false);
+                    } else {
+                        if ( renderer==null ) createDasPeer();
+                        if ( resetRanges ) doResetRanges(true);
+                        setResetPanel(false);
+                    }
                 } else if (resetRanges) {
                     doResetRanges(true);
                 }
@@ -280,6 +307,7 @@ public class PanelController extends DomNodeController {
             if (fillDs == null) {
                 if (getRenderer() != null) {
                     getRenderer().setDataSet(null);
+                    getRenderer().setException(null); // remove leftover message.
                 }
             } else {
                 setDataSet(fillDs);
@@ -323,60 +351,82 @@ public class PanelController extends DomNodeController {
      * @param renderType
      */
     private void resetPanel(QDataSet fillDs, RenderType renderType) {
-        logger.finest("resetPanel..." + fillDs + " " + renderType);
+        logger.finest("resetPanel(" + fillDs + " " + renderType+") panel="+ panel );
         if (renderer != null) {
             renderer.setActive(true);
         }
 
-        if (childPanels != null) {
-            for (Panel p : this.childPanels) {
-                if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
-                    dom.controller.deletePanel(p);
+        if (fillDs != null) {
+
+            boolean shouldHaveChildren= fillDs.rank() == 2
+                    &&  ( renderType != RenderType.spectrogram )
+                    &&  fillDs.length(0) < 12;
+
+            String[] labels = null;
+            if ( shouldHaveChildren ) labels= SemanticOps.getComponentLabels(fillDs);
+
+            boolean weShallAddChildren=
+                    !dom.controller.isValueAdjusting()
+                    && shouldHaveChildren
+                    && needNewChildren( labels, getChildPanels() );
+
+            if ( !shouldHaveChildren || weShallAddChildren ) {
+                List<Panel> childPanels= getChildPanels();
+                for ( Panel p : childPanels ) {
+                    if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
+                        dom.controller.deletePanel(p);
+                    }
                 }
             }
-        }
 
-        if (fillDs != null) {
             resetRenderType(panel.getRenderType());
             setResetPanel(false);
 
-            doResetRanges(true);
+            if ( resetRanges ) {
+                doResetRanges(true);
+                setResetRanges(false);
+            }
 
-            setResetRanges(false);
+            if ( shouldHaveChildren ) {
+                renderer.setActive(false);
+                panel.setDisplayLegend(false);
+            }
 
             // add additional panels when it's a bundle of rank1 datasets.
-            if (!dom.controller.isValueAdjusting()) {
-                if ( fillDs.rank() == 2 && ( renderType != RenderType.spectrogram ) && fillDs.length(0) < 12) {
-                    MutatorLock lock = dom.controller.mutatorLock();
-                    lock.lock();
-                    renderer.setActive(false);
-                    String[] labels = SemanticOps.getComponentLabels(fillDs);
-                    Color c = panel.getStyle().getColor();
-                    Color fc= panel.getStyle().getFillColor();
-                    Plot domPlot = dom.controller.getPlotFor(panel);
-                    List<Panel> cp = new ArrayList<Panel>(fillDs.length(0));
-                    for (int i = 0; i < fillDs.length(0); i++) {
-                        Panel cpanel = dom.controller.copyPanel(panel, domPlot, dsf);
-                        cpanel.controller.getRenderer().setActive(false);
-                        cp.add(cpanel);
-                        cpanel.controller.parentPanel = panel;
-                        cpanel.getStyle().setColor(deriveColor(c, i));
-                        cpanel.getStyle().setFillColor( deriveColor(fc,i).brighter() );
-                        cpanel.setComponent(labels[i]);
-                        cpanel.setDisplayLegend(true);
-                        cpanel.setLegendLabel(labels[i].trim());
-                        cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
-                        cpanel.controller.setDataSet(fillDs);
-                    }
-                    for ( Panel cpanel: cp ) {
-                        cpanel.controller.getRenderer().setActive(true);
-                    }
-                    renderer.setActive(false);
-                    setChildPanels(cp);
-                    lock.unlock();
+            if ( weShallAddChildren ) {
+
+                MutatorLock lock = dom.controller.mutatorLock();
+                lock.lock();
+
+                Color c = panel.getStyle().getColor();
+                Color fc= panel.getStyle().getFillColor();
+                Plot domPlot = dom.controller.getPlotFor(panel);
+                List<Panel> cp = new ArrayList<Panel>(fillDs.length(0));
+                for (int i = 0; i < fillDs.length(0); i++) {
+                    Panel cpanel = dom.controller.copyPanel(panel, domPlot, dsf);
+                    cpanel.controller.getRenderer().setActive(false);
+                    cp.add(cpanel);
+                    cpanel.setParentPanel( panel.getId() );
+                    cpanel.getStyle().setColor(deriveColor(c, i));
+                    cpanel.getStyle().setFillColor( deriveColor(fc,i).brighter() );
+                    cpanel.setComponent(labels[i]);
+                    cpanel.setDisplayLegend(true);
+                    cpanel.setLegendLabel(labels[i].trim());
+                    cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
+                    cpanel.controller.setDataSet(fillDs);
                 }
-            } //!dom.controller.isValueAdjusting()
-        } //fillDs != null
+                for ( Panel cpanel: cp ) {
+                    cpanel.controller.getRenderer().setActive(true);
+                }
+                renderer.setActive(false);
+                setChildPanels(cp);
+                lock.unlock();
+            }
+
+        } else {
+            resetRenderType(panel.getRenderType());
+            
+        }
     }
 
     /**
@@ -394,6 +444,7 @@ public class PanelController extends DomNodeController {
 
         public void propertyChange(PropertyChangeEvent evt) {
             setResetPanel(true);
+            setResetRanges(true);
         }
     };
 
@@ -441,7 +492,7 @@ public class PanelController extends DomNodeController {
         return renderer;
     }
 
-    public void setRenderer(Renderer renderer) {
+    private void setRenderer(Renderer renderer) {
         this.renderer = renderer;
         if (renderer instanceof SeriesRenderer) {
             bindToSeriesRenderer((SeriesRenderer) renderer);
@@ -490,7 +541,11 @@ public class PanelController extends DomNodeController {
             doAutoranging(panelCopy);
         }
 
-        panel.syncTo(panelCopy);
+        if ( panel.getComponent().equals("") ) {
+            panel.syncTo(panelCopy);
+        } else {
+            panel.syncTo(panelCopy,Collections.singletonList(Panel.PROP_LEGENDLABEL) );
+        }
 
         plot.syncTo(panel.getPlotDefaults());
 
@@ -783,38 +838,9 @@ public class PanelController extends DomNodeController {
         return dsf;
     }
 
-    /**
-     * used to explicitly set the rendering type.  This installs a das2 renderer
-     * into the plot to implement the render type.
-     *
-     * preconditions:
-     *   renderer type has been identified.
-     * postconditions:
-     *   das2 renderer peer is created and bindings made.
-     * @param renderType
-     */
-    public void resetRenderType(RenderType renderType) {
-        if (this.parentPanel != null && !this.parentPanel.renderType.equals(renderType)) {
-            this.parentPanel.setRenderType(renderType);
-            return;
-        }
-
-        /*if (childPanels != null) { // kludge
-        if (renderType == RenderType.spectrogram) {
-        //RenderType.spectrogram changes the rank of the view, so we need to
-        //treat it specially.
-        this.setResetRanges(true);
-        this.resetPanel(dsf.controller.getFillDataSet(),renderType);
-
-        } else {
-        for (Panel p : this.childPanels) {
-        p.setRenderType(renderType);
-        }
-        }
-        }*/
-
+    private void createDasPeer(){
         Renderer oldRenderer = getRenderer();
-        Renderer newRenderer = AutoplotUtil.maybeCreateRenderer(renderType, oldRenderer, getColorbar());
+        Renderer newRenderer = AutoplotUtil.maybeCreateRenderer( panel.getRenderType(), oldRenderer, getColorbar() );
 
         if (oldRenderer != newRenderer) {
             setRenderer(newRenderer);
@@ -832,6 +858,40 @@ public class PanelController extends DomNodeController {
             }
         }
 
+    }
+
+    /**
+     * used to explicitly set the rendering type.  This installs a das2 renderer
+     * into the plot to implement the render type.
+     *
+     * preconditions:
+     *   renderer type has been identified.
+     * postconditions:
+     *   das2 renderer peer is created and bindings made.
+     * @param renderType
+     */
+    public void resetRenderType(RenderType renderType) {
+        Panel parentPanel= getParentPanel();
+        if ( parentPanel != null ) {
+            parentPanel.setRenderType(renderType);
+            return;
+        }
+
+        /*if (childPanels != null) { // kludge
+        if (renderType == RenderType.spectrogram) {
+        //RenderType.spectrogram changes the rank of the view, so we need to
+        //treat it specially.
+        this.setResetRanges(true);
+        this.resetPanel(dsf.controller.getFillDataSet(),renderType);
+
+        } else {
+        for (Panel p : this.childPanels) {
+        p.setRenderType(renderType);
+        }
+        }
+        }*/
+
+        createDasPeer();
     }
 
     public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
