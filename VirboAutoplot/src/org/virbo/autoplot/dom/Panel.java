@@ -62,7 +62,7 @@ public class Panel extends DomNode {
         this.plotDefaults = plot;
         propertyChangeSupport.firePropertyChange(PROP_PLOT_DEFAULTS, oldPlot, plot);
     }
-    protected RenderType renderType = RenderType.spectrogram;
+    protected RenderType renderType = RenderType.series;
     public static final String PROP_RENDERTYPE = "renderType";
 
     public RenderType getRenderType() {
@@ -91,7 +91,24 @@ public class Panel extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_PLOTID, oldPlotId, plotId);
     }
     
-    
+    protected String parentPanel = "";
+    /**
+     * id of this panel's parent, which groups the panels into one abstract
+     * plot.  The parent and children must share the same dataSourceFilter.
+     */
+    public static final String PROP_PARENTPANEL = "parentPanel";
+
+    public String getParentPanel() {
+        return parentPanel;
+    }
+
+    public void setParentPanel(String parentPanel) {
+        String oldParentPanel = this.parentPanel;
+        this.parentPanel = parentPanel;
+        propertyChangeSupport.firePropertyChange(PROP_PARENTPANEL, oldParentPanel, parentPanel);
+    }
+
+
     /**
      * selects the component of the dataset to plot, such as "X" or "MAGNITUDE".  These
      * component names come from the dataset labels.  Canonical names are 
@@ -231,6 +248,7 @@ public class Panel extends DomNode {
         Panel that = (Panel) n;
         if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
         if ( !exclude.contains( PROP_DATASOURCEFILTERID ) ) this.setDataSourceFilterId(that.getDataSourceFilterId());
+        if ( !exclude.contains( PROP_PARENTPANEL ) ) this.setParentPanel(that.getParentPanel());
         if ( !exclude.contains( PROP_COMPONENT ) ) this.setComponent(that.getComponent());
         if ( !exclude.contains( PROP_LEGENDLABEL ) ) this.setLegendLabel(that.getLegendLabel());
         if ( !exclude.contains( PROP_DISPLAYLEGEND ) ) this.setDisplayLegend(that.isDisplayLegend());
