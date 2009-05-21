@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -349,8 +350,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         DasCanvas.setDisableActions(true);
 
         //if ( canvas!=null ) throw new IllegalArgumentException("only one canvas for now");
-        DasCanvas dasCanvas = new DasCanvas();
         Canvas lcanvas = new Canvas();
+        DasCanvas dasCanvas = new DasCanvas(lcanvas.getWidth(),lcanvas.getHeight());
 
         lcanvas.setId("canvas_0");
         new CanvasController(application, lcanvas).setDasCanvas(dasCanvas);
@@ -560,6 +561,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             setPanel(panel1);
         }
 
+        panel1.getController().resetRenderType( panel1.getRenderType() );
         return panel1;
     }
 
@@ -683,7 +685,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         List<Panel> newPanels = new ArrayList<Panel>();
         for (Panel srcPanel : p) {
             if (!srcPanel.getComponent().equals("")) {
-                // parent should have copied it.
+                if ( srcPanel.getController().getParentPanel()==null ) {
+                    Panel newp = copyPanel(srcPanel, newPlot, dsf);
+                    newPanels.add(newp);
+                }
             } else {
                 Panel newp = copyPanel(srcPanel, newPlot, dsf);
                 newPanels.add(newp);
@@ -698,7 +703,6 @@ public class ApplicationController extends DomNodeController implements RunLater
                         newKids.add(kidp);
                     }
                 }
-                newp.getController().setChildPanels(newKids);
             }
         }
 
@@ -893,6 +897,59 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
+     * resets the dom to the initial state by deleting added panels, plots and data sources.
+     */
+    public void reset() {
+        MutatorLock lock= mutatorLock();
+        lock.lock();
+
+        for ( int i=application.getPanels().length-1; i>0; i-- ) {
+            deletePanel( application.getPanels(i) ); //may delete dsf and plots as well.
+        }
+
+        for ( int i=application.getDataSourceFilters().length-1; i>0; i-- ) {
+            deleteDataSourceFilter( application.getDataSourceFilters(i) );
+        }
+
+        for ( int i=application.getPlots().length-1; i>0; i-- ) {
+            deletePlot( application.getPlots(i) );
+        }
+
+        for ( int i=application.getBindings().length-1; i>0; i-- ) {
+            deleteBinding( application.getBindings(i) );
+        }
+
+        Canvas c= application.getCanvases(0);
+        for ( int i=c.getRows().length-1; i>0; i-- ) {
+            c.getController().deleteRow(c.getRows(i));
+        }
+
+        if ( c.getRows().length>0 ) {
+            c.getRows(0).syncTo( new Row(), Arrays.asList("id","top","bottom") );
+            c.getRows(0).setTop("0%");
+            c.getRows(0).setBottom("100%");
+        }
+
+        for ( int i=c.getColumns().length-1; i>0; i-- ) {
+            c.getController().deleteColumn(c.getColumns(i));
+        }
+
+        if ( c.getColumns().length>0 ) {
+            c.getColumns(0).syncTo( new Column(), Arrays.asList("id","left","right") );
+            c.getColumns(0).setLeft("0%");
+            c.getColumns(0).setRight("100%");
+        }
+
+        application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList("id") );
+        application.getDataSourceFilters(0).getController().setDataSetInternal(null);
+        application.getPlots(0).syncTo( new Plot(), Arrays.asList("id",Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+        application.getPanels(0).syncTo( new Panel(), Arrays.asList("id",Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID) );
+
+        lock.unlock();
+    }
+
+
+    /**
      * binds two bean properties together.  Bindings are bidirectional, but
      * the initial copy is from src to dst.  In MVC terms, src should be the model
      * and dst should be a view.  The properties must fire property
@@ -910,22 +967,9 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param dstProp a property name such as "label"
      */
     public void bind(DomNode src, String srcProp, Object dst, String dstProp, Converter converter ) {
-        BindingGroup bc;
-        synchronized (bindingContexts) {
-            bc = bindingContexts.get(src);
-            if (bc == null) {
-                bc = new BindingGroup();
-                bindingContexts.put(src, bc);
-            }
-        }
-
-        Binding b;
-
-        b = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
-        if ( converter!=null ) b.setConverter( converter );
-
-        bc.addBinding(b);
-
+        
+        logger.finer( "bind "+ src+"."+ srcProp +" to "+ dst + "."+ dstProp );
+        
         String srcId = src.getId();
 
         String dstId = "???";
@@ -936,17 +980,39 @@ public class ApplicationController extends DomNodeController implements RunLater
             dstId = "das2:" + ((DasCanvasComponent) dst).getDasName();
         }
 
-        BindingModel bb = new BindingModel(srcId, srcId, srcProp, dstId, dstProp);
+        BindingModel bindingModel = new BindingModel(srcId, srcId, srcProp, dstId, dstProp);
+
+        if ( application.bindings.contains(bindingModel) ) {
+            logger.finest("binding already exists, ignoring");
+            setStatus("binding already exists: "+bindingModel );
+            return;
+        }
+
+        // now do the implementation
+        BindingGroup bc;
+        synchronized (bindingContexts) {
+            bc = bindingContexts.get(src);
+            if (bc == null) {
+                bc = new BindingGroup();
+                bindingContexts.put(src, bc);
+            }
+        }
+
+        Binding binding;
+
+        binding = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
+        if ( converter!=null ) binding.setConverter( converter );
 
         if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
             List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
-            bindings.add(bb);
+            bindings.add(bindingModel);
             application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
+            bc.addBinding(binding);
         }
 
-        b.bind();
+        binding.bind();
 
-        this.bindingImpls.put(bb, b);
+        this.bindingImpls.put(bindingModel, binding);
     }
 
     public void bind( DomNode src, String srcProp, Object dst, String dstProp) {
@@ -965,8 +1031,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             for (BindingModel b : application.getBindings()) {
                 if (b.getSrcId().equals(src.getId()) || b.getDstId().equals(src.getId())) {
                     bb.remove(b);
-                    bindingImpls.get(b).unbind();
-                    bindingImpls.remove(b);
+                    Binding bimpl= bindingImpls.get(b);
+                    if ( bimpl!=null ) {
+                        bimpl.unbind();
+                        bindingImpls.remove(b);
+                    }
                 }
             }
             application.setBindings(bb.toArray(new BindingModel[bb.size()]));
