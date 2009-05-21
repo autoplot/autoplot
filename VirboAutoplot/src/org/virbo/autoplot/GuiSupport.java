@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.prefs.Preferences;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ComponentInputMap;
@@ -43,6 +45,8 @@ import javax.swing.filechooser.FileFilter;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceController;
+import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.transferrable.ImageSelection;
@@ -117,6 +121,48 @@ public class GuiSupport {
         new Thread(run, "CopyDataSetToClipboardThread").start();
     }
 
+    public static void editPanel( ApplicationModel applicationModel, Component parent ) {
+        
+        Application dom = applicationModel.dom;
+
+        AddPanelDialog dia = new AddPanelDialog( (Frame)SwingUtilities.getWindowAncestor(parent), true);
+
+        String suri= dom.getController().getFocusUri();
+        Pattern hasKidsPattern= Pattern.compile("vap\\+internal\\:(data_\\d+)(,(data_\\d+))?+(,(data_\\d+))?+");
+        Matcher m= hasKidsPattern.matcher(suri);
+
+        dia.getPrimaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+        dia.getSecondaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+        dia.getTertiaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+
+        if ( m.matches() ) {
+            int depCount= m.group(5)!=null ? 2 : ( m.group(3)!=null ? 1 : ( m.group(1)!=null ? 0 : -1 ) );
+            dia.setDepCount(depCount);
+            if ( m.group(1)!=null ) {
+                DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(1) );
+                dia.getPrimaryDataSetSelector().setValue(dsf.getUri());
+            }
+            if ( m.group(3)!=null ) {
+                DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(3) );
+                dia.getSecondaryDataSetSelector().setValue(dsf.getUri());
+                
+            }
+            if ( m.group(5)!=null ) {
+                DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(5) );
+                dia.getTertiaryDataSetSelector().setValue(dsf.getUri());
+            }
+        } else {
+            dia.getPrimaryDataSetSelector().setValue( suri );
+        }
+        
+        dia.setVisible(true);
+        if (dia.isCancelled()) {
+            return;
+        }
+        handleAddPanelDialog(dia, dom, applicationModel);
+
+    }
+
     void addPanel() {
 
         ApplicationModel applicationModel = parent.applicationModel;
@@ -135,44 +181,7 @@ public class GuiSupport {
         if (dia.isCancelled()) {
             return;
         }
-
-        Plot plot = null;
-        Panel panel = null;
-
-        int modifiers = dia.getModifiers();
-        if ((modifiers & KeyEvent.CTRL_MASK) == KeyEvent.CTRL_MASK) { // new plot
-            plot = null;
-            panel = null;
-        //nothing
-        } else if ((modifiers & KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK) {  // overplot
-            plot = dom.getController().getPlot();
-        } else {
-            panel = dom.getController().getPanel();
-        }
-
-        if (dia.getDepCount() == 0) {
-            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
-            dom.getController().plot(plot, panel,
-                    dia.getPrimaryDataSetSelector().getValue());
-        } else if (dia.getDepCount() == 1) {
-            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
-            applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
-            dom.getController().plot(plot, panel,
-                    dia.getSecondaryDataSetSelector().getValue(),
-                    dia.getPrimaryDataSetSelector().getValue());
-        } else if (dia.getDepCount() == 2) {
-            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
-            applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
-            applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
-            dom.getController().plot(plot, panel,
-                    dia.getSecondaryDataSetSelector().getValue(),
-                    dia.getTertiaryDataSetSelector().getValue(),
-                    dia.getPrimaryDataSetSelector().getValue());
-        } else if (dia.getDepCount() == -1) {
-            if (panel == null) {
-                panel = dom.getController().addPanel(plot, null);
-            }
-        }
+        handleAddPanelDialog(dia, dom, applicationModel);
 
     }
 
@@ -272,6 +281,23 @@ public class GuiSupport {
                         parent.applicationModel.getExceptionHandler().handle(ex);
                     }
                 }
+            }
+        };
+    }
+
+    public Action createNewDOMAction() {
+        return new AbstractAction("New Application...") {
+            public void actionPerformed( ActionEvent e ) {
+                if ( parent.stateSupport.isDirty() ) {
+                    String msg= "The application has been modified.  Do you want to save your changes?";
+                    int result= JOptionPane.showConfirmDialog(parent,msg );
+                    if ( result==JOptionPane.OK_OPTION ) {
+                        parent.stateSupport.saveAs();
+                    } else if ( result==JOptionPane.CANCEL_OPTION ) {
+                        return;
+                    }
+                }
+                parent.dom.getController().reset();
             }
         };
     }
@@ -457,5 +483,39 @@ public class GuiSupport {
                 }
             }
         };
+    }
+
+    private static void handleAddPanelDialog(AddPanelDialog dia, Application dom, ApplicationModel applicationModel) {
+        Plot plot = null;
+        Panel panel = null;
+        int modifiers = dia.getModifiers();
+        if ((modifiers & KeyEvent.CTRL_MASK) == KeyEvent.CTRL_MASK) {
+            // new plot
+            plot = null;
+            panel = null;
+            //nothing
+        } else if ((modifiers & KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK) {
+            // overplot
+            plot = dom.getController().getPlot();
+        } else {
+            panel = dom.getController().getPanel();
+        }
+        if (dia.getDepCount() == 0) {
+            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
+            dom.getController().plot(plot, panel, dia.getPrimaryDataSetSelector().getValue());
+        } else if (dia.getDepCount() == 1) {
+            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
+            applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
+            dom.getController().plot(plot, panel, dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
+        } else if (dia.getDepCount() == 2) {
+            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
+            applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
+            applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
+            dom.getController().plot(plot, panel, dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
+        } else if (dia.getDepCount() == -1) {
+            if (panel == null) {
+                panel = dom.getController().addPanel(plot, null);
+            }
+        }
     }
 }
