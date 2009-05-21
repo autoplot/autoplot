@@ -71,6 +71,9 @@ public class Column extends DomNode {
     public void syncTo(DomNode n) {
         DomUtil.syncTo(this,n);
     }
-
+    
+    public void syncTo(DomNode n, List<String> exclude) {
+        DomUtil.syncTo(this,n,exclude);
+    }
 
 }
