@@ -9,6 +9,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
@@ -285,6 +286,14 @@ public class ApplicationControllerSupport {
             }
         });
         panelMenu.add(item);
+
+        JMenuItem editDataMenu = new JMenuItem(new AbstractAction("Edit Data Source") {
+            public void actionPerformed(ActionEvent e) {
+                GuiSupport.editPanel( controller.model, plot );
+            }
+        });
+        
+        plot.getDasMouseInputAdapter().addMenuItem(editDataMenu);
 
         plot.getDasMouseInputAdapter().addMenuItem(new JSeparator());
 
