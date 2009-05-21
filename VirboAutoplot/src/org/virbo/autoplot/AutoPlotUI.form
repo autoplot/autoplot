@@ -348,15 +348,14 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="dataSetSelector" pref="670" max="32767" attributes="0"/>
+              <Component id="dataSetSelector" pref="669" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="tabbedPanelContainer" alignment="0" pref="694" max="32767" attributes="2"/>
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="statusLabel" min="-2" pref="513" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+          <Component id="statusLabel" alignment="0" pref="693" max="32767" attributes="0"/>
+          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
+              <Component id="tabbedPanelContainer" alignment="1" pref="693" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -365,19 +364,20 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dataSetSelector" min="-2" pref="27" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="tabbedPanelContainer" pref="398" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace pref="533" max="32767" attributes="0"/>
               <Component id="statusLabel" min="-2" pref="23" max="-2" attributes="0"/>
+          </Group>
+          <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
+              <Group type="102" alignment="1" attributes="0">
+                  <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
+                  <Component id="tabbedPanelContainer" pref="523" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+              </Group>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JPanel" name="tabbedPanelContainer">
-
-      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
-    </Container>
     <Component class="org.virbo.datasource.DataSetSelector" name="dataSetSelector">
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataSetSelectorActionPerformed"/>
@@ -399,5 +399,9 @@
         <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="statusLabelMouseClicked"/>
       </Events>
     </Component>
+    <Container class="javax.swing.JPanel" name="tabbedPanelContainer">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
+    </Container>
   </SubComponents>
 </Form>
