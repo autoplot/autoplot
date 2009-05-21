@@ -69,7 +69,7 @@ public class CanvasController extends DomNodeController {
 
         ApplicationController ac = application.controller;
 
-        ac.bind(this.canvas, Canvas.PROP_WIDTH, dasCanvas, "preferredWidth");
+        ac.bind(this.canvas, Canvas.PROP_WIDTH, dasCanvas, "preferredWidth"); //TODO: seven second delay
         ac.bind(this.canvas, Canvas.PROP_HEIGHT, dasCanvas, "preferredHeight");
         ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
 
@@ -221,6 +221,18 @@ public class CanvasController extends DomNodeController {
         rows.remove(row);
 
         canvas.setRows(rows.toArray(new Row[rows.size()]));
+        lock.unlock();
+    }
+    
+    protected void deleteColumn(Column column) {
+        MutatorLock lock = changesSupport.mutatorLock();
+        lock.lock();
+
+        List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+
+        columns.remove(column);
+
+        canvas.setColumns(columns.toArray(new Column[columns.size()]));
         lock.unlock();
     }
 
