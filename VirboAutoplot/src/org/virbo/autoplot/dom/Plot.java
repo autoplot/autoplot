@@ -138,6 +138,16 @@ public class Plot extends DomNode {
         this.zaxis.syncTo(that.getZaxis());
     }
 
+    public void syncTo(DomNode n,List<String> exclude) {
+        super.syncTo(n); //TODO: ID!
+        Plot that = (Plot) n;
+        if ( !exclude.contains(PROP_TITLE) ) this.setTitle( that.getTitle() );
+        if ( !exclude.contains(PROP_ISOTROPIC) )this.setIsotropic( that.isIsotropic() );
+        this.xaxis.syncTo(that.getXaxis());
+        this.yaxis.syncTo(that.getYaxis());
+        this.zaxis.syncTo(that.getZaxis());
+    }
+
     @Override
     public List<DomNode> childNodes() {
         ArrayList<DomNode> result = new ArrayList<DomNode>();
