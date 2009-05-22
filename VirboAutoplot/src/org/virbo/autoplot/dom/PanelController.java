@@ -125,6 +125,8 @@ public class PanelController extends DomNodeController {
 
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceFilter.PROP_SLICEDIMENSION) || evt.getPropertyName().equals(DataSourceFilter.PROP_TRANSPOSE)) {
+                logger.fine("property change in DSF means I need to autorange: "+evt.getPropertyName());
+
                 setResetRanges(true);
             }
         }
@@ -286,7 +288,7 @@ public class PanelController extends DomNodeController {
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
             QDataSet fillDs = dsf.controller.getFillDataSet();
-            logger.fine("got new dataset: " + fillDs);
+            logger.fine("got new dataset: " + fillDs + "  resetPanel="+resetPanel+"  resetRanges="+resetRanges );
             if (fillDs != null) {
                 if (resetPanel) {
                     if ( panel.getComponent().equals("") ) {
@@ -301,6 +303,7 @@ public class PanelController extends DomNodeController {
                     }
                 } else if (resetRanges) {
                     doResetRanges(true);
+                    setResetRanges(false);
                 }
             }
 
@@ -329,10 +332,10 @@ public class PanelController extends DomNodeController {
      */
     private boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
         if ( oldRenderType==newRenderType ) return false;
-        if ( newRenderType==RenderType.spectrogram ) {
+        if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
             return true;
         } else {
-            if ( oldRenderType==RenderType.spectrogram ) {
+            if ( oldRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
                 return true;
             } else {
                 return false;
@@ -359,7 +362,7 @@ public class PanelController extends DomNodeController {
         if (fillDs != null) {
 
             boolean shouldHaveChildren= fillDs.rank() == 2
-                    &&  ( renderType != RenderType.spectrogram )
+                    &&  ( renderType != RenderType.spectrogram || renderType != RenderType.nnSpectrogram )
                     &&  fillDs.length(0) < 12;
 
             String[] labels = null;
@@ -493,7 +496,10 @@ public class PanelController extends DomNodeController {
     }
 
     private void setRenderer(Renderer renderer) {
+        Renderer oldRenderer= this.renderer;
         this.renderer = renderer;
+        ApplicationController ac = this.dom.controller;
+        ac.unbindImpl(node);
         if (renderer instanceof SeriesRenderer) {
             bindToSeriesRenderer((SeriesRenderer) renderer);
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
@@ -505,8 +511,7 @@ public class PanelController extends DomNodeController {
         } else {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
-        }
-        ApplicationController ac = this.dom.controller;
+        }        
         ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL);
         ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
         ac.bind(panel, Panel.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
@@ -627,7 +632,7 @@ public class PanelController extends DomNodeController {
             cpanel.setLegendLabel((String) legendLabel);
         }
 
-        if (spec == RenderType.spectrogram) {
+        if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
             if (dom.getOptions().isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
                 plotDefaults.getZaxis().setLog(v.equals("log"));
             }
@@ -708,7 +713,7 @@ public class PanelController extends DomNodeController {
 
         QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
 
-        if (spec == RenderType.spectrogram) {
+        if (spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
 
             QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             if (xds == null) {
