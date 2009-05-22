@@ -32,7 +32,7 @@ public class CompletionContext {
     public final static Object CONTEXT_FILE="file"; 
     public final static Object CONTEXT_PARAMETER_NAME="paramName";
     public final static Object CONTEXT_PARAMETER_VALUE="paramValue";
-    
+
     public CompletionContext() {
     }
     
