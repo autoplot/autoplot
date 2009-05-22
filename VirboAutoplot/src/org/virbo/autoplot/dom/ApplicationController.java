@@ -64,6 +64,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     LayoutListener layoutListener;
     boolean headless;
     final Map<Object, BindingGroup> bindingContexts;
+    final Map<Object, BindingGroup> implBindingContexts; // these are for controllers to use.
     final Map<BindingModel, Binding> bindingImpls;
     final Map<Connector, ColumnColumnConnector> connectorImpls;
     private final static Logger logger = Logger.getLogger("virbo.controller");
@@ -98,8 +99,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         if (!headless && DasApplication.hasAllPermission()) {
             application.getOptions().loadPreferences();
         }
-        //bindingContexts = new HashMap<Object, BindingGroup>();
         bindingContexts = new HashMap();
+        implBindingContexts= new HashMap();
         bindingImpls = new HashMap();
         connectorImpls = new HashMap();
 
@@ -196,7 +197,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             }
 
-            List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
+/*            List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
             if (ps.size() == 1) {
                 p = ps.get(0);
             } else if (ps.size() > 1) {
@@ -207,16 +208,16 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if (ip < ps.size()) {
                     p = ps.get(ip);
                 }
-            }
+            }*/
 
             setPlot(domPlot);
 
             if (p != null) {
-                logger.fine("focus to " + p);
+                logger.fine("focus due to plot getting focus: " + p);
                 setFocusUri(p.controller.getDataSourceFilter().getUri());
                 if (getPanel() != p) {
-                    setStatus("" + domPlot + ", " + p + " selected");
                     setPanel(p);
+                    setStatus("" + domPlot + ", " + p + " selected");
                 }
             }
 
@@ -585,7 +586,6 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
             Panel p = findPanel(r);
             if (getPanel() != p) {
-                setStatus(p + " selected");
                 setPanel(p);
             }
 
@@ -997,6 +997,15 @@ public class ApplicationController extends DomNodeController implements RunLater
                 bindingContexts.put(src, bc);
             }
         }
+        // now do the implementation
+        BindingGroup implBc;
+        synchronized (implBindingContexts) {
+            implBc = implBindingContexts.get(src);
+            if (implBc == null) {
+                implBc = new BindingGroup();
+                implBindingContexts.put(src, implBc);
+            }
+        }
 
         Binding binding;
 
@@ -1008,6 +1017,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             bindings.add(bindingModel);
             application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
             bc.addBinding(binding);
+        } else {
+            implBc.addBinding( binding );
         }
 
         binding.bind();
@@ -1058,6 +1069,24 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
                 bindings.removeAll(remove);
                 application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
+
+            }
+        }
+
+    }
+
+    /**
+     * unbind all implementation bindings associated with the dom node.
+     * @param src
+     */
+    protected void unbindImpl( DomNode src ) {
+        BindingGroup bc;
+        synchronized (implBindingContexts) {
+            bc = implBindingContexts.get(src);
+            if (bc != null) {
+
+                bc.unbind();
+                implBindingContexts.remove(bc);
 
             }
         }
@@ -1125,6 +1154,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param status
      */
     public void setStatus(String status) {
+        logger.fine(status+" (status message)");
         String oldStatus = this.status;
         this.status = status;
         propertyChangeSupport.firePropertyChange(PROP_STATUS, oldStatus, status);
@@ -1227,7 +1257,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         return result;
     }
 
-    List<Panel> getPanelsFor(DataSourceFilter plot) {
+    public List<Panel> getPanelsFor(DataSourceFilter plot) {
         String id = plot.getId();
         List<Panel> result = new ArrayList<Panel>();
         for (Panel p : application.getPanels()) {
@@ -1249,6 +1279,11 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public void setPanel(Panel panel) {
+        if ( panel==null ) {
+            setStatus("no panel selected");
+        } else {
+            setStatus(panel + " selected");
+        }
         Panel oldPanel = this.panel;
         this.panel = panel;
         propertyChangeSupport.firePropertyChange(PROP_PANEL, oldPanel, panel);
@@ -1335,6 +1370,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         for (Panel p : application.getPanels()) {  // kludge to avoid reset range
             p.controller.setResetRanges(false);
             p.controller.setResetPanel(true);
+        }
+        for (DataSourceFilter dsf: application.getDataSourceFilters() ) {
+            dsf.controller.setResetDimensions(false);
         }
     }
 
