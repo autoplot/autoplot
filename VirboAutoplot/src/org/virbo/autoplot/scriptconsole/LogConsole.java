@@ -314,7 +314,7 @@ public class LogConsole extends javax.swing.JPanel {
         saveButton = new javax.swing.JButton();
         copyButton = new javax.swing.JButton();
         verbosityPanel = new javax.swing.JPanel();
-        jToggleButton1 = new javax.swing.JToggleButton();
+        jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         commandLineTextPane1 = new org.virbo.autoplot.scriptconsole.CommandLineTextPane();
@@ -366,10 +366,10 @@ public class LogConsole extends javax.swing.JPanel {
                 .add(copyButton))
         );
 
-        jToggleButton1.setText("console settings....");
-        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButton1.setText("Console Settings...");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton1ActionPerformed(evt);
+                jButton1ActionPerformed(evt);
             }
         });
 
@@ -379,13 +379,13 @@ public class LogConsole extends javax.swing.JPanel {
             verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
                 .addContainerGap(132, Short.MAX_VALUE)
-                .add(jToggleButton1))
+                .add(jButton1))
         );
         verbosityPanelLayout.setVerticalGroup(
             verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
                 .addContainerGap(35, Short.MAX_VALUE)
-                .add(jToggleButton1))
+                .add(jButton1))
         );
 
         jLabel2.setText("AP>");
@@ -505,19 +505,19 @@ private void commandLineTextPane1FocusGained(java.awt.event.FocusEvent evt) {//G
     impl.startPopup(this.commandLineTextPane1);
 }//GEN-LAST:event_commandLineTextPane1FocusGained
 
-private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
-    getSettingsDialog().setVisible(jToggleButton1.isSelected());
-}//GEN-LAST:event_jToggleButton1ActionPerformed
+private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    getSettingsDialog().setVisible(true);
+}//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionsPanel;
     private javax.swing.JButton clearButton;
     private org.virbo.autoplot.scriptconsole.CommandLineTextPane commandLineTextPane1;
     private javax.swing.JButton copyButton;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTextPane logTextArea;
     private javax.swing.JButton saveButton;
     private javax.swing.JPanel verbosityPanel;
