@@ -73,6 +73,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                     "values greater than this value are treated as fill."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "delim=",
                     "parse records by splitting on delimiter."));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "tail=",
+                    "read the last n records."));
 
             return result;
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
@@ -124,6 +126,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
             } else if (paramName.equals("validMax")) {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>"));
+            } else if (paramName.equals("tail")) {
+                return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>"));
             } else {
                 return Collections.emptyList();
             }
