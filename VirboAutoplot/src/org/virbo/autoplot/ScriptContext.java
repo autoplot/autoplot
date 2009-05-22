@@ -26,6 +26,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.JComponent;
 import org.das2.DasApplication;
 import org.das2.fsm.FileStorageModel;
@@ -37,7 +38,9 @@ import org.jdesktop.beansbinding.Bindings;
 import org.python.core.PyJavaInstance;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.DomUtil;
+import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
@@ -134,40 +137,97 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
     }
 
+    /**
+     * plot the dataset in the first dataSource node.
+     * @param ds
+     * @throws java.lang.InterruptedException
+     */
     public static void plot(QDataSet ds) throws InterruptedException {
+        plot( 0, (String)null, ds );
+    }
+
+    /**
+     * plot the dataset in the first dataSource node.
+     * @param ds
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot( QDataSet x, QDataSet y ) throws InterruptedException {
+        plot( 0, (String)null, x, y );
+    }
+    
+    /**
+     * plot the dataset in the first dataSource node.
+     * @param ds
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot( QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
+        plot( 0, (String)null, x, y, z );
+    }
+
+    /**
+     * plot the dataset in the specified dataSource node.
+     * @param ds
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot( int chNum, QDataSet ds) throws InterruptedException {
+        plot( chNum, (String)null, ds );
+    }
+
+    /**
+     * plot the dataset in the specified  dataSource node.
+     * @param ds
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot( int chNum, QDataSet x, QDataSet y ) throws InterruptedException {
+        plot( chNum, (String)null, x, y );
+    }
+
+    /**
+     * plot the dataset in the specified  dataSource node.
+     * @param ds
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot( int chNum, QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
+        plot( chNum, (String)null, x, y, z );
+    }
+    /**
+     * plot the dataset in the chNum dataSource node.
+     * @param ds
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot( int chNum, String label, QDataSet ds) throws InterruptedException {
         maybeInitModel();
-        model.setDataSet(ds);
+        model.setDataSet( chNum, label, ds );
         model.waitUntilIdle(false);
     }
 
-    public static void plot( QDataSet x, QDataSet y ) throws InterruptedException {
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y ) throws InterruptedException {
         maybeInitModel();
         DDataSet yds= DDataSet.copy(y);
         if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
-        model.setDataSet(yds);
+        model.setDataSet( chNum, label, yds);
         model.waitUntilIdle(false);
     }
-    
-    public static void plot( QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
-        maybeInitModel();
 
+    public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
+        maybeInitModel();
         if ( z.rank()==1 ) {
             DDataSet yds= DDataSet.copy(y);
             yds.putProperty( QDataSet.DEPEND_0, x );
             yds.putProperty( QDataSet.PLANE_0, z );
-            model.setDataSet(yds);
+            model.setDataSet(chNum, label, yds);
         } else {
             DDataSet zds= DDataSet.copy(z);
             if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, x );
             if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
-            model.setDataSet(zds);
+            model.setDataSet(chNum, label, zds);
         }
-        
         model.waitUntilIdle(false);
     }
 
+
     /**
-     * set the autoplot status ber string.  Use the prefixes "busy:", "warning:"
+     * set the autoplot status bar string.  Use the prefixes "busy:", "warning:"
      * and "error:" to set icons.
      * @param message
      */
