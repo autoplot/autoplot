@@ -361,6 +361,14 @@ public class GuiSupport {
             }
         }));
 
+        result.add(new JMenuItem(new AbstractAction("Nearest Neighbor Spectrogram") {
+
+            public void actionPerformed(ActionEvent e) {
+                Panel panel = plot.getController().getApplication().getController().getPanel();
+                panel.setRenderType(ApplicationModel.RenderType.nnSpectrogram);
+            }
+        }));
+
         return result;
     }
 
