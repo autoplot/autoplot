@@ -52,6 +52,7 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
+import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
@@ -106,11 +107,10 @@ public class AutoplotUtil {
         List<Renderer> recycleRends = Arrays.asList(result.getRenderers());
 
         ApplicationModel.RenderType type = AutoplotUtil.getRenderType(ds);
-        List<Renderer> rends = AutoplotUtil.getRenderers(ds, type, recycleRends, cb);
 
-        for (Renderer rend1 : rends) {
-            result.addRenderer(rend1);
-        }
+        Renderer rend1= maybeCreateRenderer( type, recycleRends.get(0), cb);
+
+        result.addRenderer(rend1);
 
         c.add(result, row, col);
         c.revalidate();
@@ -959,14 +959,28 @@ public class AutoplotUtil {
     public static Renderer maybeCreateRenderer(RenderType renderType,
             Renderer recyclable, DasColorBar colorbar) {
         if (renderType == RenderType.spectrogram) {
+            SpectrogramRenderer result;
             if (recyclable != null && recyclable instanceof SpectrogramRenderer) {
-                return recyclable;
+                result= (SpectrogramRenderer) recyclable;
             } else {
-                Renderer result = new SpectrogramRenderer(null, colorbar);
+                result = new SpectrogramRenderer(null, colorbar);
+                result.setDataSetLoader(null);
+                colorbar.setVisible(true);
+            }
+            result.setRebinner( SpectrogramRenderer.RebinnerEnum.binAverage );
+            return result;
+        } else if (renderType == RenderType.nnSpectrogram) {
+            SpectrogramRenderer result;
+            if (recyclable != null && recyclable instanceof SpectrogramRenderer) {
+                result= (SpectrogramRenderer) recyclable;
+            } else {
+                result = new SpectrogramRenderer(null, colorbar);
                 result.setDataSetLoader(null);
                 colorbar.setVisible(true);
                 return result;
             }
+            result.setRebinner( SpectrogramRenderer.RebinnerEnum.nearestNeighbor );
+            return result;
         } else if (renderType == RenderType.hugeScatter) {
             if (recyclable != null && recyclable instanceof ImageVectorDataSetRenderer) {
                 return recyclable;
@@ -1001,10 +1015,13 @@ public class AutoplotUtil {
 
             } else if (renderType == RenderType.scatter) {
                 result.setPsymConnector(PsymConnector.NONE);
+                result.setPsym( DefaultPlotSymbol.CIRCLES );
                 result.setFillToReference(false);
 
             } else if (renderType == RenderType.colorScatter) {
                 result.setPsymConnector(PsymConnector.NONE);
+                result.setPsym( DefaultPlotSymbol.CIRCLES );
+                result.setSymSize(3);
                 result.setFillToReference(false);
 
             } else if (renderType == RenderType.stairSteps) {
@@ -1024,103 +1041,4 @@ public class AutoplotUtil {
 
     }
 
-    /**
-     * return the renderers that should be used to render the data.  More than one renderer can be returned 
-     * to support plotting vector components.  This is not used.
-     * 
-     * The renderer will have the dataset set.
-     * @param ds
-     * @param type
-     * @param recyclable Reuse these if possible to reduce jitter.  May be null.
-     * @return
-     */
-    public static List<Renderer> getRenderers(QDataSet ds, RenderType renderType,
-            List<Renderer> recyclable, DasColorBar colorbar) {
-        if (recyclable == null) recyclable = Collections.emptyList();
-        if (renderType == RenderType.spectrogram) {
-            if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SpectrogramRenderer) {
-                recyclable.get(0).setDataSet(TableDataSetAdapter.create(ds));
-                return recyclable;
-            } else {
-                Renderer result = new SpectrogramRenderer(null, colorbar);
-                result.setDataSetLoader(null);
-                colorbar.setVisible(true);
-                result.setDataSet(TableDataSetAdapter.create(ds));
-                return Collections.singletonList(result);
-            }
-        } else {
-            List<Renderer> result;
-            if (ds.rank() == 1) {
-                SeriesRenderer result1;
-                if (recyclable != null && recyclable.size() == 1 && recyclable.get(0) instanceof SeriesRenderer) {
-                    result = recyclable;
-                    result1 = (SeriesRenderer) result.get(0);
-                } else {
-                    result1 = new SeriesRenderer();
-                    result1.setDataSetLoader(null);
-                    result = Collections.singletonList((Renderer) result1);
-                }
-                result.get(0).setDataSet(VectorDataSetAdapter.create(ds));
-
-                if (renderType == RenderType.colorScatter) {
-                    result1.setColorBar(colorbar);
-                    result1.setColorByDataSetId(QDataSet.PLANE_0); //schema
-                    colorbar.setVisible(true);
-                } else {
-                    result1.setColorByDataSetId(""); //schema
-                    colorbar.setVisible(false);
-                }
-            } else {
-                int dim = ds.length(0);
-                Color color = Color.black; // TODO: this will change.
-                result = new ArrayList<Renderer>();
-                for (int i = 0; i < dim; i++) {
-                    SeriesRenderer rend1 = new SeriesRenderer();
-                    rend1.setDataSetLoader(null);
-                    float[] colorHSV = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
-                    if (colorHSV[2] < 0.7f) {
-                        colorHSV[2] = 0.7f;
-                    }
-                    if (colorHSV[1] < 0.7f) {
-                        colorHSV[1] = 0.7f;
-                    }
-                    rend1.setColor(Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]));
-                    rend1.setFillColor(Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]));
-                    rend1.setDataSet(VectorDataSetAdapter.create(DataSetOps.slice1(ds, i)));
-                    result.add(rend1);
-                }
-                colorbar.setVisible(false);
-            }
-
-            for (Renderer rend1 : result) {
-                SeriesRenderer seriesRend = (SeriesRenderer) rend1;
-                if (renderType == RenderType.series) {
-
-                    seriesRend.setPsymConnector(PsymConnector.SOLID);
-                    seriesRend.setHistogram(false);
-                    seriesRend.setFillToReference(false);
-
-                } else if (renderType == RenderType.scatter) {
-                    seriesRend.setPsymConnector(PsymConnector.NONE);
-                    seriesRend.setFillToReference(false);
-
-                } else if (renderType == RenderType.colorScatter) {
-                    seriesRend.setPsymConnector(PsymConnector.NONE);
-                    seriesRend.setFillToReference(false);
-
-                } else if (renderType == RenderType.stairSteps) {
-                    seriesRend.setPsymConnector(PsymConnector.SOLID);
-                    seriesRend.setFillToReference(true);
-                    seriesRend.setHistogram(true);
-
-                } else if (renderType == RenderType.fillToZero) {
-                    seriesRend.setPsymConnector(PsymConnector.SOLID);
-                    seriesRend.setFillToReference(true);
-                    seriesRend.setHistogram(false);
-
-                }
-            }
-            return result;
-        }
-    }
 }
