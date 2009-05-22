@@ -46,7 +46,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     /** Creates new form JythonScriptPanel */
     public JythonScriptPanel( final ApplicationModel model, final DataSetSelector selector) {
         initComponents();
-        
+        jScrollPane2.getVerticalScrollBar().setUnitIncrement( 12 ); // TODO: should be line height.
         jPanel1.add( textArea, BorderLayout.CENTER );
 
         setContext(CONTEXT_APPLICATION);
