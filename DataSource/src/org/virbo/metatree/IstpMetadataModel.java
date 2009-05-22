@@ -89,8 +89,8 @@ public class IstpMetadataModel extends MetadataModel {
     }
 
     private DatumRange getValidRange(Map attrs, Units units) {
-        double max = doubleValue(attrs.get("VALIDMAX"), units);
-        double min = doubleValue(attrs.get("VALIDMIN"), units);
+        double max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE );
+        double min = doubleValue(attrs.get("VALIDMIN"), units, -1e29 ); //TODO: remove limitation
         if ( units.isFill(min) ) min= min / 100; // kludge because DatumRanges cannot contain fill.
         return DatumRange.newDatumRange(min, max, units);
     }
@@ -112,8 +112,8 @@ public class IstpMetadataModel extends MetadataModel {
                 max = doubleValue(attrs.get("SCALEMAX"), units);
                 min = 0;
             } else {
-                max = doubleValue(attrs.get("VALIDMAX"), units, Double.POSITIVE_INFINITY);
-                min = doubleValue(attrs.get("VALIDMIN"), units, Double.NEGATIVE_INFINITY);
+                max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE );
+                min = doubleValue(attrs.get("VALIDMIN"), units, -1e29 );
             }
         }
         if ("log".equals(getScaleType(attrs)) && min <= 0) {
