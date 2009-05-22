@@ -56,6 +56,8 @@ import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
+import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
@@ -95,7 +97,7 @@ public class ApplicationModel {
     }
 
     public enum RenderType {
-        spectrogram, hugeScatter, series, scatter, colorScatter, stairSteps, fillToZero,
+        spectrogram, nnSpectrogram, hugeScatter, series, scatter, colorScatter, stairSteps, fillToZero,
     }
 
     static final Logger logger = Logger.getLogger("virbo.autoplot");
@@ -155,6 +157,32 @@ public class ApplicationModel {
         dom.getController().getDataSourceFilter().setUri("vap+internal:");
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(null); // clear out properties and metadata
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds);
+    }
+
+    /**
+     * just plot this dataset using the specified dataSourceFilter index.  panels and dataSourceFilters
+     * are added until the index exists.  This is introduced to support jython scripting, but may be
+     * useful elsewhere.
+     * @param chNum the index of the DataSourceFilter to use.
+     * @param ds
+     */
+    public void setDataSet( int chNum, String label, QDataSet ds ) {
+        while ( dom.getDataSourceFilters().length <= chNum ) {
+            dom.getController().addPanel( null, null  );
+        }
+        DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
+        List<Panel> panels= dom.getController().getPanelsFor( dsf );
+        for ( Panel p: panels ) {
+            p.getController().setResetPanel(true);
+            if ( label!=null ) {
+                p.setLegendLabel(label);
+                p.setDisplayLegend(true);
+            }
+        }
+        dsf.getController()._setDataSource(null);
+        dsf.setUri("vap+internal:");
+        dsf.getController().setDataSetInternal(null); // clear out properties and metadata
+        dsf.getController().setDataSetInternal(ds);
     }
 
     public void setDataSource(DataSource dataSource) {
