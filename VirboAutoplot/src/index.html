@@ -6,7 +6,7 @@
     <H3>ViRBO Autoplot Application (#{tag})</H3>
         <p><a href="autoplot-#{tag}.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
-        <p><small>A recently-loaded vap has layout information controlling the size of the plots.  CDF editor has many bugfixes.</small></p>
+        <p><small>A rank 3 dataset is aggregated and sliced twice.</small></p>
 
 	<p>This demonstration application attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
@@ -19,38 +19,39 @@ be applied to the data, for example, specifying valid range and fill data.
         
         <p>Recent changes include:</p>
 <ul><li> bugfixes:
-<ul><li> various bugs with the CDF panel editor pointed out by bob
-</li><li> non-double values for validmin, validmax would cause runtime exception
-</li><li> spaces in zip file names
-</li><li> 2791340: Excel spreadsheet editor works in webstart release
-</li><li> runtime exception for "java.lang.IllegalArgumentException: unable to find panel for das renderer" fixed
+<ul><li> aggregation with rank 3 datasets had lots of issues.
+</li><li> multiple identical bindings would result in runtime exception when attempt to unbind
+</li><li> 2793948: clean up of panels with child panels stuff (used for B-GSM for example, copy panels would fail)
+<ul><li> copy panels would fail
+</li><li> vap files were quirky at best
+</li></ul>
+</li><li> regression in panel focus fixed.  (move By to plot below would move Bx instead)
 
-</li><li> panel height weights messed up after two panels.
-</li><li> panel heights properly bind to das objects and are properly loaded and saved in vap files.
-</li><li> cadence check disabling is done *after* we try to guess cadence.
-</li><li> Excel and Ascii table GUIs [select] buttons clear the current selection so that any column can be selected.
-</li><li> NullPointerException when export to Excel when dataset doesn't have units.
-</li><li> many events didn't add to undo/redo list
+</li><li> bugfixes with rank 3 dataset slicing, vap files, autoranging.
+</li><li> 2792481: docked canvas could only be so small and status bar would get clipped.  now axis panel and style panel have scrollbars.
+</li><li> large ascii files with no valid records would hang up the reader during completion, now the header length is limited to 10000 lines.
+</li><li> 2789036: tiny columns in ascii table fixed
+</li><li> 2794977:File-&gt;"Reset Application" resets application to initial state.
+</li><li> 2794972: "Edit Data Source" added to plot context menu.
 </li></ul>
-</li><li> cdf panel displays parameter descriptions.
-</li><li> bug 2790177: splash screen added to help with long startup time (7sec) issue.
-</li><li> ascii table parser supports quotes in csv's (1,2,"help",3)
-</li><li> ascii table parser can parse array of times (before times had to be depend_0)
-</li><li>Runtime Exception dialog allows exception reports to be submitted to Jeremy's server
+</li><li> minor features:
+<ul><li> Ascii table reader gets new "tail" parameter
+
+</li><li> script context gets "plot( panelNum, label, qdataset )" methods
+</li><li> PyQDataSet is sequence by defining __len__, allowing ds[3] to slice a rank&gt;1 dataset.
+</li><li> switch from spectrogram to series to spectrogram supported for rank 2 with small number of channels (<12).
+</li><li> nearest neighbor spectrogram introduced to render types for convenience.
 </li></ul>
-<p>Known issues:
-</p>
-<ul><li> 2769881 delete parent panel, then switch to spectrogram
-</li><li> completion with aggregation doens't work
+
+<p>Known issues:</p>
+<li> Applet suffers from same seven second delay, applet can show display
+</li><li> bug: aggregation sometimes still jumps when you adjust the z-axis.  Demo 2.
 </li><li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
-</li><li> bug: aggregation sometimes still jumps when you adjust the z-axis. Demo 2.
-</li><li> last recent URI is not added to DataSetSelector when Autoplot starts up.
-</li><li> 2769881 delete parent panel, then switch to spectrogram
-</li><li> 2712135 FileSystemCompletions must account for aggregation wildcards
-</li><li> 2792362 aggregation and context overview resets zoom
-</li><li> 2792363 add overplot resets zoom
-</li></ul>
-
+</li><li> last URI is not added to DataSetSelector.
+</li><li> CDF depend_1 number of elements is incorrect.
+</li><li> Unable to download vap:<a href="ftp://user:pass@mrfrench.lanl.gov/lanl/geo/cdf/H3_SOPA/LANL-97A/2007/LANL_LANL-97A_H3_SOPA_20070130_V01.cdf" class="external free" title="ftp://user:pass@mrfrench.lanl.gov/lanl/geo/cdf/H3_SOPA/LANL-97A/2007/LANL_LANL-97A_H3_SOPA_20070130_V01.cdf" rel="nofollow">ftp://user:pass@mrfrench.lanl.gov/lanl/geo/cdf/H3_SOPA/LANL-97A/2007/LANL_LANL-97A_H3_SOPA_20070130_V01.cdf</a>
+</li><li> race condition with setSliceDimension and setFillDataSet results in "inconvertable units"
+</li>
 
 <p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
