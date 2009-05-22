@@ -12,9 +12,14 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel.MapMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -26,6 +31,7 @@ import org.virbo.dsutil.AsciiParser;
 import org.das2.util.TimeParser;
 import java.text.ParseException;
 import java.util.StringTokenizer;
+import org.das2.util.ByteBufferInputStream;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dsops.Ops;
@@ -87,6 +93,16 @@ public class AsciiTableDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws IOException {
 
         ds = doReadFile(mon);
+
+/*        String o= params.get("tail");
+        if ( o!=null ) {
+            int itail= Integer.parseInt(o);
+            int nrec= ds.length();
+            if ( nrec>itail ) {
+                ds= DDataSet.copy( DataSetOps.trim( ds, nrec-itail, itail ) );
+            }
+        }*/
+
 
         // combine times if necessary
         if (timeColumns > 1) {
@@ -528,7 +544,32 @@ public class AsciiTableDataSource extends AbstractDataSource {
         }
 
         // --- done configuration, now read ---
-        DDataSet ds1 = (DDataSet) parser.readFile(file.toString(), mon); //DANGER
+        DDataSet ds1;
+        o = params.get("tail");
+        if (o != null) {
+            ByteBuffer buff= new FileInputStream( file ).getChannel().map( MapMode.READ_ONLY, 0, file.length() );
+            int tailNum= Integer.parseInt(o);
+            int tailCount=0;
+            int ipos=(int)file.length();
+            boolean foundNonEOL= false;
+            while ( tailCount<tailNum && ipos>=0 ) {
+                ipos--;
+                byte ch= buff.get((int)ipos);
+                if ( ch==10 ) {
+                    if ( ipos>1 && buff.get(ipos-1)==13 ) ipos=ipos-1;
+                    if ( foundNonEOL ) tailCount++;
+                } else if ( ch==13 ) {
+                    if ( foundNonEOL ) tailCount++;
+                } else {
+                    foundNonEOL= true;
+                }
+            }
+            buff.position( tailCount<tailNum ? 0 : ipos+1 );
+            InputStream in= new ByteBufferInputStream(buff);
+            ds1 = (DDataSet) parser.readStream( new InputStreamReader(in), mon); //DANGER
+        } else {
+            ds1 = (DDataSet) parser.readFile(file.toString(), mon); //DANGER
+        }
 
         return ds1;
     }
