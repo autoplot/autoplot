@@ -29,6 +29,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
+import org.virbo.dataset.TrimStrideWrapper;
 import org.virbo.dataset.WritableDataSet;
 
 /**
@@ -262,6 +263,11 @@ public class PyQDataSet extends PyJavaInstance {
         return (Number) result;
     }
 
+    @Override
+    public int __len__() {
+        return rods.length();
+    }
+
     /* accessor and mutator */
     /**
      * This implements the Python indexing, such as data[4,:,3:5].  Note this
@@ -303,7 +309,11 @@ public class PyQDataSet extends PyJavaInstance {
 
             } else if (arg0.isNumberType()) {
                 int idx = ((Number) arg0.__tojava__(Number.class)).intValue();
-                return Py.java2py(rods.value(idx));
+                if ( rods.rank()>1 ) {
+                    return new PyQDataSet( DataSetOps.slice0(rods, idx) );
+                } else {
+                    return Py.java2py(rods.value(idx));
+                }
                 
             } else if (arg0.isSequenceType()) {
                 QubeDataSetIterator iter = new QubeDataSetIterator(rods);
@@ -352,6 +362,7 @@ public class PyQDataSet extends PyJavaInstance {
                     resultIter.next();
                     resultIter.putValue(result, d);
                 }
+
                 return new PyQDataSet(result);
             } else {
                 throw Py.TypeError("invalid index type: "+arg0);
