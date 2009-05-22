@@ -185,11 +185,18 @@ public class DataSourceController extends DomNodeController {
         }
 
         logger.fine("dep names: " + Arrays.asList(depNames));
+
         setDepnames(Arrays.asList(depNames));
 
-        if (ds.rank() > 2) {
+        if ( isResetDimensions() ) {
+
+            if (ds.rank() > 2 && isResetDimensions() ) {
             guessSliceDimension();
+            }
         }
+
+        setResetDimensions(false);
+
     }
 
     public synchronized void setDataSource(boolean valueWasAdjusting,DataSource dataSource) {
@@ -307,10 +314,9 @@ public class DataSourceController extends DomNodeController {
             setStatus("busy: apply fill and autorange");
 
             extractProperties();
-            if ( isResetDimensions() ) {
-                doDimensionNames();
-                setResetDimensions(false);
-            }
+
+            doDimensionNames();
+
             _setHistogram(new AutoHistogram().doit(ds, null));
             //doFillValidRange();  the QDataSet returned 
             updateFill();
