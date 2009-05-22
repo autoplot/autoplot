@@ -328,9 +328,12 @@ class TsdsDataSource extends AbstractDataSource {
 
         InputStream in = connection.getInputStream();
         String encoding = connection.getContentEncoding();
+        logger.finer("downloading "+connection.getURL());
         if ( encoding!=null && encoding.equalsIgnoreCase("gzip")) {
+            logger.finer("got gzip encoding");
             in = new GZIPInputStream(in);
         } else if ( encoding!=null && encoding.equalsIgnoreCase("deflate")) {
+            logger.finer("got deflate encoding");
             in = new InflaterInputStream(in, new Inflater(true));
         }
 
