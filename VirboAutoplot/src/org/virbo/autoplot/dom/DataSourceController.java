@@ -60,6 +60,7 @@ public class DataSourceController extends DomNodeController {
 
         public void propertyChange(PropertyChangeEvent e) {
             if (dataSet != null && dataSet.rank() == 3) {
+                logger.fine("updateSlice ->updateFillSoon()");
                 updateFillSoon();
             }
         }
@@ -216,6 +217,7 @@ public class DataSourceController extends DomNodeController {
         this.dsf.setFill("");
 
         _setDataSource(dataSource);
+        setResetDimensions(true);
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
             if (getTsb() != null) {
@@ -305,7 +307,10 @@ public class DataSourceController extends DomNodeController {
             setStatus("busy: apply fill and autorange");
 
             extractProperties();
-            doDimensionNames();
+            if ( isResetDimensions() ) {
+                doDimensionNames();
+                setResetDimensions(false);
+            }
             _setHistogram(new AutoHistogram().doit(ds, null));
             //doFillValidRange();  the QDataSet returned 
             updateFill();
@@ -997,6 +1002,24 @@ public class DataSourceController extends DomNodeController {
         this.uriNeedsResolution = uriNeedsResolution;
         propertyChangeSupport.firePropertyChange(PROP_URINEEDSRESOLUTION, oldUriNeedsResolution, uriNeedsResolution);
     }
+
+    protected boolean resetDimensions = false;
+    /**
+     * true if the data source is changed and we need to reset the dimension names when
+     * we get our first data set.
+     */
+    public static final String PROP_RESETDIMENSIONS = "resetDimensions";
+
+    public boolean isResetDimensions() {
+        return resetDimensions;
+    }
+
+    public void setResetDimensions(boolean resetDimensions) {
+        boolean oldResetDimensions = this.resetDimensions;
+        this.resetDimensions = resetDimensions;
+        propertyChangeSupport.firePropertyChange(PROP_RESETDIMENSIONS, oldResetDimensions, resetDimensions);
+    }
+
 
     /**
      * guess the best dimension to slice by default, based on metadata.  Currently,
