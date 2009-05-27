@@ -137,9 +137,21 @@ public class CompletionSupport {
                 result= new CompletionContext( CompletionContext.PACKAGE_NAME, join(tokens,1,myTokenIndex), completable );
                 
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.NAME ) {
-                return new CompletionContext( CompletionContext.METHOD_NAME, tokens.get(myTokenIndex-1).image, "" );
+                String contextString= tokens.get(myTokenIndex-1).image;
+                int i= myTokenIndex-1;
+                while ( i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT ) {
+                    contextString = tokens.get(i-2).image + tokens.get(i-1).image + contextString;
+                    i=i-2;
+                }
+                return new CompletionContext( CompletionContext.METHOD_NAME, contextString, "" );
             } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
-                return new CompletionContext( CompletionContext.METHOD_NAME, tokens.get(myTokenIndex-2).image, completable );
+                String contextString= tokens.get(myTokenIndex-2).image;
+                int i= myTokenIndex-2;
+                while ( i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT ) {
+                    contextString = tokens.get(i-2).image + tokens.get(i-1).image + contextString;
+                    i=i-2;
+                }
+                return new CompletionContext( CompletionContext.METHOD_NAME, contextString, completable );
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING ) {
                 if ( myTokenIndex>1 && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
                     return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );
