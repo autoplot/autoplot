@@ -1,5 +1,6 @@
 package org.das2.jythoncompletion;
 
+import java.util.logging.Level;
 import javax.swing.text.Document;
 import org.python.core.PyClassPeeker;
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.Utilities;
@@ -44,7 +46,6 @@ public class JythonCompletionTask implements CompletionTask {
 
     public static final String CLIENT_PROPERTY_INTERPRETER_PROVIDER = "JYTHON_INTERPRETER_PROVIDER";
     JTextComponent editor;
-
     String context;
     private JythonInterpreterProvider jythonInterpreterProvider;
 
@@ -53,8 +54,16 @@ public class JythonCompletionTask implements CompletionTask {
         jythonInterpreterProvider = (JythonInterpreterProvider) t.getClientProperty(CLIENT_PROPERTY_INTERPRETER_PROVIDER);
     }
 
-    private void setMessage( String message ) {
-
+    private Method getReadMethod(PyObject context, PyObject po, Class dc, String propName) {
+        try {
+            String methodName = "get" + propName.substring(0,1).toUpperCase() + propName.substring(1);
+            Method m = dc.getMethod(methodName);
+            return m;
+        } catch (NoSuchMethodException ex) {
+            return null;
+        } catch (SecurityException ex) {
+            return null;
+        }
     }
 
     public void query(CompletionResultSet arg0) {
@@ -98,13 +107,20 @@ public class JythonCompletionTask implements CompletionTask {
         String eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
 
         //kludge to handle increase in indent level
-        if ( eval.endsWith(":\n") ) {
-            eval= eval + "  pass\n";
+        if (eval.endsWith(":\n")) {
+            eval = eval + "  pass\n";
         }
-        
+
+        Logger logger = Logger.getLogger(JythonCompletionTask.class.getName());
         interp.exec(eval);
 
-        PyObject context = interp.eval(cc.contextString);
+        PyObject context;
+        try {
+            context = interp.eval(cc.contextString);
+        } catch (PyException ex) {
+            rs.addItem(new MessageCompletionItem("Eval error: " + cc.contextString, ex.toString()));
+            return;
+        }
 
         PyList po2 = (PyList) context.__dir__();
         for (int i = 0; i < po2.__len__(); i++) {
@@ -113,20 +129,20 @@ public class JythonCompletionTask implements CompletionTask {
             if (ss.startsWith(cc.completable)) {
                 PyObject po;
                 try {
-                    po= context.__getattr__(s);
-                } catch ( PyException e ) {
-                    System.err.println("PyException from \""+ss+"\":");
+                    po = context.__getattr__(s);
+                } catch (PyException e) {
+                    System.err.println("PyException from \"" + ss + "\":");
                     e.printStackTrace();
                     continue;
                 }
                 String label = ss;
                 String signature = null;
-                String args= "";
+                String args = "";
                 if (context instanceof PyJavaClass) {
                     if (po instanceof PyReflectedFunction) {
                         Method m = new PyReflectedFunctionPeeker((PyReflectedFunction) po).getMethod(0);
                         signature = methodSignature(m);
-                        args= methodArgs(m);
+                        args = methodArgs(m);
                     }
                 } else if (context instanceof PyClass) {
                     PyClassPeeker peek = new PyClassPeeker((PyClass) context);
@@ -142,25 +158,32 @@ public class JythonCompletionTask implements CompletionTask {
                     }
                     signature = fieldSignature(f);
                 } else if (context instanceof PyJavaInstance) {
-
                     if (po instanceof PyMethod) {
                         PyMethod m = (PyMethod) po;
                         Method jm = getJavaMethod(m, 0);
                         signature = methodSignature(jm);
-                        args= methodArgs(jm);
+                        args = methodArgs(jm);
                     } else {
                         PyJavaInstancePeeker peek = new PyJavaInstancePeeker((PyJavaInstance) context);
                         Class dc = peek.getInstanceClass();
-                        Field f = null;
-                        try {
-                            f = dc.getField(label);
-                        } catch (NoSuchFieldException ex) {
-                        } catch (SecurityException ex) {
+                        Method propReadMethod = getReadMethod(context, po, dc, label);
+                        if (propReadMethod != null) {
+                            signature = methodSignature(propReadMethod);
+                            args = "";
+                        } else {
+                            Field f = null;
+                            try {
+                                f = dc.getField(label);
+                            } catch (NoSuchFieldException ex) {
+                                logger.finest("NoSuchFieldException for item " + s);
+                            } catch (SecurityException ex) {
+                                logger.finest("SecurityException for item " + s);
+                            }
+                            if (f == null) continue;
+                            //TODO: don't include static fields in list.
+                            signature = fieldSignature(f);
+                            label = ss;
                         }
-                        if (f == null) continue;
-                      //TODO: don't include static fields in list.
-                        signature = fieldSignature(f);
-                        label = ss;
                     }
                 } else {
                     if (po instanceof PyReflectedFunction) {
@@ -254,10 +277,10 @@ public class JythonCompletionTask implements CompletionTask {
 
     private void queryNames(CompletionContext cc, CompletionResultSet rs) throws BadLocationException {
 
-        String[] keywords= new String[] { "assert", "def", "elif", "except",  "from", "for", "finally", "import", "while", "print", "raise" }; //TODO: not complete
-        for ( String kw: keywords ) {
-            if ( kw.startsWith(cc.completable) ) {
-               rs.addItem( new DefaultCompletionItem( kw, cc.completable.length(), kw, kw, null,0 ) );
+        String[] keywords = new String[]{"assert", "def", "elif", "except", "from", "for", "finally", "import", "while", "print", "raise"}; //TODO: not complete
+        for (String kw : keywords) {
+            if (kw.startsWith(cc.completable)) {
+                rs.addItem(new DefaultCompletionItem(kw, cc.completable.length(), kw, kw, null, 0));
             }
         }
 
@@ -275,13 +298,13 @@ public class JythonCompletionTask implements CompletionTask {
             if (ss.startsWith(cc.completable)) {
                 PyObject po = locals.get(s);
                 String label = ss;
-                String args="";
+                String args = "";
                 if (po instanceof PyReflectedFunction) {
                     label = ss + "() JAVA";
                     PyReflectedFunction prf = (PyReflectedFunction) po;
                     PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
                     signature = methodSignature(peek.getMethod(0));
-                    args= methodArgs( peek.getMethod(0) );
+                    args = methodArgs(peek.getMethod(0));
                     peek.getName();
 
                 } else if (po.isCallable()) {
@@ -295,7 +318,7 @@ public class JythonCompletionTask implements CompletionTask {
                 if (signature != null) {
                     link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
                 }
-                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss+args, label, link));
+                rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
             }
         }
 
@@ -309,20 +332,20 @@ public class JythonCompletionTask implements CompletionTask {
         String RPAREN = ")";
         String SPACE = " "; // "%20";
 
-        StringBuffer sig= new StringBuffer();
-        
-        sig.append( LPAREN);
+        StringBuffer sig = new StringBuffer();
+
+        sig.append(LPAREN);
         List<String> sargs = new ArrayList<String>();
 
         for (Class arg : javaMethod.getParameterTypes()) {
-            
+
             sargs.add(arg.getSimpleName());
         }
         sig.append(join(sargs, "," + SPACE));
         sig.append(RPAREN);
         return sig.toString();
     }
-        
+
     private String methodSignature(Method javaMethod) {
         String javadocPath = join(javaMethod.getDeclaringClass().getCanonicalName().split("\\."), "/") + ".html";
 
@@ -391,5 +414,4 @@ public class JythonCompletionTask implements CompletionTask {
     public void cancel() {
         //throw new UnsupportedOperationException("Not supported yet.");
     }
-
 }
