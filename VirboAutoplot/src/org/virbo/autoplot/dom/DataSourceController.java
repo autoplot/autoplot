@@ -231,6 +231,7 @@ public class DataSourceController extends DomNodeController {
                 _setDataSet(null);
                 List<Panel> ps = dom.controller.getPanelsFor(dsf);
                 if (ps.size() > 0) {
+//TODO: flakey
                     timeSeriesBrowseController = new TimeSeriesBrowseController(ps.get(0));
                     timeSeriesBrowseController.setup(valueWasAdjusting);
                 }
@@ -986,6 +987,7 @@ public class DataSourceController extends DomNodeController {
                 mon.setProgressMessage("done getting data source");
 
             } catch (Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             } finally {
                 mon.finished();
@@ -1034,22 +1036,25 @@ public class DataSourceController extends DomNodeController {
     private void guessSliceDimension() {
         int lat = -1, lon = -1;
 
-        int[] slicePref = new int[]{1, 1, 1};
+        int[] slicePref = new int[]{2, 2, 2}; // slicePref big means more likely to slice.
         for (int i = 0; i < getDepnames().size(); i++) {
-            String n = getDepnames().get(i);
-            if (n.equals("lat")) {
+            String n = getDepnames().get(i).toLowerCase();
+            if (n.startsWith("lat")) {
                 slicePref[i] = 0;
                 lat = i;
-            }
-            if (n.equals("lon")) {
+            } else if (n.startsWith("lon")) {
                 slicePref[i] = 0;
                 lon = i;
-            }
-            if (n.equals("angle")) {
-                slicePref[i] = 2;
-            }
-            if (n.equals("bundle")) {
-                slicePref[i] = 2;
+            } else if (n.contains("time") ) {
+                slicePref[i] = 1;
+            } else if (n.contains("epoch") ) {
+                slicePref[i] = 1;
+            } else if (n.contains("angle")) {
+                slicePref[i] = 4;
+            } else if (n.contains("alpha") ) { // commonly used for pitch angle in space physics
+                slicePref[i] = 4;
+            } else if (n.contains("bundle")) {
+                slicePref[i] = 4;
             }
         }
 
