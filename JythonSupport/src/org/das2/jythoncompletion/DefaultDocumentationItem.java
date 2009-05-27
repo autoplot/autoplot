@@ -22,13 +22,22 @@ import org.das2.jythoncompletion.support.CompletionDocumentation;
 public class DefaultDocumentationItem implements CompletionDocumentation {
 
     String link;
+    String text;
 
     /** Creates a new instance of UserDocumentationItem */
     public DefaultDocumentationItem(String link) {
+        this( link, null );
+    }
+
+    public DefaultDocumentationItem(String link,String text) {
         this.link = link;
+        this.text = text;
     }
 
     public String getText() {
+        if ( text!=null ) {
+            return text;
+        }
         URL url = getURL();
         if (url == null) {
             return "<html>unable to resolve link: <br>"+link+"</html>";
