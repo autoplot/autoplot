@@ -90,16 +90,25 @@ public class Axis extends DomNode {
     }
 
     public void syncTo(DomNode n) {
+        super.syncTo(n);
         if ( controller!=null ) {
-            controller.syncTo(n);
+            controller.syncTo(n,new ArrayList<String>());
         } else {
-            super.syncTo(n);
-            Axis that = (Axis) n;
-            this.setLog(that.isLog());
-            this.setRange(that.getRange());
-            this.setLabel(that.getLabel());
+            syncTo(n,new ArrayList<String>() );
         }
+    }
 
+    public void syncTo(DomNode n, List<String> exclude ) {
+        super.syncTo(n,exclude);
+        if ( controller!=null ) {
+            controller.syncTo(n,exclude);
+        } else {
+            Axis that = (Axis) n;
+            if ( !exclude.contains( PROP_LOG ) ) this.setLog(that.isLog());
+            if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
+            if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
+            if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
+        }
     }
 
     @Override

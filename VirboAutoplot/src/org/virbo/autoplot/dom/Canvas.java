@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -182,9 +183,18 @@ public class Canvas extends DomNode {
     @Override
     public void syncTo(DomNode n) {
         if ( controller!=null ) {
-            controller.syncTo((Canvas)n);
+            controller.syncTo((Canvas)n,new ArrayList<String>(),new HashMap<String, String>());
         } else {
             DomUtil.syncTo( this, n );
+        }
+    }
+
+    @Override
+    public void syncTo(DomNode n,List<String> exclude) {
+        if ( controller!=null ) {
+            controller.syncTo((Canvas)n,exclude,new HashMap<String, String>());
+        } else {
+            DomUtil.syncTo( this, n, exclude );
         }
     }
 

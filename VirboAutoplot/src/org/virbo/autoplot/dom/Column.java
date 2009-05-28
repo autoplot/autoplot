@@ -63,7 +63,14 @@ public class Column extends DomNode {
     }
 
     @Override
-    List<Diff> diffs(DomNode node) {
+    public DomNode copy() {
+        Column that= (Column)super.copy();
+        that.controller= null;
+        return that;
+    }
+    
+    @Override
+    public List<Diff> diffs(DomNode node) {
         return DomUtil.getDiffs( this, node );
     }
 

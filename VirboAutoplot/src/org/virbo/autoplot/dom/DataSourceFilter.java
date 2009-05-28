@@ -148,7 +148,7 @@ public class DataSourceFilter extends DomNode {
     }
 
     public void syncTo(DomNode n, List<String> exclude ) {
-        if ( !exclude.contains( DomNode.PROP_ID ) ) super.syncTo(n);
+        super.syncTo(n,exclude);
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setValidRange(that.getValidRange());        
@@ -161,7 +161,7 @@ public class DataSourceFilter extends DomNode {
     public List<Diff> diffs(DomNode node) {
         DataSourceFilter that= (DataSourceFilter)node;
         
-        List<Diff> result = new ArrayList<Diff>();
+        List<Diff> result = super.diffs(node);
         
         boolean b;
         
