@@ -24,6 +24,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -87,11 +89,7 @@ public class LogConsole extends javax.swing.JPanel {
                     public void run() {
                         try {
                             System.out.println("AP> " + s);
-                            if (interp == null) {
-                                commandLineTextPane1.setText("initializing interpretter...");
-                                interp = JythonUtil.createInterpreter(true, false);
-                                commandLineTextPane1.setText(s);
-                            }
+                            maybeInitializeInterpreter();
                             interp.exec(s);
                             commandLineTextPane1.setText("");
                         } catch (IOException ex) {
@@ -110,12 +108,7 @@ public class LogConsole extends javax.swing.JPanel {
         this.commandLineTextPane1.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
 
             public PythonInterpreter createInterpreter() throws java.io.IOException {
-                if (interp == null) {
-                    String s = commandLineTextPane1.getText();
-                    commandLineTextPane1.setText("initializing interpretter...");
-                    interp = JythonUtil.createInterpreter(true, false);
-                    commandLineTextPane1.setText(s);
-                }
+                maybeInitializeInterpreter();
                 return interp;
             }
         });
@@ -129,6 +122,21 @@ public class LogConsole extends javax.swing.JPanel {
         timer2.setRepeats(false);
 
     }
+
+    private void maybeInitializeInterpreter( ) throws IOException {
+        if (interp == null) {
+            String s = commandLineTextPane1.getText();
+            commandLineTextPane1.setText("initializing interpretter...");
+            interp = JythonUtil.createInterpreter(true, false);
+            if ( scriptContext!=null ) {
+                for ( Entry<String,Object> e: scriptContext.entrySet() ) {
+                    interp.set( e.getKey(), e.getValue() );
+                }
+            }
+            commandLineTextPane1.setText(s);
+        }
+    }
+    
     protected String searchText = "";
     public static final String PROP_SEARCHTEXT = "searchText";
 
@@ -141,6 +149,19 @@ public class LogConsole extends javax.swing.JPanel {
         this.searchText = searchText;
         update();
         firePropertyChange(PROP_SEARCHTEXT, oldSearchText, searchText);
+    }
+
+    protected Map<String, Object> scriptContext = null;
+    public static final String PROP_SCRIPTCONTEXT = "scriptContext";
+
+    public Map<String, Object> getScriptContext() {
+        return scriptContext;
+    }
+
+    public void setScriptContext(Map<String, Object> scriptContext) {
+        Map<String, Object> oldScriptContext = this.scriptContext;
+        this.scriptContext = scriptContext;
+        firePropertyChange(PROP_SCRIPTCONTEXT, oldScriptContext, scriptContext);
     }
 
     private synchronized LogConsoleSettingsDialog getSettingsDialog() {
@@ -175,7 +196,8 @@ public class LogConsole extends javax.swing.JPanel {
                 //}
                 }
                 if (rec.getLevel().intValue() >= Level.WARNING.intValue()) {
-                    LogConsole.this.oldStdErr.println(rec.getMessage());
+                    if (LogConsole.this.oldStdErr != null)
+                        LogConsole.this.oldStdErr.println(rec.getMessage());
                 }
             }
 
@@ -190,15 +212,26 @@ public class LogConsole extends javax.swing.JPanel {
         h.setLevel(Level.ALL);
         return h;
     }
+    private static boolean alreadyLoggingStdout = false;
 
     /**
      * create loggers that log messages sent to System.err and System.out.
-     * This is used with turnOffConsoleHandlers.
+     * This is used with turnOffConsoleHandlers.  This checks to see if
+     * stderr and stdout are already logging, for example when a second application
+     * is launched in the same jvm.
+     * 
      * @see turnOffConsoleHandlers
      */
-    public void logConsoleMessages() {
+    public synchronized void logConsoleMessages() {
         Logger logger;
         LoggingOutputStream los;
+
+        if (alreadyLoggingStdout) {
+            System.err.println("already logging stdout and stderr");
+            return;
+        } else {
+            alreadyLoggingStdout = true;
+        }
 
         logger = Logger.getLogger("console.stdout");
         los = new LoggingOutputStream(logger, Level.INFO);
@@ -245,9 +278,9 @@ public class LogConsole extends javax.swing.JPanel {
             doc.remove(0, doc.getLength());
             long lastT = 0;
 
-            MutableAttributeSet highlistAttr= new SimpleAttributeSet();
-            StyleConstants.setBackground( highlistAttr, Color.ORANGE );
-            
+            MutableAttributeSet highlistAttr = new SimpleAttributeSet();
+            StyleConstants.setBackground(highlistAttr, Color.ORANGE);
+
             for (LogRecord rec : records) {
                 if (rec.getLevel().intValue() >= level) {
                     if (lastT != 0 && rec.getMillis() - lastT > 5000) {
@@ -273,14 +306,14 @@ public class LogConsole extends javax.swing.JPanel {
                         recMsg = prefix.trim() + ": " + recMsg;
                     }
 
-                    AttributeSet attr= null;
+                    AttributeSet attr = null;
                     if (st != null && p.matcher(recMsg).find()) {
-                        attr= highlistAttr;
+                        attr = highlistAttr;
                     }
                     try {
                         //buf.append(recMsg).append("\n");
-                        recMsg+= "\n";
-                        doc.insertString(doc.getLength(), recMsg, attr );
+                        recMsg += "\n";
+                        doc.insertString(doc.getLength(), recMsg, attr);
                     } catch (BadLocationException ex) {
                         Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
                     }
