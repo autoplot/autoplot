@@ -26,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.das2.DasApplication;
+import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasCanvas;
@@ -68,9 +69,14 @@ public class ApplicationController extends DomNodeController implements RunLater
     final Map<BindingModel, Binding> bindingImpls;
     final Map<Connector, ColumnColumnConnector> connectorImpls;
     private final static Logger logger = Logger.getLogger("virbo.controller");
-    private int plotIdNum = 0;
-    private AtomicInteger panelIdNum = new AtomicInteger(0);
-    private int dsfIdNum = 0;
+
+    private static AtomicInteger canvasIdNum = new AtomicInteger(0);
+    private static AtomicInteger plotIdNum = new AtomicInteger(0);
+    private static AtomicInteger panelIdNum = new AtomicInteger(0);
+    private static AtomicInteger dsfIdNum = new AtomicInteger(0);
+    private static AtomicInteger rowIdNum = new AtomicInteger(0);
+    private static AtomicInteger columnIdNum = new AtomicInteger(0);
+    private static AtomicInteger appIdNum= new AtomicInteger(0);
 
     ApplicationControllerSyncSupport syncSupport;
     ApplicationControllerSupport support;
@@ -85,7 +91,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         this.syncSupport = new ApplicationControllerSyncSupport(this);
         this.support = new ApplicationControllerSupport(this);
 
-        application.setId("app_0");
+        application.setId("app_"+appIdNum.getAndIncrement());
         application.getOptions().setId("options_0");
 
         application.addPropertyChangeListener(domListener);
@@ -307,8 +313,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected synchronized DataSourceFilter addDataSourceFilter() {
         DataSourceFilter dsf = new DataSourceFilter();
         new DataSourceController(this.model, dsf);
-        dsf.setId("data_" + dsfIdNum);
-        dsfIdNum++;
+        assignId(dsf);
         List<DataSourceFilter> dataSourceFilters = new ArrayList<DataSourceFilter>(Arrays.asList(this.application.getDataSourceFilters()));
         dataSourceFilters.add(dsf);
         this.application.setDataSourceFilters(dataSourceFilters.toArray(new DataSourceFilter[dataSourceFilters.size()]));
@@ -354,7 +359,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         Canvas lcanvas = new Canvas();
         DasCanvas dasCanvas = new DasCanvas(lcanvas.getWidth(),lcanvas.getHeight());
 
-        lcanvas.setId("canvas_0");
+        assignId( lcanvas );
+
         new CanvasController(application, lcanvas).setDasCanvas(dasCanvas);
 
         new RowController( lcanvas.getMarginRow() ).createDasPeer( lcanvas, null );
@@ -510,7 +516,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                     deletePlot(src);
                 }
                 if (getPanelsFor(dst).size() == 1) {
-                    dst.syncTo(p.plotDefaults);
+                    dst.syncTo(p.plotDefaults, Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
                 }
             }
         }
@@ -612,7 +618,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             domRow = ccontroller.addInsertRow( ccontroller.getRowFor(getPlot()), direction);
         }
 
-        int num = plotIdNum++;
+        int num = plotIdNum.getAndIncrement();
 
         domPlot.setId("plot_" + num);
         domPlot.getXaxis().setId("xaxis_" + num);
@@ -727,7 +733,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected Panel copyPanel(Panel srcPanel, Plot domPlot, DataSourceFilter dsf) {
         logger.finer( "copyPanel("+srcPanel+","+domPlot+","+dsf+")");
         Panel newp = addPanel(domPlot, dsf);
-        newp.syncTo(srcPanel, Arrays.asList("plotId", "dataSourceFilterId"));
+        newp.syncTo(srcPanel, Arrays.asList(DomNode.PROP_ID,Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID));
         if (dsf == null) { // new DataSource, but with the same URI.
             DataSourceFilter dsfnew = newp.controller.getDataSourceFilter();
             DataSourceFilter dsfsrc = srcPanel.controller.getDataSourceFilter();
@@ -753,7 +759,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         if (addPanel) {
             addPanel(that, null);
         }
-        that.syncTo(srcPlot);
+        that.syncTo( srcPlot,Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
 
         if (bindx) {
             BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
@@ -929,7 +935,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         if ( c.getRows().length>0 ) {
-            c.getRows(0).syncTo( new Row(), Arrays.asList("id","top","bottom") );
+            c.getRows(0).syncTo( new Row(), Arrays.asList(DomNode.PROP_ID, Row.PROP_TOP, Row.PROP_BOTTOM ) );
             c.getRows(0).setTop("0%");
             c.getRows(0).setBottom("100%");
         }
@@ -939,15 +945,15 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         if ( c.getColumns().length>0 ) {
-            c.getColumns(0).syncTo( new Column(), Arrays.asList("id","left","right") );
+            c.getColumns(0).syncTo( new Column(), Arrays.asList(DomNode.PROP_ID, Column.PROP_LEFT, Column.PROP_RIGHT ) );
             c.getColumns(0).setLeft("0%");
             c.getColumns(0).setRight("100%");
         }
 
-        application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList("id") );
+        application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
         application.getDataSourceFilters(0).getController().setDataSetInternal(null);
-        application.getPlots(0).syncTo( new Plot(), Arrays.asList("id",Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
-        application.getPanels(0).syncTo( new Panel(), Arrays.asList("id",Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID) );
+        application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+        application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID) );
 
         lock.unlock();
     }
@@ -1271,6 +1277,35 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
         return result;
     }
+
+    /**
+     * assign a unique name to this node, considering its type.
+     * @param node
+     */
+    protected void assignId( DomNode node ) {
+        if ( node instanceof Row ) {
+            if ( rowIdNum.get()==0 ) {
+                node.setId("marginRow_"+rowIdNum.getAndIncrement());
+            } else {
+                node.setId( "row_"+rowIdNum.getAndIncrement() );
+            }
+        } else if ( node instanceof Column ) {
+            if ( columnIdNum.get()==0 ) {
+                node.setId( "marginColumn_"+columnIdNum.getAndIncrement() );
+            } else {
+                node.setId( "column_"+columnIdNum.getAndIncrement() );
+            }
+        } else if ( node instanceof DataSourceFilter ) {
+            node.setId("data_" + dsfIdNum);
+            dsfIdNum.getAndIncrement();
+        } else if ( node instanceof Canvas ) {
+            node.setId("canvas_"+canvasIdNum.getAndIncrement());
+            
+        } else {
+            throw new IllegalArgumentException("unsupported type: "+node.getClass().getName() );
+        }
+    }
+    
     /** focus **/
     /**
      * focus panel
@@ -1358,15 +1393,25 @@ public class ApplicationController extends DomNodeController implements RunLater
                 Options.PROP_SCRIPTVISIBLE,
                 Options.PROP_SERVERENABLED));
 
-        syncSupport.syncToCanvases(that.getCanvases());
 
-        syncSupport.syncToPlotsAndPanels(that.getPlots(), that.getPanels(), that.getDataSourceFilters());
+        Map<String,String> nameMap= new HashMap<String,String>() {
+            @Override
+            public String get(Object key) {
+                String result= super.get(key);
+                return (result==null) ? (String)key : result;
+            }
+        };
+
+        if ( !this.application.id.equals( that.id ) ) nameMap.put( that.id, this.application.id );
+
+        syncSupport.syncToCanvases(that.getCanvases(),nameMap);
+
+        syncSupport.syncToPlotsAndPanels( that.getPlots(), that.getPanels(), that.getDataSourceFilters(), nameMap );
 
         application.setTimeRange(that.getTimeRange());
 
-        syncSupport.syncBindings(that.getBindings());
+        syncSupport.syncBindingsNew( that.getBindings(), nameMap );
         syncSupport.syncConnectors(that.getConnectors());
-
 
         canvasLock.unlock();
 
