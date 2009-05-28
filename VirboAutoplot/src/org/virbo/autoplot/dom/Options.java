@@ -322,7 +322,7 @@ public class Options extends DomNode {
 
 
     public void syncTo( DomNode n,List<String> exclude ) {
-        super.syncTo(n);
+        super.syncTo(n,exclude);
         Options that = (Options) n;
         if ( !exclude.contains(PROP_BACKGROUND) ) this.setBackground(that.getBackground());
         if ( !exclude.contains(PROP_FOREGROUND) ) this.setForeground(that.getForeground());
@@ -349,7 +349,7 @@ public class Options extends DomNode {
     public List<Diff> diffs(DomNode node) {
         Options that = (Options) node;
 
-        List<Diff> result = new ArrayList<Diff>();
+        List<Diff> result = super.diffs(node);
 
         boolean b;
 

@@ -200,14 +200,14 @@ public class Panel extends DomNode {
 
     public List<Diff> diffs(DomNode node) {
         
-        List<Diff> result = new ArrayList<Diff>();
+        List<Diff> result = super.diffs(node);
+        
         Panel that = (Panel) node;
-
-        boolean b;
 
         if ( !that.plotId.equals( this.plotId ) ) {
             result.add( new PropertyChangeDiff( "plotId", that.plotId, this.plotId ) );
         }
+
         if ( !that.legendLabel.equals( this.legendLabel ) ) {
             result.add( new PropertyChangeDiff( "legendLabel", that.legendLabel, this.legendLabel ) );
         }
@@ -244,7 +244,7 @@ public class Panel extends DomNode {
     }
     
     public void syncTo( DomNode n, List<String> exclude ) {
-        if ( !exclude.contains( DomNode.PROP_ID ) ) super.syncTo(n);
+        super.syncTo(n,exclude);
         Panel that = (Panel) n;
         if ( !exclude.contains( PROP_PLOTID ) ) this.setPlotId(that.getPlotId());
         if ( !exclude.contains( PROP_DATASOURCEFILTERID ) ) this.setDataSourceFilterId(that.getDataSourceFilterId());

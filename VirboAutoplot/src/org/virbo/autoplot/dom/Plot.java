@@ -5,6 +5,7 @@
 package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,7 +16,6 @@ public class Plot extends DomNode {
 
     public Plot() {
     }
-        
     protected Axis xaxis = new Axis();
     public static final String PROP_XAXIS = "xaxis";
 
@@ -52,8 +52,6 @@ public class Plot extends DomNode {
         this.zaxis = zaxis;
         propertyChangeSupport.firePropertyChange(PROP_ZAXIS, oldZaxis, zaxis);
     }
-    
-    
     protected String title = "";
     /**
      * title for the plot. 
@@ -69,9 +67,7 @@ public class Plot extends DomNode {
         this.title = title;
         propertyChangeSupport.firePropertyChange(PROP_TITLE, oldTitle, title);
     }
-
     protected boolean isotropic = false;
-
     public static final String PROP_ISOTROPIC = "isotropic";
 
     public boolean isIsotropic() {
@@ -83,8 +79,7 @@ public class Plot extends DomNode {
         this.isotropic = isotropic;
         propertyChangeSupport.firePropertyChange(PROP_ISOTROPIC, oldIsotropic, isotropic);
     }
-    
-    protected String rowId;
+    protected String rowId="";
     public static final String PROP_ROWID = "rowId";
 
     public String getRowId() {
@@ -96,8 +91,7 @@ public class Plot extends DomNode {
         this.rowId = rowId;
         propertyChangeSupport.firePropertyChange(PROP_ROWID, oldRowId, rowId);
     }
-
-    protected String columnId;
+    protected String columnId="";
     public static final String PROP_COLUMNID = "columnId";
 
     public String getColumnId() {
@@ -109,8 +103,6 @@ public class Plot extends DomNode {
         this.columnId = columnId;
         propertyChangeSupport.firePropertyChange(PROP_COLUMNID, oldColumnId, columnId);
     }
-
-    
     protected PlotController controller;
 
     public PlotController getController() {
@@ -119,33 +111,28 @@ public class Plot extends DomNode {
 
     @Override
     public DomNode copy() {
-        Plot result= (Plot) super.copy();
-        result.controller= null;
-        result.xaxis= (Axis) result.xaxis.copy();
-        result.yaxis= (Axis) result.yaxis.copy();
-        result.zaxis= (Axis) result.zaxis.copy();
+        Plot result = (Plot) super.copy();
+        result.controller = null;
+        result.xaxis = (Axis) result.xaxis.copy();
+        result.yaxis = (Axis) result.yaxis.copy();
+        result.zaxis = (Axis) result.zaxis.copy();
         return result;
     }
-    
-    
+
     public void syncTo(DomNode n) {
-        super.syncTo(n);
-        Plot that = (Plot) n;
-        this.setTitle( that.getTitle() );
-        this.setIsotropic( that.isIsotropic() );
-        this.xaxis.syncTo(that.getXaxis());
-        this.yaxis.syncTo(that.getYaxis());
-        this.zaxis.syncTo(that.getZaxis());
+        syncTo( n, new ArrayList<String>() );
     }
 
-    public void syncTo(DomNode n,List<String> exclude) {
-        super.syncTo(n); //TODO: ID!
+    public void syncTo(DomNode n, List<String> exclude) {
+        super.syncTo(n,exclude);
         Plot that = (Plot) n;
-        if ( !exclude.contains(PROP_TITLE) ) this.setTitle( that.getTitle() );
-        if ( !exclude.contains(PROP_ISOTROPIC) )this.setIsotropic( that.isIsotropic() );
-        this.xaxis.syncTo(that.getXaxis());
-        this.yaxis.syncTo(that.getYaxis());
-        this.zaxis.syncTo(that.getZaxis());
+        if (!exclude.contains(PROP_TITLE)) this.setTitle(that.getTitle());
+        if (!exclude.contains(PROP_ISOTROPIC)) this.setIsotropic(that.isIsotropic());
+        if (!exclude.contains(PROP_ROWID)) this.setRowId(that.getRowId());
+        if (!exclude.contains(PROP_COLUMNID)) this.setColumnId(that.getColumnId());
+        this.xaxis.syncTo(that.getXaxis(),exclude); // possibly exclude id's.
+        this.yaxis.syncTo(that.getYaxis(),exclude);
+        this.zaxis.syncTo(that.getZaxis(),exclude);
     }
 
     @Override
@@ -154,23 +141,28 @@ public class Plot extends DomNode {
         result.add(xaxis);
         result.add(yaxis);
         result.add(zaxis);
-        
+
         return result;
     }
 
     public List<Diff> diffs(DomNode node) {
 
         Plot that = (Plot) node;
-        List<Diff> result = new ArrayList<Diff>();
+        List<Diff> result = super.diffs(node);
 
         boolean b;
-        
-        b=  that.title.equals(this.title) ;
-        if ( !b ) result.add( new PropertyChangeDiff( "title", that.title, this.title ) );
-        
-        result.addAll( DomUtil.childDiffs("xaxis", this.getXaxis().diffs(that.getXaxis()) ) );
-        result.addAll( DomUtil.childDiffs("yaxis", this.getYaxis().diffs(that.getYaxis()) ) );
-        result.addAll( DomUtil.childDiffs("zaxis", this.getZaxis().diffs(that.getZaxis()) ) );
+
+        b = that.title.equals(this.title);
+        if (!b) result.add(new PropertyChangeDiff("title", that.title, this.title));
+        b = that.isotropic == this.isotropic;
+        if (!b) result.add(new PropertyChangeDiff("isotropic", that.isotropic, this.isotropic));
+        b = that.rowId.equals(this.rowId);
+        if (!b) result.add(new PropertyChangeDiff("rowId", that.rowId, this.rowId));
+        b = that.columnId.equals(this.columnId);
+        if (!b) result.add(new PropertyChangeDiff("columnId", that.columnId, this.columnId));
+        result.addAll(DomUtil.childDiffs("xaxis", this.getXaxis().diffs(that.getXaxis())));
+        result.addAll(DomUtil.childDiffs("yaxis", this.getYaxis().diffs(that.getYaxis())));
+        result.addAll(DomUtil.childDiffs("zaxis", this.getZaxis().diffs(that.getZaxis())));
         return result;
     }
 }

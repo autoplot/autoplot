@@ -182,23 +182,27 @@ public class PanelStyle extends DomNode {
     /*  DomNode Stuff ******************/
 
     public void syncTo( DomNode node ) {
-        super.syncTo(node);
+        syncTo(node,new ArrayList<String>());
+    }
+
+    public void syncTo( DomNode node, List<String> exclude ) {
+        super.syncTo(node,exclude);
         PanelStyle that= ( PanelStyle )node;
-        this.setColortable( that.colortable );
-        this.setFillToReference( that.fillToReference );
-        this.setColor( that.getColor() );
-        this.setFillColor( that.getFillColor() );
-        this.setReference( that.getReference() );
-        this.setLineWidth( that.getLineWidth() );
-        this.setPlotSymbol( that.getPlotSymbol() );
-        this.setSymbolSize( that.getSymbolSize() );
-        this.setSymbolConnector( that.getSymbolConnector() );
+        if ( !exclude.contains(PROP_COLORTABLE ) ) this.setColortable( that.colortable );
+        if ( !exclude.contains(PROP_FILL_TO_REFERENCE ) )this.setFillToReference( that.fillToReference );
+        if ( !exclude.contains(PROP_COLOR ) )this.setColor( that.getColor() );
+        if ( !exclude.contains(PROP_FILLCOLOR ) ) this.setFillColor( that.getFillColor() );
+        if ( !exclude.contains(PROP_REFERENCE ) )this.setReference( that.getReference() );
+        if ( !exclude.contains(PROP_LINE_WIDTH ) )this.setLineWidth( that.getLineWidth() );
+        if ( !exclude.contains(PROP_PLOT_SYMBOL ) )this.setPlotSymbol( that.getPlotSymbol() );
+        if ( !exclude.contains(PROP_SYMBOL_SIZE ) )this.setSymbolSize( that.getSymbolSize() );
+        if ( !exclude.contains(PROP_SYMBOL_CONNECTOR ) )this.setSymbolConnector( that.getSymbolConnector() );
     }
 
     public List<Diff> diffs(DomNode node) {
         PanelStyle that= (PanelStyle)node;
-        List<Diff> result = new ArrayList<Diff>();
-        
+
+        List<Diff> result = super.diffs(node);
 
         boolean b;
         b=  that.color.equals(this.color) ;
