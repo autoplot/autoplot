@@ -288,7 +288,7 @@ public class PanelController extends DomNodeController {
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
             QDataSet fillDs = dsf.controller.getFillDataSet();
-            logger.fine("got new dataset: " + fillDs + "  resetPanel="+resetPanel+"  resetRanges="+resetRanges );
+            logger.fine(""+panel+" got new dataset: " + fillDs + "  resetPanel="+resetPanel+"  resetRanges="+resetRanges );
             if (fillDs != null) {
                 if (resetPanel) {
                     if ( panel.getComponent().equals("") ) {
@@ -332,10 +332,14 @@ public class PanelController extends DomNodeController {
      */
     private boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
         if ( oldRenderType==newRenderType ) return false;
-        if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
+        if ( oldRenderType==RenderType.spectrogram && newRenderType==RenderType.nnSpectrogram ) {
+            return false;
+        } else if ( newRenderType==RenderType.nnSpectrogram && oldRenderType==RenderType.spectrogram ) {
+            return false;
+        } else if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
             return true;
         } else {
-            if ( oldRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
+            if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
                 return true;
             } else {
                 return false;
@@ -362,7 +366,7 @@ public class PanelController extends DomNodeController {
         if (fillDs != null) {
 
             boolean shouldHaveChildren= fillDs.rank() == 2
-                    &&  ( renderType != RenderType.spectrogram || renderType != RenderType.nnSpectrogram )
+                    &&  ( renderType != RenderType.spectrogram && renderType != RenderType.nnSpectrogram )
                     &&  fillDs.length(0) < 12;
 
             String[] labels = null;
@@ -373,7 +377,7 @@ public class PanelController extends DomNodeController {
                     && shouldHaveChildren
                     && needNewChildren( labels, getChildPanels() );
 
-            if ( !shouldHaveChildren || weShallAddChildren ) {
+            if ( !shouldHaveChildren || weShallAddChildren ) { // delete any old child panels
                 List<Panel> childPanels= getChildPanels();
                 for ( Panel p : childPanels ) {
                     if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
@@ -536,7 +540,7 @@ public class PanelController extends DomNodeController {
         Plot plot = dom.controller.getPlotFor(panel);
 
         Panel panelCopy = (Panel) panel.copy();
-        panelCopy.getPlotDefaults().syncTo(plot);
+        panelCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
 
         if (dom.getOptions().isAutolabelling()) {
             doMetadata(panelCopy, autorange, true);
@@ -552,7 +556,7 @@ public class PanelController extends DomNodeController {
             panel.syncTo(panelCopy,Collections.singletonList(Panel.PROP_LEGENDLABEL) );
         }
 
-        plot.syncTo(panel.getPlotDefaults());
+        plot.syncTo( panel.getPlotDefaults(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
 
         setStatus("done, apply fill and autorange");
         changesSupport.changePerformed(this, PENDING_RESET_RANGE);
@@ -847,7 +851,7 @@ public class PanelController extends DomNodeController {
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer( panel.getRenderType(), oldRenderer, getColorbar() );
 
-        if (oldRenderer != newRenderer) {
+        if (oldRenderer != newRenderer || getDasPlot()!=newRenderer.getParent() ) {
             setRenderer(newRenderer);
 
             DasPlot plot = getDasPlot();
@@ -857,7 +861,6 @@ public class PanelController extends DomNodeController {
             }
             plot.addRenderer(newRenderer);
             logger.finest("plot.addRenderer "+plot+" "+newRenderer);
-
             if (getDataSourceFilter().controller.getFillDataSet() != null) {
                 setDataSet(getDataSourceFilter().controller.getFillDataSet());
             }
