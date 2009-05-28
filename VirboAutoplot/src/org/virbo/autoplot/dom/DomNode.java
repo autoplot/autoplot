@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,13 +33,17 @@ public abstract class DomNode implements Cloneable {
     /**
      * bulk assignment of properties.  When the node's children differ, then a controller should be used
      * to implement the sync.
-     * Syncing should include the node's ID.  (for now, it's not clear what the ramifications are...)
+     * Syncing should include the node's ID.  
      * @param n
      */
     public void syncTo( DomNode n ) {
-        //this.id= n.id;  don't sync ID!!!
+        this.id= n.id; 
     }
 
+    public void syncTo( DomNode n, List<String> exclude ) {
+        if ( !exclude.contains(PROP_ID) ) this.id= n.id;
+    }
+    
     /**
      * return any child nodes.
      * @return
@@ -46,6 +51,7 @@ public abstract class DomNode implements Cloneable {
     public List<DomNode> childNodes() {
         return Collections.emptyList();
     }
+
     /**
      * return a list of the differences between this and another node.  The
      * differences describe how to mutate that node to make it like this
@@ -53,7 +59,16 @@ public abstract class DomNode implements Cloneable {
      * @param node
      * @return
      */
-    abstract List<Diff> diffs( DomNode node );
+    public List<Diff> diffs( DomNode that ) {
+        List<Diff> result = new ArrayList<Diff>();
+
+        boolean b;
+
+        b= that.id.equals(this.id);
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_ID, that.id, this.id ));
+        return result;
+
+    }
 
     public DomNode() {        
         id= "";
