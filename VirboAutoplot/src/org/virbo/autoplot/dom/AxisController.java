@@ -6,6 +6,7 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
@@ -90,7 +91,7 @@ public class AxisController extends DomNodeController {
         return dasAxis;
     }
 
-    void syncTo(DomNode n) {
+    void syncTo(DomNode n,List<String> exclude ) {
         Lock lock = null;
         if ( dasAxis!=null ) {
             lock= dasAxis.mutatorLock();
@@ -98,9 +99,10 @@ public class AxisController extends DomNodeController {
         }
         //TODO: should call ((DomNode)n).syncTo(n);
         Axis that = (Axis) n;
-        axis.setLog(that.isLog());
-        axis.setRange(that.getRange());
-        axis.setLabel(that.getLabel());
+        if ( !exclude.contains( Axis.PROP_LOG ) ) axis.setLog(that.isLog());
+        if ( !exclude.contains( Axis.PROP_RANGE ) ) axis.setRange(that.getRange());
+        if ( !exclude.contains( Axis.PROP_LABEL ) ) axis.setLabel(that.getLabel());
+        if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
         if ( lock!=null ) lock.unlock();
     }
 }
