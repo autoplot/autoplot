@@ -51,6 +51,12 @@ public class PyReflectedFunctionPeeker {
                     return declaringClass.getMethod(f.__name__, cs[0],cs[1],cs[2],cs[3],cs[4],cs[5]);
                 case 7:
                     return declaringClass.getMethod(f.__name__, cs[0],cs[1],cs[2],cs[3],cs[4],cs[5],cs[6]);
+                case 8:
+                    return declaringClass.getMethod(f.__name__, cs[0],cs[1],cs[2],cs[3],cs[4],cs[5],cs[6],cs[7]);
+                case 9:
+                    return declaringClass.getMethod(f.__name__, cs[0],cs[1],cs[2],cs[3],cs[4],cs[5],cs[6],cs[7],cs[8]);
+                case 10:
+                    return declaringClass.getMethod(f.__name__, cs[0],cs[1],cs[2],cs[3],cs[4],cs[5],cs[6],cs[7],cs[8],cs[9]);
                 default:
                     throw new IllegalArgumentException("too many params ("+cs.length+")");
             }
