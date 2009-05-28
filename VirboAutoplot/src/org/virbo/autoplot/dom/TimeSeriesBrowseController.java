@@ -57,7 +57,7 @@ public class TimeSeriesBrowseController {
         this.panelController = p.getController();
         this.dsf= p.getController().getDataSourceFilter();
         this.dataSourceController= dsf.getController();
-        
+
         this.plot = panelController.getDasPlot();
         this.xAxis = panelController.getDasPlot().getXAxis();
     }
@@ -65,8 +65,8 @@ public class TimeSeriesBrowseController {
     public void setup( boolean valueWasAdjusting ) {
         boolean setTsbInitialResolution = true;
         if (setTsbInitialResolution) {
-            DatumRange timeRange = dataSourceController.getTsb().getTimeRange();
-            if ( !valueWasAdjusting ) this.plot.getXAxis().resetRange(timeRange);
+            DatumRange tr = dataSourceController.getTsb().getTimeRange();
+            if ( !valueWasAdjusting ) this.plot.getXAxis().resetRange(tr);
             updateTsb(true);
         }
 
