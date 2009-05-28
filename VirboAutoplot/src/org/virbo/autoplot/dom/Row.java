@@ -70,12 +70,13 @@ public class Row extends DomNode {
     @Override
     public DomNode copy() {
         Row that= (Row)super.copy();
+        that.controller= null;
         return that;
     }
 
 
     @Override
-    List<Diff> diffs(DomNode node) {
+    public List<Diff> diffs(DomNode node) {
         return DomUtil.getDiffs( this, node );
     }
 
