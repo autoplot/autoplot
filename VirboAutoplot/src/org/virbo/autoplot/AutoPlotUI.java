@@ -23,7 +23,6 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.PersistentStateSupport;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -37,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -48,7 +48,6 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -58,8 +57,6 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
-import org.das2.system.DasLogger;
-import org.das2.system.ExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -76,10 +73,8 @@ import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
-import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.UndoRedoSupport;
-import org.virbo.autoplot.util.CanvasLayoutPanel;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
@@ -488,6 +483,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
     private void initLogConsole() throws SecurityException {
         logConsole = new LogConsole();
+        logConsole.setScriptContext( Collections.singletonMap( "dom", (Object)applicationModel.dom ) ); // must cast or javac complains
         logConsole.turnOffConsoleHandlers();
         logConsole.logConsoleMessages(); // stderr, stdout logged to Logger "console"
 
@@ -592,7 +588,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }
 
     public void setStatus(String message) {
-
         if ( message.startsWith("busy:" ) ) {
             setMessage( BUSY_ICON, message.substring(5).trim() );
             logger.info(message);
@@ -1435,8 +1430,11 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
     }
     
     public void setMessage( Icon icon, String message ) {
+        String myMess= message;
+        if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
         this.statusLabel.setIcon( icon );
-        this.statusLabel.setText(message);
+        this.statusLabel.setText(myMess);
+        this.statusLabel.setToolTipText(message);
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
