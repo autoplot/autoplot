@@ -26,20 +26,15 @@ public class ApplicationControllerSyncSupport {
         this.application= controller.application;
     }
 
-    protected void syncToCanvases( Canvas[] canvases ) {
+    protected void syncToCanvases( Canvas[] canvases, Map<String,String> layoutIds ) {
         if ( canvases.length!=application.canvases.size() ) throw new IllegalArgumentException("not implemented");
-       /* while (application.canvases.size() < canvases.length) {
-            controller.addCanvas();
-        }
-        while (application.canvases.size() > canvases.length) {
-            //controller.deleteCanvas( plott );
-        }*/
+        //TODO: multiple canvases not supported
         for (int i = 0; i < canvases.length; i++) {
-            application.canvases.get(i).syncTo(canvases[i]);
+            application.canvases.get(i).controller.syncTo(canvases[i],new ArrayList<String>(),layoutIds);
         }
     }
 
-    protected void syncToPlots( Plot[] plots, Map<String,String> plotIds ) {
+    protected void syncToPlots( Plot[] plots, Map<String,String> nameMap ) {
         List<Diff> diffs= DomUtil.getArrayDiffs( "plots", plots, application.getPlots() );
         for ( Diff d: diffs ) {
             if ( d instanceof ArrayNodeDiff ) {
@@ -73,15 +68,13 @@ public class ApplicationControllerSyncSupport {
                 col=  (Column) DomUtil.getElementById( application, p.getColumnId() );
                 new PlotController( application, p ).createDasPeer( row.controller.getCanvas(), row, col );
             }
-            plotIds.put( p.getId(), p.getId() );
+            nameMap.put( p.getId(), p.getId() );  //DANGER--this is intentionally the same.
         }
     }
 
-    protected void syncToPlotsAndPanels( Plot[] plots, Panel[] panels, DataSourceFilter[] dataSourceFilters ) {
-        Map<String,String> plotIds= new HashMap<String,String>();
-        Map<String,String> dsfIds= new HashMap<String,String>();
+    protected void syncToPlotsAndPanels( Plot[] plots, Panel[] panels, DataSourceFilter[] dataSourceFilters ,Map<String,String> nameMap) {
 
-        syncToPlots(plots,plotIds);
+        syncToPlots(plots,nameMap);
 
         while (application.dataSourceFilters.size() < dataSourceFilters.length) {
             controller.addDataSourceFilter();
@@ -95,7 +88,7 @@ public class ApplicationControllerSyncSupport {
         }
         for (int i = 0; i < dataSourceFilters.length; i++) {
             application.dataSourceFilters.get(i).syncTo(dataSourceFilters[i]);
-            dsfIds.put( dataSourceFilters[i].getId(), application.dataSourceFilters.get(i).getId() );
+            nameMap.put( dataSourceFilters[i].getId(), application.dataSourceFilters.get(i).getId() );
         }
 
         while (application.panels.size() < panels.length) {
@@ -114,9 +107,10 @@ public class ApplicationControllerSyncSupport {
         for (int i = 0; i < panels.length; i++) {
             application.panels.get(i).syncTo(panels[i], 
                     Arrays.asList( Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE ) );
-            application.panels.get(i).setPlotId( plotIds.get(panels[i].getPlotId() ) );
+            application.panels.get(i).setPlotId( nameMap.get(panels[i].getPlotId() ) );
             application.panels.get(i).setRenderType( panels[i].getRenderType() );
-            application.panels.get(i).setDataSourceFilterId(dsfIds.get(panels[i].getDataSourceFilterId()) );
+            application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
+            application.panels.get(i).setDataSourceFilterId( nameMap.get(panels[i].getDataSourceFilterId()) );
         }
 
 
@@ -150,7 +144,7 @@ public class ApplicationControllerSyncSupport {
     }
 
 
-    protected void syncBindingsNew( BindingModel[] bindings ) {
+    protected void syncBindingsNew( BindingModel[] bindings ,Map<String,String> idMap) {
         List<Diff> diffs= DomUtil.getArrayDiffs( "bindings", bindings, application.getBindings() );
         for ( Diff d: diffs ) {
             if ( d instanceof ArrayNodeDiff ) {
@@ -161,8 +155,8 @@ public class ApplicationControllerSyncSupport {
                     controller.deleteBinding(domBinding);
                 } if ( and.getAction()==ArrayNodeDiff.Action.Insert ) {
                     BindingModel c= (BindingModel) and.getNode();
-                    DomNode src= DomUtil.getElementById(application,c.srcId);
-                    DomNode dst= DomUtil.getElementById(application,c.dstId);
+                    DomNode src= DomUtil.getElementById(application,idMap.get(c.srcId));
+                    DomNode dst= DomUtil.getElementById(application,idMap.get(c.dstId));
                     if ( src==null || dst==null ) {
                         Logger.getLogger( ApplicationControllerSupport.class.getName() ).finer("node was null");
                     } else {
@@ -176,7 +170,7 @@ public class ApplicationControllerSyncSupport {
     }
     
     protected void syncBindings( BindingModel[] bindings ) {
-        syncBindingsNew(bindings);
+        syncBindingsNew(bindings,new HashMap<String, String>());
         /*
         List<BindingModel> addBindings= new ArrayList<BindingModel>();
         List<BindingModel> deleteBindings= new ArrayList<BindingModel>();
