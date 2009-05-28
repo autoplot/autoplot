@@ -4,17 +4,12 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import org.das2.graph.DasCanvas;
-import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
 import org.das2.system.MutatorLock;
@@ -29,18 +24,14 @@ public class CanvasController extends DomNodeController {
     DasCanvas dasCanvas;
     private Application application;
     private Canvas canvas;
-    private static AtomicInteger rowIdNum = new AtomicInteger(0);
-    private static AtomicInteger columnIdNum = new AtomicInteger(0);
-    public final String MARGINROWID = "marginRow_" + rowIdNum.incrementAndGet();
-    public final String MARGINCOLUMNID = "marginColumn_" + columnIdNum.incrementAndGet();
-
+    
     public CanvasController(Application dom, Canvas canvas) {
         super(canvas);
         this.application = dom;
         this.canvas = canvas;
         canvas.controller = this;
-        canvas.getMarginRow().setId(MARGINROWID);
-        canvas.getMarginColumn().setId(MARGINCOLUMNID);
+        dom.getController().assignId(canvas.getMarginRow());
+        dom.getController().assignId(canvas.getMarginColumn());
     }
 
     /**
@@ -200,7 +191,7 @@ public class CanvasController extends DomNodeController {
 
         canvas.setRows(rows.toArray(new Row[rows.size()]));
 
-        row.setId("row_" + rowIdNum.getAndIncrement());
+        this.application.getController().assignId( row );
 
         lock.unlock();
 
@@ -236,10 +227,12 @@ public class CanvasController extends DomNodeController {
         lock.unlock();
     }
 
-    protected void syncTo(Canvas canvas) {
+    protected void syncTo(Canvas canvas, List<String> exclude, Map<String,String> layoutIds ) {
 
+        // here we are looking for where the incorrect canvas is attached to the row.
         List<Diff> diffs =  canvas.diffs(this.canvas);
         for (Diff d : diffs) {
+            if ( exclude.contains(d.propertyName()) ) continue;
             try {
                 if (d instanceof ArrayNodeDiff) {
                     ArrayNodeDiff and = (ArrayNodeDiff) d;
@@ -247,7 +240,7 @@ public class CanvasController extends DomNodeController {
                 d.doDiff(this.canvas);
             } catch (RuntimeException ex) {
                 ex.printStackTrace();
-                d.doDiff(this.canvas);
+                d.doDiff(this.canvas); // for debugging TODO remove
             }
         }
         for (Row r : this.canvas.getRows()) {
