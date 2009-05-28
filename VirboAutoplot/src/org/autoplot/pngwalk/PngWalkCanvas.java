@@ -15,6 +15,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
@@ -25,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -101,6 +105,7 @@ public class PngWalkCanvas extends JPanel {
 
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
 
         int CELL_PAD = 30;
 
@@ -247,13 +252,31 @@ public class PngWalkCanvas extends JPanel {
                 if (width == -1) width = NOMINAL_WIDTH;
 
                 Rectangle bounds;
+                final boolean newMethod= true;
 
                 if (index < currentIndex) {
                     int x = xm - 200 + (index - currentIndex) * targetSize / 4;
-                    bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1,false);
-                    if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
+                    
+                    if ( newMethod ) {
+                        bounds = bounds( x, y, width, height, targetSize, targetSize, 0.1, false );
+                        BufferedImage im;
+                        if ( image instanceof BufferedImage ) {
+                            im= (BufferedImage) image;
+                        } else {
+                            im= new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
+                            im.getGraphics().drawImage( image, 0, 0, this );
+                        }
+                        ScalePerspectiveImageOp op= new ScalePerspectiveImageOp( im.getWidth(), im.getHeight(),
+                                0, 0, bounds.width, bounds.height,
+                                0.1 );
+                        g.drawImage( im, op, bounds.x, bounds.y );
+                        g.draw( op.getOutline( bounds.x, bounds.y ) );
+                    } else {
+                        bounds = bounds(x, y, width, height, targetSize, targetSize, 0.05, false);
+                        if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
+                        }
+                        g.draw(bounds);
                     }
-                    g.draw(bounds);
                     if ( usedLastImage ) drawMomentStr( g, bounds);
 
                 } else if (index == currentIndex) {
@@ -267,10 +290,26 @@ public class PngWalkCanvas extends JPanel {
                     if ( usedLastImage ) drawMomentStr( g, bounds);
                 } else {
                     int x = xm + 200 + (index - currentIndex) * targetSize / 4;
-                    bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1,false);
-                    if ( g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
+                    if ( newMethod ) {
+                        bounds = bounds( x, y, width, height, targetSize, targetSize, 0.1, false );
+                        BufferedImage im;
+                        if ( image instanceof BufferedImage ) {
+                            im= (BufferedImage) image;
+                        } else {
+                            im= new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
+                            im.getGraphics().drawImage( image, 0, 0, this );
+                        }
+                        ScalePerspectiveImageOp op= new ScalePerspectiveImageOp( im.getWidth(), im.getHeight(),
+                                0, 0, bounds.width, bounds.height,
+                                -0.05 );
+                        g.drawImage( im, op, bounds.x, bounds.y );
+                        g.draw( op.getOutline( bounds.x, bounds.y ) );
+                    } else {
+                        bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1,false);
+                        if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
+                        }
+                        g.draw(bounds);
                     }
-                    g.draw(bounds);
                     if ( usedLastImage ) drawMomentStr( g, bounds);
                 }
 
@@ -342,7 +381,7 @@ public class PngWalkCanvas extends JPanel {
 
         }
     }
-    List<Image> images = new ArrayList<Image>();
+    List<Image> images = new ArrayList();
     List<URL> urls = new ArrayList<URL>();
     List<DatumRange> ranges = new ArrayList<DatumRange>();
     Map<Rectangle, Integer> imagebounds;
@@ -364,15 +403,24 @@ public class PngWalkCanvas extends JPanel {
 
     private synchronized void updateImages() {
         try {
+            DatumRange currentRange=null;
+            if ( ranges.size()>currentIndex ) currentRange = ranges.get(currentIndex);
             ranges = new ArrayList<DatumRange>();
             urls = WalkUtil.getFilesFor(template, timeRange, ranges);
-            images = new ArrayList<Image>();
+            images = new ArrayList();
             for (int i = 0; i < urls.size(); i++) {
                 images.add(i, getToolkit().createImage(urls.get(i)));
             }
             exception= null;
+            if ( currentRange!=null ) {
+                currentIndex= ranges.indexOf( currentRange );
+                if ( currentIndex==-1 ) currentIndex= 0;
+            } else {
+                currentIndex= 0;
+            }
+            setCurrentIndex( currentIndex );
+           
         } catch ( Exception ex ) {
-            DasExceptionHandler.handle(ex);
             DasExceptionHandler.handle(ex);
             exception= ex;
         }
