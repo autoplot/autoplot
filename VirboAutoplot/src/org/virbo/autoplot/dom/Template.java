@@ -39,7 +39,11 @@ public class Template extends DomNode {
     }
 
     public void syncTo(DomNode n) {
-        super.syncTo(n);
+        syncTo(n,new ArrayList<String>());
+    }
+
+    public void syncTo(DomNode n,List<String> exclude ) {
+        super.syncTo(n,exclude);
     }
 
     public List<Diff> diffs(DomNode node) {
