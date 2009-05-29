@@ -64,6 +64,7 @@ public class PlotController extends DomNodeController {
                 dasPlot.setRow(dasRow);
                 domPlot.getXaxis().getController().getDasAxis().setRow(dasRow);
                 domPlot.getYaxis().getController().getDasAxis().setRow(dasRow);
+                domPlot.getZaxis().getController().getDasAxis().setRow(dasRow);
             } else if ( dasPlot!=null && evt.getPropertyName().equals(Plot.PROP_COLUMNID) ) {
                 Column col= (Column) DomUtil.getElementById( dom, (String)evt.getNewValue() );
                 DasColumn dasColumn= col.controller.getDasColumn();
