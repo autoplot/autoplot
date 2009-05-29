@@ -1,16 +1,11 @@
-uri= 'vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/$Y/po_k0_hyd_$Y$m$d_v...cdf?ELE_MEAN_ENERGY&timerange=2001-01-05'
-outputFolder= '/tmp/pngwalk/'
-product= 'product'
-timeFormat= '%Y%m%d'
-times= getTimeRangesFor( uri, '2001', timeFormat )
+dom= getDocumentModel()
 
-java.io.File(outputFolder).mkdirs()
+uri= dom.dataSourceFilters[0].uri
 
-from org.das2.components import DasProgressPanel
+from javax.swing import *
+from java.awt import FlowLayout
 
-mon= DasProgressPanel.createFramed("running batch")
-
-def myWriteToPng( filename, appmodel, dom, width, height ): 
+def myWriteToPng( filename, appmodel, dom, width, height ):
    appmodel.waitUntilIdle(False);
    from org.das2.util import DasPNGEncoder, DasPNGConstants
    out= java.io.FileOutputStream( filename )
@@ -20,38 +15,92 @@ def myWriteToPng( filename, appmodel, dom, width, height ):
    encoder.write(image, out)
    out.close();
 
-n= len(times)
-mon.setTaskSize( n )
-mon.started()
+def doBatch( times, dom, outputFolder, product, timeFormat, mon ):
 
-appmodel= ApplicationModel()
-appmodel.addDasPeersToApp()
+    java.io.File(outputFolder).mkdirs()
 
-dom= appmodel.getDocumentModel()
-dom.syncTo( getDocumentModel() )
+    n= len(times)
+    mon.setTaskSize( n )
+    mon.started()
 
+    mon.setProgressMessage('initializing child application')
 
-from org.virbo.autoplot.state import StatePersistence
-StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom );
+    appmodel= ApplicationModel()
+    appmodel.addDasPeersToApp()
 
-dom.canvases[0].fitted=False
-w0= dom.canvases[0].width
-h0= dom.canvases[0].height
+    dom2= appmodel.getDocumentModel()
 
-dom.getController().waitUntilIdle();
+    mon.setProgressMessage('synchronize to this application')
 
+    dom2.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
 
-count= 0
-for i in times:
-   count= count+1
-   mon.setTaskProgress(count)
-   #if ( mon.isCancelled ): break
-   print '%d of %d' % (count, n )
-   dom.timeRange= DatumRangeUtil.parseTimeRangeValid(i)
-   myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom, w0, h0 )
+    dom2.options.autolayout= False
 
-mon.finished()
+    mon.setProgressMessage('write ' + product + '.vap' )
+    from org.virbo.autoplot.state import StatePersistence
+    StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom2 );
 
-from org.autoplot.pngwalk import DemoPngWalk
-DemoPngWalk.start( 'file:' + outputFolder + product + '_' + timeFormat + '.png', getViewWindow() )
+    dom2.canvases[0].fitted=False
+    w0= dom2.canvases[0].width
+    h0= dom2.canvases[0].height
+
+    dom2.getController().waitUntilIdle();
+
+    mon.setProgressMessage('making images')
+
+    count= 0
+    for i in times:
+       count= count+1
+       if ( mon.cancelled ): break
+       mon.setTaskProgress(count)
+       dom2.timeRange= DatumRangeUtil.parseTimeRangeValid(i)
+       mon.setProgressMessage('write '+ product + '_%s.png' % i )
+       myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom2, w0, h0 )
+
+    mon.finished()
+
+p= JPanel(  )
+p.layout= BoxLayout( p, BoxLayout.Y_AXIS )
+
+p.add( JLabel( 'Output Folder:' ) )
+outputFolderTf= JTextField( '/tmp/pngwalk/' )
+p.add( outputFolderTf )
+
+p.add( JLabel( 'Time Range:' ) )
+timeRangeTf= JTextField( '2009' )
+p.add( timeRangeTf )
+
+outputFolder=0
+timeRangeStr=0
+proceed= False
+
+if ( JOptionPane.showConfirmDialog( getViewWindow(), p, 'pngwalk options', JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ):
+   outputFolder= outputFolderTf.text
+   timeRangeStr= timeRangeTf.text
+   proceed= True
+else:
+   proceed= False
+
+from org.virbo.autoplot import ApplicationModel
+
+if ( proceed ):
+    product= 'product'
+    timeFormat= '%Y%m%d'
+
+    from org.das2.components import DasProgressPanel
+    mon= DasProgressPanel.createFramed( getViewWindow(),"running batch")
+
+    times= getTimeRangesFor( uri, timeRangeStr, timeFormat )
+    
+    doBatch( times, dom, outputFolder, product, timeFormat, mon )
+
+    if ( not mon.cancelled ):
+
+      from org.autoplot.pngwalk import DemoPngWalk
+      if ( outputFolder[1]==':' ):
+        url= 'file:/'+outputFolder
+      else:
+        url= 'file:'+outputFolder
+
+      DemoPngWalk.start( url + product + '_' + timeFormat + '.png', getViewWindow() )
 
