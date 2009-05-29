@@ -199,7 +199,11 @@ public class JythonCompletionTask implements CompletionTask {
                 }
                 String link = null;
                 if (signature != null) {
-                    link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
+                    if ( signature.startsWith("javax") || signature.startsWith("java") ) {
+                        link= "http://java.sun.com/j2se/1.5.0/docs/api/" + signature;
+                    } else {
+                        link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
+                    }
                 }
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
             }
