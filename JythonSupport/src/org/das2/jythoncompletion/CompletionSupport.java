@@ -77,7 +77,25 @@ public class CompletionSupport {
             return line.substring(0,pos);
         }
     }
-    
+
+    private static String exprBeforeDot( List<Token> tokens, int pos ) {
+            String contextString= tokens.get(pos-1).image;
+            int i= pos-1;
+            while ( i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT ) {
+                if ( tokens.get(i-2).kind==PythonGrammarConstants.RBRACKET
+                        && i>5
+                        && tokens.get(i-4).kind==PythonGrammarConstants.LBRACKET
+                        && tokens.get(i-5).kind==PythonGrammarConstants.NAME ) {
+                    contextString= tokens.get(i-5).image + tokens.get(i-4).image + tokens.get(i-3).image + tokens.get(i-2).image + tokens.get(i-1).image + contextString;
+                    i=i-5;
+                } else {
+                    contextString = tokens.get(i-2).image + tokens.get(i-1).image + contextString;
+                    i=i-2;
+                }
+            }
+            return contextString;
+    }
+
     public static CompletionContext getCompletionContext( String line, int pos, int i0, int i1, int i2 ) {
 
         List<Token> tokens= new ArrayList<Token>(20);
@@ -137,20 +155,10 @@ public class CompletionSupport {
                 result= new CompletionContext( CompletionContext.PACKAGE_NAME, join(tokens,1,myTokenIndex), completable );
                 
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.NAME ) {
-                String contextString= tokens.get(myTokenIndex-1).image;
-                int i= myTokenIndex-1;
-                while ( i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT ) {
-                    contextString = tokens.get(i-2).image + tokens.get(i-1).image + contextString;
-                    i=i-2;
-                }
+                String contextString= exprBeforeDot(tokens, myTokenIndex);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, "" );
             } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
-                String contextString= tokens.get(myTokenIndex-2).image;
-                int i= myTokenIndex-2;
-                while ( i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT ) {
-                    contextString = tokens.get(i-2).image + tokens.get(i-1).image + contextString;
-                    i=i-2;
-                }
+                String contextString= exprBeforeDot(tokens, myTokenIndex-1);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, completable );
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING ) {
                 if ( myTokenIndex>1 && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
