@@ -69,18 +69,18 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
 
     Shape getOutline( double x, double y ) {
         GeneralPath path= new GeneralPath();
-        Point2D src= new Point2D.Double();
-        Point2D dst= new Point2D.Double();
-        dst= this.getPoint2D( new Point2D.Double(0,0), dst);
-        path.moveTo(dst.getX(), dst.getY());
-        dst= this.getPoint2D( new Point2D.Double(w,0), dst);
-        path.lineTo(dst.getX(), dst.getY());
-        dst= this.getPoint2D( new Point2D.Double(w,h), dst);
-        path.lineTo(dst.getX(), dst.getY());
-        dst= this.getPoint2D( new Point2D.Double(0,h), dst);
-        path.lineTo(dst.getX(), dst.getY());
-        dst= this.getPoint2D( new Point2D.Double(0,0), dst);
-        path.lineTo(dst.getX(), dst.getY());
+        Point2D src= new Point2D.Float();
+        Point2D dst= new Point2D.Float();
+        dst= this.getPoint2D( new Point2D.Float(0,0), dst);
+        path.moveTo((float)dst.getX(), (float)dst.getY());
+        dst= this.getPoint2D( new Point2D.Float(w,0), dst);
+        path.lineTo((float)dst.getX(), (float)dst.getY());
+        dst= this.getPoint2D( new Point2D.Float(w,h), dst);
+        path.lineTo((float)dst.getX(), (float)dst.getY());
+        dst= this.getPoint2D( new Point2D.Float(0,h), dst);
+        path.lineTo((float)dst.getX(), (float)dst.getY());
+        dst= this.getPoint2D( new Point2D.Float(0,0), dst);
+        path.lineTo((float)dst.getX(), (float)dst.getY());
         path.transform( AffineTransform.getTranslateInstance(x,y) );
         return path;
     }
