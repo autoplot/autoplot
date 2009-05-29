@@ -4,6 +4,10 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,14 +58,35 @@ public class CanvasController extends DomNodeController {
         canvas.getMarginRow().setBottom(ss[1]);
     }
 
-    protected void setDasCanvas(DasCanvas canvas) {
+    protected void setDasCanvas(final DasCanvas canvas) {
         assert (dasCanvas != null);
         this.dasCanvas = canvas;
 
         ApplicationController ac = application.controller;
 
-        ac.bind(this.canvas, Canvas.PROP_WIDTH, dasCanvas, "preferredWidth"); //TODO: seven second delay
-        ac.bind(this.canvas, Canvas.PROP_HEIGHT, dasCanvas, "preferredHeight");
+        dasCanvas.addComponentListener( new ComponentListener() {
+            public void componentResized(ComponentEvent e) {
+                if ( CanvasController.this.canvas.getWidth()!=dasCanvas.getWidth() ) CanvasController.this.canvas.setWidth(dasCanvas.getWidth());
+                if ( CanvasController.this.canvas.getHeight()!=dasCanvas.getHeight() ) CanvasController.this.canvas.setHeight(dasCanvas.getHeight());
+            }
+            public void componentMoved(ComponentEvent e) {
+            }
+            public void componentShown(ComponentEvent e) {
+            }
+            public void componentHidden(ComponentEvent e) {
+            }
+        });
+
+        this.canvas.addPropertyChangeListener( Canvas.PROP_WIDTH, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                dasCanvas.setPreferredWidth( CanvasController.this.canvas.getWidth() );
+            }
+        } );
+        this.canvas.addPropertyChangeListener( Canvas.PROP_HEIGHT, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                dasCanvas.setPreferredHeight( CanvasController.this.canvas.getHeight() );
+            }
+        } );
         ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
 
     }
