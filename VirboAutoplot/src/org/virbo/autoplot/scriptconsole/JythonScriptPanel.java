@@ -7,15 +7,22 @@ package org.virbo.autoplot.scriptconsole;
 
 import java.awt.BorderLayout;
 import java.awt.Event;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
-import javax.swing.text.StyledEditorKit;
 import org.das2.jythoncompletion.JythonCompletionProvider;
 import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
@@ -94,6 +101,20 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             public void changedUpdate(DocumentEvent e) {
             }
         });
+
+        this.textArea.getActionMap().put( "save", new AbstractAction( "save" ) {
+            public void actionPerformed( ActionEvent e ) {
+                try {
+                    support.save();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+
+        this.textArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK ), "save" );
 
         EditorContextMenu menu= new EditorContextMenu( this.textArea );
         menu.setDataSetSelector(selector);
