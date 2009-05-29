@@ -151,7 +151,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         if ( newDsf!=null ) {
             int max= newDsf.getController().getMaxSliceIndex(newDsf.getSliceDimension());
-            if ( max>0 ) sliceIndexSpinner.setModel( new SpinnerNumberModel(0, 0, max-1, 1) );
+            if ( max>0 ) sliceIndexSpinner.setModel( new SpinnerNumberModel(newDsf.getSliceIndex(), 0, max-1, 1) );
         }
 
         dsfListener= new PropertyChangeListener() {
