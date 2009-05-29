@@ -70,6 +70,8 @@ public class LayoutUtil {
         int ymin = 90000;
         int ymax = -90000;
 
+        if ( canvas.getWidth()==0 ) return;
+
         Rectangle bounds;
         for (DasCanvasComponent cc : canvas.getCanvasComponents()) {
             if (cc.getColumn() == c && cc.isVisible()) {
