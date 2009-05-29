@@ -108,9 +108,21 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         if (src.getRGB(w - 1, 0) != bgColor) hasBg = false;
         if (src.getRGB(w - 1, h - 1) != bgColor) hasBg = false;
 
-        for (int j = 0; j < h; j+=ssy ) {
-            for ( int i = 0; i<w; i+=ssx ) {
-                int color = src.getRGB(i, j);
+        // make sure that all the borders are included in the averages.
+        int[] jj= new int[h/ssy+1];
+        for ( int k1=0; k1<h/ssy; k1++ ) jj[k1]= k1*ssy;
+        jj[h/ssy]= h-1;
+
+        int[] ii= new int[w/ssx+1];
+        for ( int k2=0; k2<w/ssx; k2++ ) ii[k2]= k2*ssx;
+        ii[w/ssx]= w-1;
+
+        for ( int k1 = 0; k1 < jj.length; k1++ ) {
+            int j= jj[k1];
+            for ( int k2 = 0; k2<ii.length; k2++ ) {
+                int i= ii[k2];
+                
+                int color = src.getRGB(i,j);
 
                 int i1 = x1 + (int) (i * w1 / w );
                 int pp = (int) Math.round( p>0 ? ( i * p)  : ( ( i-w ) *p ) );
