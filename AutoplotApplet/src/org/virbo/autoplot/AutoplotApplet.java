@@ -73,7 +73,7 @@ public class AutoplotApplet extends JApplet {
     String statusCallback;
     String timeCallback;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090515.1";
+    public static final String VERSION = "20090518.1";
 
     private String getStringParameter(String name, String deft) {
         String result = getParameter(name);
@@ -150,10 +150,21 @@ public class AutoplotApplet extends JApplet {
         super.start();
 
         model = new ApplicationModel();
+        model.setApplet(true);
+
+        System.err.println("ApplicationModel created @ " + (System.currentTimeMillis() - t0) + " msec");
 
         model.addDasPeersToApp();
+
+        System.err.println("done addDasPeersToApp @ " + (System.currentTimeMillis() - t0) + " msec");
+
         add(model.getCanvas(), BorderLayout.CENTER);
+
+        System.err.println("done add to applet @ " + (System.currentTimeMillis() - t0) + " msec");
+
         validate();
+
+        System.err.println("done applet.validate @ " + (System.currentTimeMillis() - t0) + " msec");
 
         try {
             System.err.println("Formatters: " + DataSourceRegistry.getInstance().getFormatterExtensions());
@@ -193,6 +204,7 @@ public class AutoplotApplet extends JApplet {
         timeCallback = getStringParameter("timeCallback", "");
 
         setInitializationStatus("readParameters");
+        System.err.println("done readParameters @ " + (System.currentTimeMillis() - t0) + " msec");
 
         dom.getOptions().setAutolayout("true".equals(getParameter("autolayout")));
         if (!dom.getOptions().isAutolayout()) {
@@ -259,6 +271,7 @@ public class AutoplotApplet extends JApplet {
 
         }
 
+        System.err.println("done set parameters @ " + (System.currentTimeMillis() - t0) + " msec");
 
         // createAppletTester();
         //Logger.getLogger("").setLevel( Level.WARNING );
@@ -304,6 +317,7 @@ public class AutoplotApplet extends JApplet {
             setInitializationStatus("dataSetLoaded");
         }
 
+        System.err.println("done dataSetLoaded @ " + (System.currentTimeMillis() - t0) + " msec");
 
         // axis settings
         Plot p = dom.getController().getPlot();
@@ -381,6 +395,8 @@ public class AutoplotApplet extends JApplet {
                 ex.printStackTrace();
             }
         }
+        
+        System.err.println("done setRenderType @ " + (System.currentTimeMillis() - t0) + " msec");
 
         if (!scolor.equals("")) {
             try {
