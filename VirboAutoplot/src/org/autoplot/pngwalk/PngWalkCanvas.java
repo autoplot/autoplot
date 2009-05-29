@@ -15,8 +15,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,7 +26,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -48,12 +45,12 @@ public class PngWalkCanvas extends JPanel {
     public static final int NOMINAL_HEIGHT = 600;
     public static final int NOMINAL_WIDTH = 800;
 
-
-    private static Rectangle bounds(int xpos, int ypos, int width, int height, int targetWidth, int targetHeight, double aspectFactor,boolean debug) {
+    private static Rectangle bounds(int xpos, int ypos, int width, int height, int targetWidth, int targetHeight, double aspectFactor, boolean debug) {
         double aspect = 1. * width / height;
         int target = 1. * targetWidth / targetHeight > aspect ? targetHeight : targetWidth;
 
-        if ( debug ) System.err.printf( "tw=%d th=%d rat=%5.2f asp=%5.2f  target=%d\n", targetWidth, targetHeight, 1. * targetWidth / targetHeight, aspect, target );
+        if (debug)
+            System.err.printf("tw=%d th=%d rat=%5.2f asp=%5.2f  target=%d\n", targetWidth, targetHeight, 1. * targetWidth / targetHeight, aspect, target);
         double sqrtAspect = Math.sqrt(aspect * aspectFactor);
         int w = (int) (target * sqrtAspect);
         int h = (int) (target / sqrtAspect);
@@ -61,8 +58,8 @@ public class PngWalkCanvas extends JPanel {
         int y = ypos - h / 2;
         return new Rectangle(x, y, w, h);
     }
+    MouseWheelListener wlistener = new MouseWheelListener() {
 
-    MouseWheelListener wlistener= new MouseWheelListener() {
         public void mouseWheelMoved(MouseWheelEvent e) {
             int current = getCurrentIndex();
             current += e.getWheelRotation();
@@ -71,7 +68,6 @@ public class PngWalkCanvas extends JPanel {
             setCurrentIndex(current);
         }
     };
-
     MouseAdapter mlistener = new MouseAdapter() {
 
         public void mouseClicked(MouseEvent e) {
@@ -85,16 +81,16 @@ public class PngWalkCanvas extends JPanel {
                 if (mode == DisplayMode.day) {
                     setMode(lastMode);
                 } else {
-                    if ( getCurrentIndex()==selected || e.getClickCount()>1 ) {
+                    if (getCurrentIndex() == selected || e.getClickCount() > 1) {
                         setMode(DisplayMode.day);
                     }
                     setCurrentIndex(selected);
                 }
             }
         }
-
     };
-
+    Map<Image, Image> rightThumbsCache = new HashMap();
+    Map<Image, Image> leftThumbsCache = new HashMap();
     // keep track of the last drawn image to avoid flicker
     Image lastImage;
 
@@ -105,18 +101,18 @@ public class PngWalkCanvas extends JPanel {
 
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
         int CELL_PAD = 30;
 
         imagebounds = new HashMap<Rectangle, Integer>();
 
-        if ( exception!=null ) {
-            g.drawString( exception.toString(), 100, 100 );
+        if (exception != null) {
+            g.drawString(exception.toString(), 100, 100);
             return;
         }
-        if ( images.size()==0 ) {
-            g.drawString( "no matching images found", getWidth()/2 - 100, getHeight()/2 );
+        if (images.size() == 0) {
+            g.drawString("no matching images found", getWidth() / 2 - 100, getHeight() / 2);
             return;
         }
         if (mode == DisplayMode.day) {
@@ -133,15 +129,15 @@ public class PngWalkCanvas extends JPanel {
             if (height == -1) height = NOMINAL_HEIGHT;
             if (width == -1) width = NOMINAL_WIDTH;
 
-            Rectangle bounds = bounds(getWidth() / 2, getHeight() / 2, width, height, getWidth() * 80 / 100, getHeight() * 80 / 100, 1.0,false);
+            Rectangle bounds = bounds(getWidth() / 2, getHeight() / 2, width, height, getWidth() * 80 / 100, getHeight() * 80 / 100, 1.0, false);
             if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 lastImage = image;
             }
             g.draw(bounds);
-            maybeTimeStamp( g, bounds, ranges.get(currentIndex) );
+            maybeTimeStamp(g, bounds, ranges.get(currentIndex));
 
             if (usedLastImage) {
-                drawMomentStr(g,bounds);
+                drawMomentStr(g, bounds);
             }
 
             imagebounds.put(bounds, currentIndex);
@@ -153,7 +149,7 @@ public class PngWalkCanvas extends JPanel {
             int columns = 7;
             int targetSize = (getWidth() - CELL_PAD) / columns - CELL_PAD;
 
-            int ylow=0;
+            int ylow = 0;
             for (int index = minIndex; index <= maxIndex; index++) {
                 if (index < 0) continue;
                 if (index >= images.size()) continue;
@@ -170,19 +166,19 @@ public class PngWalkCanvas extends JPanel {
                 int x = CELL_PAD + targetSize / 2 + (CELL_PAD + targetSize) * icol;
                 int y = CELL_PAD + targetSize / 2;
 
-                Rectangle bounds = bounds(x, y, width, height, targetSize, targetSize, 1.0,false);
+                Rectangle bounds = bounds(x, y, width, height, targetSize, targetSize, 1.0, false);
                 if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 }
                 g.draw(bounds);
-                ylow= Math.max( bounds.y+bounds.height, ylow );
+                ylow = Math.max(bounds.y + bounds.height, ylow);
 
-                maybeTimeStamp(g, bounds, ranges.get(index) );
+                maybeTimeStamp(g, bounds, ranges.get(index));
 
                 imagebounds.put(bounds, index);
 
             }
 
-            boolean usedLastImage= false;
+            boolean usedLastImage = false;
             Image image = images.get(currentIndex);
             int height = image.getHeight(this);
             int width = image.getWidth(this);
@@ -196,21 +192,21 @@ public class PngWalkCanvas extends JPanel {
             if (width == -1) width = NOMINAL_WIDTH;
 
             //int widthLimit= getWidth()-CELL_PAD*2;
-            int widthLimit= 100000;
+            int widthLimit = 100000;
             int heightLimit = getHeight() - ylow - CELL_PAD;
-            Rectangle size =  bounds( 0, 0, width, height, widthLimit,heightLimit, 1.0 ,false);
+            Rectangle size = bounds(0, 0, width, height, widthLimit, heightLimit, 1.0, false);
 
-            Rectangle bounds = bounds( getWidth() / 2, ylow + Math.max( size.height, getHeight() - ylow ) / 2,
+            Rectangle bounds = bounds(getWidth() / 2, ylow + Math.max(size.height, getHeight() - ylow) / 2,
                     width, height,
-                    widthLimit, heightLimit, 1.0, false );
+                    widthLimit, heightLimit, 1.0, false);
             if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 lastImage = image;
             }
             g.draw(bounds);
 
-            maybeTimeStamp( g, bounds, ranges.get(currentIndex) );
+            maybeTimeStamp(g, bounds, ranges.get(currentIndex));
             if (usedLastImage) {
-                drawMomentStr(g,bounds);
+                drawMomentStr(g, bounds);
             }
             imagebounds.put(bounds, currentIndex);
 
@@ -226,19 +222,19 @@ public class PngWalkCanvas extends JPanel {
             int minIndex = currentIndex - columns;
             int maxIndex = currentIndex + columns;
 
-            for ( int i = 0; i< columns*2 + 1; i++ ) {
+            for (int i = 0; i < columns * 2 + 1; i++) {
 
                 int index;
-                int d= columns - i/2;
-                if ( i%2==0 ) {
-                    index= currentIndex - d;
+                int d = columns - i / 2;
+                if (i % 2 == 0) {
+                    index = currentIndex - d;
                 } else {
-                    index= currentIndex + d;
+                    index = currentIndex + d;
                 }
                 if (index < 0) continue;
                 if (index >= images.size()) continue;
 
-                boolean usedLastImage= false;
+                boolean usedLastImage = false;
                 Image image = images.get(index);
                 int height = image.getHeight(this);
                 int width = image.getWidth(this);
@@ -252,65 +248,81 @@ public class PngWalkCanvas extends JPanel {
                 if (width == -1) width = NOMINAL_WIDTH;
 
                 Rectangle bounds;
-                final boolean newMethod= true;
+                final boolean newMethod = true;
 
                 if (index < currentIndex) {
                     int x = xm - 200 + (index - currentIndex) * targetSize / 4;
-                    
-                    if ( newMethod ) {
-                        bounds = bounds( x, y, width, height, targetSize, targetSize, 0.1, false );
-                        BufferedImage im;
-                        if ( image instanceof BufferedImage ) {
-                            im= (BufferedImage) image;
-                        } else {
-                            im= new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
-                            im.getGraphics().drawImage( image, 0, 0, this );
+
+                    if (newMethod) {
+                        bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
+
+                        Image cacheImage = rightThumbsCache.get(image);
+
+                        if (cacheImage == null) {
+                            BufferedImage im;
+                            if (image instanceof BufferedImage) {
+                                im = (BufferedImage) image;
+                            } else {
+                                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                                im.getGraphics().drawImage(image, 0, 0, this);
+                            }
+                            addBorder(im,0.1);
+                            ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
+                                    0, 0, bounds.width, bounds.height,
+                                    0.1);
+                            cacheImage= op.filter( im, null );
+                            rightThumbsCache.put( image, cacheImage );
                         }
-                        ScalePerspectiveImageOp op= new ScalePerspectiveImageOp( im.getWidth(), im.getHeight(),
-                                0, 0, bounds.width, bounds.height,
-                                0.1 );
-                        g.drawImage( im, op, bounds.x, bounds.y );
-                        g.draw( op.getOutline( bounds.x, bounds.y ) );
+                        g.drawImage( cacheImage, bounds.x, bounds.y, this );
+                        //g.draw(op.getOutline(bounds.x, bounds.y));
                     } else {
                         bounds = bounds(x, y, width, height, targetSize, targetSize, 0.05, false);
                         if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                         }
                         g.draw(bounds);
                     }
-                    if ( usedLastImage ) drawMomentStr( g, bounds);
+                    if (usedLastImage) drawMomentStr(g, bounds);
 
                 } else if (index == currentIndex) {
                     int x = xm;
-                    bounds = bounds(x, y, width, height, 360, height, 1.0,false);
-                    if ( g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
-                        lastImage= image;
+                    bounds = bounds(x, y, width, height, 360, height, 1.0, false);
+                    if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
+                        lastImage = image;
                     }
                     g.draw(bounds);
-                    maybeTimeStamp( g, bounds, ranges.get(index) );
-                    if ( usedLastImage ) drawMomentStr( g, bounds);
+                    maybeTimeStamp(g, bounds, ranges.get(index));
+                    if (usedLastImage) drawMomentStr(g, bounds);
                 } else {
                     int x = xm + 200 + (index - currentIndex) * targetSize / 4;
-                    if ( newMethod ) {
-                        bounds = bounds( x, y, width, height, targetSize, targetSize, 0.1, false );
-                        BufferedImage im;
-                        if ( image instanceof BufferedImage ) {
-                            im= (BufferedImage) image;
-                        } else {
-                            im= new BufferedImage( width, height, BufferedImage.TYPE_INT_ARGB );
-                            im.getGraphics().drawImage( image, 0, 0, this );
+                    if (newMethod) {
+                        bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
+
+                        Image cacheImage = leftThumbsCache.get(image);
+
+                        if (cacheImage == null) {
+                            BufferedImage im;
+                            if (image instanceof BufferedImage) {
+                                im = (BufferedImage) image;
+                            } else {
+                                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                                im.getGraphics().drawImage(image, 0, 0, this);
+                            }
+                            addBorder(im,0.1);
+                            ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
+                                    0, 0, bounds.width, bounds.height,
+                                    -0.05);
+                            cacheImage= op.filter( im, null );
+                            leftThumbsCache.put( image, cacheImage );
                         }
-                        ScalePerspectiveImageOp op= new ScalePerspectiveImageOp( im.getWidth(), im.getHeight(),
-                                0, 0, bounds.width, bounds.height,
-                                -0.05 );
-                        g.drawImage( im, op, bounds.x, bounds.y );
-                        g.draw( op.getOutline( bounds.x, bounds.y ) );
+                        g.drawImage( cacheImage, bounds.x, bounds.y, this );
+                        //g.draw(op.getOutline(bounds.x, bounds.y));
                     } else {
-                        bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1,false);
+                        bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
                         if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                         }
                         g.draw(bounds);
                     }
-                    if ( usedLastImage ) drawMomentStr( g, bounds);
+                    if (usedLastImage) drawMomentStr(g, bounds);
                 }
 
                 imagebounds.put(bounds, index);
@@ -352,14 +364,14 @@ public class PngWalkCanvas extends JPanel {
                 int irow = (index - minIndex) / columns;
                 int icol = (index - minIndex) % columns;
 
-                ylow = ( targetHeight + CELL_PAD ) * irow;
+                ylow = (targetHeight + CELL_PAD) * irow;
 
-                Rectangle bounds = bounds(0, 0, width, height, targetWidth, targetHeight, 1.0,false);
+                Rectangle bounds = bounds(0, 0, width, height, targetWidth, targetHeight, 1.0, false);
 
                 int x = CELL_PAD + targetWidth / 2 + (CELL_PAD + targetWidth) * icol;
                 int y = ylow + CELL_PAD + targetHeight / 2;
 
-                bounds = bounds(x, y, width, height, targetWidth, targetHeight, 1.0,false);
+                bounds = bounds(x, y, width, height, targetWidth, targetHeight, 1.0, false);
                 nextYLow = Math.max(nextYLow, bounds.y + bounds.height);
 
                 if (index == currentIndex) {
@@ -373,7 +385,7 @@ public class PngWalkCanvas extends JPanel {
                 if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                 }
                 g.draw(bounds);
-                maybeTimeStamp( g, bounds, ranges.get(index) );
+                maybeTimeStamp(g, bounds, ranges.get(index));
 
                 imagebounds.put(bounds, index);
 
@@ -386,43 +398,56 @@ public class PngWalkCanvas extends JPanel {
     List<DatumRange> ranges = new ArrayList<DatumRange>();
     Map<Rectangle, Integer> imagebounds;
 
-    private void drawMomentStr(Graphics2D g,Rectangle bounds) {
+    private void addBorder( BufferedImage im, double sx ) {
+        Graphics g= im.getGraphics();
+        g.setColor( Color.black);
+        g.drawRect(0,0,im.getWidth()-1,im.getHeight()-1);
+        if ( sx<0.6 ) {
+            g.drawRect(1,0,im.getWidth()-3,im.getHeight()-1);
+            if ( sx<0.3 ) {
+                g.drawRect(2,0,im.getWidth()-5,im.getHeight()-1);
+            }
+        }
+    }
+
+    private void drawMomentStr(Graphics2D g, Rectangle bounds) {
         g.drawString("moment...", bounds.x + bounds.width / 2 - 30, bounds.y + bounds.height / 2 - 30);
         g.setColor(Color.white);
         g.drawString("moment...", bounds.x + bounds.width / 2 - 32, bounds.y + bounds.height / 2 - 32);
         g.setColor(Color.black);
     }
 
-    private synchronized void maybeTimeStamp(Graphics2D g, Rectangle bounds, DatumRange dr ) {
-        int fmh= 14; // font metrics height
+    private synchronized void maybeTimeStamp(Graphics2D g, Rectangle bounds, DatumRange dr) {
+        int fmh = 14; // font metrics height
         if (dr != null) {
             String rangestr = dr.toString();
-            g.drawString(rangestr, bounds.x, bounds.y + bounds.height + fmh );
+            g.drawString(rangestr, bounds.x, bounds.y + bounds.height + fmh);
         }
     }
 
     private synchronized void updateImages() {
         try {
-            DatumRange currentRange=null;
-            if ( ranges.size()>currentIndex ) currentRange = ranges.get(currentIndex);
+            DatumRange currentRange = null;
+            if (ranges.size() > currentIndex)
+                currentRange = ranges.get(currentIndex);
             ranges = new ArrayList<DatumRange>();
             urls = WalkUtil.getFilesFor(template, timeRange, ranges);
             images = new ArrayList();
             for (int i = 0; i < urls.size(); i++) {
                 images.add(i, getToolkit().createImage(urls.get(i)));
             }
-            exception= null;
-            if ( currentRange!=null ) {
-                currentIndex= ranges.indexOf( currentRange );
-                if ( currentIndex==-1 ) currentIndex= 0;
+            exception = null;
+            if (currentRange != null) {
+                currentIndex = ranges.indexOf(currentRange);
+                if (currentIndex == -1) currentIndex = 0;
             } else {
-                currentIndex= 0;
+                currentIndex = 0;
             }
-            setCurrentIndex( currentIndex );
-           
-        } catch ( Exception ex ) {
+            setCurrentIndex(currentIndex);
+
+        } catch (Exception ex) {
             DasExceptionHandler.handle(ex);
-            exception= ex;
+            exception = ex;
         }
         repaint();
     }
@@ -494,22 +519,19 @@ public class PngWalkCanvas extends JPanel {
 
     public synchronized void setCurrentIndex(int currentIndex) {
         int oldCurrentIndex = this.currentIndex;
-        String oldItem= getCurrentItem();
         if (currentIndex >= 0 && currentIndex < this.images.size()) {
+            String oldItem = getCurrentItem();
             this.currentIndex = currentIndex;
             repaint();
             firePropertyChange(PROP_CURRENTINDEX, oldCurrentIndex, currentIndex);
-            firePropertyChange(PROP_CURRENTITEM, oldItem, getCurrentItem() );
+            firePropertyChange(PROP_CURRENTITEM, oldItem, getCurrentItem());
         }
     }
 
     // for 35-up;
     private int minIndex = 0;
     private int maxIndex = 0;
-
-
-    private Exception exception=null;
-
+    private Exception exception = null;
     protected String template = null;
     /**
      * template string identifying the images
@@ -522,20 +544,19 @@ public class PngWalkCanvas extends JPanel {
     }
 
     public void setTemplate(String template) {
-        template= template.trim();
-        if ( template.startsWith("file:///") ) {
-            template= "file:/" + template.substring(8);
+        template = template.trim();
+        if (template.startsWith("file:///")) {
+            template = "file:/" + template.substring(8);
         }
         String oldTemplate = this.template;
         this.template = template;
         firePropertyChange(PROP_TEMPLATE, oldTemplate, template);
         updateImages();
     }
-
     public static final String PROP_CURRENTITEM = "currentItem";
 
     public String getCurrentItem() {
-        if (urls != null) {
+        if (urls != null && urls.size()>currentIndex ) {
             return urls.get(currentIndex).toString();
         } else {
             return null;
@@ -554,7 +575,6 @@ public class PngWalkCanvas extends JPanel {
             Logger.getLogger(PngWalkCanvas.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
     protected String timeRange = "";
     public static final String PROP_TIMERANGE = "timeRange";
 
@@ -565,15 +585,14 @@ public class PngWalkCanvas extends JPanel {
     public void setTimeRange(String timeRange) {
         String oldTimeRange = this.timeRange;
         this.timeRange = timeRange;
-        if ( timeRange.trim().length()>0 ) {
+        if (timeRange.trim().length() > 0) {
             try {
                 DatumRangeUtil.parseTimeRange(timeRange);
             } catch (ParseException ex) {
-                this.timeRange= oldTimeRange;
+                this.timeRange = oldTimeRange;
             }
         }
         firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
         updateImages();
     }
-
 }
