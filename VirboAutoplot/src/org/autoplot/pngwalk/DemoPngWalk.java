@@ -34,8 +34,8 @@ public class DemoPngWalk {
             }
         }
 
-        //String template = "file:/tmp/pngwalk/product_$Y$m$d.png"; // One Slash!!
-        final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
+        String template = "file:/tmp/pngwalk/product_$Y$m$d.png"; // One Slash!!
+        //final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
         //final String template=  "file:/net/spot3/home/jbf/fun/pics/2001minnesota/.*JPG" ;
         //final String template= "file:/home/jbf/public_html/voyager/VGPW_0201/BROWSE/V1/.*.PNG";
         //final String template= "file:///net/spot3/home/jbf/fun/pics/20080315_tenerife_masca_hike/IMG_.*.JPG";
