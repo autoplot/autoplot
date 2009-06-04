@@ -58,7 +58,7 @@ import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
-import org.virbo.autoplot.ApplicationModel.RenderType;
+import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.QDataSet;
@@ -106,7 +106,7 @@ public class AutoplotUtil {
         }
         List<Renderer> recycleRends = Arrays.asList(result.getRenderers());
 
-        ApplicationModel.RenderType type = AutoplotUtil.getRenderType(ds);
+        RenderType type = AutoplotUtil.getRenderType(ds);
 
         Renderer rend1= maybeCreateRenderer( type, recycleRends.get(0), cb);
 
