@@ -8,6 +8,8 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
@@ -32,11 +34,13 @@ public class ColumnController extends DomNodeController {
     protected void createDasPeer( Canvas canvas, DasColumn parent ) {
         DasCanvas c= canvas.controller.getDasCanvas();
         dasColumn= DasColumn.create( c, parent, column.getLeft(), column.getRight() );
+        final List<String> minList= Arrays.asList( DasDevicePosition.PROP_MINIMUM, DasDevicePosition.PROP_EMMINIMUM, DasDevicePosition.PROP_PTMINIMUM );
+        final List<String> maxList= Arrays.asList( DasDevicePosition.PROP_MAXIMUM, DasDevicePosition.PROP_EMMAXIMUM, DasDevicePosition.PROP_PTMAXIMUM );
         PropertyChangeListener list= new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if ( evt.getPropertyName().equals( DasDevicePosition.PROP_DMAXIMUM ) ) {
+                if ( maxList.contains( evt.getPropertyName() ) ) {
                     column.setRight( DasDevicePosition.formatLayoutStr(dasColumn, false ) );
-                } else if ( evt.getPropertyName().equals( DasDevicePosition.PROP_DMINIMUM ) ) {
+                } else if ( minList.contains( evt.getPropertyName() ) ) {
                     column.setLeft( DasDevicePosition.formatLayoutStr(dasColumn, true) );
                 }
             }
