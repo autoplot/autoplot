@@ -253,7 +253,7 @@ public class ScriptContext extends PyJavaInstance {
      * @param name string name of the plot style.
      */
     public static void setRenderStyle( String name ) {
-        dom.getController().getPanel().setRenderType( ApplicationModel.RenderType.valueOf(name) );
+        dom.getController().getPanel().setRenderType( RenderType.valueOf(name) );
     }
     /**
      * write out the current canvas to a png file.

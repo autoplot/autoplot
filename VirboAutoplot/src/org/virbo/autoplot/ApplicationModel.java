@@ -96,10 +96,6 @@ public class ApplicationModel {
         return exceptionHandler;
     }
 
-    public enum RenderType {
-        spectrogram, nnSpectrogram, hugeScatter, series, scatter, colorScatter, stairSteps, fillToZero,
-    }
-
     static final Logger logger = Logger.getLogger("virbo.autoplot");
     /**
      * dataset with fill data has been recalculated
