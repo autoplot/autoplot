@@ -8,6 +8,8 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasDevicePosition;
@@ -31,15 +33,19 @@ public class RowController extends DomNodeController {
     protected void createDasPeer( Canvas canvas, DasRow parent ) {
         DasCanvas c= canvas.controller.getDasCanvas();
         dasRow= DasRow.create( c, parent, row.getTop(), row.getBottom() );
+
+        final List<String> minList= Arrays.asList( DasDevicePosition.PROP_MINIMUM, DasDevicePosition.PROP_EMMINIMUM, DasDevicePosition.PROP_PTMINIMUM );
+        final List<String> maxList= Arrays.asList( DasDevicePosition.PROP_MAXIMUM, DasDevicePosition.PROP_EMMAXIMUM, DasDevicePosition.PROP_PTMAXIMUM );
         PropertyChangeListener list= new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if ( evt.getPropertyName().equals( DasDevicePosition.PROP_DMAXIMUM ) ) {
+                if ( maxList.contains( evt.getPropertyName() ) ) {
                     row.setBottom( DasDevicePosition.formatLayoutStr(dasRow, false ) );
-                } else if ( evt.getPropertyName().equals( DasDevicePosition.PROP_DMINIMUM ) ) {
+                } else if ( minList.contains( evt.getPropertyName() ) ) {
                     row.setTop( DasDevicePosition.formatLayoutStr(dasRow, true) );
                 }
             }
         };
+
         dasRow.addPropertyChangeListener(list);
         list= new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
