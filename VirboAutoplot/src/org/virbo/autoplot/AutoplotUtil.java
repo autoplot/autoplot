@@ -923,7 +923,7 @@ public class AutoplotUtil {
 
         if (fillds.rank() >= 2) {
             if (dep1 != null && isVectorOrBundleIndex(dep1)) {
-                if (fillds.length() > 200000) {
+                if (fillds.length() > 80000) {
                     spec = RenderType.hugeScatter;
                 } else {
                     spec = RenderType.series;
@@ -932,7 +932,7 @@ public class AutoplotUtil {
                 spec = RenderType.spectrogram;
             }
         } else {
-            if (fillds.length() > 200000) {
+            if (fillds.length() > 80000) {
                 spec = RenderType.hugeScatter;
             } else {
                 spec = RenderType.series;
