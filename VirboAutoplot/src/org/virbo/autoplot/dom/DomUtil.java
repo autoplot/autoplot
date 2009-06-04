@@ -84,9 +84,10 @@ public class DomUtil {
      *    plots[0].range
      * @param node
      * @param propertyName the value, (or the old value if we were setting it.)
+     * @param getClass return the property class type instead of the value.
      * @return propertyDescriptor or null.
      */
-    private static Object setGetPropertyInt( DomNode node, String propertyName, boolean setit, Object value ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    private static Object setGetPropertyInt( DomNode node, String propertyName, boolean setit, boolean getClass, Object value ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
         String[] props= propertyName.split("\\.",-2);
         int iprop=0;
         Pattern indexedPattern= Pattern.compile("([a-zA-Z_]+)\\[(\\d+)\\]");
@@ -106,8 +107,11 @@ public class DomUtil {
                         if ( iprop==props.length-1 ) {
                             if ( setit ) {
                                 ((IndexedPropertyDescriptor)pds[i]).getIndexedWriteMethod().invoke( thisNode, idx, value );
+                            } else if ( getClass ) {
+                                return ((IndexedPropertyDescriptor)pds[i]).getPropertyType();
+                            } else {
+                                return thisValue;
                             }
-                            return thisValue;
                         }
                         thisNode= thisValue;
                         break;
@@ -121,8 +125,11 @@ public class DomUtil {
                         if ( iprop==props.length-1 ) {
                             if ( setit ) {
                                 (pds[i]).getWriteMethod().invoke( thisNode, value );
+                            } else if ( getClass ) {
+                                return (pds[i]).getPropertyType();
+                            } else {
+                                return thisValue;
                             }
-                            return thisValue;
                         }
                         thisNode= thisValue;
                         break;
@@ -132,25 +139,19 @@ public class DomUtil {
             iprop++;
         }
 
-        return result;
+        return result; // TODO: when do we get here?
     }
 
-    static Object getPropertyValue(DomNode node, String propertyName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        return setGetPropertyInt( node, propertyName, false, null );
+    public static Object getPropertyValue(DomNode node, String propertyName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        return setGetPropertyInt( node, propertyName, false,false, null );
     }
 
-    static void setPropertyValue(DomNode node, String propertyName, Object val ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-        setGetPropertyInt( node, propertyName, true, val );
+    public static void setPropertyValue(DomNode node, String propertyName, Object val ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        setGetPropertyInt( node, propertyName, true,false, val );
     }
 
-
-
-    static boolean hasProperty(DomNode result, String propertyName) {
-        return BeanProperty.create(propertyName).isReadable(result);
-    }
-
-    static void setProperty(DomNode result, String propertyName, Object value) {
-        BeanProperty.create(propertyName).setValue(result, value);
+    public static Class getPropertyType( DomNode node, String propertyName ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        return (Class)setGetPropertyInt( node, propertyName, false, true, null );
     }
 
     /**
