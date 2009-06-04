@@ -151,6 +151,8 @@ public class PanelController extends DomNodeController {
                     }
                     if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
                         resetPanel(getDataSourceFilter().getController().getFillDataSet(), panel.getRenderType());
+                    } else {
+                        resetRenderType(newRenderType);
                     }
                     setResetPanel(false);
                 }
@@ -297,7 +299,7 @@ public class PanelController extends DomNodeController {
                         resetPanel(fillDs, renderType);
                         setResetPanel(false);
                     } else {
-                        if ( renderer==null ) createDasPeer();
+                        if ( renderer==null ) maybeCreateDasPeer();
                         if ( resetRanges ) doResetRanges(true);
                         setResetPanel(false);
                     }
@@ -847,7 +849,7 @@ public class PanelController extends DomNodeController {
         return dsf;
     }
 
-    private void createDasPeer(){
+    private void maybeCreateDasPeer(){
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer( panel.getRenderType(), oldRenderer, getColorbar() );
 
@@ -885,21 +887,12 @@ public class PanelController extends DomNodeController {
             return;
         }
 
-        /*if (childPanels != null) { // kludge
-        if (renderType == RenderType.spectrogram) {
-        //RenderType.spectrogram changes the rank of the view, so we need to
-        //treat it specially.
-        this.setResetRanges(true);
-        this.resetPanel(dsf.controller.getFillDataSet(),renderType);
-
-        } else {
-        for (Panel p : this.childPanels) {
-        p.setRenderType(renderType);
+        for ( Panel ch: getChildPanels() ) {
+            ch.renderType= renderType;  // we don't want to enter resetRenderType.
+            ch.getController().maybeCreateDasPeer();
         }
-        }
-        }*/
 
-        createDasPeer();
+        maybeCreateDasPeer();
     }
 
     public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
