@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
@@ -394,6 +395,30 @@ public class GuiSupport {
             }
         });
 
+        thisPanel.getActionMap().put("NEXT_PANEL", new AbstractAction() {
+            public void actionPerformed( ActionEvent e ) {
+                Application dom= parent.dom;
+                Panel p= dom.getController().getPanel();
+                int idx= Arrays.asList( dom.getPanels() ).indexOf(p);
+                if ( idx==-1 ) idx=0;
+                idx++;
+                if ( idx==dom.getPanels().length ) idx=0;
+                dom.getController().setPanel( dom.getPanels(idx) );
+            }
+        });
+
+        thisPanel.getActionMap().put("PREV_PANEL", new AbstractAction() {
+            public void actionPerformed( ActionEvent e ) {
+                Application dom= parent.dom;
+                Panel p= dom.getController().getPanel();
+                int idx= Arrays.asList( dom.getPanels() ).indexOf(p);
+                if ( idx==-1 ) idx=0;
+                idx--;
+                if ( idx==-1 ) idx= dom.getPanels().length-1;
+                dom.getController().setPanel( dom.getPanels(idx) );
+            }
+        });
+
         InputMap map = new ComponentInputMap(thisPanel);
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), "UNDO");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), "REDO");
@@ -402,6 +427,8 @@ public class GuiSupport {
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");  // american keyboard
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.CTRL_DOWN_MASK), "NEXT_PANEL");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "PREV_PANEL");
         thisPanel.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, map);
 
     }
