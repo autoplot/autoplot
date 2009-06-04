@@ -294,7 +294,7 @@ public class GuiSupport {
                     int result= JOptionPane.showConfirmDialog(parent,msg );
                     if ( result==JOptionPane.OK_OPTION ) {
                         parent.stateSupport.saveAs();
-                    } else if ( result==JOptionPane.CANCEL_OPTION ) {
+                    } else if ( result==JOptionPane.CANCEL_OPTION || result==JOptionPane.CLOSED_OPTION ) {
                         return;
                     }
                 }
@@ -310,7 +310,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.scatter);
+                panel.setRenderType(RenderType.scatter);
             }
         }));
 
@@ -318,7 +318,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.colorScatter);
+                panel.setRenderType(RenderType.colorScatter);
             }
         }));
 
@@ -326,7 +326,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.series);
+                panel.setRenderType(RenderType.series);
             }
         }));
 
@@ -334,7 +334,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.stairSteps);
+                panel.setRenderType(RenderType.stairSteps);
             }
         }));
 
@@ -342,7 +342,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.fillToZero);
+                panel.setRenderType(RenderType.fillToZero);
             }
         }));
 
@@ -350,7 +350,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.hugeScatter);
+                panel.setRenderType(RenderType.hugeScatter);
             }
         }));
 
@@ -358,7 +358,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.spectrogram);
+                panel.setRenderType(RenderType.spectrogram);
             }
         }));
 
@@ -366,7 +366,7 @@ public class GuiSupport {
 
             public void actionPerformed(ActionEvent e) {
                 Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(ApplicationModel.RenderType.nnSpectrogram);
+                panel.setRenderType(RenderType.nnSpectrogram);
             }
         }));
 
