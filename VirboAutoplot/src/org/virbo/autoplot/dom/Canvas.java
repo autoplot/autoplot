@@ -70,6 +70,19 @@ public class Canvas extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_FITTED, oldfitted, fitted);
     }
 
+    protected String font = "sans-10";
+    public static final String PROP_FONT = "font";
+
+    public String getFont() {
+        return font;
+    }
+
+    public void setFont(String font) {
+        String oldFont = this.font;
+        this.font = font;
+        propertyChangeSupport.firePropertyChange(PROP_FONT, oldFont, font);
+    }
+
     public static final String PROP_ROWS = "rows";
     protected List<Row> rows = new LinkedList<Row>();
 
