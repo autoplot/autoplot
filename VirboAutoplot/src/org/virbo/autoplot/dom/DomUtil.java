@@ -254,6 +254,28 @@ public class DomUtil {
     }
 
     /**
+     * find the nodes matching this regex.
+     * @param root
+     * @param regex
+     * @return
+     */
+    public static List<DomNode> findElementsById( DomNode root, String regex ) {
+        Pattern p= Pattern.compile(regex);
+        if (regex == null || regex.equals("")) {
+            throw new IllegalArgumentException("id cannot be null or zero-length string");
+        }
+        List<DomNode> result= new ArrayList();
+        if ( p.matcher(root.getId()).matches() ) result.add(root);
+        for (DomNode n : root.childNodes()) {
+            if ( p.matcher(n.getId()).matches() ) {
+                result.add( n );
+            }
+            result.addAll( findElementsById( n, regex ) );
+        }
+        return result;
+    }
+
+    /**
      * Just like Arrays.toList, but copies into ArrayList so elements may be inserted.
      * @param <T>
      * @param a
@@ -492,4 +514,5 @@ public class DomUtil {
             return encodeColor( (java.awt.Color)value);
         }
     };
+
 }
