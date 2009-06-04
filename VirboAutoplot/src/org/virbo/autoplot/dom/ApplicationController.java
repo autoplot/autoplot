@@ -358,6 +358,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         //if ( canvas!=null ) throw new IllegalArgumentException("only one canvas for now");
         Canvas lcanvas = new Canvas();
         DasCanvas dasCanvas = new DasCanvas(lcanvas.getWidth(),lcanvas.getHeight());
+        dasCanvas.setScaleFonts(false);
 
         assignId( lcanvas );
 
@@ -1381,7 +1382,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         ApplicationController ac = this;
         ac.bind(application, "options.background", canvas, "background" );
         ac.bind(application, "options.foreground", canvas, "foreground" );
-        ac.bind(application, "options.canvasFont", canvas, "font", DomUtil.STRING_TO_FONT );
+        ac.bind(application, "options.canvasFont", canvas, "baseFont", DomUtil.STRING_TO_FONT );
     }
 
     protected synchronized void syncTo(Application that) {
