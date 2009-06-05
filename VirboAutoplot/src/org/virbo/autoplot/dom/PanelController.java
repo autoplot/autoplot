@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.datum.Units;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
@@ -25,7 +26,7 @@ import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.system.MutatorLock;
 import org.virbo.autoplot.ApplicationModel;
-import org.virbo.autoplot.ApplicationModel.RenderType;
+import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
@@ -37,6 +38,11 @@ import org.virbo.dataset.SemanticOps;
 
 /**
  * PanelController manages the Panel, for example resolving the datasource and loading the dataset.
+ *
+ * Three state flags:
+ *   * resetRanges means all work needs to be done
+ *   * resetPanel means we might need to introduce child panels and reset the rendertype
+ *   * resetRenderType means we might need to refresh the peer.
  * @author jbf
  */
 public class PanelController extends DomNodeController {
@@ -152,7 +158,7 @@ public class PanelController extends DomNodeController {
                     if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
                         resetPanel(getDataSourceFilter().getController().getFillDataSet(), panel.getRenderType());
                     } else {
-                        resetRenderType(newRenderType);
+                        doResetRenderType(newRenderType);
                     }
                     setResetPanel(false);
                 }
@@ -306,6 +312,8 @@ public class PanelController extends DomNodeController {
                 } else if (resetRanges) {
                     doResetRanges(true);
                     setResetRanges(false);
+                } else if ( resetRenderType ) {
+                    doResetRenderType(panel.getRenderType());
                 }
             }
 
@@ -388,7 +396,7 @@ public class PanelController extends DomNodeController {
                 }
             }
 
-            resetRenderType(panel.getRenderType());
+            doResetRenderType(panel.getRenderType());
             setResetPanel(false);
 
             if ( resetRanges ) {
@@ -433,7 +441,7 @@ public class PanelController extends DomNodeController {
             }
 
         } else {
-            resetRenderType(panel.getRenderType());
+            doResetRenderType(panel.getRenderType());
             
         }
     }
@@ -479,10 +487,11 @@ public class PanelController extends DomNodeController {
 
     /**
      * true indicates the controller should install a new renderer to implement the
-     * renderType selection.
+     * renderType selection.  This may mean that we introduce or remove child panels.
+     * This implies resetRenderType.
      */
-    protected boolean resetPanel = true;
     public static final String PROP_RESETPANEL = "resetPanel";
+    protected boolean resetPanel = true;
 
     public boolean isResetPanel() {
         return resetPanel;
@@ -494,6 +503,21 @@ public class PanelController extends DomNodeController {
         propertyChangeSupport.firePropertyChange(PROP_RESETPANEL, oldResetPanel, resetPanel);
     }
 
+    /**
+     * true indicates the peer should be reset to the current renderType.
+     */
+    public static final String PROP_RESETRENDERTYPE = "resetRenderType";
+    protected boolean resetRenderType = false;
+
+    public boolean isResetRenderType() {
+        return resetRenderType;
+    }
+
+    public void setResetRenderType(boolean resetRenderType) {
+        boolean oldResetRenderType = this.resetRenderType;
+        this.resetRenderType = resetRenderType;
+        propertyChangeSupport.firePropertyChange(PROP_RESETRENDERTYPE, oldResetRenderType, resetRenderType);
+    }
 
     protected Renderer renderer = null;
 
@@ -558,10 +582,53 @@ public class PanelController extends DomNodeController {
             panel.syncTo(panelCopy,Collections.singletonList(Panel.PROP_LEGENDLABEL) );
         }
 
-        plot.syncTo( panel.getPlotDefaults(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
+        checkBindings( plot, panel.getPlotDefaults() );
+
+        List<String> excludeFromSync= new ArrayList( Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
+        List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
+        BindingModel existingBinding= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.xaxis, Axis.PROP_RANGE );
+        if ( bms.contains(existingBinding) ) {
+            if ( bms.size()>1 ) {
+                excludeFromSync.add(Plot.PROP_XAXIS);
+            }
+        }
+        plot.syncTo( panel.getPlotDefaults(), excludeFromSync );
 
         setStatus("done, apply fill and autorange");
         changesSupport.changePerformed(this, PENDING_RESET_RANGE);
+    }
+
+    /**
+     * after autoranging, we need to check to see if a panel's plot looks like
+     * it should be automatically bound or unbound.
+     *
+     * We unbind if changing this plot's axis settings will make another plot
+     * invalid.
+     *
+     * We bind if the axis setting is similar to the application timerange.
+     * @param plot the plot whose binds we are checking.  Bindings with this node may be added or removed.
+     * @param newSettings the new plot settings from autoranging.
+     */
+    private void checkBindings( Plot plot, Plot newSettings ) {
+        boolean shouldBindX= false;
+        List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
+        BindingModel bm= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
+        bms.remove(bm);
+        
+        if ( bms.size()==0 ) {
+            dom.setTimeRange( newSettings.getXaxis().getRange() );
+            shouldBindX= true;
+        }
+        if ( dom.timeRange.getUnits().isConvertableTo(newSettings.getXaxis().getRange().getUnits()) && dom.timeRange.intersects( newSettings.getXaxis().getRange() ) ) {
+            shouldBindX= true;
+        }
+        if ( bm==null && shouldBindX ) {
+            logger.finer("add binding because ranges overlap");
+            dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
+        } else if ( bm!=null && !shouldBindX ) {
+            logger.finer("remove timerange binding that would cause inconvertable units");
+            dom.getController().deleteBinding(bm);
+        }
     }
 
     /**
@@ -880,7 +947,7 @@ public class PanelController extends DomNodeController {
      *   das2 renderer peer is created and bindings made.
      * @param renderType
      */
-    public void resetRenderType(RenderType renderType) {
+    public void doResetRenderType(RenderType renderType) {
         Panel parentPanel= getParentPanel();
         if ( parentPanel != null ) {
             parentPanel.setRenderType(renderType);
@@ -888,7 +955,7 @@ public class PanelController extends DomNodeController {
         }
 
         for ( Panel ch: getChildPanels() ) {
-            ch.renderType= renderType;  // we don't want to enter resetRenderType.
+            ch.renderType= renderType;  // we don't want to enter doResetRenderType.
             ch.getController().maybeCreateDasPeer();
         }
 
