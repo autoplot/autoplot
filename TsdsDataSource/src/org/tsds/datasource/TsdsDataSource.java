@@ -22,8 +22,10 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -40,14 +42,18 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.TagGenDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -259,8 +265,10 @@ class TsdsDataSource extends AbstractDataSource {
         String type = connect.getContentType();
         logit("made url2 connection", t0);
 
-        BufferDataSet result;
-        if (type.startsWith("text/xml")) {
+        QDataSet result;
+        if ( params.get("out").equals("ncml") ) {
+            result= new TsmlNcml().doRead(url2,connect);
+        } else if (type.startsWith("text/xml")) {
             result = tsml(connect.getInputStream(), mon);
             logit("done text/xml from url2", t0);
         } else {
@@ -386,6 +394,43 @@ class TsdsDataSource extends AbstractDataSource {
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+
+    /**
+     * do the initial settings.
+     * @param in
+     * @throws javax.xml.parsers.ParserConfigurationException
+     * @throws java.io.IOException
+     * @throws org.xml.sax.SAXException
+     */
+    private void initialNcml(InputStream in) throws ParserConfigurationException, IOException, SAXException {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource source = new InputSource(in);
+            initialDocument = builder.parse(source);
+            in.close();
+
+            XPathFactory factory = XPathFactory.newInstance();
+            XPath xpath = factory.newXPath();
+
+            String sStartTime = xpath.evaluate("//netcdf/StartDate/text()", initialDocument);
+            String sEndTime = xpath.evaluate("//netcdf/EndDate/text()", initialDocument);
+
+            String sppd = xpath.evaluate("//netcdf/IntervalsPerDay/text()", initialDocument);
+
+            int ppd = Integer.parseInt(sppd);
+            parameterPpd = ppd;
+
+            DatumRange dr0 = DatumRangeUtil.parseTimeRangeValid(sStartTime);
+            DatumRange dr1 = DatumRangeUtil.parseTimeRangeValid(sEndTime);
+
+            parameterRange = new DatumRange(dr0.min(), dr1.max());
+
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     /**
