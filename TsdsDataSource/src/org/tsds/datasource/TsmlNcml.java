@@ -46,6 +46,13 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
+ * This new transport for the TSDS server uses a dialect of ncml to describe
+ * data.  Using a particular dialect allows a simple reader to be used without
+ * having to include the full netcdf library.
+ *
+ * The public method "doRead" the entry point, and is given the location of one
+ * of ncml+tsml data, and then internal references are followed to load the data
+ * values as well as metadata.
  *
  * @author jbf
  */
@@ -59,6 +66,15 @@ public class TsmlNcml {
 
     URL codebase= null;
 
+    /**
+     * read the ncml+tsml from the url, and follow references to read in the dataset.
+     * @param url the location of ncml+tsml file.  This also defines the codebase for references within the file.
+     * @param connect, if non-null, use this connection.  url must still be provided to define the codebase.
+     * @return the data in a QDataSet.
+     * @throws java.io.IOException
+     * @throws javax.xml.parsers.ParserConfigurationException
+     * @throws org.xml.sax.SAXException
+     */
     public QDataSet doRead( URL url, URLConnection connect ) throws IOException, ParserConfigurationException, SAXException {
         //URL url= TsmlNcml.class.getResource("/test/data.filter4.tsml.ncml.xml");
         codebase= url;
