@@ -109,7 +109,7 @@ public class ApplicationControllerSyncSupport {
                     Arrays.asList( Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE ) );
             application.panels.get(i).setPlotId( nameMap.get(panels[i].getPlotId() ) );
             application.panels.get(i).setRenderType( panels[i].getRenderType() );
-            application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
+            //application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
             application.panels.get(i).setDataSourceFilterId( nameMap.get(panels[i].getDataSourceFilterId()) );
         }
 
