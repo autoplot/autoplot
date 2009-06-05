@@ -16,7 +16,7 @@ import org.das2.event.MouseModule;
 import org.das2.event.PointSlopeDragRenderer;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
-import org.virbo.autoplot.ApplicationModel.RenderType;
+import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.layout.LayoutConstants;
 
