@@ -23,9 +23,13 @@ public class DemoPngWalk {
 
     public static void main(String[] args) {
 
+        System.err.println("this is pngwalk 20090529");
         final ArgumentList alm = new ArgumentList("AutoPlotUI");
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
         alm.addOptionalPositionArgument(0, "template",  "file:/tmp/pngwalk/product_$Y$m$d.png", "initial template to use.");
+        
+        alm.process(args);
+        
         if (alm.getBooleanValue("nativeLAF")) {
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
@@ -33,6 +37,7 @@ public class DemoPngWalk {
                 e.printStackTrace();
             }
         }
+
 
         String template = alm.getValue("template"); // One Slash!!
         //final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
