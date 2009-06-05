@@ -69,7 +69,6 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
 
     Shape getOutline( double x, double y ) {
         GeneralPath path= new GeneralPath();
-        Point2D src= new Point2D.Float();
         Point2D dst= new Point2D.Float();
         dst= this.getPoint2D( new Point2D.Float(0,0), dst);
         path.moveTo((float)dst.getX(), (float)dst.getY());
