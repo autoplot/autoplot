@@ -29,8 +29,6 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
     final int x1;
     // output offset
     final int y1;
-    final double sx;
-    final double sy; //scale y
     final double p;
     int nw;
     int nh;
@@ -50,8 +48,6 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
     public ScalePerspectiveImageOp(int w, int h, int x1, int y1, int w1, int h1, double p) {
         this.w = w;
         this.h = h;
-        this.sx = ( w1 / w );
-        this.sy = ( h1 / h );
         this.w1 = w1;
         this.h1= h1;
         this.x1= x1;
