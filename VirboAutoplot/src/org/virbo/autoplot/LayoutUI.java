@@ -20,12 +20,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -33,10 +35,14 @@ import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.CanvasController;
+import org.virbo.autoplot.dom.Column;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.PanelStyle;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
 
 /**
@@ -136,19 +142,63 @@ public class LayoutUI extends javax.swing.JPanel {
         item = new JMenuItem(new AbstractAction("Delete Plot") {
 
             public void actionPerformed(ActionEvent e) {
-                if (app.getPlots().length > 1) {
-                    Plot domPlot = app.getController().getPlot();
-                    List<Panel> panels = app.getController().getPanelsFor(domPlot);
-                    for (Panel pan : panels) {
-                        if (app.getPanels().length > 1) {
-                            app.getController().deletePanel(pan);
-                        } else {
-                            app.getController().setStatus("warning: the last panel may not be deleted");
+                List<Object> os= canvasLayoutPanel1.getSelectedComponents();
+                for ( Object o: os ) {
+                    if (app.getPlots().length > 1) {
+                        Plot domPlot=null;
+                        if ( o instanceof Component ) {
+                            domPlot= app.getController().getPlotFor((Component)o);
                         }
+                        if ( domPlot==null ) continue;
+                        List<Panel> panels = app.getController().getPanelsFor(domPlot);
+                        for (Panel pan : panels) {
+                            if (app.getPanels().length > 1) {
+                                app.getController().deletePanel(pan);
+                            } else {
+                                app.getController().setStatus("warning: the last panel may not be deleted");
+                            }
+                        }
+                        app.getController().deletePlot(domPlot);
+                    } else {
+                        app.getController().setStatus("warning: last plot may not be deleted");
                     }
-                    app.getController().deletePlot(domPlot);
-                } else {
-                    app.getController().setStatus("warning: last plot may not be deleted");
+                }
+            }
+        });
+        plotContextMenu.add(item);
+
+        item = new JMenuItem(new AbstractAction("Add Plots...") {
+
+            public void actionPerformed(ActionEvent e) {
+                AddPlotsDialog dia= new AddPlotsDialog();
+                dia.getNumberOfColumnsTextField().setValue(1);
+                dia.getNumberOfRowsTextField().setValue(1);
+                if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(panelListComponent, dia, "Add Plots", JOptionPane.OK_CANCEL_OPTION ) ) {
+                     int nr= (Integer)dia.getNumberOfRowsTextField().getValue();
+                     int nc= (Integer)dia.getNumberOfColumnsTextField().getValue();
+                     List<Column> cols;
+                     final CanvasController ccontroller = app.getController().getCanvas().getController();
+                     if ( nc>1 ) {
+                         cols= ccontroller.addColumns(nc);
+                     } else {
+                         cols= Collections.singletonList( app.getController().getCanvas().getMarginColumn() );
+                     }
+                     List<Row> rows;
+                     rows= ccontroller.addRows(nr);
+                     for ( int i=0; i<nr; i++ ) {
+                         Plot masterp=null;
+                         for ( int j=0; j<nc; j++ ){
+                             Plot p= app.getController().addPlot( rows.get(i), cols.get(j));
+                             if ( j==0 ) {
+                                 masterp= p;
+                             } else {
+                                 app.getController().bind( masterp.getZaxis(), Axis.PROP_RANGE, p.getZaxis(), Axis.PROP_RANGE );
+                                 app.getController().bind( masterp.getZaxis(), Axis.PROP_LOG, p.getZaxis(), Axis.PROP_LOG );
+                                 app.getController().bind( masterp.getZaxis(), Axis.PROP_LABEL, p.getZaxis(), Axis.PROP_LABEL );
+                             }
+                             Panel panel= app.getController().addPanel(p, null);
+                         }
+                     }
                 }
             }
         });
