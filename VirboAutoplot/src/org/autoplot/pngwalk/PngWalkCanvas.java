@@ -58,7 +58,8 @@ public class PngWalkCanvas extends JPanel {
         int y = ypos - h / 2;
         return new Rectangle(x, y, w, h);
     }
-    MouseWheelListener wlistener = new MouseWheelListener() {
+
+    transient MouseWheelListener wlistener = new MouseWheelListener() {
 
         public void mouseWheelMoved(MouseWheelEvent e) {
             int current = getCurrentIndex();
@@ -68,7 +69,8 @@ public class PngWalkCanvas extends JPanel {
             setCurrentIndex(current);
         }
     };
-    MouseAdapter mlistener = new MouseAdapter() {
+
+    transient MouseAdapter mlistener = new MouseAdapter() {
 
         public void mouseClicked(MouseEvent e) {
             int selected = -1;
@@ -89,6 +91,7 @@ public class PngWalkCanvas extends JPanel {
             }
         }
     };
+    
     Map<Image, Image> rightThumbsCache = new HashMap();
     Map<Image, Image> leftThumbsCache = new HashMap();
     // keep track of the last drawn image to avoid flicker
@@ -167,8 +170,9 @@ public class PngWalkCanvas extends JPanel {
                 int y = CELL_PAD + targetSize / 2;
 
                 Rectangle bounds = bounds(x, y, width, height, targetSize, targetSize, 1.0, false);
-                if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
-                }
+                
+                g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this);
+                
                 g.draw(bounds);
                 ylow = Math.max(bounds.y + bounds.height, ylow);
 
@@ -277,8 +281,7 @@ public class PngWalkCanvas extends JPanel {
                         //g.draw(op.getOutline(bounds.x, bounds.y));
                     } else {
                         bounds = bounds(x, y, width, height, targetSize, targetSize, 0.05, false);
-                        if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
-                        }
+                        g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this);
                         g.draw(bounds);
                     }
                     if (usedLastImage) drawMomentStr(g, bounds);
@@ -318,8 +321,7 @@ public class PngWalkCanvas extends JPanel {
                         //g.draw(op.getOutline(bounds.x, bounds.y));
                     } else {
                         bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
-                        if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
-                        }
+                        g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this);
                         g.draw(bounds);
                     }
                     if (usedLastImage) drawMomentStr(g, bounds);
@@ -382,8 +384,7 @@ public class PngWalkCanvas extends JPanel {
                     g.setColor(Color.black);
                 }
 
-                if (!g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
-                }
+                g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this);
                 g.draw(bounds);
                 maybeTimeStamp(g, bounds, ranges.get(index));
 
@@ -513,7 +514,7 @@ public class PngWalkCanvas extends JPanel {
      */
     public static final String PROP_CURRENTINDEX = "currentIndex";
 
-    public int getCurrentIndex() {
+    public synchronized int getCurrentIndex() {
         return currentIndex;
     }
 
@@ -555,7 +556,7 @@ public class PngWalkCanvas extends JPanel {
     }
     public static final String PROP_CURRENTITEM = "currentItem";
 
-    public String getCurrentItem() {
+    public synchronized String getCurrentItem() {
         if (urls != null && urls.size()>currentIndex ) {
             return urls.get(currentIndex).toString();
         } else {
