@@ -22,11 +22,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.das2.DasApplication;
-import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasCanvas;
@@ -49,6 +50,7 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
+import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
 
@@ -203,18 +205,11 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             }
 
-/*            List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
-            if (ps.size() == 1) {
-                p = ps.get(0);
-            } else if (ps.size() > 1) {
-                int ip = 0;
-                while (ip < ps.size() && ps.get(ip).isActive() == false) {
-                    ip++;
-                }
-                if (ip < ps.size()) {
-                    p = ps.get(ip);
-                }
-            }*/
+            // if there's just one panel in the plot, then go ahead and set the focus uri.
+            List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
+            if ( p==null && ps.size() == 1) {
+                setFocusUri(ps.get(0).controller.getDataSourceFilter().getUri());
+            }
 
             setPlot(domPlot);
 
@@ -489,8 +484,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         p.setPlotId(dst.getId());
 
-        ApplicationModel.RenderType rt = p.getRenderType();
-        p.controller.resetRenderType(rt);
+        RenderType rt = p.getRenderType();
+        p.controller.doResetRenderType(rt);
 
     }
     PropertyChangeListener plotIdListener = new PropertyChangeListener() {
@@ -566,10 +561,10 @@ public class ApplicationController extends DomNodeController implements RunLater
             this.application.setPanels(temp);
             //panel1.addPropertyChangeListener(application.childListener);
             panel1.addPropertyChangeListener(domListener);
-            setPanel(panel1);
+            if ( panel==null ) setPanel(panel1);
         }
 
-        panel1.getController().resetRenderType( panel1.getRenderType() );
+        panel1.getController().doResetRenderType( panel1.getRenderType() );
         return panel1;
     }
 
@@ -604,7 +599,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * focus plot, and currently only LayoutConstants.ABOVE and LayoutConstants.BELOW
      * are supported.
      * 
-     * @param direction
+     * @param direction LayoutConstants.ABOVE, LayoutConstants.BELOW, or null.  Null indicates the layout will be done elsewhere.
      * @return
      */
     public synchronized Plot addPlot(Object direction) {
@@ -613,10 +608,15 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         CanvasController ccontroller=  ((CanvasController)canvas.controller);
         Row domRow;
-        if (canvas.getRows().length == 0) {
+
+        Plot focus = getPlot();
+
+        if ( canvas.getRows().length == 0) {
             domRow = ccontroller.addRow();
+        } else if ( direction==null ) {
+            domRow= ccontroller.getRowFor(focus);
         } else {
-            domRow = ccontroller.addInsertRow( ccontroller.getRowFor(getPlot()), direction);
+            domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction);
         }
 
         int num = plotIdNum.getAndIncrement();
@@ -632,11 +632,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         domPlot.setColumnId( canvas.getMarginColumn().getId() );
 
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
-        Plot focus = getPlot();
 
         if (focus != null) {
             int idx = plots.indexOf(focus);
-            if (direction == LayoutConstants.BELOW) {
+            if ( direction==null || direction == LayoutConstants.BELOW) {
                 idx = idx + 1;
             }
             plots.add(idx, domPlot);
@@ -645,16 +644,23 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         application.setPlots(plots.toArray(new Plot[plots.size()]));
+        if ( getPlot()==null ) setPlot(domPlot);
 
         //domPlot.addPropertyChangeListener(application.childListener);
         domPlot.addPropertyChangeListener(domListener);
-        setPlot(domPlot);
 
         if (plots.size() == 1) {
             bind(application, Application.PROP_TIMERANGE, domPlot.getXaxis(), Axis.PROP_RANGE);
         }
 
         return domPlot;
+    }
+
+    public Plot addPlot(Row get, Column get0) {
+        Plot p= addPlot(null);
+        p.setRowId( get.getId() );
+        p.setColumnId( get0.getId() );
+        return p;
     }
 
     /**
@@ -1129,31 +1135,51 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return the BindingModel or null if it doesn't exist.
      */
     public BindingModel findBinding(DomNode src, String srcProp, DomNode dst, String dstProp) {
+        List<BindingModel> results= findBindings( src,  srcProp, dst, dstProp );
+        if ( results.size()==0 ) {
+            return null;
+        } else {
+            return results.get(0);  // TODO: this should be a singleton.
+        }
+    }
+
+    /**
+     * Find the bindings that match given constraints.  If a property name or node is null, then the
+     * search is unconstrained.
+     * @param src
+     * @param srcProp
+     * @param dst
+     * @param dstProp
+     * @return the BindingModel or null if it doesn't exist.
+     */
+    public List<BindingModel> findBindings(DomNode src, String srcProp, DomNode dst, String dstProp) {
+        List<BindingModel> result= new ArrayList();
         for (BindingModel b : application.getBindings()) {
             try {
-                if (b.getSrcId().equals(src.getId()) && b.getDstId().equals(dst.getId()) && b.getSrcProperty().equals(srcProp) && b.getDstProperty().equals(dstProp)) {
-                    return b;
-                }
-                if (b.getSrcId().equals(dst.getId()) && b.getDstId().equals(src.getId()) && b.getSrcProperty().equals(dstProp) && b.getDstProperty().equals(srcProp)) {
-                    return b;
+                if (  ( src==null || b.getSrcId().equals(src.getId()) )
+                        && ( dst==null || b.getDstId().equals(dst.getId()) )
+                        && ( srcProp==null || b.getSrcProperty().equals(srcProp) )
+                        && ( dstProp==null || b.getDstProperty().equals(dstProp) ) ){
+                    result.add(b);
+                } else if ( ( dst==null || b.getSrcId().equals(dst.getId()) )
+                        && ( src==null || b.getDstId().equals(src.getId()) )
+                        && ( dstProp==null || b.getSrcProperty().equals(dstProp) )
+                        && ( srcProp==null || b.getDstProperty().equals(srcProp) ) ) {
+                    result.add(b);
                 }
             } catch (NullPointerException ex) {
                 throw ex;
             }
 
         }
-        return null;
+        return result;
     }
 
     public BindingModel[] getBindingsFor(DomNode node) {
-        List<BindingModel> result = new ArrayList<BindingModel>();
-        for (BindingModel b : application.getBindings()) {
-            if (b.getSrcId().equals(node.getId()) || b.getDstId().equals(node.getId())) {
-                result.add(b);
-            }
-        }
-        return result.toArray(new BindingModel[result.size()]);
+        List<BindingModel> results= findBindings( node, null, null, null );
+        return results.toArray( new BindingModel[results.size()] );
     }
+    
     protected String status = "";
     public static final String PROP_STATUS = "status";
 
@@ -1310,7 +1336,41 @@ public class ApplicationController extends DomNodeController implements RunLater
             throw new IllegalArgumentException("unsupported type: "+node.getClass().getName() );
         }
     }
-    
+
+    /**
+     * returns the maximum id number found, or -1.
+     * @param nodes
+     * @param pattern
+     * @return
+     */
+    private int maxIdNum( List<DomNode> nodes, String pattern ) {
+        int min= -1;
+        Pattern p= Pattern.compile(pattern);
+        for ( DomNode n: nodes ) {
+            Matcher m= p.matcher(n.getId());
+            if ( m.matches() ) {
+                int idNum= Integer.parseInt( m.group(1) );
+                if (idNum>min ) min= idNum;
+            }
+        }
+        return min;
+    }
+    /**
+     * reset the sequence id numbers based on the number if instances in the 
+     * application.  For example, we sync to a new state, so the id numbers 
+     * are now invalid.
+     */
+    private void resetIdSequenceNumbers() {
+        List<DomNode> nodes;
+        nodes= DomUtil.findElementsById( application, ".+_(\\d+)" );
+        rowIdNum.set( maxIdNum( nodes, "row_(\\d+)" )+1 );
+        columnIdNum.set( maxIdNum( nodes, "column_(\\d+)" )+1 );
+        dsfIdNum.set( maxIdNum( nodes, "data_(\\d+)") + 1 );
+        canvasIdNum.set( maxIdNum( nodes, "canvas_(\\d+)" ) + 1 );
+        panelIdNum.set( maxIdNum( nodes, "panel_(\\d+)" ) + 1 );
+        plotIdNum.set( maxIdNum( nodes, "plot_(\\d+)" ) + 1 );
+    }
+
     /** focus **/
     /**
      * focus panel
@@ -1420,10 +1480,13 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         canvasLock.unlock();
 
+        resetIdSequenceNumbers();
+
         lock.unlock();
         for (Panel p : application.getPanels()) {  // kludge to avoid reset range
             p.controller.setResetRanges(false);
-            p.controller.setResetPanel(true);
+            p.controller.setResetPanel(false);
+            p.controller.setResetRenderType(true);
         }
         for (DataSourceFilter dsf: application.getDataSourceFilters() ) {
             dsf.controller.setResetDimensions(false);
@@ -1465,4 +1528,5 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         };
     }
+
 }
