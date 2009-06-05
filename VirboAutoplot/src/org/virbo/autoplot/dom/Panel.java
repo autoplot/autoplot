@@ -6,7 +6,7 @@ package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.virbo.autoplot.ApplicationModel.RenderType;
+import org.virbo.autoplot.RenderType;
 
 /**
  *
@@ -70,6 +70,9 @@ public class Panel extends DomNode {
     }
 
     public void setRenderType(RenderType renderType) {
+        if ( renderType==null ) {
+            renderType= RenderType.series; // this is caused by old files.
+        }
         RenderType oldRenderType = this.renderType;
         this.renderType = renderType;
         propertyChangeSupport.firePropertyChange(PROP_RENDERTYPE, oldRenderType, renderType);
