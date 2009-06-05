@@ -28,7 +28,7 @@ public class CanvasController extends DomNodeController {
     DasCanvas dasCanvas;
     private Application application;
     private Canvas canvas;
-    
+
     public CanvasController(Application dom, Canvas canvas) {
         super(canvas);
         this.application = dom;
@@ -66,31 +66,41 @@ public class CanvasController extends DomNodeController {
 
         ApplicationController ac = application.controller;
 
-        dasCanvas.addComponentListener( new ComponentListener() {
+        dasCanvas.addComponentListener(new ComponentListener() {
+
             public void componentResized(ComponentEvent e) {
-                if ( CanvasController.this.canvas.getWidth()!=dasCanvas.getWidth() ) CanvasController.this.canvas.setWidth(dasCanvas.getWidth());
-                if ( CanvasController.this.canvas.getHeight()!=dasCanvas.getHeight() ) CanvasController.this.canvas.setHeight(dasCanvas.getHeight());
+                if (CanvasController.this.canvas.getWidth() != dasCanvas.getWidth()) {
+                    CanvasController.this.canvas.setWidth(dasCanvas.getWidth());
+                }
+                if (CanvasController.this.canvas.getHeight() != dasCanvas.getHeight()) {
+                    CanvasController.this.canvas.setHeight(dasCanvas.getHeight());
+                }
             }
+
             public void componentMoved(ComponentEvent e) {
             }
+
             public void componentShown(ComponentEvent e) {
             }
+
             public void componentHidden(ComponentEvent e) {
             }
         });
 
-        this.canvas.addPropertyChangeListener( Canvas.PROP_WIDTH, new PropertyChangeListener() {
+        this.canvas.addPropertyChangeListener(Canvas.PROP_WIDTH, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
-                dasCanvas.setPreferredWidth( CanvasController.this.canvas.getWidth() );
+                dasCanvas.setPreferredWidth(CanvasController.this.canvas.getWidth());
             }
-        } );
-        this.canvas.addPropertyChangeListener( Canvas.PROP_HEIGHT, new PropertyChangeListener() {
+        });
+        this.canvas.addPropertyChangeListener(Canvas.PROP_HEIGHT, new PropertyChangeListener() {
+
             public void propertyChange(PropertyChangeEvent evt) {
-                dasCanvas.setPreferredHeight( CanvasController.this.canvas.getHeight() );
+                dasCanvas.setPreferredHeight(CanvasController.this.canvas.getHeight());
             }
-        } );
+        });
         ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
-        ac.bind(this.canvas, Canvas.PROP_FONT, dasCanvas, DasCanvas.PROP_BASEFONT, DomUtil.STRING_TO_FONT );  //TODO: bind this to the dasCanvas.
+        ac.bind(this.canvas, Canvas.PROP_FONT, dasCanvas, DasCanvas.PROP_BASEFONT, DomUtil.STRING_TO_FONT);  //TODO: bind this to the dasCanvas.
 
     }
 
@@ -100,14 +110,18 @@ public class CanvasController extends DomNodeController {
 
     Row getRowFor(Plot domPlot) {
         for (Row row : canvas.getRows()) {
-            if (row.getId().equals(domPlot.getRowId())) return row;
+            if (row.getId().equals(domPlot.getRowId())) {
+                return row;
+            }
         }
         throw new IllegalArgumentException("no row found for " + domPlot);
     }
 
     Row getRowFor(DasRow dasRow) {
         for (Row row : canvas.getRows()) {
-            if (row.controller.getDasRow() == dasRow) return row;
+            if (row.controller.getDasRow() == dasRow) {
+                return row;
+            }
         }
         throw new IllegalArgumentException("no dom row found for " + dasRow);
     }
@@ -203,7 +217,9 @@ public class CanvasController extends DomNodeController {
         row.setParent(canvas.getMarginRow().getId());
         new RowController(row).createDasPeer(this.canvas, canvas.getMarginRow().getController().getDasRow());
 
-        if (trow != null) insertGapFor(row, trow, position);
+        if (trow != null) {
+            insertGapFor(row, trow, position);
+        }
 
         List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
 
@@ -219,7 +235,7 @@ public class CanvasController extends DomNodeController {
 
         canvas.setRows(rows.toArray(new Row[rows.size()]));
 
-        this.application.getController().assignId( row );
+        this.application.getController().assignId(row);
 
         lock.unlock();
 
@@ -227,7 +243,71 @@ public class CanvasController extends DomNodeController {
 
     }
 
-    protected Row addRow() {
+    /**
+     * add rows below the current plot.
+     * @param count
+     * @return
+     */
+    public List<Row> addRows(int count) {
+        Row trow;
+        if (application.getController().getPlot() != null) {
+            trow = getRowFor(application.getController().getPlot());
+        } else {
+            trow = canvas.getRows(canvas.getRows().length - 1);
+        }
+
+        List<Row> rows = new ArrayList();
+        for (int i = 0; i < count; i++) {
+            rows.add(addInsertRow(trow,  LayoutConstants.BELOW ));
+        }
+        return rows;
+    }
+
+    /**
+     * insert the row into the other rows by shrinking them to make room.
+     * @param trow row to position above or below, or null if we don't care.
+     * @param position LayoutConstants.RIGHT, LayoutConstants.LEFT
+     */
+    public List<Column> addColumns(int count) {
+        MutatorLock lock = changesSupport.mutatorLock();
+        lock.lock();
+
+        List<Column> result = new ArrayList();
+        List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+
+        for (int i = 0; i < count; i++) {
+            final Column column = new Column();
+
+            column.setParent(canvas.getMarginRow().getId());
+
+            new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
+            this.application.getController().assignId(column);
+            result.add(column);
+
+            int lpm = 1000 * i / count;
+            int rpm = 1000 * (i + 1) / count;
+            int lem= i*50/(count-1);
+            int rem= 50*(count-1-i)/(count-1);
+            column.setLeft("" + lpm / 10. + "%+"+lem/10.+"em");
+            column.setRight("" + rpm / 10. + "%-"+rem/10.+"em");
+
+        }
+
+        columns.addAll(result);
+
+        canvas.setColumns(columns.toArray(new Column[columns.size()]));
+
+        lock.unlock();
+
+        return result;
+
+    }
+
+    /**
+     * add a row to the application, below.
+     * @return
+     */
+    public Row addRow() {
         return addInsertRow(null, null);
     }
 
@@ -242,7 +322,7 @@ public class CanvasController extends DomNodeController {
         canvas.setRows(rows.toArray(new Row[rows.size()]));
         lock.unlock();
     }
-    
+
     protected void deleteColumn(Column column) {
         MutatorLock lock = changesSupport.mutatorLock();
         lock.lock();
@@ -255,12 +335,14 @@ public class CanvasController extends DomNodeController {
         lock.unlock();
     }
 
-    protected void syncTo(Canvas canvas, List<String> exclude, Map<String,String> layoutIds ) {
+    protected void syncTo(Canvas canvas, List<String> exclude, Map<String, String> layoutIds) {
 
         // here we are looking for where the incorrect canvas is attached to the row.
-        List<Diff> diffs =  canvas.diffs(this.canvas);
+        List<Diff> diffs = canvas.diffs(this.canvas);
         for (Diff d : diffs) {
-            if ( exclude.contains(d.propertyName()) ) continue;
+            if (exclude.contains(d.propertyName())) {
+                continue;
+            }
             try {
                 if (d instanceof ArrayNodeDiff) {
                     ArrayNodeDiff and = (ArrayNodeDiff) d;
