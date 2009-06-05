@@ -88,8 +88,8 @@ public abstract class WrappersEditor implements PropertyEditor {
             pe.setAsText(text);
         } catch (Exception e) {
             //Reasonable to assume any exceptions from core/jdk editors are legit
-            IllegalArgumentException iae = new IllegalArgumentException (e.getMessage());
-            String msg = e.getLocalizedMessage();
+            //IllegalArgumentException iae = new IllegalArgumentException (e.getMessage());
+            //String msg = e.getLocalizedMessage();
             throw new RuntimeException(e);
         }
     }
