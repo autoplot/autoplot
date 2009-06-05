@@ -130,9 +130,9 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_ISOTROPIC)) this.setIsotropic(that.isIsotropic());
         if (!exclude.contains(PROP_ROWID)) this.setRowId(that.getRowId());
         if (!exclude.contains(PROP_COLUMNID)) this.setColumnId(that.getColumnId());
-        this.xaxis.syncTo(that.getXaxis(),exclude); // possibly exclude id's.
-        this.yaxis.syncTo(that.getYaxis(),exclude);
-        this.zaxis.syncTo(that.getZaxis(),exclude);
+        if (!exclude.contains(PROP_XAXIS)) this.xaxis.syncTo(that.getXaxis(),exclude); // possibly exclude id's.
+        if (!exclude.contains(PROP_YAXIS)) this.yaxis.syncTo(that.getYaxis(),exclude);
+        if (!exclude.contains(PROP_ZAXIS)) this.zaxis.syncTo(that.getZaxis(),exclude);
     }
 
     @Override
