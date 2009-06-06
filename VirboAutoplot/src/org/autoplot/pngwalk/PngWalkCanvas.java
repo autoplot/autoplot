@@ -268,7 +268,9 @@ public class PngWalkCanvas extends JPanel {
                                 im = (BufferedImage) image;
                             } else {
                                 im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                                im.getGraphics().drawImage(image, 0, 0, this);
+                                if ( !im.getGraphics().drawImage(image, 0, 0, this) ) {
+                                    continue;
+                                }
                             }
                             addBorder(im,0.1);
                             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
@@ -308,7 +310,9 @@ public class PngWalkCanvas extends JPanel {
                                 im = (BufferedImage) image;
                             } else {
                                 im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                                im.getGraphics().drawImage(image, 0, 0, this);
+                                if ( ! im.getGraphics().drawImage(image, 0, 0, this) ) {
+                                    continue;
+                                }
                             }
                             addBorder(im,0.1);
                             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
