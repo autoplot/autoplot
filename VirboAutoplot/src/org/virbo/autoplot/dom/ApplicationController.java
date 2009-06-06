@@ -93,8 +93,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         this.syncSupport = new ApplicationControllerSyncSupport(this);
         this.support = new ApplicationControllerSupport(this);
 
-        application.setId("app_"+appIdNum.getAndIncrement());
-        application.getOptions().setId("options_0");
+        int i= appIdNum.getAndIncrement();
+        application.setId("app_"+i);
+        application.getOptions().setId("options_"+i);
 
         application.addPropertyChangeListener(domListener);
         for ( DomNode n: application.childNodes() ) {
@@ -540,10 +541,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             domPlot = addPlot(LayoutConstants.BELOW);
         }
 
-        panel1.setId("panel_" + fpanelIdNum);
+        assignId(panel1);
 
-        panel1.getStyle().setId("style_" + fpanelIdNum);
-        panel1.getPlotDefaults().setId("plot_defaults_" + fpanelIdNum);
         panel1.getStyle().setColor(application.getOptions().getColor());
         panel1.getStyle().setFillColor(application.getOptions().getFillColor());
         panel1.getStyle().setAntiAliased(application.getOptions().isDrawAntiAlias());
@@ -619,12 +618,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction);
         }
 
-        int num = plotIdNum.getAndIncrement();
-
-        domPlot.setId("plot_" + num);
-        domPlot.getXaxis().setId("xaxis_" + num);
-        domPlot.getYaxis().setId("yaxis_" + num);
-        domPlot.getZaxis().setId("zaxis_" + num);
+        assignId( domPlot );
 
         new PlotController(application, domPlot).createDasPeer(canvas, domRow ,canvas.getMarginColumn() );
 
@@ -1315,23 +1309,34 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     protected void assignId( DomNode node ) {
         if ( node instanceof Row ) {
-            if ( rowIdNum.get()==0 ) {
-                node.setId("marginRow_"+rowIdNum.getAndIncrement());
-            } else {
-                node.setId( "row_"+rowIdNum.getAndIncrement() );
-            }
+            node.setId( "row_"+rowIdNum.getAndIncrement() );
+
         } else if ( node instanceof Column ) {
-            if ( columnIdNum.get()==0 ) {
-                node.setId( "marginColumn_"+columnIdNum.getAndIncrement() );
-            } else {
-                node.setId( "column_"+columnIdNum.getAndIncrement() );
-            }
+            node.setId( "column_"+columnIdNum.getAndIncrement() );
+
         } else if ( node instanceof DataSourceFilter ) {
             node.setId("data_" + dsfIdNum);
             dsfIdNum.getAndIncrement();
         } else if ( node instanceof Canvas ) {
-            node.setId("canvas_"+canvasIdNum.getAndIncrement());
-            
+            int i= canvasIdNum.getAndIncrement();
+            node.setId("canvas_"+i);
+            Canvas ca= (Canvas)node;
+            ca.getMarginColumn().setId("marginColumn_"+i);
+            ca.getMarginRow().setId("marginRow_"+i);
+
+        } else if ( node instanceof Panel ) {
+            int i= panelIdNum.getAndIncrement();
+            node.setId("panel_"+i );
+            ((Panel)node).getStyle().setId("style_"+i);
+            ((Panel)node).getPlotDefaults().setId("plot_defaults_" + i);
+        } else if ( node instanceof Plot ) {
+            int num = plotIdNum.getAndIncrement();
+            Plot domPlot= (Plot)node;
+            domPlot.setId("plot_" + num);
+            domPlot.getXaxis().setId("xaxis_" + num);
+            domPlot.getYaxis().setId("yaxis_" + num);
+            domPlot.getZaxis().setId("zaxis_" + num);
+
         } else {
             throw new IllegalArgumentException("unsupported type: "+node.getClass().getName() );
         }
