@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import org.das2.util.ArgumentList;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
+import org.virbo.datasource.DataSetURL;
 
 /**
  *
@@ -23,6 +24,8 @@ public class DemoPngWalk {
 
     public static void main(String[] args) {
 
+        //DataSetURL.init();  // FtpFileSystem implementation
+        
         System.err.println("this is pngwalk 20090529");
         final ArgumentList alm = new ArgumentList("AutoPlotUI");
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
@@ -63,7 +66,7 @@ public class DemoPngWalk {
                 int i0 = template.indexOf("_$Y");
                 if ( i0==-1 ) i0= template.indexOf("_%Y");
                 int i1 = s.indexOf(".png");
-                if ( i1==-1 ) return false;
+                if ( i1==-1 || i0==-1 ) return false;
                 //String timeRange = s.substring(i0 + 1, i1);
                 String productFile = template.substring(0, i0) + ".vap";
                 try {
