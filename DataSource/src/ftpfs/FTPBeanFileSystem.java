@@ -42,11 +42,8 @@ import org.das2.system.MutatorLock;
  */
 public class FTPBeanFileSystem extends WebFileSystem {
 
-    String userHost;
-
     FTPBeanFileSystem(URL root) {
         super(root, localRoot(root));
-        userHost= root.getUserInfo();
     }
 
     /* dumb method looks for / in parent directory's listing */
@@ -206,8 +203,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                 FtpBean bean = new FtpBean();
                 try {
-                    if ( userHost!=null ) {
-                        String[] userHostArr= userHost.split(":");
+                    String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
+                    if ( userInfo!=null ) {
+                        String[] userHostArr= userInfo.split(":");
                         bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
                         String cwd= bean.getDirectory();
                         bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
@@ -319,8 +317,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
             try {
                 FtpBean bean = new FtpBean();
 
-                if ( userHost!=null ) {
-                    String[] userHostArr= userHost.split(":");
+                String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
+                if ( userInfo!=null ) {
+                    String[] userHostArr= userInfo.split(":");
                     bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
                     String cwd= bean.getDirectory();
                     bean.setDirectory( cwd + ss[2].substring(ss[1].length()) );
