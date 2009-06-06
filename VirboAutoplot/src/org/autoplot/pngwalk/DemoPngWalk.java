@@ -24,7 +24,7 @@ public class DemoPngWalk {
 
     public static void main(String[] args) {
 
-        //DataSetURL.init();  // FtpFileSystem implementation
+        DataSetURL.init();  // FtpFileSystem implementation
         
         System.err.println("this is pngwalk 20090529");
         final ArgumentList alm = new ArgumentList("AutoPlotUI");
