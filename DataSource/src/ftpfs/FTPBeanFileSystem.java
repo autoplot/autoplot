@@ -318,9 +318,17 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
             try {
                 FtpBean bean = new FtpBean();
-                bean.ftpConnect(url.getHost(), "ftp");
-                String cwd= bean.getDirectory();
-                bean.setDirectory( cwd + ss[2].substring(ss[1].length()));
+
+                if ( userHost!=null ) {
+                    String[] userHostArr= userHost.split(":");
+                    bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
+                    String cwd= bean.getDirectory();
+                    bean.setDirectory( cwd + ss[2].substring(ss[1].length()) );
+                } else {
+                    bean.ftpConnect(getRootURL().getHost(), "ftp");
+                    String cwd= bean.getDirectory();
+                    bean.setDirectory( cwd + ss[2].substring(ss[1].length()) );
+                }
 
                 File listingFile = new File(targetFile.getParentFile(), ".listing");
                 if (!listingFile.exists()) {
@@ -357,7 +365,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 };
                 bean.getBinaryFile(ss[3].substring(ss[2].length()), partFile.toString(), observer);
                 bean.close();
-                mon.finished();
+                
             } catch (RuntimeException ex) {
                 ex.printStackTrace();
                 if (ex.getCause() instanceof IOException) {
@@ -384,7 +392,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
             throw e;
             
         } finally {
-
+            mon.finished();
             lock.unlock();
         }
         
