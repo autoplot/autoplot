@@ -11,11 +11,8 @@
 
 package org.virbo.cdfdatasource;
 
-import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
 import gsfc.nssdc.cdf.CDFException;
-import gsfc.nssdc.cdf.Entry;
-import gsfc.nssdc.cdf.Variable;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
@@ -234,8 +231,8 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             CDF cdf= CDF.open( fileName, CDF.READONLYoff );
 
             logger.finest("inspect cdf for plottable parameters");
-            parameterDescriptions= CdfUtil.getPlottable( cdf, true, 3, false );
-            parameterInfo= CdfUtil.getPlottable( cdf, true, 3, true );
+            parameterDescriptions= CdfUtil.getPlottable( cdf, true, 4, false );
+            parameterInfo= CdfUtil.getPlottable( cdf, true, 4, true );
             if ( parameterDescriptions.size()==0 ) {
                 throw new IllegalArgumentException("no plottable parameters in cdf file!");
             }
@@ -272,8 +269,10 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         } catch (CDFException ex) {
             DasExceptionHandler.handle( ex );
         } catch (IOException ex) {
+            DasExceptionHandler.handle( ex );
             Logger.getLogger(CdfDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
+            DasExceptionHandler.handle( ex );
             Logger.getLogger(CdfDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
