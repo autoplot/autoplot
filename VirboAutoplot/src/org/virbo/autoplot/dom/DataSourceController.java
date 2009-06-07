@@ -172,7 +172,7 @@ public class DataSourceController extends DomNodeController {
 
         QDataSet ds = getDataSet();
 
-        String[] depNames = new String[3];
+        String[] depNames = new String[ds.rank()];
         for (int i = 0; i < ds.rank(); i++) {
             depNames[i] = "dim" + i;
             QDataSet dep0 = (QDataSet) ds.property("DEPEND_" + i);
@@ -191,7 +191,7 @@ public class DataSourceController extends DomNodeController {
         if ( isResetDimensions() ) {
 
             if (ds.rank() > 2 && isResetDimensions() ) {
-            guessSliceDimension();
+                guessSliceDimension();
             }
         }
 
