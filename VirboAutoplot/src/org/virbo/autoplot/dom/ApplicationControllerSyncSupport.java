@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
  * Support methods for synchronizing two Application trees with different
@@ -63,9 +64,20 @@ public class ApplicationControllerSyncSupport {
 
         for ( Plot p: application.getPlots() ) {
             if ( p.controller==null ) {
-                Row row= (Row) DomUtil.getElementById( application, p.getRowId() );
+                Row row;
+                if ( p.getRowId().equals("") ) {
+                    row= application.controller.getCanvas().marginRow;
+                } else {
+                    row= (Row) DomUtil.getElementById( application, p.getRowId() );
+                    if ( row==null ) row= application.controller.getCanvas().marginRow;
+                }
                 Column col;
-                col=  (Column) DomUtil.getElementById( application, p.getColumnId() );
+                if ( p.getColumnId().equals("") ) {
+                    col= application.controller.getCanvas().marginColumn;
+                } else {
+                    col=  (Column) DomUtil.getElementById( application, p.getColumnId() );
+                    if ( col==null ) col= application.controller.getCanvas().marginColumn;
+                }
                 new PlotController( application, p ).createDasPeer( row.controller.getCanvas(), row, col );
             }
             nameMap.put( p.getId(), p.getId() );  //DANGER--this is intentionally the same.
