@@ -295,7 +295,7 @@ public class CdfUtil {
             int nzz = data[0][0][0].length;
             float[] back = new float[nx * ny * nz * nzz];
             flatten(data, back, 0, nx, ny, nz, nzz );
-            result = FDataSet.wrap(back, nx, ny, nz, nzz);
+            result = FDataSet.wrap(back, new int[] { nx, ny, nz, nzz } );
         } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT4) {
             int[][][][] data = (int[][][][]) odata;
             int nx = data.length;
@@ -304,7 +304,7 @@ public class CdfUtil {
             int nzz = data[0][0][0].length;
             int[] back = new int[nx * ny * nz * nzz];
             flatten(data, back, 0, nx, ny, nz, nzz);
-            result = IDataSet.wrap(back, nx, ny, nz, nzz);
+            result = IDataSet.wrap(back,  new int[] { nx, ny, nz, nzz } );
         } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
             short[][][][] data = (short[][][][]) odata;
             int nx = data.length;
@@ -313,7 +313,7 @@ public class CdfUtil {
             int nzz = data[0][0][0].length;
             short[] back = new short[nx * ny * nz * nzz ];
             flatten(data, back, 0, nx, ny, nz, nzz);
-            result = SDataSet.wrap(back, nx, ny, nz, nzz);
+            result = SDataSet.wrap(back, new int[] { nx, ny, nz, nzz } );
         } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE) {
             byte[][][][] data = (byte[][][][]) odata;
             int nx = data.length;
@@ -322,7 +322,7 @@ public class CdfUtil {
             int nzz = data[0][0][0].length;
             byte[] back = new byte[nx * ny * nz * nzz];
             flatten(data, back, 0, nx, ny, nz, nzz);
-            result = BDataSet.wrap(back, nx, ny, nz, nzz);
+            result = BDataSet.wrap(back,  new int[] { nx, ny, nz, nzz } );
 
         } else {
             throw new RuntimeException("Unsupported Data Type " + variable.getDataType() + " java type " + odata.getClass());
@@ -553,7 +553,7 @@ public class CdfUtil {
             result = wrapRank3(varType, odata, variable);
 
         } else {
-            result = leafSlice(varType, odata, 0);
+            result = wrapRank4(varType, odata, variable);
         }
 
         return result;
