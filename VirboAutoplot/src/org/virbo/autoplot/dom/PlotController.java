@@ -60,6 +60,7 @@ public class PlotController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             if ( dasPlot!=null && evt.getPropertyName().equals(Plot.PROP_ROWID) ) {
                 Row row= (Row) DomUtil.getElementById( dom, (String)evt.getNewValue() );
+                if ( row==null ) row= dom.controller.getCanvas().marginRow;
                 DasRow dasRow= row.controller.getDasRow();
                 dasPlot.setRow(dasRow);
                 domPlot.getXaxis().getController().getDasAxis().setRow(dasRow);
@@ -67,6 +68,7 @@ public class PlotController extends DomNodeController {
                 domPlot.getZaxis().getController().getDasAxis().setRow(dasRow);
             } else if ( dasPlot!=null && evt.getPropertyName().equals(Plot.PROP_COLUMNID) ) {
                 Column col= (Column) DomUtil.getElementById( dom, (String)evt.getNewValue() );
+                if ( col==null ) col= dom.controller.getCanvas().marginColumn;
                 DasColumn dasColumn= col.controller.getDasColumn();
                 dasPlot.setColumn(dasColumn);
                 domPlot.getXaxis().getController().getDasAxis().setColumn(dasColumn);
