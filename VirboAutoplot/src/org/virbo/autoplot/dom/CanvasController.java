@@ -34,8 +34,6 @@ public class CanvasController extends DomNodeController {
         this.application = dom;
         this.canvas = canvas;
         canvas.controller = this;
-        dom.getController().assignId(canvas.getMarginRow());
-        dom.getController().assignId(canvas.getMarginColumn());
     }
 
     /**
