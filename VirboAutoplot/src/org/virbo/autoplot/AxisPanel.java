@@ -166,7 +166,6 @@ public class AxisPanel extends javax.swing.JPanel {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames));
-                            sliceTypeComboBox.setSelectedIndex(newDsf.getSliceDimension());
                         }
                     });
                 }
