@@ -70,6 +70,11 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
     abstract public double value(int i0, int i1, int i2, int i3);
 
+    public void putValue( int i0, int i1, int i2, int i3, double v ) {
+        throw new IllegalArgumentException("rank limit");
+    }
+
+
     public Object property(String name) {
         return properties.get(name);
     }
@@ -86,6 +91,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         return property(name);
     }
 
+    public Object property(String name, int i0, int i1, int i2, int i3 ) {
+        return property(name);
+    }
+
     @SuppressWarnings("unchecked")
     public void putProperty(String name, Object value) {
         properties.put(name, value);
@@ -99,6 +108,14 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         putProperty(name, value);
     }
 
+    public void putProperty(String name, int i0, int i1, int i2, Object value) {
+        putProperty(name, value);
+    }
+
+    public void putProperty(String name, int i0, int i1, int i2, int i3, Object value) {
+        putProperty(name, value);
+    }
+
     public int length() {
         return dimSizes[0];
     }
@@ -109,6 +126,10 @@ public abstract class DodsVarDataSet implements WritableDataSet {
 
     public int length(int i0, int i1) {
         return dimSizes[2];
+    }
+
+    public int length(int i0, int i1, int i2 ) {
+        throw new IllegalArgumentException("rank limit");
     }
 
     public static class Int32Array extends DodsVarDataSet {
