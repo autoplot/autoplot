@@ -1415,7 +1415,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * focus canvas.
      */
-    protected Canvas canvas = new Canvas();
+    protected Canvas canvas;
     public static final String PROP_CANVAS = "canvas";
 
     public Canvas getCanvas() {
