@@ -26,7 +26,7 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
     
     <form action="SimpleServlet">
         Enter Autoplot URL:
-        <input type="text" name="url" value="http://www.sarahandjeremy.net/~jbf/1wire/data/2007/0B000800408DD710.%Y%m%d.d2s?timerange=20071210" size="80" />
+        <input type="text" name="url" value="http://localhost:14397/AutoplotServlet/data/0B000800408DD710.$Y$m$d.d2s?timerange=20090314" size="80" />
         <input type="submit" value="Plot" />
     </form>
 
