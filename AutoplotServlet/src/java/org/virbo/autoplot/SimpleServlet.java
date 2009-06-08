@@ -5,7 +5,6 @@
 package org.virbo.autoplot;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.util.logging.Logger;
 import org.das2.util.DasPNGConstants;
@@ -76,6 +75,7 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        System.err.println( "requestMethod="+request.getMethod() );
         long t0= System.currentTimeMillis();
         String suniq= request.getParameter("requestId");
         long uniq;
@@ -158,6 +158,8 @@ public class SimpleServlet extends HttpServlet {
                 dom.getOptions().setAutolayout(false);
                 if (!row.equals("")) dom.getController().getCanvas().getController().setRow(row);
                 if (!column.equals("")) dom.getController().getCanvas().getController().setColumn(column);
+                dom.getCanvases(0).getRows(0).setTop("0%");
+                dom.getCanvases(0).getRows(0).setBottom("100%");
             }
 
             if (!font.equals("")) appmodel.getCanvas().setBaseFont(Font.decode(font));
@@ -202,6 +204,13 @@ public class SimpleServlet extends HttpServlet {
                         logit("timeSeriesBrowse got data source",t0,uniq);
                     }
                 }
+
+            QDataSet ds;
+            try {
+                ds = dsource.getDataSet(new NullProgressMonitor());
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
 
                 if (!process.equals("")) {
                     QDataSet r = dsource.getDataSet(new NullProgressMonitor());
@@ -268,7 +277,7 @@ public class SimpleServlet extends HttpServlet {
 
 
             if (!srenderType.equals("")) {
-                ApplicationModel.RenderType renderType = ApplicationModel.RenderType.valueOf(srenderType);
+                RenderType renderType = RenderType.valueOf(srenderType);
                 dom.getController().getPanel().setRenderType(renderType);
             }
 
