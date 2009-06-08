@@ -7,6 +7,8 @@ for i in \
   dist/lib/QDataSet.jar dist/lib/QStream.jar dist/lib/dasCore.jar dist/lib/DataSource.jar \
   dist/lib/BinaryDataSource.jar dist/lib/DataSourcePack.jar dist/lib/TsdsDataSource.jar \
   dist/lib/beansbinding-1.2.1.jar \
+  dist/lib/commons-httpclient-3.0.jar \
+  dist/lib/commons-logging-1.0.4.jar \
   dist/lib/VirboAutoplot.jar \
   dist/AutoplotApplet.jar; do
     name=${i}
@@ -41,9 +43,8 @@ rm -r appletjar/scripts
 rm -r appletjar/images
 rm -r appletjar/external
 #rm -r appletjar/zipfs
-rm -r appletjar/org/virbo/autoplot/AutoPlotUI*
 rm -r appletjar/org/virbo/autoplot/AddPanelDia*
-rm -r appletjar/org/virbo/autoplot/scriptconsole*
+#rm -r appletjar/org/virbo/autoplot/scriptconsole*
 #rm -r appletjar/org/virbo/autoplot/resources/
 #rm -r appletjar/org/virbo/autoplot/bookmarks/
 #rm -r appletjar/org/virbo/ascii/
@@ -99,5 +100,6 @@ pwd
 
 cd ..
 
+echo "copy temp/AutoplotAppletAll.jar to dist/"
 cp temp/AutoplotAppletAll.jar dist
 
