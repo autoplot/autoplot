@@ -18,39 +18,27 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
-<ul><li> bugfixes:
-<ul><li> aggregation with rank 3 datasets had lots of issues.
-</li><li> multiple identical bindings would result in runtime exception when attempt to unbind
-</li><li> 2793948: clean up of panels with child panels stuff (used for B-GSM for example, copy panels would fail)
-<ul><li> copy panels would fail
-</li><li> vap files were quirky at best
+bugfixes:
+<ul><li> problems with vap files resolved.
+</li><li> download from authenticated FTP site works (such as <a href="ftp://user:pass@mrfrench.lanl.gov/" class="external free" title="ftp://user:pass@mrfrench.lanl.gov/" rel="nofollow">ftp://user:pass@mrfrench.lanl.gov/</a>).
+</li><li> inconsistencies between Servlet and Applet initial view
+</li><li> CDF depend_1 number of elements is incorrect.
 </li></ul>
-</li><li> regression in panel focus fixed.  (move By to plot below would move Bx instead)
+</li><li> introductory rank 4 support in QDataSet
 
-</li><li> bugfixes with rank 3 dataset slicing, vap files, autoranging.
-</li><li> 2792481: docked canvas could only be so small and status bar would get clipped.  now axis panel and style panel have scrollbars.
-</li><li> large ascii files with no valid records would hang up the reader during completion, now the header length is limited to 10000 lines.
-</li><li> 2789036: tiny columns in ascii table fixed
-</li><li> 2794977:File-&gt;"Reset Application" resets application to initial state.
-</li><li> 2794972: "Edit Data Source" added to plot context menu.
+</li><li> introduce KeyChain object for storing credentials of HTTP and FTP sites, basic authentication dialog when
 </li></ul>
-</li><li> minor features:
-<ul><li> Ascii table reader gets new "tail" parameter
-
-</li><li> script context gets "plot( panelNum, label, qdataset )" methods
-</li><li> PyQDataSet is sequence by defining __len__, allowing ds[3] to slice a rank&gt;1 dataset.
-</li><li> switch from spectrogram to series to spectrogram supported for rank 2 with small number of channels (<12).
-</li><li> nearest neighbor spectrogram introduced to render types for convenience.
+<p>user:pass is used in the URIs.
+</p>
+<ul><li> NOTE: vap load/save tightened up, which may cause some old vap files to break.
 </li></ul>
-
+        
 <p>Known issues:</p>
 <ul>
 <li> Applet suffers from same seven second delay, applet can show display
 </li><li> bug: aggregation sometimes still jumps when you adjust the z-axis.  Demo 2.
 </li><li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
 </li><li> last URI is not added to DataSetSelector.
-</li><li> CDF depend_1 number of elements is incorrect.
-</li><li> Unable to download vap:<a href="ftp://user:pass@mrfrench.lanl.gov/lanl/geo/cdf/H3_SOPA/LANL-97A/2007/LANL_LANL-97A_H3_SOPA_20070130_V01.cdf" class="external free" title="ftp://user:pass@mrfrench.lanl.gov/lanl/geo/cdf/H3_SOPA/LANL-97A/2007/LANL_LANL-97A_H3_SOPA_20070130_V01.cdf" rel="nofollow">ftp://user:pass@mrfrench.lanl.gov/lanl/geo/cdf/H3_SOPA/LANL-97A/2007/LANL_LANL-97A_H3_SOPA_20070130_V01.cdf</a>
 </li><li> race condition with setSliceDimension and setFillDataSet results in "inconvertable units"
 </li>
 </ul>
