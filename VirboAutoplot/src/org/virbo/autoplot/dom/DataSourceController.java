@@ -96,7 +96,7 @@ public class DataSourceController extends DomNodeController {
                 if (!dom.controller.isValueAdjusting()) {
                     resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
                 } else {
-                    new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller) {
+                    new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, false ) {
                         @Override
                         public void run() {
                             if ( uriNeedsResolution ) resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
@@ -294,7 +294,7 @@ public class DataSourceController extends DomNodeController {
 
         if (ac.isValueAdjusting()) {
             final QDataSet fds = ds;
-            new RunLaterListener( ChangesSupport.PROP_VALUEADJUSTING, ac ) {
+            new RunLaterListener( ChangesSupport.PROP_VALUEADJUSTING, ac, false ) {
                 @Override
                 public void run() {
                     setDataSetInternal(fds);
