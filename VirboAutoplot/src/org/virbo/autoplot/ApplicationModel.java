@@ -47,10 +47,12 @@ import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
@@ -495,6 +497,40 @@ public class ApplicationModel {
     }
 
     /**
+     * fix the state to make it valid, to the extent that this is possible.
+     * For example, old vap files didn't specify rows, so we add rows to make
+     * it.  Note the mechanism used to save old states doesn't allow for importing,
+     * since it's tied to classes in the running JRE.  It would be non-trivial
+     * to implement this.  So we do this for now.
+     * 
+     * @param state
+     */
+    private void makeValid( Application state ) {
+        if ( state.getController()!=null ) throw new IllegalArgumentException("state must not have controller");
+        // check to see if rows need to be made
+
+        Canvas c= state.getCanvases(0);
+        if ( c.getMarginRow().getId().equals("") ) c.getMarginRow().setId("marginRow_0");
+        if ( c.getMarginColumn().getId().equals("") ) c.getMarginColumn().setId("marginColumn_0");
+
+        if ( state.getPlots(0).getRowId().equals("") ) {
+            int n= state.getPlots().length;
+            Row[] rows= new Row[n];
+            for ( int i=0; i<n; i++ ) {
+                Row r= new Row();
+                r.setBottom( ""+((i+1)*10000/100./n)+"%-2.0em" );
+                r.setTop( ""+((i)*10000/100./n)+"%+2.0em" );
+                r.setParent( c.getMarginRow().getId() );
+                r.setId("row_"+i);
+                state.getPlots(i).setRowId(r.getId());
+                state.getPlots(i).setColumnId(c.getMarginColumn().getId());
+                rows[i]= r;
+            }
+            c.setRows(rows);
+        }
+    }
+
+    /**
      * open the serialized DOM, apply additional modifications to the DOM, then
      * sync the application to this.
      * @param f
@@ -506,6 +542,7 @@ public class ApplicationModel {
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
         Application state = (Application) StatePersistence.restoreState(f);
+        makeValid( state );
 
         if (deltas != null) {
             for (Entry<String, String> e : deltas.entrySet()) {
