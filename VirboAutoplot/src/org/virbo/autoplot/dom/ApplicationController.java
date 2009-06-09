@@ -718,6 +718,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         for (Panel newp : newPanels) {
             newp.getController().setResetRanges(false);
             newp.getController().setResetPanel(false);
+            newp.getController().setResetRenderType(false);
         }
 
         return newPlot;
