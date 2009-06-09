@@ -7,6 +7,7 @@ package org.virbo.autoplot.util;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import org.das2.system.RequestProcessor;
 
 /**
  * maybe a handy class to have something run later.
@@ -23,11 +24,18 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
     
     PropertyChange node;
     String propertyName;
+    boolean immediatelyAfter;
 
     int invocationCount=0;
     private static int instanceCount=0;
 
-    public RunLaterListener( String propertyName, PropertyChange node ) {
+    /**
+     *
+     * @param propertyName the property name we listen to.
+     * @param node the object that we listen to.
+     * @param immediatelyAfter run this on the change notification thread.  If false, a new thread is used to run this.
+     */
+    public RunLaterListener( String propertyName, PropertyChange node, boolean immediatelyAfter ) {
         instanceCount++;
 
         this.node= node;
@@ -54,7 +62,12 @@ public abstract class RunLaterListener implements PropertyChangeListener, Runnab
         if ( invocationCount>1 ) {
             return;
         }
-        run();
+        if ( immediatelyAfter ) {
+            run();
+        } else {
+            RequestProcessor.invokeLater(this);
+        }
+        
     }
 
     public abstract void run();
