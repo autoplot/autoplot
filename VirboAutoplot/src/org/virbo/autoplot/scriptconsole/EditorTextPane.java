@@ -5,6 +5,7 @@
 
 package org.virbo.autoplot.scriptconsole;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -34,12 +35,36 @@ public class EditorTextPane extends JTextPane {
 
         getActionMap().put( "redo", new AbstractAction( undo.getRedoPresentationName() ) {
             public void actionPerformed( ActionEvent e ) {
-                undo.redo();
+               try {
+                    undo.redo();
+               } catch ( javax.swing.undo.CannotRedoException ex ) {
+                   
+               }
             }
         });
 
+        getActionMap().put( "biggerFont", new AbstractAction( "Text Size Bigger" ) {
+            public void actionPerformed( ActionEvent e ) {
+               Font f= getFont();
+               float size= f.getSize2D();
+               float step= size < 14 ? 1 : 2;
+               setFont( f.deriveFont( Math.min( 40, size + step ) ) );
+            }
+        } );
+
+        getActionMap().put( "smallerFont", new AbstractAction( "Text Size Smaller" ) {
+            public void actionPerformed( ActionEvent e ) {
+               Font f= getFont();
+               float size= f.getSize2D();
+               float step= size < 14 ? 1 : 2;
+               setFont( f.deriveFont( Math.max( 4, size - step ) ) );
+            }
+        } );
+
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK ), "undo" );
         getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK ), "redo" );
+        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, KeyEvent.CTRL_DOWN_MASK ), "biggerFont" );
+        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK ), "smallerFont" );
     }
 
 
