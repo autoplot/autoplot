@@ -15,7 +15,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
@@ -582,7 +585,7 @@ public class PanelController extends DomNodeController {
             panel.syncTo(panelCopy,Collections.singletonList(Panel.PROP_LEGENDLABEL) );
         }
 
-        checkBindings( plot, panel.getPlotDefaults() );
+        doCheckBindings( plot, panel.getPlotDefaults() );
 
         List<String> excludeFromSync= new ArrayList( Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
         List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
@@ -609,7 +612,7 @@ public class PanelController extends DomNodeController {
      * @param plot the plot whose binds we are checking.  Bindings with this node may be added or removed.
      * @param newSettings the new plot settings from autoranging.
      */
-    private void checkBindings( Plot plot, Plot newSettings ) {
+    private void doCheckBindings( Plot plot, Plot newSettings ) {
         boolean shouldBindX= false;
         List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
         BindingModel bm= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
@@ -619,8 +622,14 @@ public class PanelController extends DomNodeController {
             dom.setTimeRange( newSettings.getXaxis().getRange() );
             shouldBindX= true;
         }
-        if ( dom.timeRange.getUnits().isConvertableTo(newSettings.getXaxis().getRange().getUnits()) && dom.timeRange.intersects( newSettings.getXaxis().getRange() ) ) {
-            shouldBindX= true;
+        DatumRange xrange= newSettings.getXaxis().getRange();
+        if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) ) {
+            if ( dom.timeRange.intersects( xrange ) ) {
+                double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.2 : 0.8;
+                if ( DatumRangeUtil.normalize( dom.timeRange, xrange.max() ) - DatumRangeUtil.normalize( dom.timeRange, xrange.min() ) > reqOverlap ) {
+                    shouldBindX= true;
+                }
+            }
         }
         if ( bm==null && shouldBindX ) {
             logger.finer("add binding because ranges overlap");
