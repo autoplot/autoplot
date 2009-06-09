@@ -12,6 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
@@ -19,15 +21,12 @@ import java.awt.event.ContainerListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import org.das2.util.ClassMap;
 
 /**
@@ -38,9 +37,16 @@ public class CanvasLayoutPanel extends JLabel {
 
     JComponent target;
     ClassMap<Color> types;
+    Timer timer;
 
     public CanvasLayoutPanel() {
         types = new ClassMap<Color>();
+        timer= new Timer(100,new ActionListener(){
+            public void actionPerformed( ActionEvent e ) {
+                repaint();
+            }
+        });
+        timer.setRepeats(false);
         addMouseListener(mouseListener);
     }
 
@@ -173,19 +179,19 @@ public class CanvasLayoutPanel extends JLabel {
     transient ComponentListener componentListener = new ComponentListener() {
 
         public void componentResized(ComponentEvent e) {
-            repaint();
+            timer.restart();
         }
 
         public void componentMoved(ComponentEvent e) {
-            repaint();
+            timer.restart();
         }
 
         public void componentShown(ComponentEvent e) {
-            repaint();
+            timer.restart();
         }
 
         public void componentHidden(ComponentEvent e) {
-            repaint();
+            timer.restart();
         }
     };
 
@@ -195,12 +201,12 @@ public class CanvasLayoutPanel extends JLabel {
 
             public void componentAdded(ContainerEvent e) {
                 e.getChild().addComponentListener(componentListener);
-                repaint();
+                timer.restart();
             }
 
             public void componentRemoved(ContainerEvent e) {
                 e.getChild().removeComponentListener(componentListener);
-                repaint();
+                timer.restart();
             }
         });
 
