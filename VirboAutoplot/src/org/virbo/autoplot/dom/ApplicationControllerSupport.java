@@ -9,14 +9,12 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
 import org.das2.event.PointSlopeDragRenderer;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
-import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.layout.LayoutConstants;
 
@@ -228,6 +226,7 @@ public class ApplicationControllerSupport {
                 controller.bind(domPlot.zaxis, Axis.PROP_LOG, that.zaxis, Axis.PROP_LOG);
                 controller.bind(domPlot.zaxis, Axis.PROP_LABEL, that.zaxis, Axis.PROP_LABEL);
                 controller.addConnector(domPlot, that);
+                that.getController().resetZoom();
             }
         });
 
