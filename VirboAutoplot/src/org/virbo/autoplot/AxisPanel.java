@@ -122,6 +122,28 @@ public class AxisPanel extends javax.swing.JPanel {
     }
     BindingGroup dataSourceFilterBindingGroup;
 
+    private void updateSliceTypeComboBox( DataSourceFilter dsf, boolean immediately ) {
+
+        final String[] depNames1 = new String[4];
+
+        final String[] depNames = (String[]) dsf.getController().getDepnames().toArray( new String[ dsf.getController().getDepnames().size()] ); //TODO: what if panelId changes...
+        for (int i = 0; i < depNames.length; i++) {
+            depNames1[i] = depNames[i] + " (" + dsf.getController().getMaxSliceIndex(i) + " bins)";
+        }
+        if ( dsf.getSliceDimension()>=depNames.length ) {
+            dsf.setSliceDimension(0); // we used to not care, so old vap files were sloppy.
+        }
+        if ( immediately ) {
+            sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
+                }
+            });
+        }
+    }
+
     private synchronized void doDataSourceFilterBindings() {
 
         if (dataSourceFilterBindingGroup != null) dataSourceFilterBindingGroup.unbind();
@@ -136,7 +158,9 @@ public class AxisPanel extends javax.swing.JPanel {
             dataSourceFilterBindingGroup = null;
             return;
         }
-        
+
+        updateSliceTypeComboBox(newDsf,true);
+
         BindingGroup bc = new BindingGroup();
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("fill"), this.fillValueComboBox, BeanProperty.create("selectedItem")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("validRange"), this.validRangeComboBox, BeanProperty.create("selectedItem")));
@@ -146,7 +170,11 @@ public class AxisPanel extends javax.swing.JPanel {
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,newDsf, BeanProperty.create("transpose"), this.transposeCheckBox, BeanProperty.create("selected")));
 
-        bc.bind();
+        try {
+            bc.bind();
+        } catch ( RuntimeException e ) {
+            throw e;
+        }
         dataSourceFilterBindingGroup = bc;
 
         if ( newDsf!=null ) {
@@ -158,16 +186,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(DataSourceController.PROP_DEPNAMES)) {
-                    List<String> depNamesList= newDsf.getController().getDepnames();
-                    final String[] depNames = (String[]) depNamesList.toArray( new String[depNamesList.size()] ); //TODO: what if panelId changes...
-                    for (int i = 0; i < depNames.length; i++) {
-                        depNames[i] = depNames[i] + " (" + newDsf.getController().getMaxSliceIndex(i) + " bins)";
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames));
-                        }
-                    });
+                    updateSliceTypeComboBox( newDsf, false );
                 }
                 if (evt.getPropertyName().equals(DataSourceFilter.PROP_SLICEDIMENSION)) {
                     SwingUtilities.invokeLater(new Runnable() {
