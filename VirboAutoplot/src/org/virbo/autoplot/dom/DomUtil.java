@@ -238,8 +238,11 @@ public class DomUtil {
      * @return
      */
     public static DomNode getElementById(DomNode root, String id) {
-        if (id == null || id.equals("")) {
-            throw new IllegalArgumentException("id cannot be null or zero-length string");
+        if (id == null ) {
+            throw new IllegalArgumentException("id cannot be null");
+        }
+        if ( id.equals("") ) {
+            throw new IllegalArgumentException("id be zero-length string");
         }
         if (root.getId().equals(id)) return root;
         for (DomNode n : root.childNodes()) {
