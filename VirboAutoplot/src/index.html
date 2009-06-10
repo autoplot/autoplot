@@ -6,7 +6,7 @@
     <H3>ViRBO Autoplot Application (#{tag})</H3>
         <p><a href="autoplot-#{tag}.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
-        <p><small>A rank 3 dataset is aggregated and sliced twice.</small></p>
+        <p><small>A vap created with Autoplot is displayed using the servlet. (Note the width and height are incorrect.)</small></p>
 
 	<p>This demonstration application attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
@@ -18,18 +18,17 @@ be applied to the data, for example, specifying valid range and fill data.
         </p>
         
         <p>Recent changes include:</p>
+<ul>
 bugfixes:
 <ul><li> problems with vap files resolved.
-</li><li> download from authenticated FTP site works (such as <a href="ftp://user:pass@mrfrench.lanl.gov/" class="external free" title="ftp://user:pass@mrfrench.lanl.gov/" rel="nofollow">ftp://user:pass@mrfrench.lanl.gov/</a>).
+</li><li> download from authenticated FTP site works (such as ftp://user:pass@mrfrench.lanl.gov/).
 </li><li> inconsistencies between Servlet and Applet initial view
 </li><li> CDF depend_1 number of elements is incorrect.
 </li></ul>
-</li><li> introductory rank 4 support in QDataSet
-
-</li><li> introduce KeyChain object for storing credentials of HTTP and FTP sites, basic authentication dialog when
+<li> introductory rank 4 support in QDataSet
+</li><li> introduce KeyChain object for storing credentials of HTTP and FTP sites, and a basic authentication dialog when user:pass is used in the URIs.
+</li><li> improvements to jython completion in script console, ctrl +/- resize in script console.
 </li></ul>
-<p>user:pass is used in the URIs.
-</p>
 <ul><li> NOTE: vap load/save tightened up, which may cause some old vap files to break.
 </li></ul>
         
