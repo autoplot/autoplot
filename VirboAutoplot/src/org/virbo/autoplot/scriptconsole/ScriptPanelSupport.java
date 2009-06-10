@@ -213,7 +213,13 @@ public class ScriptPanelSupport {
         try {
             if (panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE) {
                 if (file != null) {
-                    JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURL.getDataSourceFactory(file.toURI(), new NullProgressMonitor());
+                    URI uri;
+                    try {
+                        uri = new URI("vap+jyds:" + file.toURI().toString());
+                    } catch (URISyntaxException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURL.getDataSourceFactory( uri, new NullProgressMonitor());
                     if (factory != null) {
                         factory.addExeceptionListener(new ExceptionListener() {
 
