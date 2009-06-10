@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
  * Support methods for synchronizing two Application trees with different
