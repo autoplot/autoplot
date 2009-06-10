@@ -1,66 +1,78 @@
+#Sample script to make a set of summary plots
+
 dom= getDocumentModel()
 
+#only uses URI to get time aggregation...
 uri= dom.dataSourceFilters[0].uri
+
+#TODO: check for URI template, because if it's not there we get a strange error message
+#if ( uri.indexOf('%Y')==-1 and uri.indexOf('$Y')==-1 and url.indexOf('%y')==-1 and url.indexOf('$y')==-1 ):
+#   print 'URI isn''t a template, this is going to cause problems'
 
 from javax.swing import *
 from java.awt import FlowLayout
 
 def myWriteToPng( filename, appmodel, dom, width, height ):
-   appmodel.waitUntilIdle(False);
-   from org.das2.util import DasPNGEncoder, DasPNGConstants
-   out= java.io.FileOutputStream( filename )
-   image = dom.canvases[0].controller.dasCanvas.getImage(width, height);
-   encoder = DasPNGEncoder();
-   encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, java.util.Date().toString() );
-   encoder.write(image, out)
-   out.close();
+  appmodel.waitUntilIdle(False);
+  from org.das2.util import DasPNGEncoder, DasPNGConstants
+  out= java.io.FileOutputStream( filename )
+  image = dom.canvases[0].controller.dasCanvas.getImage(width, height);
+  encoder = DasPNGEncoder();
+  encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, java.util.Date().toString() );
+  encoder.write(image, out)
+  out.close();
 
 def doBatch( times, dom, outputFolder, product, timeFormat, mon ):
 
-    java.io.File(outputFolder).mkdirs()
+   java.io.File(outputFolder).mkdirs()
 
-    n= len(times)
-    mon.setTaskSize( n )
-    mon.started()
+   n= len(times)
+   mon.setTaskSize( n )
+   mon.started()
 
-    mon.setProgressMessage('initializing child application')
+   mon.setProgressMessage('initializing child application')
 
-    appmodel= ApplicationModel()
-    appmodel.addDasPeersToApp()
+   appmodel= ApplicationModel()
+   appmodel.addDasPeersToApp()
 
-    dom2= appmodel.getDocumentModel()
+   dom2= appmodel.getDocumentModel()
 
-    mon.setProgressMessage('synchronize to this application')
+   mon.setProgressMessage('synchronize to this application')
 
-    dom2.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
+   dom2.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
 
-    dom2.options.autolayout= False
+   dom2.options.autolayout= False
 
-    mon.setProgressMessage('write ' + product + '.vap' )
-    from org.virbo.autoplot.state import StatePersistence
-    StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom2 );
+   mon.setProgressMessage('write ' + product + '.vap' )
+   from org.virbo.autoplot.state import StatePersistence
+   StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom2 );
 
-    dom2.canvases[0].fitted=False
-    w0= dom2.canvases[0].width
-    h0= dom2.canvases[0].height
+   dom2.canvases[0].fitted=False
+   w0= dom2.canvases[0].width
+   h0= dom2.canvases[0].height
 
-    dom2.getController().waitUntilIdle();
+   dom2.getController().waitUntilIdle();
 
-    mon.setProgressMessage('making images')
+   mon.setProgressMessage('making images')
 
-    count= 0
-    for i in times:
-       count= count+1
-       if ( mon.cancelled ): break
-       mon.setTaskProgress(count)
-       dom2.timeRange= DatumRangeUtil.parseTimeRangeValid(i)
-       mon.setProgressMessage('write '+ product + '_%s.png' % i )
-       myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom2, w0, h0 )
+   count= 0
+   for i in times:
+      count= count+1
+      if ( mon.cancelled ): break
+      mon.setTaskProgress(count)
+      dom2.timeRange= DatumRangeUtil.parseTimeRangeValid(i)
+      mon.setProgressMessage('write '+ product + '_%s.png' % i )
+      myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom2, w0, h0 )
 
-    mon.finished()
+   mon.finished()
 
 p= JPanel(  )
 p.layout= BoxLayout( p, BoxLayout.Y_AXIS )
+
+p.add( JLabel( 'Filename Root:' ) )
+fln_rootTf= JTextField( 'product' )
+fln_rootTf.toolTipText='stem used to ensure unique filenames.'
+p.add( fln_rootTf )
 
 p.add( JLabel( 'Output Folder:' ) )
 outputFolderTf= JTextField( '/tmp/pngwalk/' )
@@ -72,35 +84,36 @@ p.add( timeRangeTf )
 
 outputFolder=0
 timeRangeStr=0
+fln_root=0
 proceed= False
 
 if ( JOptionPane.showConfirmDialog( getViewWindow(), p, 'pngwalk options', JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ):
-   outputFolder= outputFolderTf.text
-   timeRangeStr= timeRangeTf.text
-   proceed= True
+  outputFolder= outputFolderTf.text
+  timeRangeStr= timeRangeTf.text
+  fln_root=  fln_rootTf.text
+  proceed= True
 else:
-   proceed= False
+  proceed= False
 
 from org.virbo.autoplot import ApplicationModel
 
 if ( proceed ):
-    product= 'product'
-    timeFormat= '%Y%m%d'
 
-    from org.das2.components import DasProgressPanel
-    mon= DasProgressPanel.createFramed( getViewWindow(),"running batch")
+   timeFormat= '%Y%m%d'
 
-    times= getTimeRangesFor( uri, timeRangeStr, timeFormat )
-    
-    doBatch( times, dom, outputFolder, product, timeFormat, mon )
+   from org.das2.components import DasProgressPanel
+   mon= DasProgressPanel.createFramed( getViewWindow(),"running batch")
 
-    if ( not mon.cancelled ):
+   times= getTimeRangesFor( uri, timeRangeStr, timeFormat )
 
-      from org.autoplot.pngwalk import DemoPngWalk
-      if ( outputFolder[1]==':' ):
-        url= 'file:/'+outputFolder
-      else:
-        url= 'file:'+outputFolder
+   doBatch( times, dom, outputFolder, fln_root, timeFormat, mon )
 
-      DemoPngWalk.start( url + product + '_' + timeFormat + '.png', getViewWindow() )
+   if ( not mon.cancelled ):
 
+     from org.autoplot.pngwalk import DemoPngWalk
+     if ( outputFolder[1]==':' ):
+       url= 'file:/'+outputFolder
+     else:
+       url= 'file:'+outputFolder
+
+     DemoPngWalk.start( url + fln_root + '_' + timeFormat + '.png', getViewWindow() )
