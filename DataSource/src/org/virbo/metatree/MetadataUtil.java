@@ -6,15 +6,10 @@
 package org.virbo.metatree;
 
 import java.text.ParseException;
-import org.das2.datum.NumberUnits;
 import org.das2.datum.Units;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.das2.datum.Basis;
-import org.das2.datum.Datum;
-import org.das2.datum.TimeLocationUnits;
-import org.das2.datum.TimeUtil;
-import org.das2.datum.UnitsConverter.ScaleOffset;
+import org.virbo.dataset.SemanticOps;
 import org.w3c.dom.Node;
 
 /**
@@ -26,47 +21,20 @@ public class MetadataUtil {
      * lookupUnits canonical units object, or allocate one.
      * @param units string identifier.
      * @return canonical units object.
+     * @deprecated use SemanticOps instead
      */
     public static synchronized Units lookupUnits(String sunits) {
-        Units result;
-        try {
-            result= Units.getByName(sunits);
-        } catch ( IllegalArgumentException ex ) {
-            if ( sunits.equals("sec") ) {   // begin, giant table of kludges
-                result= Units.seconds;
-            } else if ( sunits.equals("msec") ) {  // CDF
-                result= Units.milliseconds;
-            } else {
-                result= new NumberUnits( sunits );
-            }
-        }
-        return result;
+        return SemanticOps.lookupUnits(sunits);
     }
     
     /**
      * return canonical das2 unit for colloquial time.
      * @param string
      * @return
+     * @deprecated use SemanticOps instead
      */
     public static Units lookupTimeLengthUnit(String s) throws ParseException {
-        s= s.toLowerCase().trim();
-        if ( s.startsWith("sec") ) {
-            return Units.seconds;
-        } else if ( s.startsWith("ms") || s.startsWith("millisec") ) {
-            return Units.milliseconds;
-        } else if ( s.equals("hr") || s.startsWith("hour") ) {
-            return Units.hours;
-        } else if ( s.equals("mn") || s.startsWith("min") ) {
-            return Units.minutes;
-        } else if ( s.startsWith("us") || s.startsWith("\u00B5s" ) || s.startsWith("micros")) {
-            return Units.microseconds;
-        } else if ( s.startsWith("ns") || s.startsWith("nanos" ) ) {
-            return Units.nanoseconds;
-        } else if ( s.startsWith("d") ) {
-            return Units.days;
-        } else {
-            throw new ParseException("failed to identify unit: "+s,0);
-        }
+        return SemanticOps.lookupTimeLengthUnit(s);
     }
     
     /**
@@ -74,26 +42,10 @@ public class MetadataUtil {
      * allocated, then parse for "<unit> since <datum>"
      * @param timeUnits
      * @return
+     * @deprecated use SemanticOps instead
      */
     public static synchronized Units lookupTimeUnits( String units ) throws ParseException {
-        Units result;
-        try {
-            result= Units.getByName(units);
-            return result;
-        } catch ( IllegalArgumentException ex ) {
-            String[] ss= units.split("since");
-            String soffsetUnits= ss[0];
-            Units offsetUnits= lookupTimeLengthUnit(ss[0]);
-            Datum datum= TimeUtil.create(ss[1]);
-            String canonicalName = "" + offsetUnits + " since "+ datum;
-            Basis basis= new Basis( "since "+ datum, "since "+ datum, Basis.since2000, datum.doubleValue(Units.us2000), Units.us2000.getOffsetUnits() );
-            result= new TimeLocationUnits( canonicalName, canonicalName, offsetUnits, basis );
-            result.registerConverter( Units.us2000, 
-                    new ScaleOffset( 
-                    offsetUnits.convertDoubleTo(Units.microseconds, 1.0), 
-                    datum.doubleValue(Units.us2000) ) );
-            return result;
-        }
+        return SemanticOps.lookupTimeUnits(units);
     }
     
     /**
