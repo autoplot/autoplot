@@ -124,7 +124,9 @@ public class SimpleServlet extends HttpServlet {
 
             OutputStream out = response.getOutputStream();
 
-            if (surl.equals("about:plugins")) {
+            if ( vap!=null ) {
+                response.setContentType(format);
+            } else if (surl.equals("about:plugins")) {
                 response.setContentType("text/html");
                 out.write(DataSetSelectorSupport.getPluginsText().getBytes());
                 out.close();
@@ -174,8 +176,10 @@ public class SimpleServlet extends HttpServlet {
                 if ( width==-1 && height!=-1 ) width= (int)( height * aspect );
                 if ( height==-1 && width!=-1 ) height= (int)( width / aspect );
             }
-            dom.getController().getCanvas().setWidth( width );
-            dom.getController().getCanvas().setHeight( height );
+            if ( vap==null ) {
+                dom.getController().getCanvas().setWidth( width );
+                dom.getController().getCanvas().setHeight( height );
+            }
 
             logit("set canvas parameters",t0,uniq);
             
@@ -184,7 +188,7 @@ public class SimpleServlet extends HttpServlet {
                 logit("opened vap",t0,uniq);
             }
 
-            if (!surl.equals("")) {
+            if (surl!=null && !"".equals(surl)) {
                 DataSource dsource;
                 try {
                     dsource = DataSetURL.getDataSource(surl);
@@ -207,7 +211,7 @@ public class SimpleServlet extends HttpServlet {
 
             QDataSet ds;
             try {
-                ds = dsource.getDataSet(new NullProgressMonitor());
+                ds = dsource==null ? null : dsource.getDataSet(new NullProgressMonitor());
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
