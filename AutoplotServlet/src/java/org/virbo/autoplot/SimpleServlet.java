@@ -26,6 +26,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.graph.DasCanvas;
 import org.das2.system.DasLogger;
 import org.das2.util.AboutUtil;
 import org.das2.util.TimerConsoleFormatter;
@@ -179,6 +180,8 @@ public class SimpleServlet extends HttpServlet {
             if ( vap==null ) {
                 dom.getController().getCanvas().setWidth( width );
                 dom.getController().getCanvas().setHeight( height );
+                DasCanvas c= dom.getController().getCanvas().getController().getDasCanvas();
+                c.prepareForOutput( width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             }
 
             logit("set canvas parameters",t0,uniq);
@@ -186,6 +189,10 @@ public class SimpleServlet extends HttpServlet {
             if (vap != null) {
                 appmodel.doOpen(new File(vap));
                 logit("opened vap",t0,uniq);
+                width= appmodel.dom.getCanvases(0).getWidth();
+                height= appmodel.dom.getCanvases(0).getHeight();
+                DasCanvas c= dom.getController().getCanvas().getController().getDasCanvas();
+                c.prepareForOutput( width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             }
 
             if (surl!=null && !"".equals(surl)) {
