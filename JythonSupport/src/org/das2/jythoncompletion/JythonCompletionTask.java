@@ -160,7 +160,12 @@ public class JythonCompletionTask implements CompletionTask {
                 } else if (context instanceof PyJavaInstance) {
                     if (po instanceof PyMethod) {
                         PyMethod m = (PyMethod) po;
-                        Method jm = getJavaMethod(m, 0);
+                        Method jm;
+                        try {
+                            jm = getJavaMethod(m, 0);
+                        } catch ( RuntimeException ex ) {
+                            continue;
+                        }
                         signature = methodSignature(jm);
                         args = methodArgs(jm);
                     } else {
