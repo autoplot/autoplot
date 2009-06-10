@@ -88,7 +88,19 @@ public class PlotController extends DomNodeController {
         DatumRange y = this.domPlot.yaxis.range;
         DasAxis xaxis = new DasAxis(x.min(), x.max(), DasAxis.HORIZONTAL);
         DasAxis yaxis = new DasAxis(y.min(), y.max(), DasAxis.VERTICAL);
-
+        
+        if (UnitsUtil.isTimeLocation(xaxis.getUnits())) {
+            xaxis.setUserDatumFormatter(new DateTimeDatumFormatter());
+        } else {
+            xaxis.setUserDatumFormatter(null);
+        }
+        
+        if (UnitsUtil.isTimeLocation(yaxis.getUnits())) {
+            yaxis.setUserDatumFormatter(new DateTimeDatumFormatter());
+        } else {
+            yaxis.setUserDatumFormatter(null);
+        }
+        
         domPlot.setRowId(domRow.getId());
         DasRow row = domRow.controller.getDasRow();
         domPlot.addPropertyChangeListener( Plot.PROP_ROWID, rowColListener );
@@ -188,13 +200,6 @@ public class PlotController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent e) {
             if (e.getSource() instanceof DasAxis) {
                 DasAxis axis = (DasAxis) e.getSource();
-                // we can safely ignore these events.
-                if (((DasAxis) e.getSource()).valueIsAdjusting()) {
-                    return;
-                }
-                if (domPlot.isIsotropic()) {
-                    checkIsotropic(axis);
-                }
 
                 if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) ) {
                     if (UnitsUtil.isTimeLocation(axis.getUnits())) {
@@ -203,6 +208,15 @@ public class PlotController extends DomNodeController {
                         axis.setUserDatumFormatter(null);
                     }
                 }
+
+                // we can safely ignore these events.
+                if (((DasAxis) e.getSource()).valueIsAdjusting()) {
+                    return;
+                }
+                if (domPlot.isIsotropic()) {
+                    checkIsotropic(axis);
+                }
+
             }
 
 
