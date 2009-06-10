@@ -202,7 +202,7 @@ public class PanelController extends DomNodeController {
             dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
             dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
         }
-        setDataSourceFilterController(getDataSourceFilter().controller);
+        setDataSourceFilterController( dsf.controller );
     }
 
     private Color deriveColor( Color color, int i ) {
@@ -468,7 +468,7 @@ public class PanelController extends DomNodeController {
         }
     };
 
-    public void setDataSourceFilterController(final DataSourceController dsc) {
+    private void setDataSourceFilterController(final DataSourceController dsc) {
         dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
         dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
     }
@@ -973,7 +973,6 @@ public class PanelController extends DomNodeController {
 
     public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
         ApplicationController ac = this.dom.controller;
-
         ac.bind(panel, "style.lineWidth", seriesRenderer, "lineWidth");
         ac.bind(panel, "style.color", seriesRenderer, "color");
         ac.bind(panel, "style.symbolSize", seriesRenderer, "symSize");
@@ -983,7 +982,6 @@ public class PanelController extends DomNodeController {
         ac.bind(panel, "style.fillToReference", seriesRenderer, "fillToReference");
         ac.bind(panel, "style.reference", seriesRenderer, "reference");
         ac.bind(panel, "style.antiAliased", seriesRenderer, "antiAliased");
-
     }
 
     public void bindToSpectrogramRenderer(SpectrogramRenderer spectrogramRenderer) {
