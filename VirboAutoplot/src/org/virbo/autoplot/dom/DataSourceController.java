@@ -223,7 +223,11 @@ public class DataSourceController extends DomNodeController {
         this.dsf.setValidRange("");
         this.dsf.setFill("");
 
-        _setDataSource(dataSource);
+        if ( valueWasAdjusting ) {
+            this.dataSource = dataSource;
+        } else {
+            _setDataSource(dataSource);
+        }
         setResetDimensions(true);
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
@@ -237,7 +241,7 @@ public class DataSourceController extends DomNodeController {
                 }
 
             } else {
-                update(true, true);
+                update(!valueWasAdjusting, !valueWasAdjusting );
             }
         }
 
