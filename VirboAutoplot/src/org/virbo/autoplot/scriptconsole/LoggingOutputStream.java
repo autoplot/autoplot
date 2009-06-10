@@ -39,7 +39,10 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
         synchronized (this) {
             super.flush();
             record = this.toString();
+
+            if ( !record.contains(lineSeparator ) ) return;
             super.reset();
+
 
             if (record.length() == 0 || record.equals(lineSeparator)) {
                 // avoid empty records 
