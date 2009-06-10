@@ -1489,10 +1489,12 @@ public class ApplicationController extends DomNodeController implements RunLater
         resetIdSequenceNumbers();
 
         lock.unlock();
+
         for (Panel p : application.getPanels()) {  // kludge to avoid reset range
             p.controller.setResetRanges(false);
             p.controller.setResetPanel(false);
-            p.controller.setResetRenderType(true);
+            p.controller.doResetRenderType( p.getRenderType() );
+            p.controller.setResetRenderType(false);
         }
         for (DataSourceFilter dsf: application.getDataSourceFilters() ) {
             dsf.controller.setResetDimensions(false);
