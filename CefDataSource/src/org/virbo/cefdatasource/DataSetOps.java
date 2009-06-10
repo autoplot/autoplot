@@ -61,7 +61,7 @@ public class DataSetOps {
      * @param ds rank 3 dataset
      * @return DDataSet of rank 3-1.
      */
-    public static DDataSet collapse1(QDataSet ds) {
+    public static DDataSet collapse3(QDataSet ds) {
         DDataSet result;
         int[] qube = DataSetUtil.qubeDims( ds );
         Units u = (Units) ds.property(QDataSet.UNITS);
