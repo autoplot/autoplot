@@ -49,7 +49,12 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
                 return;
             }
 
-            logger.logp(level, "", "", record);
+            String[] ss= record.split("\n");
+
+            for ( int i=0; i<ss.length; i++ ) {
+                logger.logp(level, "", "", ss[i]);
+            }
+            
         }
     }
 } 
