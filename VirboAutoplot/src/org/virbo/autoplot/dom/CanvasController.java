@@ -106,6 +106,26 @@ public class CanvasController extends DomNodeController {
         return dasCanvas;
     }
 
+    /**
+     * get the row above or below.
+     * @param r
+     * @param dir LayoutConstants.ABOVE or LayoutConstants.BELOW
+     * @return the row or null if no such row exists.
+     */
+    Row getRow( Row r, Object dir ) {
+        int idx= canvas.rows.indexOf(r);
+        if ( idx==-1 ) throw new IllegalArgumentException("canvas doesn't contain this row");
+        if ( dir==LayoutConstants.ABOVE ) {
+            if ( idx==0 ) return null;
+            return canvas.rows.get(idx-1);
+        } else if ( dir==LayoutConstants.BELOW ){
+            if ( idx==canvas.rows.size()-1 ) return null;
+            return canvas.rows.get(idx+1);
+        } else {
+            throw new IllegalArgumentException("dir must be ABOVE or BELOW");
+        }
+    }
+
     Row getRowFor(Plot domPlot) {
         for (Row row : canvas.getRows()) {
             if (row.getId().equals(domPlot.getRowId())) {
