@@ -79,7 +79,7 @@ public class AutoplotApplet extends JApplet {
     String timeCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090608.3";
+    public static final String VERSION = "20090610.2";
     private Image splashImage;
 
     private String getStringParameter(String name, String deft) {
@@ -149,7 +149,7 @@ public class AutoplotApplet extends JApplet {
         //System.err.println( "init="+initializing+ " " +this.dom.getController().getCanvas().getController().getDasCanvas().isVisible() + "  " +
         //        ""+ this.dom.getController().getCanvas().getController().getDasCanvas().getBackground() );
         if (initializing) {
-            //super.paint(g);
+            super.paint(g);
             if (splashImage != null) {
                 if (!g.drawImage(splashImage, 0, 0, this)) {
                     drawString(g, "loading splash", 20, getHeight() / 2 - 14);
@@ -159,13 +159,13 @@ public class AutoplotApplet extends JApplet {
 
             if (loadInitialMonitor != null) {
                 Color c0= g.getColor();
-                g.setColor(Color.red);
+                g.setColor( new Color( 0, 0, 255, 200  ) );
                 long size = loadInitialMonitor.getTaskSize();
                 long pos = loadInitialMonitor.getTaskProgress();
                 int x0 = 20;
                 int y0 = getHeight() / 2;
                 int w = 100;
-                int h = 10;
+                int h = 5;
                 if (size == -1) {
                     long t = System.currentTimeMillis() % 2000;
                     int x= (int) (t * w / 2000);
@@ -181,7 +181,7 @@ public class AutoplotApplet extends JApplet {
                     timer.restart();
 
                 } else {
-                    g.fillRect(x0, y0, x0 + (int) (pos * w / 500), h);
+                    g.fillRect(x0, y0, x0 + (int) (pos * w / size ), h);
                 }
                 g.setColor(c0);
                 g.drawRect( x0, y0, w, h );
@@ -275,6 +275,10 @@ public class AutoplotApplet extends JApplet {
         String zdrawTickLabels = getStringParameter("plot.zaxis.drawTickLabels", "");
         statusCallback = getStringParameter("statusCallback", "");
         timeCallback = getStringParameter("timeCallback", "");
+
+        if ( srenderType.equals("fill_to_zero") ) {
+            srenderType= "fillToZero";
+        }
 
         setInitializationStatus("readParameters");
         System.err.println("done readParameters @ " + (System.currentTimeMillis() - t0) + " msec");
@@ -380,13 +384,12 @@ public class AutoplotApplet extends JApplet {
                 }
             }
 
-/*            QDataSet ds;
+            QDataSet ds;
             try {
-                ds = dsource.getDataSet(loadInitialMonitor);
+                ds = dsource==null ? null : dsource.getDataSet(loadInitialMonitor);
             } catch (Exception ex) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
                 throw new RuntimeException(ex);
-            }*/
+            }
 
             appmodel.setDataSource(dsource);
 
@@ -521,7 +524,7 @@ public class AutoplotApplet extends JApplet {
             if (surl.startsWith("about:")) {
                 setDataSetURL(surl);
             } else {
-                dom.getDataSourceFilters(0).setUri(surl);
+                //dom.getDataSourceFilters(0).setUri(surl);
             }
         }
 
