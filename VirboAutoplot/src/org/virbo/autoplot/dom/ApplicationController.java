@@ -1221,13 +1221,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     public Plot getPlotAbove(Plot p) {
-        int n = application.getPlots().length;
-        for (int i = 0; i < n - 1; i++) {
-            if (application.getPlots(i + 1) == p) {
-                return application.getPlots(i);
-            }
-        }
-        return null;
+        return getPlot( p, LayoutConstants.ABOVE );
     }
 
     /**
@@ -1237,13 +1231,29 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     public Plot getPlotBelow(Plot p) {
+        return getPlot( p, LayoutConstants.BELOW );
+    }
+    
+    public Plot getPlot( Plot p, Object dir ) {
+        Row r= getCanvas().getController().getRowFor(p);
+        Row above= getCanvas().getController().getRow(r,dir);
+
+        if ( above==null ) return null;
         int n = application.getPlots().length;
-        for (int i = 1; i < n; i++) {
-            if (application.getPlots(i - 1) == p) {
-                return application.getPlots(i);
+        Plot best= null;
+        for (int i = 0; i < n; i++) {
+            final Plot p1 = application.getPlots(i);
+            if (p1.getRowId().equals( above.getId() ) ) {
+                if ( best==null ) {
+                    best= p1;
+                } else {
+                    if ( p1.columnId.equals( p.getColumnId() ) ) {
+                        best= p1;
+                    }
+                }
             }
         }
-        return null;
+        return best;
     }
 
     /**
