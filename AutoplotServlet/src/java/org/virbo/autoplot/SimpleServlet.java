@@ -121,7 +121,9 @@ public class SimpleServlet extends HttpServlet {
             String zlog= ServletUtil.getStringParameter(request, "plot.zaxis.log", "" );
             String zdrawTickLabels= ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "" );
             
-            
+            if ( srenderType.equals("fill_to_zero") ) {
+                srenderType= "fillToZero";
+            }
 
             OutputStream out = response.getOutputStream();
 
