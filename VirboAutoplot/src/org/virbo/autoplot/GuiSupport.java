@@ -287,7 +287,7 @@ public class GuiSupport {
     }
 
     public Action createNewDOMAction() {
-        return new AbstractAction("New Application...") {
+        return new AbstractAction("Reset Application...") {
             public void actionPerformed( ActionEvent e ) {
                 if ( parent.stateSupport.isDirty() ) {
                     String msg= "The application has been modified.  Do you want to save your changes?";

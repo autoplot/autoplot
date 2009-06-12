@@ -133,7 +133,9 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot(String surl) throws InterruptedException {
         maybeInitView();
-        model.resetDataSetSourceURL(surl, new NullProgressMonitor());
+        DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
+        dsf.setUri(null);
+        dsf.setUri(surl);
         model.waitUntilIdle(false);
     }
 

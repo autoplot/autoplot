@@ -58,42 +58,32 @@ public class MetaDataPanel extends javax.swing.JPanel {
             }
         });
 
-        dom.getController().addPropertyChangeListener(ApplicationController.PROP_PANEL, new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent evt) {
-                bindToPanel();
-            }
-        });
-
         dom.getController().addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
-
             public void propertyChange(PropertyChangeEvent evt) {
-                bindToDataSourceFilter();
+                bindToDataSourceFilter( dom.getController().getDataSourceFilter() );
             }
         });
 
-        bindToPanel();
-        bindToDataSourceFilter();
+        DataSourceFilter dsf= dom.getController().getDataSourceFilter();
+        if ( dsf!=null ) bindToDataSourceFilter(dsf);
 
         //applicationModel.addPropertyChangeListener(this.appModelListener);
         updateProperties();
         updateStatistics();
     }
 
-    private void bindToDataSourceFilter() {
+    private void bindToDataSourceFilter( DataSourceFilter dsf ) {
         if (bindToDataSourceFilter != null) {
             DataSourceController dsc = bindToDataSourceFilter.getController();
             dsc.removePropertyChangeListener(propertiesListener);
             dsc.removePropertyChangeListener(fillListener);
         }
-        dom.getController().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
-        dom.getController().getDataSourceFilter().getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillListener);
+        dsf.getController().addPropertyChangeListener(DataSourceController.PROP_RAWPROPERTIES, propertiesListener);
+        dsf.getController().addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillListener);
         updateProperties();
         updateStatistics();
     }
 
-    private void bindToPanel() {
-    }
 
     public void updateProperties() {
 

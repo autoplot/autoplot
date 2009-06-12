@@ -430,7 +430,7 @@ public class ApplicationModel {
     }
 
     void resetZoom() {
-        dom.getController().getPlot().getController().resetZoom();
+        dom.getController().getPlot().getController().resetZoom(true, true, true);
     }
 
     private int stepForSize( int size ) {

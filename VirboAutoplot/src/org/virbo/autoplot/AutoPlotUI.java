@@ -1128,7 +1128,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }//GEN-LAST:event_zoomInMenuItemActionPerformed
 
     private void resetZoomMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetZoomMenuItemActionPerformed
-        dom.getController().getPlot().getController().resetZoom();
+        dom.getController().getPlot().getController().resetZoom(true, true, true);
     }//GEN-LAST:event_resetZoomMenuItemActionPerformed
 
     private void fontsAndColorsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fontsAndColorsMenuItemActionPerformed
