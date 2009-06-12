@@ -15,10 +15,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.das2.datum.DatumRange;
-import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.Units;
-import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
@@ -465,6 +461,10 @@ public class PanelController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             setResetPanel(true);
             setResetRanges(true);
+            Plot p= dom.controller.getPlotFor(panel);
+            p.getXaxis().setAutorange(true);
+            p.getYaxis().setAutorange(true);
+            p.getZaxis().setAutorange(true);
         }
     };
 
@@ -557,13 +557,13 @@ public class PanelController extends DomNodeController {
      *   renderType has been identified for the panel.
      * postconditions:
      *   panel's plotDefaults are set based on metadata and autoranging.
-     *   plot is synced to plotDefaults.
+     *   listening plot may invoke its resetZoom method.
      *
-     * TODO: I think this is invoked for overplots.
      * @param autorange
      */
     private synchronized void doResetRanges(boolean autorange) {
         logger.finest("doResetRanges...");
+        setStatus("busy: do autorange");
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
 
         Plot plot = dom.controller.getPlotFor(panel);
@@ -579,66 +579,19 @@ public class PanelController extends DomNodeController {
             doAutoranging(panelCopy);
         }
 
-        if ( panel.getComponent().equals("") ) {
-            panel.syncTo(panelCopy);
-        } else {
-            panel.syncTo(panelCopy,Collections.singletonList(Panel.PROP_LEGENDLABEL) );
-        }
+        if ( panel.getComponent().equals("") ) panel.setLegendLabel( panelCopy.getLegendLabel() );
 
-        doCheckBindings( plot, panel.getPlotDefaults() );
+        panelCopy.getPlotDefaults().getXaxis().setAutorange(true); // this is how we distinguish it from the original, useless plot defaults.
+        panelCopy.getPlotDefaults().getYaxis().setAutorange(true);
+        panelCopy.getPlotDefaults().getZaxis().setAutorange(true);
 
-        List<String> excludeFromSync= new ArrayList( Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
-        List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
-        BindingModel existingBinding= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.xaxis, Axis.PROP_RANGE );
-        if ( bms.contains(existingBinding) ) {
-            if ( bms.size()>1 ) {
-                excludeFromSync.add(Plot.PROP_XAXIS);
-            }
-        }
-        plot.syncTo( panel.getPlotDefaults(), excludeFromSync );
+        panel.setPlotDefaults( panelCopy.getPlotDefaults() );
+        // and hope that the plot is listening.
 
-        setStatus("done, apply fill and autorange");
+        setStatus("done, autorange");
         changesSupport.changePerformed(this, PENDING_RESET_RANGE);
     }
 
-    /**
-     * after autoranging, we need to check to see if a panel's plot looks like
-     * it should be automatically bound or unbound.
-     *
-     * We unbind if changing this plot's axis settings will make another plot
-     * invalid.
-     *
-     * We bind if the axis setting is similar to the application timerange.
-     * @param plot the plot whose binds we are checking.  Bindings with this node may be added or removed.
-     * @param newSettings the new plot settings from autoranging.
-     */
-    private void doCheckBindings( Plot plot, Plot newSettings ) {
-        boolean shouldBindX= false;
-        List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
-        BindingModel bm= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
-        bms.remove(bm);
-        
-        if ( bms.size()==0 ) {
-            dom.setTimeRange( newSettings.getXaxis().getRange() );
-            shouldBindX= true;
-        }
-        DatumRange xrange= newSettings.getXaxis().getRange();
-        if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) ) {
-            if ( dom.timeRange.intersects( xrange ) ) {
-                double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.2 : 0.8;
-                if ( DatumRangeUtil.normalize( dom.timeRange, xrange.max() ) - DatumRangeUtil.normalize( dom.timeRange, xrange.min() ) > reqOverlap ) {
-                    shouldBindX= true;
-                }
-            }
-        }
-        if ( bm==null && shouldBindX ) {
-            logger.finer("add binding because ranges overlap");
-            dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
-        } else if ( bm!=null && !shouldBindX ) {
-            logger.finer("remove timerange binding that would cause inconvertable units");
-            dom.getController().deleteBinding(bm);
-        }
-    }
 
     /**
      * extract properties from the data and metadata to get axis labels, fill values, and
@@ -780,7 +733,9 @@ public class PanelController extends DomNodeController {
 
     /**
      * this is the old updateFillSeries and updateFillSpectrogram code.  This calculates
-     * ranges and preferred symbol settings, and puts the values in cpanel.plotDefaults.
+     * ranges and preferred symbol settings, and puts the values in panelCopy.plotDefaults.
+     * The dom Plot containing this panel should be listening for changes in panel.plotDefaults,
+     * and can then decide if it wants to use the autorange settings.
      * @param cpanel
      * @param props
      * @param spec
@@ -930,14 +885,15 @@ public class PanelController extends DomNodeController {
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer( panel.getRenderType(), oldRenderer, getColorbar() );
 
         if (oldRenderer != newRenderer || getDasPlot()!=newRenderer.getParent() ) {
-            setRenderer(newRenderer);
+            if ( oldRenderer != newRenderer ) setRenderer(newRenderer);
 
             DasPlot plot = getDasPlot();
 
             if (oldRenderer != null) {
-                plot.removeRenderer(oldRenderer);
+                if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
             }
-            plot.addRenderer(newRenderer);
+            if ( oldRenderer!=newRenderer ) plot.addRenderer(newRenderer);
+
             logger.finest("plot.addRenderer "+plot+" "+newRenderer);
             if (getDataSourceFilter().controller.getFillDataSet() != null) {
                 setDataSet(getDataSourceFilter().controller.getFillDataSet());

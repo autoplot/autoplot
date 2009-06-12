@@ -316,7 +316,7 @@ public class DataSourceController extends DomNodeController {
                 return;
             }
 
-            setStatus("busy: apply fill and autorange");
+            setStatus("busy: apply fill");
 
             extractProperties();
 
@@ -325,6 +325,8 @@ public class DataSourceController extends DomNodeController {
             _setHistogram(new AutoHistogram().doit(ds, null));
             //doFillValidRange();  the QDataSet returned 
             updateFill();
+
+            setStatus("done, apply fill");
 
             List<Panel> panels= dom.controller.getPanelsFor(dsf);
             if ( panels.size()==0 ) {

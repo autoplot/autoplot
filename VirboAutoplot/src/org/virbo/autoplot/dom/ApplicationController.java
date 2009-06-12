@@ -50,7 +50,6 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
-import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
 
@@ -474,21 +473,13 @@ public class ApplicationController extends DomNodeController implements RunLater
     private void movePanel(Panel p, Plot src, Plot dst) {
         assert (p.getPlotId().equals(src.getId()) || p.getPlotId().equals(dst.getId()));
 
-        DasPlot srcPlot = src.controller.getDasPlot();
-        DasPlot dstPlot = dst.controller.getDasPlot();
-
-        Renderer rr = p.controller.getRenderer();
-        if (rr != null) {
-            srcPlot.removeRenderer(rr);
-            dstPlot.addRenderer(rr);
-        }
+        src.getController().removePanel( p );
+        dst.getController().addPanel( p );
 
         p.setPlotId(dst.getId());
 
-        RenderType rt = p.getRenderType();
-        p.controller.doResetRenderType(rt);
-
     }
+    
     PropertyChangeListener plotIdListener = new PropertyChangeListener() {
 
         public String toString() {
@@ -528,7 +519,6 @@ public class ApplicationController extends DomNodeController implements RunLater
     public Panel addPanel(Plot domPlot, DataSourceFilter dsf) {
         logger.fine("enter addPanel("+domPlot+","+dsf+")");
 
-        final int fpanelIdNum = this.panelIdNum.getAndIncrement();
         final Panel panel1 = new Panel();
 
         if (dsf == null) {
@@ -539,6 +529,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         if (domPlot == null) {
             domPlot = addPlot(LayoutConstants.BELOW);
+        } else {
+            System.err.println("hwshshssisks");
         }
 
         assignId(panel1);
@@ -563,16 +555,15 @@ public class ApplicationController extends DomNodeController implements RunLater
             if ( panel==null ) setPanel(panel1);
         }
 
-        panel1.getController().doResetRenderType( panel1.getRenderType() );
+        if ( domPlot.getController()!=null ) {
+            domPlot.controller.addPanel(panel1);
+        } else {
+            System.err.println("now we are   s c r e w e d");
+        }
+        
         return panel1;
     }
 
-    private void addPlotFocusListener(DasPlot plot) {
-        logger.fine("add focus listener to " + plot);
-        plot.addFocusListener(focusAdapter);
-        plot.getXAxis().addFocusListener(focusAdapter);
-        plot.getYAxis().addFocusListener(focusAdapter);
-    }
     PropertyChangeListener rendererFocusListener = new PropertyChangeListener() {
 
         public String toString() {
@@ -621,6 +612,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         assignId( domPlot );
 
         new PlotController(application, domPlot).createDasPeer(canvas, domRow ,canvas.getMarginColumn() );
+
+        domPlot.getXaxis().setAutorange(true);
+        domPlot.getYaxis().setAutorange(true);
+        domPlot.getZaxis().setAutorange(true);
 
         domPlot.setRowId( domRow.getId() );
         domPlot.setColumnId( canvas.getMarginColumn().getId() );
@@ -926,6 +921,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         for ( int i=application.getPlots().length-1; i>0; i-- ) {
             deletePlot( application.getPlots(i) );
         }
+        application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
+        application.getPlots(0).getXaxis().setAutorange(true);
+        application.getPlots(0).getYaxis().setAutorange(true);
+        application.getPlots(0).getZaxis().setAutorange(true);
 
         for ( int i=application.getBindings().length-1; i>0; i-- ) {
             deleteBinding( application.getBindings(i) );
@@ -942,6 +941,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             c.getRows(0).setBottom("100%");
         }
 
+
         for ( int i=c.getColumns().length-1; i>0; i-- ) {
             c.getController().deleteColumn(c.getColumns(i));
         }
@@ -957,6 +957,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
         application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID) );
 
+        resetIdSequenceNumbers();
+        
         lock.unlock();
     }
 
@@ -1501,7 +1503,6 @@ public class ApplicationController extends DomNodeController implements RunLater
         lock.unlock();
 
         for (Panel p : application.getPanels()) {  // kludge to avoid reset range
-            p.controller.setResetRanges(false);
             p.controller.setResetPanel(false);
             p.controller.doResetRenderType( p.getRenderType() );
             p.controller.setResetRenderType(false);

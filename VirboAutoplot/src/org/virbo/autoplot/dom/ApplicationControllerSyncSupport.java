@@ -107,7 +107,7 @@ public class ApplicationControllerSyncSupport {
             String idd = panels[i].getPlotId();
             Plot p = null;
             for (int j = 0; j < plots.length; j++) {
-                if (plots[j].getId().equals(idd)) p = plots[j];
+                if (application.getPlots(j).getId().equals(idd)) p = application.getPlots(j);
             }
             controller.addPanel(p,null);
         }

@@ -11,7 +11,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasAxis.Lock;
-import org.das2.system.MutatorLock;
 
 /**
  *
@@ -30,10 +29,13 @@ public class AxisController extends DomNodeController {
         this.axis = axis;
         axis.controller = this;
         bindTo(dasAxis);
-        axis.addPropertyChangeListener(invalidRangeListener);
+        axis.addPropertyChangeListener(rangeChangeListener);
     }
 
-    private PropertyChangeListener invalidRangeListener = new PropertyChangeListener() {
+    /**
+     * checks to see that the axis is still valid and clears the autorange property.
+     */
+    private PropertyChangeListener rangeChangeListener = new PropertyChangeListener() {
 
         private DatumRange logCheckRange(DatumRange range, boolean log) {
 
@@ -65,6 +67,8 @@ public class AxisController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
             if ( dom.controller.isValueAdjusting() || valueIsAdjusting() ) return;
+            if ( evt.getPropertyName().equals( Axis.PROP_RANGE )
+                    || evt.getPropertyName().equals( Axis.PROP_LOG ) ) axis.setAutorange(false);
             DatumRange oldRange = axis.range;
             DatumRange range = logCheckRange(axis.range, axis.log);
             if (!range.equals(oldRange)) {
@@ -78,13 +82,22 @@ public class AxisController extends DomNodeController {
         return super.isValueAdjusting() || dasAxis.valueIsAdjusting();
     }
 
+    /**
+     * set the range without affecting the auto state.
+     */
+    public void setRangeAutomatically( DatumRange range, boolean log ) {
+        axis.setRange(range);
+        axis.setLog(log);
+        axis.setRange(range);
+        axis.setAutorange(true);
+    }
+
     public synchronized void bindTo(DasAxis p) {
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", p, "datumRange");
         ac.bind(axis, "log", p, "log");
         ac.bind(axis, "label", p, "label");
         ac.bind(axis, "drawTickLabels", p, "tickLabelsVisible");
-
     }
 
     public DasAxis getDasAxis() {
@@ -102,6 +115,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_LOG ) ) axis.setLog(that.isLog());
         if ( !exclude.contains( Axis.PROP_RANGE ) ) axis.setRange(that.getRange());
         if ( !exclude.contains( Axis.PROP_LABEL ) ) axis.setLabel(that.getLabel());
+        if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutorange(that.isAutorange());
         if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
         if ( lock!=null ) lock.unlock();
     }

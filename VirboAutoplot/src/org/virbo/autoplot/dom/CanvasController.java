@@ -4,6 +4,8 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.beans.PropertyChangeEvent;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
@@ -28,12 +31,19 @@ public class CanvasController extends DomNodeController {
     DasCanvas dasCanvas;
     private Application application;
     private Canvas canvas;
+    private Timer repaintSoonTimer;
 
     public CanvasController(Application dom, Canvas canvas) {
         super(canvas);
         this.application = dom;
         this.canvas = canvas;
         canvas.controller = this;
+        repaintSoonTimer= new Timer(100, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+               dasCanvas.repaint();
+            }
+        });
+        repaintSoonTimer.setRepeats(false);
     }
 
     /**
@@ -183,11 +193,11 @@ public class CanvasController extends DomNodeController {
             dasRow.setEmMinimum(emIn);
             dasRow.setEmMaximum(-emIn);
         }
-
     }
 
     void removeGaps() {
         removeGapsAndOverlaps(Arrays.asList(canvas.getRows()));
+        repaintSoonTimer.restart();
     }
 
     /**
@@ -218,7 +228,7 @@ public class CanvasController extends DomNodeController {
         removeGapsAndOverlaps(rows);
 
         lock.unlock();
-
+        repaintSoonTimer.restart();
     }
 
     /**

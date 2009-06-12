@@ -226,7 +226,7 @@ public class ApplicationControllerSupport {
                 controller.bind(domPlot.zaxis, Axis.PROP_LOG, that.zaxis, Axis.PROP_LOG);
                 controller.bind(domPlot.zaxis, Axis.PROP_LABEL, that.zaxis, Axis.PROP_LABEL);
                 controller.addConnector(domPlot, that);
-                that.getController().resetZoom();
+                that.getController().resetZoom(true, true, true);
             }
         });
 
@@ -299,7 +299,7 @@ public class ApplicationControllerSupport {
         plot.getDasMouseInputAdapter().addMenuItem(new JMenuItem(new AbstractAction("Reset Zoom") {
 
             public void actionPerformed(ActionEvent e) {
-                plotController.resetZoom();
+                plotController.resetZoom(true, true, true);
             }
         }));
 
