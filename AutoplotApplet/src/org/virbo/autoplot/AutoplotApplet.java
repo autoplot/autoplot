@@ -11,7 +11,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -34,6 +37,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.components.propertyeditor.PropertyEditor;
@@ -145,25 +149,37 @@ public class AutoplotApplet extends JApplet {
         };
     }
 
-    public void paint(Graphics g) {
+    public void paint( Graphics g ) {
+        //super.paint(g);
+        paintComponent(g);
+    }
+    
+    public void paintComponent(Graphics g1) {
         //System.err.println( "init="+initializing+ " " +this.dom.getController().getCanvas().getController().getDasCanvas().isVisible() + "  " +
         //        ""+ this.dom.getController().getCanvas().getController().getDasCanvas().getBackground() );
+
+        Graphics2D g= (Graphics2D)g1;
         if (initializing) {
+            
             super.paint(g);
+            g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+
+            int leftJust= 70;
+            int em= g.getFontMetrics().getHeight();
             if (splashImage != null) {
                 if (!g.drawImage(splashImage, 0, 0, this)) {
-                    drawString(g, "loading splash", 20, getHeight() / 2 - 14);
+                    drawString(g, "loading splash", leftJust, getHeight() / 2 - em);
                 }
             }
-            drawString(g, "initializing...", 20, getHeight() / 2);
+            drawString(g, "initializing...", leftJust, getHeight() / 2);
 
             if (loadInitialMonitor != null) {
                 Color c0= g.getColor();
                 g.setColor( new Color( 0, 0, 255, 200  ) );
                 long size = loadInitialMonitor.getTaskSize();
                 long pos = loadInitialMonitor.getTaskProgress();
-                int x0 = 20;
-                int y0 = getHeight() / 2;
+                int x0 = leftJust;
+                int y0 = getHeight() / 2 + em/2;
                 int w = 100;
                 int h = 5;
                 if (size == -1) {
@@ -181,7 +197,8 @@ public class AutoplotApplet extends JApplet {
                     timer.restart();
 
                 } else {
-                    g.fillRect(x0, y0, x0 + (int) (pos * w / size ), h);
+                    if ( pos>size ) pos= size;
+                    g.fillRect(x0, y0, (int) (pos * w / size ), h);
                 }
                 g.setColor(c0);
                 g.drawRect( x0, y0, w, h );
@@ -195,19 +212,26 @@ public class AutoplotApplet extends JApplet {
     public void init() {
         super.init();
 
+        String fontParam = getParameter("font");
+        if ( fontParam!=null ) {
+            Font f= Font.decode(fontParam);
+            f= f.deriveFont( f.getSize2D()+2 );
+            setFont( f );
+        }
+
+
         loadInitialMonitor = myMon();
-        String splashImage = getStringParameter("splashImage", "");
-        if (!splashImage.equals("")) {
-            this.splashImage = getImage(getDocumentBase(), splashImage);
+        String si = getStringParameter("splashImage", "");
+        if (!si.equals("")) {
+            this.splashImage = getImage(getDocumentBase(), si);
             repaint();
         }
 
         initializing = true;
         System.err.println("init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
 
-        setLayout(new BorderLayout());
-
         System.err.println("done init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
+
         repaint();
 
     }
@@ -227,7 +251,7 @@ public class AutoplotApplet extends JApplet {
     public void start() {
         System.err.println("start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
         super.start();
-
+        
         model = new ApplicationModel();
         model.setApplet(true);
         model.dom.getOptions().setAutolayout(false);
@@ -248,7 +272,11 @@ public class AutoplotApplet extends JApplet {
         //dom = (Application) model.getDocumentModel().copy();
         dom = model.getDocumentModel();
 
-        Object request = null;
+        String debug= getParameter("debug");
+        if ( debug!=null && !debug.equals("true") ) {
+            //TODO:  print all parameters
+        }
+
         int width = getIntParameter("width", 700);
         int height = getIntParameter("height", 400);
         String fontParam = getStringParameter("font", "");
@@ -331,6 +359,7 @@ public class AutoplotApplet extends JApplet {
             appmodel.canvas.setBackground(Color.decode(sbackgroundColor));
         }
 
+        getContentPane().setLayout(new BorderLayout());
 
         if (getParameter("select") != null) {
             final DataSetSelector select = new DataSetSelector();
@@ -347,7 +376,7 @@ public class AutoplotApplet extends JApplet {
                 }
             });
 
-            add(select, BorderLayout.NORTH);
+            getContentPane().add(select, BorderLayout.NORTH);
 
         }
 
@@ -528,7 +557,7 @@ public class AutoplotApplet extends JApplet {
             }
         }
 
-        add(model.getCanvas(), BorderLayout.CENTER);
+        getContentPane().add(model.getCanvas(), BorderLayout.CENTER);
 
         System.err.println("done add to applet @ " + (System.currentTimeMillis() - t0) + " msec");
 
@@ -752,7 +781,7 @@ public class AutoplotApplet extends JApplet {
         Runnable run = new Runnable() {
 
             public void run() {
-                dom.getController().getPlot().getController().resetZoom();
+                dom.getController().getPlot().getController().resetZoom(true, true, true);
             }
         };
         SwingUtilities.invokeLater(run);
