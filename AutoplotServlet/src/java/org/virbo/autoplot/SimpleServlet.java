@@ -78,7 +78,7 @@ public class SimpleServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.err.println( "requestMethod="+request.getMethod() );
+        //System.err.println( "requestMethod="+request.getMethod() );
         long t0= System.currentTimeMillis();
         String suniq= request.getParameter("requestId");
         long uniq;
@@ -89,7 +89,9 @@ public class SimpleServlet extends HttpServlet {
             addHandlers(uniq);
         }
         
-        logit("-- new request "+uniq, t0,uniq);
+        String debug= request.getParameter("debug");
+
+        logit("-- new request "+uniq, t0,uniq,debug);
         try {
 
             String surl = request.getParameter("url");
@@ -123,7 +125,7 @@ public class SimpleServlet extends HttpServlet {
             String zlog= ServletUtil.getStringParameter(request, "plot.zaxis.log", "" );
             String zdrawTickLabels= ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "" );
 
-            if ( ServletUtil.getStringParameter(request,"debug","false").equals("true") ) {
+            if ( debug!=null && !debug.equals("false") ) {
                 for ( Enumeration en=request.getParameterNames(); en.hasMoreElements(); ) {
                     String n= (String) en.nextElement();
                     System.err.println( ""+n+": "+ Arrays.asList(request.getParameterValues(n)));
@@ -155,14 +157,14 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType(format);
             }
 
-            logit("get parameters",t0,uniq);
+            logit("get parameters",t0,uniq,debug);
             
             System.setProperty("java.awt.headless", "true");
 
             ApplicationModel appmodel = new ApplicationModel();
             appmodel.addDasPeersToApp();
 
-            logit("create application model",t0,uniq);
+            logit("create application model",t0,uniq,debug);
 
             Application dom= appmodel.getDocumentModel();
 
@@ -195,11 +197,11 @@ public class SimpleServlet extends HttpServlet {
                 c.prepareForOutput( width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             }
 
-            logit("set canvas parameters",t0,uniq);
+            logit("set canvas parameters",t0,uniq,debug);
             
             if (vap != null) {
                 appmodel.doOpen(new File(vap));
-                logit("opened vap",t0,uniq);
+                logit("opened vap",t0,uniq,debug);
                 width= appmodel.dom.getCanvases(0).getWidth();
                 height= appmodel.dom.getCanvases(0).getHeight();
                 DasCanvas c= dom.getController().getCanvas().getController().getDasCanvas();
@@ -215,7 +217,7 @@ public class SimpleServlet extends HttpServlet {
                 } catch (Exception ex) {
                     throw ex;
                 }
-                logit("got data source",t0,uniq);
+                logit("got data source",t0,uniq,debug);
                 
                 DatumRange timeRange=null;
                 if (!stimeRange.equals("")) {
@@ -223,7 +225,7 @@ public class SimpleServlet extends HttpServlet {
                     TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                     if (tsb != null) {
                         tsb.setTimeRange(timeRange);
-                        logit("timeSeriesBrowse got data source",t0,uniq);
+                        logit("timeSeriesBrowse got data source",t0,uniq,debug);
                     }
                 }
 
@@ -236,7 +238,7 @@ public class SimpleServlet extends HttpServlet {
 
                 if (!process.equals("")) {
                     QDataSet r = dsource.getDataSet(new NullProgressMonitor());
-                    logit("done with read",t0,uniq);
+                    logit("done with read",t0,uniq,debug);
                     if (process.equals("histogram")) {
                         appmodel.setDataSet( Ops.histogram(r, 100 ) );
                     } else if ( process.equals("magnitude(fft)") ) {
@@ -245,10 +247,10 @@ public class SimpleServlet extends HttpServlet {
                     } else if ( process.equals("nop") ) {
                         appmodel.setDataSet( r );
                     }
-                    logit("done with process",t0,uniq);
+                    logit("done with process",t0,uniq,debug);
                 } else {
                     appmodel.setDataSource(dsource);
-                    logit("done with setDataSource",t0,uniq);
+                    logit("done with setDataSource",t0,uniq,debug);
                 }
                 
                 if (!stimeRange.equals("") ) {
@@ -256,7 +258,7 @@ public class SimpleServlet extends HttpServlet {
                     if ( UnitsUtil.isTimeLocation( dom.getTimeRange().getUnits() ) ) {
                         dom.setTimeRange(timeRange);
                     }
-                    logit("done with setTimeRange",t0,uniq);
+                    logit("done with setTimeRange",t0,uniq,debug);
                 }
 
             }
@@ -317,26 +319,25 @@ public class SimpleServlet extends HttpServlet {
                 dom.getOptions().setBackground(Color.decode(sbackgroundColor));
             }
 
-            logit("done with setStyle",t0,uniq);
+            logit("done with setStyle",t0,uniq,debug);
             if (!script.equals("")) {
                 URL url = new URL(request.getRequestURL().toString());
                 URL scriptUrl = new URL(url, script);
 
-                System.err.println(scriptUrl);
                 //can't do anything more until script context is not static
                 PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
 
                 interp.execfile(AutoPlotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
 
-                logit("done with script",t0,uniq);
+                logit("done with script",t0,uniq,debug);
             }
             
             dom.getController().waitUntilIdle();
 
             if (format.equals("image/png")) {
-                logit("waiting for image",t0,uniq);
+                logit("waiting for image",t0,uniq,debug);
                 Image image = appmodel.canvas.getImage(width, height);
-                logit("got image",t0,uniq);
+                logit("got image",t0,uniq,debug);
                 
                 DasPNGEncoder encoder = new DasPNGEncoder();
                 encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
@@ -351,21 +352,21 @@ public class SimpleServlet extends HttpServlet {
                     }
                 }
             } else if (format.equals("application/pdf")) {
-                logit("do prepareForOutput",t0,uniq);
+                logit("do prepareForOutput",t0,uniq,debug);
                 appmodel.canvas.prepareForOutput(width, height);
-                logit("done with prepareForOutput",t0,uniq);
+                logit("done with prepareForOutput",t0,uniq,debug);
                 GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
 
                 appmodel.canvas.writeToGraphicsOutput(out, go);
-                logit("done with write to output",t0,uniq);
+                logit("done with write to output",t0,uniq,debug);
             } else if (format.equals("image/svg+xml")) {
-                logit("do prepareForOutput...",t0,uniq);
+                logit("do prepareForOutput...",t0,uniq,debug);
                 appmodel.canvas.prepareForOutput(width, height);
-                logit("done with prepareForOutput",t0,uniq);
+                logit("done with prepareForOutput",t0,uniq,debug);
                 GraphicsOutput go = new org.das2.util.awt.SvgGraphicsOutput();
 
                 appmodel.canvas.writeToGraphicsOutput(out, go);
-                logit("done with write to output",t0,uniq);
+                logit("done with write to output",t0,uniq,debug);
             } else {
                 throw new IllegalArgumentException("format must be image/png, application/pdf, or image/svg+xml");
 
@@ -373,7 +374,7 @@ public class SimpleServlet extends HttpServlet {
 
             
             out.close();
-            logit( "done with request",t0,uniq);
+            logit( "done with request",t0,uniq,debug);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -411,7 +412,7 @@ public class SimpleServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private void logit(String string, long t0,long id) {
-        System.err.printf("##%d# %s: %d\n", id, string, ( System.currentTimeMillis()-t0) );
+    private void logit(String string, long t0,long id,String debug) {
+        if ( debug!=null && !debug.equals("false") ) System.err.printf("##%d# %s: %d\n", id, string, ( System.currentTimeMillis()-t0) );
     }
 }
