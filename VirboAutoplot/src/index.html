@@ -19,18 +19,13 @@ be applied to the data, for example, specifying valid range and fill data.
         
         <p>Recent changes include:</p>
 <ul>
-bugfixes:
-<ul><li> problems with vap files resolved.
-</li><li> download from authenticated FTP site works (such as ftp://user:pass@mrfrench.lanl.gov/).
-</li><li> inconsistencies between Servlet and Applet initial view
-</li><li> CDF depend_1 number of elements is incorrect.
+<li>introduces the axis autorange property.
+<ul><li> fixes a number of problems as described here: <a href="http://autoplot.org/developer.axis_auto_property" class="external free" title="http://autoplot.org/developer.axis_auto_property" rel="nofollow">http://autoplot.org/developer.axis_auto_property</a>
+</li><li> this will almost certainly caus labelling problems, in particular, edited labels will be clobbered by automatic ones.
 </li></ul>
-<li> introductory rank 4 support in QDataSet
-</li><li> introduce KeyChain object for storing credentials of HTTP and FTP sites, and a basic authentication dialog when user:pass is used in the URIs.
-</li><li> improvements to jython completion in script console, ctrl +/- resize in script console.
-</li><li> minor improvements to png walk script at https://vxoware.svn.sourceforge.net/svnroot/vxoware/autoplot/trunk/VirboAutoplot/src/scripts/pngwalk/makePngWalk.jy
-</li><li> NOTE: vap load/save tightened up, which may cause some old vap files to break.
+</li><li> autorange property improves autorange behavior, for example, moving a second panels to same plot will autorange to include the new panel as well.
 </li></ul>
+<p>
         
 <p>Known issues:</p>
 <ul>
