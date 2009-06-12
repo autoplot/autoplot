@@ -15,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import javax.servlet.ServletException;
@@ -120,7 +122,14 @@ public class SimpleServlet extends HttpServlet {
             String zrange= ServletUtil.getStringParameter(request, "plot.zaxis.range", "" );
             String zlog= ServletUtil.getStringParameter(request, "plot.zaxis.log", "" );
             String zdrawTickLabels= ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "" );
-            
+
+            if ( ServletUtil.getStringParameter(request,"debug","false").equals("true") ) {
+                for ( Enumeration en=request.getParameterNames(); en.hasMoreElements(); ) {
+                    String n= (String) en.nextElement();
+                    System.err.println( ""+n+": "+ Arrays.asList(request.getParameterValues(n)));
+                }
+            }
+
             if ( srenderType.equals("fill_to_zero") ) {
                 srenderType= "fillToZero";
             }
