@@ -74,6 +74,7 @@ import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
+import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetSelector;
@@ -735,6 +736,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         undoMultipleMenu = new javax.swing.JMenu();
         jSeparator2 = new javax.swing.JSeparator();
         editDomMenuItem = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JSeparator();
         pasteDataSetURLMenuItem = new javax.swing.JMenuItem();
         copyDataSetURLMenuItem = new javax.swing.JMenuItem();
@@ -820,6 +822,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
         editMenu.add(editDomMenuItem);
+
+        jMenuItem6.setText("Inspect Vap File...");
+        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem6ActionPerformed(evt);
+            }
+        });
+        editMenu.add(jMenuItem6);
         editMenu.add(jSeparator1);
 
         pasteDataSetURLMenuItem.setText("Paste URL");
@@ -1268,6 +1278,25 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
     statusLabel.setIcon(null);
 }//GEN-LAST:event_statusLabelMouseClicked
 
+private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+    JFileChooser chooser= new JFileChooser();
+    chooser.setCurrentDirectory( stateSupport.getCurrentFile().getParentFile() );
+    if ( stateSupport.isCurrentFileOpened() ) {
+        chooser.setSelectedFile( stateSupport.getCurrentFile() );
+    }
+    if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(this) ) {
+            try {
+                Application vap = (Application) StatePersistence.restoreState( chooser.getSelectedFile() );
+                PropertyEditor edit = new PropertyEditor(vap);
+                edit.showDialog(edit);
+                
+            } catch (IOException ex) {
+                Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+    }
+}//GEN-LAST:event_jMenuItem6ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1461,6 +1490,7 @@ private void statusLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
