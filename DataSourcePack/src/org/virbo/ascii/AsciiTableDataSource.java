@@ -301,6 +301,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
             } else {
                 if (delim.equals("+")) {
                     delim = " ";
+                } else if ( delim.equalsIgnoreCase("tab") ) {
+                    delim = "\t";
                 }
                 columnCount = parser.setDelimParser(file.toString(), delim).fieldCount();
             }
