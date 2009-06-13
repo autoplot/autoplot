@@ -143,6 +143,9 @@ public class Panel extends DomNode {
     }
 
     public void setLegendLabel(String legendLabel) {
+        if ( legendLabel.equals("nT") && !parentPanel.equals("") ) {
+            System.err.println("WHO'S SETTING MY LABEL?!?!?");
+        }
         String oldLegendLabel = this.legendLabel;
         this.legendLabel = legendLabel;
         propertyChangeSupport.firePropertyChange(PROP_LEGENDLABEL, oldLegendLabel, legendLabel);
@@ -162,6 +165,22 @@ public class Panel extends DomNode {
         boolean oldDisplayLegend = this.displayLegend;
         this.displayLegend = displayLegend;
         propertyChangeSupport.firePropertyChange(PROP_DISPLAYLEGEND, oldDisplayLegend, displayLegend);
+    }
+
+    /**
+     * true indicates the axis label hasn't been changed by a human and may/should be autoranged.
+     */
+    public static final String PROP_AUTOLABEL = "autolabel";
+    protected boolean autolabel = false;
+
+    public boolean isAutolabel() {
+        return autolabel;
+    }
+
+    public void setAutolabel(boolean autolabel) {
+        boolean oldAutolabel = this.autolabel;
+        this.autolabel = autolabel;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOLABEL, oldAutolabel, autolabel);
     }
 
     /**
@@ -215,6 +234,10 @@ public class Panel extends DomNode {
             result.add( new PropertyChangeDiff( "legendLabel", that.legendLabel, this.legendLabel ) );
         }
 
+        if ( that.autolabel!=this.autolabel ) {
+            result.add( new PropertyChangeDiff( "autolabel", that.autolabel, this.autolabel ) );
+        }
+
         if ( !that.displayLegend==this.displayLegend ) {
             result.add( new PropertyChangeDiff( "displayLegend", that.displayLegend, this.displayLegend ) );
         }
@@ -254,6 +277,7 @@ public class Panel extends DomNode {
         if ( !exclude.contains( PROP_PARENTPANEL ) ) this.setParentPanel(that.getParentPanel());
         if ( !exclude.contains( PROP_COMPONENT ) ) this.setComponent(that.getComponent());
         if ( !exclude.contains( PROP_LEGENDLABEL ) ) this.setLegendLabel(that.getLegendLabel());
+        if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutolabel(that.isAutolabel());
         if ( !exclude.contains( PROP_DISPLAYLEGEND ) ) this.setDisplayLegend(that.isDisplayLegend());
         if ( !exclude.contains( PROP_ACTIVE ) ) this.setActive(that.isActive());
         if ( !exclude.contains( PROP_RENDERTYPE ) ) this.setRenderType( that.getRenderType() );

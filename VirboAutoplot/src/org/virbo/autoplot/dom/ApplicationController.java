@@ -544,6 +544,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         panel1.setPlotId(domPlot.getId());
         panel1.setDataSourceFilterId(dsf.getId());
 
+        panel1.setAutolabel(true);
+
         synchronized (this) {
             Panel[] p = application.getPanels();
             Panel[] temp = new Panel[p.length + 1];
@@ -557,8 +559,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         if ( domPlot.getController()!=null ) {
             domPlot.controller.addPanel(panel1);
-        } else {
-            System.err.println("now we are   s c r e w e d");
         }
         
         return panel1;
@@ -616,6 +616,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         domPlot.getXaxis().setAutorange(true);
         domPlot.getYaxis().setAutorange(true);
         domPlot.getZaxis().setAutorange(true);
+        domPlot.getXaxis().setAutolabel(true);
+        domPlot.getYaxis().setAutolabel(true);
+        domPlot.getZaxis().setAutolabel(true);
+        domPlot.setAutolabel(true);
 
         domPlot.setRowId( domRow.getId() );
         domPlot.setColumnId( canvas.getMarginColumn().getId() );

@@ -69,6 +69,9 @@ public class AxisController extends DomNodeController {
             if ( dom.controller.isValueAdjusting() || valueIsAdjusting() ) return;
             if ( evt.getPropertyName().equals( Axis.PROP_RANGE )
                     || evt.getPropertyName().equals( Axis.PROP_LOG ) ) axis.setAutorange(false);
+            if ( evt.getPropertyName().equals( Axis.PROP_LABEL ) ) {
+                axis.setAutolabel(false);
+            }
             DatumRange oldRange = axis.range;
             DatumRange range = logCheckRange(axis.range, axis.log);
             if (!range.equals(oldRange)) {

@@ -102,6 +102,10 @@ public class PanelController extends DomNodeController {
         panel.setParentPanel( p.getId() );
     }
 
+    /**
+     * return the parent panel, or null if the panel doesn't have a parent.
+     * @return
+     */
     public Panel getParentPanel() {
         if ( panel.getParentPanel().equals("") ) {
             return null;
@@ -162,7 +166,9 @@ public class PanelController extends DomNodeController {
                     setResetPanel(false);
                 }
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
-                resetDataSourceFilter();
+                changeDataSourceFilter();
+            } else if ( evt.getPropertyName().equals( Panel.PROP_LEGENDLABEL ) ) {
+                panel.setAutolabel(false);
             }
         }
     };
@@ -178,7 +184,12 @@ public class PanelController extends DomNodeController {
         return false;
     }
 
-    private void resetDataSourceFilter() {
+    /**
+     * the DataSourceFilter id has changed, so we need to stop listening to the
+     * old one and connect to the new one.  Also, if the old dataSourceFilter is
+     * now an orphan, delete it from the application.
+     */
+    private void changeDataSourceFilter() {
         if (dsf != null) {
             unbindDsf();
             List<DomNode> usages= DomUtil.dataSourceUsages(dom, dsf.getId() );
@@ -427,7 +438,7 @@ public class PanelController extends DomNodeController {
                     cpanel.getStyle().setFillColor( deriveColor(fc,i).brighter() );
                     cpanel.setComponent(labels[i]);
                     cpanel.setDisplayLegend(true);
-                    cpanel.setLegendLabel(labels[i].trim());
+                    if ( cpanel.isAutolabel() ) cpanel.setLegendLabel(labels[i].trim());
                     cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
                     cpanel.controller.setDataSet(fillDs);
                 }
@@ -453,18 +464,21 @@ public class PanelController extends DomNodeController {
      * sets resetRanges to false after the load.
      */
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
-
-        public String toString() {
-            return "" + PanelController.this;
-        }
-
         public void propertyChange(PropertyChangeEvent evt) {
             setResetPanel(true);
             setResetRanges(true);
+            panel.setAutolabel(true);
             Plot p= dom.controller.getPlotFor(panel);
-            p.getXaxis().setAutorange(true);
-            p.getYaxis().setAutorange(true);
-            p.getZaxis().setAutorange(true);
+            List<Panel> panels= dom.controller.getPanelsFor(p);
+            if ( panels.size()==1 ) {
+                p.getXaxis().setAutorange(true);
+                p.getYaxis().setAutorange(true);
+                p.getZaxis().setAutorange(true);
+                p.getXaxis().setAutolabel(true);
+                p.getYaxis().setAutolabel(true);
+                p.getZaxis().setAutolabel(true);
+                p.setAutolabel(true);
+            }
         }
     };
 
@@ -569,17 +583,40 @@ public class PanelController extends DomNodeController {
         Plot plot = dom.controller.getPlotFor(panel);
 
         Panel panelCopy = (Panel) panel.copy();
+        panelCopy.setId("");
+        panelCopy.setParentPanel("");
         panelCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
 
-        if (dom.getOptions().isAutolabelling()) {
-            doMetadata(panelCopy, autorange, true);
+        if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autolabel property.
+            DataSourceController dsc= getDataSourceFilter().getController();
+            doMetadata(panelCopy, dsc.getFillProperties(), dsc.getFillDataSet() );
+
+            String reduceRankString = getDataSourceFilter().controller.getReduceDataSetString();
+            if (dsf.controller.getReduceDataSetString() != null) {
+                String title = panelCopy.getPlotDefaults().getTitle();
+                title += "!c" + reduceRankString;
+                panelCopy.getPlotDefaults().setTitle(title);
+            }
         }
 
         if (dom.getOptions().isAutoranging()) {
-            doAutoranging(panelCopy);
+            Map props = getDataSourceFilter().controller.getFillProperties();
+            QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
+            doAutoranging( panelCopy,props,fillDs );
+
+            Renderer newRenderer = getRenderer();
+            if (newRenderer instanceof SeriesRenderer && fillDs != null) {
+                QDataSet d = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                if (d != null) {
+                    ((SeriesRenderer) newRenderer).setCadenceCheck((d.property(QDataSet.CADENCE) != null));
+                } else {
+                    ((SeriesRenderer) newRenderer).setCadenceCheck(true);
+                }
+            }
+            
         }
 
-        if ( panel.getComponent().equals("") ) panel.setLegendLabel( panelCopy.getLegendLabel() );
+        if ( panel.getComponent().equals("") && panel.isAutolabel() ) panel.setLegendLabel( panelCopy.getLegendLabel() );
 
         panelCopy.getPlotDefaults().getXaxis().setAutorange(true); // this is how we distinguish it from the original, useless plot defaults.
         panelCopy.getPlotDefaults().getYaxis().setAutorange(true);
@@ -604,54 +641,24 @@ public class PanelController extends DomNodeController {
      * @param autorange
      * @param interpretMetadata
      */
-    private void doMetadata(Panel panelCopy, boolean autorange, boolean interpretMetadata) {
-        final DataSourceFilter dsf = getDataSourceFilter();
-        QDataSet fillDs = dsf.controller.getFillDataSet();
-        Map<String, Object> properties = dsf.controller.getFillProperties();
+    private static void doMetadata( Panel panelCopy, Map<String,Object> properties, QDataSet fillDs ) {
 
-        RenderType renderType = panel.getRenderType();
+        panelCopy.getPlotDefaults().getXaxis().setLabel("");
+        panelCopy.getPlotDefaults().getYaxis().setLabel("");
+        panelCopy.getPlotDefaults().getZaxis().setLabel("");
+        panelCopy.getPlotDefaults().setTitle("");
+        panelCopy.setLegendLabel("");
+        
+        doInterpretMetadata(panelCopy, properties, panelCopy.getRenderType());
 
-
-        /* begin interpret metadata */
-        if (interpretMetadata && autorange) {
-
-            if (dom.getOptions().isAutolabelling()) {
-                panelCopy.getPlotDefaults().getXaxis().setLabel("");
-                panelCopy.getPlotDefaults().getYaxis().setLabel("");
-                panelCopy.getPlotDefaults().getZaxis().setLabel("");
-                panelCopy.getPlotDefaults().setTitle("");
-            }
-
-            doInterpretMetadata(panelCopy, properties, panel.getRenderType());
-
-            String reduceRankString = getDataSourceFilter().controller.getReduceDataSetString();
-            if (dsf.controller.getReduceDataSetString() != null) {
-                String title = panelCopy.getPlotDefaults().getTitle();
-                title += "!c" + reduceRankString;
-                panelCopy.getPlotDefaults().setTitle(title);
-            }
-
-            PanelUtil.unitsCheck(properties, fillDs); // DANGER--this may cause overplotting problems in the future by removing units
-
-            panel.syncTo(panelCopy);
-
-        } else {
-            // kludge to support updating slice location report without autoranging.
-            // I don't think it's coming into this dead code.
-            if (dsf.controller.getReduceDataSetString() != null) {
-                panelCopy.getPlotDefaults().setTitle("");
-                doInterpretMetadata(panelCopy, properties, renderType);
-
-            }
-        }
-
+        PanelUtil.unitsCheck(properties, fillDs); // DANGER--this may cause overplotting problems in the future by removing units
 
     }
 
-    private void doInterpretMetadata(Panel cpanel, Map properties, RenderType spec) {
+    private static void doInterpretMetadata( Panel panelCopy, Map properties, RenderType spec) {
 
         Object v;
-        final Plot plotDefaults = cpanel.getPlotDefaults();
+        final Plot plotDefaults = panelCopy.getPlotDefaults();
 
         if ((v = properties.get(QDataSet.TITLE)) != null) {
             plotDefaults.setTitle((String) v);
@@ -664,19 +671,19 @@ public class PanelController extends DomNodeController {
             legendLabel= (String)v;
         }
         if ( legendLabel!=null ) {
-            cpanel.setLegendLabel((String) legendLabel);
+            panelCopy.setLegendLabel((String) legendLabel);
         }
 
         if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
-            if (dom.getOptions().isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
+            if ( (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
                 plotDefaults.getZaxis().setLog(v.equals("log"));
             }
 
-            if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.LABEL)) != null) {
+            if ( (v = properties.get(QDataSet.LABEL)) != null) {
                 plotDefaults.getZaxis().setLabel((String) v);
             }
 
-            if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.DEPEND_1)) != null) {
+            if ( (v = properties.get(QDataSet.DEPEND_1)) != null) {
                 Map m = (Map) v;
                 Object v2 = m.get(QDataSet.LABEL);
                 if (v2 != null) {
@@ -685,11 +692,11 @@ public class PanelController extends DomNodeController {
 
             }
         } else { // hugeScatter okay
-            if (dom.getOptions().isAutoranging() && (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
+            if ( (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
                 plotDefaults.getYaxis().setLog(v.equals("log"));
             }
 
-            if (dom.getOptions().isAutolabelling() && (v = properties.get(QDataSet.LABEL)) != null) {
+            if ( (v = properties.get(QDataSet.LABEL)) != null) {
                 plotDefaults.getYaxis().setLabel((String) v);
             }
 
@@ -713,7 +720,7 @@ public class PanelController extends DomNodeController {
         if ((v = properties.get(QDataSet.DEPEND_0)) != null) {
             Map m = (Map) v;
             Object v2 = m.get(QDataSet.LABEL);
-            if (dom.getOptions().isAutolabelling() && v2 != null) {
+            if ( v2 != null) {
                 plotDefaults.getXaxis().setLabel((String) v2);
             }
 
@@ -721,7 +728,7 @@ public class PanelController extends DomNodeController {
 
     }
 
-    private void guessCadence(MutablePropertyDataSet xds, QDataSet fillDs) {
+    private static void guessCadence(MutablePropertyDataSet xds, QDataSet fillDs) {
         if ( xds.length()<2 ) return;
 
         RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
@@ -740,15 +747,14 @@ public class PanelController extends DomNodeController {
      * @param props
      * @param spec
      */
-    private void doAutoranging(Panel panelCopy) {
-        Map props = getDataSourceFilter().controller.getFillProperties();
+    private static void doAutoranging( Panel panelCopy, Map<String,Object> props, QDataSet fillDs ) {
+
         RenderType spec = panelCopy.getRenderType();
 
         if (props == null) {
             props = Collections.EMPTY_MAP;
         }
 
-        QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
 
         if (spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
 
@@ -762,7 +768,7 @@ public class PanelController extends DomNodeController {
                 yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); // QUBE
             }
 
-            guessCadence((MutablePropertyDataSet) xds, fillDs);
+            guessCadence((MutablePropertyDataSet) xds, null);
             guessCadence((MutablePropertyDataSet) yds, null);
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
@@ -797,7 +803,7 @@ public class PanelController extends DomNodeController {
 
             panelCopy.getStyle().setLineWidth(1.0f);
 
-            QDataSet hist= getDataSourceFilter().controller.getHistogram();
+            QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
             AutoplotUtil.AutoRangeDescriptor desc;
             if ( false && hist!=null ) {
                 desc= AutoplotUtil.autoRange( hist, fillDs, props );
@@ -814,16 +820,6 @@ public class PanelController extends DomNodeController {
             }
 
             guessCadence((MutablePropertyDataSet) xds, fillDs);
-
-            Renderer newRenderer = getRenderer();
-            if (newRenderer instanceof SeriesRenderer && fillDs != null) {
-                QDataSet d = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-                if (d != null) {
-                    ((SeriesRenderer) newRenderer).setCadenceCheck((d.property(QDataSet.CADENCE) != null));
-                } else {
-                    ((SeriesRenderer) newRenderer).setCadenceCheck(true);
-                }
-            }
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 

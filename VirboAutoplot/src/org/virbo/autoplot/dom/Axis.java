@@ -100,6 +100,22 @@ public class Axis extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGE, oldAutorange, autorange);
     }
 
+    /**
+     * true indicates the axis label hasn't been changed by a human and may/should be autoranged.
+     */
+    public static final String PROP_AUTOLABEL = "autolabel";
+    protected boolean autolabel = false;
+
+    public boolean isAutolabel() {
+        return autolabel;
+    }
+
+    public void setAutolabel(boolean autolabel) {
+        boolean oldAutolabel = this.autolabel;
+        this.autolabel = autolabel;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOLABEL, oldAutolabel, autolabel);
+    }
+
 
     AxisController controller;
 
@@ -126,6 +142,7 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
             if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutorange(that.isAutorange());
+            if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutolabel(that.isAutolabel());
             if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
         }
     }
@@ -152,6 +169,8 @@ public class Axis extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff("label", that.label , this.label ) );
         b=  that.autorange==this.autorange;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTORANGE, that.autorange , this.autorange ) );
+        b=  that.autolabel==this.autolabel;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTOLABEL, that.autolabel , this.autolabel ) );
         b=  that.drawTickLabels==this.drawTickLabels;
         if ( !b ) result.add(new PropertyChangeDiff("drawTickLabels", that.drawTickLabels, this.drawTickLabels ) );
 

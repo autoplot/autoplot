@@ -89,7 +89,8 @@ public class PanelUtil {
 
     /**
      * check to make sure properties units are consistent with dataset units,
-     * otherwise we'll have problems with units conversions.
+     * otherwise we'll have problems with units conversions.  The map
+     * properties may have its property units changed to make them consistent.
      * @param properties
      * @param dataset
      */

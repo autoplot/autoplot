@@ -6,6 +6,7 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
@@ -46,17 +47,19 @@ public class PlotController extends DomNodeController {
         dasPlot.addPropertyChangeListener(listener);
         dasPlot.getXAxis().addPropertyChangeListener(listener);
         dasPlot.getYAxis().addPropertyChangeListener(listener);
-        this.plot.addPropertyChangeListener( Plot.PROP_ISOTROPIC, new PropertyChangeListener() {
-            public void propertyChange( PropertyChangeEvent e ) {
-                if ( plot.isIsotropic() ) checkIsotropic(null);
-            }
-        });
     }
 
     public PlotController( Application dom, Plot plot ) {
         super( plot );
         this.dom = dom;
         this.plot = plot;
+        this.plot.addPropertyChangeListener( Plot.PROP_ISOTROPIC, new PropertyChangeListener() {
+            public void propertyChange( PropertyChangeEvent e ) {
+                if ( PlotController.this.plot.isIsotropic() ) checkIsotropic(null);
+            }
+        });
+        this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
+
         plot.controller= this;
     }
 
@@ -82,6 +85,14 @@ public class PlotController extends DomNodeController {
             }
         }
 
+    };
+
+    private PropertyChangeListener labelListener= new PropertyChangeListener() {
+         public void propertyChange(PropertyChangeEvent evt) {
+            if ( evt.getPropertyName().equals(Plot.PROP_TITLE) ) {
+                plot.setAutolabel(false);
+            }
+         }
     };
 
     protected void createDasPeer( Canvas canvas, Row domRow ,Column domColumn) {
@@ -307,7 +318,29 @@ public class PlotController extends DomNodeController {
         p.removePropertyChangeListener( Panel.PROP_PLOT_DEFAULTS, plotDefaultsListener );
     }
 
+    /**
+     * returns true if all the panels are a parent and its children.
+     * @param panels
+     * @return
+     */
+    private static boolean oneFamily( List<Panel> panelsIn ) {
+        if ( panelsIn.size()==0 ) return false;
+        List<Panel> panels= new ArrayList(panelsIn);
+        Panel p= panels.get(0);
+        if ( p.getController().getParentPanel()!=null ) {
+            p= p.getController().getParentPanel();
+        }
+        panels.remove(p);
+        panels.removeAll( p.getController().getChildPanels() );
 
+        if ( panels.size()==0 ) return true; else return false;
+
+    }
+
+    /**
+     * check all the panels' plot defaults, so that properties marked as automatic can be reset.
+     * @param panel
+     */
     private void doPanelDefaultsChange( Panel panel ) {
 
         if ( panel!=null ) {
@@ -326,12 +359,17 @@ public class PlotController extends DomNodeController {
             }
         }
 
-        if ( dom.getController().getPanelsFor(plot).size()==1 ) {
+        if ( oneFamily( dom.getController().getPanelsFor(plot) ) ) {
             Panel p= dom.getController().getPanelsFor(plot).get(0);
-            plot.setTitle( p.getPlotDefaults().getTitle() );
-            plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
+            if ( !p.getParentPanel().equals("") ) p = p.getController().getParentPanel();
+            if ( plot.isAutolabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
+            if ( plot.getXaxis().isAutolabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
+            if ( plot.getYaxis().isAutolabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
+            if ( plot.getXaxis().isAutorange() && plot.getYaxis().isAutorange() ) {
+                plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
+            }
         }
-        
+
         resetZoom( plot.getXaxis().isAutorange(), plot.getYaxis().isAutorange(), plot.getZaxis().isAutorange() );
 
     }

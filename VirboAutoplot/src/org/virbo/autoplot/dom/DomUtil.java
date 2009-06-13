@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.Color;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
@@ -517,5 +518,19 @@ public class DomUtil {
             return encodeColor( (java.awt.Color)value);
         }
     };
+
+    public static final Converter AUTO_TO_COLOR= new Converter() {
+        @Override
+        public Object convertForward(Object value) {
+            boolean b= ((Boolean)value).booleanValue();
+            return b ? Color.WHITE : Color.LIGHT_GRAY;
+        }
+
+        @Override
+        public Object convertReverse(Object value) {
+            return Color.WHITE.equals(value);
+        }
+    };
+
 
 }
