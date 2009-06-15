@@ -8,22 +8,19 @@ package org.virbo.datasource;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
+import java.net.MalformedURLException;
 import org.das2.DasApplication;
-import org.das2.util.DasExceptionHandler;
 import java.util.logging.Level;
 import javax.swing.text.BadLocationException;
+import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,8 +44,12 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.das2.DasException;
+import org.das2.components.DasProgressPanel;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
+import org.das2.util.DasExceptionHandler;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.DataSetURL.CompletionResult;
 
 /**
@@ -138,8 +139,8 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         try {
 
-            if ( surl.endsWith("/") || surl.contains("/?") || surl.endsWith(".zip") || surl.contains(".zip?") ) {
-                int carotpos= editor.getCaretPosition();
+            if (surl.endsWith("/") || surl.contains("/?") || surl.endsWith(".zip") || surl.contains(".zip?")) {
+                int carotpos = editor.getCaretPosition();
                 //int carotpos = surl.contains("?") surl.length();
                 setMessage("Getting filesystem completions.");
                 showCompletions(surl, carotpos);
@@ -228,9 +229,9 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void browseSourceType() {
         String surl = (String) dataSetSelector.getEditor().getItem();
 
-        DataSourceEditorPanel edit=null;
+        DataSourceEditorPanel edit = null;
         try {
-            edit = DataSetURL.getDataSourceEditorPanel( DataSetURL.getURI(surl) );
+            edit = DataSetURL.getDataSourceEditorPanel(DataSetURL.getURI(surl));
         } catch (URISyntaxException ex) {
             Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -678,33 +679,50 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_plotItButtonActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        String context = (String) dataSetSelector.getSelectedItem();
+        final String context = (String) dataSetSelector.getSelectedItem();
 
         String ext = DataSetURL.getExt(context);
-        if ( ( !context.contains("/?") && context.contains("?") ) || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
+        if ((!context.contains("/?") && context.contains("?")) || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
             browseSourceType();
 
         } else {
-            try {
-                URLSplit split= URLSplit.parse(context);
-                URL url= new URL( split.file );
-                if (url.getProtocol().equals("file")) {
-                    File f = new File(url.getPath());
-                    if ( f.exists() && f.isFile() ) {
-                        browseSourceType();
-                    } else {
-                        JFileChooser chooser = new JFileChooser(url.getPath());
+            final URLSplit split = URLSplit.parse(context);
+            if ( split.scheme.equals("file") || split.scheme.equals("http") || split.scheme.equals("https") || split.scheme.equals("ftp")) {
+                try {
+                    if (FileSystemUtil.resourceExists(context)) {
+                        if ( !FileSystemUtil.resourceIsLocal(context) ) {
+                            Runnable run= new Runnable() {
+                                public void run() {
+                                    ProgressMonitor mon= DasProgressPanel.createFramed(
+                                        SwingUtilities.getWindowAncestor(DataSetSelector.this),
+                                        "downloading "+split.file.substring(split.path.length()) );
+                                    try {
+                                        FileSystemUtil.doDownload(context, mon);
+                                    } catch (Exception ex) {
+                                        FileSystem.getExceptionHandler().handle(ex);
+                                    }
+                                    browseSourceType();
+                                }
+                            };
+                            RequestProcessor.invokeLater(run);
+                        } else {
+                            browseSourceType();
+                        }
+                    } else if (split.scheme.equals("file")) {
+                        JFileChooser chooser = new JFileChooser( split.path );
                         int result = chooser.showOpenDialog(this);
                         if (result == JFileChooser.APPROVE_OPTION) {
-                            String suri= DataSetURL.newUri( context,chooser.getSelectedFile().toString() );
+                            String suri = DataSetURL.newUri(context, chooser.getSelectedFile().toString());
                             dataSetSelector.setSelectedItem(suri);
                         }
+                    } else {
+                        showCompletions();
                     }
-                } else {
-                    showCompletions();
+                } catch (IOException ex) {
+                    FileSystem.getExceptionHandler().handle(ex);
                 }
-            } catch (MalformedURLException e) {
-                DasExceptionHandler.handle(e);
+            } else {
+                showCompletions();
             }
         }
     }//GEN-LAST:event_browseButtonActionPerformed
