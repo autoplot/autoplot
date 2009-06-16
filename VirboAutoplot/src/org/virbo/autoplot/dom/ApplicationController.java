@@ -219,6 +219,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if (getPanel() != p) {
                     setPanel(p);
                     setStatus("" + domPlot + ", " + p + " selected");
+                    canvas.controller.indicateSelection( Arrays.asList(domPlot,p) );
                 }
             }
 
@@ -1409,6 +1410,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             setStatus("no panel selected");
         } else {
             setStatus(panel + " selected");
+            canvas.controller.indicateSelection( Collections.singletonList((DomNode)panel) );
         }
         Panel oldPanel = this.panel;
         this.panel = panel;

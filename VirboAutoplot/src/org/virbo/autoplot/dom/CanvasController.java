@@ -4,10 +4,14 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.geom.Area;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.ParseException;
@@ -19,6 +23,8 @@ import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
+import org.das2.graph.Painter;
+import org.das2.graph.SelectionUtil;
 import org.das2.system.MutatorLock;
 import org.virbo.autoplot.layout.LayoutConstants;
 
@@ -391,6 +397,43 @@ public class CanvasController extends DomNodeController {
                 new ColumnController(r).createDasPeer(this.canvas, this.canvas.getMarginColumn().getController().getDasColumn());
             }
         }
+    }
+
+    public void indicateSelection( List<DomNode> selectedItems ) {
+
+        if ( !dasCanvas.isShowing() ) return;
+        final List<Shape> sel= new ArrayList<Shape>();
+        for ( Object o: selectedItems ) {
+            Area sel1=null;
+            if ( o instanceof Plot ) {
+                sel.add( SelectionUtil.getSelectionArea( ((Plot)o).getController().getDasPlot() ) );
+            } else if ( o instanceof Panel ) {
+                sel.add( SelectionUtil.getSelectionArea( ((Panel)o).getController().getRenderer() ) );
+            }
+
+            if (sel1!=null) sel.add(sel1);
+        }
+
+        final Painter p= new Painter() {
+            { System.err.println("XYZ"); }
+
+            public void paint(Graphics2D g) {
+                g.setColor( new Color( 255, 255, 0, 100 ) );
+                for ( Shape s: sel ) {
+                    if ( s!=null ) g.fill(s);
+                }
+            }
+        };
+
+        dasCanvas.addTopDecorator( p );
+        Timer clearSelectionTimer= new Timer( 400, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dasCanvas.removeTopDecorator( p );
+            }
+        });
+        clearSelectionTimer.setRepeats(false);
+        clearSelectionTimer.restart();
+
     }
 
     public String toString() {
