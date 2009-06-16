@@ -3,34 +3,31 @@
     <title>Autoplot Application (#{tag})</title>
 </head>
 <body>
-    <H3>ViRBO Autoplot Application (#{tag})</H3>
-        <p><a href="autoplot-#{tag}.jnlp"><img src="launch.png"></a></p>
+    <H3>Autoplot Application (#{tag})</H3>
+        <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
-        <p><small>"add panels" from the layout tab is used to add two plots side-by-side.</small></p>
-
-	<p>This demonstration application attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
-	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
-displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.  Additional metadata can then 
-be applied to the data, for example, specifying valid range and fill data.
-	</p>
+        <p><small>Data from a U.S.G.S. data server shows the height of the Iowa and Cedar Rivers in the 2008 floods.</small></p>
         
-        <p>This development release is an untagged version with experimental features.            
+	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
+	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
+displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
+	</p>
+
+        <p>This development release is an untagged version with experimental features.
         </p>
         
         <p>Recent changes include:</p>
 <ul>
-<li>introduces the axis autorange property.
-<ul><li> fixes a number of problems as described here: <a href="http://autoplot.org/developer.axis_auto_property" class="external free" title="http://autoplot.org/developer.axis_auto_property" rel="nofollow">http://autoplot.org/developer.axis_auto_property</a>
-</li><li> this will almost certainly caus labelling problems, in particular, edited labels will be clobbered by automatic ones.
-</li></ul>
-</li><li> autorange property improves autorange behavior, for example, moving a second panels to same plot will autorange to include the new panel as well.
+<li> bugfix: dataset selector completion on a remote file brings up the data source editor, not a single completion of the filename.
+</li><li> plots and panels flash as they are selected
+</li><li> autolabel property for panels, plots, and axes completes fixes to autoranging vap files.
+</li><li> bugfix 2792362: aggregation and context overview resets zoom.
 </li></ul>
 <p>
         
 <p>Known issues:</p>
 <ul>
 <li> Applet suffers from same seven second delay, applet can show display
-</li><li> bug: aggregation sometimes still jumps when you adjust the z-axis.  Demo 2.
 </li><li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
 </li><li> last URI is not added to DataSetSelector.
 </li><li> race condition with setSliceDimension and setFillDataSet results in "inconvertable units"
