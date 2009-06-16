@@ -4,7 +4,7 @@
 <jnlp 
     spec="1.0+" 
     codebase="http://www.autoplot.org/jnlp/#{tag}/"
-    href="autoplot-#{tag}.jnlp">
+    href="autoplot.jnlp">
     
     <information> 
         <title>Autoplot(#{tag})</title> 
