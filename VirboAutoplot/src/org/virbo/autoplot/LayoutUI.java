@@ -265,6 +265,7 @@ public class LayoutUI extends javax.swing.JPanel {
     transient ListSelectionListener panelSelectionListener = new ListSelectionListener() {
 
         public void valueChanged(ListSelectionEvent e) {
+            if ( panelListComponent.getValueIsAdjusting() ) return;
             if (panelListComponent.getSelectedValues().length == 1) {
                 if ( ! app.getController().isValueAdjusting() ) {
                     Panel p = (Panel) panelListComponent.getSelectedValue();
