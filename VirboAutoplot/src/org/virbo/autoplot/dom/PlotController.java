@@ -183,7 +183,6 @@ public class PlotController extends DomNodeController {
          ac.support.addAxisContextMenuItems(dasPlot1, this, this.plot, this.plot.getYaxis());
          ac.support.addAxisContextMenuItems(dasPlot1, this, this.plot, this.plot.getZaxis());
 
-         Logger logger= Logger.getLogger(PlotController.class.getName());
         logger.fine("add focus listener to " + dasPlot1);
         dasPlot1.addFocusListener(ac.focusAdapter);
         dasPlot1.getXAxis().addFocusListener(ac.focusAdapter);
@@ -279,18 +278,18 @@ public class PlotController extends DomNodeController {
         }
 
         if ( x ) {
-            plot.getXaxis().setRange(newSettings.getXaxis().getRange());
             plot.getXaxis().setLog( newSettings.getXaxis().isLog() );
+            plot.getXaxis().setRange(newSettings.getXaxis().getRange());
             plot.getXaxis().setAutorange(true);
         }
         if ( y ) {
-            plot.getYaxis().setRange(newSettings.getYaxis().getRange());
             plot.getYaxis().setLog( newSettings.getYaxis().isLog() );
+            plot.getYaxis().setRange(newSettings.getYaxis().getRange());
             plot.getYaxis().setAutorange(true);
         }
         if ( z ) {
-            plot.getZaxis().setRange(newSettings.getZaxis().getRange());
             plot.getZaxis().setLog( newSettings.getZaxis().isLog() );
+            plot.getZaxis().setRange(newSettings.getZaxis().getRange());
             plot.getZaxis().setAutorange(true);
         }
     }
@@ -365,6 +364,7 @@ public class PlotController extends DomNodeController {
             if ( plot.isAutolabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
             if ( plot.getXaxis().isAutolabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
             if ( plot.getYaxis().isAutolabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
+            if ( plot.getZaxis().isAutolabel() ) plot.getZaxis().setLabel( p.getPlotDefaults().getZaxis().getLabel() );
             if ( plot.getXaxis().isAutorange() && plot.getYaxis().isAutorange() ) {
                 plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
             }
