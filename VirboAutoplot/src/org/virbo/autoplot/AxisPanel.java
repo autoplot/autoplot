@@ -212,6 +212,8 @@ public class AxisPanel extends javax.swing.JPanel {
         Binding b;
         Plot p = applicationController.getPlot();
 
+        if (plotBindingGroup != null) plotBindingGroup.unbind();
+        
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.label"), xTitleTextField, BeanProperty.create("text")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p,BeanProperty.create( "xaxis.range"), xredit, BeanProperty.create("value")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("xaxis.log"), xLog, BeanProperty.create("selected")));
@@ -228,7 +230,6 @@ public class AxisPanel extends javax.swing.JPanel {
 
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("isotropic"), this.isotropicCheckBox, BeanProperty.create("selected")));
 
-        if (plotBindingGroup != null) plotBindingGroup.unbind();
         plotBindingGroup = bc;
         bc.bind();
 
