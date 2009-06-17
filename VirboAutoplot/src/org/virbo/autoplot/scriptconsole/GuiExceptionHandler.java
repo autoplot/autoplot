@@ -37,7 +37,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.LogRecord;
 import java.util.logging.XMLFormatter;
 import org.apache.commons.httpclient.HttpClient;
@@ -104,18 +106,19 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         }
     }
 
-    private void showExceptionDialog( final Throwable t, String extraInfo ) {
+    private Map<Integer,DiaDescriptor> dialogs= new HashMap<Integer, DiaDescriptor>();
 
-        final boolean uncaught= extraInfo.equals(UNCAUGHT);
+    private synchronized DiaDescriptor createDialog( final Throwable t, final boolean uncaught ) {
+        final DiaDescriptor diaDescriptor= new DiaDescriptor();
+        diaDescriptor.hits=1;
 
-        String errorMessage = extraInfo + t.getClass().getName() + "\n"
-            + (t.getMessage() == null ? "" : t.getMessage());        
-        final JDialog dialog = new JDialog( DasApplication.getDefaultApplication().getMainFrame() );        
+        final JDialog dialog = new JDialog( DasApplication.getDefaultApplication().getMainFrame() );
         if ( !uncaught ) {
             dialog.setTitle("Error Notification");
         } else {
             dialog.setTitle("Runtime Error Occurred");
         }
+
         dialog.setModal(false);
         dialog.setResizable(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -123,30 +126,32 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         messageArea.setLineWrap(true);
         messageArea.setWrapStyleWord(true);
         messageArea.setEditable(false);
-        messageArea.setText(errorMessage);
+
         JScrollPane message = new JScrollPane(messageArea);
         message.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(message, BorderLayout.CENTER);
-        
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton ok = new JButton("Ok");
         final JToggleButton details = new JToggleButton("Show Details");
         buttonPanel.add(ok);
         buttonPanel.add(details);
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-        
+
         dialog.getContentPane().add(mainPanel, BorderLayout.CENTER);
-        
+
         final JTextArea traceArea = new JTextArea(10, 40);
         traceArea.setLineWrap(false);
         traceArea.setEditable(false);
         traceArea.setTabSize(4);
+
+        diaDescriptor.textArea= messageArea;
         
         StringWriter writer = new StringWriter();
         t.printStackTrace(new PrintWriter(writer));
         traceArea.setText(writer.toString());
-        
+
         final JPanel stackPane = new JPanel(new BorderLayout());
         stackPane.add(new JScrollPane(traceArea), BorderLayout.NORTH);
         stackPane.setBorder(new javax.swing.border.EmptyBorder(10, 10, 10, 10));
@@ -162,18 +167,19 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         buttonPanel2.add(submit);
 
         submitButton= submit;
-        
+
         stackPane.add(buttonPanel2, BorderLayout.SOUTH);
         Dimension size = message.getPreferredSize();
         size.width = stackPane.getPreferredSize().width;
         message.setPreferredSize(size);
-        
+
         ok.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dialog.dispose();
+                dialogs.remove( diaDescriptor.hash );
             }
         });
-        
+
         details.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (details.isSelected()) {
@@ -188,7 +194,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 }
             }
         });
-        
+
         dump.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String text = traceArea.getText();
@@ -223,10 +229,61 @@ public final class GuiExceptionHandler implements ExceptionHandler {
                 }
             }
         });
+
+        diaDescriptor.dialog= dialog;
+        return diaDescriptor;
+    }
+
+    class DiaDescriptor {
+        JDialog dialog;
+        int hits;
+        JTextArea textArea;
+        int hash;
+    }
+    
+    private synchronized void showExceptionDialog( final Throwable t, String extraInfo ) {
+
+        final boolean uncaught= extraInfo.equals(UNCAUGHT);
+
+        int hash= hashCode(t);
+        
+        DiaDescriptor dia1= dialogs.get(hash);
+        
+        String errorMessage = extraInfo + t.getClass().getName() + "\n"
+            + (t.getMessage() == null ? "" : t.getMessage());
+
+        if ( dia1!=null ) {
+            errorMessage= errorMessage + "\n\nError hit "+(1+dia1.hits)+ " times" ;
+            dia1.hits++;
+        }
+
+        if ( dia1==null ) {
+            dia1= createDialog( t, uncaught );
+        }
+
+        final JDialog dialog = dia1.dialog;
+
+        dialogs.put( hash, dia1 );
+        dia1.hash= hash;
+
+        dia1.textArea.setText(errorMessage);
         
         dialog.pack();
         dialog.setLocationRelativeTo(null);
         dialog.setVisible(true);
+
+
+    }
+
+    private static int hashCode( Throwable t ) {
+        int rteHash= 0;
+
+        StackTraceElement[] ee= t.getStackTrace();
+        for ( int i=ee.length-1; i>=0 && i>ee.length-5; i-- ) {
+            rteHash= 31*rteHash + hashCode(ee[i]);
+        }
+        rteHash= Math.abs(rteHash);
+        return rteHash;
     }
 
     private static int hashCode( StackTraceElement e ) {
@@ -347,12 +404,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
 
     private void submitRuntimeException( Throwable t, boolean uncaught ) throws IOException {
-        int rteHash= 0;
-        StackTraceElement[] ee= t.getStackTrace();
-        for ( int i=ee.length-1; i>=0 && i>ee.length-5; i-- ) {
-            rteHash= 31*rteHash + hashCode(ee[i]);
-        }
-        rteHash= Math.abs(rteHash);
+        int rteHash;
+        rteHash= hashCode( t );
         
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
@@ -399,7 +452,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
 
     public static void main( String[] args ) {
-        new GuiExceptionHandler().handle( new RuntimeException("Bad Deal!") );
+        ExceptionHandler eh= new GuiExceptionHandler();
+        eh.handle( new RuntimeException("Bad Deal!") );
+        eh.handle( new RuntimeException("Bad Deal!") );
+        eh.handle( new RuntimeException("Bad Deal!") );
+        for ( int i=0; i<3; i++ ) {
+            eh.handle( new RuntimeException("Bad Deal 2!") );
+        }
     }
 
 }
