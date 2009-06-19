@@ -211,9 +211,11 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         WritableDataSet result;
         if (reform) {
+            //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1);
             result = CdfUtil.wrapCdfHyperData(variable, 0, -1, 1);
         } else {
             long recCount = (recs[1] - recs[0]) / recs[2];
+            //result = CdfUtil.wrapCdfHyperDataHacked(variable, recs[0], recCount, recs[2]);
             result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         result.putProperty(QDataSet.NAME, svariable);
