@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -153,7 +154,41 @@ public class DataSourceUtil {
 	}
 	return buf.toString();
     }
-    
+
+    public static String strjoin(Collection<String> c, String delim) {
+        StringBuffer result = new StringBuffer();
+        for (String s : c) {
+            if (result.length() > 0) {
+                result.append(delim);
+            }
+            result.append(s);
+        }
+        return result.toString();
+    }
+
+    public static String strjoin( long[] dims, String delim ) {
+        StringBuffer sdims= new StringBuffer();
+        if ( dims.length>0 ) {
+                sdims.append( dims[0] );
+                for ( int i=1; i<dims.length; i++ ) {
+                        sdims.append( delim +dims[i]);
+                }
+        }
+        return sdims.toString();
+    }
+
+    public static String strjoin( int[] dims, String delim ) {
+        StringBuffer sdims= new StringBuffer();
+        if ( dims.length>0 ) {
+                sdims.append( dims[0] );
+                for ( int i=1; i<dims.length; i++ ) {
+                        sdims.append( delim +dims[i]);
+                }
+        }
+        return sdims.toString();
+    }
+
+
     public static void main(String[] args ) {
         String surl= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
         System.err.println( makeAggregation(surl) );
