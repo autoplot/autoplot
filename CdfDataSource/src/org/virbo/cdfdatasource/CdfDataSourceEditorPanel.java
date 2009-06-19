@@ -263,6 +263,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 parameter= parameterDescriptions.entrySet().iterator().next().getKey();
                 parameterList.setSelectedValue( parameter, true );
                 subsetTextField.setText("");
+                param= parameter;
             }
             parameter= param;
 
