@@ -116,7 +116,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
         this.textArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK ), "save" );
 
-        EditorContextMenu menu= new EditorContextMenu( this.textArea );
+        EditorContextMenu menu= new EditorContextMenu( this.textArea, this );
         menu.setDataSetSelector(selector);
 
         JythonCompletionProvider.getInstance().addPropertyChangeListener( JythonCompletionProvider.PROP_MESSAGE, new PropertyChangeListener() {

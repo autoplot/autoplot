@@ -11,10 +11,12 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
@@ -146,11 +148,21 @@ public class ScriptPanelSupport {
         }
     }
 
-    private void loadFile(File file) throws IOException, FileNotFoundException {
+    protected void loadFile(File file) throws IOException, FileNotFoundException {
+        InputStream r= new FileInputStream(file);
+        loadInputStream( r );
+        if (file.toString().endsWith(".jyds")) {
+            panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
+        } else {
+            panel.setContext(JythonScriptPanel.CONTEXT_APPLICATION);
+        }
+    }
+
+    protected void loadInputStream( InputStream in ) throws IOException {
         BufferedReader r = null;
         try {
             StringBuffer buf = new StringBuffer();
-            r = new BufferedReader(new FileReader(file));
+            r = new BufferedReader(new InputStreamReader(in));
             String s = r.readLine();
             while (s != null) {
                 buf.append(s + "\n");
@@ -160,11 +172,6 @@ public class ScriptPanelSupport {
             d.remove(0, d.getLength());
             d.insertString(0, buf.toString(), null);
             panel.setDirty(false);
-            if (file.toString().endsWith(".jyds")) {
-                panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
-            } else {
-                panel.setContext(JythonScriptPanel.CONTEXT_APPLICATION);
-            }
         } catch (BadLocationException ex) {
             throw new RuntimeException(ex);
         } finally {

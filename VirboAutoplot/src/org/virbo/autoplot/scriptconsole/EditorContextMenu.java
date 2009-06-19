@@ -4,10 +4,12 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.io.IOException;
 import org.das2.components.propertyeditor.PropertyEditor;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -27,9 +29,11 @@ public class EditorContextMenu {
     private EditorTextPane editor;
     private JPopupMenu menu;
     private DataSetSelector dataSetSelector;
+    private JythonScriptPanel sp;
 
-    EditorContextMenu( EditorTextPane edit ) {
+    EditorContextMenu( EditorTextPane edit, JythonScriptPanel sp  ) {
         this.editor = edit;
+        this.sp= sp;
         editor.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -57,6 +61,13 @@ public class EditorContextMenu {
                 }
             });
             menu.add( insertCodeMenu );
+            JMenu submenu= new JMenu("Example Scripts");
+            submenu.add( new AbstractAction("makePngWalk.jy") {
+                public void actionPerformed(ActionEvent e) {
+                    loadExample( "/scripts/pngwalk/makePngWalk.jy" );
+                }
+            });
+            menu.add( submenu );
             JMenu settingsMenu= new JMenu("Settings");
             settingsMenu.add( new AbstractAction("Edit Settings") {
                 public void actionPerformed(ActionEvent e) {
@@ -75,5 +86,18 @@ public class EditorContextMenu {
         } catch (BadLocationException ex) {
             Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void loadExample( String code ) {
+        try {
+            URL url = EditorContextMenu.class.getResource(code);
+            if (sp.isDirty()) {
+                sp.support.saveAs();
+            }
+            sp.support.loadInputStream(url.openStream());
+        } catch (IOException ex) {
+            Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
 }
