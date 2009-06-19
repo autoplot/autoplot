@@ -228,7 +228,7 @@
         <property name="jnlp.dir" location="${dist.dir}/jnlp/"/>
         <mkdir dir="${jnlp.dir}"/>
         
-        <copy file="${build.classes.dir}/autoplot.jnlp" tofile="${jnlp.dir}/autoplot-${release_tag}.jnlp" />
+        <copy file="${build.classes.dir}/autoplot.jnlp" tofile="${jnlp.dir}/autoplot.jnlp" />
         <copy file="${build.classes.dir}/index.html" tofile="${jnlp.dir}/index.html" />
         <copy file="${build.classes.dir}/logo16x16.png" tofile="${jnlp.dir}/logo16x16.png" />
         <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
@@ -238,7 +238,7 @@
         <copy file="${build.classes.dir}/screen.vap" tofile="${jnlp.dir}/screen.vap" />
         <copy file="${build.classes.dir}/splash.png" tofile="${jnlp.dir}/splash.png" />
         <copy file="${build.classes.dir}/launch.png" tofile="${jnlp.dir}/launch.png" />
-        <replace file="${jnlp.dir}/autoplot-${release_tag}.jnlp" >
+        <replace file="${jnlp.dir}/autoplot.jnlp" >
             <replacefilter token="#{tag}" value="${release_tag}" />
         </replace>
         <replace file="${jnlp.dir}/index.html" >
