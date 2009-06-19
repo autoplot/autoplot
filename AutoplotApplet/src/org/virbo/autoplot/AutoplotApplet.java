@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -148,75 +149,77 @@ public class AutoplotApplet extends JApplet {
             }
         };
     }
-
-    public void paint( Graphics g ) {
-        //super.paint(g);
-        paintComponent(g);
-    }
     
-    public void paintComponent(Graphics g1) {
-        //System.err.println( "init="+initializing+ " " +this.dom.getController().getCanvas().getController().getDasCanvas().isVisible() + "  " +
-        //        ""+ this.dom.getController().getCanvas().getController().getDasCanvas().getBackground() );
+    private JComponent progressComponent = new JComponent() {
 
-        Graphics2D g= (Graphics2D)g1;
-        if (initializing) {
-            
-            super.paint(g);
-            g.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+        @Override
+        protected void paintComponent(Graphics g1) {
+            //System.err.println( "init="+initializing+ " " +this.dom.getController().getCanvas().getController().getDasCanvas().isVisible() + "  " +
+            //        ""+ this.dom.getController().getCanvas().getController().getDasCanvas().getBackground() );
 
-            int leftJust= 70;
-            int em= g.getFontMetrics().getHeight();
-            if (splashImage != null) {
-                if (!g.drawImage(splashImage, 0, 0, this)) {
-                    drawString(g, "loading splash", leftJust, getHeight() / 2 - em);
+            Graphics2D g = (Graphics2D) g1;
+            int leftJust = 70;
+            if (initializing) {
+
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+                int em = g.getFontMetrics().getHeight();
+                if (splashImage != null) {
+                    if (!g.drawImage(splashImage, 0, 0, this)) {
+                        drawString(g, "loading splash", leftJust, getHeight() / 2 - em);
+                    }
                 }
-            }
-            drawString(g, "initializing...", leftJust, getHeight() / 2);
+                drawString(g, "initializing...", leftJust, getHeight() / 2);
 
-            if (loadInitialMonitor != null) {
-                Color c0= g.getColor();
-                g.setColor( new Color( 0, 0, 255, 200  ) );
-                long size = loadInitialMonitor.getTaskSize();
-                long pos = loadInitialMonitor.getTaskProgress();
-                int x0 = leftJust;
-                int y0 = getHeight() / 2 + em/2;
-                int w = 100;
-                int h = 5;
-                if (size == -1) {
-                    long t = System.currentTimeMillis() % 2000;
-                    int x= (int) (t * w / 2000);
-                    int x1= (int) (t * w / 2000 ) + h*2;
-                    int ww= x1-x;
-                    g.fillRect(x0 + x, y0, Math.min( w-x, x1-x ), h );
-                    Timer timer= new Timer( 100, new ActionListener() {
-                        public void actionPerformed(ActionEvent e) {
-                            repaint();
+                if (loadInitialMonitor != null) {
+                    Color c0 = g.getColor();
+                    g.setColor(new Color(0, 0, 255, 200));
+                    long size = loadInitialMonitor.getTaskSize();
+                    long pos = loadInitialMonitor.getTaskProgress();
+                    int x0 = leftJust;
+                    int y0 = getHeight() / 2 + em / 2;
+                    int w = 100;
+                    int h = 5;
+                    if (size == -1) {
+                        long t = System.currentTimeMillis() % 2000;
+                        int x = (int) (t * w / 2000);
+                        int x1 = (int) (t * w / 2000) + h * 2;
+                        int ww = x1 - x;
+                        g.fillRect(x0 + x, y0, Math.min(w - x, x1 - x), h);
+                        Timer timer = new Timer(100, new ActionListener() {
+
+                            public void actionPerformed(ActionEvent e) {
+                                repaint();
+                            }
+                        });
+                        timer.setRepeats(false);
+                        timer.restart();
+
+                    } else {
+                        if (pos > size) {
+                            pos = size;
                         }
-                    } );
-                    timer.setRepeats(false);
-                    timer.restart();
-
-                } else {
-                    if ( pos>size ) pos= size;
-                    g.fillRect(x0, y0, (int) (pos * w / size ), h);
+                        g.fillRect(x0, y0, (int) (pos * w / size), h);
+                    }
+                    g.setColor(c0);
+                    g.drawRect(x0, y0, w, h);
                 }
-                g.setColor(c0);
-                g.drawRect( x0, y0, w, h );
+            } else {
+                drawString(g, "done initializing", leftJust, getHeight() / 2);
             }
-        } else {
-            super.paint(g);
+
         }
-    }
+    };
 
     @Override
     public void init() {
         super.init();
 
         String fontParam = getParameter("font");
-        if ( fontParam!=null ) {
-            Font f= Font.decode(fontParam);
-            f= f.deriveFont( f.getSize2D()+2 );
-            setFont( f );
+        if (fontParam != null) {
+            Font f = Font.decode(fontParam);
+            f = f.deriveFont(f.getSize2D() + 2);
+            setFont(f);
         }
 
 
@@ -228,6 +231,9 @@ public class AutoplotApplet extends JApplet {
         }
 
         initializing = true;
+        getContentPane().add( progressComponent );
+        validate();
+
         System.err.println("init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
 
         System.err.println("done init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
@@ -251,7 +257,7 @@ public class AutoplotApplet extends JApplet {
     public void start() {
         System.err.println("start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
         super.start();
-        
+
         model = new ApplicationModel();
         model.setApplet(true);
         model.dom.getOptions().setAutolayout(false);
@@ -272,8 +278,8 @@ public class AutoplotApplet extends JApplet {
         //dom = (Application) model.getDocumentModel().copy();
         dom = model.getDocumentModel();
 
-        String debug= getParameter("debug");
-        if ( debug!=null && !debug.equals("true") ) {
+        String debug = getParameter("debug");
+        if (debug != null && !debug.equals("true")) {
             //TODO:  print all parameters
         }
 
@@ -304,8 +310,8 @@ public class AutoplotApplet extends JApplet {
         statusCallback = getStringParameter("statusCallback", "");
         timeCallback = getStringParameter("timeCallback", "");
 
-        if ( srenderType.equals("fill_to_zero") ) {
-            srenderType= "fillToZero";
+        if (srenderType.equals("fill_to_zero")) {
+            srenderType = "fillToZero";
         }
 
         setInitializationStatus("readParameters");
@@ -390,8 +396,8 @@ public class AutoplotApplet extends JApplet {
         //String vap = getParameter("vap");
         String script = getStringParameter("script", "");
 
-        if ( surl==null ) {
-            surl= getParameter("dataSetURL");
+        if (surl == null) {
+            surl = getParameter("dataSetURL");
         }
         if (surl != null && !surl.equals("")) {
             DataSource dsource;
@@ -415,7 +421,7 @@ public class AutoplotApplet extends JApplet {
 
             QDataSet ds;
             try {
-                ds = dsource==null ? null : dsource.getDataSet(loadInitialMonitor);
+                ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -557,7 +563,8 @@ public class AutoplotApplet extends JApplet {
             }
         }
 
-        getContentPane().add(model.getCanvas(), BorderLayout.CENTER);
+        getContentPane().remove(progressComponent);
+        getContentPane().add(model.getCanvas());
 
         System.err.println("done add to applet @ " + (System.currentTimeMillis() - t0) + " msec");
 
