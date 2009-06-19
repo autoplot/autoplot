@@ -13,7 +13,7 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii
    ascii= keyword_Set(ascii) ; 1=do ascii stream, 0=binary
 
    xdatatype= ascii ? 'ascii24' : 'sun_real8'
-   datatype= ascii ? 'ascii10' : 'sun_real8'
+   datatype= ascii ? 'ascii16' : 'sun_real8'
 
    packetDescriptor= [ '[01]xxxxxx<packet>' ]
    t= tag_names( dataStruct )
@@ -23,16 +23,17 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii
    totalItems=1
 
    format='(f24.12'
-   reclen= 4 + 24 + (nt-1) * 10
+   reclen= 4 + 24 + (nt-1) * 20
    for i=1,nt-1 do begin
       s= size( dataStruct.(i) )
       name= i eq 1 ? '' : t[i]  ;;; stream reader needs a default plane
       if ( s[0] eq 1 ) then begin
          packetDescriptor= [ packetDescriptor, $
              '   <y type="'+datatype+'" name="'+name+'" idlname="'+t[i]+'" />' ]
-         format= format + ( ( i lt n_elements(t)-1 ) ? ',f10.3' : ',f9.3)' )
+         format= format + ( ( i lt n_elements(t)-1 ) ? ',e16.4' : ',e15.3)' )
          totalItems+=1
       endif else begin
+         if n_elements( ytags ) eq 0 then ytags= findgen(  s[2] )
          sytags= strjoin( strtrim( ytags, 2 ), ',' )
          nitems= s[2]
          packetDescriptor= [ packetDescriptor, $
@@ -40,8 +41,8 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii
              +'" nitems="'+strtrim(nitems,2)  $
              +'" yTags="'+sytags+'"' $
              +' />' ]
-         for i=1,nitems-1 do format= format + ',f10.3'
-         format= format + ( ( i lt n_elements(t)-1 ) ? ','+',f10.3' : ','+'f9.3)' )
+         for i=1,nitems-1 do format= format + ',e16.4'
+         format= format + ( ( i lt n_elements(t)-1 ) ? ','+',e16.4' : ','+'e15.4)' )
          totalItems+= nitems
       endelse
    endfor
