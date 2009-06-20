@@ -415,8 +415,6 @@ public class CanvasController extends DomNodeController {
         }
 
         final Painter p= new Painter() {
-            { System.err.println("XYZ"); }
-
             public void paint(Graphics2D g) {
                 g.setColor( new Color( 255, 255, 0, 100 ) );
                 for ( Shape s: sel ) {
