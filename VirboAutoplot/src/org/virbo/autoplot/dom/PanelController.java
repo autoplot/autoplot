@@ -885,10 +885,13 @@ public class PanelController extends DomNodeController {
 
             DasPlot plot = getDasPlot();
 
+            DasPlot oldPlot=null;
             if (oldRenderer != null) {
+                oldPlot= oldRenderer.getParent();
+                if ( oldPlot!=null && oldPlot!=getDasPlot() ) oldRenderer.getParent().removeRenderer(oldRenderer);
                 if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
             }
-            if ( oldRenderer!=newRenderer ) plot.addRenderer(newRenderer);
+            if ( oldPlot==null || oldRenderer!=newRenderer ) plot.addRenderer(newRenderer);
 
             logger.finest("plot.addRenderer "+plot+" "+newRenderer);
             if (getDataSourceFilter().controller.getFillDataSet() != null) {
