@@ -548,13 +548,13 @@ public class CdfUtil {
         } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE) {
             result = DDataSet.wrap((double[]) odata, qube);
 
-        } else if (varType == Variable.CDF_INT4) {
+        } else if (varType == Variable.CDF_UINT4 ) {
+            result = LDataSet.wrap((long[]) odata, qube);
+        
+        } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT2) {
             result = IDataSet.wrap((int[]) odata, qube);
 
-        } else if (varType == Variable.CDF_UINT4) {
-            result = LDataSet.wrap((long[]) odata, qube);
-
-        } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
+        } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT1) {
             result = SDataSet.wrap((short[]) odata, qube);
 
         } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE) {
@@ -677,13 +677,13 @@ public class CdfUtil {
             } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE) {
                 result = DDataSet.wrap((double[]) odata);
 
-            } else if (varType == Variable.CDF_INT4) {
-                result = IDataSet.wrap((int[]) odata);
-
             } else if (varType == Variable.CDF_UINT4) {
                 result = LDataSet.wrap((long[]) odata);
 
-            } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
+            } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT2) {
+                result = IDataSet.wrap((int[]) odata);
+
+            } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT1) {
                 result = SDataSet.wrap((short[]) odata);
 
             } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE) {
@@ -865,6 +865,7 @@ public class CdfUtil {
         Attribute aAttr = null, bAttr = null, cAttr = null, dAttr = null;
 
         Attribute catDesc = null;
+        Attribute varNotes= null;
 
         logger.fine("getting CDF attributes");
         try {
@@ -885,6 +886,10 @@ public class CdfUtil {
         }
         try {
             catDesc = cdf.getAttribute("CATDESC");
+        } catch (CDFException e) {
+        }
+        try {
+            varNotes= cdf.getAttribute("VAR_NOTES");
         } catch (CDFException e) {
         }
 
@@ -920,6 +925,7 @@ public class CdfUtil {
                 Variable z1DependVariable = null;
                 long z1MaxRec = -1;
                 String scatDesc = null;
+                String svarNotes = null;
 
                 try {
                     if (aAttr != null) {  // check for metadata for DEPEND_1
@@ -983,6 +989,11 @@ public class CdfUtil {
                             Entry entry = catDesc.getEntry(var);
                             scatDesc = String.valueOf(entry.getData());
                         }
+                        if (varNotes!=null ) {
+                            logger.fine("get attribute " + varNotes.getName() + " entry for " + var.getName());
+                            Entry entry = varNotes.getEntry(var);
+                            svarNotes = String.valueOf(entry.getData());
+                        }
                     } catch (CDFException e) {
                         //e.printStackTrace();
                     }
@@ -1014,6 +1025,9 @@ public class CdfUtil {
                         descbuf.append("" + (maxRec + 1) + " records of "+recDesc+"<br>");
                     if (scatDesc != null)
                         descbuf.append("" + scatDesc + "<br>");
+                    if (svarNotes !=null ) {
+                        descbuf.append("<br><p><small>" + svarNotes + "<small></p>");
+                    }
                     descbuf.append("</html>");
                     result.put(var.getName(), descbuf.toString());
                 } else {
