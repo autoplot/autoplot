@@ -530,8 +530,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         if (domPlot == null) {
             domPlot = addPlot(LayoutConstants.BELOW);
-        } else {
-            System.err.println("hwshshssisks");
         }
 
         assignId(panel1);
