@@ -123,7 +123,12 @@ public class CdfFileDataSource extends AbstractDataSource {
                 Map<String, Object> istpProps = model.properties(attributes);
                 Units pu= (Units) istpProps.get(QDataSet.UNITS);
                 Units u= (Units) result.property( QDataSet.UNITS );
-                UnitsConverter uc= UnitsConverter.getConverter( pu, u );
+                UnitsConverter uc;
+                if ( u==Units.cdfEpoch ) {
+                    uc= UnitsConverter.IDENTITY;
+                } else {
+                    uc= UnitsConverter.getConverter( pu, u );
+                }
                 Number nn= (Number)istpProps.get(QDataSet.VALID_MAX);
                 if ( nn!=null ) result.putProperty(QDataSet.VALID_MAX, uc.convert(nn) );
                 nn= (Number)istpProps.get(QDataSet.VALID_MIN);
@@ -215,8 +220,8 @@ public class CdfFileDataSource extends AbstractDataSource {
             result = CdfUtil.wrapCdfHyperData(variable, 0, -1, 1);
         } else {
             long recCount = (recs[1] - recs[0]) / recs[2];
-            //result = CdfUtil.wrapCdfHyperDataHacked(variable, recs[0], recCount, recs[2]);
-            result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
+            result = CdfUtil.wrapCdfHyperDataHacked(variable, recs[0], recCount, recs[2]);
+            //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         result.putProperty(QDataSet.NAME, svariable);
 
