@@ -876,7 +876,7 @@ public class PanelController extends DomNodeController {
         return dsf;
     }
 
-    private void maybeCreateDasPeer(){
+    protected void maybeCreateDasPeer(){
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer( panel.getRenderType(), oldRenderer, getColorbar() );
 
