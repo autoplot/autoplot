@@ -142,7 +142,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             if (surl.endsWith("/") || surl.contains("/?") || surl.endsWith(".zip") || surl.contains(".zip?")) {
                 int carotpos = editor.getCaretPosition();
                 //int carotpos = surl.contains("?") surl.length();
-                setMessage("Getting filesystem completions.");
+                setMessage("busy: getting filesystem completions.");
                 showCompletions(surl, carotpos);
 
             } else if (surl.endsWith("/..")) { // pop up one directory
