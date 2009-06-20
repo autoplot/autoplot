@@ -62,6 +62,7 @@
         <jar href="http://www.autoplot.org/jnlp-lib/metadata-extractor-2.1.0.jar" />
         
         <!-- cdf -->
+        <jar href="http://www.autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.0.jnlp" > -->
         <extension name="cdf" href="http://www.autoplot.org/cdf-jnlp/cdf-3.3.0-hack.jnlp" >
