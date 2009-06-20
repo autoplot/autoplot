@@ -287,6 +287,7 @@ public class ScriptPanelSupport {
                             }
                             try {
                                 PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+                                interp.set("dom", model.getDocumentModel() );
                                 boolean dirty0 = panel.isDirty();
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
