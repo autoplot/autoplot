@@ -135,8 +135,8 @@ public class PanelController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(DataSourceFilter.PROP_SLICEDIMENSION) || evt.getPropertyName().equals(DataSourceFilter.PROP_TRANSPOSE)) {
                 logger.fine("property change in DSF means I need to autorange: "+evt.getPropertyName());
-
                 setResetRanges(true);
+                maybeSetPlotAutorange();
             }
         }
     };
@@ -316,11 +316,11 @@ public class PanelController extends DomNodeController {
                         setResetPanel(false);
                     } else {
                         if ( renderer==null ) maybeCreateDasPeer();
-                        if ( resetRanges ) doResetRanges(true);
+                        if ( resetRanges ) doResetRanges();
                         setResetPanel(false);
                     }
                 } else if (resetRanges) {
-                    doResetRanges(true);
+                    doResetRanges();
                     setResetRanges(false);
                 } else if ( resetRenderType ) {
                     doResetRenderType(panel.getRenderType());
@@ -410,7 +410,7 @@ public class PanelController extends DomNodeController {
             setResetPanel(false);
 
             if ( resetRanges ) {
-                doResetRanges(true);
+                doResetRanges();
                 setResetRanges(false);
             }
 
@@ -468,20 +468,27 @@ public class PanelController extends DomNodeController {
             setResetPanel(true);
             setResetRanges(true);
             panel.setAutolabel(true);
-            Plot p= dom.controller.getPlotFor(panel);
-            List<Panel> panels= dom.controller.getPanelsFor(p);
-            if ( panels.size()==1 ) {
-                p.getXaxis().setAutorange(true);
-                p.getYaxis().setAutorange(true);
-                p.getZaxis().setAutorange(true);
-                p.getXaxis().setAutolabel(true);
-                p.getYaxis().setAutolabel(true);
-                p.getZaxis().setAutolabel(true);
-                p.setAutolabel(true);
-            }
+            maybeSetPlotAutorange();
         }
     };
 
+    /**
+     * we'd like the plot to autorange, so check to see if we are the only
+     * panel, and if so, set its autorange and autolabel flags.
+     */
+    private void maybeSetPlotAutorange() {
+        Plot p= dom.controller.getPlotFor(panel);
+        List<Panel> panels= dom.controller.getPanelsFor(p);
+        if ( panels.size()==1 ) {
+            p.getXaxis().setAutorange(true);
+            p.getYaxis().setAutorange(true);
+            p.getZaxis().setAutorange(true);
+            p.getXaxis().setAutolabel(true);
+            p.getYaxis().setAutolabel(true);
+            p.getZaxis().setAutolabel(true);
+            p.setAutolabel(true);
+        }
+    }
     private void setDataSourceFilterController(final DataSourceController dsc) {
         dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
         dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
@@ -575,7 +582,7 @@ public class PanelController extends DomNodeController {
      *
      * @param autorange
      */
-    private synchronized void doResetRanges(boolean autorange) {
+    private synchronized void doResetRanges() {
         logger.finest("doResetRanges...");
         setStatus("busy: do autorange");
         changesSupport.performingChange(this, PENDING_RESET_RANGE);
