@@ -4,13 +4,12 @@ dom= getDocumentModel()
 
 #only uses URI to get time aggregation...
 uri= dom.dataSourceFilters[0].uri
+if ( uri.find('%25')!=-1 ): # unescaped code
+  uri= uri.replace( '%25', '$' )
 
 #TODO: check for URI template, because if it's not there we get a strange error message
 #if ( uri.indexOf('%Y')==-1 and uri.indexOf('$Y')==-1 and url.indexOf('%y')==-1 and url.indexOf('$y')==-1 ):
 #   print 'URI isn''t a template, this is going to cause problems'
-
-from javax.swing import *
-from java.awt import FlowLayout
 
 def myWriteToPng( filename, appmodel, dom, width, height ):
   appmodel.waitUntilIdle(False);
@@ -65,6 +64,8 @@ def doBatch( times, dom, outputFolder, product, timeFormat, mon ):
       myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom2, w0, h0 )
 
    mon.finished()
+
+from javax.swing import JPanel, BoxLayout, JTextField, JLabel, JOptionPane
 
 p= JPanel(  )
 p.layout= BoxLayout( p, BoxLayout.Y_AXIS )
