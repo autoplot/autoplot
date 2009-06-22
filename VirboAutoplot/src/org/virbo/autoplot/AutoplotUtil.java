@@ -8,7 +8,6 @@
  */
 package org.virbo.autoplot;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
@@ -33,7 +32,6 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +56,6 @@ import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
-import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.QDataSet;
@@ -67,8 +64,6 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.RankZeroDataSet;
-import org.virbo.dataset.TableDataSetAdapter;
-import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 import org.w3c.dom.Document;
@@ -87,6 +82,8 @@ public class AutoplotUtil {
      */
     public final static int DS_LENGTH_LIMIT = 10000000;
 
+    private static final Logger logger= Logger.getLogger( AutoplotUtil.class.getName() );
+    
     /**
      * this is not used.  It is called from createIcon, which is not used.
      * @param c
@@ -581,6 +578,12 @@ public class AutoplotUtil {
                         d1 = DatumRangeUtil.normalizeLog(range, dd1);
                         d2 = DatumRangeUtil.normalizeLog(range, dd2);
                     }
+                    if ( d2>1.1 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
+                        range= DatumRangeUtil.rescaleLog( range, 0, 2 );
+                        d2= d2/2;
+                        d1= d1/2;
+                        logger.fine("adjusting TYPICAL_MAX from metadata");
+                    }
                 } else {
                     try {
                         d1 = DatumRangeUtil.normalize(range, result.range.min());
@@ -591,15 +594,24 @@ public class AutoplotUtil {
                         d1 = DatumRangeUtil.normalize(range, result.range.min());
                         d2 = DatumRangeUtil.normalize(range, result.range.max());
                     }
+                    if ( d2>1.1 && d2<2.0 ) { // see if we can save TYPICAL_MIN by doubling range
+                        range= DatumRangeUtil.rescale( range, 0, 2 );
+                        d2= d2/2;
+                        d1= d1/2;
+                        logger.fine("adjusting TYPICAL_MAX from metadata");
+                    }
                 }
                 if (d2 - d1 > 0.1 // the stats range occupies 10% of the typical range
-                        && d2 > 0. // and the stats max is greater than the typical range min()
+                        && d2 > 0.  // and the stats max is greater than the typical range min()
+                        && d2 < 1.1 // and the top isn't clipping data badly
+                        && d1 > -0.1 // and the bottom isn't clipping data badly
                         && d1 < 1.) {  // and the stats min is less then the typical range max().
                     result.range = range;
                     // just use the metadata settings.
-
+                    logger.fine("using TYPICAL_MIN, TYPICAL_MAX from metadata");
                     return result; // DANGER--EXIT POINT
-
+                } else {
+                    logger.fine("TYPICAL_MIN, TYPICAL_MAX from metadata rejected because it clipped or squished the data.");
                 }
             }
         }
