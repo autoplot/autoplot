@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.CancelledOperationException;
@@ -61,7 +62,11 @@ public class DataSourceController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent e) {
             if (dataSet != null && dataSet.rank() == 3) {
                 logger.fine("updateSlice ->updateFillSoon()");
-                updateFillSoon();
+                int delay=0;
+                if ( e.getPropertyName().equals( DataSourceFilter.PROP_SLICEDIMENSION ) ) { //kludge for 2795481: switch slice dimension can result in inconvertable units
+                    delay= 100;
+                }
+                updateFillSoon(delay);
             }
         }
     };
@@ -73,7 +78,8 @@ public class DataSourceController extends DomNodeController {
 
         public void propertyChange(PropertyChangeEvent e) {
             if (dataSet != null) {
-                updateFillSoon();
+                logger.fine("change in fill or valid range ->updateFillSoon()");
+                updateFillSoon(0);
             }
         }
     };
@@ -502,12 +508,19 @@ public class DataSourceController extends DomNodeController {
 
     /**
      * call updateFill in new thread
+     * @param delay insert this delay so other threads may complete first.
      */
-    private void updateFillSoon() {
+    private void updateFillSoon( final int delay ) {
         changesSupport.performingChange(this, PENDING_FILL_DATASET);
         RequestProcessor.invokeLater(new Runnable() {
-
             public void run() {
+                if ( delay>0 ) {
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(DataSourceController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
                 updateFill();
                 changesSupport.changePerformed(this, PENDING_FILL_DATASET);
             }
