@@ -24,8 +24,10 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.JComponent;
 import org.das2.DasApplication;
 import org.das2.fsm.FileStorageModel;
@@ -288,6 +290,15 @@ public class ScriptContext extends PyJavaInstance {
             }
         }
     }
+
+    /**
+     * This is intended to be used with a debugger.  The developer should put
+     * a breakpoint at the out.write statement, and then call peekAt from
+     * the script.
+     *
+     * @param o
+     * @throws java.io.IOException
+     */
     public static void peekAt(Object o) throws IOException {
         out.write(o.toString().getBytes());
         return;
@@ -349,6 +360,34 @@ public class ScriptContext extends PyJavaInstance {
         }
 
         return result;
+    }
+
+    /**
+     * Given a spec to format timeranges and a range to contain each timerange,
+     * produce a list of all timeranges covering the range formatted with the
+     * spec.  For example ( "%Y%m%d", "Jun 2009" ) would result in
+     * 20090601, 20090602, ..., 20090630.
+     * @param spec such as "%Y-%m".  Note specs like "%Y%m" will not be parsable.
+     * @param srange range limiting the list, such as "2009"
+     * @return a string array of formatted time ranges, such as [ "2009-01", "2009-02", ..., "2009-12" ]
+     * @throws java.text.ParseException of the outer range cannot be parsed.
+     */
+    public static String[] generateTimeRanges( String spec, String srange ) throws ParseException {
+        TimeParser tp= TimeParser.create(spec);
+        DatumRange range= DatumRangeUtil.parseTimeRange(srange);
+
+        String sstart= tp.format( range.min(), null );
+
+        tp.parse(sstart);
+        DatumRange curr= tp.getTimeRange();
+        List<String> result= new ArrayList<String>();
+        while ( range.intersects(curr) ) {
+            String scurr= tp.format( curr.min(), curr.max() );
+            result.add( scurr );
+            curr= curr.next();
+        }
+        return result.toArray( new String[result.size()] );
+
     }
 
     /**
