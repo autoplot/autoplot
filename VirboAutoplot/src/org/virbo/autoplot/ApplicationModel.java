@@ -76,7 +76,7 @@ public class ApplicationModel {
     DasCanvas canvas;
     Timer tickleTimer;
     Application dom;
-    ExceptionHandler exceptionHandler;
+    private ExceptionHandler exceptionHandler;
     boolean applet= false;
 
     public void setApplet( boolean v ) {
@@ -89,6 +89,11 @@ public class ApplicationModel {
     
     public ExceptionHandler getExceptionHandler() {
         return exceptionHandler;
+    }
+
+    public void setExceptionHandler(ExceptionHandler eh) {
+        this.exceptionHandler= eh;
+        DasApplication.getDefaultApplication().setExceptionHandler(exceptionHandler);
     }
 
     static final Logger logger = Logger.getLogger("virbo.autoplot");
@@ -109,12 +114,6 @@ public class ApplicationModel {
 
         dom = new Application();
 
-        if ( DasApplication.getDefaultApplication().isHeadless() ) {
-            exceptionHandler= DasApplication.getDefaultApplication().getExceptionHandler();
-        } else {
-            exceptionHandler= new GuiExceptionHandler();
-            DasApplication.getDefaultApplication().setExceptionHandler(exceptionHandler);
-        }
     }
 
     /**
