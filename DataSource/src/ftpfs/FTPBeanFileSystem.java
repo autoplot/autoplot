@@ -35,6 +35,7 @@ import java.util.List;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.system.MutatorLock;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  *
@@ -82,24 +83,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
         logger.finer( "ftpBeanFilesystem copyFile(" + partFile + ","+ targetFile );
         WritableByteChannel dest = Channels.newChannel(new FileOutputStream(targetFile));
         ReadableByteChannel src = Channels.newChannel(new FileInputStream(partFile));
-        final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
-        while (src.read(buffer) != -1) {
-            // prepare the buffer to be drained
-            buffer.flip();
-            // write to the channel, may block
-            dest.write(buffer);
-            // If partial transfer, shift remainder down
-            // If buffer is empty, same as doing clear()
-            buffer.compact();
-        }
-        // EOF will leave buffer in fill state
-        buffer.flip();
-        // make sure the buffer is fully drained.
-        while (buffer.hasRemaining()) {
-            dest.write(buffer);
-        }
-        dest.close();
-        src.close();
+        DataSourceUtil.transfer(src, dest);
         return true;
 
     }
