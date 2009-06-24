@@ -9,11 +9,15 @@
 
 package org.virbo.datasource;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -188,6 +192,32 @@ public class DataSourceUtil {
         return sdims.toString();
     }
 
+    /**
+     * transfers the data from one channel to another.
+     * @param src
+     * @param dest
+     * @throws java.io.IOException
+     */
+    public static void transfer( ReadableByteChannel src, WritableByteChannel dest ) throws IOException {
+        final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);
+        while (src.read(buffer) != -1) {
+            // prepare the buffer to be drained
+            buffer.flip();
+            // write to the channel, may block
+            dest.write(buffer);
+            // If partial transfer, shift remainder down
+            // If buffer is empty, same as doing clear()
+            buffer.compact();
+        }
+        // EOF will leave buffer in fill state
+        buffer.flip();
+        // make sure the buffer is fully drained.
+        while (buffer.hasRemaining()) {
+            dest.write(buffer);
+        }
+        dest.close();
+        src.close();
+    }
 
     public static void main(String[] args ) {
         String surl= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
