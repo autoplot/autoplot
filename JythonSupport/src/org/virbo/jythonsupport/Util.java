@@ -4,10 +4,16 @@
  */
 package org.virbo.jythonsupport;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 import java.util.Map;
 import org.das2.util.filesystem.FileSystem;
@@ -21,6 +27,7 @@ import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  * Utilities for jython scripts in both the datasource and application contexts.
@@ -97,6 +104,34 @@ public class Util {
      */
     public static QDataSet getDataSet(String surl) throws Exception {
         return getDataSet(surl, null);
+    }
+
+    /**
+     * load data from the input stream into Autoplot internal data model.  This
+     * will block until the load is complete.  This works by creating a temporary
+     * file and then using the correct reader to read the data.  When the data source
+     * is able to read directly from a stream, no temporary file is created.  Currently
+     * this always loads to a file, and therefore does not support applets.
+     *
+     * @param ext the extension and any parsing parameters, such as "vap+bin:?recLength=2000&rank2=1:"
+     * @param in
+     * @return
+     * @throws java.lang.Exception
+     */
+    public static QDataSet getDataSet( String spec, InputStream in, ProgressMonitor mon ) throws Exception {
+        String[] ss= spec.split(":",-2);
+        String ext;
+        int i= ss[0].indexOf("+");
+        ext= (i==-1) ? ss[0] : ss[0].substring(i+1);
+        File f= File.createTempFile("autoplot", "."+ext );
+
+        ReadableByteChannel chin= Channels.newChannel(in);
+        WritableByteChannel chout= new FileOutputStream(f).getChannel();
+        DataSourceUtil.transfer(chin, chout);
+
+        String virtUrl= ss[0]+":"+ f.toURI().toString() + ss[1];
+        QDataSet ds= getDataSet(virtUrl,mon);
+        return ds;
     }
     
     /**
