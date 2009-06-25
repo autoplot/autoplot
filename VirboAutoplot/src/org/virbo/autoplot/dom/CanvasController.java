@@ -203,6 +203,14 @@ public class CanvasController extends DomNodeController {
 
     void removeGaps() {
         removeGapsAndOverlaps(Arrays.asList(canvas.getRows()));
+        repaintSoon();
+    }
+
+    /**
+     * the das2 canvas doesn't always repaint when it should, so this
+     * allows clients to force a repaint in about 100 ms.
+     */
+    void repaintSoon() {
         repaintSoonTimer.restart();
     }
 
@@ -234,7 +242,7 @@ public class CanvasController extends DomNodeController {
         removeGapsAndOverlaps(rows);
 
         lock.unlock();
-        repaintSoonTimer.restart();
+        repaintSoon();
     }
 
     /**
