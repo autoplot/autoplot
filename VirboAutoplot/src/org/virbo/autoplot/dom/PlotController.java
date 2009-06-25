@@ -87,6 +87,18 @@ public class PlotController extends DomNodeController {
 
     };
 
+    private Canvas getCanvasForPlot() {
+        Canvas[] cc= dom.getCanvases();
+        for ( Canvas c: cc ) {
+            for ( Row r: c.getRows() ) {
+                if ( r.getId().equals(plot.getRowId()) ) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
     private PropertyChangeListener labelListener= new PropertyChangeListener() {
          public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals(Plot.PROP_TITLE) ) {
