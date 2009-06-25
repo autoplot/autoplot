@@ -87,6 +87,11 @@ public class PlotController extends DomNodeController {
 
     };
 
+    /**
+     * return the Canvas containing this plot, or null if this cannot be resolved.
+     * 
+     * @return
+     */
     private Canvas getCanvasForPlot() {
         Canvas[] cc= dom.getCanvases();
         for ( Canvas c: cc ) {
