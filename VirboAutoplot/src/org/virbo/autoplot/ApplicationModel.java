@@ -53,7 +53,6 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Row;
-import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
