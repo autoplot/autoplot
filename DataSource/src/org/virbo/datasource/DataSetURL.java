@@ -283,11 +283,17 @@ public class DataSetURL {
             ext = uri.getScheme().substring(0, i);
 
         } else {
-            URL url = getWebURL(uri);
+            int i2 = uri.getScheme().indexOf("+");
+            if ( i2!=-1 ) {
+                ext= uri.getScheme().substring(i2+1);
+            } else {
 
-            String file = url.getPath();
-            i = file.lastIndexOf(".");
-            ext = i == -1 ? "" : file.substring(i);
+                URL url = getWebURL(uri);
+
+                String file = url.getPath();
+                i = file.lastIndexOf(".");
+                ext = i == -1 ? "" : file.substring(i);
+            }
         }
         return DataSourceRegistry.getInstance().getFormatByExt(ext);
 
