@@ -2,15 +2,6 @@
 
 dom= getDocumentModel()
 
-#only uses URI to get time aggregation...
-uri= dom.dataSourceFilters[0].uri
-if ( uri.find('%25')!=-1 ): # unescaped code
-  uri= uri.replace( '%25', '$' )
-
-#TODO: check for URI template, because if it's not there we get a strange error message
-#if ( uri.indexOf('%Y')==-1 and uri.indexOf('$Y')==-1 and url.indexOf('%y')==-1 and url.indexOf('$y')==-1 ):
-#   print 'URI isn''t a template, this is going to cause problems'
-
 def myWriteToPng( filename, appmodel, dom, width, height ):
   appmodel.waitUntilIdle(False);
   from org.das2.util import DasPNGEncoder, DasPNGConstants
@@ -54,12 +45,14 @@ def doBatch( times, dom, outputFolder, product, timeFormat, mon ):
 
    mon.setProgressMessage('making images')
 
+   tp= TimeParser.create(timeFormat)
+
    count= 0
    for i in times:
       count= count+1
       if ( mon.cancelled ): break
       mon.setTaskProgress(count)
-      dom2.timeRange= DatumRangeUtil.parseTimeRangeValid(i)
+      dom2.timeRange= tp.parse(i).getTimeRange()
       mon.setProgressMessage('write '+ product + '_%s.png' % i )
       myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom2, w0, h0 )
 
@@ -79,6 +72,10 @@ p.add( JLabel( 'Output Folder:' ) )
 outputFolderTf= JTextField( '/tmp/pngwalk/' )
 p.add( outputFolderTf )
 
+p.add( JLabel( 'Time Format:' ) )
+timeFormatTf= JTextField( '%Y%m%d' )
+p.add( timeFormatTf )
+
 p.add( JLabel( 'Time Range:' ) )
 timeRangeTf= JTextField( '2009' )
 p.add( timeRangeTf )
@@ -92,6 +89,7 @@ if ( JOptionPane.showConfirmDialog( getViewWindow(), p, 'pngwalk options', JOpti
   outputFolder= outputFolderTf.text
   timeRangeStr= timeRangeTf.text
   fln_root=  fln_rootTf.text
+  timeFormat= timeFormatTf.text
   proceed= True
 else:
   proceed= False
@@ -100,12 +98,10 @@ from org.virbo.autoplot import ApplicationModel
 
 if ( proceed ):
 
-   timeFormat= '%Y%m%d'
-
    from org.das2.components import DasProgressPanel
    mon= DasProgressPanel.createFramed( getViewWindow(),"running batch")
 
-   times= getTimeRangesFor( uri, timeRangeStr, timeFormat )
+   times= generateTimeRanges( timeFormat, timeRangeStr )
 
    doBatch( times, dom, outputFolder, fln_root, timeFormat, mon )
 
