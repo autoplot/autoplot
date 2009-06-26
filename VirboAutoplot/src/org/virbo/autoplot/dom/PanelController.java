@@ -478,6 +478,7 @@ public class PanelController extends DomNodeController {
      */
     private void maybeSetPlotAutorange() {
         Plot p= dom.controller.getPlotFor(panel);
+        if ( p==null ) return;
         List<Panel> panels= dom.controller.getPanelsFor(p);
         if ( panels.size()==1 ) {
             p.getXaxis().setAutorange(true);
@@ -735,7 +736,15 @@ public class PanelController extends DomNodeController {
 
     }
 
-    private static void guessCadence(MutablePropertyDataSet xds, QDataSet fillDs) {
+    /**
+     * guess the cadence of the dataset tags, putting the rank 0 dataset cadence
+     * into the property QDataSet.CADENCE of the tags ds.  fillDs is used to
+     * identify missing values, which are skipped for the cadence guess.
+     *
+     * @param xds the tags for which the cadence is determined.
+     * @param fillDs a dependent dataset possibly will fill values, or null.
+     */
+    private static void guessCadence( MutablePropertyDataSet xds, QDataSet fillDs ) {
         if ( xds.length()<2 ) return;
 
         RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
