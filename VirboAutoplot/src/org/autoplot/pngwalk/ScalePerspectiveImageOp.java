@@ -34,6 +34,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
     int nh;
     private int w1;
     private int h1;
+    private int rh1; // reflection height
 
     /**
      *
@@ -43,18 +44,20 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
      * @param y1 upper left hand corner ( when p=0 )
      * @param w1 new width
      * @param h1 new height at the middle
+     * @param rh1 extra height for the reflection
      * @param p rockiness
      */
-    public ScalePerspectiveImageOp(int w, int h, int x1, int y1, int w1, int h1, double p) {
+    public ScalePerspectiveImageOp(int w, int h, int x1, int y1, int w1, int h1, int rh1, double p) {
         this.w = w;
         this.h = h;
         this.w1 = w1;
         this.h1= h1;
+        this.rh1= rh1 * h / h1;
         this.x1= x1;
         this.y1= y1;
         this.p = p;
         this.nw = (int) w1;
-        this.nh = (int) h1;
+        this.nh = (int) h1 + rh1;
         this.ssx= Math.max( 1, w / w1 / 2 );
         if ( p!=0 ) {
             this.ssy= 1;
@@ -112,6 +115,8 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         for ( int k2=0; k2<w/ssx; k2++ ) ii[k2]= k2*ssx;
         ii[w/ssx]= w-1;
 
+        boolean reflect= true;
+
         for ( int k1 = 0; k1 < jj.length; k1++ ) {
             int j= jj[k1];
             for ( int k2 = 0; k2<ii.length; k2++ ) {
@@ -120,8 +125,10 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                 int color = src.getRGB(i,j);
 
                 int i1 = x1 + (int) (i * w1 / w );
-                int pp = (int) Math.round( p>0 ? ( i * p)  : ( ( i-w ) *p ) );
-                int j1 = y1 + (int) (((j * (1000 - pp * 2)) + pp * h) * h1 / h / 1000 );
+                double pp = p>0 ? ( i * p)  : ( ( i-w ) *p );
+                double hai= h1 - 2 * pp;
+                int j1= y1 + (int) ( pp + j * ( hai / h ) );
+                //int j1 = y1 + (int) (((j * (1000 - pp * 2)) + pp * h) * h1 / h / 1000 );
                 int didx = index(i1, j1);
                 int weight;
                 if (hasBg) {
@@ -135,6 +142,26 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                 bb[didx] += weight * ((color >> 0 & 0xff) - AVG);
                 aa[didx] += weight;
                 nn[didx] += 255;
+
+                if ( reflect ) {
+
+                    j1= (int) ( pp + hai + (h-j) * ( hai / h ) );
+                    //j1 = ( y1 + (int) (((j * (1000 - pp * 2)) + pp * h) * h1 / h / 1000 ) ) + j/10;
+
+                    didx = index(i1, j1);
+
+                    weight = (color >> 24 & 0xff);
+
+                    double	ww1 = Math.max( 1,weight * ( ( (0.4 ) / (rh1) ) *(j - (h-rh1) ) ) );
+
+
+                    rr[didx] += 255*((color >> 16 & 0xff) - AVG);
+                    gg[didx] += 255*((color >> 8 & 0xff) - AVG);
+                    bb[didx] += 255*((color >> 0 & 0xff) - AVG);
+                    aa[didx] += ww1;
+                    nn[didx] += 255;
+
+                }
             }
         }
 
