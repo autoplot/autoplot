@@ -12,6 +12,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -119,8 +120,39 @@ public class ApplicationController extends DomNodeController implements RunLater
         eventListener = AWTEventMulticaster.add(eventListener, list);
     }
 
+    public Application getApplication() {
+        return application;
+    }
+
+    public ApplicationModel getApplicationModel() {
+        return model;
+    }
+
     public void removeActionListener(ActionListener list) {
         AWTEventMulticaster.remove(eventListener, list);
+    }
+
+    PropertyChangeSupport das2PeerListenerSupport= new DebugPropertyChangeSupport(this);
+
+    /**
+     * kludgy way to decouple the context menus from the DOM tree.
+     * @param listener
+     */
+    public synchronized void addDas2PeerChangeListener(PropertyChangeListener listener) {
+        das2PeerListenerSupport.addPropertyChangeListener(listener);
+        if ( application.getPlots(0).getController()!=null ) {
+            das2PeerListenerSupport.firePropertyChange( "das2peer", null, application.getPlots(0).getController() );
+        }
+    }
+
+
+    /**
+     * this is decouple the context menus from the DOM.  We'll keep a list of
+     * interested parties and let them add context menus.
+     * @param aThis
+     */
+    void maybeAddContextMenus(PlotController aThis) {
+        das2PeerListenerSupport.firePropertyChange( "das2peer", null, aThis );
     }
 
     private void fireActionEvent(ActionEvent e) {
@@ -426,7 +458,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * adds a context overview plotId below the plotId.
      * @param domPlot
      */
-    protected void addConnector(Plot domPlot, Plot that) {
+    public void addConnector(Plot domPlot, Plot that) {
         logger.fine( "addConnector("+domPlot+","+that+")" );
         List<Connector> connectors = new ArrayList<Connector>(Arrays.asList(application.getConnectors()));
         final Connector connector = new Connector(domPlot.getId(), that.getId());
@@ -676,7 +708,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param dsf
      * @return
      */
-    protected Plot copyPlotAndPanels(Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
+    public Plot copyPlotAndPanels(Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
         List<Panel> p = getPanelsFor(domPlot);
 
         MutatorLock lock = mutatorLock();
