@@ -12,7 +12,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -21,10 +20,6 @@ import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColumn;
 import org.das2.util.DasMath;
-import org.das2.util.PersistentStateSupport;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,9 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -117,40 +110,6 @@ public class AutoplotUtil {
         result.resize();
         System.err.println(result.getBounds());
         return result;
-    }
-
-    /**
-     * creates an icon for the dataset.  Presently this just grabs the autoplot canvas image,
-     * but it should really create a small canvas and let das2 reduce the data before
-     * rendering it.
-     * @param model
-     * @param surl
-     * @return
-     */
-    public static ImageIcon createIcon(ApplicationModel model, String surl) {
-        try {
-            QDataSet ds = org.virbo.jythonsupport.Util.getDataSet(surl);
-            DasCanvas c = new DasCanvas(320, 320);
-            c.setSize(320, 320);
-            DasPlot p = AutoplotUtil.createPlot(c, ds, null, null);
-            p.getRow().setMinimum(0);
-            p.getRow().setMaximum(1);
-            p.getColumn().setMinimum(0);
-            p.getColumn().setMaximum(1);
-            JFrame f = new JFrame();
-            f.getContentPane().add(c);
-            BufferedImage image = (BufferedImage) c.getImage(320, 320);
-            return scaleIcon(new ImageIcon(image), 64, 48);
-        } catch (Exception e) {
-            BufferedImage image;
-            try {
-                image = ImageIO.read(AutoplotUtil.class.getResource("/org/virbo/autoplot/resources/error-icon.png"));
-            } catch (IOException ex) {
-                Logger.getLogger(AutoplotUtil.class.getName()).log(Level.SEVERE, null, ex);
-                throw new RuntimeException(ex);
-            }
-            return new ImageIcon(image);
-        }
     }
 
     /**
@@ -846,35 +805,6 @@ public class AutoplotUtil {
             }
         }
         return result;
-    }
-
-    public static PersistentStateSupport getPersistentStateSupport(final AutoPlotUI parent, final ApplicationModel applicationModel) {
-        final PersistentStateSupport stateSupport = new PersistentStateSupport(parent, null, "vap") {
-
-            protected void saveImpl(File f) throws IOException {
-                applicationModel.doSave(f);
-                applicationModel.addRecent(f.toURI().toString());
-                parent.setStatus("saved " + f);
-            }
-
-            protected void openImpl(final File file) throws IOException {
-                applicationModel.doOpen(file);
-                parent.setStatus("opened " + file);
-            }
-        };
-
-        stateSupport.addPropertyChangeListener(new PropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent ev) {
-                String label;
-                if (stateSupport.isCurrentFileOpened()) {
-                    label = stateSupport.getCurrentFile() + " " + (stateSupport.isDirty() ? "*" : "");
-                    parent.setMessage(label);
-                }
-            }
-        });
-
-        return stateSupport;
     }
 
     /**
