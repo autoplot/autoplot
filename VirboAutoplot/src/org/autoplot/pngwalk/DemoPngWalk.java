@@ -7,11 +7,14 @@ package org.autoplot.pngwalk;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import org.das2.datum.DatumRange;
 import org.das2.util.ArgumentList;
+import org.das2.util.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.datasource.DataSetURL;
@@ -89,7 +92,14 @@ public class DemoPngWalk {
                 if ( i0==-1 ) i0= template.indexOf("_%Y");
                 int i1 = s.indexOf(".png");
                 if ( i1==-1 ) return;
+                TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
                 String timeRange = s.substring(i0 + 1, i1);
+                try {
+                    DatumRange dr= tp.parse(timeRange).getTimeRange();
+                    timeRange= dr.toString().replaceAll(" ", "+");
+                } catch ( ParseException ex ) {
+                    throw new RuntimeException(ex);
+                }
                 String productFile = template.substring(0, i0) + ".vap";
 
                 final String suri = productFile + "?timeRange=" + timeRange;
