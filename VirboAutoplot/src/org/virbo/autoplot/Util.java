@@ -74,7 +74,7 @@ public class Util {
      * @return one line per jar
      */
     public static List<String> getBuildInfos() throws IOException {
-        Enumeration<URL> urls = AutoPlotUI.class.getClassLoader().getResources("META-INF/build.txt");
+        Enumeration<URL> urls = Util.class.getClassLoader().getResources("META-INF/build.txt");
 
         List<String> result = new ArrayList<String>();
 
