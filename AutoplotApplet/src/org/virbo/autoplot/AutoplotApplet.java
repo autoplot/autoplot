@@ -60,8 +60,6 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetSelectorSupport;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceRegistry;
@@ -84,7 +82,7 @@ public class AutoplotApplet extends JApplet {
     String timeCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090610.2";
+    public static final String VERSION = "20090624.1";
     private Image splashImage;
 
     private String getStringParameter(String name, String deft) {
@@ -367,25 +365,6 @@ public class AutoplotApplet extends JApplet {
 
         getContentPane().setLayout(new BorderLayout());
 
-        if (getParameter("select") != null) {
-            final DataSetSelector select = new DataSetSelector();
-
-            if (getCodeBase() != null) {
-                select.setValue(getCodeBase().toString());
-            }
-            select.addActionListener(new ActionListener() {
-
-                public void actionPerformed(ActionEvent e) {
-                    System.err.println("actionPerformed()");
-                    System.err.println("  " + select.getValue());
-                    setDataSetURL(select.getValue());
-                }
-            });
-
-            getContentPane().add(select, BorderLayout.NORTH);
-
-        }
-
         System.err.println("done set parameters @ " + (System.currentTimeMillis() - t0) + " msec");
 
         // createAppletTester();
@@ -641,7 +620,7 @@ public class AutoplotApplet extends JApplet {
 
                 public void run() {
                     if (surl.equals("about:plugins")) {
-                        String text = DataSetSelectorSupport.getPluginsText();
+                        String text = DataSourceRegistry.getPluginsText();
                         JOptionPane.showMessageDialog(AutoplotApplet.this, text);
                         return;
 
