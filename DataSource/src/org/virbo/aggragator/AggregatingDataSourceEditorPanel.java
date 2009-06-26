@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.datasource.URLSplit;
 
 /**
@@ -122,7 +123,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
             String delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUrl(url);
             if ( delegateEditorPanel==null ) {
-                delegateEditorPanel = DataSetURL.getDataSourceEditorPanel(new URI(delegateUrl));
+                delegateEditorPanel = DataSourceEditorPanelUtil.getDataSourceEditorPanel(new URI(delegateUrl));
             }
             if ( delegateEditorPanel==null ) {
                 JPanel delegateP= new JPanel(new BorderLayout());

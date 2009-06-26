@@ -37,7 +37,6 @@ import java.util.logging.Logger;
 import org.das2.DasApplication;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.LocalFileSystem;
-import org.virbo.aggragator.AggregatingDataSourceEditorPanel;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -299,32 +298,6 @@ public class DataSetURL {
 
     }
 
-    /**
-     * @param uri
-     * @return an EditorPanel or null if one is not found.
-     */
-    public static DataSourceEditorPanel getDataSourceEditorPanel(URI uri) {
-        String surl = uri.toString();
-        String ext = DataSetURL.getExt(surl);
-
-        if (isAggregating(uri.toString())) {
-            String eext = DataSetURL.getExplicitExt(uri.toString());
-            if (eext != null) {
-                AggregatingDataSourceEditorPanel result = new AggregatingDataSourceEditorPanel();
-                DataSourceEditorPanel edit = DataSourceRegistry.getInstance().getEditorByExt(eext);
-                if (edit != null) {
-                    result.setDelegateEditorPanel(edit);
-                }
-                return result;
-            } else {
-                return new AggregatingDataSourceEditorPanel();
-            }
-
-        }
-
-        DataSourceEditorPanel edit = DataSourceRegistry.getInstance().getEditorByExt(ext);
-        return edit;
-    }
 
     /**
      * get the datasource factory for the URL.

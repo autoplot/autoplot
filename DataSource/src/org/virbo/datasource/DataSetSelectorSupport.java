@@ -139,24 +139,7 @@ public class DataSetSelectorSupport {
     }
 
     public static String getPluginsText() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("<html>");
-        {
-            buf.append("<h1>Plugins by Extension:</h1>");
-            Map m = DataSourceRegistry.getInstance().dataSourcesByExt;
-            for (Object k : m.keySet()) {
-                buf.append("" + k + ": " + m.get(k) + "<br>");
-            }
-        }
-        {
-            buf.append("<h1>Plugins by Mime Type:</h1>");
-            Map m = DataSourceRegistry.getInstance().dataSourcesByMime;
-            for (Object k : m.keySet()) {
-                buf.append("" + k + ": " + m.get(k) + "<br>");
-            }
-        }
-        buf.append("</html>");
-        return buf.toString();
+        return DataSourceRegistry.getPluginsText();
     }
 
     JMenu recentMenu() {

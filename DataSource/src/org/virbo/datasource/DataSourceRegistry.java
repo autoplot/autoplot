@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -157,7 +158,7 @@ public class DataSourceRegistry {
      * @param name, such as "http://autoplot.org/data/autoplot.gif"
      * @return extension, such as ".gif"
      */
-    private static String getExtension( String name ) {
+    protected static String getExtension( String name ) {
         if (name.indexOf('.') == -1 ) name= "."+name;
         if ( name.indexOf('.') > 0 ) {
             int i= name.lastIndexOf('.');
@@ -204,29 +205,6 @@ public class DataSourceRegistry {
         
     }
     
-    public DataSourceEditorPanel getEditorByExt(String extension) {
-        if ( extension==null ) return null;
-        extension= getExtension(extension);
-        Object o = dataSourceEditorByExt.get(extension);
-        if (o == null) {
-            return null;
-        }
-
-        DataSourceEditorPanel result;
-        if (o instanceof String) {
-            try {
-                Class clas = Class.forName((String) o);
-                Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
-                result = ( DataSourceEditorPanel) constructor.newInstance(new Object[]{});
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        } else {
-            result = ( DataSourceEditorPanel) o;
-        }
-        return result;        
-    }    
-
     public synchronized DataSourceFactory getSourceByMime(String mime) {
         if ( mime==null ) return null;
         Object o = dataSourcesByMime.get(mime.toLowerCase());
@@ -259,6 +237,17 @@ public class DataSourceRegistry {
     }
 
     /**
+     * returns a String of DataSourceEditor for the extention.  This should be
+     * used via DataSourceEditorPanelUtil. (This is introduced to remove the
+     * dependence on the swing library for clients that don't wish to use swing.)
+     * @param ext
+     * @return
+     */
+    public synchronized Object getDataSourceEditorByExt( String ext ) {
+        return this.dataSourceEditorByExt.get(ext);
+    }
+
+    /**
      * return the extension for the factory.
      * @param factory
      * @return
@@ -268,6 +257,27 @@ public class DataSourceRegistry {
             if ( dataSourcesByExt.get(ext)==factory ) return ext;
         }
         return null;
+    }
+
+    public static String getPluginsText() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("<html>");
+        {
+            buf.append("<h1>Plugins by Extension:</h1>");
+            Map m = DataSourceRegistry.getInstance().dataSourcesByExt;
+            for (Object k : m.keySet()) {
+                buf.append("" + k + ": " + m.get(k) + "<br>");
+            }
+        }
+        {
+            buf.append("<h1>Plugins by Mime Type:</h1>");
+            Map m = DataSourceRegistry.getInstance().dataSourcesByMime;
+            for (Object k : m.keySet()) {
+                buf.append("" + k + ": " + m.get(k) + "<br>");
+            }
+        }
+        buf.append("</html>");
+        return buf.toString();
     }
     
 }
