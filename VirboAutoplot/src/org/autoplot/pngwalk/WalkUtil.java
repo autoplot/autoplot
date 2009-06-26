@@ -14,11 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.fsm.FileStorageModel;
-import org.das2.util.FileUtil;
+import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
-import org.virbo.aggragator.AggregatingDataSourceFactory;
 
 /**
  *
@@ -74,10 +72,10 @@ public class WalkUtil {
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
 
         i = splitIndex(sansArgs);
-        FileSystem fs = FileSystem.create( new URL(sansArgs.substring(0, i)) );
-        String spec= sansArgs.substring(i).replaceAll("\\$", "%");
-        FileStorageModel fsm=null;
-        if ( spec.contains("%Y")||spec.contains("%y") ) fsm= FileStorageModel.create( fs, spec );
+        FileSystem fs = FileSystem.create( new URL(sansArgs.substring(0, i+1)) );
+        String spec= sansArgs.substring(i+1).replaceAll("\\$", "%");
+        FileStorageModelNew fsm=null;
+        if ( spec.contains("%Y")||spec.contains("%y") ) fsm= FileStorageModelNew.create( fs, spec );
 
         String[] ss;
         if ( fsm!=null ) {
