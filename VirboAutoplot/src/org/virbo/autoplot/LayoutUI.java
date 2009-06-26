@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
+import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -38,6 +39,7 @@ import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.CanvasController;
 import org.virbo.autoplot.dom.Column;
+import org.virbo.autoplot.dom.DomOps;
 import org.virbo.autoplot.dom.Options;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.PanelStyle;
@@ -100,13 +102,7 @@ public class LayoutUI extends javax.swing.JPanel {
     ;
     Map<Component, JPopupMenu> contextMenus = null;
 
-    private synchronized void createPopupMenus() {
-        contextMenus = new HashMap<Component, JPopupMenu>();
-
-        JPopupMenu plotContextMenu = new JPopupMenu();
-
-        JMenuItem item;
-        item = new JMenuItem(new AbstractAction("Remove Bindings") {
+    Action removeBindingsAction= new AbstractAction("Remove Bindings") {
 
             public void actionPerformed(ActionEvent e) {
                 Plot domPlot = app.getController().getPlot();
@@ -116,11 +112,9 @@ public class LayoutUI extends javax.swing.JPanel {
                 }
                 app.getController().unbind(domPlot);
             }
-        });
-        item.setToolTipText("remove any plot and panel property bindings");
-        plotContextMenu.add(item);
+        };
 
-        item = new JMenuItem(new AbstractAction("Edit Plot Properties") {
+        Action editPlotPropertiesAction= new AbstractAction("Edit Plot Properties") {
 
             public void actionPerformed(ActionEvent e) {
                 DasPlot component= (DasPlot)canvasLayoutPanel1.getComponent();
@@ -136,10 +130,9 @@ public class LayoutUI extends javax.swing.JPanel {
                     edit.showDialog(LayoutUI.this);
                 }
             }
-        });
-        plotContextMenu.add(item);
+        };
 
-        item = new JMenuItem(new AbstractAction("Delete Plot") {
+        Action deletePlotAction= new AbstractAction("Delete Plot") {
 
             public void actionPerformed(ActionEvent e) {
                 List<Object> os= canvasLayoutPanel1.getSelectedComponents();
@@ -164,10 +157,9 @@ public class LayoutUI extends javax.swing.JPanel {
                     }
                 }
             }
-        });
-        plotContextMenu.add(item);
+        };
 
-        item = new JMenuItem(new AbstractAction("Add Plots...") {
+        Action addPlotsAction= new AbstractAction("Add Plots...") {
 
             public void actionPerformed(ActionEvent e) {
                 AddPlotsDialog dia= new AddPlotsDialog();
@@ -201,10 +193,17 @@ public class LayoutUI extends javax.swing.JPanel {
                      }
                 }
             }
-        });
-        plotContextMenu.add(item);
+        };
 
-        contextMenus.put(canvasLayoutPanel1, plotContextMenu);
+
+
+
+    private synchronized void createPopupMenus() {
+        contextMenus = new HashMap<Component, JPopupMenu>();
+
+        JMenuItem item;
+
+        contextMenus.put( canvasLayoutPanel1, plotActionsMenu );
 
         JPopupMenu panelContextMenu = new JPopupMenu();
 
@@ -335,6 +334,36 @@ public class LayoutUI extends javax.swing.JPanel {
         panelListComponent.setModel(panelList);
     }
 
+    /**
+     * return a list of the selected plots, with the primary selection the first
+     * item.
+     * @return
+     */
+    private List<Plot> getSelectedPlots( ) {
+        List<Object> os= canvasLayoutPanel1.getSelectedComponents();
+        List<Plot> result= new ArrayList();
+
+        for ( Object o: os ) {
+            if (app.getPlots().length > 1) {
+                Plot domPlot=null;
+                if ( o instanceof Component ) {
+                    domPlot= app.getController().getPlotFor((Component)o);
+                }
+                if ( domPlot==null ) continue;
+                result.add(domPlot);
+            }
+        }
+        Object o= canvasLayoutPanel1.getComponent();
+        if ( o instanceof Component ) {
+            Plot domPlot= app.getController().getPlotFor((Component)o);
+            if ( domPlot!=null ) {
+                result.remove(domPlot);
+                result.add(0, domPlot);
+            }
+        }
+        return result;
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -344,11 +373,58 @@ public class LayoutUI extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        plotActionsMenu = new javax.swing.JPopupMenu();
+        plotMenu = new javax.swing.JMenu();
+        propertiesMenuItem = new javax.swing.JMenuItem(editPlotPropertiesAction);
+        deleteMenuItem = new javax.swing.JMenuItem(deletePlotAction);
+        addPlotsBelowMenuItem = new javax.swing.JMenuItem(addPlotsAction);
+        removeBindingsMenuItem = new javax.swing.JMenuItem(removeBindingsAction);
+        plotsMenu = new javax.swing.JMenu();
+        swapMenuItem = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         panelListComponent = new javax.swing.JList();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         canvasLayoutPanel1 = new org.virbo.autoplot.util.CanvasLayoutPanel();
+
+        plotMenu.setText("Plot");
+
+        propertiesMenuItem.setText("Properties...");
+        propertiesMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                propertiesMenuItemActionPerformed(evt);
+            }
+        });
+        plotMenu.add(propertiesMenuItem);
+
+        deleteMenuItem.setText("Delete");
+        deleteMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteMenuItemActionPerformed(evt);
+            }
+        });
+        plotMenu.add(deleteMenuItem);
+
+        addPlotsBelowMenuItem.setText("Add Plots Below...");
+        plotMenu.add(addPlotsBelowMenuItem);
+
+        removeBindingsMenuItem.setText("Remove Bindings");
+        removeBindingsMenuItem.setToolTipText("Remove bindings to other parts of the application");
+        plotMenu.add(removeBindingsMenuItem);
+
+        plotActionsMenu.add(plotMenu);
+
+        plotsMenu.setText("Plots");
+
+        swapMenuItem.setText("Swap Position");
+        swapMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                swapMenuItemActionPerformed(evt);
+            }
+        });
+        plotsMenu.add(swapMenuItem);
+
+        plotActionsMenu.add(plotsMenu);
 
         panelListComponent.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -388,11 +464,70 @@ public class LayoutUI extends javax.swing.JPanel {
                     .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void propertiesMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_propertiesMenuItemActionPerformed
+        DasPlot component= (DasPlot)canvasLayoutPanel1.getComponent();
+                Plot domPlot = app.getController().getPlotFor(component);
+                List<Object> components= canvasLayoutPanel1.getSelectedComponents();
+                Plot[] plots= new Plot[components.size()];
+                for ( int i=0; i<components.size(); i++ ) plots[i]= app.getController().getPlotFor( (Component) components.get(i) );
+                if ( components.size()>1 ) {
+                    PropertyEditor edit = PropertyEditor.createPeersEditor(domPlot,plots);
+                    edit.showDialog(LayoutUI.this);
+                } else {
+                    PropertyEditor edit = new PropertyEditor(domPlot);
+                    edit.showDialog(LayoutUI.this);
+                }
+}//GEN-LAST:event_propertiesMenuItemActionPerformed
+
+    private void deleteMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteMenuItemActionPerformed
+                        List<Object> os= canvasLayoutPanel1.getSelectedComponents();
+                for ( Object o: os ) {
+                    if (app.getPlots().length > 1) {
+                        Plot domPlot=null;
+                        if ( o instanceof Component ) {
+                            domPlot= app.getController().getPlotFor((Component)o);
+                        }
+                        if ( domPlot==null ) continue;
+                        List<Panel> panels = app.getController().getPanelsFor(domPlot);
+                        for (Panel pan : panels) {
+                            if (app.getPanels().length > 1) {
+                                app.getController().deletePanel(pan);
+                            } else {
+                                app.getController().setStatus("warning: the last panel may not be deleted");
+                            }
+                        }
+                        app.getController().deletePlot(domPlot);
+                    } else {
+                        app.getController().setStatus("warning: last plot may not be deleted");
+                    }
+                }
+
+    }//GEN-LAST:event_deleteMenuItemActionPerformed
+
+    private void swapMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_swapMenuItemActionPerformed
+        List<Plot> plots= getSelectedPlots();
+        if ( plots.size()==2 ) {
+            DomOps.swapPosition( plots.get(0), plots.get(1) );
+            this.app.getController().setStatus("swapped "+plots.get(0)+ " and " +plots.get(1) );
+        } else {
+            this.app.getController().setStatus("warning: select two plots");
+        }
+    }//GEN-LAST:event_swapMenuItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem addPlotsBelowMenuItem;
     private org.virbo.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
+    private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JList panelListComponent;
+    private javax.swing.JPopupMenu plotActionsMenu;
+    private javax.swing.JMenu plotMenu;
+    private javax.swing.JMenu plotsMenu;
+    private javax.swing.JMenuItem propertiesMenuItem;
+    private javax.swing.JMenuItem removeBindingsMenuItem;
+    private javax.swing.JMenuItem swapMenuItem;
     // End of variables declaration//GEN-END:variables
 }
