@@ -55,6 +55,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
+import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
 import org.das2.util.filesystem.FileSystem;
@@ -73,6 +74,7 @@ import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
+import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
@@ -129,6 +131,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
 
+        if ( DasApplication.getDefaultApplication().isHeadless() ) {
+            model.setExceptionHandler( DasApplication.getDefaultApplication().getExceptionHandler() );
+        } else {
+            model.setExceptionHandler( new GuiExceptionHandler() );
+        }
+
         ScriptContext.setApplicationModel(model);
         ScriptContext.setView(this);
 
@@ -153,6 +161,17 @@ public class AutoPlotUI extends javax.swing.JFrame {
         dataSetSelector.setMonitorFactory( dom.getController().getMonitorFactory() );
 
         final ApplicationController appController= applicationModel.getDocumentModel().getController();
+
+        appController.addDas2PeerChangeListener( new PropertyChangeListener() {
+            public void propertyChange( PropertyChangeEvent e ) {
+                PlotController plotController= (PlotController) e.getNewValue();
+                ApplicationController controller= plotController.getApplication().getController();
+                support.addPlotContextMenuItems( controller, plotController.getDasPlot(), plotController, plotController.getPlot() );
+                support.addAxisContextMenuItems(  controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getXaxis());
+                support.addAxisContextMenuItems( controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getYaxis());
+                support.addAxisContextMenuItems(  controller,  plotController.getDasPlot(), plotController,  plotController.getPlot(), plotController.getPlot().getZaxis());
+            }
+        } );
 
         appController.addPropertyChangeListener( ApplicationController.PROP_FOCUSURI, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -181,7 +200,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
 
-        stateSupport = AutoplotUtil.getPersistentStateSupport(this, applicationModel);
+        stateSupport = getPersistentStateSupport(this, applicationModel);
 
         fillFileMenu();
 
@@ -715,6 +734,35 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bookmarksMenu.add(new JSeparator());
 
         addBookmarks(bookmarksMenu, bookmarks);
+    }
+
+    public static PersistentStateSupport getPersistentStateSupport(final AutoPlotUI parent, final ApplicationModel applicationModel) {
+        final PersistentStateSupport stateSupport = new PersistentStateSupport(parent, null, "vap") {
+
+            protected void saveImpl(File f) throws IOException {
+                applicationModel.doSave(f);
+                applicationModel.addRecent(f.toURI().toString());
+                parent.setStatus("saved " + f);
+            }
+
+            protected void openImpl(final File file) throws IOException {
+                applicationModel.doOpen(file);
+                parent.setStatus("opened " + file);
+            }
+        };
+
+        stateSupport.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent ev) {
+                String label;
+                if (stateSupport.isCurrentFileOpened()) {
+                    label = stateSupport.getCurrentFile() + " " + (stateSupport.isDirty() ? "*" : "");
+                    parent.setMessage(label);
+                }
+            }
+        });
+
+        return stateSupport;
     }
 
     /** This method is called from within the constructor to
