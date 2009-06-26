@@ -87,6 +87,10 @@ public class PlotController extends DomNodeController {
 
     };
 
+    public Plot getPlot() {
+        return plot;
+    }
+
     /**
      * return the Canvas containing this plot, or null if this cannot be resolved.
      * 
@@ -194,12 +198,7 @@ public class PlotController extends DomNodeController {
         new AxisController(application, this.plot.getZaxis(), colorbar);
 
         this.plot.controller.bindTo(dasPlot1);
-
-        ac.support.addPlotContextMenuItems(dasPlot1, this, this.plot);
-        ac.support.addAxisContextMenuItems(dasPlot1, this, this.plot, this.plot.getXaxis());
-         ac.support.addAxisContextMenuItems(dasPlot1, this, this.plot, this.plot.getYaxis());
-         ac.support.addAxisContextMenuItems(dasPlot1, this, this.plot, this.plot.getZaxis());
-
+        
         logger.fine("add focus listener to " + dasPlot1);
         dasPlot1.addFocusListener(ac.focusAdapter);
         dasPlot1.getXAxis().addFocusListener(ac.focusAdapter);
@@ -221,6 +220,9 @@ public class PlotController extends DomNodeController {
 
         this.dasPlot = dasPlot1;
         this.dasColorBar = colorbar;
+
+        application.controller.maybeAddContextMenus( this );
+
     }
 
 
