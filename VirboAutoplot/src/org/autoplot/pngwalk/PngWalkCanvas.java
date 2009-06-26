@@ -94,7 +94,87 @@ public class PngWalkCanvas extends JPanel {
     
     Map<Image, Image> rightThumbsCache = new HashMap();
     Map<Image, Image> leftThumbsCache = new HashMap();
-    // keep track of the last drawn image to avoid flicker
+    Map<Image, Image> thumbsCache= new HashMap();
+
+    synchronized BufferedImage getRightImage( Image image, int width, int height, Rectangle bounds ) {
+        double magp= 0.02;
+        Image cacheImage = rightThumbsCache.get(image);
+
+        if (cacheImage == null) {
+            BufferedImage im;
+            if (image instanceof BufferedImage) {
+                im = (BufferedImage) image;
+            } else {
+                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                if ( !im.getGraphics().drawImage(image, 0, 0, this) ) {
+                    return null;
+                }
+            }
+            addBorder(im,0.1);
+            ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
+                    0, 0, bounds.width, bounds.height, bounds.height/4,
+                    magp );
+            cacheImage= op.filter( im, null );
+            rightThumbsCache.put( image, cacheImage );
+            return (BufferedImage)cacheImage;
+        } else {
+            return (BufferedImage)cacheImage;
+        }
+    }
+
+    synchronized BufferedImage getLeftImage( Image image, int width, int height, Rectangle bounds ) {
+        double magp= 0.02;
+        Image cacheImage = leftThumbsCache.get(image);
+
+        if (cacheImage == null) {
+            BufferedImage im;
+            if (image instanceof BufferedImage) {
+                im = (BufferedImage) image;
+            } else {
+                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                if ( !im.getGraphics().drawImage(image, 0, 0, this) ) {
+                    return null;
+                }
+            }
+            addBorder(im,0.1);
+            ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
+                    0, 0, bounds.width, bounds.height, bounds.height/4,
+                    -1*magp );
+            cacheImage= op.filter( im, null );
+            leftThumbsCache.put( image, cacheImage );
+            return (BufferedImage)cacheImage;
+        } else {
+            return (BufferedImage)cacheImage;
+        }
+    }
+
+    synchronized BufferedImage getCacheImage( Image image, int width, int height, Rectangle bounds ) {
+        double magp= 0.00;
+        Image cacheImage = thumbsCache.get(image);
+
+        if (cacheImage == null) {
+            BufferedImage im;
+            if (image instanceof BufferedImage) {
+                im = (BufferedImage) image;
+            } else {
+                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                if ( !im.getGraphics().drawImage(image, 0, 0, this) ) {
+                    return null;
+                }
+            }
+            addBorder(im,0.1);
+            ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
+                    0, 0, bounds.width, bounds.height, bounds.height/2,
+                    -1*magp );
+            cacheImage= op.filter( im, null );
+            thumbsCache.put( image, cacheImage );
+            return (BufferedImage)cacheImage;
+        } else {
+            return (BufferedImage)cacheImage;
+        }
+    }
+
+    // keep track of the last drawn image to reduce flicker
     Image lastImage;
 
     @Override
@@ -170,8 +250,9 @@ public class PngWalkCanvas extends JPanel {
                 int y = CELL_PAD + targetSize / 2;
 
                 Rectangle bounds = bounds(x, y, width, height, targetSize, targetSize, 1.0, false);
-                
-                g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this);
+
+                BufferedImage im= getCacheImage( image, width, height, bounds );
+                g.drawImage(im, bounds.x, bounds.y, this);
                 
                 g.draw(bounds);
                 ylow = Math.max(bounds.y + bounds.height, ylow);
@@ -260,29 +341,16 @@ public class PngWalkCanvas extends JPanel {
                     if (newMethod) {
                         bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
 
-                        Image cacheImage = rightThumbsCache.get(image);
+                        BufferedImage cacheImage = getRightImage( image, width, height, bounds );
 
                         if (cacheImage == null) {
-                            BufferedImage im;
-                            if (image instanceof BufferedImage) {
-                                im = (BufferedImage) image;
-                            } else {
-                                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                                if ( !im.getGraphics().drawImage(image, 0, 0, this) ) {
-                                    continue;
-                                }
-                            }
-                            addBorder(im,0.1);
-                            ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
-                                    0, 0, bounds.width, bounds.height,
-                                    0.1);
-                            cacheImage= op.filter( im, null );
-                            rightThumbsCache.put( image, cacheImage );
+                            continue;
                         }
+
                         g.drawImage( cacheImage, bounds.x, bounds.y, this );
                         //g.draw(op.getOutline(bounds.x, bounds.y));
                     } else {
-                        bounds = bounds(x, y, width, height, targetSize, targetSize, 0.05, false);
+                        bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
                         g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this);
                         g.draw(bounds);
                     }
@@ -291,10 +359,27 @@ public class PngWalkCanvas extends JPanel {
                 } else if (index == currentIndex) {
                     int x = xm;
                     bounds = bounds(x, y, width, height, 360, height, 1.0, false);
-                    if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
+                    //if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
+                    //    lastImage = image;
+                    //}
+                    //g.draw(bounds);
+
+                    BufferedImage im;
+                    if (image instanceof BufferedImage) {
+                                im = (BufferedImage) image;
+                            } else {
+                                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                                if ( !im.getGraphics().drawImage(image, 0, 0, this) ) {
+                                    continue;
+                                }
+                            }
+                     addBorder(im,1);
+                    ScalePerspectiveImageOp op = new ScalePerspectiveImageOp( width, height,
+                            0, 0, bounds.width, bounds.height,100,
+                           0. );
+                    g.drawImage(im, op, bounds.x, bounds.y );
                         lastImage = image;
-                    }
-                    g.draw(bounds);
+                        
                     maybeTimeStamp(g, bounds, ranges.get(index));
                     if (usedLastImage) drawMomentStr(g, bounds);
                 } else {
@@ -302,25 +387,12 @@ public class PngWalkCanvas extends JPanel {
                     if (newMethod) {
                         bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
 
-                        Image cacheImage = leftThumbsCache.get(image);
+                        Image cacheImage = getLeftImage( image, width, height, bounds );
 
                         if (cacheImage == null) {
-                            BufferedImage im;
-                            if (image instanceof BufferedImage) {
-                                im = (BufferedImage) image;
-                            } else {
-                                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                                if ( ! im.getGraphics().drawImage(image, 0, 0, this) ) {
-                                    continue;
-                                }
-                            }
-                            addBorder(im,0.1);
-                            ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
-                                    0, 0, bounds.width, bounds.height,
-                                    -0.05);
-                            cacheImage= op.filter( im, null );
-                            leftThumbsCache.put( image, cacheImage );
+                            continue;
                         }
+
                         g.drawImage( cacheImage, bounds.x, bounds.y, this );
                         //g.draw(op.getOutline(bounds.x, bounds.y));
                     } else {
@@ -388,7 +460,8 @@ public class PngWalkCanvas extends JPanel {
                     g.setColor(Color.black);
                 }
 
-                g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this);
+                Image im= getCacheImage( image, width, height, bounds );
+                g.drawImage( im, bounds.x, bounds.y, this);
                 g.draw(bounds);
                 maybeTimeStamp(g, bounds, ranges.get(index));
 
