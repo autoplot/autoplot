@@ -1,6 +1,3 @@
 org.virbo.ascii.AsciiTableDataSourceFactory
-org.virbo.excel.ExcelSpreadsheetDataSourceFactory
 org.virbo.das2Stream.Das2StreamDataSourceFactory application/x-das2stream
-org.virbo.netCDF.NetCDFDataSourceFactory
-org.virbo.dods.DodsDataSourceFactory
 org.virbo.spase.SpaseRecordDataSourceFactory
