@@ -107,8 +107,6 @@ public class ApplicationModel {
 
     public ApplicationModel() {
 
-        BeansUtil.registerEditor(RenderType.class, EnumerationEditor.class);
-
         DataSetURL.init();
 
         dom = new Application();
@@ -119,6 +117,10 @@ public class ApplicationModel {
      * better if called from swing thread
      */
     public void addDasPeersToApp() {
+        if ( !applet ) {
+            BeansUtil.registerEditor(RenderType.class, EnumerationEditor.class);
+        }
+
         new ApplicationController(this, dom);
 
         canvas = dom.getController().addCanvas();
