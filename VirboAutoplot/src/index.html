@@ -6,8 +6,7 @@
     <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
-        <p><small>Data from a U.S.G.S. data server shows the height of the Iowa and Cedar Rivers in the 2008 floods.
-        Behind, three slices in pitch angle show that rank 3, column major cdfs are fixed.</small></p>
+        <p><small>Autoplot plots data from a random CDF file, in this case sounder data from Alouette2.</small></p>
         
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
@@ -19,21 +18,15 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Recent changes include:</p>
 <ul>
-<li> miscellaneous bugfixes in sync and cdf
-</li><li> rank 3 column-major cdfs fixed with hacked cdf library
-</li><li> hacked cdf library improves performance by avoiding unnecessary copies.
-</li><li> cdf VAR_NOTES indicated on the data source editor.
-</li>
-<li> bugfix 2806556: dataset selector completion on a remote file brings up the data source editor, not a single completion of the filename.
-</li><li> plots and panels flash as they are selected
-</li><li> autolabel property for panels, plots, and axes completes fixes to autoranging vap files.
-</li><li> bugfix 2792362: aggregation and context overview resets zoom.
-</li><li> bugfix: restore support for plot( vapfile ) from scripts (and PNGWalkTool)
-</li><li> improve support for plot from IDL.
-</li><li> add "Example Scripts-&gt;Make PNG Walk" to script panel context menu
+<li> bugfix in autohistogram, most of data treated as outliers.
+</li><li> tweaks to guess cadence algorithm, add explicit test for detecting log spacing.  loosen up for log spacing.
+</li><li> refactorings in Autoplot to decouple GUI from DOM model, this is to support applet and servlet use.
+</li><li> refactor das2 to factor out dasml, legacy system for serializing das2 applications.
+</li><li> make png walk allows output time format to specified instead of inferring format from aggregated URI.  
+<ul><li> This allows use with datasets like TSDS that do not use aggregation.
+</li><li> Also allows finer control like producing hourly plots.
 
-</li><li> Exception dialog coalesces repeated exceptions into one message dialog (e.g. message repeats 20 times).
-</li></ul>
+</li></ul></ul>
 <p>
         
 <p>Known issues:</p>
