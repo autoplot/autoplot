@@ -202,8 +202,8 @@ public class IstpMetadataModel extends MetadataModel {
 
         for (int i = 0; i < 4; i++) {
             String key = "DEPEND_" + i;
-            if (attrs.containsKey(key)) {
-                Map<String, Object> props = (Map<String, Object>) attrs.get(key);
+            Map<String, Object> props = (Map<String, Object>) attrs.get(key);
+            if (props!=null) {
                 properties.put(key, properties(props));
             }
         }
