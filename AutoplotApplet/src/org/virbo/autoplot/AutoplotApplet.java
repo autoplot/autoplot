@@ -47,6 +47,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasCanvas;
+import org.das2.system.ExceptionHandler;
 import org.das2.util.AboutUtil;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
@@ -257,6 +258,17 @@ public class AutoplotApplet extends JApplet {
         super.start();
 
         model = new ApplicationModel();
+        model.setExceptionHandler( new ExceptionHandler() {
+
+            public void handle(Throwable t) {
+                t.printStackTrace();
+            }
+
+            public void handleUncaught(Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
         model.setApplet(true);
         model.dom.getOptions().setAutolayout(false);
 
@@ -813,7 +825,7 @@ public class AutoplotApplet extends JApplet {
 
             {
                 //"tsds.http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0";
-                params.put("dataSetURL", "http://www.sarahandjeremy.net/jeremy/1wire/data/2008/0B000800408DD710.20080106.d2s");
+                params.put("dataSetURL", "http://autoplot.org/data/alpha_proton_ratio.qds");
                 params.put("column", "5em,100%-10em");
                 params.put("font", "sans-8");
                 params.put("row", "3em,100%-3em");
