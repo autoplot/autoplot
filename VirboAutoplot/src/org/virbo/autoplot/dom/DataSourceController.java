@@ -512,7 +512,7 @@ public class DataSourceController extends DomNodeController {
      */
     private void updateFillSoon( final int delay ) {
         changesSupport.performingChange(this, PENDING_FILL_DATASET);
-        RequestProcessor.invokeLater(new Runnable() {
+        Runnable run= new Runnable() {
             public void run() {
                 if ( delay>0 ) {
                     try {
@@ -524,7 +524,13 @@ public class DataSourceController extends DomNodeController {
                 updateFill();
                 changesSupport.changePerformed(this, PENDING_FILL_DATASET);
             }
-        });
+        };
+        if ( delay==0 ) {
+            logger.finest("delay=0 means I should update fill in this thread");
+            run.run();
+        } else {
+            RequestProcessor.invokeLater(run);
+        }
     }
 
     /**
