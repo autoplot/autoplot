@@ -6,8 +6,10 @@
 package org.virbo.metatree;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import org.das2.datum.Units;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.virbo.dataset.SemanticOps;
 import org.w3c.dom.Node;
@@ -107,5 +109,36 @@ public class MetadataUtil {
         }
         return child;
     }
-    
+
+    /**
+     * slice the properties to reduce rank.
+     * @param properties
+     * @param sliceDimension
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String,Object> sliceProperties(Map<String,Object> properties, int sliceDimension) {
+        Map result = new LinkedHashMap(properties);
+        List<Object> deps = new ArrayList(3);
+        for (int i = 0; i < 3; i++) {
+            deps.add(i, properties.get("DEPEND_" + i));
+        }
+
+        deps.remove(sliceDimension);
+        deps.add(2, null);
+
+        for (int i = 0; i < 3; i++) {
+            result.put("DEPEND_" + i, deps.get(i));
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Map<String,Object> transposeProperties(Map<String,Object> properties) {
+        Map result = new LinkedHashMap(properties);
+        result.put("DEPEND_1", properties.get("DEPEND_0"));
+        result.put("DEPEND_0", properties.get("DEPEND_1"));
+        return result;
+
+    }
 }
