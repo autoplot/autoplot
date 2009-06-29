@@ -37,6 +37,7 @@ import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
 import org.virbo.dsutil.AutoHistogram;
+import org.virbo.metatree.MetadataUtil;
 
 /**
  *
@@ -593,11 +594,11 @@ public class DataSourceController extends DomNodeController {
             }
             _setReduceDataSetString(reduceRankString);
 
-            properties = PanelUtil.sliceProperties(properties, sliceDimension);
+            properties = MetadataUtil.sliceProperties(properties, sliceDimension);
 
             if (dsf.isTranspose()) {
                 ds = new TransposeRank2DataSet(ds);
-                properties = PanelUtil.transposeProperties(properties);
+                properties = MetadataUtil.transposeProperties(properties);
             }
 
             fillDs = DataSetOps.makePropertiesMutable(ds);
