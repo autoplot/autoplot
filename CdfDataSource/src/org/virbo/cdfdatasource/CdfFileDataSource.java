@@ -35,6 +35,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
@@ -45,8 +46,8 @@ import org.virbo.metatree.MetadataUtil;
  */
 public class CdfFileDataSource extends AbstractDataSource {
 
-    HashMap properties;
-    HashMap<String, Object> attributes;
+    Map properties;
+    Map<String, Object> attributes;
 
     private final static Logger logger= Logger.getLogger(CdfFileDataSource.class.getName());
 
@@ -113,7 +114,12 @@ public class CdfFileDataSource extends AbstractDataSource {
             Variable variable = cdf.getVariable(svariable);
             String interpMeta = (String) map.get("interpMeta");
             if (!"no".equals(interpMeta)) {
+                long numRec= variable.getNumWrittenRecords();
+                long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
                 attributes = readAttributes(cdf, variable, 0);
+                if ( recs[2]==-1 ) {
+                    attributes= MetadataUtil.sliceProperties(attributes, 0);
+                }
             }
             WritableDataSet result = wrapDataSet(cdf, svariable, constraint, false);
             cdf.close();
@@ -143,37 +149,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     }
 
-    /**
-     * returns [ start, stride, stop ]
-     * @param constraint
-     * @return
-     */
-    private long[] parseConstraint(String constraint, long recCount) throws ParseException {
-        long[] result = new long[]{0, recCount, 1};
-        if (constraint == null) {
-            return result;
-        } else {
-            Pattern p = Pattern.compile("\\[(\\d*)[:](\\d*)(?:[:](\\d*))?\\]");
-            Matcher m = p.matcher(constraint);
-            if (m.matches()) {
-                if (m.group(1).length() > 0) {
-                    result[0] = Integer.parseInt(m.group(1));
-                }
-                if (m.group(2).length() > 0) {
-                    result[1] = Integer.parseInt(m.group(2));
-                }
-                if (m.group(3) != null) {
-                    if (m.group(3).length() > 0) {
-                        result[2] = Integer.parseInt(m.group(3));
-                    }
-                }
-                return result;
-            } else {
-                throw new ParseException("no match!", 0);
-            }
-        }
-    }
-
+    
     /**
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      */
@@ -212,14 +188,18 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
         }
 
-        long[] recs = parseConstraint(constraints, numRec);
-
+        long[] recs = DataSourceUtil.parseConstraint(constraints, numRec);
+        boolean slice= recs[1]==-1;
         WritableDataSet result;
         if (reform) {
-            //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1);
-            result = CdfUtil.wrapCdfHyperData(variable, 0, -1, 1);
+            result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1);
+            //result = CdfUtil.wrapCdfHyperData(variable, 0, -1, 1);
         } else {
             long recCount = (recs[1] - recs[0]) / recs[2];
+            if ( slice ) {
+                recCount= -1;
+                recs[2]= 1;
+            }
             result = CdfUtil.wrapCdfHyperDataHacked(variable, recs[0], recCount, recs[2]);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
@@ -244,8 +224,9 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         int[] qubeDims= DataSetUtil.qubeDims(result);
         for (int idep = 0; idep < 3; idep++) {
-            Map dep = (Map) thisAttributes.get("DEPEND_" + idep);
-            String labl = (String) thisAttributes.get("LABL_PTR_" + idep);
+            int sidep= slice ? (idep+1) : idep;
+            Map dep = (Map) thisAttributes.get( "DEPEND_" + sidep );
+            String labl = (String) thisAttributes.get("LABL_PTR_" + sidep);
             if ( dep != null && qubeDims.length<=idep ) {
                 logger.info("DEPEND_"+idep+" found but data is lower rank");
                 continue;
@@ -266,7 +247,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                     if (DataSetUtil.isMonotonic(depDs)) {
                         depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                     } else {
-                        if (idep == 0) {
+                        if (sidep == 0) {
                             System.err.println("sorting dep0 to make depend0 monotonic");
                             QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
                             result = DataSetOps.applyIndex(result, idep, sort, false);
@@ -292,13 +273,26 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         boolean swapHack = false; // TODO: figure out where this was needed.
 
-        if (result.rank() == 3) {
+        if ( result.rank() == 3) {
             int n1 = result.length(0);
             int n2 = result.length(0, 0);
             QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
             QDataSet dep2 = (QDataSet) result.property(QDataSet.DEPEND_2);
             if (n1 != n2 && dep1 != null && dep1.length() == n2) {
                 if (dep2 != null && dep2.length() == n1) {
+                    swapHack = true;
+                    System.err.println("swaphack avoids runtime error");
+                }
+            }
+        }
+
+        if ( slice && result.rank()==2 ) {
+            int n0 = result.length();
+            int n1 = result.length(0);
+            QDataSet dep0 = (QDataSet) result.property(QDataSet.DEPEND_0);
+            QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
+            if (n0 != n1 && dep0 != null && dep0.length() == n1) {
+                if (dep1 != null && dep1.length() == n0) {
                     swapHack = true;
                     System.err.println("swaphack avoids runtime error");
                 }
@@ -317,6 +311,17 @@ public class CdfFileDataSource extends AbstractDataSource {
             attributes.put(QDataSet.DEPEND_2, att1);
         }
 
+        if (swapHack && slice && result.rank() == 2) { // need to swap for rank 3.
+            QDataSet dep0 = (QDataSet) result.property(QDataSet.DEPEND_0);
+            QDataSet dep1 = (QDataSet) result.property(QDataSet.DEPEND_1);
+            result.putProperty(QDataSet.DEPEND_1, dep0);
+            result.putProperty(QDataSet.DEPEND_0, dep1);
+
+            Object att0 = attributes.get(QDataSet.DEPEND_0);
+            Object att1 = attributes.get(QDataSet.DEPEND_1);
+            attributes.put(QDataSet.DEPEND_0, att1);
+            attributes.put(QDataSet.DEPEND_1, att0);
+        }
         return result;
     }
 
