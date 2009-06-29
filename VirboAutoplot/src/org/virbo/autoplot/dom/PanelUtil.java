@@ -56,38 +56,6 @@ public class PanelUtil {
     }
     
     /**
-     * slice the properties to reduce rank.
-     * @param properties
-     * @param sliceDimension
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    protected static Map sliceProperties(Map properties, int sliceDimension) {
-        Map result = new LinkedHashMap(properties);
-        List<Object> deps = new ArrayList(3);
-        for (int i = 0; i < 3; i++) {
-            deps.add(i, properties.get("DEPEND_" + i));
-        }
-
-        deps.remove(sliceDimension);
-        deps.add(2, null);
-
-        for (int i = 0; i < 3; i++) {
-            result.put("DEPEND_" + i, deps.get(i));
-        }
-        return result;
-    }
-
-    @SuppressWarnings("unchecked")
-    protected static Map transposeProperties(Map properties) {
-        Map result = new LinkedHashMap(properties);
-        result.put("DEPEND_1", properties.get("DEPEND_0"));
-        result.put("DEPEND_0", properties.get("DEPEND_1"));
-        return result;
-
-    }
-
-    /**
      * check to make sure properties units are consistent with dataset units,
      * otherwise we'll have problems with units conversions.  The map
      * properties may have its property units changed to make them consistent.
