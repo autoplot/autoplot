@@ -18,6 +18,7 @@ import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -217,6 +218,47 @@ public class DataSourceUtil {
         }
         dest.close();
         src.close();
+    }
+
+
+    /**
+     * returns [ start, stop, stride ] or [ start, -1, -1 ] for slice.  This is
+     * provided to reduce code and for uniform behavior.
+     * @param constraint, such as "[0:100:2]" for even records between 0 and 100, non-inclusive.
+     * @return
+     */
+    public static long[] parseConstraint(String constraint, long recCount) throws ParseException {
+        long[] result = new long[]{0, recCount, 1};
+        final String INT="([+-]?+\\d*)";
+        if (constraint == null) {
+            return result;
+        } else {
+            if ( constraint.startsWith("[") && constraint.endsWith("]") ) {
+                constraint= constraint.substring(1,constraint.length()-1);
+            }
+            try {
+                String[] ss= constraint.split(":",-2);
+                int [] ii= new int[ss.length];
+                if ( ss.length>0 && ss[0].length()>0 ) {
+                    result[0]= Integer.parseInt(ss[0]);
+                    if ( result[0]<0 ) result[0]= recCount+result[0];
+                }
+                if ( ss.length>1 && ss[1].length()>0 ) {
+                    result[1]= Integer.parseInt(ss[1]);
+                    if ( result[1]<0 ) result[1]= recCount+result[1];
+                }
+                if ( ss.length>2 && ss[2].length()>0 ) {
+                    result[2]= Integer.parseInt(ss[2]);
+                }
+                if ( ss.length==1 ) { // slice
+                    result[1]= -1;
+                    result[2]= -1;
+                }
+            } catch ( NumberFormatException ex ) {
+                throw new ParseException("expected integer: "+ex.toString(),0);
+            }
+            return result;
+        }
     }
 
     public static void main(String[] args ) {
