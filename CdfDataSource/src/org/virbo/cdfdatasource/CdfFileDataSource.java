@@ -192,8 +192,8 @@ public class CdfFileDataSource extends AbstractDataSource {
         boolean slice= recs[1]==-1;
         WritableDataSet result;
         if (reform) {
-            result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1);
-            //result = CdfUtil.wrapCdfHyperData(variable, 0, -1, 1);
+            //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
+            result = CdfUtil.wrapCdfHyperData(variable, 0, -1, 1);
         } else {
             long recCount = (recs[1] - recs[0]) / recs[2];
             if ( slice ) {
