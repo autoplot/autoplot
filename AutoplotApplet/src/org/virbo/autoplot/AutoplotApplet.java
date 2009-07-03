@@ -13,10 +13,10 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -38,15 +38,21 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.event.BoxSelectionEvent;
+import org.das2.event.BoxSelectionListener;
+import org.das2.event.BoxSelectorMouseModule;
+import org.das2.event.CrossHairRenderer;
+import org.das2.event.MouseModule;
 import org.das2.graph.DasCanvas;
+import org.das2.graph.DasPlot;
 import org.das2.system.ExceptionHandler;
 import org.das2.util.AboutUtil;
 import org.das2.util.filesystem.FileObject;
@@ -81,9 +87,10 @@ public class AutoplotApplet extends JApplet {
     static Logger logger = Logger.getLogger("virbo.autoplot.applet");
     String statusCallback;
     String timeCallback;
+    String clickCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090624.1";
+    public static final String VERSION = "20090703.2";
     private Image splashImage;
 
     private String getStringParameter(String name, String deft) {
@@ -122,6 +129,18 @@ public class AutoplotApplet extends JApplet {
                 Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    private void clickCallback( String plotid, DasPlot plot, MouseEvent e ) {
+        try {
+            Datum xdatum= plot.getXAxis().invTransform(e.getX());
+            Datum ydatum= plot.getYAxis().invTransform(e.getY());
+
+            String jscall= String.format("%s('%s','%s','%s',%d,%d,%d )", clickCallback, plotid, xdatum, ydatum, e.getX(), e.getY(), e.getID() );
+                getAppletContext().showDocument(new URL("javascript:" + jscall ));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            }
     }
 
     private void drawString(Graphics g, String s, int x, int y) {
@@ -319,6 +338,7 @@ public class AutoplotApplet extends JApplet {
         String zdrawTickLabels = getStringParameter("plot.zaxis.drawTickLabels", "");
         statusCallback = getStringParameter("statusCallback", "");
         timeCallback = getStringParameter("timeCallback", "");
+        clickCallback= getStringParameter("clickCallback", "" );
 
         if (srenderType.equals("fill_to_zero")) {
             srenderType = "fillToZero";
@@ -577,6 +597,31 @@ public class AutoplotApplet extends JApplet {
                 timeCallback(String.valueOf(evt.getNewValue()));
             }
         });
+
+        if ( clickCallback!=null ) {
+            final DasPlot plot= dom.getPlots(0).getController().getDasPlot();
+            MouseModule mm= new MouseModule( plot, new CrossHairRenderer( plot, null, plot.getXAxis(), plot.getYAxis() ), "appletClick" ) {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    e= SwingUtilities.convertMouseEvent( plot, e, plot.getCanvas() );
+                    clickCallback( dom.getPlots(0).getId(), plot, e );
+                }
+
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    e= SwingUtilities.convertMouseEvent( plot, e, plot.getCanvas() );
+                    clickCallback( dom.getPlots(0).getId(), plot, e );
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    e= SwingUtilities.convertMouseEvent( plot, e, plot.getCanvas() );
+                    clickCallback( dom.getPlots(0).getId(), plot, e );
+                }
+
+            };
+            plot.getDasMouseInputAdapter().setPrimaryModule(mm);
+        }
 
         System.err.println("done start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
     }
