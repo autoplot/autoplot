@@ -12,6 +12,9 @@
           eval(consoleIn.value)
           consoleOut.value= 'executed >>'+consoleIn.value+'<<'
       }
+      function onClick( id, xdata, ydata, x, y, type ) {
+          consoleOut.value=""+id+" "+xdata+","+ydata+" x="+x+ " y="+y+" type="+type;
+      }
     </script>
   <body>
     This demonstrates the parameters that control the initial settings of the applet.
@@ -20,9 +23,9 @@
     is still a new use mode for Autoplot and funky behavior should be expected.
     <br>
     <applet  width="600" height="200" id="applet1"
-          code="org.virbo.autoplot.AutoplotApplet" archive="AutoplotAppletAll.jar"
+          code="org.virbo.autoplot.AutoplotApplet" archive="AutoplotAppletAll2.jar"
           onpropertychange="f">
-                <param name="dataSetURL" value="tsds.http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0">
+                <param name="dataSetURL" value="http://localhost:14397/AutoplotServlet/data/0B000800408DD710.20090314.d2s">
                 <param name="column" value="5em,100%-10em">
                 <param name="font" value="sans-italic-10">
                 <param name="row" value="3em,100%-3em">
@@ -31,6 +34,7 @@
                 <param name="fillColor" value="#aaaaff">
                 <param name="foregroundColor" value="#ffffff">
                 <param name="backgroundColor" value="#000000">
+                <param name="clickCallback" value="onClick">
           
     </applet><br>
     <p>output console:</p>
