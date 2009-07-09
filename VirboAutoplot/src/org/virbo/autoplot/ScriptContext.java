@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import org.das2.DasApplication;
 import org.das2.fsm.FileStorageModel;
@@ -334,6 +335,26 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
         model.getCanvas().writeToPDF(filename);
         setStatus("wrote to "+filename);
+    }
+
+    /**
+     * creates an image from the provided DOM.  This blocks until the image is
+     * ready.
+     * TODO: verify
+     * @param applicationIn
+     * @return
+     */
+    public static BufferedImage writeToBufferedImage( Application applicationIn ) {
+        ApplicationModel appmodel= new ApplicationModel();
+        appmodel.addDasPeersToApp();
+        appmodel.getDocumentModel().syncTo(applicationIn);
+
+        int height= applicationIn.getCanvases(0).getHeight();
+        int width= applicationIn.getCanvases(0).getWidth();
+
+        BufferedImage image= (BufferedImage) appmodel.getCanvas().getImage(width, height);
+        
+        return image;
     }
 
     /**
