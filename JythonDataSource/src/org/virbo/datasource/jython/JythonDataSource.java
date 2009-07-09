@@ -16,7 +16,9 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -29,6 +31,7 @@ import org.python.util.PythonInterpreter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.jythonsupport.JythonOps;
@@ -49,6 +52,19 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         addCability(Caching.class, this);
         this.listener = factory.listener;
 
+    }
+
+    private File getScript() throws IOException {
+        File jythonScript; // script to run.
+        URI resourceURI;     // optional resource URI that is argument to script, excluding script argument.
+
+        if ( params.get( PARAM_SCRIPT )!=null ) {
+            jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
+        } else {
+            resourceURI= null;
+            jythonScript= getFile(new NullProgressMonitor());
+        }
+        return jythonScript;
     }
 
     @Override
