@@ -165,15 +165,18 @@ public class ApplicationModel {
         List<Panel> panels= dom.getController().getPanelsFor( dsf );
         for ( Panel p: panels ) {
             p.getController().setResetPanel(true);
-            if ( label!=null ) {
-                p.setLegendLabel(label);
-                p.setDisplayLegend(true);
-            }
         }
         dsf.getController()._setDataSource(null);
         dsf.setUri("vap+internal:");
         dsf.getController().setDataSetInternal(null); // clear out properties and metadata
         dsf.getController().setDataSetInternal(ds);
+        for ( Panel p: panels ) {
+            if ( label!=null ) {
+                p.setLegendLabel(label);
+                p.setAutolabel(false); // TODO: kludge, it should clear this automatically
+                p.setDisplayLegend(true);
+            }
+        }
     }
 
     public void setDataSource(DataSource dataSource) {
