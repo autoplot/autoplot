@@ -28,7 +28,9 @@ import org.das2.jythoncompletion.JythonCompletionTask;
 import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.python.core.Py;
 import org.python.core.PyDictionary;
+import org.python.core.PyNone;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.JythonUtil;
@@ -163,6 +165,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     PythonInterpreter interp = org.virbo.jythonsupport.JythonUtil.createInterpreter(false);
                     interp.set("monitor", new NullProgressMonitor());
                     interp.set("params", new PyDictionary());
+                    interp.set("resourceURI", Py.None );
                     return interp;
                 }
             });
