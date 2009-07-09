@@ -944,28 +944,29 @@ public class PanelController extends DomNodeController {
 
     public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
         ApplicationController ac = this.dom.controller;
-        ac.bind(panel, "style.lineWidth", seriesRenderer, "lineWidth");
-        ac.bind(panel, "style.color", seriesRenderer, "color");
-        ac.bind(panel, "style.symbolSize", seriesRenderer, "symSize");
-        ac.bind(panel, "style.symbolConnector", seriesRenderer, "psymConnector");
-        ac.bind(panel, "style.plotSymbol", seriesRenderer, "psym");
-        ac.bind(panel, "style.fillColor", seriesRenderer, "fillColor");
-        ac.bind(panel, "style.fillToReference", seriesRenderer, "fillToReference");
-        ac.bind(panel, "style.reference", seriesRenderer, "reference");
-        ac.bind(panel, "style.antiAliased", seriesRenderer, "antiAliased");
+        ac.bind(panel.style, "lineWidth", seriesRenderer, "lineWidth");
+        ac.bind(panel.style, "color", seriesRenderer, "color");
+        ac.bind(panel.style, "symbolSize", seriesRenderer, "symSize");
+        ac.bind(panel.style, "symbolConnector", seriesRenderer, "psymConnector");
+        ac.bind(panel.style, "plotSymbol", seriesRenderer, "psym");
+        ac.bind(panel.style, "fillColor", seriesRenderer, "fillColor");
+        ac.bind(panel.style, "fillToReference", seriesRenderer, "fillToReference");
+        ac.bind(panel.style, "reference", seriesRenderer, "reference");
+        ac.bind(panel.style, "antiAliased", seriesRenderer, "antiAliased");
     }
 
     public void bindToSpectrogramRenderer(SpectrogramRenderer spectrogramRenderer) {
         ApplicationController ac = this.dom.controller;
 
-        ac.bind(panel, "style.rebinMethod", spectrogramRenderer, "rebinner");
-        ac.bind(panel, "style.colortable", spectrogramRenderer, "colorBar.type");
+        ac.bind(panel.style, "rebinMethod", spectrogramRenderer, "rebinner");
+        if ( spectrogramRenderer.getColorBar()!=null )
+            ac.bind(panel.style, "colortable", spectrogramRenderer.getColorBar(), "type");
 
     }
 
     public void bindToImageVectorDataSetRenderer(ImageVectorDataSetRenderer renderer) {
         ApplicationController ac = this.dom.controller;
-        ac.bind(panel, "style.color", renderer, "color");
+        ac.bind(panel.style, "color", renderer, "color");
         ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL);
         ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
     }
