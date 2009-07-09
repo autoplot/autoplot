@@ -20,7 +20,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Converter;
-import test.dom.BindingTest;
 
 /**
  * It is appearent that the overhead of BeansBinding is so great that a lightweight
@@ -146,15 +145,15 @@ public class BindingSupport {
             Method apcl = dst.getClass().getMethod("addPropertyChangeListener", String.class, PropertyChangeListener.class);
             apcl.invoke(dst, dstProp, dstListener);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InvocationTargetException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchMethodException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         synchronized (implBindingContexts) {
@@ -196,15 +195,15 @@ public class BindingSupport {
                     Method apcl = bi.dst.getClass().getMethod("removePropertyChangeListener", String.class, PropertyChangeListener.class);
                     apcl.invoke(bi.dst, bi.dstProp, bi.dstListener);
                 } catch (IllegalAccessException ex) {
-                    Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
-                    Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (NoSuchMethodException ex) {
-                    Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SecurityException ex) {
-                    Logger.getLogger(BindingTest.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 bi.src.removePropertyChangeListener(bi.srcProp, bi.srcListener);
             }
