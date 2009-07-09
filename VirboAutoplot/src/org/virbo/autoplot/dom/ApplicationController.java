@@ -67,7 +67,9 @@ public class ApplicationController extends DomNodeController implements RunLater
     LayoutListener layoutListener;
     boolean headless;
     final Map<Object, BindingGroup> bindingContexts;
-    final Map<Object, BindingGroup> implBindingContexts; // these are for controllers to use.
+    //final Map<Object, BindingGroup> implBindingContexts; // these are for controllers to use.
+    protected BindingSupport bindingSupport= new BindingSupport();
+
     final Map<BindingModel, Binding> bindingImpls;
     final Map<Connector, ColumnColumnConnector> connectorImpls;
     private final static Logger logger = Logger.getLogger("virbo.controller");
@@ -109,7 +111,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             application.getOptions().loadPreferences();
         }
         bindingContexts = new HashMap();
-        implBindingContexts= new HashMap();
+        //implBindingContexts= new HashMap();
         bindingImpls = new HashMap();
         connectorImpls = new HashMap();
 
@@ -1046,33 +1048,28 @@ public class ApplicationController extends DomNodeController implements RunLater
                 bindingContexts.put(src, bc);
             }
         }
-        // now do the implementation
-        BindingGroup implBc;
-        synchronized (implBindingContexts) {
-            implBc = implBindingContexts.get(src);
-            if (implBc == null) {
-                implBc = new BindingGroup();
-                implBindingContexts.put(src, implBc);
-            }
-        }
 
-        Binding binding;
-
-        binding = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
-        if ( converter!=null ) binding.setConverter( converter );
 
         if (!dstId.equals("???") && !dstId.startsWith("das2:")) {
+            Binding binding;
+
+            binding = Bindings.createAutoBinding(UpdateStrategy.READ_WRITE, src, BeanProperty.create(srcProp), dst, BeanProperty.create(dstProp));
+            if ( converter!=null ) binding.setConverter( converter );
+
             List<BindingModel> bindings = new ArrayList<BindingModel>(Arrays.asList(application.getBindings()));
             bindings.add(bindingModel);
             application.setBindings(bindings.toArray(new BindingModel[bindings.size()]));
             bc.addBinding(binding);
+            binding.bind();
+            this.bindingImpls.put(bindingModel, binding);
+            
         } else {
-            implBc.addBinding( binding );
+            // these are bindings used to implement the application, such as from an Axis to DasAxis.
+            // The user shouldn't be able to unbind these.
+            bindingSupport.bind( src, srcProp, dst, dstProp, converter );
+
         }
 
-        binding.bind();
-
-        this.bindingImpls.put(bindingModel, binding);
     }
 
     public void bind( DomNode src, String srcProp, Object dst, String dstProp) {
@@ -1129,17 +1126,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param src
      */
     protected void unbindImpl( DomNode src ) {
-        BindingGroup bc;
-        synchronized (implBindingContexts) {
-            bc = implBindingContexts.get(src);
-            if (bc != null) {
-
-                bc.unbind();
-                implBindingContexts.remove(bc);
-
-            }
-        }
-
+        bindingSupport.unbind(src);
     }
 
     public void deleteBinding(BindingModel binding) {
@@ -1494,9 +1481,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     private void bindTo(DasCanvas canvas) {
         ApplicationController ac = this;
-        ac.bind(application, "options.background", canvas, "background" );
-        ac.bind(application, "options.foreground", canvas, "foreground" );
-        ac.bind(application, "options.canvasFont", canvas, "baseFont", DomUtil.STRING_TO_FONT );
+        ac.bind(application.options, "background", canvas, "background" );
+        ac.bind(application.options, "foreground", canvas, "foreground" );
+        ac.bind(application.options, "canvasFont", canvas, "baseFont", DomUtil.STRING_TO_FONT );
     }
 
     protected synchronized void syncTo(Application that) {
