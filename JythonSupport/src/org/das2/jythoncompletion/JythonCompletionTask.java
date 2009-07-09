@@ -24,6 +24,7 @@ import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 import org.python.core.PyClass;
 import org.python.core.PyException;
+import org.python.core.PyInstance;
 import org.python.core.PyJavaClass;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyJavaInstancePeeker;
@@ -112,6 +113,7 @@ public class JythonCompletionTask implements CompletionTask {
         }
 
         Logger logger = Logger.getLogger(JythonCompletionTask.class.getName());
+
         interp.exec(eval);
 
         PyObject context;
@@ -190,6 +192,10 @@ public class JythonCompletionTask implements CompletionTask {
                             label = ss;
                         }
                     }
+                } else if ( context instanceof PyObject ) {
+                    PyObject o= context.__dir__();
+                    label= ss;
+                    signature= null;
                 } else {
                     if (po instanceof PyReflectedFunction) {
                         label = ss + "() STATIC JAVA";
