@@ -24,14 +24,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.system.MutatorLock;
@@ -177,9 +179,17 @@ public class FTPBeanFileSystem extends WebFileSystem {
         return (DirectoryEntry[]) result.toArray(new DirectoryEntry[result.size()]);
     }
 
-    public String[] listDirectory(String directory) {
+    Map<String,String[]> listings= Collections.synchronizedMap( new HashMap() );
+
+    public synchronized String[] listDirectory(String directory) {
         directory = toCanonicalFolderName(directory);
 
+        String[] result= listings.get(directory);
+        if ( result!=null ) {
+            logger.fine("using cached listing for "+directory);
+            return result;
+        }
+        
         try {
             new File(localRoot, directory).mkdirs();
             File listing = new File(localRoot, directory + ".listing");
@@ -226,10 +236,11 @@ public class FTPBeanFileSystem extends WebFileSystem {
             listing.deleteOnExit();
 
             DirectoryEntry[] des = parseLsl(directory, listing);
-            String[] result = new String[des.length];
+            result = new String[des.length];
             for (int i = 0; i < des.length; i++) {
                 result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
             }
+            listings.put(directory, result);
             return result;
 
         } catch (IOException e) {
