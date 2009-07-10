@@ -156,7 +156,9 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         if (context == CONTEXT_APPLICATION) {
             this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
-                    return JythonUtil.createInterpreter(true, false);
+                    PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+                    interp.set("dom", model.getDocumentModel() );
+                    return interp;
                 }
             });
         } else if (context == CONTEXT_DATA_SOURCE) {
