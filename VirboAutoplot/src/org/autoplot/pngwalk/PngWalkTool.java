@@ -273,9 +273,7 @@ public class PngWalkTool extends javax.swing.JPanel {
 
     private void templateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_templateTextFieldActionPerformed
         String template= templateTextField.getText();
-        if ( ! canvas.getTemplate().equals(template) ) {
-            canvas.setTemplate(template);
-        }
+        canvas.setTemplate(template);
     }//GEN-LAST:event_templateTextFieldActionPerformed
 
     private void timeFilterTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFilterTextFieldActionPerformed

@@ -5,6 +5,7 @@
 
 package org.autoplot.pngwalk;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,6 +18,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
+import org.das2.util.monitor.ProgressMonitor;
 
 /**
  *
@@ -54,6 +56,7 @@ public class WalkUtil {
         return fs.getFileObject(surl.substring(i+1)).exists();
     }
 
+
     /**
      * return an array of URLs that match the spec for the time range provided.
      *
@@ -63,7 +66,7 @@ public class WalkUtil {
      * @throws java.io.IOException if the remote folder cannot be listed.
      * @throws java.text.ParseException if the timerange cannot be parsed.
      */
-    public static List<URL> getFilesFor( String surl, String timeRange, List<DatumRange> timeRanges ) throws IOException, ParseException {
+    public static List<URL> getFilesFor( String surl, String timeRange, List<DatumRange> timeRanges, boolean download, ProgressMonitor mon ) throws IOException, ParseException {
         DatumRange dr = null;
         if ( timeRange!=null && timeRange.trim().length()>0 ) dr= DatumRangeUtil.parseTimeRange(timeRange);
 
@@ -74,6 +77,10 @@ public class WalkUtil {
         i = splitIndex(sansArgs);
         FileSystem fs = FileSystem.create( new URL(sansArgs.substring(0, i+1)) );
         String spec= sansArgs.substring(i+1).replaceAll("\\$", "%");
+
+        spec= spec.replaceAll("\\*", ".*");
+        spec= spec.replaceAll("\\?", ".");
+        
         FileStorageModelNew fsm=null;
         if ( spec.contains("%Y")||spec.contains("%y") ) fsm= FileStorageModelNew.create( fs, spec );
 
@@ -81,10 +88,12 @@ public class WalkUtil {
         if ( fsm!=null ) {
             ss= fsm.getNamesFor(dr);
         } else {
-            if ( spec.substring(1).contains("/") ) throw new IllegalArgumentException("nested wildcards (.*/.*) not supported");
-            ss= fs.listDirectory( "/", spec.substring(1) );
+            if ( spec.substring(1).contains("/") ) throw new IllegalArgumentException("nested wildcards (*/*) not supported");
+            ss= fs.listDirectory( "/", spec );
         }
 
+        Arrays.sort(ss);
+        
         List<URL> result= new ArrayList(ss.length);
         timeRanges.clear();
 
@@ -92,7 +101,12 @@ public class WalkUtil {
             DatumRange dr2=null;
             if ( fsm!=null ) dr2= fsm.getRangeFor(ss[i]);
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
-                result.add( new URL( fs.getRootURL(), ss[i]) );
+                if ( fs.getFileObject(ss[i]).isLocal() ) {
+                    File f= fs.getFileObject(ss[i]).getFile();
+                    result.add( f.toURI().toURL() );
+                } else {
+                    result.add( new URL( fs.getRootURL(), ss[i]) );
+                }
                 timeRanges.add(dr2);
             }
         }

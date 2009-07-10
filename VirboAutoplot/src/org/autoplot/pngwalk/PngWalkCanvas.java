@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -27,9 +28,12 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasExceptionHandler;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  *
@@ -336,7 +340,7 @@ public class PngWalkCanvas extends JPanel {
                 final boolean newMethod = true;
 
                 if (index < currentIndex) {
-                    int x = xm - 200 + (index - currentIndex) * targetSize / 4;
+                    int x = xm - 200 + (index - currentIndex) * width /24 ; // fudge
 
                     if (newMethod) {
                         bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
@@ -383,7 +387,7 @@ public class PngWalkCanvas extends JPanel {
                     maybeTimeStamp(g, bounds, ranges.get(index));
                     if (usedLastImage) drawMomentStr(g, bounds);
                 } else {
-                    int x = xm + 200 + (index - currentIndex) * targetSize / 4;
+                    int x = xm + 200 + (index - currentIndex)  * width /24;
                     if (newMethod) {
                         bounds = bounds(x, y, width, height, targetSize, targetSize, 0.1, false);
 
@@ -509,7 +513,8 @@ public class PngWalkCanvas extends JPanel {
             if (ranges.size() > currentIndex)
                 currentRange = ranges.get(currentIndex);
             ranges = new ArrayList<DatumRange>();
-            urls = WalkUtil.getFilesFor(template, timeRange, ranges);
+            
+            urls = WalkUtil.getFilesFor(template, timeRange, ranges, true, new NullProgressMonitor() );
             images = new ArrayList();
             for (int i = 0; i < urls.size(); i++) {
                 images.add(i, getToolkit().createImage(urls.get(i)));
