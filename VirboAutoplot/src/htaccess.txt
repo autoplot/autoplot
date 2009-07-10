@@ -1,0 +1,2 @@
+# Return the right mime type for JNLP files
+AddType application/x-java-jnlp-file .jnlp
