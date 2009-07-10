@@ -368,11 +368,10 @@ public class ScriptPanelSupport {
                 out.write(text.getBytes());
                 panel.setDirty(false);
                 panel.setFilename(file.toString());
-                if (updateSurl) {
-                    model.setDataSourceURL(file.toString());
-                } else {
-                    model.getDataSourceFilterController().update(true, true);
-                }
+                //if (updateSurl) {
+                //    model.setDataSourceURL(file.toString());
+                //    model.getDataSourceFilterController().update(true, true);
+                //}
 
             }
 
