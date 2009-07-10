@@ -6,7 +6,7 @@
     <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
-        <p><small>Autoplot plots data from a random CDF file, in this case sounder data from Alouette2.</small></p>
+        <p><small>Autoplot is used to extract the sound of individual fireworks.  In this application, data within mouse box selections are auralized and formatted into a wav file.</small></p>
         
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
@@ -18,15 +18,15 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Recent changes include:</p>
 <ul>
-<li> bugfix in autohistogram, most of data treated as outliers.
-</li><li> tweaks to guess cadence algorithm, add explicit test for detecting log spacing.  loosen up for log spacing.
-</li><li> refactorings in Autoplot to decouple GUI from DOM model, this is to support applet and servlet use.
-</li><li> refactor das2 to factor out dasml, legacy system for serializing das2 applications.
-</li><li> make png walk allows output time format to specified instead of inferring format from aggregated URI.  
-<ul><li> This allows use with datasets like TSDS that do not use aggregation.
-</li><li> Also allows finer control like producing hourly plots.
-
-</li></ul></ul>
+<li> bugfix 2818967: inconsistent handling of fill obs in ACE SIS
+</li><li> introduce support for bundle datasets
+</li><li> bugfix in QStream when packets are &gt;10000KB.
+</li><li> introduce lightweight bindings to improve startup time
+</li><li> tweaks to png walk tool, such as sorting filenames and spacing in coverflow.
+</li><li> png walk tool reflections were released in last version.
+</li><li> das2 Auralizer fixed. (see VirboAutoplot/src/scripts/auralizeTool.py)
+</li><li> jython completions improved by setting symbols "resourceURI" and "dom".  Automatic data source update removed as other mechanisms can provide this functionality.
+</li></ul>
 <p>
         
 <p>Known issues:</p>
@@ -34,7 +34,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 <li> Applet suffers from same seven second delay, applet can show display
 </li><li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
 </li><li> last URI is not added to DataSetSelector.
-</li><li> race condition with setSliceDimension and setFillDataSet results in "inconvertable units"
 </li>
 </ul>
 <p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
