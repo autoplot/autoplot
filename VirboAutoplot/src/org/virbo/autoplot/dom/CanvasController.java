@@ -442,6 +442,10 @@ public class CanvasController extends DomNodeController {
 
     }
 
+    ApplicationController getApplicationController() {
+        return this.application.getController();
+    }
+
     public String toString() {
         return "" + canvas + " controller";
     }
