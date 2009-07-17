@@ -48,10 +48,12 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Canvas;
+import org.virbo.autoplot.dom.CanvasUtil;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
@@ -155,10 +157,13 @@ public class ApplicationModel {
      * are added until the index exists.  This is introduced to support jython scripting, but may be
      * useful elsewhere.
      * @param chNum the index of the DataSourceFilter to use.
-     * @param ds
+     * @param label label for the dataset's panels, if non-null.
+     * @param ds the dataset to plot.
      */
     public void setDataSet( int chNum, String label, QDataSet ds ) {
         while ( dom.getDataSourceFilters().length <= chNum ) {
+            Plot p= CanvasUtil.getMostBottomPlot(dom.getController().getCanvas());
+            dom.getController().setPlot(p);
             dom.getController().addPanel( null, null  );
         }
         DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
@@ -170,8 +175,38 @@ public class ApplicationModel {
         dsf.setUri("vap+internal:");
         dsf.getController().setDataSetInternal(null); // clear out properties and metadata
         dsf.getController().setDataSetInternal(ds);
+        if ( label!=null ) {
+            for ( Panel p: panels ) {
+                p.setLegendLabel(label);
+                p.setAutolabel(false); // TODO: kludge, it should clear this automatically
+                p.setDisplayLegend(true);
+            }
+        }
+    }
+
+    /**
+     * just plot this dataset using the specified dataSourceFilter index.  panels and dataSourceFilters
+     * are added until the index exists.  This is introduced to support jython scripting, but may be
+     * useful elsewhere.
+     * @param chNum the index of the DataSourceFilter to use.
+     * @param label label for the dataset's panels, if non-null.
+     * @param suri the data source id to plot.
+     */
+    public void setDataSet( int chNum, String label, String suri ) {
+        while ( dom.getDataSourceFilters().length <= chNum ) {
+            Plot p= CanvasUtil.getMostBottomPlot(dom.getController().getCanvas());
+            dom.getController().setPlot(p);
+            dom.getController().addPanel( null, null  );
+        }
+        DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
+        List<Panel> panels= dom.getController().getPanelsFor( dsf );
         for ( Panel p: panels ) {
-            if ( label!=null ) {
+            p.getController().setResetPanel(true);
+        }
+        dsf.getController()._setDataSource(null);
+        dsf.setUri(suri);
+        if ( label!=null ) {
+            for ( Panel p: panels ) {
                 p.setLegendLabel(label);
                 p.setAutolabel(false); // TODO: kludge, it should clear this automatically
                 p.setDisplayLegend(true);
@@ -479,18 +514,9 @@ public class ApplicationModel {
     /**
      * set the application state.
      * @param state
-     * @param deep if true, then unpack the dataset as well.
      * @param forceFill, force a data load
      */
-    public void restoreState(Application state, boolean deep, boolean forceFill) {
-        if (forceFill) {
-            for (DataSourceFilter dsf : this.dom.getDataSourceFilters()) {
-                if (dsf.getUri() != null && !dsf.getUri().startsWith("vap+internal:")) {
-                    dsf.setUri(null);
-                    dsf.getController().setDataSource(true, null);
-                }
-            }
-        }
+    public void restoreState(Application state) {
         this.dom.syncTo(state);
     }
 
@@ -574,7 +600,7 @@ public class ApplicationModel {
         }
 
         //logger.fine("" + state.diffs(this.dom));
-        restoreState(state, true, true);
+        restoreState(state);
         setUseEmbeddedDataSet(false);
 
         propertyChangeSupport.firePropertyChange("file", null, f);
