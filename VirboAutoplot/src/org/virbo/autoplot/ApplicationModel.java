@@ -514,10 +514,9 @@ public class ApplicationModel {
     /**
      * set the application state.
      * @param state
-     * @param forceFill, force a data load
      */
     public void restoreState(Application state) {
-        this.dom.syncTo(state);
+        this.dom.syncTo(state); 
     }
 
     void doSave(File f) throws IOException {
