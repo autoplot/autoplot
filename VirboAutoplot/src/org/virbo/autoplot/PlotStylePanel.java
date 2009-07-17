@@ -18,6 +18,7 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.system.RequestProcessor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -95,9 +96,13 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
         validate();
 
-        doOptionsBindings();
-
-        doPanelBindings();
+        Runnable run= new Runnable() {
+            public void run() {
+                doOptionsBindings();
+                doPanelBindings();
+            }
+        };
+        RequestProcessor.invokeLater(run);
     }
 
     public synchronized void doOptionsBindings( ) {

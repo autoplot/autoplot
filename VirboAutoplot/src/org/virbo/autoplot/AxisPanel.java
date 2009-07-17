@@ -18,6 +18,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
+import org.das2.system.RequestProcessor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -87,12 +88,15 @@ public class AxisPanel extends javax.swing.JPanel {
         zredit.setValue(colorbar.getDatumRange());
         zAxisRangePanel.add(zredit, BorderLayout.CENTER);
 
-        doPlotBindings();
-        doPanelBindings();
-
-        doApplicationBindings();
-
-        doDataSourceFilterBindings();
+        Runnable run= new Runnable() {
+            public void run() {
+                doPlotBindings();
+                doPanelBindings();
+                doApplicationBindings();
+                doDataSourceFilterBindings();
+            }
+        };
+        RequestProcessor.invokeLater(run);
 
         sliceIndexSpinner.addMouseWheelListener(new MouseWheelListener() {
 
