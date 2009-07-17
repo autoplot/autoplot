@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import org.virbo.jythonsupport.ui.EditorContextMenu;
 import java.awt.BorderLayout;
 import java.awt.Event;
 import java.awt.event.ActionEvent;
@@ -14,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -30,12 +32,12 @@ import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyDictionary;
-import org.python.core.PyNone;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.datasource.DataSetSelector;
+import org.virbo.jythonsupport.ui.EditorTextPane;
 
 /**
  *
@@ -109,16 +111,23 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 try {
                     support.save();
                 } catch (FileNotFoundException ex) {
-                    Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    model.getExceptionHandler().handle(ex);
                 } catch (IOException ex) {
-                    Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    model.getExceptionHandler().handle(ex);
                 }
             }
         });
 
         this.textArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK ), "save" );
 
-        EditorContextMenu menu= new EditorContextMenu( this.textArea, this );
+        EditorContextMenu menu= new EditorContextMenu( this.textArea );
+
+        menu.addExampleAction( new AbstractAction("makePngWalk.jy") {
+            public void actionPerformed(ActionEvent e) {
+                loadExample( "/scripts/pngwalk/makePngWalk.jy" );
+            }
+        });
+
         menu.setDataSetSelector(selector);
 
         JythonCompletionProvider.getInstance().addPropertyChangeListener( JythonCompletionProvider.PROP_MESSAGE, new PropertyChangeListener() {
@@ -132,12 +141,27 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     }
 
+    private void loadExample( String code ) {
+        try {
+            URL url = EditorContextMenu.class.getResource(code);
+            if (this.isDirty()) {
+                this.support.saveAs();
+            }
+            this.support.loadInputStream(url.openStream());
+        } catch (IOException ex) {
+            Logger.getLogger(EditorContextMenu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     protected void updateStatus() {
         if ( filename==null ) {
             fileNameLabel.setText( "" + ( dirty ? " *" : "" ));
         } else {
             File file= new File(filename);
             getEditorPanel().setEditable(file.canWrite());
+            if ( file.canWrite()==false ) {
+                System.err.println("help!");
+            }
             fileNameLabel.setText( filename + ( file.canWrite() ? "" : " (read only)" ) + ( dirty ? " *" : "" ) ) ;
         }
     }
@@ -183,7 +207,7 @@ public class JythonScriptPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        textArea = new org.virbo.autoplot.scriptconsole.EditorTextPane();
+        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
         savePlotButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
         openButton = new javax.swing.JButton();
@@ -312,7 +336,7 @@ private void textAreaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:eve
     private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
     private javax.swing.JButton savePlotButton;
-    private org.virbo.autoplot.scriptconsole.EditorTextPane textArea;
+    private org.virbo.jythonsupport.ui.EditorTextPane textArea;
     // End of variables declaration//GEN-END:variables
 
     public EditorTextPane getEditorPanel() {
