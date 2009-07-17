@@ -12,7 +12,7 @@ builder= DataSetBuilder( 1, 1000 )
 for s in files:
    timestr= s[3:17]
    d= timeparser.parse(timestr).getTime( Units.us2000 )
-   builder.putValue( 0, d )
+   builder.putValue( -1, d )
    builder.nextRecord()
 
 builder.putProperty( QDataSet.UNITS, Units.us2000 )
@@ -51,7 +51,7 @@ def showImages( showFiles ):
    
 
 ## add the box selector #########################
-plot= getApplicationModel().plot
+plot= dom.plots[0].controller.dasPlot
 
 from org.das2.event import BoxSelectorMouseModule
 
