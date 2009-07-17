@@ -115,7 +115,7 @@ public class UndoRedoSupport {
             StateStackElement elephant = stateStack.get(stateStackPos - 1);
             ignoringUpdates = true;
             applicationModel.setRestoringState(true);
-            applicationModel.restoreState(elephant.state, false, false);
+            applicationModel.restoreState(elephant.state);
             applicationModel.setRestoringState(false);
             ignoringUpdates = false;
         }
@@ -139,7 +139,7 @@ public class UndoRedoSupport {
         if (stateStackPos < stateStack.size()) {
             StateStackElement elephant = stateStack.get(stateStackPos);
             ignoringUpdates = true;
-            applicationModel.restoreState(elephant.state, false, false);
+            applicationModel.restoreState(elephant.state);
             ignoringUpdates = false;
             stateStackPos++;
         }
