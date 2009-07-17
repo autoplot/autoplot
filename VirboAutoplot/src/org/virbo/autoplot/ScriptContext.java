@@ -144,6 +144,30 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
+     * bring up the autoplot with the specified URL.
+     * @param chNum the data source number to reset the URI.
+     * @param surl
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot(int chNum, String surl) throws InterruptedException {
+        maybeInitView();
+        model.setDataSet( chNum, null, surl );
+        model.waitUntilIdle(false);
+    }
+
+    /**
+     * bring up the autoplot with the specified URL.
+     * @param chNum the data source number to reset the URI.
+     * @param surl
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot(int chNum, String label, String surl) throws InterruptedException {
+        maybeInitView();
+        model.setDataSet( chNum, label, surl );
+        model.waitUntilIdle(false);
+    }
+
+    /**
      * plot the dataset in the first dataSource node.
      * @param ds
      * @throws java.lang.InterruptedException
