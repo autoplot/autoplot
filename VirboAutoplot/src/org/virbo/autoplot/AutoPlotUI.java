@@ -58,6 +58,7 @@ import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
+import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -255,14 +256,63 @@ public class AutoPlotUI extends javax.swing.JFrame {
         applicationModel.getCanvas().setFitted(true);
         JScrollPane scrollPane = new JScrollPane(applicationModel.getCanvas());
         tabs.insertTab("canvas", null, scrollPane, TABS_TOOLTIP, 0);
-
-        tabs.insertTab("axes", null, new AxisPanel(applicationModel), TABS_TOOLTIP, 1);
-        tabs.insertTab("style", null, new PlotStylePanel(applicationModel), TABS_TOOLTIP, 2);
-
-        LayoutUI lui= new LayoutUI();
-        lui.setApplication(dom);
-        tabs.insertTab("layout",null, lui, TABS_TOOLTIP, 3 );
+        tabs.validate();
         
+        tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
+
+        final ApplicationModel fmodel= model;
+
+        //SwingUtilities.invokeLater(addAxes());
+        //SwingUtilities.invokeLater(addStyle());
+        //SwingUtilities.invokeLater(addLayout());
+        //SwingUtilities.invokeLater( new Runnable() {
+        //    public void run() {
+        //        addFeatures(fmodel);
+        //    }
+        //});
+        addAxes().run();
+        addStyle().run();
+        addLayout().run();
+        addFeatures(fmodel);
+        
+        updateBookmarks();
+
+        pack();
+
+        applicationModel.getCanvas().resizeAllComponents();
+        applicationModel.getCanvas().repaint();
+        applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
+
+    }
+
+    private Runnable addAxes() {
+        return new Runnable() {
+            public void run() {
+                tabs.insertTab("axes", null, new AxisPanel(applicationModel), TABS_TOOLTIP, 1);
+            }
+        };
+    }
+
+    private Runnable addStyle() {
+        return new Runnable() {
+            public void run() {
+                tabs.insertTab("style", null, new PlotStylePanel(applicationModel), TABS_TOOLTIP, 2);
+            }
+        };
+    }
+
+    private Runnable addLayout() {
+        return new Runnable() {
+            public void run() {
+                LayoutUI lui= new LayoutUI();
+                lui.setApplication(dom);
+                tabs.insertTab("layout",null, lui, TABS_TOOLTIP, 3 );
+            }
+        };
+    }
+
+    private void addFeatures( ApplicationModel model ) {
+
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
         tabs.insertTab("metadata", null, mdp, TABS_TOOLTIP, 4);
 
@@ -276,12 +326,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
         tickleTimer = new TickleTimer(300, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                
+
                 if ( dom.getController().isValueAdjusting() ) return; // don't listen to property changes during state transitions.
-                
+
                 undoRedoSupport.pushState(evt);
                 stateSupport.markDirty();
-                
+
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         refreshUndoRedoLabel();
@@ -329,13 +379,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
-        tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
-
         tabbedPanelContainer.validate();
-
-        updateBookmarks();
-
-        pack();
 
     }
 
