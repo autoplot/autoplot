@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import java.awt.HeadlessException;
 import java.beans.ExceptionListener;
 import java.beans.PropertyChangeEvent;
@@ -137,12 +138,13 @@ public class ScriptPanelSupport {
         }
         OutputStream out = null;
         try {
+            if ( !file.canWrite() ) throw new IOException("unable to write to file: "+file);
             out = new FileOutputStream(file);
             String text = panel.getEditorPanel().getText();
             out.write(text.getBytes());
             panel.setDirty(false);
         } finally {
-            out.close();
+            if ( out!=null ) out.close();
         }
     }
 
@@ -259,7 +261,7 @@ public class ScriptPanelSupport {
                         updateSurl = true;
                     }
 
-                    if (panel.isDirty()) {
+                    if (panel.isDirty() && file.canWrite() ) {
                         save();
                     }
 
@@ -270,7 +272,9 @@ public class ScriptPanelSupport {
                     annotationsSupport.clearAnnotations();
                     selector.maybePlot(false);
 
-                    panel.setFilename(file.toString());
+                    if ( updateSurl ) {
+                        panel.setFilename(file.toString());
+                    }
                 }
 
             } else if (panel.getContext() == JythonScriptPanel.CONTEXT_APPLICATION) {
@@ -280,7 +284,7 @@ public class ScriptPanelSupport {
                     public void run() {
                         int offset = 0;
                         try {
-                            if (file != null) {
+                            if (file != null && file.canWrite() ) {
                                 save();
                             }
                             try {
