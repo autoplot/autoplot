@@ -31,6 +31,11 @@ public class DomNodeController {
         this.node= node;
     }
 
+    /**
+     * return the controller for the node, if it exists, through introspection.
+     * @param n
+     * @return the controller or null.
+     */
     public static DomNodeController getController( DomNode n ) {
         try {
             Method m= n.getClass().getMethod( "getController" );
