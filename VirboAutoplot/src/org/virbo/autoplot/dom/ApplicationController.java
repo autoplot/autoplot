@@ -165,6 +165,17 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
     AtomicInteger eventId = new AtomicInteger();
 
+    PropertyChangeListener controllerListener= new PropertyChangeListener() {
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            logger.finest("controller change: " + evt.getSource() + "." + evt.getPropertyName() + " (" + evt.getOldValue() + "->" + evt.getNewValue() +")");
+            //if( evt.getPropertyName().equals("resetDimensions") && evt.getNewValue().equals(Boolean.TRUE) ) {
+            //    System.err.println("here here here");
+            //}
+        }
+
+    };
+
     PropertyChangeListener domListener = new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
@@ -177,40 +188,65 @@ public class ApplicationController extends DomNodeController implements RunLater
             //if ( c!=null && c.isValueAdjusting()) return;
             }
 
-            if ( !isValueAdjusting() ) {
+            if ( !isValueAdjusting() ) { // undo/redo support notification
                 fireActionEvent(new ActionEvent(evt.getSource(), eventId.incrementAndGet(), evt.getPropertyName()));
             }
 
+            DomNodeController c;
             Object oldValue = evt.getOldValue();
             if (oldValue != null) {
                 if (oldValue instanceof DomNode) {
                     final DomNode d = (DomNode) oldValue;
                     d.removePropertyChangeListener(domListener);
-                    for ( DomNode k: d.childNodes() ) k.removePropertyChangeListener(domListener);
+                    c= DomNodeController.getController(d);
+                    if ( c!=null ) c.removePropertyChangeListener(controllerListener);
+                    for ( DomNode k: d.childNodes() ) {
+                        k.removePropertyChangeListener(domListener);
+                        c= DomNodeController.getController(k);
+                        if ( c!=null ) c.removePropertyChangeListener(controllerListener);
+                    }
                 } else if (oldValue.getClass().isArray() && DomNode.class.isAssignableFrom(oldValue.getClass().getComponentType())) {
                     for (int i = 0; i < Array.getLength(oldValue); i++) {
                         final DomNode d= ((DomNode) Array.get(oldValue, i));
                         d.removePropertyChangeListener(domListener);
-                        for ( DomNode k: d.childNodes() ) k.removePropertyChangeListener(domListener);
+                        c= DomNodeController.getController(d);
+                        if ( c!=null ) c.removePropertyChangeListener(controllerListener);
+                        for ( DomNode k: d.childNodes() ) {
+                            k.removePropertyChangeListener(domListener);
+                            c= DomNodeController.getController(k);
+                            if ( c!=null ) c.removePropertyChangeListener(controllerListener);
                         }
                     }
                 }
+            }
 
             Object newValue = evt.getNewValue();
             if (newValue != null) {
                 if (newValue instanceof DomNode) {
                     final DomNode d = (DomNode) newValue;
                     d.addPropertyChangeListener(domListener);
-                    for ( DomNode k: d.childNodes() ) k.addPropertyChangeListener(domListener);
+                    c= DomNodeController.getController(d);
+                    if ( c!=null ) c.addPropertyChangeListener(controllerListener);
+                    for ( DomNode k: d.childNodes() ) {
+                        k.addPropertyChangeListener(domListener);
+                        c= DomNodeController.getController(k);
+                        if ( c!=null ) c.addPropertyChangeListener(controllerListener);
+                    }
                 } else if (newValue.getClass().isArray() && DomNode.class.isAssignableFrom(newValue.getClass().getComponentType())) {
                     for (int i = 0; i < Array.getLength(newValue); i++) {
                         final DomNode d= ((DomNode) Array.get(newValue, i));
                         d.addPropertyChangeListener(domListener);
-                        for ( DomNode k: d.childNodes() ) k.addPropertyChangeListener(domListener);
+                        c= DomNodeController.getController(d);
+                        if ( c!=null ) c.addPropertyChangeListener(controllerListener);
+                        for ( DomNode k: d.childNodes() ) {
+                            k.addPropertyChangeListener(domListener);
+                            c= DomNodeController.getController(k);
+                            if ( c!=null ) c.removePropertyChangeListener(controllerListener);
                         }
                     }
                 }
             }
+        }
     };
     FocusAdapter focusAdapter = new FocusAdapter() {
 
@@ -958,6 +994,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         for ( int i=application.getPlots().length-1; i>0; i-- ) {
             deletePlot( application.getPlots(i) );
         }
+        application.getPlots(0).getXaxis().setLog(false); // kludge
+        application.getPlots(0).getYaxis().setLog(false); // kludge
+        application.getPlots(0).getZaxis().setLog(false); // kludge
         application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
         application.getPlots(0).getXaxis().setAutorange(true);
         application.getPlots(0).getYaxis().setAutorange(true);
