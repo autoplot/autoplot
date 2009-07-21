@@ -994,9 +994,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         for ( int i=application.getPlots().length-1; i>0; i-- ) {
             deletePlot( application.getPlots(i) );
         }
-        application.getPlots(0).getXaxis().setLog(false); // kludge
-        application.getPlots(0).getYaxis().setLog(false); // kludge
-        application.getPlots(0).getZaxis().setLog(false); // kludge
+        application.getPlots(0).getXaxis().setLog(false); // TODO kludge
+        application.getPlots(0).getYaxis().setLog(false); // TODO kludge
+        application.getPlots(0).getZaxis().setLog(false); // TODO kludge
         application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
         application.getPlots(0).getXaxis().setAutorange(true);
         application.getPlots(0).getYaxis().setAutorange(true);
