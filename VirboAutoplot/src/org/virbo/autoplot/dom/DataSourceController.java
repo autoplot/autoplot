@@ -197,7 +197,7 @@ public class DataSourceController extends DomNodeController {
 
         if ( isResetDimensions() ) {
 
-            if (ds.rank() > 2 && isResetDimensions() ) {
+            if (ds.rank() > 2 ) {
                 guessSliceDimension();
             }
         }
@@ -234,8 +234,8 @@ public class DataSourceController extends DomNodeController {
             this.dataSource = dataSource;
         } else {
             _setDataSource(dataSource);
+            setResetDimensions(true);
         }
-        setResetDimensions(true);
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
             if (getTsb() != null) {
@@ -1152,5 +1152,9 @@ public class DataSourceController extends DomNodeController {
 
     private void setStatus(String string) {
         dom.controller.setStatus(string);
+    }
+
+    public String toString() {
+        return this.dsf + " controller";
     }
 }
