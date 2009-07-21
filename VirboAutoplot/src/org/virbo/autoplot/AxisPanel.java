@@ -96,7 +96,8 @@ public class AxisPanel extends javax.swing.JPanel {
                 doDataSourceFilterBindings();
             }
         };
-        RequestProcessor.invokeLater(run);
+        run.run();
+        //RequestProcessor.invokeLater(run);
 
         sliceIndexSpinner.addMouseWheelListener(new MouseWheelListener() {
 

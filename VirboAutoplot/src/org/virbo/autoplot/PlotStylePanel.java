@@ -102,7 +102,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 doPanelBindings();
             }
         };
-        RequestProcessor.invokeLater(run);
+        run.run();
+        //RequestProcessor.invokeLater(run);
     }
 
     public synchronized void doOptionsBindings( ) {
