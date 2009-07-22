@@ -1,0 +1,74 @@
+-injars dist/AutoplotAll.jar(!test/**,!com/**)
+-outjars dist/AutoplotAll.pro.jar
+
+-libraryjars /usr/local/jdk1.5.0_17/jre/lib/rt.jar
+
+-target 1.5
+-printusage unused.txt
+-dontoptimize
+-dontobfuscate
+-printmapping mapping.txt
+-keepattributes *Annotation*
+-verbose
+-dontwarn
+-dump keep.txt
+-printseeds seeds.txt
+
+
+# Preserve all public applets.
+# -keep public class org.autoplot.virbo.AutoplotApplet
+-keep public class org.** extends javax.swing.JApplet {
+    <methods>;
+}
+
+# Preserve the special static methods that are required in all enumeration
+# classes.
+-keepclassmembers class * extends java.lang.Enum {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# DomNode
+-keep public class * extends org.virbo.autoplot.dom.DomNode {
+    <methods>;
+}
+
+# Data Sources
+-keep class * extends org.virbo.datasource.DataSource {
+    <methods>;
+}
+
+# Data Source Factories
+-keep class * extends org.virbo.datasource.DataSourceFactory {
+    <methods>;
+}
+
+# Renderer properties
+-keep class * extends org.das2.graph.Renderer {
+    <fields>;
+    <methods>;
+}
+
+# DomNode
+-keep,allowshrinking class * extends org.virbo.autoplot.dom.DomNode {
+    public <methods>;
+}
+
+# Keep - Applets. Keep all extensions of java.applet.Applet.
+-keep public class * extends java.applet.Applet
+
+# Also keep - Serialization code. Keep all fields and methods that are used for
+# serialization.
+-keepclassmembers class * extends java.io.Serializable {
+    static final long serialVersionUID;
+    static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+# Keep names - Native method names. Keep all native class/method names.
+-keepclasseswithmembers,allowshrinking class * {
+    native <methods>;
+}
