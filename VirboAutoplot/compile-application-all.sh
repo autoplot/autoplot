@@ -6,6 +6,14 @@
 #
 # CDF Support will be awkward because of the binaries.  Support this for the hudson platform.
 
+# set JAVA5_HOME and JAVA6_HOME
+if [ "" = "$JAVA5_HOME" ]; then
+    JAVA5_HOME=/usr/local/jdk1.5.0_17/
+fi
+if [ "" = "$JAVA6_HOME" ]; then
+    JAVA6_HOME=/usr/local/jre1.6.0_14/
+fi
+
 rm -r -f temp-src/
 mkdir temp-src/
 rm -r -f temp-classes/
@@ -32,7 +40,7 @@ echo "copy sources..."
 for i in \
   QDataSet QStream dasCore DataSource \
   JythonSupport \
-  IdlMatmabSupport \
+  IdlMatlabSupport \
   BinaryDataSource DataSourcePack JythonDataSource \
   Das2ServerDataSource TsdsDataSource  \
   NetCdfDataSource CdfDataSource CefDataSource \
@@ -91,13 +99,13 @@ echo "done copy resources."
 # compile key java classes.
 echo "compile sources..."
 cd temp-src
-/usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoPlotUI.java
-/usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java
-/usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java
+$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoPlotUI.java
+$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java
+$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo /usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
-   /usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
+   echo $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
+   $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
 done
 cd ..
 echo "done compile sources."
@@ -107,11 +115,12 @@ echo "make jumbo jar file..."
 cd temp-classes
 
 echo `pwd`
-/usr/local/jdk1.5.0_17/bin/jar cmf ../temp-src/MANIFEST.MF ../dist/AutoplotAll.jar *
+$JAVA5_HOME/bin/jar cmf ../temp-src/MANIFEST.MF ../dist/AutoplotAll.jar *
 cd ..
 echo "done make jumbo jar file..."
 
-#echo "proguard/pack200 stuff..."
-#/usr/local/jre1.6.0_14/bin/java -jar ../APLibs/lib/proguard.jar @apApplicationAll.proguard
-#/usr/local/jre1.6.0_14/bin/pack200 dist/AutoplotAll.pro.jar.pack.gz dist/AutoplotAll.pro.jar
-#echo "done proguard/pack200 stuff."
+echo "proguard/pack200 stuff..."
+#proguard is compiled for Java 6.  This needs to be fixed.
+$JAVA6_HOME/bin/java -jar ../APLibs/lib/proguard.jar @apApplicationAll.proguard
+$JAVA6_HOME/bin/pack200 dist/AutoplotAll.pro.jar.pack.gz dist/AutoplotAll.pro.jar
+echo "done proguard/pack200 stuff."
