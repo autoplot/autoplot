@@ -58,7 +58,6 @@ import javax.swing.SwingUtilities;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
-import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -124,7 +123,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private static String RESOURCES= "/org/virbo/autoplot/resources/";
     public static final Icon WARNING_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"warning-icon.png") );
     public static final Icon ERROR_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"error-icon.png") );
-    public static final Icon BUSY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"spinner_16.gif") );
+    public static final Icon BUSY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"spinner.gif") );
     public static final Icon READY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"indProgress0.png") );
     public static final Icon IDLE_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"idle-icon.png") );
         
