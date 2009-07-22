@@ -1458,7 +1458,11 @@ private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 logger.fine("enter invokeLater");
 
                 logger.addHandler( APSplash.getInstance().getLogHandler() );
-                if ( !"true".equals( System.getProperty("java.awt.headless") ) ) APSplash.showSplash();
+                if ( !"true".equals( System.getProperty("java.awt.headless") ) ) {
+                    APSplash.showSplash();
+                } else {
+                    System.err.println("this is autoplot"+APSplash.getVersion());
+                }
                 
                 model.addDasPeersToApp();
 
