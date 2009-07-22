@@ -32,7 +32,8 @@ public class JythonMain {
     }
     
     public static void main(String[] args) throws Exception {
-        
+
+        System.err.println("org.virbo.autoplot.JythonMain "+APSplash.getVersion());
         interp = JythonUtil.createInterpreter(true,false);
 
         InputStream in;
