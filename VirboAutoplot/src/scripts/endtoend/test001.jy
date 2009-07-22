@@ -1,0 +1,7 @@
+from java.lang import System
+System.setProperty( "java.awt.headless", "true" )
+ds= getDataSet( 'http://www.autoplot.org/data/fireworks.wav' )
+plot( 0, ds )
+plot( 1, fftWindow( ds, 512 ) )
+setCanvasSize( 800, 600 )
+writeToPng( 'test001.png' )
