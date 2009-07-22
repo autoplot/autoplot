@@ -52,6 +52,6 @@ public class JythonMain {
         }
         
         interp.execfile( in, inIdentifier );
-        
+        System.exit(0);
     }
 }
