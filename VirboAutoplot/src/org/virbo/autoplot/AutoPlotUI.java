@@ -1458,7 +1458,7 @@ private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 logger.fine("enter invokeLater");
 
                 logger.addHandler( APSplash.getInstance().getLogHandler() );
-                APSplash.getInstance().showSplash();
+                if ( !"true".equals( System.getProperty("java.awt.headless") ) ) APSplash.getInstance().showSplash();
                 
                 model.addDasPeersToApp();
 
