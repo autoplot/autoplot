@@ -8,24 +8,20 @@ package test.endtoend;
 import java.io.IOException;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 
 /**
  *
  * @author jbf
  */
-public class Test001 {
+public class Test003 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
-            QDataSet ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
-            ScriptContext.plot( 0, ds );
-            ScriptContext.plot( 1, Ops.fftWindow( ds, 512 ) );
+            QDataSet ds= Util.getDataSet( "file:/home/jbf/ct/lanl/hudson/geo_pitch_stack_test1_local.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
-            ScriptContext.writeToPng( "test001.png" );
+            ScriptContext.writeToPng( "test003.png" );
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( RuntimeException ex ) {
-            ex.printStackTrace();
             System.exit(1);
         }
     }
