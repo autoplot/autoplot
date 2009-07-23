@@ -20,6 +20,7 @@ public class Test003 {
             ScriptContext.writeToPng( "test003.png" );
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( RuntimeException ex ) {
+            ex.printStackTrace();
             System.exit(1);
         }
     }
