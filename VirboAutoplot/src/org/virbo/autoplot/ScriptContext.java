@@ -595,4 +595,10 @@ public class ScriptContext extends PyJavaInstance {
         if ( ! filename.endsWith(".vap") ) throw new IllegalArgumentException("filename must end in vap");
         model.doSave( new File( filename ) );
     }
+
+    public static void load( String filename ) throws IOException {
+        maybeInitModel();
+        if ( ! filename.endsWith(".vap") ) throw new IllegalArgumentException("filename must end in vap");
+        model.doOpen( new File( filename ) );
+    }
 }
