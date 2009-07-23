@@ -596,6 +596,11 @@ public class ScriptContext extends PyJavaInstance {
         model.doSave( new File( filename ) );
     }
 
+    /**
+     * load the vap file.  Currently the filename must be a local file.
+     * @param filename
+     * @throws java.io.IOException
+     */
     public static void load( String filename ) throws IOException {
         maybeInitModel();
         if ( ! filename.endsWith(".vap") ) throw new IllegalArgumentException("filename must end in vap");
