@@ -22,5 +22,6 @@ public class Test001 {
         ScriptContext.plot( 1, Ops.fftWindow( ds, 512 ) );
         ScriptContext.setCanvasSize( 800, 600 );
         ScriptContext.writeToPng( "test001.png" );
+        System.exit(0);  // TODO: something is firing up the event thread
     }
 }
