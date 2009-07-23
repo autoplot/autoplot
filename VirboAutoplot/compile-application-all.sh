@@ -27,6 +27,7 @@ for i in ../../APLibs/lib/*.jar; do
 done
 
 # use hacked version of cdf library
+rm -rf gsfc/
 jar xf ../../APLibs/lib/cdfjava-hack.jar
 
 for i in ../../APLibs/lib/netCDF/*.jar; do
