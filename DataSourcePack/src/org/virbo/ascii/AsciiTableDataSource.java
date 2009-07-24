@@ -107,19 +107,28 @@ public class AsciiTableDataSource extends AbstractDataSource {
         // combine times if necessary
         if (timeColumns > 1) {
             final Units u = Units.t2000;
+            int warnCount=10;
             // replace the first column with the datum time
             for (int i = 0; i < ds.length(); i++) {
-                timeParser.resetSeconds();
-                for (int j = 0; j < timeColumns; j++) {
-                    double d = ds.value(i, timeColumn + j);
-                    double fp = d - (int) Math.floor(d);
-                    if (fp == 0) {
-                        timeParser.setDigit(timeFormats[j], (int) d);
-                    } else {
-                        timeParser.setDigit(timeFormats[j], d);
+                try {
+                    timeParser.resetSeconds();
+                    for (int j = 0; j < timeColumns; j++) {
+                        double d = ds.value(i, timeColumn + j);
+                        double fp = d - (int) Math.floor(d);
+                        if (fp == 0) {
+                            timeParser.setDigit(timeFormats[j], (int) d);
+                        } else {
+                            timeParser.setDigit(timeFormats[j], d);
+                        }
                     }
-                }
                 ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000));
+                } catch ( IllegalArgumentException ex ) {
+                    if ( warnCount>0 ) { // prevent errors from bogging down
+                        new RuntimeException("failed to read time at record "+i, ex ).printStackTrace();
+                        warnCount--;
+                    }
+                    ds.putValue( i, timeColumn, Units.t2000.getFillDouble() );
+                }
             }
             parser.setUnits(timeColumn, Units.t2000);
         }
@@ -428,9 +437,35 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     timeFormat= timeFormat.replaceFirst("%b","%m");
                     ib = timeFormat.indexOf("%b");  // support multiple
                 }
-
-                ib = timeFormat.indexOf("%{ignore"); // arbitary skip must not have fields following but before delimiter
+                ib = timeFormat.indexOf("%j:%H:%M:%S"); // kludge number 1
                 if (ib != -1) {
+                    int theColumn = timeFormat.substring(0, ib).split("%", -2).length - 1;
+                    final Pattern colonDelim= Pattern.compile(":");
+                    AsciiParser.FieldParser theFieldParser = new AsciiParser.FieldParser() {
+                        public double parseField(String field, int columnIndex) throws ParseException {
+                            String[] ss= colonDelim.split(field);
+                            return Integer.parseInt(ss[0]) + Integer.parseInt(ss[1]) / 24. + Integer.parseInt(ss[2]) / 1440. + Integer.parseInt(ss[3]) / 86400.;
+                        }
+                    };
+                    parser.setFieldParser(theColumn, theFieldParser);
+                    timeFormat= timeFormat.replaceFirst("%j:%H:%M:%S","%j");
+                }
+                ib = timeFormat.indexOf("%H:%M:%S"); // kludge number 2
+                if (ib != -1) {
+                    int theColumn = timeFormat.substring(0, ib).split("%", -2).length - 1;
+                    final Pattern colonDelim= Pattern.compile(":");
+                    AsciiParser.FieldParser theFieldParser = new AsciiParser.FieldParser() {
+                        public double parseField(String field, int columnIndex) throws ParseException {
+                            String[] ss= colonDelim.split(field);
+                            return Integer.parseInt(ss[0]) + Integer.parseInt(ss[1]) / 60. + Integer.parseInt(ss[2]) / 3600.;
+                        }
+                    };
+                    parser.setFieldParser(theColumn, theFieldParser);
+                    timeFormat= timeFormat.replaceFirst("%H:%M:%S","%H");
+                }
+                timeFormats = timeFormat.split(delim, -2);
+                ib = timeFormat.indexOf("%{ignore"); // arbitary skip must not have fields following but before delimiter
+                while (ib != -1) {
                     int column = timeFormat.substring(0, ib).split("%", -2).length - 1;
                     AsciiParser.FieldParser nullFieldParser = new AsciiParser.FieldParser() {
                         public double parseField(String field, int columnIndex) throws ParseException {
@@ -438,6 +473,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                         }
                     };
                     parser.setFieldParser(column, nullFieldParser);
+                    ib = timeFormat.indexOf("%{ignore",ib+1);
                 }
             } else {
                 timeParser = TimeParser.create(timeFormat);
