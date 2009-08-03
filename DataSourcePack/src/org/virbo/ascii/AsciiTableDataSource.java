@@ -121,7 +121,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                             timeParser.setDigit(timeFormats[j], d);
                         }
                     }
-                ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000));
+                    ds.putValue(i, timeColumn, timeParser.getTime(Units.t2000) );
                 } catch ( IllegalArgumentException ex ) {
                     if ( warnCount>0 ) { // prevent errors from bogging down
                         new RuntimeException("failed to read time at record "+i, ex ).printStackTrace();
