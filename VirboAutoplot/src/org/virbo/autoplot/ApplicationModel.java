@@ -567,6 +567,7 @@ public class ApplicationModel {
      */
     void doOpen(File f, LinkedHashMap<String, String> deltas) throws IOException {
 
+        if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
         Application state = (Application) StatePersistence.restoreState(f);
