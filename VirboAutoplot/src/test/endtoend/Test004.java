@@ -16,6 +16,7 @@ public class Test004 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
             ScriptContext.load( "/home/jbf/ct/hudson/vap/merka_celias_test004.vap" );
+            System.err.println( "#### model pending changes: " + ScriptContext.getDocumentModel().getController().isPendingChanges() );
             ScriptContext.setCanvasSize( 992, 711 );
             ScriptContext.writeToPng( "test004.png" );
             System.exit(0);  // TODO: something is firing up the event thread
