@@ -16,31 +16,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 
 /**
- * provide separation from DOM objects by decorating them.
- */
-class TreeNode {
-    Node domNode;
-    TreeNode( Node domNode ) {
-        this.domNode= domNode;
-    }
-    public String toString() {
-        String val;
-        if ( isLeaf() ) {
-            val= domNode.getNodeName() + "= \"" + domNode.getFirstChild().getNodeValue()+"\"";
-        } else {
-            val= domNode.getNodeName();
-        }
-        return val;
-    }
-    public Node getDomNode() {
-        return domNode;
-    }
-    
-    boolean isLeaf() {
-        return domNode.getChildNodes().getLength()==1 && domNode.getFirstChild().getNodeType()==Node.TEXT_NODE;
-    }
-}
-/**
  * This class implements the Swing TreeModel interface so that the DOM tree
  * returned by a TreeWalker can be displayed in a JTree component.
  **/
