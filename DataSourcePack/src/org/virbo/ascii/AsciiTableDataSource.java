@@ -199,7 +199,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             MutablePropertyDataSet mds = DataSetOps.leafTrim(ds, rank2[0], rank2[1]);
 
             if (depend1Labels != null) {
-                QDataSet labels = Ops.labels(parser.getFieldNames());
+                QDataSet labels = Ops.labels(parser.getFieldLabels());
                 labels = DataSetOps.leafTrim(labels, depend1Labels[0], depend1Labels[1]);
                 mds.putProperty(QDataSet.DEPEND_1, labels);
             }
