@@ -1,0 +1,27 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package test.endtoend;
+
+import java.io.IOException;
+import org.virbo.autoplot.ScriptContext;
+
+/**
+ *
+ * @author jbf
+ */
+public class Test004 {
+    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+        try {
+            ScriptContext.load( "/home/jbf/ct/hudson/vap/merka_celias_test004.vap" );
+            ScriptContext.setCanvasSize( 992, 711 );
+            ScriptContext.writeToPng( "test004.png" );
+            System.exit(0);  // TODO: something is firing up the event thread
+        } catch ( RuntimeException ex ) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
+    }
+}
