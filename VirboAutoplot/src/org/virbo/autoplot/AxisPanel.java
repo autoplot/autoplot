@@ -11,14 +11,14 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
+import org.das2.datum.DatumRange;
+import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
-import org.das2.system.RequestProcessor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -88,6 +88,27 @@ public class AxisPanel extends javax.swing.JPanel {
         zredit.setValue(colorbar.getDatumRange());
         zAxisRangePanel.add(zredit, BorderLayout.CENTER);
 
+        xredit.addPropertyChangeListener( new PropertyChangeListener() {
+           public void propertyChange(PropertyChangeEvent ev ) {
+               DatumRange dr= (DatumRange)xredit.getValue();
+               xLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
+               if ( !xLog.isEnabled() ) xLog.setSelected(false);
+           }
+        });
+        yredit.addPropertyChangeListener( new PropertyChangeListener() {
+           public void propertyChange(PropertyChangeEvent ev ) {
+               DatumRange dr= (DatumRange)yredit.getValue();
+               yLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
+               if ( !yLog.isEnabled() ) yLog.setSelected(false);
+           }
+        });
+        zredit.addPropertyChangeListener( new PropertyChangeListener() {
+           public void propertyChange(PropertyChangeEvent ev ) {
+               DatumRange dr= (DatumRange)zredit.getValue();
+               zLog.setEnabled( UnitsUtil.isRatioMeasurement(dr.getUnits() ) );
+               if ( !zLog.isEnabled() ) zLog.setSelected(false);
+           }
+        });
         Runnable run= new Runnable() {
             public void run() {
                 doPlotBindings();
