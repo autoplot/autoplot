@@ -308,10 +308,19 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 columnCount = p.fieldCount();
                 delim = p.getDelim();
             } else {
+                if ( delim.equals(",") ) delim="COMMA";
+                delim= delim.replaceAll("WHITESPACE", "\\s+");
+                delim= delim.replaceAll("SPACE", " ");
+                delim= delim.replaceAll("COMMA", ",");
+                delim= delim.replaceAll("COLON", ":");
+                delim= delim.replaceAll("TAB", "\t");
+                delim= delim.replaceAll("whitespace", "\\s+");
+                delim= delim.replaceAll("space", " ");
+                delim= delim.replaceAll("comma", ",");
+                delim= delim.replaceAll("colon", ":");
+                delim= delim.replaceAll("tab", "\t");
                 if (delim.equals("+")) {
                     delim = " ";
-                } else if ( delim.equalsIgnoreCase("tab") ) {
-                    delim = "\t";
                 }
                 columnCount = parser.setDelimParser(file.toString(), delim).fieldCount();
             }
