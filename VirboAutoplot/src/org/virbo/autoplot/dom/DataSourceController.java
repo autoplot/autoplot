@@ -99,6 +99,7 @@ public class DataSourceController extends DomNodeController {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
+                DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 setUriNeedsResolution(true);
                 if (!dom.controller.isValueAdjusting()) {
                     resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
@@ -106,7 +107,9 @@ public class DataSourceController extends DomNodeController {
                     new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, false ) {
                         @Override
                         public void run() {
+                            DataSourceController.this.changesSupport.performingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                             if ( uriNeedsResolution ) resolveDataSource(true,getMonitor("resetting data source", "resetting data source"));
+                            DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                         }
                     };
                 }
@@ -115,6 +118,7 @@ public class DataSourceController extends DomNodeController {
     };
     private TimeSeriesBrowseController timeSeriesBrowseController;
     private static final String PENDING_DATA_SOURCE = "dataSource";
+    private static final String PENDING_RESOLVE_DATA_SOURCE = "resolveDataSource";
     private static final String PENDING_FILL_DATASET = "fillDataSet";
     private static final String PENDING_UPDATE = "update";
 
