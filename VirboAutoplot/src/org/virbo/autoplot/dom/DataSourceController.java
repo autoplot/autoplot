@@ -102,7 +102,9 @@ public class DataSourceController extends DomNodeController {
                 DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 setUriNeedsResolution(true);
                 if (!dom.controller.isValueAdjusting()) {
+                    DataSourceController.this.changesSupport.performingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                     resolveDataSource(false,getMonitor("resetting data source", "resetting data source"));
+                    DataSourceController.this.changesSupport.changePerformed( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 } else {
                     new RunLaterListener(ChangesSupport.PROP_VALUEADJUSTING, dom.controller, false ) {
                         @Override
