@@ -605,7 +605,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
             applicationModel.resetDataSetSourceURL(surl, getStatusBarProgressMonitor("Finished "+surl) );
         } catch (RuntimeException ex) {
             applicationModel.getExceptionHandler().handleUncaught(ex);
-            setStatus(ERROR_ICON,ex.getMessage());
+            String msg= ex.getMessage();
+            if ( msg==null ) msg= ex.toString();
+            setStatus(ERROR_ICON,msg);
         }
     }
 
@@ -1555,6 +1557,7 @@ private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     
     public void setMessage( Icon icon, String message ) {
         String myMess= message;
+        if ( message==null ) message= "<null>"; // TODO: fix this later
         if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
         this.statusLabel.setIcon( icon );
         this.statusLabel.setText(myMess);
