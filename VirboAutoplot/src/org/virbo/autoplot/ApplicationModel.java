@@ -441,6 +441,7 @@ public class ApplicationModel {
         item.setTitle(autoTitle);
 
         List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
+        if ( bookmarks==null ) bookmarks= new ArrayList<Bookmark>();
         List<Bookmark> newValue = new ArrayList<Bookmark>(bookmarks);
 
         if (newValue.contains(item)) { // move it to the front of the list
