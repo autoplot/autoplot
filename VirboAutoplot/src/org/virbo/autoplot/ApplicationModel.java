@@ -402,6 +402,7 @@ public class ApplicationModel {
     }
 
     public void addRecent(String surl) {
+        if ( recent==null ) recent= new ArrayList<Bookmark>(); // kludge for rpwg TODO: why is this null?
         List oldValue = Collections.unmodifiableList(recent);
         ArrayList<Bookmark> newValue = new ArrayList<Bookmark>(recent);
         Bookmark book = new Bookmark.Item(surl);
