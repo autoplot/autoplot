@@ -418,7 +418,9 @@ public class PlotController extends DomNodeController {
         if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) ) {
             if ( dom.timeRange.intersects( xrange ) ) {
                 double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.2 : 0.8;
-                if ( DatumRangeUtil.normalize( dom.timeRange, xrange.max() ) - DatumRangeUtil.normalize( dom.timeRange, xrange.min() ) > reqOverlap ) {
+                double overlap= DatumRangeUtil.normalize( dom.timeRange, xrange.max() ) - DatumRangeUtil.normalize( dom.timeRange, xrange.min() );
+                if ( overlap > 1.0 ) overlap= 1/overlap;
+                if ( overlap > reqOverlap ) {
                     shouldBindX= true;
                 }
             }
