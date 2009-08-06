@@ -46,9 +46,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.event.BoxSelectionEvent;
-import org.das2.event.BoxSelectionListener;
-import org.das2.event.BoxSelectorMouseModule;
 import org.das2.event.CrossHairRenderer;
 import org.das2.event.MouseModule;
 import org.das2.graph.DasCanvas;
@@ -84,13 +81,13 @@ public class AutoplotApplet extends JApplet {
     ApplicationModel model;
     Application dom;
     boolean initializing = true;
-    static Logger logger = Logger.getLogger("virbo.autoplot.applet");
+    static Logger logger = Logger.getLogger("autoplot.applet");
     String statusCallback;
     String timeCallback;
     String clickCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090703.2";
+    public static final String VERSION = "20090806.2";
     private Image splashImage;
 
     private String getStringParameter(String name, String deft) {
@@ -460,7 +457,7 @@ public class AutoplotApplet extends JApplet {
         Plot p = dom.getController().getPlot();
 
         if (!title.equals("")) {
-            p.setTitle(title);
+            p.setTitle(title);            
         }
 
         Axis axis = p.getXaxis();
@@ -598,7 +595,7 @@ public class AutoplotApplet extends JApplet {
             }
         });
 
-        if ( clickCallback!=null ) {
+        if ( !clickCallback.equals("") ) {
             final DasPlot plot= dom.getPlots(0).getController().getDasPlot();
             MouseModule mm= new MouseModule( plot, new CrossHairRenderer( plot, null, plot.getXAxis(), plot.getYAxis() ), "appletClick" ) {
                 @Override
