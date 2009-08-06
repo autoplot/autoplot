@@ -6,6 +6,7 @@ package org.virbo.binarydatasource;
 
 import java.nio.ByteBuffer;
 import org.virbo.dataset.AbstractDataSet;
+import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
 
 /**
@@ -98,29 +99,31 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @return
      */
     public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, Object type ) {
+        BufferDataSet result;
         if ( type.equals(DOUBLE) ) {
-            return new Double( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new Double( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(FLOAT) ) {
-            return new  Float( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Float( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(LONG) ) {
-            return new  Long( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Long( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(INT) ) {
-            return new  Int( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Int( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(UINT) ) {
-            return new  UInt( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  UInt( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(SHORT) ) {
-            return new  Short( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Short( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(USHORT) ) {
-            return new  UShort( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  UShort( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(TRUNCATEDFLOAT) ) {
-            return new  TruncatedFloat( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  TruncatedFloat( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(BYTE) ) {
-            return new  Byte( rank, reclen, recoffs, len0, len1, len2, buf );
+            result=new  Byte( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if (type.equals(UBYTE) ) {
-            return new UByte( rank, reclen, recoffs, len0, len1, len2, buf );           
+            result=new UByte( rank, reclen, recoffs, len0, len1, len2, buf );
         } else {
             throw new IllegalArgumentException("bad data type: "+type);
         }
+        return result;
     }
 
     public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, Object type, ByteBuffer back  ) {
@@ -133,6 +136,9 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         this.len2 = len2;
         this.type= type;
         this.fieldLen= byteCount(type);
+        if ( rank>1 ) {
+            putProperty( QDataSet.QUBE, Boolean.TRUE );
+        }
     }
 
     public Object getType() {
