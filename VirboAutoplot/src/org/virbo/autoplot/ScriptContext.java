@@ -132,7 +132,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.lang.InterruptedException
      */
     public static void plot(String surl) throws InterruptedException {
-        maybeInitView();
+        maybeInitModel();
         if ( surl.endsWith(".vap") || surl.contains(".vap?") ) {
             model.resetDataSetSourceURL(surl, new NullProgressMonitor());
         } else {
@@ -150,7 +150,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.lang.InterruptedException
      */
     public static void plot(int chNum, String surl) throws InterruptedException {
-        maybeInitView();
+        maybeInitModel();
         model.setDataSet( chNum, null, surl );
         model.waitUntilIdle(false);
     }
@@ -162,7 +162,7 @@ public class ScriptContext extends PyJavaInstance {
      * @throws java.lang.InterruptedException
      */
     public static void plot(int chNum, String label, String surl) throws InterruptedException {
-        maybeInitView();
+        maybeInitModel();
         model.setDataSet( chNum, label, surl );
         model.waitUntilIdle(false);
     }
