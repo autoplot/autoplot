@@ -555,7 +555,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void formatDataSet(QDataSet ds, String file) throws Exception {
         if (!file.contains(":/")) {
-            file = new File(file).toString();
+            file = new File(file).getCanonicalFile().toString();
         }
         URI uri = DataSetURL.getURI(file);
         URL url = DataSetURL.getResourceURI(uri).toURL(); //TODO: prevents jdbc:mysql:...
