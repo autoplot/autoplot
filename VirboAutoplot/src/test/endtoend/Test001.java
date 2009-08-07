@@ -18,6 +18,8 @@ import org.virbo.jythonsupport.Util;
 public class Test001 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
+            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
             QDataSet ds= Util.getDataSet( "http://www.autoplot.org/data/fireworks.wav" );
             ScriptContext.plot( 0, ds );
             ScriptContext.plot( 1, Ops.fftWindow( ds, 512 ) );

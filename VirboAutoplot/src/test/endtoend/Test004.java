@@ -15,6 +15,9 @@ import org.virbo.autoplot.ScriptContext;
 public class Test004 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
+            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
             ScriptContext.load( "/home/jbf/ct/hudson/vap/merka_celias_test004.vap" );
             System.err.println( "#### model pending changes: " + ScriptContext.getDocumentModel().getController().isPendingChanges() );
             ScriptContext.setCanvasSize( 992, 711 );

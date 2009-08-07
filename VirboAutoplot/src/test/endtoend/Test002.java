@@ -20,6 +20,9 @@ public class Test002 {
 
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
+            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
             //ScriptContext.createGui();
             QDataSet ds = Util.getDataSet("http://www.autoplot.org/data/fireworks.wav");
             final Application dom = ScriptContext.getDocumentModel();
