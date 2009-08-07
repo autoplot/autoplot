@@ -453,6 +453,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     AsciiParser.FieldParser theFieldParser = new AsciiParser.FieldParser() {
                         public double parseField(String field, int columnIndex) throws ParseException {
                             String[] ss= colonDelim.split(field);
+                            if ( ss.length<3 ) throw new ParseException("expected three colons: "+field,0);
                             return Integer.parseInt(ss[0]) + Integer.parseInt(ss[1]) / 24. + Integer.parseInt(ss[2]) / 1440. + Integer.parseInt(ss[3]) / 86400.;
                         }
                     };
@@ -466,6 +467,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
                     AsciiParser.FieldParser theFieldParser = new AsciiParser.FieldParser() {
                         public double parseField(String field, int columnIndex) throws ParseException {
                             String[] ss= colonDelim.split(field);
+                            if ( ss.length<3 ) throw new ParseException("expected two colons: "+field,0);
                             return Integer.parseInt(ss[0]) + Integer.parseInt(ss[1]) / 60. + Integer.parseInt(ss[2]) / 3600.;
                         }
                     };
