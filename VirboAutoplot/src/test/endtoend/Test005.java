@@ -25,6 +25,9 @@ public class Test005 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
             ScriptContext.setCanvasSize(800, 600);
+            ScriptContext.getDocumentModel().getOptions().setAutolayout(false);
+            ScriptContext.getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
             ScriptContext.plot("http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
             ScriptContext.writeToPng("test005_demo1.png");
 
