@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
@@ -28,11 +30,13 @@ import java.util.zip.InflaterInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.TagGenDataSet;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
@@ -56,6 +60,7 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class TsmlNcml {
+    private static final int RANK_LIMIT = 2;
 
     public static void main(String[] args) throws Exception {
         new TsmlNcml().doRead(
@@ -124,7 +129,7 @@ public class TsmlNcml {
 
         if ( depend!=null ) {
             String shape= (String) depend.property("shape");
-            String[] shapes= shape.split(",");
+            String[] shapes= shape.split("[, ]");
             for ( int i=0; i<shapes.length; i++ ) {
                 Ops.dependsOn( depend, i, dss.get(shapes[i]) );
             }
@@ -134,12 +139,25 @@ public class TsmlNcml {
         }
     }
 
+    private Units lookupUnits( String sunits ) {
+                    if ( sunits.contains("since") ) {
+                        try {
+                            return SemanticOps.lookupTimeUnits(sunits);
+                        } catch (ParseException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    } else {
+                       return SemanticOps.lookupUnits(sunits);
+                    }
+    }
+
     protected MutablePropertyDataSet netcdf(Node node) throws MalformedURLException, IOException {
         Map<String, Object> props = new HashMap();
         NodeList nl = node.getChildNodes();
         MutablePropertyDataSet result = null;
         Map<String,Node> dimensions = new LinkedHashMap();
         NamedNodeMap attrs = node.getAttributes();
+        String dataType= null;
         if (attrs.getNamedItem("location") != null) {
             result = location(node);
         } else {
@@ -151,11 +169,22 @@ public class TsmlNcml {
                     dimensions.put( maybeGetAttr(child,"name"), child );
                 } else if (child.getNodeName().equals("attribute")) {
                     if (((Attr) child.getAttributes().getNamedItem("name")).getValue().equals("units")) {
-                        props.put(QDataSet.UNITS, MetadataUtil.lookupUnits(child.getAttributes().getNamedItem("value").getTextContent()));
+                        props.put(QDataSet.UNITS, lookupUnits(child.getAttributes().getNamedItem("value").getTextContent()));
+                    } else if (((Attr) child.getAttributes().getNamedItem("name")).getValue().equals("DataType")) {
+                        dataType= child.getAttributes().getNamedItem("value").getTextContent();
                     }
                 } else if (child.getNodeName().equals("variable")) {
                     result = variable( child, dimensions, null );
                 }
+            }
+        }
+        if ( dataType!=null ) {
+            if ( dataType.equals("vector") ) {
+                String[] componentLabels= new String[result.length(0)];
+                for ( int i=0; i<componentLabels.length; i++ ) {
+                    componentLabels[i]= "c"+i; // TODO: ask Bob how the components are labelled.
+                }
+                result.putProperty( QDataSet.DEPEND_1, Ops.labels(componentLabels) ); //TODO: QDataSet scheme change coming COMPONENT.
             }
         }
         return result;
@@ -203,7 +232,8 @@ public class TsmlNcml {
             Node child = nl.item(i);
             if (child.getNodeName().equals("attribute")) {
                 if (((Attr) child.getAttributes().getNamedItem("name")).getValue().equals("units")) {
-                    props.put(QDataSet.UNITS, MetadataUtil.lookupUnits(child.getAttributes().getNamedItem("value").getTextContent()));
+                    String sunits= child.getAttributes().getNamedItem("value").getTextContent();
+                    props.put(QDataSet.UNITS, lookupUnits(sunits));
                 }
             } else if (child.getNodeName().equals("values")) {
                 Node increment = child.getAttributes().getNamedItem("increment");
@@ -250,7 +280,7 @@ public class TsmlNcml {
         }
 
         String shape= maybeGetAttr( variable, "shape" );
-        String[] shapes= shape.split(",");
+        String[] shapes= shape.split("[, ]");
 
         int len1= -1;
         if ( dims.size()>1 ) {
@@ -275,9 +305,9 @@ public class TsmlNcml {
             BufferDataSet data3= (BufferDataSet)tsds( new URL( codebase, surl ), size, len1, type, new NullProgressMonitor() );
 
             MutablePropertyDataSet data= data3.trim( 0, points );
-            BufferDataSet dataMin= data3.trim( 2*points, 3*points );
+            BufferDataSet dataMin= data3.trim( RANK_LIMIT*points, 3*points );
             dataMin.putProperty( QDataSet.NAME, "binmin" );
-            BufferDataSet dataMax= data3.trim( 1*points, 2*points );
+            BufferDataSet dataMax= data3.trim( 1*points, RANK_LIMIT*points );
             dataMax.putProperty( QDataSet.NAME, "binmax" );
             data.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(dataMax, data));
             data.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(data, dataMin));
@@ -334,12 +364,12 @@ public class TsmlNcml {
         bbuf.flip();
         bbuf.order(ByteOrder.LITTLE_ENDIAN);
 
-        int points = bbuf.limit() / BufferDataSet.byteCount(type);
-
         if ( len1==-1 ) {
+            int points = bbuf.limit() / BufferDataSet.byteCount(type);
             return org.virbo.binarydatasource.BufferDataSet.makeDataSet( 1, BufferDataSet.byteCount(type), 0, points, 1, 1, bbuf, type );
         } else {
-            return org.virbo.binarydatasource.BufferDataSet.makeDataSet( 2, len1* BufferDataSet.byteCount(type), 0, points, len1, 1, bbuf, type );
+            int points = bbuf.limit() / len1 / BufferDataSet.byteCount(type);
+            return org.virbo.binarydatasource.BufferDataSet.makeDataSet( RANK_LIMIT, len1* BufferDataSet.byteCount(type), 0, points, len1, 1, bbuf, type );
         }
     }
 
