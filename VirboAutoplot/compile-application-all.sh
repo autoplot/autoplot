@@ -42,6 +42,7 @@ for i in \
   QDataSet QStream dasCore DataSource \
   JythonSupport \
   IdlMatlabSupport \
+  AudioSystemDataSource \
   BinaryDataSource DataSourcePack JythonDataSource \
   Das2ServerDataSource TsdsDataSource  \
   NetCdfDataSource CdfDataSource CefDataSource \
