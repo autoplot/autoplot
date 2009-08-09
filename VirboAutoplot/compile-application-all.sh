@@ -126,7 +126,7 @@ done
 cd ..
 echo "done compile sources."
 
-if ( "$hasErrors" -eq "1" ); then
+if [ $hasErrors -eq 1 ]; then
   echo "Error somewhere in compile, see above"
   exit 1 
 fi
