@@ -329,17 +329,6 @@ public class Options extends DomNode {
         if ( !exclude.contains(PROP_COLOR) )this.setColor(that.getColor());
         if ( !exclude.contains(PROP_FILLCOLOR) )this.setFillColor(that.getFillColor());
         if ( !exclude.contains(PROP_CANVASFONT) )this.setCanvasFont(that.getCanvasFont());
-        if ( !exclude.contains(PROP_LOGCONSOLEVISIBLE) )this.setLogConsoleVisible(that.isLogConsoleVisible());
-        if ( !exclude.contains(PROP_SCRIPTVISIBLE) )this.setScriptVisible(that.isScriptVisible());
-        if ( !exclude.contains(PROP_SERVERENABLED) )this.setServerEnabled(that.isServerEnabled());
-        if ( !exclude.contains(PROP_DRAWGRID) )this.setDrawGrid(that.isDrawGrid());
-        if ( !exclude.contains(PROP_DRAWMINORGRID) )this.setDrawMinorGrid(that.isDrawMinorGrid());
-        if ( !exclude.contains(PROP_DRAWANTIALIAS) )this.setDrawAntiAlias(that.drawAntiAlias);
-        if ( !exclude.contains(PROP_TEXTANTIALIAS) )this.setTextAntiAlias(that.textAntiAlias);
-        if ( !exclude.contains(PROP_OVERRENDERING) )this.setOverRendering(that.overRendering);
-        if ( !exclude.contains(PROP_AUTOLABELLING) )this.setAutolabelling(that.autolabelling);
-        if ( !exclude.contains(PROP_AUTORANGING) )this.setAutoranging(that.autoranging);
-        if ( !exclude.contains(PROP_AUTOLAYOUT) )this.setAutolayout(that.autolayout);
     }
 
     public void syncTo(DomNode n) {
@@ -353,41 +342,29 @@ public class Options extends DomNode {
 
         boolean b;
 
-        b = that.isAutolabelling()==this.isAutolabelling();
-        if (!b) result.add(new PropertyChangeDiff(PROP_AUTOLABELLING, that.isAutolabelling(), this.isAutolabelling()));
-        b = that.isAutolayout()==this.isAutolayout();
-        if (!b) result.add(new PropertyChangeDiff(PROP_AUTOLAYOUT, that.isAutolayout(), this.isAutolayout()));
-        b = that.isAutoranging()==this.isAutoranging();
-        if (!b) result.add(new PropertyChangeDiff(PROP_AUTORANGING, that.isAutoranging(), this.isAutoranging()));
         b = that.getBackground().equals(this.getBackground());
         if (!b) result.add(new PropertyChangeDiff(PROP_BACKGROUND, that.getBackground(), this.getBackground()));
-        b = that.getCanvasFont().equals(this.getCanvasFont());
-        if (!b) result.add(new PropertyChangeDiff(PROP_CANVASFONT, that.getCanvasFont(), this.getCanvasFont()));
-        b = that.getColor().equals(this.getColor());
-        if (!b) result.add(new PropertyChangeDiff(PROP_COLOR, that.getColor(), this.getColor()));
-        b = that.isDrawAntiAlias()==this.isDrawAntiAlias();
-        if (!b) result.add(new PropertyChangeDiff(PROP_DRAWANTIALIAS, that.isDrawAntiAlias(), this.isDrawAntiAlias()));
-        b = that.isDrawGrid()==this.isDrawGrid();
-        if (!b) result.add(new PropertyChangeDiff(PROP_DRAWGRID, that.isDrawGrid(), this.isDrawGrid()));
-        b = that.isDrawMinorGrid()==this.isDrawMinorGrid();
-        if (!b) result.add(new PropertyChangeDiff(PROP_DRAWMINORGRID, that.isDrawMinorGrid(), this.isDrawMinorGrid()));
-        b = that.getFillColor().equals(this.getFillColor());
-        if (!b) result.add(new PropertyChangeDiff(PROP_FILLCOLOR, that.getFillColor(), this.getFillColor()));
         b = that.getForeground().equals(this.getForeground());
         if (!b) result.add(new PropertyChangeDiff(PROP_FOREGROUND, that.getForeground(), this.getForeground()));
-        b = that.isLogConsoleVisible() == this.isLogConsoleVisible();
-        if (!b) result.add(new PropertyChangeDiff(PROP_LOGCONSOLEVISIBLE, that.isLogConsoleVisible(), this.isLogConsoleVisible()));
-        b = that.isOverRendering() == this.isOverRendering();
-        if (!b) result.add(new PropertyChangeDiff(PROP_OVERRENDERING, that.isOverRendering(), this.isOverRendering()));
-        b = that.isScriptVisible() == this.isScriptVisible();
-        if (!b) result.add(new PropertyChangeDiff(PROP_SCRIPTVISIBLE, that.isScriptVisible(), this.isScriptVisible()));
-        b = that.isServerEnabled() == this.isServerEnabled();
-        if (!b) result.add(new PropertyChangeDiff(PROP_SERVERENABLED, that.isServerEnabled(), this.isServerEnabled()));
-        b = that.isSpecialEffects() == this.isSpecialEffects();
-        if (!b) result.add(new PropertyChangeDiff(PROP_SPECIALEFFECTS, that.isSpecialEffects(), this.isSpecialEffects()));
-        b = that.isTextAntiAlias() == this.isTextAntiAlias();
-        if (!b) result.add(new PropertyChangeDiff(PROP_TEXTANTIALIAS, that.isTextAntiAlias(), this.isTextAntiAlias()));
+        b = that.getColor().equals(this.getColor());
+        if (!b) result.add(new PropertyChangeDiff(PROP_COLOR, that.getColor(), this.getColor()));
+        b = that.getFillColor().equals(this.getFillColor());
+        if (!b) result.add(new PropertyChangeDiff(PROP_FILLCOLOR, that.getFillColor(), this.getFillColor()));
+        b = that.getCanvasFont().equals(this.getCanvasFont());
+        if (!b) result.add(new PropertyChangeDiff(PROP_CANVASFONT, that.getCanvasFont(), this.getCanvasFont()));
         return result;
     }
+
+    @Override
+    public DomNode copy() {
+        Options that= new Options();
+        that.setBackground( this.getBackground() );
+        that.setForeground( this.getForeground() );
+        that.setColor( this.getColor() );
+        that.setFillColor( this.getFillColor() );
+        that.setCanvasFont( this.getCanvasFont() );
+        return that;
+    }
+
 
 }
