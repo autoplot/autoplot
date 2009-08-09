@@ -1,4 +1,4 @@
-#!/bin/bash -xv
+#!/bin/bash
 
 # this copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.  This list is separate from the ant build script,
