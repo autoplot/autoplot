@@ -4,6 +4,8 @@
  */
 package org.virbo.autoplot;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
 import org.das2.dataset.TableDataSet;
 import org.das2.dataset.VectorDataSet;
@@ -597,13 +599,15 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * load the vap file.  Currently the filename must be a local file.
+     * load the vap file.  This is implemented by calling plot on the URI.
      * @param filename
      * @throws java.io.IOException
      */
     public static void load( String filename ) throws IOException {
-        maybeInitModel();
-        if ( ! filename.endsWith(".vap") ) throw new IllegalArgumentException("filename must end in vap");
-        model.doOpen( new File( filename ) );
+        try {
+            plot(filename);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
