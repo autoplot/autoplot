@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -xv
 
 # this copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.  This list is separate from the ant build script,
@@ -110,10 +110,10 @@ hasErrors=0
 echo "compile sources..."
 cd temp-src
 if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoPlotUI.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
