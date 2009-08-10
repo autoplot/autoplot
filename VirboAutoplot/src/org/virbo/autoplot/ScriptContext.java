@@ -4,8 +4,6 @@
  */
 package org.virbo.autoplot;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
 import org.das2.dataset.TableDataSet;
 import org.das2.dataset.VectorDataSet;
@@ -30,10 +28,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import org.das2.DasApplication;
 import org.das2.fsm.FileStorageModel;
+import org.das2.system.ExceptionHandler;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -43,6 +41,7 @@ import org.python.core.PyJavaInstance;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
@@ -62,6 +61,7 @@ public class ScriptContext extends PyJavaInstance {
     private static synchronized void maybeInitModel() {
         if (model == null) {
             model = new ApplicationModel();
+            model.setExceptionHandler( new ExitExceptionHandler() );
             model.addDasPeersToApp();
             dom= model.getDocumentModel();
         }
