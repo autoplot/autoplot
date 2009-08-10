@@ -18,6 +18,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Recent changes include:</p>
 <ul>
+<li> minor improvements in jython script panel./li>
+<li> bugfix: datasets are automatically added top to bottom for ScriptContext.plot(index,dataset )/li>
+<li> introduce ScriptContext.plot(index,uri)
+<li> bugfix: remove unnessary force data reload when loading vaps that messed up slice dimension for rank 3 datasets
 <li> bugfix 2818967: inconsistent handling of fill obs in ACE SIS
 </li><li> introduce support for bundle datasets
 </li><li> bugfix in QStream when packets are &gt;10000KB.
@@ -32,7 +36,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 <p>Known issues:</p>
 <ul>
 <li> Applet suffers from same seven second delay, applet can show display
-</li><li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
+</li><li>
+lingering issues with rank 3 data/slice Dimension in vaps.
+</li>
+<li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
 </li><li> last URI is not added to DataSetSelector.
 </li>
 </ul>
