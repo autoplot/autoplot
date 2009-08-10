@@ -76,13 +76,17 @@ public class WavDataSource2 extends AbstractDataSource {
         String type=null;
 
         if ( audioFormat.getEncoding()== Encoding.PCM_SIGNED ) {
-            if ( bits==16 ) {
+            if ( bits==32 ) {
+                type= "int";
+            } else if ( bits==16 ) {
                 type= "short";
             } else if ( bits==8 ) {
                 type= "byte";
             }
         } else {
-            if ( bits==16 ) {
+            if ( bits==32 ) {
+                type= "uint";
+            } else if ( bits==16 ) {
                 type= "ushort";
             } else if ( bits==8 ) {
                 type= "ubyte";
