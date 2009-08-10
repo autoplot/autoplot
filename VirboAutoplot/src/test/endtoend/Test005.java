@@ -28,8 +28,6 @@ public class Test005 {
     public static void xxx() {
         System.err.println("-- timer: "+ ( System.currentTimeMillis()-t0) );
         final Canvas c = ScriptContext.getDocumentModel().getCanvases(0);
-        System.err.println(c.getMarginColumn().getRight() + " " + c.getMarginColumn().getRight());
-        System.err.println(c.getMarginRow().getTop() + " " + c.getMarginRow().getBottom());
     }
 
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
@@ -113,6 +111,9 @@ public class Test005 {
 
             ScriptContext.plot("http://autoplot.org/data/hsi_fsimg_5050612_001.fits");
             ScriptContext.writeToPng("test005_demo13.png");
+
+            xxx();
+
             ScriptContext.plot("vap:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&validMax=32000&timerange=Dec+2004");
             ScriptContext.writeToPng("test005_demo14.png");
 
