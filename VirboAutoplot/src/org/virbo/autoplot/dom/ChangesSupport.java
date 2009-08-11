@@ -154,5 +154,7 @@ public class ChangesSupport {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
-
+    public String toString() {
+        return "changeSupport: "+ changesPending;
+    }
 }
