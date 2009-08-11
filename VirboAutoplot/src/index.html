@@ -6,7 +6,8 @@
     <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
-        <p><small>Autoplot is used to extract the sound of individual fireworks.  In this application, data within mouse box selections are auralized and formatted into a wav file.</small></p>
+        <p><small>A suite of Hudson tests are used to detect inadvertent changes in Autoplot and improve software quality.  Behind,
+                ViRBO's TSDS server supports arrays-of-vectors and spectrograms.</small></p>
         
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
@@ -18,19 +19,12 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Recent changes include:</p>
 <ul>
-<li> minor improvements in jython script panel./li>
-<li> bugfix: datasets are automatically added top to bottom for ScriptContext.plot(index,dataset )/li>
-<li> introduce ScriptContext.plot(index,uri)
-<li> bugfix: remove unnessary force data reload when loading vaps that messed up slice dimension for rank 3 datasets
-<li> bugfix 2818967: inconsistent handling of fill obs in ACE SIS
-</li><li> introduce support for bundle datasets
-</li><li> bugfix in QStream when packets are &gt;10000KB.
-</li><li> introduce lightweight bindings to improve startup time
-</li><li> tweaks to png walk tool, such as sorting filenames and spacing in coverflow.
-</li><li> png walk tool reflections were released in last version.
-</li><li> das2 Auralizer fixed. (see VirboAutoplot/src/scripts/auralizeTool.py)
-</li><li> jython completions improved by setting symbols "resourceURI" and "dom".  Automatic data source update removed as other mechanisms can provide this functionality.
-</li></ul>
+    <li>introduce test suites for Hudson Continuous Integration Server.</li>
+<li> minor bugfixes.</li>
+<li>ascii table columns can have labels like "10.3-11.6"</li>
+<li>introduce build script to relax dependence on Apache Ant.</li>
+<li>initial support for vector datasets and spectrograms in TSDS</li>
+</ul>
 <p>
         
 <p>Known issues:</p>
