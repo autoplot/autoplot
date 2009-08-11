@@ -30,6 +30,7 @@ import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.layout.LayoutUtil;
 
 /**
  *
@@ -465,6 +466,11 @@ public class AxisPanel extends javax.swing.JPanel {
 
         autolayoutCheckbox.setText("Autolayout");
         autolayoutCheckbox.setToolTipText("<html><p>Allow the application to reposition axes so labels are not clipped and unused space is reduced.  </P><p>Axes can be positioned manually by turning off this option, then hold shift down to enable plot corner drag anchors.</p></html>");
+        autolayoutCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                autolayoutCheckboxActionPerformed(evt);
+            }
+        });
 
         autolabellingCheckbox.setText("Autolabelling");
         autolabellingCheckbox.setToolTipText("allow automatic setting of axis labels based on metadata.\n");
@@ -685,6 +691,14 @@ public class AxisPanel extends javax.swing.JPanel {
     private void transposeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transposeCheckBoxActionPerformed
         //applicationModel.updateFill(true);
 }//GEN-LAST:event_transposeCheckBoxActionPerformed
+
+    private void autolayoutCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autolayoutCheckboxActionPerformed
+        if ( autolayoutCheckbox.isSelected() ) {
+            LayoutUtil.autolayout( applicationController.getDasCanvas(),
+                 applicationController.getRow(), applicationController.getColumn() );
+        }
+    }//GEN-LAST:event_autolayoutCheckboxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox allowAutoRangingCheckBox;
     private javax.swing.JCheckBox autolabellingCheckbox;
