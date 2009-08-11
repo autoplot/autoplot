@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
+import javax.swing.SwingUtilities;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
@@ -21,6 +22,7 @@ public class AxisController extends DomNodeController {
     DasAxis dasAxis;
     private Application dom;
     Axis axis;
+    private final static Object PENDING_RANGE_TWEAK="pendingRangeTweak";
 
     public AxisController(Application dom, Axis axis, DasAxis dasAxis) {
         super( axis );
@@ -64,7 +66,7 @@ public class AxisController extends DomNodeController {
             }
         }
 
-        public void propertyChange(PropertyChangeEvent evt) {
+        public synchronized void propertyChange(PropertyChangeEvent evt) {
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
             if ( dom.controller.isValueAdjusting() || valueIsAdjusting() ) return;
             if ( evt.getPropertyName().equals( Axis.PROP_RANGE )
@@ -72,10 +74,19 @@ public class AxisController extends DomNodeController {
             if ( evt.getPropertyName().equals( Axis.PROP_LABEL ) ) {
                 axis.setAutolabel(false);
             }
-            DatumRange oldRange = axis.range;
-            DatumRange range = logCheckRange(axis.range, axis.log);
-            if (!range.equals(oldRange)) {
-                axis.setRange(range);
+            if ( evt.getPropertyName().equals(Axis.PROP_LOG) || evt.getPropertyName().equals(Axis.PROP_RANGE) ) {
+                DatumRange oldRange = axis.range;
+                final DatumRange range = logCheckRange(axis.range, axis.log);
+                if (!range.equals(oldRange)) {
+                    changesSupport.registerPendingChange(this, PENDING_RANGE_TWEAK);
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            axis.setRange(range);
+                            changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
+                        }
+                    };
+                    SwingUtilities.invokeLater(run);
+                }
             }
         }
     };
