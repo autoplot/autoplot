@@ -78,14 +78,7 @@ public class AxisController extends DomNodeController {
                 DatumRange oldRange = axis.range;
                 final DatumRange range = logCheckRange(axis.range, axis.log);
                 if (!range.equals(oldRange)) {
-                    changesSupport.registerPendingChange(this, PENDING_RANGE_TWEAK);
-                    Runnable run= new Runnable() {
-                        public void run() {
-                            axis.setRange(range);
-                            changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
-                        }
-                    };
-                    SwingUtilities.invokeLater(run);
+                    axis.setRange(range);
                 }
             }
         }
