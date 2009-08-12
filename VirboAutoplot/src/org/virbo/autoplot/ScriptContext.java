@@ -610,4 +610,12 @@ public class ScriptContext extends PyJavaInstance {
             throw new RuntimeException(ex);
         }
     }
+
+    /**
+     * reset the application to its initial state.
+     */
+    public static void reset() {
+        maybeInitModel();
+        dom.getController().reset();
+    }
 }
