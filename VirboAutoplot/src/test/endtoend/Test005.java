@@ -13,7 +13,6 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.Axis;
-import org.virbo.autoplot.dom.Canvas;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSetURL.CompletionResult;
 
@@ -25,9 +24,9 @@ public class Test005 {
 
     static long t0= System.currentTimeMillis();
 
-    public static void xxx() {
-        System.err.println("-- timer: "+ ( System.currentTimeMillis()-t0) );
-        final Canvas c = getDocumentModel().getCanvases(0);
+    public static void xxx(String id) {
+        System.err.println("-- timer -- " + id + " --: "+ ( System.currentTimeMillis()-t0) );
+        t0= System.currentTimeMillis();
     }
 
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
@@ -37,12 +36,12 @@ public class Test005 {
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
 
-            xxx();
+            xxx("init");
 
             plot("http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
             writeToPng("test005_demo1.png");
 
-            xxx();
+            xxx("demo1");
 
             {
                 plot("http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109");
@@ -51,7 +50,7 @@ public class Test005 {
                 writeToPng("test005_demo2.png");
             }
 
-            xxx();
+            xxx("demo2");
 
             {
                 String suri = "ftp://ftp.virbo.org/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?";
@@ -62,36 +61,36 @@ public class Test005 {
                 }
                 out.close();
             }
-            xxx();
+            xxx("demo3");
 
             plot("http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density");
             writeToPng("test005_demo1_r.png");
-            xxx();
+            xxx("demo1 return");
 
             plot("http://autoplot.org/data/autoplot.xls?column=A");
             writeToPng("test005_demo4.png");
-            xxx();
+            xxx("demo4");
             plot("http://autoplot.org/data/autoplot.cdf?BGSM");
             writeToPng("test005_demo5.png");
-            xxx();
+            xxx("demo5");
             plot("http://autoplot.org/data/autoplot.xls?column=A");   // must delete extra panels from BGSM
             writeToPng("test005_demo4_r.png");
-            xxx();
+            xxx("demo4 return");
             plot("http://autoplot.org/data/autoplot.xml");
             writeToPng("test005_demo6.png");
-            xxx();
+            xxx("demo6");
             plot("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_1963.dat");
             writeToPng("test005_demo7.png");
-            xxx();
+            xxx("demo7");
             plot("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?timerange=1963-1965");
             writeToPng("test005_demo8.png");
-            xxx();
+            xxx("demo8");
             plot("vap:ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?column=field17&timeFormat=$Y+$j+$H&time=field0&validMax=999&timerange=1972");
             writeToPng("test005_demo9.png");
-            xxx();
+            xxx("demo9");
             plot("http://autoplot.org/data/autoplot.ncml");
             writeToPng("test005_demo10.png");
-            xxx();
+            xxx("demo10");
             {
                 String[] list = org.virbo.jythonsupport.Util.list("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
                 PrintWriter out = new PrintWriter("test005_demo11.txt");
@@ -100,22 +99,23 @@ public class Test005 {
                 }
                 out.close();
             }
-            xxx();
+            xxx("demo11");
             {
             plot("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");
             getDocumentModel().getDataSourceFilters(0).setSliceIndex(2);
             getDocumentModel().getPlots(0).getZaxis().setRange(DatumRange.newDatumRange(-20e4, 20e4, Units.dimensionless));
             writeToPng("test005_demo12.png");
             }
-            xxx();
+            xxx("demo12");
 
             plot("http://autoplot.org/data/hsi_fsimg_5050612_001.fits");
             writeToPng("test005_demo13.png");
 
-            xxx();
+            xxx("demo13");
 
             plot("vap:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&validMax=32000&timerange=Dec+2004");
             writeToPng("test005_demo14.png");
+            xxx("demo14");
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (RuntimeException ex) {
