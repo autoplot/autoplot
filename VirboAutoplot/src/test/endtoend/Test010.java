@@ -5,16 +5,12 @@
 package test.endtoend;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import org.virbo.autoplot.ScriptContext;
-import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.QDataSet;
+import java.util.ArrayList;
+import java.util.List;
 import org.virbo.datasource.DataSetURL;
-import org.virbo.dsops.Ops;
-import org.virbo.jythonsupport.Util;
 
 /**
  * checks to see if our favorite servers are responsive.
@@ -22,7 +18,7 @@ import org.virbo.jythonsupport.Util;
  */
 public class Test010 {
 
-    public static void doTest( int id, String uri ) throws Exception {
+    public static void doTest( String uri ) throws Exception {
         URL url= DataSetURL.getWebURL( new URI( uri ) );
 
         URLConnection connect= url.openConnection();
@@ -33,11 +29,28 @@ public class Test010 {
     }
     
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
-        try {
-            doTest( 0, "http://autoplot.org/data/foo.dat" );
-            System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
-            ex.printStackTrace();
+        List<String> tests= new ArrayList();
+        tests.add("http://autoplot.org/data/foo.dat");
+        tests.add("ftp://mrfrench.lanl.gov/autoplot_gifwalks/SOPA_pitch/");
+        tests.add("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
+        tests.add("ftp://cdaweb.gsfc.nasa.gov/pub/istp/");
+        tests.add("http://caa.estec.esa.int/caa/search.xml");
+        tests.add("http://papco.org/data");
+
+        List<Exception> exceptions= new ArrayList();
+        for ( String uri: tests ) {
+            System.out.println("## "+uri+" ##");
+            try {
+                doTest( uri );
+                System.out.println("ok");
+            } catch (Exception ex) {
+                ex.printStackTrace(System.out);
+                exceptions.add(ex);
+            }
+        }
+        if ( exceptions.size()==0 ) {
+            System.exit(0);
+        } else {
             System.exit(1);
         }
     }
