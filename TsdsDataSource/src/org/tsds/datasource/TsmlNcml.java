@@ -22,7 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
@@ -39,7 +38,6 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.TagGenDataSet;
 import org.virbo.dsops.Ops;
-import org.virbo.metatree.MetadataUtil;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -169,13 +167,21 @@ public class TsmlNcml {
                 } else if (child.getNodeName().equals("dimension")) {
                     dimensions.put(maybeGetAttr(child, "name"), child);
                 } else if (child.getNodeName().equals("attribute")) {
-                    if (((Attr) child.getAttributes().getNamedItem("name")).getValue().equals("units")) {
-                        props.put(QDataSet.UNITS, lookupUnits(child.getAttributes().getNamedItem("value").getTextContent()));
-                    } else if (((Attr) child.getAttributes().getNamedItem("name")).getValue().equals("DataType")) {
-                        dataType = child.getAttributes().getNamedItem("value").getTextContent();
+                    String attName= ((Attr) child.getAttributes().getNamedItem("name")).getValue();
+                    String attValue= ((Attr) child.getAttributes().getNamedItem("value")).getTextContent();
+                    if (attName.equals("units")) {
+                        props.put(QDataSet.UNITS, lookupUnits(attValue));
+                    } else if (attName.equals("DataType")) {
+                        dataType = attValue;
+                    } else if (attName.equals("long_name")) { //TODO: this is really TITLE, according to COARDS
+                        props.put( QDataSet.LABEL, attValue );
+                    } else if (attName.equals("title") ) {
+                        props.put( QDataSet.TITLE, attValue );
                     }
                 } else if (child.getNodeName().equals("variable")) {
                     result = variable(child, dimensions, null);
+                    String oldLabel= (String)result.property(QDataSet.LABEL);
+                    if ( oldLabel==null ) result.putProperty( QDataSet.LABEL, ((Attr)child.getAttributes().getNamedItem("name")).getValue() );
                 }
             }
         }
@@ -187,6 +193,9 @@ public class TsmlNcml {
                 }
                 result.putProperty(QDataSet.DEPEND_1, Ops.labels(componentLabels)); //TODO: QDataSet scheme change coming COMPONENT.
             }
+        }
+        for ( Entry e : props.entrySet() ) {
+            result.putProperty( (String)e.getKey(), e.getValue() );
         }
         return result;
     }
@@ -233,9 +242,14 @@ public class TsmlNcml {
         for (int i = 0; i < nl.getLength(); i++) {
             Node child = nl.item(i);
             if (child.getNodeName().equals("attribute")) {
-                if (((Attr) child.getAttributes().getNamedItem("name")).getValue().equals("units")) {
-                    String sunits = child.getAttributes().getNamedItem("value").getTextContent();
-                    props.put(QDataSet.UNITS, lookupUnits(sunits));
+                String attName= ((Attr) child.getAttributes().getNamedItem("name")).getValue();
+                String attValue= ((Attr) child.getAttributes().getNamedItem("value")).getTextContent();
+                if (attName.equals("units")) {
+                    props.put(QDataSet.UNITS, lookupUnits(attValue));
+                } else if (attName.equals("long_name")) { //TODO: this is really TITLE, according to COARDS
+                    props.put( QDataSet.LABEL, attValue );
+                } else if (attName.equals("title") ) {
+                    props.put( QDataSet.TITLE, attValue );
                 }
             } else if (child.getNodeName().equals("values")) {
                 Node increment = child.getAttributes().getNamedItem("increment");
