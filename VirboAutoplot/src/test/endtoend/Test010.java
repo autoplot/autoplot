@@ -31,6 +31,7 @@ public class Test010 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         List<String> tests= new ArrayList();
         tests.add("http://autoplot.org/data/foo.dat");
+        tests.add("http://timeseries.org/get.cgi?StartDate=19980101&EndDate=20090101&ppd=1&ext=bin&out=tsml&param1=NGDC_NOAA15_SEM2-33-v0" );
         tests.add("ftp://mrfrench.lanl.gov/autoplot_gifwalks/SOPA_pitch/");
         tests.add("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
         tests.add("ftp://cdaweb.gsfc.nasa.gov/pub/istp/");
