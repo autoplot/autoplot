@@ -410,18 +410,20 @@ public class PlotController extends DomNodeController {
         BindingModel bm= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
         bms.remove(bm);
 
-        if ( bms.size()==0 ) {
-            dom.setTimeRange( newSettings.getXaxis().getRange() );
-            shouldBindX= true;
-        }
-        DatumRange xrange= newSettings.getXaxis().getRange();
-        if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) ) {
-            if ( dom.timeRange.intersects( xrange ) ) {
-                double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.2 : 0.8;
-                double overlap= DatumRangeUtil.normalize( dom.timeRange, xrange.max() ) - DatumRangeUtil.normalize( dom.timeRange, xrange.min() );
-                if ( overlap > 1.0 ) overlap= 1/overlap;
-                if ( overlap > reqOverlap ) {
-                    shouldBindX= true;
+        if ( newSettings.getXaxis().isLog()==false ) {
+            if ( bms.size()==0 ) {
+                dom.setTimeRange( newSettings.getXaxis().getRange() );
+                shouldBindX= true;
+            }
+            DatumRange xrange= newSettings.getXaxis().getRange();
+            if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) ) {
+                if ( dom.timeRange.intersects( xrange ) ) {
+                    double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.2 : 0.8;
+                    double overlap= DatumRangeUtil.normalize( dom.timeRange, xrange.max() ) - DatumRangeUtil.normalize( dom.timeRange, xrange.min() );
+                    if ( overlap > 1.0 ) overlap= 1/overlap;
+                    if ( overlap > reqOverlap ) {
+                        shouldBindX= true;
+                    }
                 }
             }
         }
