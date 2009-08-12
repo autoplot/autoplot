@@ -100,10 +100,11 @@ public class Test009 {
             
             dom.getPlots(0).getXaxis().setRange( DatumRange.newDatumRange( 999, 1021, Units.dimensionless ) );
             writePng( "test009_016.png" );
-            dom.getPlots(0).getXaxis().setLog( true );
-            writePng( "test009_017.png" );
-            dom.getPlots(0).getXaxis().setRange( DatumRangeUtil.parseTimeRangeValid("1990-01-01 03:15:01 to 03:15:02") );
-            writePng( "test009_018.png" );
+
+            //dom.getPlots(0).getXaxis().setLog( true );
+            //writePng( "test009_017.png" );
+            //dom.getPlots(0).getXaxis().setRange( DatumRangeUtil.parseTimeRangeValid("1990-01-01 03:15:01 to 03:15:02") );
+            //writePng( "test009_018.png" );
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( RuntimeException ex ) {
