@@ -50,7 +50,7 @@ public class Test007 {
             doTest( 0, "vap+tsds:http://timeseries.org/get.cgi?StartDate=19980101&EndDate=20090101&ppd=1&ext=bin&out=tsml&param1=NGDC_NOAA15_SEM2-33-v0" );
             doTest( 1, "vap+tsds:http://timeseries.org/cgi-bin/get.cgi?StartDate=19900301&EndDate=19900302&ppd=24&ext=bin&out=bin&param1=SourceAcronym_Subset2-1-v0");
             doTest( 2, "vap+tsds:http://timeseries.org/get3.cgi?StartDate=19900301&EndDate=19900301&ppd=24&ext=bin&out=ncml&param1=SourceAcronym_Subset2-1-v0" );
-            //doTest( 2, "vap:http://vho.nasa.gov/mission/soho/celias_pm_30sec/1998.txt?time=YY&column=GSE_X&timeFormat=$y+$b+$d+$(ignore):$H:$M:$S" );
+            doTest( 3, "vap+tsds:http://timeseries.org/get3.cgi?StartDate=19930101&EndDate=20031231&ppd=24&ext=bin&out=ncml&param1=Kanekal_SAMPEX_elo_1hour-1-v0" );
 
 
             System.exit(0);  // TODO: something is firing up the event thread
