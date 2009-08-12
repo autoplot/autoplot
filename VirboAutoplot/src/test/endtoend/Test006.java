@@ -4,10 +4,9 @@
  */
 package test.endtoend;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import org.virbo.autoplot.ScriptContext;
+import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dsops.Ops;
@@ -29,12 +28,12 @@ public class Test006 {
         hist.putProperty( QDataSet.TITLE, uri );
         String label= String.format( "test006_%03d", id );
         hist.putProperty( QDataSet.LABEL, label );
-        ScriptContext.formatDataSet( hist, label+".qds");
+        formatDataSet( hist, label+".qds");
 
         QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
         if ( dep0!=null ) {
             MutablePropertyDataSet hist2= (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-            ScriptContext.formatDataSet( hist2, label+".dep0.qds");
+            formatDataSet( hist2, label+".dep0.qds");
         } else {
             PrintWriter pw= new PrintWriter( label+".dep0.qds" );
             pw.println("no dep0");
