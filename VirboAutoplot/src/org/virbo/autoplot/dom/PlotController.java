@@ -410,9 +410,9 @@ public class PlotController extends DomNodeController {
         BindingModel bm= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
         bms.remove(bm);
 
-        if ( newSettings.getXaxis().isLog()==false ) {
+        if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutorange() ) {
             if ( bms.size()==0 ) {
-                dom.setTimeRange( newSettings.getXaxis().getRange() );
+                dom.setTimeRange( plot.getXaxis().getRange() );
                 shouldBindX= true;
             }
             DatumRange xrange= newSettings.getXaxis().getRange();
