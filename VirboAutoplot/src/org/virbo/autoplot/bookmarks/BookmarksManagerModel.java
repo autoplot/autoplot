@@ -140,7 +140,7 @@ public class BookmarksManagerModel {
         return model;
     }
 
-    void addBookmarks(List<Bookmark> bookmarks, Bookmark context) {
+    void addBookmarks(List<Bookmark> bookmarks, Bookmark context, boolean insert) {
         ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
         for (Bookmark b : this.list) {
             newList.add((Bookmark) b.copy());
@@ -151,7 +151,7 @@ public class BookmarksManagerModel {
         }
         if (context == null || (containsFolder && context instanceof Bookmark.Folder)) { // only allow folders in the root node
             if (newList.contains(context)) {
-                newList.addAll(newList.indexOf(context) + 1, bookmarks);
+                newList.addAll(newList.indexOf(context) + ( insert ? 0 : 1 ), bookmarks);
             } else {
                 newList.addAll(bookmarks);
             }
@@ -160,14 +160,14 @@ public class BookmarksManagerModel {
             newFolder.getBookmarks().addAll(bookmarks);
         } else {
             if (newList.contains(context)) {
-                newList.addAll(newList.indexOf(context) + 1, bookmarks);
+                newList.addAll(newList.indexOf(context) + ( insert ? 0 : 1 ), bookmarks);
             } else {
                 boolean isAdded = false;
                 for (Bookmark b : newList) {
                     if (b instanceof Bookmark.Folder) {
                         List<Bookmark> bs = ((Bookmark.Folder) b).getBookmarks();
                         if (!isAdded && bs.contains(context)) {
-                            bs.addAll(bs.indexOf(context) + 1, bookmarks);
+                            bs.addAll(bs.indexOf(context) + ( insert ? 0 : 1 ), bookmarks);
                             isAdded = true;
                         }
                     }
@@ -180,7 +180,11 @@ public class BookmarksManagerModel {
     }
 
     void addBookmark(Bookmark bookmark, Bookmark context) {
-        addBookmarks(Collections.singletonList(bookmark), context);
+        addBookmarks(Collections.singletonList(bookmark), context, false);
+    }
+
+    void insertBookmark( Bookmark bookmark, Bookmark context) {
+        addBookmarks(Collections.singletonList(bookmark), context, true);
     }
 
     /**

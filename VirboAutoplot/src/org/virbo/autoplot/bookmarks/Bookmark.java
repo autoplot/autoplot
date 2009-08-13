@@ -94,8 +94,13 @@ public abstract class Bookmark {
 
         NodeList nl;
         nl = ((Element) element).getElementsByTagName("title");
-        s = ((Text) (nl.item(0).getFirstChild())).getData();
-        title = URLDecoder.decode(s, "UTF-8");
+        if (nl.getLength()>0 ) {
+            if ( !nl.item(0).hasChildNodes() ) throw new IllegalArgumentException("bookmark has empty title");
+            s = ((Text) (nl.item(0).getFirstChild())).getData();
+            title = URLDecoder.decode(s, "UTF-8");
+        } else {
+            throw new IllegalArgumentException("bookmark has no title");
+        }
 
         nl = ((Element) element).getElementsByTagName("icon");
         if (nl.getLength() > 0) {
@@ -136,16 +141,18 @@ public abstract class Bookmark {
     public static List<Bookmark> parseBookmarks(Element root) {
         ArrayList<Bookmark> result = new ArrayList<Bookmark>();
         NodeList list = root.getChildNodes();
-
+        Bookmark lastBook=null;
         for (int i = 0; i < list.getLength(); i++) {
             Node n = list.item(i);
             if ( ! ( n instanceof Element ) ) continue;
             try {
                 Bookmark book = parseBookmark(n);
                 result.add(book);
+                lastBook= book;
             } catch (Exception ex) {
                 System.err.println("## bookmark number=" + i);
                 ex.printStackTrace();
+                System.err.println("last bookmark parsed:"+lastBook);
                 continue;
             }
 

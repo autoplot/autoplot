@@ -89,10 +89,10 @@ public class BookmarksManagerTransferrable {
                     if (item != null) {
                         if (item == context) return;
                         model.removeBookmark(item);
-                        model.addBookmark(item, context);
+                        model.insertBookmark(item, context);
                     } else if (items != null) {
                         model.removeBookmarks(items);
-                        model.addBookmarks(items, context);
+                        model.addBookmarks(items, context, true);
                     }
 
                 } catch (UnsupportedFlavorException ex) {
