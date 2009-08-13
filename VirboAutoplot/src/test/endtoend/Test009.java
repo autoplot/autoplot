@@ -6,13 +6,17 @@
 package test.endtoend;
 
 import java.io.IOException;
+import org.das2.dataset.VectorDataSet;
+import org.das2.dataset.VectorUtil;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dsops.Ops;
 
 /**
@@ -71,6 +75,11 @@ public class Test009 {
             ScriptContext.plot( DataSetOps.trim( rank1Rand, 0, 10000000) );
             writePng( "test009_011.png" );
 
+            VectorDataSet vds= VectorDataSetAdapter.create(rank1Rand);
+            vds= VectorUtil.reduce2D( vds, 0, vds.getXLength(), Units.dimensionless.createDatum(1e5), Units.dimensionless.createDatum(100) );
+            ScriptContext.plot( DataSetAdapter.create(vds) );
+            writePng( "test009_011a.png" );
+
             QDataSet rank2Rand= Ops.add( Ops.randomn(-12345,100000,100),
                     Ops.sin( Ops.add( Ops.outerProduct( Ops.linspace( 0, 1000., 100000 ), Ops.replicate(1,100)),
                                         Ops.outerProduct( Ops.replicate(1,100000), Ops.linspace(0,10,100) ) ) ) );
@@ -100,6 +109,7 @@ public class Test009 {
             
             dom.getPlots(0).getXaxis().setRange( DatumRange.newDatumRange( 999, 1021, Units.dimensionless ) );
             writePng( "test009_016.png" );
+
 
             //dom.getPlots(0).getXaxis().setLog( true );
             //writePng( "test009_017.png" );
