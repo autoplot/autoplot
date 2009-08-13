@@ -685,7 +685,11 @@ public class DataSourceController extends DomNodeController {
             if (ds != null) {
                 setDataSetInternal(ds);
             } else {
-                update(false, false);
+                List<Panel> panels = dom.controller.getPanelsFor(dsf);
+                for ( Panel p: panels )  {
+                    p.getController().setResetRanges(true);
+                }
+                update(true, true);
             }
         }
     };
@@ -693,7 +697,8 @@ public class DataSourceController extends DomNodeController {
     /**
      * update the model and view using the new DataSource to create a new dataset,
      * then inspecting the dataset to decide on axis settings.
-     * @param autorange if false, then no autoranging is done, just the fill part.
+     *
+     * NOTE autorange and interpretMeta have no effect!
      */
     public synchronized void update(final boolean autorange, final boolean interpretMeta) {
         changesSupport.performingChange(this, PENDING_UPDATE);
