@@ -430,6 +430,10 @@ public class PlotController extends DomNodeController {
         if ( bm==null && shouldBindX ) {
             logger.finer("add binding because ranges overlap");
             dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
+            //if ( !CanvasUtil.getMostBottomPlot(dom.getController().getCanvasFor(plot))==plot ) {
+            //    plot.getXaxis().setDrawTickLabels(false);
+            //} //TODO: could disable tick label drawing automatically.
+
         } else if ( bm!=null && !shouldBindX ) {
             logger.finer("remove timerange binding that would cause inconvertable units");
             dom.getController().deleteBinding(bm);
