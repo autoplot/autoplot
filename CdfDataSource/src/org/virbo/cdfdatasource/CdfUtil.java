@@ -20,16 +20,13 @@ import gsfc.nssdc.cdf.Variable;
 import gsfc.nssdc.cdf.util.CDFUtils;
 import java.io.File;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
 import org.virbo.dataset.BDataSet;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.IDataSet;
@@ -571,6 +568,9 @@ public class CdfUtil {
             result.putProperty(QDataSet.UNITS, units);
 
         } else if (varType == Variable.CDF_EPOCH) {
+            if ( qube.length==2 && qube[1]==1 ) {// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
+                qube= new int[] { qube[0] };
+            }
             result = DDataSet.wrap((double[]) odata, qube);
             result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
             result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
@@ -734,113 +734,6 @@ public class CdfUtil {
         return result;
     }
 
-    private static int[] qubeDims(Object odata) {
-        List<Integer> result = new ArrayList();
-        result.add(Array.getLength(odata));
-        odata = Array.get(odata, 0);
-        while (odata.getClass().isArray()) {
-            result.add(Array.getLength(odata));
-            odata = Array.get(odata, 0);
-        }
-        int[] iresult = new int[result.size()];
-        for (int i = 0; i < result.size(); i++) {
-            iresult[i] = result.get(i);
-        }
-        return iresult;
-    }
-
-    private static WritableDataSet leafSlice(long varType, Object odata, int idx) {
-        int[] qubeDims = qubeDims(odata);
-        int[] newQubeDims = DataSetOps.removeElement(qubeDims, qubeDims.length - 1);
-        int nele = newQubeDims[0];
-        int skip = qubeDims[newQubeDims.length];
-
-        for (int i = 1; i < newQubeDims.length; i++) {
-            nele *= newQubeDims[i];
-        }
-
-        if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
-            float[][][][] fdata = ((float[][][][]) odata);
-            float[] result = new float[nele];
-            int iele = 0;
-            for (int i0 = 0; i0 < qubeDims[0]; i0++) {
-                for (int i1 = 0; i1 < qubeDims[1]; i1++) {
-                    for (int i2 = 0; i2 < qubeDims[2]; i2++) {
-                        result[iele++] = fdata[i0][i1][i2][idx];
-                    }
-                }
-            }
-            return FDataSet.wrap((float[]) result, newQubeDims);
-
-        } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE) {
-            double[][][][] fdata = ((double[][][][]) odata);
-            double[] result = new double[nele];
-            int iele = 0;
-            for (int i0 = 0; i0 < qubeDims[0]; i0++) {
-                for (int i1 = 0; i1 < qubeDims[1]; i1++) {
-                    for (int i2 = 0; i2 < qubeDims[2]; i2++) {
-                        result[iele++] = fdata[i0][i1][i2][idx];
-                    }
-                }
-            }
-            return DDataSet.wrap((double[]) result, newQubeDims);
-
-        } else if (varType == Variable.CDF_UINT4) {
-            long[][][][] fdata = ((long[][][][]) odata);
-            long[] result = new long[nele];
-            int iele = 0;
-            for (int i0 = 0; i0 < qubeDims[0]; i0++) {
-                for (int i1 = 0; i1 < qubeDims[1]; i1++) {
-                    for (int i2 = 0; i2 < qubeDims[2]; i2++) {
-                        result[iele++] = fdata[i0][i1][i2][idx];
-                    }
-                }
-            }
-            return LDataSet.wrap((long[]) result, newQubeDims);
-
-        } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT2) {
-            int[][][][] fdata = ((int[][][][]) odata);
-            int[] result = new int[nele];
-            int iele = 0;
-            for (int i0 = 0; i0 < qubeDims[0]; i0++) {
-                for (int i1 = 0; i1 < qubeDims[1]; i1++) {
-                    for (int i2 = 0; i2 < qubeDims[2]; i2++) {
-                        result[iele++] = fdata[i0][i1][i2][idx];
-                    }
-                }
-            }
-            return IDataSet.wrap((int[]) result, newQubeDims);
-
-        } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT2 || varType == Variable.CDF_UINT1) {
-            short[][][][] fdata = ((short[][][][]) odata);
-            short[] result = new short[nele];
-            short iele = 0;
-            for (short i0 = 0; i0 < qubeDims[0]; i0++) {
-                for (short i1 = 0; i1 < qubeDims[1]; i1++) {
-                    for (short i2 = 0; i2 < qubeDims[2]; i2++) {
-                        result[iele++] = fdata[i0][i1][i2][idx];
-                    }
-                }
-            }
-            return SDataSet.wrap((short[]) result, newQubeDims);
-
-        } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE) {
-            byte[][][][] fdata = ((byte[][][][]) odata);
-            byte[] result = new byte[nele];
-            byte iele = 0;
-            for (byte i0 = 0; i0 < qubeDims[0]; i0++) {
-                for (byte i1 = 0; i1 < qubeDims[1]; i1++) {
-                    for (byte i2 = 0; i2 < qubeDims[2]; i2++) {
-                        result[iele++] = fdata[i0][i1][i2][idx];
-                    }
-                }
-            }
-            return BDataSet.wrap((byte[]) result, newQubeDims);
-
-        } else {
-            throw new IllegalArgumentException("bad type");
-        }
-    }
 
     public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit) throws CDFException {
         return getPlottable(cdf, dataOnly, rankLimit, false);
@@ -928,7 +821,7 @@ public class CdfUtil {
                 String svarNotes = null;
 
                 try {
-                    if (aAttr != null) {  // check for metadata for DEPEND_1
+                    if (aAttr != null) {  // check for metadata for DEPEND_0
                         logger.fine("get attribute " + aAttr.getName() + " entry for " + var.getName());
                         Entry xEntry = aAttr.getEntry(var);
                         xDependVariable = cdf.getVariable(String.valueOf(xEntry.getData()));
