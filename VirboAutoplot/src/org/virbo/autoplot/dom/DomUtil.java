@@ -532,5 +532,22 @@ public class DomUtil {
         }
     };
 
+    /**
+     * returns true if all the panels are a parent and its children.
+     * @param panels
+     * @return
+     */
+    public static boolean oneFamily( List<Panel> panelsIn ) {
+        if ( panelsIn.size()==0 ) return false;
+        List<Panel> panels= new ArrayList(panelsIn);
+        Panel p= panels.get(0);
+        if ( p.getController().getParentPanel()!=null ) {
+            p= p.getController().getParentPanel();
+        }
+        panels.remove(p);
+        panels.removeAll( p.getController().getChildPanels() );
 
+        if ( panels.size()==0 ) return true; else return false;
+
+    }
 }
