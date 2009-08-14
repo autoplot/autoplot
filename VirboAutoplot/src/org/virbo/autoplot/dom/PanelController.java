@@ -231,7 +231,7 @@ public class PanelController extends DomNodeController {
 
     private boolean rendererAcceptsData(QDataSet fillDs) {
         if ( getRenderer() instanceof SpectrogramRenderer ) {
-            return fillDs.rank()>1;
+            return fillDs.rank()>1 && fillDs.rank()<4;
         } else if ( getRenderer() instanceof SeriesRenderer) {
             return fillDs.rank()==1;
         } else if ( getRenderer() instanceof ImageVectorDataSetRenderer ) {
