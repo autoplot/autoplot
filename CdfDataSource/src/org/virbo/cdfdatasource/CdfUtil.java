@@ -903,6 +903,8 @@ public class CdfUtil {
                                 desc += "," + z1DependVariable.getName() + "=" + (z1MaxRec + 1);
                             }
                         }
+                    } else if ( rank>1 ) {
+                        desc += ","+DataSourceUtil.strjoin( dims, ",");
                     }
                     desc += ")";
                 }
