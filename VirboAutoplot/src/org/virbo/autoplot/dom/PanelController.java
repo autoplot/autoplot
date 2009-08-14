@@ -168,7 +168,8 @@ public class PanelController extends DomNodeController {
                 changeDataSourceFilter();
             } else if ( evt.getPropertyName().equals( Panel.PROP_COMPONENT ) ) {
                 if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), (String)evt.getNewValue() ) ) {
-                    setResetRanges(true);
+                    logger.finer("component property change requires we reset render and dimensions: "+(String)evt.getOldValue() +"->"+ (String)evt.getNewValue());
+                    setResetPanel(true);
                     maybeSetPlotAutorange();
                 }
                 updateDataSet();
@@ -229,6 +230,41 @@ public class PanelController extends DomNodeController {
         return Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]);
     }
 
+    private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException {
+        String label= null;
+        if (c.length() > 5 && c.startsWith("|")) {
+            // slice and collapse specification
+            fillDs = DataSetOps.sprocess(c, fillDs);
+        } else {
+            if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
+                String[] labels = SemanticOps.getComponentLabels(fillDs);
+                if (panel.getComponent().equals("X")) {
+                    fillDs = DataSetOps.slice1(fillDs, 0);
+                    label = labels[0];
+                } else if (panel.getComponent().equals("Y")) {
+                    fillDs = DataSetOps.slice1(fillDs, 1);
+                    label = labels[1];
+                } else if (panel.getComponent().equals("Z")) {
+                    fillDs = DataSetOps.slice1(fillDs, 2);
+                    label = labels[2];
+                } else {
+                    for (int i = 0; i < labels.length; i++) {
+                        if (labels[i].equals(panel.getComponent())) {
+                            fillDs = DataSetOps.slice1(fillDs, i);
+                            label = labels[i];
+                            break;
+                        }
+                    }
+                }
+                if (label == null && !isPendingChanges()) {
+                    RuntimeException ex = new RuntimeException("component not found " + panel.getComponent());
+                    throw ex;
+                }
+            }
+        }
+        return fillDs;
+    }
+
     private boolean rendererAcceptsData(QDataSet fillDs) {
         if ( getRenderer() instanceof SpectrogramRenderer ) {
             return fillDs.rank()>1 && fillDs.rank()<4;
@@ -254,42 +290,16 @@ public class PanelController extends DomNodeController {
             return;
         }
 
-        String label = null;
-
         String c= panel.getComponent();
-        if ( c.length()>5 && c.startsWith("_") ) { // slice and collapse specification
-            fillDs= DataSetOps.sprocess( c, fillDs );
-        }
-
-        if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
-            String[] labels = SemanticOps.getComponentLabels(fillDs);
-
-            if (panel.getComponent().equals("X")) {
-                fillDs = DataSetOps.slice1(fillDs, 0);
-                label = labels[0];
-            } else if (panel.getComponent().equals("Y")) {
-                fillDs = DataSetOps.slice1(fillDs, 1);
-                label = labels[1];
-            } else if (panel.getComponent().equals("Z")) {
-                fillDs = DataSetOps.slice1(fillDs, 2);
-                label = labels[2];
+        try {
+            fillDs = processDataSet(c, fillDs );
+        } catch ( RuntimeException ex ) {
+            if (getRenderer() != null) {
+                getRenderer().setException(ex);
             } else {
-                for (int i = 0; i < labels.length; i++) {
-                    if (labels[i].equals(panel.getComponent())) {
-                        fillDs = DataSetOps.slice1(fillDs, i);
-                        label = labels[i];
-                        break;
-                    }
-                }
+                throw ex;
             }
-            if (label == null && !isPendingChanges() ) {
-                RuntimeException ex= new RuntimeException("component not found " + panel.getComponent() );
-                if ( getRenderer()!=null ) {
-                    getRenderer().setException( ex );
-                } else {
-                    throw ex;
-                }
-            }
+            return;
         }
 
         if (getRenderer() != null) {
@@ -348,8 +358,13 @@ public class PanelController extends DomNodeController {
                     panel.renderType = renderType;
                     resetPanel(fillDs, renderType);
                     setResetPanel(false);
+                } else if ( panel.getComponent().startsWith("|") ) {
+                    QDataSet fillDs2 = processDataSet( panel.getComponent(), fillDs );
+                    RenderType renderType = AutoplotUtil.getRenderType(fillDs2);
+                    panel.renderType = renderType;
+                    resetPanel(fillDs2, renderType);
+                    setResetPanel(false);
                 } else {
-                    if ( panel.getComponent().startsWith("_") ) panel.component=""; //TODO yuck danger code.
                     if (renderer == null) maybeCreateDasPeer();
                     if (resetRanges) doResetRanges();
                     setResetPanel(false);
@@ -493,6 +508,7 @@ public class PanelController extends DomNodeController {
      */
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
+            if ( panel.getComponent().startsWith("|") ) panel.component=""; //TODO yuck danger code.
             setResetPanel(true);
             setResetRanges(true);
             panel.setAutolabel(true);
@@ -637,7 +653,7 @@ public class PanelController extends DomNodeController {
 
         if (dom.getOptions().isAutoranging()) {
             Map props = getDataSourceFilter().controller.getFillProperties();
-            QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
+            QDataSet fillDs = processDataSet( panel.getComponent(), getDataSourceFilter().controller.getFillDataSet() );
             doAutoranging( panelCopy,props,fillDs );
 
             Renderer newRenderer = getRenderer();
@@ -809,7 +825,11 @@ public class PanelController extends DomNodeController {
 
             QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
             if (yds == null) {
-                yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); // QUBE
+                if ( fillDs.rank()>1 ) {
+                    yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); // QUBE
+                } else {
+                    yds = DataSetUtil.indexGenDataSet(10); // later the user will get a message "renderer cannot plot..."
+                }
             }
 
             guessCadence((MutablePropertyDataSet) xds, null);
