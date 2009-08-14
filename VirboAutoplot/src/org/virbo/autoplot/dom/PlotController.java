@@ -337,25 +337,6 @@ public class PlotController extends DomNodeController {
     }
 
     /**
-     * returns true if all the panels are a parent and its children.
-     * @param panels
-     * @return
-     */
-    private static boolean oneFamily( List<Panel> panelsIn ) {
-        if ( panelsIn.size()==0 ) return false;
-        List<Panel> panels= new ArrayList(panelsIn);
-        Panel p= panels.get(0);
-        if ( p.getController().getParentPanel()!=null ) {
-            p= p.getController().getParentPanel();
-        }
-        panels.remove(p);
-        panels.removeAll( p.getController().getChildPanels() );
-
-        if ( panels.size()==0 ) return true; else return false;
-
-    }
-
-    /**
      * check all the panels' plot defaults, so that properties marked as automatic can be reset.
      * @param panel
      */
@@ -377,7 +358,7 @@ public class PlotController extends DomNodeController {
             }
         }
 
-        if ( oneFamily( dom.getController().getPanelsFor(plot) ) ) {
+        if ( DomUtil.oneFamily( dom.getController().getPanelsFor(plot) ) ) {
             Panel p= dom.getController().getPanelsFor(plot).get(0);
             if ( !p.getParentPanel().equals("") ) p = p.getController().getParentPanel();
             if ( plot.isAutolabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
