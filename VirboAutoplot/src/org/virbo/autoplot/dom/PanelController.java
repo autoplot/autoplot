@@ -51,7 +51,6 @@ public class PanelController extends DomNodeController {
 
     Logger logger = Logger.getLogger("vap.panelController");
     private Application dom;
-    private ApplicationModel appmodel;  //TODO: get rid of this
     private Panel panel;
     private DataSourceFilter dsf; // This is the one we are listening to.
     /**
@@ -65,10 +64,10 @@ public class PanelController extends DomNodeController {
         panel.controller = this;
         this.dom = dom;
         this.panel = panel;
-        this.appmodel = model;
 
         panel.addPropertyChangeListener(Panel.PROP_RENDERTYPE, panelListener);
         panel.addPropertyChangeListener(Panel.PROP_DATASOURCEFILTERID, panelListener);
+        panel.addPropertyChangeListener(Panel.PROP_COMPONENT, panelListener);
     }
 
     /**
@@ -167,6 +166,12 @@ public class PanelController extends DomNodeController {
                 }
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
                 changeDataSourceFilter();
+            } else if ( evt.getPropertyName().equals( Panel.PROP_COMPONENT ) ) {
+                if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), (String)evt.getNewValue() ) ) {
+                    setResetRanges(true);
+                    maybeSetPlotAutorange();
+                }
+                updateDataSet();
             } else if ( evt.getPropertyName().equals( Panel.PROP_LEGENDLABEL ) ) {
                 panel.setAutolabel(false);
             }
@@ -236,6 +241,12 @@ public class PanelController extends DomNodeController {
         }
     }
 
+    /**
+     * set the dataset that will be plotted.  If the component property is non-null, then
+     * additional filtering will be performed.  See http://papco.org/wiki/index.php/DataReductionSpecs
+     * @param fillDs
+     * @throws IllegalArgumentException
+     */
     private void setDataSet(QDataSet fillDs) throws IllegalArgumentException {
 
         // since we might delete sibling panels here, make sure each panel is still part of the application
@@ -244,6 +255,11 @@ public class PanelController extends DomNodeController {
         }
 
         String label = null;
+
+        String c= panel.getComponent();
+        if ( c.length()>5 && c.startsWith("_") ) { // slice and collapse specification
+            fillDs= DataSetOps.sprocess( c, fillDs );
+        }
 
         if (!panel.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
             String[] labels = SemanticOps.getComponentLabels(fillDs);
@@ -280,6 +296,7 @@ public class PanelController extends DomNodeController {
             if (rendererAcceptsData(fillDs)) {
                 getRenderer().setDataSet(DataSetAdapter.createLegacyDataSet(fillDs));
             } else {
+                getRenderer().setDataSet(null);
                 getRenderer().setException(new Exception("renderer cannot plot " + fillDs));
             }
         }
@@ -306,42 +323,53 @@ public class PanelController extends DomNodeController {
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
             QDataSet fillDs = dsf.controller.getFillDataSet();
-            logger.fine(""+panel+" got new dataset: " + fillDs + "  resetPanel="+resetPanel+"  resetRanges="+resetRanges );
-            if (fillDs != null) {
-                if (resetPanel) {
-                    if ( panel.getComponent().equals("") ) {
-                        RenderType renderType = AutoplotUtil.getRenderType(fillDs);
-                        panel.renderType= renderType;
-                        resetPanel(fillDs, renderType);
-                        setResetPanel(false);
-                    } else {
-                        if ( renderer==null ) maybeCreateDasPeer();
-                        if ( resetRanges ) doResetRanges();
-                        setResetPanel(false);
-                    }
-                } else if (resetRanges) {
-                    doResetRanges();
-                    setResetRanges(false);
-                } else if ( resetRenderType ) {
-                    doResetRenderType(panel.getRenderType());
-                }
-            }
-
-            if (fillDs == null) {
-                if (getRenderer() != null) {
-                    getRenderer().setDataSet(null);
-                    getRenderer().setException(null); // remove leftover message.
-                }
-            } else {
-                setDataSet(fillDs);
-            }
+            logger.fine("" + panel + " got new dataset: " + fillDs + "  resetPanel=" + resetPanel + "  resetRanges=" + resetRanges);
+            updateDataSet();
             changesSupport.changePerformed( this, PENDING_SET_DATASET );
         }
 
         public String toString() {
             return "" + PanelController.this;
         }
+
     };
+
+    /**
+     * get the dataset from the dataSourceFilter, and plot it possibly after
+     * slicing component.
+     * @throws IllegalArgumentException
+     */
+    private void updateDataSet() throws IllegalArgumentException {
+        QDataSet fillDs = dsf.controller.getFillDataSet();
+        if (fillDs != null) {
+            if (resetPanel) {
+                if (panel.getComponent().equals("")) {
+                    RenderType renderType = AutoplotUtil.getRenderType(fillDs);
+                    panel.renderType = renderType;
+                    resetPanel(fillDs, renderType);
+                    setResetPanel(false);
+                } else {
+                    if ( panel.getComponent().startsWith("_") ) panel.component=""; //TODO yuck danger code.
+                    if (renderer == null) maybeCreateDasPeer();
+                    if (resetRanges) doResetRanges();
+                    setResetPanel(false);
+                }
+            } else if (resetRanges) {
+                doResetRanges();
+                setResetRanges(false);
+            } else if (resetRenderType) {
+                doResetRenderType(panel.getRenderType());
+            }
+        }
+        if (fillDs == null) {
+            if (getRenderer() != null) {
+                getRenderer().setDataSet(null);
+                getRenderer().setException(null); // remove leftover message.
+            }
+        } else {
+            setDataSet(fillDs);
+        }
+    }
 
     /**
      * true indicates that the new renderType makes the axis dimensions change.
@@ -480,7 +508,7 @@ public class PanelController extends DomNodeController {
         Plot p= dom.controller.getPlotFor(panel);
         if ( p==null ) return;
         List<Panel> panels= dom.controller.getPanelsFor(p);
-        if ( panels.size()==1 ) {
+        if ( DomUtil.oneFamily(panels) ) {
             p.getXaxis().setAutorange(true);
             p.getYaxis().setAutorange(true);
             p.getZaxis().setAutorange(true);
