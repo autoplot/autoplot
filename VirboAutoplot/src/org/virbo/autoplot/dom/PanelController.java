@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -170,6 +171,7 @@ public class PanelController extends DomNodeController {
                 if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), (String)evt.getNewValue() ) ) {
                     logger.finer("component property change requires we reset render and dimensions: "+(String)evt.getOldValue() +"->"+ (String)evt.getNewValue());
                     setResetPanel(true);
+                    setResetRanges(true);
                     maybeSetPlotAutorange();
                 }
                 updateDataSet();
@@ -652,8 +654,9 @@ public class PanelController extends DomNodeController {
         }
 
         if (dom.getOptions().isAutoranging()) {
-            Map props = getDataSourceFilter().controller.getFillProperties();
+            Map props=null;
             QDataSet fillDs = processDataSet( panel.getComponent(), getDataSourceFilter().controller.getFillDataSet() );
+            if ( panel.getComponent().equals("") ) props= getDataSourceFilter().controller.getFillProperties();
             doAutoranging( panelCopy,props,fillDs );
 
             Renderer newRenderer = getRenderer();
@@ -674,10 +677,17 @@ public class PanelController extends DomNodeController {
         panelCopy.getPlotDefaults().getYaxis().setAutorange(true);
         panelCopy.getPlotDefaults().getZaxis().setAutorange(true);
 
+        if ( logger.isLoggable(Level.FINEST) ) {
+            logger.finest( String.format( "done, autorange  x:%s, y:%s ",
+                    panelCopy.getPlotDefaults().getXaxis().getRange().toString(),
+                    panelCopy.getPlotDefaults().getYaxis().getRange().toString() ) );
+        }
+
         panel.setPlotDefaults( panelCopy.getPlotDefaults() );
         // and hope that the plot is listening.
 
         setStatus("done, autorange");
+
         changesSupport.changePerformed(this, PENDING_RESET_RANGE);
     }
 
