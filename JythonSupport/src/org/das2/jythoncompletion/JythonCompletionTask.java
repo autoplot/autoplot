@@ -22,6 +22,8 @@ import javax.swing.text.Utilities;
 import org.das2.jythoncompletion.support.AsyncCompletionQuery;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystemSettings;
 import org.python.core.PyClass;
 import org.python.core.PyException;
 import org.python.core.PyInstance;
@@ -215,6 +217,8 @@ public class JythonCompletionTask implements CompletionTask {
                     } else if ( signature.startsWith("org/das2/")) {
                         link= "http://www-pw.physics.uiowa.edu/das2/javadoc/" + signature;
                     } else {
+                        String docHome= JythonCompletionProvider.getInstance().settings().getDocHome();
+                        docHome= docHome.replaceAll("AUTOPLOT_HOME", FileSystem.settings().getLocalCacheDir().toString() );
                         link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
                     }
                 }
