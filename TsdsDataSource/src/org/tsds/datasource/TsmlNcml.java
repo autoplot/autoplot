@@ -374,6 +374,8 @@ public class TsmlNcml {
             mon.setTaskProgress(totalBytesRead);
         }
 
+        //TODO: check to see if there is extra stuff at the end.
+        
         in.close();
 
         bbuf.flip();
