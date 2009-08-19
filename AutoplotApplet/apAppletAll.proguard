@@ -1,7 +1,8 @@
 -injars dist/AutoplotAppletAll.jar(!scripts/**,!test/**,!com/**)
 -outjars dist/AutoplotAppletAll.pro.jar
 
--libraryjars /usr/local/jre1.6.0_14/lib/rt.jar
+# Jeremy's spot3 hudson server.
+-libraryjars /opt/jdk1.5.0_10/jre/lib/rt.jar
 
 -target 1.5
 -printusage unused.txt
