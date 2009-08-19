@@ -83,6 +83,7 @@ rm org/das2/util/JCrypt.class
 #rm org/das2/fsm/FileStorageModel.class
 #rm org/das2/graph/XAxisDataLoader.class
 
+mkdir -p ../dist/
 $JAVA5_HOME/bin/jar cf ../dist/AutoplotAppletAll.jar *
 cd ..
 
