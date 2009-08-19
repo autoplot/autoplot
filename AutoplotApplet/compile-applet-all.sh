@@ -3,6 +3,14 @@
 # this copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.
 
+# set JAVA5_HOME and JAVA6_HOME
+if [ "" = "$JAVA5_HOME" ]; then
+    JAVA5_HOME=/usr/local/jdk1.5.0_17/
+fi
+if [ "" = "$JAVA6_HOME" ]; then
+    JAVA6_HOME=/usr/local/jre1.6.0_14/
+fi
+
 rm -r -f temp-src/
 mkdir temp-src/
 rm -r -f temp-classes/
@@ -33,10 +41,10 @@ find . -name '*EditorPanel.java' -exec rm {} \;
 rm -rf org/das2/dasml/*
 
 # compile key java classes.
-/usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java 
-/usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java
-/usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java
-/usr/local/jdk1.5.0_17/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java
+$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java
+$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java
+$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java
+$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java
 
 # special handling of the META-INF stuff.
 
@@ -75,9 +83,9 @@ rm org/das2/util/JCrypt.class
 #rm org/das2/fsm/FileStorageModel.class
 #rm org/das2/graph/XAxisDataLoader.class
 
-/usr/local/jdk1.5.0_17/bin/jar cf ../dist/AutoplotAppletAll2.jar *
+$JAVA5_HOME/bin/jar cf ../dist/AutoplotAppletAll.jar *
 cd ..
 
-/usr/local/jre1.6.0_14/bin/java -jar ../APLibs/lib/proguard.jar @apAppletAll2.proguard
-/usr/local/jre1.6.0_14/bin/pack200 dist/AutoplotAppletAll2.pro.jar.pack.gz dist/AutoplotAppletAll2.pro.jar
+$JAVA6_HOME/bin/java -jar ../APLibs/lib/proguard.jar @apAppletAll.proguard
+$JAVA6_HOME/bin/pack200 dist/AutoplotAppletAll.pro.jar.pack.gz dist/AutoplotAppletAll.pro.jar
 
