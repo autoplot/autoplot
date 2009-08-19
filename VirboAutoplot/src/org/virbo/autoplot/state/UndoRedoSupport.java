@@ -22,6 +22,7 @@ import javax.swing.JMenuItem;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Diff;
+import org.virbo.autoplot.dom.PropertyChangeDiff;
 
 /**
  *
@@ -164,10 +165,11 @@ public class UndoRedoSupport {
         String labelStr = "initial";
         String docString= "initial state of application";
         if (elephant != null) {
-            List<Diff> diffss = state.diffs(elephant.state);
+            List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses
                 StringBuffer docBuf= new StringBuffer();
                 for (Diff s : diffss) {
-                    docBuf.append("<br>"+s.toString());
+                    docBuf.append("<br>");
+                    docBuf.append(s.getDescription());
                 }
                 docString= docBuf.length()>4 ? docBuf.substring(4) : "";
                 docString= "<html>"+docString+"</html>";
@@ -181,7 +183,7 @@ public class UndoRedoSupport {
             } else {
                 StringBuffer buf = new StringBuffer();
                 for (Diff s : diffss) {
-                    buf.append(", " + s.toString());
+                    buf.append(", " + s.getLabel());
                 }
                 labelStr = buf.length() > 2 ? buf.substring(2) : "";
             }
