@@ -61,4 +61,12 @@ public class PropertyChangeDiff implements Diff {
         }
         return s;
     }
+
+    public String getLabel() {
+        return toString();
+    }
+
+    public String getDescription() {
+        return this.propertyName + " " + oldVal + " --> " + newVal;
+    }
 }

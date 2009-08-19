@@ -168,4 +168,12 @@ public class ArrayNodeDiff implements Diff {
         }
     }
 
+    public String getLabel() {
+        return toString();
+    }
+
+    public String getDescription() {
+        return toString();
+    }
+
 }

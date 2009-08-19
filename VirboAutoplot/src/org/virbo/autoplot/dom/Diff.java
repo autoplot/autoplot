@@ -18,4 +18,6 @@ public interface Diff {
      * @return
      */
     String propertyName();
+    String getLabel();
+    String getDescription();
 }
