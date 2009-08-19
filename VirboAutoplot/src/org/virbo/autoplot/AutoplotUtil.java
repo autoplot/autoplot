@@ -860,6 +860,16 @@ public class AutoplotUtil {
     public static RenderType getRenderType(QDataSet fillds) {
         RenderType spec;
 
+        String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
+        if ( srenderType!=null ) {
+            try {
+                spec = RenderType.valueOf(srenderType);
+                return spec;
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+        }
+
         QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
         QDataSet plane0 = (QDataSet) fillds.property(QDataSet.PLANE_0);
 
