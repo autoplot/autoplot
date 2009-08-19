@@ -90,3 +90,6 @@ cd ..
 $JAVA6_HOME/bin/java -jar ../APLibs/lib/proguard.jar @apAppletAll.proguard
 $JAVA6_HOME/bin/pack200 dist/AutoplotAppletAll.pro.jar.pack.gz dist/AutoplotAppletAll.pro.jar
 
+
+echo "copy example html."
+cp src/AutoplotApplet.html dist/
