@@ -8,7 +8,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.IndexListDataSetIterator;
@@ -22,14 +21,12 @@ import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
 import org.python.core.PySequence;
 import org.python.core.PySlice;
-import org.python.core.PyString;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
-import org.virbo.dataset.TrimStrideWrapper;
 import org.virbo.dataset.WritableDataSet;
 
 /**
@@ -52,8 +49,10 @@ public class PyQDataSet extends PyJavaInstance {
             this.ds = (WritableDataSet) ds;
         } else if (ds.rank() == 0) {
             this.ds = null;
-        } else {
+        } else if ( DataSetUtil.isQube(ds) ) {
             this.ds = DDataSet.copy(ds);
+        } else {
+            this.ds= null;
         }
         this.rods = ds;
 
@@ -375,6 +374,9 @@ public class PyQDataSet extends PyJavaInstance {
 
     @Override
     public void __setitem__(PyObject arg0, PyObject arg1) {
+        if ( ds==null ) {
+            throw new RuntimeException("__setitem__ on dataset that could not be made into mutable.");
+        }
         DataSetIterator iter = new QubeDataSetIterator(ds);
 
         if (!arg0.isSequenceType()) {
