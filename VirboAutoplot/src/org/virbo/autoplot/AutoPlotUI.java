@@ -1256,13 +1256,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
             StringBuffer buffy = new StringBuffer();
             URL aboutHtml = AutoPlotUI.class.getResource("aboutAutoplot.html");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()));
-            String s = reader.readLine();
-            while (s != null) {
-                buffy.append(s + "");
-                s = reader.readLine();
-            }
-            reader.close();
+            if ( aboutHtml!=null ) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()));
+                String s = reader.readLine();
+                while (s != null) {
+                    buffy.append(s + "");
+                    s = reader.readLine();
+                }
+                reader.close();
+            } 
 
             buffy.append("    <h2>Build Information:</h2>");
             buffy.append("<ul>");
