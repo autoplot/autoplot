@@ -2,7 +2,10 @@
 -outjars dist/AutoplotAppletAll.pro.jar
 
 # Jeremy's spot3 hudson server.
--libraryjars /opt/jdk1.5.0_10/jre/lib/rt.jar
+#-libraryjars /opt/jdk1.5.0_10/jre/lib/rt.jar
+
+# Jeremy's desktop
+-libraryjars /usr/local/jdk1.5.0_17/jre/lib/rt.jar
 
 -target 1.5
 -printusage unused.txt
@@ -28,6 +31,12 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+
+# Das2 stuff
+-keep public class org.das2.graph.** {
+    <methods>;
+}
+-keep public class
 
 # DomNode
 -keep public class * extends org.virbo.autoplot.dom.DomNode {
