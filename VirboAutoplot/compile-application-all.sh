@@ -136,7 +136,6 @@ fi
 echo "make jumbo jar file..."
 cd temp-classes
 
-echo `pwd`
 mkdir -p ../dist/
 $JAVA5_HOME/bin/jar cmf ../temp-src/MANIFEST.MF ../dist/AutoplotAll.jar *
 cd ..
