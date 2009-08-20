@@ -1,0 +1,166 @@
+#!/bin/bash
+#
+# Purpose: create two jars files that are .pack.gz.  One is code we don't expect to change often,
+# such as third-party libraries.  The other is code we do expect to change often.
+
+# this copies all the sources into the temp directory, then compiles a few key sources, so
+# that unreferenced routines are not used.  This list is separate from the ant build script,
+# so the configuration needs to be kept in sync.
+#
+# CDF Support will be awkward because of the binaries.  Support this for the hudson platform.
+
+# set JAVA5_HOME and JAVA6_HOME
+if [ "" = "$JAVA5_HOME" ]; then
+    JAVA5_HOME=/usr/local/jdk1.5.0_17/
+fi
+if [ "" = "$JAVA6_HOME" ]; then
+    JAVA6_HOME=/usr/local/jre1.6.0_14/
+fi
+
+rm -r -f temp-stable-src/
+mkdir temp-stable-src/
+rm -r -f temp-volatile-src/
+mkdir temp-volatile-src/
+rm -r -f temp-stable-classes/
+mkdir temp-stable-classes
+rm -r -f temp-volatile-classes/
+mkdir temp-volatile-classes
+
+echo "copy jar file classes..."
+cd temp-stable-classes
+for i in ../../APLibs/lib/*.jar; do
+   echo jar xf $i
+   jar xf $i
+done
+
+# use hacked version of cdf library
+rm -rf gsfc/
+jar xf ../../APLibs/lib/cdfjava-hack.jar
+
+for i in ../../APLibs/lib/netCDF/*.jar; do
+   echo jar xf $i
+   jar xf $i
+done
+cd ..
+echo "done copy jar file classes."
+
+echo "copy sources..."
+for i in \
+  QDataSet QStream dasCore DataSource \
+  JythonSupport \
+  IdlMatlabSupport \
+  AudioSystemDataSource \
+  BinaryDataSource DataSourcePack JythonDataSource \
+  Das2ServerDataSource TsdsDataSource  \
+  NetCdfDataSource CdfDataSource CefDataSource \
+  WavDataSource ImageDataSource ExcelDataSource \
+  FitsDataSource OpenDapDataSource \
+  VirboAutoplot; do
+    echo rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
+    rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
+done
+echo "done copy sources"
+
+# special handling of the META-INF stuff.
+
+echo "special handling of META-INF stuff..."
+
+file=org.virbo.datasource.DataSourceFactory.extensions
+touch temp-volatile-classes/META-INF/$file
+for i in `ls ../*/src/META-INF/$file` ; do
+   cat $i >> temp-volatile-classes/META-INF/$file
+done
+
+file=org.virbo.datasource.DataSourceFactory.mimeTypes
+touch temp-volatile-classes/META-INF/$file
+for i in `ls ../*/src/META-INF/$file` ; do
+   cat $i >> temp-volatile-classes/META-INF/$file
+done
+
+file=org.virbo.datasource.DataSourceFormat.extensions
+touch temp-volatile-classes/META-INF/$file
+for i in `ls ../*/src/META-INF/$file` ; do
+   cat $i >> temp-volatile-classes/META-INF/$file
+done
+
+echo "Main-Class: org.virbo.autoplot.AutoPlotUI" > temp-volatile-src/MANIFEST.MF
+
+# remove signatures
+rm temp-volatile-classes/META-INF/*.RSA
+rm temp-volatile-classes/META-INF/*.SF
+rm temp-stable-classes/META-INF/*.RSA
+rm temp-stable-classes/META-INF/*.SF
+
+# end, special handling of the META-INF stuff.
+echo "done special handling of META-INF stuff."
+
+echo "copy resources..."
+cd temp-volatile-src
+mkdir -p ../temp-volatile-classes/./images/toolbox/
+mkdir -p ../temp-volatile-classes/./images/icons/
+mkdir -p ../temp-volatile-classes/./images/toolbar/
+mkdir -p ../temp-volatile-classes/./com/cottagesystems/jdiskhog/resources/
+mkdir -p ../temp-volatile-classes/./org/virbo/autoplot/resources/
+mkdir -p ../temp-volatile-classes/./org/virbo/datasource/
+mkdir -p ../temp-volatile-classes/./org/netbeans/modules/editor/completion/resources/
+for i in `find . -name '*.png'`; do
+   cp $i ../temp-volatile-classes/$i
+done
+for i in `find . -name '*.gif'`; do
+   cp $i ../temp-volatile-classes/$i
+done
+for i in `find . -name '*.html'`; do
+   cp $i ../temp-classes/$i
+done
+
+cd ..
+echo "done copy resources."
+
+hasErrors=0
+
+# compile key java classes.
+echo "compile sources..."
+cd temp-volatile-src
+if ! $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoPlotUI.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
+cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
+for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+   echo $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
+   if ! $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+done
+cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1
+for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+   echo $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
+   if ! $JAVA5_HOME/bin/javac -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+done
+cd ..
+echo "done compile sources."
+
+if [ $hasErrors -eq 1 ]; then
+  echo "Error somewhere in compile, see above"
+  exit 1 
+fi
+
+echo "make jumbo jar files..."
+mkdir -p dist/
+cd temp-stable-classes
+$JAVA5_HOME/bin/jar cf ../dist/AutoplotAllStable.jar *
+cd ..
+cd temp-volatile-classes
+$JAVA5_HOME/bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotAllVolatile.jar *
+cd ..
+
+echo "done make jumbo jar files..."
+
+echo "proguard/pack200 stuff..."
+#proguard is compiled for Java 6.  This needs to be fixed.
+#$JAVA6_HOME/bin/java -jar ../APLibs/lib/proguard.jar @apApplicationAll.proguard
+#$JAVA6_HOME/bin/pack200 dist/AutoplotAll.pro.jar.pack.gz dist/AutoplotAll.pro.jar
+$JAVA6_HOME/bin/pack200 dist/AutoplotAllVolatile.jar.pack.gz dist/AutoplotAllVolatile.jar
+$JAVA6_HOME/bin/pack200 dist/AutoplotAllStable.jar.pack.gz dist/AutoplotAllStable.jar
+echo "done proguard/pack200 stuff."
+
