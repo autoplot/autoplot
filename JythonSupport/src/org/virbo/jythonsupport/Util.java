@@ -63,7 +63,14 @@ public class Util {
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
             return rds;
         } else {
-            return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
+            if ( DataSetUtil.isQube(rds) ) {
+                return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
+            } else {
+                System.err.println("unable to copy read-only dataset, which may cause problems elsewhere.");
+                //TODO: document this.
+                //TODO: fix this.
+                return rds;
+            }
         }
     }
     
