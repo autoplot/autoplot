@@ -3,7 +3,7 @@
 "http://www.cottagesystems.com/lib/dtd/jnlp-1.5.dtd">
 <jnlp 
     spec="1.0+" 
-    codebase="http://papco.org:8080/hudson/job/autoplot-jar-two/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/"
+    codebase="#{codebase}"
     href="autoplot_two_jar.jnlp">
     
     <information> 
