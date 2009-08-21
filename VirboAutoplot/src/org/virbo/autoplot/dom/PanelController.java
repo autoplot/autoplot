@@ -172,7 +172,7 @@ public class PanelController extends DomNodeController {
                     logger.finer("component property change requires we reset render and dimensions: "+(String)evt.getOldValue() +"->"+ (String)evt.getNewValue());
                     setResetPanel(true);
                     setResetRanges(true);
-                    maybeSetPlotAutorange();
+                    if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
                 }
                 updateDataSet();
             } else if ( evt.getPropertyName().equals( Panel.PROP_LEGENDLABEL ) ) {
