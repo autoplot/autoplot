@@ -213,7 +213,9 @@ public class LayoutUI extends javax.swing.JPanel {
                 Object[] os= panelListComponent.getSelectedValues();
                 Panel p= (Panel)panelListComponent.getSelectedValue();
                 PropertyEditor edit;
-                if ( os.length==1 ) {
+                if ( os.length==0 ) {
+                    return;
+                } else if ( os.length==1 ) {
                     edit = new PropertyEditor(p);
                 } else {
                     Panel[] peers= new Panel[os.length];
@@ -232,7 +234,9 @@ public class LayoutUI extends javax.swing.JPanel {
                 Object[] os= panelListComponent.getSelectedValues();
                 Panel p= (Panel)panelListComponent.getSelectedValue();
                 PropertyEditor edit;
-                if ( os.length==1 ) {
+                if ( os.length==0 ) {
+                    return;
+                } else if ( os.length==1 ) {
                     edit = new PropertyEditor(p.getStyle());
                 } else {
                     PanelStyle[] peers= new PanelStyle[os.length];
