@@ -431,7 +431,9 @@ public class PanelController extends DomNodeController {
         if (fillDs != null) {
 
             boolean shouldHaveChildren= fillDs.rank() == 2
-                    &&  ( renderType != RenderType.spectrogram && renderType != RenderType.nnSpectrogram )
+                    &&  ( renderType != RenderType.spectrogram 
+                    && renderType != RenderType.nnSpectrogram
+                    && renderType != RenderType.digital )
                     &&  fillDs.length(0) < 12;
 
             String[] labels = null;
