@@ -123,6 +123,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_RANGE ) ) axis.setRange(that.getRange());
         if ( !exclude.contains( Axis.PROP_LABEL ) ) axis.setLabel(that.getLabel());
         if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutorange(that.isAutorange());
+        if ( !exclude.contains( Axis.PROP_AUTOLABEL ) ) axis.setAutolabel(that.isAutolabel());
         if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
         if ( lock!=null ) lock.unlock();
     }
