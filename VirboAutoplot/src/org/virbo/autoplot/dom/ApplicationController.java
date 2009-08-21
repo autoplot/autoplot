@@ -1027,7 +1027,8 @@ public class ApplicationController extends DomNodeController implements RunLater
             c.getColumns(0).setLeft("0%");
             c.getColumns(0).setRight("100%");
         }
-
+        c.setFitted(true);
+        
         application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
         application.getDataSourceFilters(0).getController().setDataSetInternal(null);
         application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
