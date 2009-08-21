@@ -48,6 +48,7 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -1254,6 +1255,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private void aboutAutoplotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutAutoplotMenuItemActionPerformed
         try {
             StringBuffer buffy = new StringBuffer();
+
+            buffy.append("<html>\n");
             URL aboutHtml = AutoPlotUI.class.getResource("aboutAutoplot.html");
 
             if ( aboutHtml!=null ) {
@@ -1276,7 +1279,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
             buffy.append("<ul>    </p></html>");
 
-            JOptionPane.showMessageDialog(this, buffy.toString());
+            JLabel label= new JLabel(buffy.toString());
+
+            JOptionPane.showMessageDialog(this, label);
 
         } catch (IOException ex) {
         }
