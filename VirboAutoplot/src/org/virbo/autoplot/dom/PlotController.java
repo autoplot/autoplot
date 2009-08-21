@@ -233,8 +233,8 @@ public class PlotController extends DomNodeController {
             if (e.getSource() instanceof DasAxis) {
                 DasAxis axis = (DasAxis) e.getSource();
 
-                if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) ) {
-                    if (UnitsUtil.isTimeLocation(axis.getUnits())) {
+                if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) || e.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
+                    if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
                         axis.setUserDatumFormatter(new DateTimeDatumFormatter());
                     } else {
                         axis.setUserDatumFormatter(null);
@@ -250,7 +250,6 @@ public class PlotController extends DomNodeController {
                 }
 
             }
-
 
         }
     };
