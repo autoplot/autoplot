@@ -167,7 +167,13 @@ echo "done make jumbo jar files..."
 echo "sign the jar files..."
 $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllVolatile.jar virbo
 $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllStable.jar virbo
+
+echo "create jnlp file for build..."
 cp src/autoplot_two_jar.jnlp dist
+
+cd temp-volatile-src
+$JAVA5_HOME/bin/javac -d ../temp-volatile-classes external/FileSearchReplace.java
+cd ..
 $JAVA5_HOME/bin/java -cp ../temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 echo "proguard/pack200 stuff..."
