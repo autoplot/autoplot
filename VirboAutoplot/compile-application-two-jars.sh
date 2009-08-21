@@ -156,6 +156,10 @@ cd ..
 
 echo "done make jumbo jar files..."
 
+echo "sign the jar files..."
+$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllVolatile.jar virbo
+$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllStable.jar virbo
+
 echo "proguard/pack200 stuff..."
 #proguard is compiled for Java 6.  This needs to be fixed.
 #$JAVA6_HOME/bin/java -jar ../APLibs/lib/proguard.jar @apApplicationAll.proguard
