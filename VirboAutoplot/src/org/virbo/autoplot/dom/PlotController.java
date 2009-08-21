@@ -6,7 +6,6 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.das2.datum.Datum;
