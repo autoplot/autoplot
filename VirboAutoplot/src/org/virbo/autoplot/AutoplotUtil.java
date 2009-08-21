@@ -44,6 +44,7 @@ import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.DigitalRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
@@ -914,6 +915,7 @@ public class AutoplotUtil {
             SpectrogramRenderer result;
             if (recyclable != null && recyclable instanceof SpectrogramRenderer) {
                 result= (SpectrogramRenderer) recyclable;
+                result.setRebinner(SpectrogramRenderer.RebinnerEnum.binAverage);
             } else {
                 result = new SpectrogramRenderer(null, colorbar);
                 result.setDataSetLoader(null);
@@ -925,6 +927,7 @@ public class AutoplotUtil {
             SpectrogramRenderer result;
             if (recyclable != null && recyclable instanceof SpectrogramRenderer) {
                 result= (SpectrogramRenderer) recyclable;
+                result.setRebinner(SpectrogramRenderer.RebinnerEnum.nearestNeighbor);
             } else {
                 result = new SpectrogramRenderer(null, colorbar);
                 result.setDataSetLoader(null);
@@ -938,6 +941,15 @@ public class AutoplotUtil {
                 return recyclable;
             } else {
                 Renderer result = new ImageVectorDataSetRenderer(null);
+                result.setDataSetLoader(null);
+                colorbar.setVisible(false);
+                return result;
+            }
+        } else if ( renderType==RenderType.digital ) {
+            if (recyclable != null && recyclable instanceof DigitalRenderer) {
+                return recyclable;
+            } else {
+                Renderer result = new DigitalRenderer();
                 result.setDataSetLoader(null);
                 colorbar.setVisible(false);
                 return result;
