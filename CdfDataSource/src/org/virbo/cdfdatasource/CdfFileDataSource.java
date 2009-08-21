@@ -33,7 +33,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
-import org.virbo.dataset.WritableDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
@@ -121,7 +121,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                     attributes= MetadataUtil.sliceProperties(attributes, 0);
                 }
             }
-            WritableDataSet result = wrapDataSet(cdf, svariable, constraint, false);
+            MutablePropertyDataSet result = wrapDataSet(cdf, svariable, constraint, false);
             cdf.close();
 
             if (!"no".equals(interpMeta)) {
@@ -153,7 +153,7 @@ public class CdfFileDataSource extends AbstractDataSource {
     /**
      * @param reform for depend_1, we read the one and only rec, and the rank is decreased by 1.
      */
-    private WritableDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform) throws CDFException, ParseException {
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform) throws CDFException, ParseException {
         Variable variable = cdf.getVariable(svariable);
 
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
@@ -190,7 +190,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         long[] recs = DataSourceUtil.parseConstraint(constraints, numRec);
         boolean slice= recs[1]==-1;
-        WritableDataSet result;
+        MutablePropertyDataSet result;
         if (reform) {
             //result = CdfUtil.wrapCdfHyperDataHacked(variable, 0, -1, 1); //TODO: this doesn't handle strings properly.
             result = CdfUtil.wrapCdfHyperData(variable, 0, -1, 1);
@@ -234,10 +234,10 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
             if (dep != null && ( qubeDims[idep]>6 || labl == null) ) {
                 try {
-                    WritableDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, idep > 0);
+                    MutablePropertyDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, idep > 0);
                     //kludge for LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?FPDO
                     if (depDs.rank() == 2 && depDs.length(0) == 2) {
-                        WritableDataSet depDs1 = (WritableDataSet) Ops.reduceMean(depDs, 1);
+                        MutablePropertyDataSet depDs1 = (MutablePropertyDataSet) Ops.reduceMean(depDs, 1);
                         QDataSet binmax = DataSetOps.slice1(depDs, 1);
                         QDataSet binmin = DataSetOps.slice1(depDs, 0);
                         depDs1.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(depDs1, binmin));
@@ -263,7 +263,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             } else {
                 if (labl != null) {
                     try {
-                        WritableDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0);
+                        MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0);
                         result.putProperty("DEPEND_" + idep, depDs);
                     } catch (Exception e) {
                         e.printStackTrace(); // to support lanl.

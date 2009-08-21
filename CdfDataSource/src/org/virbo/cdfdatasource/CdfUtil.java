@@ -27,10 +27,12 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import org.virbo.dataset.BDataSet;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.IDataSet;
 import org.virbo.dataset.LDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSourceUtil;
@@ -464,11 +466,11 @@ public class CdfUtil {
      * @deprecated use 4 argument wrapCdfHyperData that takes interval.
      * @param reccount reccount -1 indicates read the one and only record and do a reform.
      */
-    public static WritableDataSet wrapCdfHyperData(Variable variable, long recStart, long recCount) throws CDFException {
+    public static MutablePropertyDataSet wrapCdfHyperData(Variable variable, long recStart, long recCount) throws CDFException {
         return wrapCdfHyperData(variable, recStart, recCount, 1);
     }
 
-    public static WritableDataSet wrapCdfHyperDataHacked(
+    public static MutablePropertyDataSet wrapCdfHyperDataHacked(
             Variable variable, long recStart, long recCount, long recInterval ) throws CDFException {
 
         long varType = variable.getDataType();
@@ -600,7 +602,7 @@ public class CdfUtil {
      * control subsetting in the zeroth dimension.
      * @param reccount reccount -1 indicates read the one and only record and do a reform.
      */
-    public static WritableDataSet wrapCdfHyperData(Variable variable, long recStart, long recCount, long recInterval) throws CDFException {
+    public static MutablePropertyDataSet wrapCdfHyperData(Variable variable, long recStart, long recCount, long recInterval) throws CDFException {
         long varType = variable.getDataType();
         long[] dimIndeces = new long[]{0};
 
@@ -641,10 +643,20 @@ public class CdfUtil {
         Object odata;
         odata= variable.getHyperData(recStart, Math.max(1, recCount), recInterval, dimIndeces, dimCounts, dimIntervals);
 
-        WritableDataSet result;
+        MutablePropertyDataSet result;
 
         int rank = 1;
 
+        if ( !odata.getClass().isArray() && recCount==-1 ) {
+            rank= 0;
+            result= DataSetUtil.asDataSet( ((Number)odata).doubleValue() );
+            if (varType == Variable.CDF_EPOCH) {
+                result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
+                result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+            }
+            return result;
+        }
+        
         Object element = Array.get(odata, 0);
         if (element.getClass().isArray()) {
             Object element2 = Array.get(element, 0);
