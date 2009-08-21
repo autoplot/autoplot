@@ -17,6 +17,14 @@ if [ "" = "$JAVA6_HOME" ]; then
     JAVA6_HOME=/usr/local/jre1.6.0_14/
 fi
 
+if [ "" = "$TAG" ]; then
+    TAG=untagged
+fi
+
+if [ "" = "$CODEBASE" ]; then
+    CODEBASE=NEED_CODEBASE_TO_BE_DEFINED_IN_COMPILE_SCRIPT
+fi
+
 rm -r -f temp-stable-src/
 mkdir temp-stable-src/
 rm -r -f temp-volatile-src/
@@ -159,6 +167,8 @@ echo "done make jumbo jar files..."
 echo "sign the jar files..."
 $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllVolatile.jar virbo
 $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllStable.jar virbo
+cp src/autoplot_two_jar.jnlp dist
+$JAVA5_HOME/bin/java -cp ../temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 echo "proguard/pack200 stuff..."
 #proguard is compiled for Java 6.  This needs to be fixed.
