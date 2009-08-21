@@ -8,6 +8,8 @@
 # so the configuration needs to be kept in sync.
 #
 # CDF Support will be awkward because of the binaries.  Support this for the hudson platform.
+#
+# This should be run from the folder "VirboAutoplot"
 
 # set JAVA5_HOME and JAVA6_HOME
 if [ "" = "$JAVA5_HOME" ]; then
@@ -72,6 +74,7 @@ echo "done copy sources"
 # special handling of the META-INF stuff.
 
 echo "special handling of META-INF stuff..."
+mkdir temp-volatile-classes/META-INF
 
 file=org.virbo.datasource.DataSourceFactory.extensions
 touch temp-volatile-classes/META-INF/$file
@@ -99,6 +102,7 @@ rm temp-volatile-classes/META-INF/*.SF
 rm temp-stable-classes/META-INF/*.RSA
 rm temp-stable-classes/META-INF/*.SF
 
+cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-volatile-classes/META-INF/build.txt
 # end, special handling of the META-INF stuff.
 echo "done special handling of META-INF stuff."
 
