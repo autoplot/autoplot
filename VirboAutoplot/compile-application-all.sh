@@ -100,6 +100,9 @@ done
 for i in `find . -name '*.gif'`; do
    cp $i ../temp-classes/$i
 done
+for i in `find . -name '*.html'`; do
+   cp $i ../temp-classes/$i
+done
 
 cd ..
 echo "done copy resources."
