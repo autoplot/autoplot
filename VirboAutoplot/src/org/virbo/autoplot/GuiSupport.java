@@ -381,6 +381,14 @@ public class GuiSupport {
             }
         }));
 
+        result.add(new JMenuItem(new AbstractAction("Digital") {
+
+            public void actionPerformed(ActionEvent e) {
+                Panel panel = plot.getController().getApplication().getController().getPanel();
+                panel.setRenderType(RenderType.digital);
+            }
+        }));
+
         return result;
     }
 
