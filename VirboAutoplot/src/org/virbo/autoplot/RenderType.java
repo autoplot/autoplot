@@ -8,5 +8,6 @@ public enum RenderType {
     scatter,
     colorScatter,
     stairSteps,
-    fillToZero
+    fillToZero,
+    digital,
 }
