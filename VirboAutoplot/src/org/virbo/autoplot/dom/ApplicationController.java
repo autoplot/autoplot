@@ -832,17 +832,17 @@ public class ApplicationController extends DomNodeController implements RunLater
         that.syncTo( srcPlot,Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
 
         if (bindx) {
-            BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot, "xaxis." + Axis.PROP_RANGE);
+            BindingModel bb = findBinding(application, Application.PROP_TIMERANGE, srcPlot.getXaxis(), Axis.PROP_RANGE);
             if (bb == null) {
-                bind(srcPlot, "xaxis." + Axis.PROP_RANGE, that, "xaxis." + Axis.PROP_RANGE);
+                bind(srcPlot.getXaxis(), Axis.PROP_RANGE, that.getXaxis(), Axis.PROP_RANGE);
             } else {
-                bind(application, Application.PROP_TIMERANGE, that, "xaxis." + Axis.PROP_RANGE);
+                bind(application, Application.PROP_TIMERANGE, that.getXaxis(), Axis.PROP_RANGE);
             }
 
         }
 
         if (bindy) {
-            bind(srcPlot, "yaxis." + Axis.PROP_RANGE, that, "yaxis." + Axis.PROP_RANGE);
+            bind(srcPlot.getYaxis(), Axis.PROP_RANGE, that.getYaxis(), Axis.PROP_RANGE);
         }
 
         return that;
