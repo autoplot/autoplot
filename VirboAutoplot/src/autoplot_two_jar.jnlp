@@ -33,7 +33,9 @@
         <j2se version="1.5+" initial-heap-size="96m" max-heap-size="1024m"
               href="http://java.sun.com/products/autodl/j2se" > 
         </j2se>
-        
+
+        <property name="jnlp.packEnabled" value="true"/>
+
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="AutoplotAllVolatile.jar" />
