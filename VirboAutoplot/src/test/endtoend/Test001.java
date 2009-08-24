@@ -42,6 +42,12 @@ public class Test001 {
             setCanvasSize( 800, 600 );
             writeToPng( "test001_002.png" );
 
+            reset();
+            plot( "file:/home/jbf/ct/hudson/data.backup/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency" );
+            // this causes bad things as of 2009-08-12.
+            plot( "file:/home/jbf/ct/hudson/data.backup/qds/hist.qds" );
+            writeToPng( "test001_003.png" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( RuntimeException ex ) {
             ex.printStackTrace();
