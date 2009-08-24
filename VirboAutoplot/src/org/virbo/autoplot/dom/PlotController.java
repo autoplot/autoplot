@@ -25,6 +25,9 @@ import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
+import org.virbo.dataset.BundleDataSet;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.QDataSet;
 
 /**
  *
@@ -317,6 +320,20 @@ public class PlotController extends DomNodeController {
         }
     };
 
+    Panel panel;
+
+    PropertyChangeListener panelDataSetListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( plot.getTitle().contains("%{CONTEXT}" ) ) {
+                QDataSet context= panel.getController().getContext();
+                String contextStr= DataSetUtil.format(context);
+                String title= plot.getTitle();
+                title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+                dasPlot.setTitle(title);
+            }
+        }
+    };
+
     void addPanel(Panel p) {
         Renderer rr= p.controller.getRenderer();
         if ( rr!=null ) dasPlot.addRenderer(rr);
@@ -359,6 +376,11 @@ public class PlotController extends DomNodeController {
         if ( DomUtil.oneFamily( dom.getController().getPanelsFor(plot) ) ) {
             Panel p= dom.getController().getPanelsFor(plot).get(0);
             if ( !p.getParentPanel().equals("") ) p = p.getController().getParentPanel();
+            if ( this.panel!=null ) {
+                this.panel.removePropertyChangeListener( PanelController.PROP_CONTEXT, panelDataSetListener );
+            }
+            this.panel= p;
+            this.panel.getController().addPropertyChangeListener( PanelController.PROP_CONTEXT, panelDataSetListener );
             if ( plot.isAutolabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
             if ( plot.getXaxis().isAutolabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
             if ( plot.getYaxis().isAutolabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
@@ -480,5 +502,14 @@ public class PlotController extends DomNodeController {
     }
     public String toString() {
         return this.plot + " controller";
+    }
+
+    /**
+     * set the title, leaving autolabel true.
+     * @param title
+     */
+    public void setTitleAutomatically(String title) {
+        plot.setTitle(title);
+        plot.setAutolabel(true);
     }
 }
