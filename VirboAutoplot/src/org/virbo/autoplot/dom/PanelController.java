@@ -28,13 +28,16 @@ import org.das2.system.MutatorLock;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.dsops.Ops;
 
 /**
  * PanelController manages the Panel, for example resolving the datasource and loading the dataset.
@@ -269,7 +272,13 @@ public class PanelController extends DomNodeController {
 
     private boolean rendererAcceptsData(QDataSet fillDs) {
         if ( getRenderer() instanceof SpectrogramRenderer ) {
-            return fillDs.rank()>1 && fillDs.rank()<4;
+            if ( fillDs.rank()==3 ) {
+                QDataSet dep0= (QDataSet) fillDs.property( QDataSet.DEPEND_0 );  // only support das2 tabledataset scheme.
+                if ( dep0!=null ) return false;
+                return rendererAcceptsData( DataSetOps.slice0(fillDs,0) );
+            } else {
+                return fillDs.rank()==2;
+            }
         } else if ( getRenderer() instanceof SeriesRenderer) {
             return fillDs.rank()==1;
         } else if ( getRenderer() instanceof ImageVectorDataSetRenderer ) {
@@ -292,9 +301,22 @@ public class PanelController extends DomNodeController {
             return;
         }
 
+        context= null;
         String c= panel.getComponent();
         try {
             fillDs = processDataSet(c, fillDs );
+            if ( c.length()>0 && c.startsWith("|") ) {
+                JoinDataSet jds= new JoinDataSet(1);
+                int idx=0;
+                QDataSet cds= (QDataSet) fillDs.property( "CONTEXT_"+idx );
+                while ( cds!=null ) {
+                    jds.join(cds);
+                    idx=idx+1;
+                    cds= (QDataSet) fillDs.property( "CONTEXT_"+idx );
+                }
+                jds.putProperty( "BUNDLE_0", Ops.zeros(jds.length()) );  //TODO: semmantics
+                _setContext(jds);
+            }
         } catch ( RuntimeException ex ) {
             if (getRenderer() != null) {
                 getRenderer().setException(ex);
@@ -313,19 +335,43 @@ public class PanelController extends DomNodeController {
             }
         }
 
-        final DataSourceFilter dsf = getDataSourceFilter();
-        String reduceRankString = dsf.controller.getReduceDataSetString();
-        if (dsf.controller.getReduceDataSetString() != null) {
-            // kludge to update title
-            String title = dom.controller.getPlot().getTitle(); //TODO: fix
-            Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
-            Matcher m = p.matcher(title);
-            if (m.matches()) {
-                title = m.group(1) + "!c" + reduceRankString;
-                getDasPlot().setTitle(title);
+        Plot plot= this.dom.getController().getPlotFor(panel);
+        List<Panel> panels= dom.controller.getPanelsFor( plot );
+        if ( DomUtil.oneFamily(panels) && plot.isAutolabel() ) {
+            final DataSourceFilter dsf = getDataSourceFilter();
+            String reduceRankString = dsf.controller.getReduceDataSetString();
+            if (dsf.controller.getReduceDataSetString() != null) {
+                // kludge to update title
+                String title = dom.controller.getPlot().getTitle(); //TODO: fix
+                Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
+                Matcher m = p.matcher(title);
+                if (m.matches()) {
+                    title = m.group(1) + "!c" + reduceRankString;
+                    plot.setTitle(title);
+                }
             }
         }
     }
+
+
+    protected QDataSet context = null;
+    /**
+     * get the context for the plotted dataset.  This will be a rank 1 dataset
+     * with a bundle dimension for each context dimension.
+     * @return
+     */
+    public static final String PROP_CONTEXT = "context";
+
+    public QDataSet getContext() {
+        return context;
+    }
+
+    private void _setContext(QDataSet context) {
+        QDataSet oldContext = this.context;
+        this.context = context;
+        propertyChangeSupport.firePropertyChange(PROP_CONTEXT, oldContext, context);
+    }
+
 
     PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
 
@@ -412,6 +458,76 @@ public class PanelController extends DomNodeController {
         }
     }
 
+    private static String[] getDimensionNames( QDataSet ds ) {
+
+        String[] depNames = new String[ds.rank()];
+        for (int i = 0; i < ds.rank(); i++) {
+            depNames[i] = "dim" + i;
+            QDataSet dep0 = (QDataSet) ds.property("DEPEND_" + i);
+            if (dep0 != null) {
+                String dname = (String) dep0.property(QDataSet.NAME);
+                if (dname != null) {
+                    depNames[i] = dname;
+                }
+            }
+        }
+
+        return depNames;
+    }
+
+    /**
+     * guess the best sprocess to reduce the rank to something we can display.
+     * guess the best dimension to slice by default, based on metadata.  Currently,
+     * this looks for the names lat, lon, and angle.
+     *
+     * @param fillDs
+     * @return sprocess string like "slice1(0)"
+     */
+    private static String guessSlice( QDataSet fillDs ) {
+        String[] depNames= getDimensionNames(fillDs);
+
+        int lat = -1, lon = -1;
+
+        int[] slicePref = new int[]{2, 2, 2}; // slicePref big means more likely to slice.
+        for (int i = 0; i < depNames.length; i++) {
+            String n = depNames[i].toLowerCase();
+            if (n.startsWith("lat")) {
+                slicePref[i] = 0;
+                lat = i;
+            } else if (n.startsWith("lon")) {
+                slicePref[i] = 0;
+                lon = i;
+            } else if (n.contains("time") ) {
+                slicePref[i] = 1;
+            } else if (n.contains("epoch") ) {
+                slicePref[i] = 1;
+            } else if (n.contains("angle")) {
+                slicePref[i] = 4;
+            } else if (n.contains("alpha") ) { // commonly used for pitch angle in space physics
+                slicePref[i] = 4;
+            } else if (n.contains("bundle")) {
+                slicePref[i] = 4;
+            }
+        }
+
+        int sliceIndex = 0;
+        int bestSlice = 0;
+        for (int i = 0; i < 3; i++) {
+            if (slicePref[i] > bestSlice) {
+                sliceIndex = i;
+                bestSlice = slicePref[i];
+            }
+        }
+
+        String result= "|slice"+sliceIndex+"(0)";
+        if (lat > -1 && lon > -1 && lat < lon) {
+            result+="|transpose()";
+        }
+
+        return result;
+
+    }
+
     /**
      * preconditions:
      *   the new renderType has been identified.
@@ -429,6 +545,8 @@ public class PanelController extends DomNodeController {
         }
 
         if (fillDs != null) {
+
+            boolean shouldSlice= fillDs.rank()>2;
 
             boolean shouldHaveChildren= fillDs.rank() == 2
                     &&  ( renderType != RenderType.spectrogram 
@@ -453,10 +571,10 @@ public class PanelController extends DomNodeController {
                 }
             }
 
-            doResetRenderType(panel.getRenderType());
+            if ( !shouldSlice ) doResetRenderType(panel.getRenderType());
             setResetPanel(false);
 
-            if ( resetRanges ) {
+            if ( resetRanges && !shouldSlice ) {
                 doResetRanges();
                 setResetRanges(false);
             }
@@ -464,6 +582,13 @@ public class PanelController extends DomNodeController {
             if ( shouldHaveChildren ) {
                 renderer.setActive(false);
                 panel.setDisplayLegend(false);
+            }
+
+            if ( shouldSlice ) {
+                String component= guessSlice( fillDs );
+                panel.setComponent(component);  // it'll reenter this code now.  problem--autorange is based on slice.
+                doResetRenderType(panel.getRenderType());
+                return;
             }
 
             // add additional panels when it's a bundle of rank1 datasets.
@@ -643,6 +768,8 @@ public class PanelController extends DomNodeController {
         panelCopy.setParentPanel("");
         panelCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
 
+        QDataSet fillDs = processDataSet( panel.getComponent(), getDataSourceFilter().controller.getFillDataSet() );
+
         if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autolabel property.
             DataSourceController dsc= getDataSourceFilter().getController();
             doMetadata(panelCopy, dsc.getFillProperties(), dsc.getFillDataSet() );
@@ -653,11 +780,16 @@ public class PanelController extends DomNodeController {
                 title += "!c" + reduceRankString;
                 panelCopy.getPlotDefaults().setTitle(title);
             }
+            if ( !panel.getComponent().equals("") ) {
+                String title = panelCopy.getPlotDefaults().getTitle();
+                title += "!c%{CONTEXT}";
+                panelCopy.getPlotDefaults().setTitle(title);
+            }
         }
 
         if (dom.getOptions().isAutoranging()) {
             Map props=null;
-            QDataSet fillDs = processDataSet( panel.getComponent(), getDataSourceFilter().controller.getFillDataSet() );
+            
             if ( panel.getComponent().equals("") ) props= getDataSourceFilter().controller.getFillProperties();
             doAutoranging( panelCopy,props,fillDs );
 
@@ -971,7 +1103,9 @@ public class PanelController extends DomNodeController {
 
             logger.finest("plot.addRenderer "+plot+" "+newRenderer);
             if (getDataSourceFilter().controller.getFillDataSet() != null) {
-                setDataSet(getDataSourceFilter().controller.getFillDataSet());
+                // this is danger code, I think inserted to support changing render type.
+                QDataSet fillDs= processDataSet(panel.getComponent(), getDataSourceFilter().controller.getFillDataSet());
+                setDataSet(fillDs);
             }
         }
 
