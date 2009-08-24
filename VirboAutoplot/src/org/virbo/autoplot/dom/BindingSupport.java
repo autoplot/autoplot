@@ -44,14 +44,21 @@ public class BindingSupport {
         Method srcGetter;
     }
 
-    private PropertyChangeListener propListener(final Object p, final Method setter, final Converter c, final boolean forward) {
+    private PropertyChangeListener propListener(final Object p, final Method setter, final Method getter, final Converter c, final boolean forward) {
         return new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 Method m;
                 try {
                     if (c == null) {
+                        Object oldValue= getter.invoke( p );
+                        if ( oldValue.equals(evt.getNewValue() ) ) return;
                         setter.invoke(p, evt.getNewValue());
+                        if ( new Exception().getStackTrace().length > 300 ) {
+                            System.err.println("setter: "+setter);
+                            System.err.println("old:" + evt.getOldValue() + "  new:"+evt.getNewValue() );
+                            System.err.println("this is that bad state!");
+                        }
                     } else {
                         if (forward) {
                             setter.invoke(p, c.convertForward(evt.getNewValue()));
@@ -131,9 +138,27 @@ public class BindingSupport {
         lookupGetterSetter(src, srcProp, bi);
         lookupGetterSetter(dst, dstProp, bi);
 
-        PropertyChangeListener srcListener = propListener(dst, bi.dstSetter, c, true);
+        //copy the current settings before binding the two.
+        try {
+            Object val = bi.srcGetter.invoke(src);
+            if (c != null) {
+                val = c.convertForward(val);
+            }
+            bi.dstSetter.invoke(dst, val);
+        } catch (IllegalArgumentException ex) {
+            throw new RuntimeException(ex);
+        } catch (InvocationTargetException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (RuntimeException ex) {
+            throw ex;
+        }
+
+        // add the listeners that bind.
+        PropertyChangeListener srcListener = propListener(dst, bi.dstSetter, bi.dstGetter, c, true);
         src.addPropertyChangeListener(srcProp, srcListener);
-        PropertyChangeListener dstListener = propListener(src, bi.srcSetter, c, false);
+        PropertyChangeListener dstListener = propListener(src, bi.srcSetter, bi.srcGetter, c, false);
 
         bi.dstListener = dstListener;
         bi.srcListener = srcListener;
@@ -161,23 +186,6 @@ public class BindingSupport {
             }
             list.add(bi);
         }
-
-        try {
-            Object val = bi.srcGetter.invoke(src);
-            if (c != null) {
-                val = c.convertForward(val);
-            }
-            bi.dstSetter.invoke(dst, val);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
-        } catch (InvocationTargetException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (RuntimeException ex) {
-            throw ex;
-        }
-
 
     }
 
