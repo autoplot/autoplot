@@ -4,11 +4,18 @@
  */
 package test.endtoend;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import org.das2.datum.Units;
+import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dsops.Ops;
+import org.virbo.qstream.SimpleStreamFormatter;
 
 /**
  * performance and function of QDataSet operations.
@@ -16,22 +23,23 @@ import org.virbo.dsops.Ops;
  */
 public class Test011 {
 
-    static long t0= System.currentTimeMillis();
+    static long t0 = System.currentTimeMillis();
 
-    private static void timer( String id ) {
-        System.out.printf("%s (millis): %5d \n",id,System.currentTimeMillis()-t0);
-        t0= System.currentTimeMillis();
+    private static void timer(String id) {
+        System.out.printf("%s (millis): %5d \n", id, System.currentTimeMillis() - t0);
+        t0 = System.currentTimeMillis();
     }
 
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
 
         timer("reset");
+        /*
         QDataSet ds= Ops.findgen(4000,30);
         timer("ds=findgen(4000,30)");
 
         for ( int i=0; i<4000; i++ ) {
-            String cmd= "_s0(40)"; //String.format("_s0(%d)", i );
-            QDataSet ds1= DataSetOps.sprocess( cmd, ds);
+        String cmd= "_s0(40)"; //String.format("_s0(%d)", i );
+        QDataSet ds1= DataSetOps.sprocess( cmd, ds);
         }
 
         timer("sprocess ds 4000 times");
@@ -48,21 +56,77 @@ public class Test011 {
 
         double total=0;
         for ( int i=0; i<ds3.length(); i++ ) {
-            for ( int j=0; j<ds3.length(0); j++ ) {
-                total+= ds3.value(i,j);
-            }
+        for ( int j=0; j<ds3.length(0); j++ ) {
+        total+= ds3.value(i,j);
+        }
         }
         timer("access each ds3.value(i,j)");
 
         total=0;
         QubeDataSetIterator it= new QubeDataSetIterator(ds3);
         while( it.hasNext() ) {
-            it.next();
-            total+= it.getValue(ds3);
+        it.next();
+        total+= it.getValue(ds3);
         }
         timer("iterator over ds3 to access");
+         */
 
-        if ( true ) {
+        // test bundle of rank 0 datasets.
+        {
+            BundleDataSet bds = BundleDataSet.createRank0Bundle();
+            MutablePropertyDataSet mds;
+            mds = DataSetUtil.asDataSet(0, Units.t2000);
+            mds.putProperty(QDataSet.NAME, "time");
+            mds.putProperty(QDataSet.FORMAT, "%1$tFT");
+            bds.bundle(mds);
+            mds = DataSetUtil.asDataSet(1000, Units.eV);
+            mds.putProperty(QDataSet.NAME, "channelEnergy");
+            mds.putProperty(QDataSet.FORMAT, "%9.3f");
+            bds.bundle(mds);
+            mds = DataSetUtil.asDataSet(90, Units.degrees);
+            mds.putProperty(QDataSet.NAME, "pitchAngle");
+            mds.putProperty(QDataSet.FORMAT, "%5.0f");
+            bds.bundle(mds);
+            mds = DataSetUtil.asDataSet(1e7, Units.dimensionless);
+            mds.putProperty(QDataSet.NAME, "flux");
+            mds.putProperty(QDataSet.CONTEXT_0, bds);
+            mds.putProperty(QDataSet.FORMAT, "%9.2f");
+            mds.putProperty(QDataSet.TITLE, DataSetUtil.format(mds));
+
+            System.err.println("test011_001: " + DataSetUtil.format(bds));
+            System.err.println("test011_001: " + DataSetUtil.format(mds));
+
+            SimpleStreamFormatter ff = new SimpleStreamFormatter();
+            ff.format(bds, new FileOutputStream("test011_001.qds"), true);
+        }
+
+        //test bundle of rank 1 datasets.
+        {
+            BundleDataSet bds = BundleDataSet.createRank1Bundle();
+            MutablePropertyDataSet mds;
+            mds = (MutablePropertyDataSet) Ops.linspace( 0, 9*86400, 10 );
+            mds.putProperty(QDataSet.UNITS, Units.t2000);
+            mds.putProperty(QDataSet.NAME, "time");
+            mds.putProperty(QDataSet.FORMAT, "%1$tFT");
+            bds.bundle(mds);
+            mds = (MutablePropertyDataSet) Ops.replicate(1000,10);
+            mds.putProperty(QDataSet.UNITS, Units.eV );
+            mds.putProperty(QDataSet.NAME, "channelEnergy");
+            mds.putProperty(QDataSet.FORMAT, "%9.3f");
+            bds.bundle(mds);
+            mds = (MutablePropertyDataSet) Ops.linspace(0,180,10);
+            mds.putProperty(QDataSet.UNITS, Units.degrees );
+            mds.putProperty(QDataSet.NAME, "pitchAngle");
+            mds.putProperty(QDataSet.FORMAT, "%5.0f");
+            bds.bundle(mds);
+
+            System.err.println("test011_002: " + DataSetUtil.format(bds));
+            SimpleStreamFormatter ff = new SimpleStreamFormatter();
+            ff.format(bds, new FileOutputStream("test011_002.qds"), true);
+
+        }
+
+        if (true) {
             System.exit(0);
         } else {
             System.exit(1);
