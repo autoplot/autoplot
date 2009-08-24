@@ -201,12 +201,12 @@ public class DataSourceController extends DomNodeController {
 
         setDepnames(Arrays.asList(depNames));
 
-        if ( isResetDimensions() ) {
-
-            if (ds.rank() > 2 ) {
-                guessSliceDimension();
-            }
-        }
+//        if ( isResetDimensions() ) {
+//
+//            if (ds.rank() > 2 ) {
+//                guessSliceDimension();
+//            }
+//        }
 
         setResetDimensions(false);
 
@@ -275,7 +275,7 @@ public class DataSourceController extends DomNodeController {
      *  the dataset is set
      *  labels are set, axes are set.  
      *  Labels reset might have triggered a timer that will redo layout.
-     *  slice dimensions are set for rank 3 dataset.
+     *  slice dimensions are set for dataset.
      * 
      * @param ds
      * @param autorange if false, autoranging will not be done.  if false, autoranging
@@ -564,16 +564,19 @@ public class DataSourceController extends DomNodeController {
             return;
         }
 
-        Map properties = getProperties();
+        Map props = getProperties();
 
         MutablePropertyDataSet fillDs;
 
-        if (getDataSet().rank() == 3) {
+        int sliceDimension = dsf.getSliceDimension();
+        int sliceIndex = dsf.getSliceIndex();
+
+        boolean doSlice= ( sliceIndex>=0 && sliceDimension>=0  ); // kludge to support legacy datasets
+
+        if ( doSlice && getDataSet().rank() == 3) { // panel now does slicing
 
             QDataSet ds;
             QDataSet dep;
-            int sliceDimension = dsf.getSliceDimension();
-            int sliceIndex = dsf.getSliceIndex();
 
             if (sliceDimension == 2) {
                 int index = Math.min(getDataSet().length(0, 0) - 1, sliceIndex);
@@ -600,11 +603,11 @@ public class DataSourceController extends DomNodeController {
             }
             _setReduceDataSetString(reduceRankString);
 
-            properties = MetadataUtil.sliceProperties(properties, sliceDimension);
+            props = MetadataUtil.sliceProperties(props, sliceDimension);
 
             if (dsf.isTranspose()) {
                 ds = new TransposeRank2DataSet(ds);
-                properties = MetadataUtil.transposeProperties(properties);
+                props = MetadataUtil.transposeProperties(props);
             }
 
             fillDs = DataSetOps.makePropertiesMutable(ds);
@@ -632,7 +635,7 @@ public class DataSourceController extends DomNodeController {
         // check the dataset for fill data, inserting canonical fill values.
         AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
 
-        _setFillProperties(properties);
+        _setFillProperties(props);
         if (fillDs == getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
             this.fillDataSet = null;
         }
@@ -999,7 +1002,7 @@ public class DataSourceController extends DomNodeController {
 
             try {
                 mon.started();
-                mon.setProgressMessage("getting data source " + surl);
+                mon.setProgressMessage("getting " + surl);
 
                 if (caching != null) {
                     if (caching.satisfies(surl)) {
