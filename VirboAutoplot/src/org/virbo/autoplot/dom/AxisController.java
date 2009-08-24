@@ -75,10 +75,14 @@ public class AxisController extends DomNodeController {
                 axis.setAutolabel(false);
             }
             if ( evt.getPropertyName().equals(Axis.PROP_LOG) || evt.getPropertyName().equals(Axis.PROP_RANGE) ) {
+                if ( isPendingChanges() ) return;
                 DatumRange oldRange = axis.range;
                 final DatumRange range = logCheckRange(axis.range, axis.log);
                 if (!range.equals(oldRange)) {
+                    changesSupport.registerPendingChange(this,PENDING_RANGE_TWEAK);
+                    changesSupport.performingChange(this, PENDING_RANGE_TWEAK);
                     axis.setRange(range);
+                    changesSupport.changePerformed(this, PENDING_RANGE_TWEAK);
                 }
             }
         }
@@ -93,10 +97,20 @@ public class AxisController extends DomNodeController {
      * set the range without affecting the auto state.
      */
     public void setRangeAutomatically( DatumRange range, boolean log ) {
+        axis.range= range; // don't fire off property change events.
+        axis.log= log;
         axis.setRange(range);
         axis.setLog(log);
-        axis.setRange(range);
         axis.setAutorange(true);
+    }
+
+    /**
+     * set the label, leaving its autolabel property true.
+     * @param label
+     */
+    public void setLabelAutomatically( String label ) {
+        axis.setLabel(label);
+        axis.setAutolabel(true);
     }
 
     public synchronized void bindTo(DasAxis p) {
