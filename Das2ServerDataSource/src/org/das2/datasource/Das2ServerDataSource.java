@@ -17,16 +17,16 @@ import org.das2.util.StreamTool;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
@@ -47,6 +47,7 @@ class Das2ServerDataSource extends AbstractDataSource {
     
     DatumRange timeRange;
     Datum resolution;
+    String dsParams;
 
     @Override
     public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
@@ -54,18 +55,27 @@ class Das2ServerDataSource extends AbstractDataSource {
         //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
         //&start_time=2004-01-01&end_time=2004-01-06&server=dataset&ascii=1
 
-        HashMap params2 = new HashMap(params);
+        Map params2 = new LinkedHashMap();
+        Map otherParams= new LinkedHashMap( params );
+        otherParams.remove("start_time");
+        otherParams.remove("end_time");
+        otherParams.remove("resolution");
+        otherParams.remove("dataset");
+        dsParams= (String)  URLSplit.formatParams(otherParams);
+
         params2.put("server", "dataset");
         if ( timeRange!=null ) {
-            params2.put("start_time", ""+timeRange.min() );
-            params2.put("end_time", ""+timeRange.max() );
+            params2.put("start_time", URLEncoder.encode(timeRange.min().toString()) );
+            params2.put("end_time", URLEncoder.encode(timeRange.max().toString()) );
         } 
         if ( resolution!=null ) {
             params2.put("resolution", ""+resolution.doubleValue(Units.seconds) );
         }
-
+        params2.put("dataset", URLEncoder.encode(params.get("dataset") ) );
+        params2.put("params", URLEncoder.encode(dsParams) );
         URL url2 = new URL("" + this.resourceURL + "?" + URLSplit.formatParams(params2));
 
+        System.err.println("opening "+url2);
         InputStream in = url2.openStream();
 
         final DasProgressMonitorInputStream mpin = new DasProgressMonitorInputStream(in, mon);
@@ -86,6 +96,10 @@ class Das2ServerDataSource extends AbstractDataSource {
         StreamTool.readStream(channel, handler);
         DataSet ds = handler.getDataSet();
 
+        if ( ds==null ) {
+            throw new RuntimeException("failed to get dataset, without explanation!");
+        }
+
         if ( timeRange==null ) timeRange= DatumRangeUtil.parseTimeRange( params2.get("start_time") + " to "+ params2.get("end_time" ) );
         return DataSetAdapter.create(ds);
     }
@@ -101,9 +115,12 @@ class Das2ServerDataSource extends AbstractDataSource {
             }
 
             public URL getURL() {
-                String sparams= "dataset="+params.get( "dataset" ) + "&start_time=" + timeRange.min() + "&end_time=" + timeRange.max();
+                String sparams= "dataset="+params.get( "dataset" ) + "&start_time=" + URLEncoder.encode( timeRange.min().toString() )
+                        + "&end_time=" + URLEncoder.encode( timeRange.max().toString() )
+                        + "&resolution=" + resolution.doubleValue(Units.seconds);
+                if ( dsParams!=null )  sparams+= "&" + dsParams;
                 try {
-                    return new URL(resourceURL, "?" + sparams);
+                    return new URL( "" + resourceURL + "?" + sparams);
                 } catch (MalformedURLException ex) {
                     throw new RuntimeException(ex);
                 }
