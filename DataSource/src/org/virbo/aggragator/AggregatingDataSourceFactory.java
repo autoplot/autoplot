@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.fsm.FileStorageModel;
+import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -48,7 +48,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         AggregatingDataSource ads = new AggregatingDataSource(url,delegateFactory);
         String surl = url.toString();
         surl= surl.replaceAll("%25","%");
-        FileStorageModel fsm = getFileStorageModel(surl);
+        FileStorageModelNew fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
         URLSplit split = URLSplit.parse(surl);
         Map parms = URLSplit.parseParams(split.params);
@@ -75,7 +75,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         return i;
     }
 
-    public static FileStorageModel getFileStorageModel(String suri) throws IOException {
+    public static FileStorageModelNew getFileStorageModel(String suri) throws IOException {
         URLSplit split= URLSplit.parse(suri);
         String surl= split.surl; // support cases where resource URI is not yet valid.
         int i = surl.indexOf('?');
@@ -84,8 +84,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         i = splitIndex(sansArgs);
         FileSystem fs = FileSystem.create( new URL(sansArgs.substring(0, i)) );
+        if ( sansArgs.charAt(i)=='/' ) i=i+1; // kludgy
         String spec= sansArgs.substring(i).replaceAll("\\$", "%");
-        FileStorageModel fsm = FileStorageModel.create(fs, spec );
+        FileStorageModelNew fsm = FileStorageModelNew.create(fs, spec );
 
         return fsm;
     }
@@ -97,7 +98,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         int urlLen = 0; //this is the position as we parse and process surl.
 
         surl= surl.replaceAll("%25","%");
-        FileStorageModel fsm = getFileStorageModel(surl);
+        FileStorageModelNew fsm = getFileStorageModel(surl);
 
         String delegateFile = fsm.getRepresentativeFile(new NullProgressMonitor());
 
@@ -141,7 +142,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
      */
     public static String getDelegateDataSourceFactoryUrl(String surl) throws IOException, IllegalArgumentException {
         surl= surl.replaceAll("%25","%");
-        FileStorageModel fsm = getFileStorageModel(surl);
+        FileStorageModelNew fsm = getFileStorageModel(surl);
 
         String file = fsm.getRepresentativeFile(new NullProgressMonitor());
 

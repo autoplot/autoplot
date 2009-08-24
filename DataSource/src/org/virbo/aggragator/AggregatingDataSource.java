@@ -23,7 +23,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.das2.fsm.FileStorageModel;
+import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
@@ -42,7 +42,7 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 public class AggregatingDataSource extends AbstractDataSource {
 
-    private FileStorageModel fsm;
+    private FileStorageModelNew fsm;
     DataSourceFactory delegateDataSourceFactory;
     /**
      * metadata from the last read.
@@ -241,11 +241,11 @@ public class AggregatingDataSource extends AbstractDataSource {
         propertyChangeSupport.firePropertyChange("viewRange", oldViewRange, viewRange);
     }
 
-    public FileStorageModel getFsm() {
+    public FileStorageModelNew getFsm() {
         return fsm;
     }
 
-    public void setFsm(FileStorageModel fsm) {
+    public void setFsm(FileStorageModelNew fsm) {
         this.fsm = fsm;
     }
     /**
