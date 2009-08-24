@@ -591,8 +591,10 @@ public class GuiSupport {
         } else {
             throw new IllegalArgumentException("this axis and plot don't go together");
         }
+        axis.setLog( targetAxis.isLog() );
+        axis.setRange( targetAxis.getRange() );
+        controller.bind(targetAxis, Axis.PROP_LOG, axis, Axis.PROP_LOG); //set log first since we might tweak range accordingly.
         controller.bind(targetAxis, Axis.PROP_RANGE, axis, Axis.PROP_RANGE);
-        controller.bind(targetAxis, Axis.PROP_LOG, axis, Axis.PROP_LOG);
     }
 
 
