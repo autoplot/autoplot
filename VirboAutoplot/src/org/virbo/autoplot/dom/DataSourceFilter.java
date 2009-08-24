@@ -81,23 +81,20 @@ public class DataSourceFilter extends DomNode {
             propertyChangeSupport.firePropertyChange(PROP_SLICEDIMENSION, oldsliceDimension, newsliceDimension);
         }
     }
-    private int sliceIndex = 0;
+
+    private int sliceIndex = -1;
+    /**
+     * index to slice the dataset in the dataSourceFilter.  This is to support
+     * legacy behavior.  -1 now indicates that no slicing should be done, and
+     * this is the default.
+     */
     public static final String PROP_SLICEINDEX = "sliceIndex";
 
-    /**
-     * Get the value of sliceIndex
-     *
-     * @return the value of sliceIndex
-     */
+
     public int getSliceIndex() {
         return this.sliceIndex;
     }
 
-    /**
-     * Set the value of sliceIndex
-     *
-     * @param newsliceIndex new value of sliceIndex
-     */
     public void setSliceIndex(int newsliceIndex) {
         int oldsliceIndex = sliceIndex;
         this.sliceIndex = newsliceIndex;
