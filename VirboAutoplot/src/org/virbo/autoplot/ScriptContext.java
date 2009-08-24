@@ -30,8 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import javax.swing.JComponent;
 import org.das2.DasApplication;
-import org.das2.fsm.FileStorageModel;
-import org.das2.system.ExceptionHandler;
+import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -395,7 +394,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static String[] getTimeRangesFor(String surl, String timeRange, String format) throws IOException, ParseException {
         DatumRange dr = DatumRangeUtil.parseTimeRange(timeRange);
-        FileStorageModel fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
+        FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
         TimeParser tf = TimeParser.create(format);
 
         String[] ss = fsm.getNamesFor(dr);
