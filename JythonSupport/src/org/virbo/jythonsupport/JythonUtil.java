@@ -4,8 +4,11 @@
  */
 package org.virbo.jythonsupport;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Properties;
 import org.python.core.Py;
+import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -24,7 +27,9 @@ public class JythonUtil {
      * @throws java.io.IOException
      */
     public static PythonInterpreter createInterpreter(boolean sandbox) throws IOException {
-        System.err.println("jython cache dir: " + Py.getSystemState().cachedir );
+        if ( PySystemState.cachedir==null ) {
+            System.setProperty( "python.cachedir", System.getProperty("user.home")+"/autoplot_data/pycache" );
+        }
         PythonInterpreter interp = new PythonInterpreter();
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
