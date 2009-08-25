@@ -98,9 +98,11 @@ echo "Main-Class: org.virbo.autoplot.AutoPlotUI" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm temp-volatile-classes/META-INF/*.RSA
+rm temp-volatile-classes/META-INF/*.DSA
 rm temp-volatile-classes/META-INF/*.SF
 rm temp-stable-classes/META-INF/*.RSA
 rm temp-stable-classes/META-INF/*.SF
+rm temp-stable-classes/META-INF/*.DSA
 
 cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-volatile-classes/META-INF/build.txt
 # end, special handling of the META-INF stuff.
