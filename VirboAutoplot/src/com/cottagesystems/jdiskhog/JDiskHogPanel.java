@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -31,142 +32,112 @@ import org.virbo.autoplot.AutoPlotUI;
 public class JDiskHogPanel extends javax.swing.JPanel {
 
     AutoPlotUI app;
-    
+
     /** Creates new form JDiskHogPanel */
-    public JDiskHogPanel( AutoPlotUI model ) {
-        this.app= model;
+    public JDiskHogPanel(AutoPlotUI model) {
+        this.app = model;
         initComponents();
         jTree1.addMouseListener(createMouseListener(jTree1));
 
     }
 
     private MouseListener createMouseListener(final JTree jtree) {
-        return new MouseAdapter() {
+        return new MyMouseListener(jtree, this);
+    }
 
-            TreePath context;
+    Action getDeleteAction(final JTree jtree) {
+        return new AbstractAction("Delete") {
 
-            @Override
-            public void mousePressed(MouseEvent e) {
+            public void actionPerformed(ActionEvent e) {
+                FSTreeModel model = (FSTreeModel) jtree.getModel();
 
-                if (e.isPopupTrigger()) {
-                    context = jtree.getPathForLocation(e.getX(), e.getY());
-                    jtree.getSelectionModel().addSelectionPath(context);
-                    if (context != null) {
-                        showPopup(e);
+                TreePath[] paths = jtree.getSelectionPaths();
+
+                boolean okay = true;
+                IllegalArgumentException ex = null;
+
+                for (int i = 0; i < paths.length; i++) {
+                    File f = model.getFile(paths[i]);
+
+                    if (f.equals(model.root)) {
+                        continue;
+                    }
+                    if (f.isFile()) {
+                        okay = f.delete();
+                    } else {
+                        try {
+                            okay = Util.deleteFileTree(f);
+                        } catch (IllegalArgumentException ex1) {
+                            ex = ex1;
+                            okay = false;
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    context = jtree.getPathForLocation(e.getX(), e.getY());
-                    jtree.getSelectionModel().addSelectionPath(context);
-                    if (context != null) {
-                        showPopup(e);
+                if (!okay) {
+                    JOptionPane.showConfirmDialog(jtree, ex.getLocalizedMessage(), "unable to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
+                }
+
+                scan(model.root);
+
+            }
+        };
+    }
+
+    Action getPlotAction(final JTree jtree) {
+        return new AbstractAction("Plot") {
+
+            public void actionPerformed(ActionEvent e) {
+
+                FSTreeModel model = (FSTreeModel) jtree.getModel();
+
+                TreePath[] paths = jtree.getSelectionPaths();
+
+
+                if (paths.length == 0) return;
+
+                File f = model.getFile(paths[0]);
+                app.plotUri(f.toString());
+
+            }
+        };
+    }
+
+    Action getCopyToAction(final JTree jtree) {
+        return new AbstractAction("Copy To...") {
+
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                if (chooser.showOpenDialog(jtree) == JFileChooser.APPROVE_OPTION) {
+                    File destdir = chooser.getSelectedFile();
+
+                    FSTreeModel model = (FSTreeModel) jtree.getModel();
+
+                    TreePath[] paths = jtree.getSelectionPaths();
+
+                    for (int i = 0; i < paths.length; i++) {
+                        File f = model.getFile(paths[i]);
+                        try {
+                            Util.fileCopy(f, destdir);
+                        } catch (FileNotFoundException ex1) {
+                            Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                            JOptionPane.showMessageDialog(jtree, "File Not Found:\n" + ex1.getLocalizedMessage());
+                        } catch (IOException ex1) {
+                            Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
+                            JOptionPane.showMessageDialog(jtree, "Error Occurred:\n" + ex1.getLocalizedMessage());
+                        }
                     }
+
                 }
-            }
-            
-            
-            JPopupMenu popup;
 
-            private synchronized void showPopup(MouseEvent e) {
-                if (popup == null) {
-                    popup = new JPopupMenu();
-                    popup.add(new JMenuItem(new AbstractAction("Delete") {
-
-                        public void actionPerformed(ActionEvent e) {
-                            FSTreeModel model = (FSTreeModel) jtree.getModel();
-
-                            TreePath[] paths = jtree.getSelectionPaths();
-
-                            boolean okay = true;
-                            IllegalArgumentException ex = null;
-
-                            for (int i = 0; i < paths.length; i++) {
-                                File f = model.getFile(paths[i]);
-
-                                if (f.equals(model.root)) {
-                                    continue;
-                                }
-                                if (f.isFile()) {
-                                    okay = f.delete();
-                                } else {
-                                    try {
-                                        okay = Util.deleteFileTree(f);
-                                    } catch (IllegalArgumentException ex1) {
-                                        ex = ex1;
-                                        okay = false;
-                                    }
-                                }
-                            }
-
-                            if (!okay) {
-                                JOptionPane.showConfirmDialog(jtree, ex.getLocalizedMessage(), "unable to delete", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE);
-                            }
-
-                            scan(model.root);
-
-                        }
-                    }));
-                    
-                    //popup.add(new JSeparator());
-                    popup.add(new JMenuItem( new AbstractAction("Plot") {
-                        public void actionPerformed(ActionEvent e) {
-                                
-                                FSTreeModel model = (FSTreeModel) jtree.getModel();
-
-                                TreePath[] paths = jtree.getSelectionPaths();
-
-
-                                if ( paths.length==0 ) return;
-                                
-                                File f = model.getFile(paths[0]);
-                                app.plotUri( f.toString() );
-                                
-                            }
-
-                        
-                    }));
-                    
-                    popup.add(new JMenuItem( new AbstractAction("Copy To...") {
-                        public void actionPerformed(ActionEvent e) {
-                            JFileChooser chooser = new JFileChooser();
-                            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                            if (chooser.showOpenDialog(JDiskHogPanel.this) == JFileChooser.APPROVE_OPTION) {
-                                File destdir= chooser.getSelectedFile();
-                                
-                                FSTreeModel model = (FSTreeModel) jtree.getModel();
-
-                                TreePath[] paths = jtree.getSelectionPaths();
-
-                                for (int i = 0; i < paths.length; i++) {
-                                    File f = model.getFile(paths[i]);
-                                    try {
-                                        Util.fileCopy(f, destdir);
-                                    } catch (FileNotFoundException ex1) {
-                                        Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
-                                        JOptionPane.showMessageDialog(JDiskHogPanel.this, "File Not Found:\n"+ex1.getLocalizedMessage());
-                                    } catch (IOException ex1) {
-                                        Logger.getLogger(JDiskHogPanel.class.getName()).log(Level.SEVERE, null, ex1);
-                                        JOptionPane.showMessageDialog(JDiskHogPanel.this, "Error Occurred:\n"+ex1.getLocalizedMessage());
-                                    }
-                                }
-
-                            }
-
-                        }
-                    }));                    
-                }
-                popup.show(jtree, e.getX(), e.getY());
             }
         };
     }
 
     public void scan(File root) {
         DiskUsageModel dumodel = new DiskUsageModel();
-        dumodel.search(root, 0, new NullProgressMonitor() );
+        dumodel.search(root, 0, new NullProgressMonitor());
         FSTreeModel model = new FSTreeModel(dumodel, root);
         jTree1.setModel(model);
     }
