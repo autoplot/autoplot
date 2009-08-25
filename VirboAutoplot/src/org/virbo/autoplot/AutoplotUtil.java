@@ -863,6 +863,14 @@ public class AutoplotUtil {
 
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
         if ( srenderType!=null ) {
+            if ( srenderType.equals("time_series") ) {
+                if (fillds.length() > 80000) {
+                    spec = RenderType.hugeScatter;
+                } else {
+                    spec = RenderType.series;
+                }
+                return spec;
+            }
             try {
                 spec = RenderType.valueOf(srenderType);
                 return spec;
