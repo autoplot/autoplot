@@ -122,13 +122,13 @@ for i in `find . -name '*.gif'`; do
    cp $i ../temp-volatile-classes/$i
 done
 for i in `find . -name '*.html'`; do
-   cp $i ../temp-classes/$i
+   cp $i ../temp-volatile-classes/$i
 done
 for i in `find . -name '*.py'`; do
-   cp $i ../temp-classes/$i
+   cp $i ../temp-volatile-classes/$i
 done
 for i in `find . -name '*.jy'`; do
-   cp $i ../temp-classes/$i
+   cp $i ../temp-volatile-classes/$i
 done
 cd ..
 echo "done copy resources."
