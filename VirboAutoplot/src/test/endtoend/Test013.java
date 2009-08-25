@@ -95,11 +95,11 @@ public class Test013 {
         MutablePropertyDataSet tags = (MutablePropertyDataSet) Ops.timegen("2003-09-09", "13.86 " + Units.seconds, 11 );
         tags.putProperty( QDataSet.NAME, "time");
 
-        MutablePropertyDataSet ds = (MutablePropertyDataSet) Ops.multiply( Ops.pow( Ops.replicate(1e5,11,3), Ops.rand(11,3) ), Ops.rand( 11, 3) );
+        MutablePropertyDataSet ds = (MutablePropertyDataSet) Ops.multiply( Ops.pow( Ops.replicate(1e5,11,3), Ops.randomu(12345,11,3) ), Ops.randomu(12345, 11, 3) );
         ds.putProperty(QDataSet.DEPEND_0, tags);
         ds.putProperty(QDataSet.NAME,"B_GSM");
 
-        MutablePropertyDataSet mode = (MutablePropertyDataSet) Ops.floor( Ops.multiply( Ops.rand( 11 ), Ops.replicate(4,11) ) );
+        MutablePropertyDataSet mode = (MutablePropertyDataSet) Ops.floor( Ops.multiply( Ops.randomu(12345, 11 ), Ops.replicate(4,11) ) );
         EnumerationUnits u= new EnumerationUnits("quality");
         u.createDatum( 0, "Good" );
         u.createDatum( 1, "Better" );
@@ -185,9 +185,10 @@ public class Test013 {
         DDataSet dep0= DDataSet.createRank1( nrec );
         funData( dep0, 10000, 0.01, 0, true );
         result.putProperty( QDataSet.DEPEND_0, dep0 );
+        Random rand= new Random(12345);
         for ( int i=0; i<13; i++ ) {
             FDataSet planeds= FDataSet.createRank1( nrec );
-            funData( planeds, Math.random()*100, Math.random()*10, 0, false );
+            funData( planeds, rand.nextDouble()*100, rand.nextDouble()*10, 0, false );
             planeds.putProperty( QDataSet.NAME, "myplane_"+i );
             result.putProperty( "PLANE_"+i, planeds );
         }
@@ -233,7 +234,7 @@ public class Test013 {
         MutablePropertyDataSet tags = (MutablePropertyDataSet) Ops.timegen("2003-09-09", "1 " + Units.days, nrec);
         tags.putProperty(QDataSet.NAME, "time");
 
-        MutablePropertyDataSet ds = (MutablePropertyDataSet) Ops.randn(nrec, 3);
+        MutablePropertyDataSet ds = (MutablePropertyDataSet) Ops.randomn(12345,nrec, 3);
         ds.putProperty(QDataSet.DEPEND_0, tags);
         ds.putProperty(QDataSet.NAME, "B_GSM");
 
