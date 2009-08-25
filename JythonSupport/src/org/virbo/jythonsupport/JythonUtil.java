@@ -2,7 +2,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package org.virbo.jythonsupport;
 
 import java.io.IOException;
@@ -14,7 +13,7 @@ import org.python.util.PythonInterpreter;
  * @author jbf
  */
 public class JythonUtil {
-    
+
     /**
      * create an interpretter object configured for Autoplot contexts:
      *   * QDataSets are wrapped so that operators are overloaded.
@@ -24,13 +23,13 @@ public class JythonUtil {
      * @return PythonInterpreter ready for commands.
      * @throws java.io.IOException
      */
-    public static PythonInterpreter createInterpreter( boolean sandbox ) throws IOException {
-	PythonInterpreter interp = new PythonInterpreter();
-	Py.getAdapter().addPostClass(new PyQDataSetAdapter());
+    public static PythonInterpreter createInterpreter(boolean sandbox) throws IOException {
+        System.err.println("jython cache dir: " + Py.getSystemState().cachedir );
+        PythonInterpreter interp = new PythonInterpreter();
+        Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
-	interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py");
-	return interp;
+        interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py");
+        return interp;
 
     }
-
 }
