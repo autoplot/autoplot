@@ -9,9 +9,9 @@ from java.net import URL
 from org.das2.util import TimeParser
 
 # security concerns
-from java.io import File
-from org.das2.util.filesystem import FileSystem
-from org.das2.fsm import FileStorageModel
+#from java.io import File
+#from org.das2.util.filesystem import FileSystem
+#from org.das2.fsm import FileStorageModel
 from org.virbo.datasource.DataSetURL import getFile
 import java
 import org
