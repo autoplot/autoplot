@@ -34,7 +34,7 @@
               href="http://java.sun.com/products/autodl/j2se" > 
         </j2se>
 
-        <!-- <property name="jnlp.packEnabled" value="true"/> -->
+        <!-- <property name="jnlp.packEnabled" value="true"/> --> 
 
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
