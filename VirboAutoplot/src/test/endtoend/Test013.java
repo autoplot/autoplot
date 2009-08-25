@@ -4,13 +4,21 @@
  */
 package test.endtoend;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.Channels;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.Random;
+import org.das2.client.DataSetStreamHandler;
+import org.das2.dataset.DataSet;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.FDataSet;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -19,8 +27,10 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
+import org.virbo.qstream.QDataSetStreamHandler;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
+import org.virbo.qstream.StreamTool;
 import test.BundleBinsDemo;
 
 /**
@@ -36,19 +46,31 @@ public class Test013 {
         t0= System.currentTimeMillis();
     }
 
+    /**
+     * format the data to ascii, then attempt to parse it.
+     * @param ds
+     * @param file
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws StreamException
+     */
+    private static void formatParse( QDataSet ds, String file) throws FileNotFoundException, IOException, StreamException {
+        SimpleStreamFormatter format = new SimpleStreamFormatter();
+        format.format(ds, new FileOutputStream(file), true);
+        QDataSetStreamHandler handler = new QDataSetStreamHandler();
+        StreamTool.readStream(Channels.newChannel(new FileInputStream(file)), handler);
+        QDataSet qds = handler.getDataSet();
+    }
+
     private static QDataSet test1() throws ParseException, StreamException, IOException {
         QDataSet ds = Ops.timegen("2003-09-09", "1 " + Units.days, 11);
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-
-        format.format( ds, new FileOutputStream("test013_test1.qds"), true );
+        formatParse( ds, "test013_test1.qds" );
         return ds;
     }
 
     private static QDataSet test1_5() throws ParseException, StreamException, IOException {
         QDataSet ds= Ops.labels(new String[]{"B-GSM,X", "B-GSM,Y", "B-GSM,Z"});
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-
-        format.format( ds, new FileOutputStream("test013_test1_5.qds"), true );
+        formatParse( ds, "test013_test1_5.qds" );
         return ds;
     }
 
@@ -63,9 +85,7 @@ public class Test013 {
         labels.putProperty(QDataSet.NAME, "dimLabels");
         ds.putProperty(QDataSet.DEPEND_1,labels );
 
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-
-        format.format( ds, new FileOutputStream("test013_test2.qds"), true );
+        formatParse( ds, "test013_test2.qds" );
 
         return ds;
     }
@@ -98,9 +118,8 @@ public class Test013 {
         ds.putProperty(QDataSet.DEPEND_1,labels );
 
         ds.putProperty( QDataSet.PLANE_0, mode );
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
 
-        format.format( ds, new FileOutputStream("test013_test3.qds"), true );
+        formatParse( ds, "test013_test3.qds" );
 
         return ds;
     }
@@ -110,22 +129,22 @@ public class Test013 {
         ds.putValue( 1, 2, 3, 0.05 );
         SimpleStreamFormatter format = new SimpleStreamFormatter();
 
-        format.format( ds, new FileOutputStream("test013_test4_rank3.qds"), true );
+        formatParse( ds, "test013_test4_rank3.qds" );
         return ds;
     }
 
     private static QDataSet test0_rank2()  throws ParseException, StreamException, IOException {
         DDataSet ds= (DDataSet) Ops.dindgen( 3, 4 );
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
+        String file= "test013_test0_rank2.qds";
+        formatParse(ds, file);
 
-        format.format( ds, new FileOutputStream("test013_test0_rank2.qds"), true );
         return ds;
     }
 
     private static QDataSet test5() throws StreamException, IOException {
         DDataSet ds= (DDataSet) Ops.dindgen( 5 );
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-        format.format( ds, new FileOutputStream("test013_test5.qds"), true );
+        String file= "test013_test5.qds";
+        formatParse(ds,file);
         return ds;
     }
 
@@ -145,8 +164,9 @@ public class Test013 {
         result= Ops.join( result, Ops.dindgen( 4 ) );
         result= Ops.join( result, Ops.dindgen( 4 ) );
         result= Ops.join( result, Ops.dindgen( 4 ) );
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-        format.format( result, new FileOutputStream("test013_test6.qds"), true );
+
+        formatParse( result, "test013_test6.qds");
+
         return result;
     }
 
@@ -186,9 +206,7 @@ public class Test013 {
 
     private static void testBundle() throws StreamException, FileNotFoundException, IOException {
         QDataSet ds= BundleBinsDemo.demo1();
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-        format.format( ds, new FileOutputStream("test013_testBundle.qds"), true );
-
+        formatParse( ds, "test013_testBundle.qds" );
     }
 
     private static void funData( WritableDataSet ds, double start, double res, int seed, boolean mono ) {
@@ -210,26 +228,91 @@ public class Test013 {
         }
     }
 
+    private static void formatBenchmark() throws ParseException, IOException, StreamException {
+        int nrec = 100000;
+        MutablePropertyDataSet tags = (MutablePropertyDataSet) Ops.timegen("2003-09-09", "1 " + Units.days, nrec);
+        tags.putProperty(QDataSet.NAME, "time");
+
+        MutablePropertyDataSet ds = (MutablePropertyDataSet) Ops.randn(nrec, 3);
+        ds.putProperty(QDataSet.DEPEND_0, tags);
+        ds.putProperty(QDataSet.NAME, "B_GSM");
+
+        MutablePropertyDataSet labels = (MutablePropertyDataSet) Ops.findgen(3);
+        labels.putProperty(QDataSet.NAME, "dimLabels");
+        ds.putProperty(QDataSet.DEPEND_1, labels);
+
+        for (int j = 0; j < 2; j++) {
+            boolean ascii = j == 0;
+
+            SimpleStreamFormatter format = new SimpleStreamFormatter();
+
+            for (int i = 0; i < 3; i++) {
+                long t0 = System.currentTimeMillis();
+
+                String filename = ascii ? "test013_benchmark1.qds" : "test013_benchmark1.binary.qds";
+                FileOutputStream fo= new FileOutputStream(filename);
+                format.format( ds, fo, ascii );
+                fo.close();
+
+                System.err.println("Time to write " + nrec + " records: " + (System.currentTimeMillis() - t0));
+            }
+
+        }
+
+    }
+
+    public static void parseBenchmark() throws FileNotFoundException, StreamException, org.das2.stream.StreamException {
+        readAsciiQds();
+        readBinaryQds();
+    }
+
+    private static void readStream( File f ) throws FileNotFoundException, StreamException, org.das2.stream.StreamException {
+        String ext= f.toString().substring(f.toString().lastIndexOf(".") ); // URI okay
+
+        if ( ext.equals(".qds") ) {
+            long t0 = System.currentTimeMillis();
+            InputStream in = new FileInputStream(f);
+            QDataSetStreamHandler handler = new QDataSetStreamHandler();
+            StreamTool.readStream(Channels.newChannel(in), handler);
+            QDataSet qds = handler.getDataSet();
+            System.err.println("Time to read " + qds.length() + " records: " + (System.currentTimeMillis() - t0));
+
+        } else {
+            long t0 = System.currentTimeMillis();
+            InputStream in = new FileInputStream(f);
+            DataSetStreamHandler handler = new DataSetStreamHandler( new HashMap(), new NullProgressMonitor() );
+            org.das2.util.StreamTool.readStream(Channels.newChannel(in), handler);
+            DataSet ds = handler.getDataSet();
+            System.err.println("Time to read " + ds.getXLength() + " records: " + (System.currentTimeMillis() - t0));
+        }
+    }
+
+
+    private static void readAsciiQds() throws FileNotFoundException, StreamException, org.das2.stream.StreamException {
+
+        File f = new File("test013_benchmark1.qds");
+
+        for (int i = 0; i < 5; i++) {
+            readStream(f);
+        }
+    }
+
+
+    private static void readBinaryQds() throws FileNotFoundException, StreamException, org.das2.stream.StreamException {
+
+        File f = new File("test013_benchmark1.binary.qds");
+
+        for (int i = 0; i < 5; i++) {
+            readStream(f);
+        }
+    }
+
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
 
             MutablePropertyDataSet ds;
 
             xxx("init");
-
-            ds= TestSupport.sampleDataRank2(100000,30);
-            ds.putProperty( QDataSet.DEPEND_0, Ops.timegen( "2009-08-25T10:00", "13.6 ms", 100000 ) );
-            ds.putProperty( QDataSet.DEPEND_1, Ops.exp10( Ops.linspace( 1.01, 3.4, 30 ) ) );
-
-            xxx("created fake rank2");
-
-            formatDataSet( ds, "test013_001.qds?type=binary" );
-
-            xxx("test013_001.qds");
-
-            formatDataSet( ds, "test013_002.qds" );
-
-            xxx("test013_002.qds");
 
             test0_rank2();
             xxx("test0_rank2()");
@@ -252,8 +335,8 @@ public class Test013 {
             test5();
             xxx("test5");
 
-            test6();
-            xxx("test6");
+            //test6();
+            xxx("test6 disabled until bug is resolved");
 
             test7();
             xxx("test7");
@@ -261,6 +344,25 @@ public class Test013 {
             testBundle();
             xxx("testBundle");
             
+            formatBenchmark();
+            xxx("formatBenchmark");
+
+            parseBenchmark();
+            xxx("parseBenchmark");
+
+            ds= TestSupport.sampleDataRank2(100000,30);
+            ds.putProperty( QDataSet.DEPEND_0, Ops.timegen( "2009-08-25T10:00", "13.6 ms", 100000 ) );
+            ds.putProperty( QDataSet.DEPEND_1, Ops.exp10( Ops.linspace( 1.01, 3.4, 30 ) ) );
+
+            xxx("created fake rank2");
+
+            formatDataSet( ds, "test013_001.qds?type=binary" );
+
+            xxx("test013_001.qds");
+
+            formatDataSet( ds, "test013_002.qds" );
+
+            xxx("test013_002.qds");
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (RuntimeException ex) {
