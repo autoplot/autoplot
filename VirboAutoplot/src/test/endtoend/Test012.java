@@ -26,7 +26,7 @@ public class Test012 {
         double t= (System.currentTimeMillis()-t0)/1000.;
         MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
         hist.putProperty( QDataSet.TITLE, uri );
-        String label= String.format( "test007_%03d", id );
+        String label= String.format( "test012_%03d", id );
         hist.putProperty( QDataSet.LABEL, label );
         formatDataSet( hist, label+".qds");
 
@@ -53,6 +53,8 @@ public class Test012 {
         try {
 
             getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+
             doTest( 0, "vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c4/cp/2003/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN" );
             doTest( 1, "vap:file:///home/jbf/ct/hudson/data/cdf/tha_l1_efw_20080402_v01.cdf?tha_efw" );
             doTest( 2, "vap:file:///home/jbf/ct/hudson/data/cdf/l1_h0_mpa_20020202_v02.cdf?dens_e" );
