@@ -108,28 +108,30 @@ echo "done special handling of META-INF stuff."
 
 echo "copy resources..."
 cd temp-volatile-src
-mkdir -p ../temp-volatile-classes/./images/toolbox/
-mkdir -p ../temp-volatile-classes/./images/icons/
-mkdir -p ../temp-volatile-classes/./images/toolbar/
-mkdir -p ../temp-volatile-classes/./com/cottagesystems/jdiskhog/resources/
-mkdir -p ../temp-volatile-classes/./org/virbo/autoplot/resources/
-mkdir -p ../temp-volatile-classes/./org/virbo/datasource/
-mkdir -p ../temp-volatile-classes/./org/netbeans/modules/editor/completion/resources/
-for i in `find . -name '*.png'`; do
+#mkdir -p ../temp-volatile-classes/images/toolbox/
+#mkdir -p ../temp-volatile-classes/images/icons/
+#mkdir -p ../temp-volatile-classes/images/toolbar/
+#mkdir -p ../temp-volatile-classes/com/cottagesystems/jdiskhog/resources/
+#mkdir -p ../temp-volatile-classes/org/virbo/autoplot/resources/
+#mkdir -p ../temp-volatile-classes/org/virbo/datasource/
+#mkdir -p ../temp-volatile-classes/org/netbeans/modules/editor/completion/resources/
+
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' ); do
+   mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
-for i in `find . -name '*.gif'`; do
-   cp $i ../temp-volatile-classes/$i
-done
-for i in `find . -name '*.html'`; do
-   cp $i ../temp-volatile-classes/$i
-done
-for i in `find . -name '*.py'`; do
-   cp $i ../temp-volatile-classes/$i
-done
-for i in `find . -name '*.jy'`; do
-   cp $i ../temp-volatile-classes/$i
-done
+#for i in `find * -name '*.gif'`; do
+#   cp $i ../temp-volatile-classes/$i
+#done
+#for i in `find * -name '*.html'`; do
+#   cp $i ../temp-volatile-classes/$i
+#done
+#for i in `find * -name '*.py'`; do
+#   cp $i ../temp-volatile-classes/$i
+#done
+#for i in `find * -name '*.jy'`; do
+#   cp $i ../temp-volatile-classes/$i
+#done
 cd ..
 echo "done copy resources."
 
