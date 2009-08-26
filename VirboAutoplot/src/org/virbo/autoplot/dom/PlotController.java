@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.event.BoxZoomMouseModule;
@@ -23,9 +24,9 @@ import org.das2.graph.DasColumn;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
+import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
-import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
@@ -199,7 +200,7 @@ public class PlotController extends DomNodeController {
         new AxisController(application, this.plot.getYaxis(), yaxis);
         new AxisController(application, this.plot.getZaxis(), colorbar);
 
-        this.plot.controller.bindTo(dasPlot1);
+        bindTo(dasPlot1);
         
         logger.fine("add focus listener to " + dasPlot1);
         dasPlot1.addFocusListener(ac.focusAdapter);
@@ -280,12 +281,16 @@ public class PlotController extends DomNodeController {
                 if (newSettings == null) {
                     newSettings = (Plot) plot1.copy();
                 } else {
-                    newSettings.xaxis.range = DatumRangeUtil.union(newSettings.xaxis.range, plot1.getXaxis().getRange());
-                    newSettings.xaxis.log = newSettings.xaxis.log & plot1.xaxis.log;
-                    newSettings.yaxis.range = DatumRangeUtil.union(newSettings.yaxis.range, plot1.getYaxis().getRange());
-                    newSettings.yaxis.log = newSettings.yaxis.log & plot1.yaxis.log;
-                    newSettings.zaxis.range = DatumRangeUtil.union(newSettings.zaxis.range, plot1.getZaxis().getRange());
-                    newSettings.zaxis.log = newSettings.zaxis.log & plot1.zaxis.log;
+                    try {
+                        newSettings.xaxis.range = DatumRangeUtil.union(newSettings.xaxis.range, plot1.getXaxis().getRange());
+                        newSettings.xaxis.log = newSettings.xaxis.log & plot1.xaxis.log;
+                        newSettings.yaxis.range = DatumRangeUtil.union(newSettings.yaxis.range, plot1.getYaxis().getRange());
+                        newSettings.yaxis.log = newSettings.yaxis.log & plot1.yaxis.log;
+                        newSettings.zaxis.range = DatumRangeUtil.union(newSettings.zaxis.range, plot1.getZaxis().getRange());
+                        newSettings.zaxis.log = newSettings.zaxis.log & plot1.zaxis.log;
+                    } catch ( InconvertibleUnitsException ex ) {
+                        logger.info("panels on the same plot have inconsistent units");
+                    }
                 }
             }
         }
@@ -325,10 +330,12 @@ public class PlotController extends DomNodeController {
     PropertyChangeListener panelDataSetListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             if ( plot.getTitle().contains("%{CONTEXT}" ) ) {
-                QDataSet context= panel.getController().getContext();
-                String contextStr= DataSetUtil.format(context);
+                QDataSet pds= panel.getController().getDataSet();
                 String title= plot.getTitle();
-                title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+                if ( pds!=null ) {
+                    String contextStr= DataSetUtil.contextAsString(pds);
+                    title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+                }
                 dasPlot.setTitle(title);
             }
         }
@@ -377,10 +384,10 @@ public class PlotController extends DomNodeController {
             Panel p= dom.getController().getPanelsFor(plot).get(0);
             if ( !p.getParentPanel().equals("") ) p = p.getController().getParentPanel();
             if ( this.panel!=null ) {
-                this.panel.removePropertyChangeListener( PanelController.PROP_CONTEXT, panelDataSetListener );
+                this.panel.getController().removePropertyChangeListener( PanelController.PROP_DATASET, panelDataSetListener );
             }
             this.panel= p;
-            this.panel.getController().addPropertyChangeListener( PanelController.PROP_CONTEXT, panelDataSetListener );
+            this.panel.getController().addPropertyChangeListener( PanelController.PROP_DATASET, panelDataSetListener );
             if ( plot.isAutolabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
             if ( plot.getXaxis().isAutolabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
             if ( plot.getYaxis().isAutolabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
@@ -486,7 +493,37 @@ public class PlotController extends DomNodeController {
 
     private synchronized void bindTo(DasPlot p) {
         ApplicationController ac= dom.controller;
-        ac.bind( this.plot, "title", p, "title" );
+        ac.bind( this.plot, "title", p, "title", new Converter() {
+            @Override
+            public Object convertForward(Object value) {
+                String title= (String)value;
+                if ( title.contains("%{CONTEXT}" ) ) {
+                    QDataSet context;
+                    String contextStr="";
+                    if ( panel!=null && panel.getController()!=null ) {
+                        QDataSet ds= panel.getController().getDataSet();
+                        if ( ds!=null ) {
+                            contextStr= DataSetUtil.contextAsString(ds);
+                        }
+                    }
+                    title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+                }
+                return title;
+            }
+
+            @Override
+            public Object convertReverse(Object value) {
+                String title= (String)value;
+                String ptitle=  plot.getTitle();
+                if (ptitle.contains("%{CONTEXT}") ) {
+                    String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
+                    if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
+                        return ptitle;
+                    }
+                }
+                return title;
+            }
+        } );
     }
 
     public BindingModel[] getBindings() {
