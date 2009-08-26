@@ -51,7 +51,9 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             List<Variable> vars= (List<Variable>)dataset.getVariables();
             
             for ( int j=0; j<vars.size();j++ ) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, vars.get(j).getName(), this, "arg_0" , null, null )    );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME,
+                        vars.get(j).getName(), this, "arg_0" ,
+                        vars.get(j).getNameAndDimensions(), vars.get(j).getDescription(), true ) );
             }
         }
         
