@@ -10,12 +10,11 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
@@ -25,19 +24,17 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.system.MutatorLock;
+import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
-import org.virbo.dataset.BundleDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.dsops.Ops;
 
 /**
  * PanelController manages the Panel, for example resolving the datasource and loading the dataset.
@@ -170,6 +167,11 @@ public class PanelController extends DomNodeController {
                 }
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
                 changeDataSourceFilter();
+                if ( !dom.getController().isValueAdjusting() ) {
+                    setResetPanel(true);
+                    setResetRanges(true);
+                    updateDataSet();
+                }
             } else if ( evt.getPropertyName().equals( Panel.PROP_COMPONENT ) ) {
                 if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), (String)evt.getNewValue() ) ) {
                     logger.finer("component property change requires we reset render and dimensions: "+(String)evt.getOldValue() +"->"+ (String)evt.getNewValue());
@@ -301,25 +303,15 @@ public class PanelController extends DomNodeController {
             return;
         }
 
-        context= null;
         String c= panel.getComponent();
         try {
             fillDs = processDataSet(c, fillDs );
-            if ( c.length()>0 && c.startsWith("|") ) {
-                JoinDataSet jds= new JoinDataSet(1);
-                int idx=0;
-                QDataSet cds= (QDataSet) fillDs.property( "CONTEXT_"+idx );
-                while ( cds!=null ) {
-                    jds.join(cds);
-                    idx=idx+1;
-                    cds= (QDataSet) fillDs.property( "CONTEXT_"+idx );
-                }
-                jds.putProperty( "BUNDLE_0", Ops.zeros(jds.length()) );  //TODO: semmantics
-                _setContext(jds);
-            }
+            _setDataSet(fillDs);
         } catch ( RuntimeException ex ) {
             if (getRenderer() != null) {
                 getRenderer().setException(ex);
+                getRenderer().setDataSet(null);
+                _setDataSet(null);
             } else {
                 throw ex;
             }
@@ -335,41 +327,43 @@ public class PanelController extends DomNodeController {
             }
         }
 
-        Plot plot= this.dom.getController().getPlotFor(panel);
-        List<Panel> panels= dom.controller.getPanelsFor( plot );
-        if ( DomUtil.oneFamily(panels) && plot.isAutolabel() ) {
-            final DataSourceFilter dsf = getDataSourceFilter();
-            String reduceRankString = dsf.controller.getReduceDataSetString();
-            if (dsf.controller.getReduceDataSetString() != null) {
-                // kludge to update title
-                String title = dom.controller.getPlot().getTitle(); //TODO: fix
-                Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
-                Matcher m = p.matcher(title);
-                if (m.matches()) {
-                    title = m.group(1) + "!c" + reduceRankString;
-                    plot.setTitle(title);
-                }
-            }
-        }
+//        Plot plot= this.dom.getController().getPlotFor(panel);
+//        List<Panel> panels= dom.controller.getPanelsFor( plot );
+//        if ( DomUtil.oneFamily(panels) && plot.isAutolabel() ) {
+//            final DataSourceFilter dsf = getDataSourceFilter();
+//            String reduceRankString = dsf.controller.getReduceDataSetString();
+//            if (dsf.controller.getReduceDataSetString() != null) {
+//                // kludge to update title
+//                String title = dom.controller.getPlot().getTitle(); //TODO: fix
+//                Pattern p = Pattern.compile("(.*)!c(.+)=(.+)");
+//                Matcher m = p.matcher(title);
+//                if (m.matches()) {
+//                    title = m.group(1) + "!c" + reduceRankString;
+//                    plot.setTitle(title);
+//                }
+//            }
+//        }
     }
 
-
-    protected QDataSet context = null;
     /**
-     * get the context for the plotted dataset.  This will be a rank 1 dataset
-     * with a bundle dimension for each context dimension.
-     * @return
+     * the current dataset plotted.  
      */
-    public static final String PROP_CONTEXT = "context";
+    public static final String PROP_DATASET = "dataSet";
 
-    public QDataSet getContext() {
-        return context;
+    protected QDataSet dataSet = null;
+
+    public QDataSet getDataSet() {
+        return dataSet;
     }
 
-    private void _setContext(QDataSet context) {
-        QDataSet oldContext = this.context;
-        this.context = context;
-        propertyChangeSupport.firePropertyChange(PROP_CONTEXT, oldContext, context);
+    public void _setDataSet(QDataSet dataSet) {
+        QDataSet oldDataSet = this.dataSet;
+        this.dataSet = dataSet;
+        if ( panel.getLegendLabel().contains("%{") && renderer!=null ) {
+            String s= (String)getLabelConverter().convertForward(panel.getLegendLabel());
+            renderer.setLegendLabel(s);
+        }
+        propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
     }
 
 
@@ -443,6 +437,7 @@ public class PanelController extends DomNodeController {
      */
     private boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
         if ( oldRenderType==newRenderType ) return false;
+        if ( newRenderType==RenderType.digital ) return false;
         if ( oldRenderType==RenderType.spectrogram && newRenderType==RenderType.nnSpectrogram ) {
             return false;
         } else if ( newRenderType==RenderType.nnSpectrogram && oldRenderType==RenderType.spectrogram ) {
@@ -740,7 +735,7 @@ public class PanelController extends DomNodeController {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
         }        
-        ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL);
+        ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL, getLabelConverter() );
         ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
         ac.bind(panel, Panel.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
     }
@@ -772,10 +767,14 @@ public class PanelController extends DomNodeController {
 
         if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autolabel property.
             DataSourceController dsc= getDataSourceFilter().getController();
-            doMetadata(panelCopy, dsc.getFillProperties(), dsc.getFillDataSet() );
+
+            Map props= new HashMap();
+            if ( panel.getComponent().equals("") ) props= dsc.getFillProperties(); //TODO: slice properties.
+
+            doMetadata(panelCopy, props, fillDs );
 
             String reduceRankString = getDataSourceFilter().controller.getReduceDataSetString();
-            if (dsf.controller.getReduceDataSetString() != null) {
+            if (dsf.controller.getReduceDataSetString() != null) { //TODO remove dsf slicing
                 String title = panelCopy.getPlotDefaults().getTitle();
                 title += "!c" + reduceRankString;
                 panelCopy.getPlotDefaults().setTitle(title);
@@ -787,8 +786,8 @@ public class PanelController extends DomNodeController {
             }
         }
 
-        if (dom.getOptions().isAutoranging()) {
-            Map props=null;
+        if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
+            Map props= new HashMap();
             
             if ( panel.getComponent().equals("") ) props= getDataSourceFilter().controller.getFillProperties();
             doAutoranging( panelCopy,props,fillDs );
@@ -970,7 +969,7 @@ public class PanelController extends DomNodeController {
             QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
             if (yds == null) {
                 if ( fillDs.rank()>1 ) {
-                    yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); // QUBE
+                    yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); //TODO: QUBE assumed
                 } else {
                     yds = DataSetUtil.indexGenDataSet(10); // later the user will get a message "renderer cannot plot..."
                 }
@@ -1161,10 +1160,45 @@ public class PanelController extends DomNodeController {
     public void bindToImageVectorDataSetRenderer(ImageVectorDataSetRenderer renderer) {
         ApplicationController ac = this.dom.controller;
         ac.bind(panel.style, "color", renderer, "color");
-        ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL);
-        ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
     }
 
+    /**
+     * special converter that fills in %{CONTEXT} macro, or inserts it when label is consistent with macro.
+     * @return
+     */
+    private Converter getLabelConverter() {
+        return new Converter() {
+            @Override
+            public Object convertForward(Object value) {
+                String title= (String)value;
+                if ( title.contains("%{CONTEXT}" ) ) {
+                    String contextStr="";
+                    if ( panel!=null ) {
+                        if ( dataSet!=null ) {
+                            contextStr= DataSetUtil.contextAsString(dataSet);
+                        }
+                    }
+                    title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+                }
+                return title;
+            }
+
+            @Override
+            public Object convertReverse(Object value) {
+                String title= (String)value;
+                String ptitle=  panel.getLegendLabel();
+                if (ptitle.contains("%{CONTEXT}") ) {
+                    String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
+                    if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
+                        return ptitle;
+                    }
+                }
+                return title;
+            }
+        };
+    }
+
+    @Override
     public boolean isPendingChanges() {
         return getDataSourceFilter().controller.isPendingChanges() || super.isPendingChanges();
     }
