@@ -22,7 +22,7 @@ import org.virbo.autoplot.util.TransparentLogger;
  * See http://das2.org/wiki/index.php/Pending_changes
  * @author jbf
  */
-public class ChangesSupport {
+public final class ChangesSupport {
     Map<Object,Object> changesPending;
     Object parent;
     private static final Logger logger= TransparentLogger.getLogger( "dom" );
@@ -66,7 +66,7 @@ public class ChangesSupport {
         }
         boolean oldVal= this.isPendingChanges();
         changesPending.put( lockObject, client );
-        propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, true );
+        propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, isPendingChanges() );
     }
 
     /**
@@ -96,7 +96,7 @@ public class ChangesSupport {
         }
         boolean oldVal= this.isPendingChanges();
         changesPending.remove(lockObject);
-        propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, true );
+        propertyChangeSupport.firePropertyChange( PROP_PENDINGCHANGES, oldVal, isPendingChanges() );
     }
 
     public static final String PROP_PENDINGCHANGES = "pendingChanges";
