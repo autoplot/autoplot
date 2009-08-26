@@ -617,9 +617,10 @@ public class DataSourceController extends DomNodeController {
             _setReduceDataSetString(null);
         }
 
+        props.put( QDataSet.RENDER_TYPE, null );
+        DataSetUtil.putProperties( props, fillDs ); //NEW: just copy the properties into the dataset.
+
         /*  begin fill dataset  */
-
-
 
 
         double vmin = Double.NEGATIVE_INFINITY, vmax = Double.POSITIVE_INFINITY, fill = Double.NaN;
