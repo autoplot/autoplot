@@ -31,6 +31,7 @@ import org.virbo.dsutil.AsciiParser;
 import org.das2.util.TimeParser;
 import java.text.ParseException;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import org.das2.util.ByteBufferInputStream;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -47,6 +48,11 @@ public class AsciiTableDataSource extends AbstractDataSource {
     File file;
     String column = null;
     String depend0 = null;
+
+    private final static Logger logger= Logger.getLogger("vap.asciiTableDataSource");
+
+    public final static String PARAM_INTERVAL_TAG="intervalTag";
+
     /**
      * if non-null, then this is used to parse the times.  For a fixed-column parser, a field
      * handler is added to the parser.  For delim parser, then the
@@ -173,6 +179,17 @@ public class AsciiTableDataSource extends AbstractDataSource {
             dep0.putProperty(QDataSet.UNITS, parser.getUnits(icol));
             if (DataSetUtil.isMonotonic(dep0)) {
                 dep0.putProperty(DDataSet.MONOTONIC, Boolean.TRUE);
+            }
+            String intervalType= params.get( PARAM_INTERVAL_TAG );
+            if ( intervalType!=null && intervalType.equals("start") ) {
+                QDataSet cadence= DataSetUtil.guessCadenceNew( dep0, null );
+                if ( cadence!=null && !"log".equals( cadence.property(QDataSet.SCALE_TYPE) ) ) {
+                    double add= cadence.value()/2; //DANGER--should really check units.
+                    logger.fine("adding half-interval width to dep0 because of "+PARAM_INTERVAL_TAG+": "+cadence);
+                    for ( int i=0; i<dep0.length(); i++ ) {
+                        dep0.putValue( i, dep0.value(i)+add );
+                    }
+                }
             }
         }
 

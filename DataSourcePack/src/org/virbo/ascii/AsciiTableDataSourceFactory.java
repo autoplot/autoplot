@@ -61,6 +61,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "time="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "timeFormat=",
                     "template for parsing time digits, default is ISO8601."));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, AsciiTableDataSource.PARAM_INTERVAL_TAG+"=",
+                    "indicate how measurement intervals are tagged." ) );
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend0="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fill="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "comment=",
@@ -111,6 +113,11 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
                 return Collections.singletonList(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "Hint at the number of columns to expect, then use fast parser that assumes fixed columns."));
             } else if (paramName.equals("time")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
+                return result;
+            } else if (paramName.equals("intervalTag")) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "start","tag values indicate the start of measurement interval"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "center", "tag values indicate the start of measurement interval."));
                 return result;
             } else if (paramName.equals("depend0")) {
                 List<CompletionContext> result = getFieldNames(cc, mon);
