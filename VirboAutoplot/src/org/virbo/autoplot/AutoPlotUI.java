@@ -476,6 +476,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
     private void fillFileMenu() {
 
+        //fileMenu.add(support.createNewApplicationAction() );
+        //fileMenu.add(support.createCloneApplicationAction() );
+
         fileMenu.add(support.createNewDOMAction());
         fileMenu.add( new JSeparator() );
         
