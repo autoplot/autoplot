@@ -17,6 +17,7 @@ import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.VectorDataSetAdapter;
+import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 
 /**
@@ -110,6 +111,16 @@ public class Test009 {
             dom.getPlots(0).getXaxis().setRange( DatumRange.newDatumRange( 999, 1021, Units.dimensionless ) );
             writePng( "test009_016.png" );
 
+            x= Ops.linspace( -9, 9, 1000 );
+            y= Ops.cos(x);
+            for ( int i=50; i<60; i++ ) ((WritableDataSet)y).putValue(i,-1e31);
+
+            ScriptContext.plot( x, y );
+            ScriptContext.setRenderStyle("fillToZero");
+            ScriptContext.setCanvasSize(800,600);
+            dom.getPanels(0).getStyle().setSymbolSize(2);
+            
+            writePng( "test009_017.png" );
 
             //dom.getPlots(0).getXaxis().setLog( true );
             //writePng( "test009_017.png" );
