@@ -7,10 +7,13 @@ package org.virbo.metatree;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import org.das2.datum.Units;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
+import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.w3c.dom.Node;
 
@@ -141,4 +144,27 @@ public class MetadataUtil {
         return result;
 
     }
+
+    public static Map<String,Object> sprocess( String c, Map<String,Object> properties ) {
+        int i=1;
+        Scanner s= new Scanner( c );
+        s.useDelimiter("[\\(\\),]");
+
+        while ( s.hasNext() ) {
+            String cmd= s.next();
+            if ( cmd.startsWith("|slice") ) {
+                int dim= cmd.charAt(6)-'0';
+                int idx= s.nextInt();
+                properties= sliceProperties( properties, dim );
+            } else if ( cmd.equals("|autoHistogram") ) {
+                Map<String,Object> newproperties= new HashMap<String,Object>();
+                newproperties.put( QDataSet.DEPEND_0, properties );
+                properties= newproperties;
+            } else if ( cmd.equals("|transpose") ) {
+                properties= transposeProperties(properties);
+            }
+        }
+        return properties;
+    }
+
 }
