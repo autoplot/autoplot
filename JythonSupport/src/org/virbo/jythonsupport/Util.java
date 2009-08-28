@@ -49,7 +49,7 @@ public class Util {
         if (mon == null) {
             mon = new NullProgressMonitor();
         }
-        QDataSet rds= result.getDataSet(mon == null ? new NullProgressMonitor() : mon);
+        QDataSet rds= result.getDataSet(mon);
         //Logger.getLogger("virbo.jythonsupport").fine( "created dataset #"+rds.getClass().gethashCode() );
 
         try {
@@ -59,7 +59,7 @@ public class Util {
         }
         metadataSurl= surl;
 
-
+        if ( rds==null ) return null;
         if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
             return rds;
         } else {
