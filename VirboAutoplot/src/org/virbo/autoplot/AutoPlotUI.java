@@ -46,6 +46,7 @@ import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -289,7 +290,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private Runnable addAxes() {
         return new Runnable() {
             public void run() {
-                tabs.insertTab("axes", null, new AxisPanel(applicationModel), TABS_TOOLTIP, 1);
+                JComponent c= new AxisPanel(applicationModel);
+                JScrollPane sp= new JScrollPane();
+                sp.setViewportView(c);
+                tabs.insertTab("axes", null, sp, TABS_TOOLTIP, 1);
             }
         };
     }
@@ -320,7 +324,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         }
 
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
-        tabs.insertTab("metadata", null, mdp, TABS_TOOLTIP, 4);
+        JScrollPane sp= new JScrollPane();
+        sp.setViewportView(mdp);
+        tabs.insertTab("metadata", null, sp, TABS_TOOLTIP, 4);
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector));
