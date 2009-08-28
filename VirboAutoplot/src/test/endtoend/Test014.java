@@ -6,6 +6,7 @@ package test.endtoend;
 
 import java.awt.Graphics2D;
 import java.io.IOException;
+import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.Painter;
@@ -49,7 +50,13 @@ public class Test014 {
         System.err.printf( "diffs(dep0)[0:3]= %f %f %f %s\n",
                 diff.value(0), diff.value(1), diff.value(2),
                 String.valueOf(diff.property(QDataSet.UNITS)) );
-        MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram( diff );
+        MutablePropertyDataSet hist;
+        if ( "log".equals( cadence.property(QDataSet.SCALE_TYPE) ) ) {
+            hist= (MutablePropertyDataSet) Ops.autoHistogram( Ops.diff( Ops.log(dep0) ) );
+            ((MutablePropertyDataSet)hist.property(QDataSet.DEPEND_0)).putProperty( QDataSet.UNITS, Units.logERatio );
+        } else {
+            hist= (MutablePropertyDataSet) Ops.autoHistogram( diff );
+        }
 
         DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
 
