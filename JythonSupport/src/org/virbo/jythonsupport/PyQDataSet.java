@@ -27,6 +27,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
+import org.virbo.dataset.TrimStrideWrapper;
 import org.virbo.dataset.WritableDataSet;
 
 /**
@@ -289,6 +290,13 @@ public class PyQDataSet extends PyJavaInstance {
                 Number start = (Number) getNumber( slice.start  );
                 Number stop = (Number) getNumber(slice.stop  );
                 Number step = (Number) getNumber(slice.step  );
+
+                if ( 1==1 ) {
+                    TrimStrideWrapper wds= new TrimStrideWrapper(rods);
+                    wds.setTrim( 0, start, stop, step );
+                    return new PyQDataSet(wds);
+                }
+
                 fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
                 iter.setIndexIteratorFactory(0, fit);
 
