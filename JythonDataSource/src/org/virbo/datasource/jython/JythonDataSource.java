@@ -16,9 +16,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -31,7 +29,6 @@ import org.python.util.PythonInterpreter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.jythonsupport.JythonOps;
@@ -46,6 +43,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     ExceptionListener listener;
     private Map<String, Object> metadata;
     private final static String PARAM_SCRIPT= "script";
+    private static Logger logger= Logger.getLogger("vap.jythondatasource");
 
     public JythonDataSource(URL url, JythonDataSourceFactory factory) {
         super(url);
@@ -72,13 +70,16 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         mon.started();
 
-        File jythonScript; // script to run.
-        URI resourceURI;     // optional resource URI that is argument to script, excluding script argument.
+        File jythonScript;   // script to run.
+        String resourceURI;  // optional resource URI that is argument to script, excluding script argument.
         
         if ( params.get( PARAM_SCRIPT )!=null ) {
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
-            mon.setProgressMessage( "loading "+url );
-            resourceURI= url.toURI();
+            mon.setProgressMessage( "loading "+url );            
+            URLSplit split= URLSplit.parse(url.toString());
+            split.params= null;
+            resourceURI= URLSplit.format(split);
+
         } else {
             resourceURI= null;
             jythonScript= getFile(new NullProgressMonitor());
@@ -96,7 +97,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 interp.exec("params=dict()");
                 for (String s : params.keySet()) {
                     if (!s.equals("arg_0") && !s.equals("script") ) {
-                        interp.exec("params['" + s + "']=" + params.get(s));
+                        String sval= params.get(s);
+                        if ( sval.length()>0 && Character.isJavaIdentifierStart(sval.charAt(0)) ) {
+                            sval= String.format( "'%s'", sval );
+                        }
+                        logger.fine("params['" + s + "']=" + sval);
+                        interp.exec("params['" + s + "']=" + sval);
                     }
                 }
 
@@ -106,7 +112,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 
                 mon.setProgressMessage( "executing script");
                 try {
-                    boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
+                    boolean debug = true;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
                         int i = 0;
                         BufferedReader reader = new BufferedReader(new FileReader( jythonScript ) );
