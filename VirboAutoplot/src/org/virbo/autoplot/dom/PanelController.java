@@ -35,6 +35,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.metatree.MetadataUtil;
 
 /**
  * PanelController manages the Panel, for example resolving the datasource and loading the dataset.
@@ -155,9 +156,6 @@ public class PanelController extends DomNodeController {
                 if (parentPanel != null) {
                     parentPanel.setRenderType(newRenderType);
                 } else {
-                    if (!dom.panels.contains(panel)) {  //TODO: I think this can be removed. The applicationController was preventing the panel/panelController from being garbage collected.
-                        throw new IllegalArgumentException("we shouldn't get here any more");
-                    }
                     if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
                         resetPanel(getDataSourceFilter().getController().getFillDataSet(), panel.getRenderType());
                     } else {
@@ -270,6 +268,20 @@ public class PanelController extends DomNodeController {
             }
         }
         return fillDs;
+    }
+
+    /**
+     * calculate the interpretted metadata after the slicing.
+     * @param c
+     * @param properties
+     * @return
+     */
+    Map<String,Object> processProperties( String c, Map<String,Object> properties ) {
+        if (c.length() > 5 && c.startsWith("|")) {
+            // slice and collapse specification
+            properties = MetadataUtil.sprocess(c, properties );
+        }
+        return properties;  
     }
 
     private boolean rendererAcceptsData(QDataSet fillDs) {
@@ -734,7 +746,8 @@ public class PanelController extends DomNodeController {
         } else {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
-        }        
+        }
+        renderer.setId( "rend_"+panel.getId());
         ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL, getLabelConverter() );
         ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
         ac.bind(panel, Panel.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
@@ -763,13 +776,12 @@ public class PanelController extends DomNodeController {
         panelCopy.setParentPanel("");
         panelCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
 
+        DataSourceController dsc= getDataSourceFilter().getController();
+
         QDataSet fillDs = processDataSet( panel.getComponent(), getDataSourceFilter().controller.getFillDataSet() );
+        Map props= processProperties( panel.getComponent(), dsc.getFillProperties() ); //TODO: support components
 
         if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autolabel property.
-            DataSourceController dsc= getDataSourceFilter().getController();
-
-            Map props= new HashMap();
-            if ( panel.getComponent().equals("") ) props= dsc.getFillProperties(); //TODO: slice properties.
 
             doMetadata(panelCopy, props, fillDs );
 
@@ -787,9 +799,7 @@ public class PanelController extends DomNodeController {
         }
 
         if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
-            Map props= new HashMap();
             
-            if ( panel.getComponent().equals("") ) props= getDataSourceFilter().controller.getFillProperties();
             doAutoranging( panelCopy,props,fillDs );
 
             Renderer newRenderer = getRenderer();
