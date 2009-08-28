@@ -401,6 +401,7 @@ public class AutoplotUtil {
             if (ds.length() > 1) {
                 int firstValid=0;
                 while ( firstValid<wds.length() && wds.value(firstValid)==0 ) firstValid++;
+                if ( firstValid==wds.length() ) throw new IllegalArgumentException("data contains no valid measurements");
                 int lastValid=wds.length()-1;
                 while ( lastValid>=0 && wds.value(lastValid)==0 ) lastValid--;
                 double min = Math.min(ds.value(firstValid), ds.value(lastValid));
