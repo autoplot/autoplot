@@ -435,6 +435,9 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bind( bc, dom.getOptions(), Options.PROP_SPECIALEFFECTS, specialEffectsMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_OVERRENDERING, overRenderingMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_DRAWGRID, drawGridCheckBox, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_AUTOLABELLING, autoLabellingCheckBoxMenuItem, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_AUTOLAYOUT, autoLayoutCheckBoxMenuItem, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_AUTORANGING, autoRangingCheckBoxMenuItem, "selected" );
         bc.bind();
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
@@ -871,6 +874,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        autoLayoutCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -1117,6 +1124,25 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu2.add(jMenuItem2);
 
         optionsMenu.add(jMenu2);
+
+        jMenu4.setText("Auto");
+
+        autoRangingCheckBoxMenuItem.setSelected(true);
+        autoRangingCheckBoxMenuItem.setText("AutoRanging");
+        autoRangingCheckBoxMenuItem.setToolTipText("allow automatic axis range setting.  Range is based on metadata hints and data range.");
+        jMenu4.add(autoRangingCheckBoxMenuItem);
+
+        autoLabellingCheckBoxMenuItem.setSelected(true);
+        autoLabellingCheckBoxMenuItem.setText("AutoLabelling");
+        autoLabellingCheckBoxMenuItem.setToolTipText("allow automatic setting of axis labels based on metadata. ");
+        jMenu4.add(autoLabellingCheckBoxMenuItem);
+
+        autoLayoutCheckBoxMenuItem.setSelected(true);
+        autoLayoutCheckBoxMenuItem.setText("AutoLayout");
+        autoLayoutCheckBoxMenuItem.setToolTipText("<html><p>Allow the application to reposition axes so labels are not clipped and unused space is reduced.  </P><p>Axes can be positioned manually by turning off this option, then hold shift down to enable plot corner drag anchors.</p></html>");
+        jMenu4.add(autoLayoutCheckBoxMenuItem);
+
+        optionsMenu.add(jMenu4);
 
         jMenuBar1.add(optionsMenu);
 
@@ -1611,6 +1637,9 @@ private void dataPanelCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
+    private javax.swing.JCheckBoxMenuItem autoLabellingCheckBoxMenuItem;
+    private javax.swing.JCheckBoxMenuItem autoLayoutCheckBoxMenuItem;
+    private javax.swing.JCheckBoxMenuItem autoRangingCheckBoxMenuItem;
     private javax.swing.JMenuItem autoplotHomepageButton;
     private javax.swing.JMenu bookmarksMenu;
     private javax.swing.JMenuItem copyDataSetURLMenuItem;
@@ -1627,6 +1656,7 @@ private void dataPanelCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;

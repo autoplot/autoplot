@@ -19,27 +19,35 @@
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="yAxisPanel" max="32767" attributes="2"/>
-                  <Component id="xAxisPanel" alignment="0" max="32767" attributes="2"/>
+                  <Component id="xAxisPanel" alignment="1" max="32767" attributes="2"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel1" min="0" max="32767" attributes="2"/>
-                  <Component id="zAxisPanel" alignment="0" max="32767" attributes="2"/>
+                  <Group type="102" attributes="0">
+                      <Component id="zAxisPanel" max="32767" attributes="2"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="jPanel1" alignment="0" min="0" max="32767" attributes="2"/>
               </Group>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="xAxisPanel" min="-2" max="-2" attributes="1"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="yAxisPanel" max="32767" attributes="1"/>
-          </Group>
-          <Group type="102" alignment="0" attributes="0">
-              <Component id="jPanel1" min="-2" max="-2" attributes="1"/>
-              <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-              <Component id="zAxisPanel" min="-2" max="-2" attributes="0"/>
+          <Group type="102" attributes="0">
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="xAxisPanel" min="-2" max="-2" attributes="1"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="yAxisPanel" min="-2" max="-2" attributes="1"/>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="1">
+                      <Component id="jPanel1" min="-2" max="-2" attributes="1"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="zAxisPanel" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -60,8 +68,8 @@
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="xTitleTextField" alignment="1" pref="222" max="32767" attributes="0"/>
-                      <Component id="xAxisRangePanel" alignment="0" pref="222" max="32767" attributes="1"/>
+                      <Component id="xTitleTextField" alignment="1" pref="216" max="32767" attributes="0"/>
+                      <Component id="xAxisRangePanel" alignment="0" pref="216" max="32767" attributes="1"/>
                       <Component id="xLog" alignment="0" min="-2" max="-2" attributes="1"/>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -119,8 +127,8 @@
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="zLog" min="-2" max="-2" attributes="0"/>
-                      <Component id="zTitleTextField" alignment="0" pref="301" max="32767" attributes="2"/>
-                      <Component id="zAxisRangePanel" alignment="0" pref="301" max="32767" attributes="2"/>
+                      <Component id="zTitleTextField" alignment="0" pref="295" max="32767" attributes="2"/>
+                      <Component id="zAxisRangePanel" alignment="0" pref="295" max="32767" attributes="2"/>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
@@ -176,10 +184,10 @@
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="yAxisRangePanel" alignment="0" pref="222" max="32767" attributes="0"/>
+                      <Component id="yAxisRangePanel" alignment="0" pref="216" max="32767" attributes="0"/>
                       <Component id="yLog" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Component id="isotropicCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
-                      <Component id="yTitleTextField" alignment="0" pref="222" max="32767" attributes="0"/>
+                      <Component id="yTitleTextField" alignment="0" pref="216" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
               </Group>
@@ -195,7 +203,7 @@
                   <Component id="yLog" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="isotropicCheckBox" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="44" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -247,30 +255,19 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" attributes="0">
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="allowAutoRangingCheckBox" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="autolabellingCheckbox" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="autolayoutCheckbox" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Group type="102" alignment="0" attributes="1">
+                          <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="titleTextField" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="1" attributes="0">
-                              <Group type="102" alignment="0" attributes="1">
-                                  <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Component id="titleTextField" pref="0" max="32767" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="legendEnableCheckbox" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Component id="legendTextField" pref="173" max="32767" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
+                          <Component id="legendEnableCheckbox" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="legendTextField" pref="179" max="32767" attributes="0"/>
                       </Group>
                   </Group>
+                  <EmptySpace min="-2" pref="23" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -286,24 +283,12 @@
                       <Component id="legendEnableCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="legendTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="allowAutoRangingCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="autolabellingCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="autolayoutCheckbox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  </Group>
-                  <EmptySpace max="32767" attributes="0"/>
+                  <EmptySpace pref="50" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JCheckBox" name="allowAutoRangingCheckBox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Autoranging"/>
-            <Property name="toolTipText" type="java.lang.String" value="allow automatic axis range setting.  Range is based on metadata hints and data range."/>
-          </Properties>
-        </Component>
         <Component class="javax.swing.JTextField" name="titleTextField">
           <Properties>
             <Property name="text" type="java.lang.String" value="title will go here"/>
@@ -313,21 +298,6 @@
         <Component class="javax.swing.JLabel" name="jLabel6">
           <Properties>
             <Property name="text" type="java.lang.String" value="Title:"/>
-          </Properties>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="autolayoutCheckbox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Autolayout"/>
-            <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&lt;p&gt;Allow the application to reposition axes so labels are not clipped and unused space is reduced.  &lt;/P&gt;&lt;p&gt;Axes can be positioned manually by turning off this option, then hold shift down to enable plot corner drag anchors.&lt;/p&gt;&lt;/html&gt;"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autolayoutCheckboxActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JCheckBox" name="autolabellingCheckbox">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Autolabelling"/>
-            <Property name="toolTipText" type="java.lang.String" value="allow automatic setting of axis labels based on metadata.&#xa;"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JCheckBox" name="legendEnableCheckbox">

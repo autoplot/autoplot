@@ -267,6 +267,34 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
+            <Menu class="javax.swing.JMenu" name="jMenu4">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Auto"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="autoRangingCheckBoxMenuItem">
+                  <Properties>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="AutoRanging"/>
+                    <Property name="toolTipText" type="java.lang.String" value="allow automatic axis range setting.  Range is based on metadata hints and data range."/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="autoLabellingCheckBoxMenuItem">
+                  <Properties>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="AutoLabelling"/>
+                    <Property name="toolTipText" type="java.lang.String" value="allow automatic setting of axis labels based on metadata. "/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="autoLayoutCheckBoxMenuItem">
+                  <Properties>
+                    <Property name="selected" type="boolean" value="true"/>
+                    <Property name="text" type="java.lang.String" value="AutoLayout"/>
+                    <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&lt;p&gt;Allow the application to reposition axes so labels are not clipped and unused space is reduced.  &lt;/P&gt;&lt;p&gt;Axes can be positioned manually by turning off this option, then hold shift down to enable plot corner drag anchors.&lt;/p&gt;&lt;/html&gt;"/>
+                  </Properties>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu3">
