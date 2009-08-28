@@ -40,6 +40,7 @@ public class Options extends DomNode {
         logConsoleVisible = prefs.getBoolean(PROP_LOGCONSOLEVISIBLE, logConsoleVisible);
         overRendering = prefs.getBoolean(PROP_OVERRENDERING, overRendering);
         scriptVisible = prefs.getBoolean(PROP_SCRIPTVISIBLE, scriptVisible);
+        dataVisible = prefs.getBoolean(PROP_DATAVISIBLE, dataVisible);
         serverEnabled = prefs.getBoolean(PROP_SERVERENABLED, serverEnabled);
         specialEffects = prefs.getBoolean(PROP_SPECIALEFFECTS, specialEffects);
         textAntiAlias = prefs.getBoolean(PROP_TEXTANTIALIAS, textAntiAlias);
@@ -71,6 +72,24 @@ public class Options extends DomNode {
         this.logConsoleVisible = logConsoleVisible;
         prefs.putBoolean(PROP_LOGCONSOLEVISIBLE, logConsoleVisible);
         propertyChangeSupport.firePropertyChange(PROP_LOGCONSOLEVISIBLE, oldLogConsoleVisible, logConsoleVisible);
+    }
+
+    /**
+     * is the data tab visible?
+     */
+    public static final String PROP_DATAVISIBLE = "dataVisible";
+
+    protected boolean dataVisible = false;
+
+    public boolean isDataVisible() {
+        return dataVisible;
+    }
+
+    public void setDataVisible(boolean dataVisible) {
+        boolean oldDataVisible = this.dataVisible;
+        this.dataVisible = dataVisible;
+        prefs.putBoolean(PROP_DATAVISIBLE, dataVisible );
+        propertyChangeSupport.firePropertyChange(PROP_DATAVISIBLE, oldDataVisible, dataVisible);
     }
 
     protected boolean serverEnabled = false;
