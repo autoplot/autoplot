@@ -36,6 +36,7 @@ import javax.swing.ComponentInputMap;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -314,6 +315,32 @@ public class GuiSupport {
         };
     }
 
+    public Action createNewApplicationAction() {
+        return new AbstractAction("New Application") {
+            public void actionPerformed( ActionEvent e ) {
+                ApplicationModel model = new ApplicationModel();
+                model.setExceptionHandler( parent.applicationModel.getExceptionHandler() );
+                model.addDasPeersToApp();
+                AutoPlotUI view = new AutoPlotUI(model);
+                view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+                view.setVisible(true);
+            }
+        };
+    }
+
+    public Action createCloneApplicationAction() {
+        return new AbstractAction("Clone Application") {
+            public void actionPerformed( ActionEvent e ) {
+                ApplicationModel model = new ApplicationModel();
+                model.setExceptionHandler( model.getExceptionHandler() );
+                model.addDasPeersToApp();
+                AutoPlotUI view = new AutoPlotUI(model);
+                view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
+                view.setVisible(true);
+                model.dom.syncTo( parent.applicationModel.dom );
+            }
+        };
+    }
     public static JMenu createEZAccessMenu(final Plot plot) {
 
         JMenu result = new JMenu("Plot Style");
