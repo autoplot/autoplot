@@ -227,6 +227,15 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="serverCheckBoxMenuItemActionPerformed"/>
                   </Events>
                 </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="dataPanelCheckBoxMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Data Panel"/>
+                    <Property name="toolTipText" type="java.lang.String" value="the &quot;data&quot; panel allows for explicitly setting valid range and fill values for the dataset, and additional controls for data reduction before plotting.&#xa;"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataPanelCheckBoxMenuItemActionPerformed"/>
+                  </Events>
+                </MenuItem>
               </SubComponents>
             </Menu>
             <Menu class="javax.swing.JMenu" name="jMenu2">

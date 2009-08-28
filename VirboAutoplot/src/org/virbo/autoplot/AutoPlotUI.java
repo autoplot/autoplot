@@ -116,6 +116,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     
     private static final Logger logger = Logger.getLogger("org.virbo.autoplot");
     private JythonScriptPanel scriptPanel;
+    private DataPanel dataPanel;
     private LogConsole logConsole;
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
@@ -312,6 +313,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
     }
 
     private void addFeatures( ApplicationModel model ) {
+
+        if (model.getDocumentModel().getOptions().isDataVisible()) {
+            final DataPanel dp= new DataPanel(dom);
+            tabs.insertTab("data", null, dp, TABS_TOOLTIP, 4);
+        }
 
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
         tabs.insertTab("metadata", null, mdp, TABS_TOOLTIP, 4);
@@ -855,6 +861,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         scriptPanelMenuItem = new javax.swing.JCheckBoxMenuItem();
         logConsoleMenuItem = new javax.swing.JCheckBoxMenuItem();
         serverCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        dataPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -1071,6 +1078,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
         jMenu1.add(serverCheckBoxMenuItem);
+
+        dataPanelCheckBoxMenuItem.setText("Data Panel");
+        dataPanelCheckBoxMenuItem.setToolTipText("the \"data\" panel allows for explicitly setting valid range and fill values for the dataset, and additional controls for data reduction before plotting.\n");
+        dataPanelCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataPanelCheckBoxMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(dataPanelCheckBoxMenuItem);
 
         optionsMenu.add(jMenu1);
 
@@ -1400,6 +1416,18 @@ private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     }
 }//GEN-LAST:event_jMenuItem6ActionPerformed
 
+private void dataPanelCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataPanelCheckBoxMenuItemActionPerformed
+    applicationModel.getDocumentModel().getOptions().setDataVisible(dataPanelCheckBoxMenuItem.isSelected());
+    if (dataPanelCheckBoxMenuItem.isSelected() ) {
+        if ( dataPanel == null ) {
+            dataPanel = new DataPanel(applicationModel.dom);
+        }
+        tabs.insertTab("data", null, dataPanel, TABS_TOOLTIP, 4);
+    } else {
+        if ( dataPanel!=null ) tabs.remove(dataPanel);
+    }
+}//GEN-LAST:event_dataPanelCheckBoxMenuItemActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1581,6 +1609,7 @@ private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     private javax.swing.JMenu bookmarksMenu;
     private javax.swing.JMenuItem copyDataSetURLMenuItem;
     private javax.swing.JMenuItem copyImageMenuItem;
+    private javax.swing.JCheckBoxMenuItem dataPanelCheckBoxMenuItem;
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
     private javax.swing.JCheckBoxMenuItem drawGridCheckBox;
