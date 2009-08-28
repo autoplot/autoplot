@@ -112,7 +112,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 
                 mon.setProgressMessage( "executing script");
                 try {
-                    boolean debug = true;  //TODO: exceptions will have the wrong line number in this mode.
+                    boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
                         int i = 0;
                         BufferedReader reader = new BufferedReader(new FileReader( jythonScript ) );
