@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Handler;
@@ -1493,11 +1494,11 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
         alm.addOptionalSwitchArgument("open", "o", "open", "", "open this URI");
-        alm.addOptionalSwitchArgument("print", "x", "print", "", "print this URI");
-
+        alm.addOptionalSwitchArgument("print", null, "print", "", "print this URI");
+        alm.addOptionalSwitchArgument("script", null, "script", "", "run this script after starting");
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
-             if ( args[i].equals("-open") ) args[i]="--open";
+           if ( args[i].equals("-open") ) args[i]="--open";
         }
 
         alm.process(args);
@@ -1608,8 +1609,29 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
                     new Thread(run, "LoadBookmarksThread").start();
 
                 }
-                
-                app.setStatus("ready");
+
+                final String script= alm.getValue("script");
+                if ( !script.equals("") ) {
+                    app.setStatus("running script "+script);
+                    final List<String> largs= new ArrayList<String>( Arrays.asList(args) );
+                    int idx= largs.indexOf("--script");
+                    for ( int i=0; i<=idx; i++ ) {
+                        largs.remove(0);
+                    }
+                    Runnable run= new Runnable() {
+                        public void run() {
+                            try {
+                                model.runScript(script, largs.toArray(new String[largs.size()]));
+                                app.setStatus("ready");
+                            } catch (IOException ex) {
+                                throw new IllegalArgumentException(ex);
+                            }   
+                        }
+                    };
+                    new Thread(run).start();
+                } else {
+                    app.setStatus("ready");
+                }
 
             }
         });
