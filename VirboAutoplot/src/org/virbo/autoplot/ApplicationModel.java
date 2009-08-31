@@ -45,6 +45,8 @@ import org.das2.system.ExceptionHandler;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
 import org.jdesktop.beansbinding.BeanProperty;
+import org.python.core.PySystemState;
+import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Canvas;
@@ -745,6 +747,18 @@ public class ApplicationModel {
             return true;
         }
     }
+
+    protected void runScript( String script, String[] argv ) throws IOException {
+        if ( argv==null ) argv= new String[] {""};
+        PySystemState.initialize( PySystemState.getBaseProperties(), null, argv );
+        PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+        interp.set("dom", getDocumentModel() );
+        URL url= DataSetURL.getURL(script);
+        InputStream in= url.openStream();
+        interp.execfile(in);
+        in.close();
+    }
+
     /**
      * Utility field used by bound properties.
      */
