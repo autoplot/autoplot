@@ -95,5 +95,8 @@
     <application-desc  main-class="org.virbo.autoplot.AutoPlotUI">  
         <argument>--nativeLAF</argument>
         <!--<argument>http://www.cottagesystems.com/virbo/apps/autoplot/data/ascii/omni2_1972.dat?column=field17</argument>-->
+        <!--<argument>&hyphen;&hyphen;bookmarks</argument>
+        <argument>http://mywebsite.com/bookmarks.xml</argument>-->
+
     </application-desc>
 </jnlp> 
