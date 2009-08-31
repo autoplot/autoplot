@@ -1484,27 +1484,53 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     /**
      * @param args the command line arguments
      */
-    public static void main(final String args[]) {
+    public static void main( String args[] ) {
 
         final ArgumentList alm = new ArgumentList("AutoPlotUI");
         alm.addOptionalPositionArgument(0, "URL", null, "initial URL to load");
-        alm.addOptionalPositionArgument(1, "bookmarks", null, "bookmarks to load");
+        alm.addOptionalSwitchArgument("bookmarks", null, "bookmarks", null, "bookmarks to load");
         alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port");
         alm.addBooleanSwitchArgument("scriptPanel", "s", "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
         alm.addOptionalSwitchArgument("open", "o", "open", "", "open this URI");
         alm.addOptionalSwitchArgument("print", null, "print", "", "print this URI");
-        alm.addOptionalSwitchArgument("script", null, "script", "", "run this script after starting");
+        alm.addOptionalSwitchArgument("script", null, "script", "", "run this script after starting.  " +
+                "Arguments following are " +
+                "passed into the script as sys.argv");
        for ( int i=0; i<args.length; i++ ) {  // kludge for java webstart, which uses "-open" not "--open"
            if ( args[i].equals("-print") ) args[i]="--print";
            if ( args[i].equals("-open") ) args[i]="--open";
         }
 
+        final List<String> scriptArgs= new ArrayList<String>();
+
+        for ( int i=1; i<args.length; i++ ) { // grab any arguments after --script and hide them from the processor.
+            if ( args.length>i && args[i-1].equals("--script") ) {
+                List<String> apArgs= new ArrayList<String>();
+                for ( int j=0; j<=i; j++ ) {
+                    apArgs.add(args[j]);
+                }
+                for ( int j=i; j<args.length; j++ ) {
+                    scriptArgs.add(args[j]);
+                }
+                args= apArgs.toArray( new String[ apArgs.size() ] );
+                break;
+            }
+        }
         alm.process(args);
 
-        System.err.println("welcome to autoplot");
-        logger.info("welcome to autoplot ");
+        String welcome= "welcome to autoplot";
+        String tag;
+        try {
+            tag = AboutUtil.getReleaseTag(APSplash.class);
+            if ( tag!=null ) welcome+=" ("+tag+")";
+        } catch (IOException ex) {
+            Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        System.err.println(welcome);
+        logger.info(welcome);
         final ApplicationModel model = new ApplicationModel();
         final String initialURL;
         final String bookmarks;
@@ -1514,6 +1540,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
             logger.fine("setting initial URL to >>>" + initialURL + "<<<");
 
             bookmarks = alm.getValue("bookmarks");
+            
         } else if ( alm.getValue("open") !=null ) {
             initialURL = alm.getValue("open");
             logger.fine("setting initial URL to >>>" + initialURL + "<<<");
@@ -1613,15 +1640,10 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
                     app.setStatus("running script "+script);
-                    final List<String> largs= new ArrayList<String>( Arrays.asList(args) );
-                    int idx= largs.indexOf("--script");
-                    for ( int i=0; i<=idx; i++ ) {
-                        largs.remove(0);
-                    }
                     Runnable run= new Runnable() {
                         public void run() {
                             try {
-                                model.runScript(script, largs.toArray(new String[largs.size()]));
+                                model.runScript(script, scriptArgs.toArray(new String[scriptArgs.size()]));
                                 app.setStatus("ready");
                             } catch (IOException ex) {
                                 throw new IllegalArgumentException(ex);
