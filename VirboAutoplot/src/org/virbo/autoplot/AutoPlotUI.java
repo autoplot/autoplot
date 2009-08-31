@@ -1618,14 +1618,14 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
                     app.dataSetSelector.setValue(initialURL);
                     app.dataSetSelector.maybePlot(false);
                 }
+                
                 if (bookmarks != null) {
                     Runnable run = new Runnable() {
-
                         public void run() {
                             try {
                                 final URL url = new URL(bookmarks);
                                 Document doc = AutoplotUtil.readDoc(url.openStream());
-                                List<Bookmark> book = Bookmark.parseBookmarks(doc);
+                                List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement());
                                 model.setBookmarks(book);
                             } catch (Exception ex) {
                                 ex.printStackTrace();
