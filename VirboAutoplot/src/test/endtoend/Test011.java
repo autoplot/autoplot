@@ -6,14 +6,17 @@ package test.endtoend;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import org.das2.dataset.VectorDataSet;
+import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.virbo.dataset.BundleDataSet;
+import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 
@@ -33,7 +36,7 @@ public class Test011 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
 
         timer("reset");
-        /*
+        
         QDataSet ds= Ops.findgen(4000,30);
         timer("ds=findgen(4000,30)");
 
@@ -65,11 +68,38 @@ public class Test011 {
         total=0;
         QubeDataSetIterator it= new QubeDataSetIterator(ds3);
         while( it.hasNext() ) {
+            it.next();
+            total+= it.getValue(ds3);
+        }
+        timer("iterator over ds3 to access");
+
+        QDataSet rank1= TestSupport.sampleDataRank1(10000000);
+        timer("rank1= TestSupport.sampleDataRank1(10000000)");
+
+        total=0;
+
+        for ( int i=0; i<rank1.length(); i++ ) {
+            total+= rank1.value(i);
+        }
+        timer("access each of rank1.value(i)");
+
+        Ops.histogram(ds, -10, 10, 1.0 );
+        timer("simple histogram of rank1");
+
+        Ops.autoHistogram(rank1);
+
+        timer("autoHistogram of rank1");
+
+        VectorDataSet vds= VectorDataSetAdapter.create(rank1);
+        DatumRange dr= org.das2.dataset.DataSetUtil.yRange(vds);
+
+        timer("range(vds(rank1))="+dr);
+
+        while( it.hasNext() ) {
         it.next();
         total+= it.getValue(ds3);
         }
         timer("iterator over ds3 to access");
-         */
 
         // test bundle of rank 0 datasets.
         {
