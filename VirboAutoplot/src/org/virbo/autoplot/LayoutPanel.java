@@ -4,7 +4,7 @@
  */
 
 /*
- * LayoutUI.java
+ * LayoutPanel.java
  *
  * Created on Mar 7, 2009, 6:24:23 AM
  */
@@ -51,10 +51,10 @@ import org.virbo.autoplot.util.CanvasLayoutPanel;
  *
  * @author jbf
  */
-public class LayoutUI extends javax.swing.JPanel {
+public class LayoutPanel extends javax.swing.JPanel {
 
-    /** Creates new form LayoutUI */
-    public LayoutUI() {
+    /** Creates new form LayoutPanel */
+    public LayoutPanel() {
         initComponents();
         updateList();
         canvasLayoutPanel1.addPropertyChangeListener(CanvasLayoutPanel.PROP_COMPONENT, new PropertyChangeListener() {
@@ -124,10 +124,10 @@ public class LayoutUI extends javax.swing.JPanel {
                 for ( int i=0; i<components.size(); i++ ) plots[i]= app.getController().getPlotFor( (Component) components.get(i) );
                 if ( components.size()>1 ) {
                     PropertyEditor edit = PropertyEditor.createPeersEditor(domPlot,plots);
-                    edit.showDialog(LayoutUI.this);
+                    edit.showDialog(LayoutPanel.this);
                 } else {
                     PropertyEditor edit = new PropertyEditor(domPlot);
-                    edit.showDialog(LayoutUI.this);
+                    edit.showDialog(LayoutPanel.this);
                 }
             }
         };
@@ -222,7 +222,7 @@ public class LayoutUI extends javax.swing.JPanel {
                     for ( int i=0; i<os.length; i++ ) peers[i]= (Panel)os[i];
                     edit= PropertyEditor.createPeersEditor( p, peers );
                 }
-                edit.showDialog(LayoutUI.this);
+                edit.showDialog(LayoutPanel.this);
             }
         });
         item.setToolTipText("edit the panel or panels");
@@ -243,7 +243,7 @@ public class LayoutUI extends javax.swing.JPanel {
                     for ( int i=0; i<os.length; i++ ) peers[i]= ((Panel)os[i]).getStyle();
                     edit= PropertyEditor.createPeersEditor( p.getStyle(), peers );
                 }
-                edit.showDialog(LayoutUI.this);
+                edit.showDialog(LayoutPanel.this);
             }
         });
 
@@ -477,10 +477,10 @@ public class LayoutUI extends javax.swing.JPanel {
                 for ( int i=0; i<components.size(); i++ ) plots[i]= app.getController().getPlotFor( (Component) components.get(i) );
                 if ( components.size()>1 ) {
                     PropertyEditor edit = PropertyEditor.createPeersEditor(domPlot,plots);
-                    edit.showDialog(LayoutUI.this);
+                    edit.showDialog(LayoutPanel.this);
                 } else {
                     PropertyEditor edit = new PropertyEditor(domPlot);
-                    edit.showDialog(LayoutUI.this);
+                    edit.showDialog(LayoutPanel.this);
                 }
 }//GEN-LAST:event_propertiesMenuItemActionPerformed
 
