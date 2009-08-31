@@ -87,29 +87,10 @@ echo "done special handling of META-INF stuff."
 
 echo "copy resources..."
 cd temp-src
-mkdir -p ../temp-classes/./images/toolbox/
-mkdir -p ../temp-classes/./images/icons/
-mkdir -p ../temp-classes/./images/toolbar/
-mkdir -p ../temp-classes/./com/cottagesystems/jdiskhog/resources/
-mkdir -p ../temp-classes/./org/virbo/autoplot/resources/
-mkdir -p ../temp-classes/./org/virbo/datasource/
-mkdir -p ../temp-classes/./org/netbeans/modules/editor/completion/resources/
-for i in `find . -name '*.png'`; do
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' ); do
+   mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
-for i in `find . -name '*.gif'`; do
-   cp $i ../temp-classes/$i
-done
-for i in `find . -name '*.html'`; do
-   cp $i ../temp-classes/$i
-done
-for i in `find . -name '*.py'`; do
-   cp $i ../temp-classes/$i
-done
-for i in `find . -name '*.jy'`; do
-   cp $i ../temp-classes/$i
-done
-cd ..
 echo "done copy resources."
 
 hasErrors=0
