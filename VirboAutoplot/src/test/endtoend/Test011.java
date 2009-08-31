@@ -86,20 +86,28 @@ public class Test011 {
         Ops.histogram(ds, -10, 10, 1.0 );
         timer("simple histogram of rank1");
 
-        Ops.autoHistogram(rank1);
+        QDataSet hist= Ops.autoHistogram(rank1);
 
         timer("autoHistogram of rank1");
+        SimpleStreamFormatter ff = new SimpleStreamFormatter();
+        ff.format(hist, new FileOutputStream("test011_000.qds"), true);
+        timer("format autoHistogram of rank1");
+
+        double min=Double.MAX_VALUE;
+        double max=Double.MIN_VALUE;
+        QDataSet wds= DataSetUtil.weightsDataSet(rank1);
+        for ( int i=0; i<rank1.length(); i++ ) {
+            if ( wds.value(i)==0 ) continue;
+            double d= rank1.value(i);
+            if ( d<min ) min= d;
+            if ( d>max ) max= d;
+        }
+        timer("range(rank1)="+min+" to "+max);
 
         VectorDataSet vds= VectorDataSetAdapter.create(rank1);
         DatumRange dr= org.das2.dataset.DataSetUtil.yRange(vds);
 
         timer("range(vds(rank1))="+dr);
-
-        while( it.hasNext() ) {
-        it.next();
-        total+= it.getValue(ds3);
-        }
-        timer("iterator over ds3 to access");
 
         // test bundle of rank 0 datasets.
         {
@@ -126,7 +134,7 @@ public class Test011 {
             System.err.println("test011_001: " + DataSetUtil.format(bds));
             System.err.println("test011_001: " + DataSetUtil.format(mds));
 
-            SimpleStreamFormatter ff = new SimpleStreamFormatter();
+            ff = new SimpleStreamFormatter();
             ff.format(bds, new FileOutputStream("test011_001.qds"), true);
         }
 
@@ -151,7 +159,7 @@ public class Test011 {
             bds.bundle(mds);
 
             System.err.println("test011_002: " + DataSetUtil.format(bds));
-            SimpleStreamFormatter ff = new SimpleStreamFormatter();
+            ff = new SimpleStreamFormatter();
             ff.format(bds, new FileOutputStream("test011_002.qds"), true);
 
         }
