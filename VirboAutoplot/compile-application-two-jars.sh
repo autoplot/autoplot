@@ -198,3 +198,5 @@ $JAVA6_HOME/bin/pack200 dist/AutoplotAllVolatile.jar.pack.gz dist/AutoplotAllVol
 $JAVA6_HOME/bin/pack200 dist/AutoplotAllStable.jar.pack.gz dist/AutoplotAllStable.jar
 echo "done proguard/pack200 stuff."
 
+echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
+cp src/htaccess.txt dist/
