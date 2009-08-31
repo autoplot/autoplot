@@ -407,6 +407,16 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
             }
         });
+        
+        // automatically enable layout panel when there are multiple panels.
+        this.application.addPropertyChangeListener( Application.PROP_PANELS, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( application.getPanels().length>1 ) {
+                    application.options.setLayoutVisible(true);
+                }
+            }
+        });
+        
     }
 
     /**

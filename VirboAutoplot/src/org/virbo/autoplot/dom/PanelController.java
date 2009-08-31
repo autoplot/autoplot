@@ -171,12 +171,14 @@ public class PanelController extends DomNodeController {
                     updateDataSet();
                 }
             } else if ( evt.getPropertyName().equals( Panel.PROP_COMPONENT ) ) {
-                if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), (String)evt.getNewValue() ) ) {
+                String newv= (String)evt.getNewValue();
+                if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), newv ) ) {
                     logger.finer("component property change requires we reset render and dimensions: "+(String)evt.getOldValue() +"->"+ (String)evt.getNewValue());
                     setResetPanel(true);
                     setResetRanges(true);
                     if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
                 }
+                if ( newv.startsWith("|") ) dom.getOptions().setDataVisible(true);
                 updateDataSet();
             } else if ( evt.getPropertyName().equals( Panel.PROP_LEGENDLABEL ) ) {
                 panel.setAutolabel(false);
