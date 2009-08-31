@@ -87,7 +87,7 @@ public class AutoplotApplet extends JApplet {
     String clickCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090806.2";
+    public static final String VERSION = "20090831.1";
     private Image splashImage;
 
     private String getStringParameter(String name, String deft) {
@@ -264,8 +264,10 @@ public class AutoplotApplet extends JApplet {
 
     @Override
     public void stop() {
+        System.err.println("stop AutoplotApplet" + VERSION );
         remove(model.getCanvas());
         this.model = null;
+        this.dom= null;
     }
 
     @Override
