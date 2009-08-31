@@ -313,11 +313,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
         if (model.getDocumentModel().getOptions().isLayoutVisible() ) {
             LayoutPanel lui= new LayoutPanel();
             lui.setApplication(dom);
+            layoutPanel= lui;
             tabs.insertTab("layout",null, lui, TABS_TOOLTIP, tabs.getTabCount() );
         }
 
         if (model.getDocumentModel().getOptions().isDataVisible()) {
             final DataPanel dp= new DataPanel(dom);
+            dataPanel= dp;
             tabs.insertTab("data", null, dp, TABS_TOOLTIP, tabs.getTabCount() );
         }
 
