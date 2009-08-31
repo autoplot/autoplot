@@ -41,6 +41,7 @@ public class Options extends DomNode {
         overRendering = prefs.getBoolean(PROP_OVERRENDERING, overRendering);
         scriptVisible = prefs.getBoolean(PROP_SCRIPTVISIBLE, scriptVisible);
         dataVisible = prefs.getBoolean(PROP_DATAVISIBLE, dataVisible);
+        layoutVisible = prefs.getBoolean(PROP_LAYOUTVISIBLE, layoutVisible);
         serverEnabled = prefs.getBoolean(PROP_SERVERENABLED, serverEnabled);
         specialEffects = prefs.getBoolean(PROP_SPECIALEFFECTS, specialEffects);
         textAntiAlias = prefs.getBoolean(PROP_TEXTANTIALIAS, textAntiAlias);
@@ -75,7 +76,7 @@ public class Options extends DomNode {
     }
 
     /**
-     * is the data tab visible?
+     * true when the data tab is visible.
      */
     public static final String PROP_DATAVISIBLE = "dataVisible";
 
@@ -91,6 +92,26 @@ public class Options extends DomNode {
         prefs.putBoolean(PROP_DATAVISIBLE, dataVisible );
         propertyChangeSupport.firePropertyChange(PROP_DATAVISIBLE, oldDataVisible, dataVisible);
     }
+
+
+    /**
+     * true when the layout tab is visible.
+     */
+    public static final String PROP_LAYOUTVISIBLE = "layoutVisible";
+
+    protected boolean layoutVisible = false;
+
+    public boolean isLayoutVisible() {
+        return layoutVisible;
+    }
+
+    public void setLayoutVisible(boolean layoutVisible) {
+        boolean oldLayoutVisible = this.layoutVisible;
+        this.layoutVisible = layoutVisible;
+        prefs.putBoolean(PROP_LAYOUTVISIBLE, layoutVisible );
+        propertyChangeSupport.firePropertyChange(PROP_LAYOUTVISIBLE, oldLayoutVisible, layoutVisible);
+    }
+
 
     protected boolean serverEnabled = false;
     public static final String PROP_SERVERENABLED = "serverEnabled";
