@@ -118,6 +118,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private static final Logger logger = Logger.getLogger("org.virbo.autoplot");
     private JythonScriptPanel scriptPanel;
     private DataPanel dataPanel;
+    private LayoutPanel layoutPanel;
     private LogConsole logConsole;
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
@@ -264,6 +265,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         final ApplicationModel fmodel= model;
 
+        /// These were an attempt to improve startup time:
         //SwingUtilities.invokeLater(addAxes());
         //SwingUtilities.invokeLater(addStyle());
         //SwingUtilities.invokeLater(addLayout());
@@ -274,13 +276,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
         //});
         addAxes().run();
         addStyle().run();
-        addLayout().run();
         addFeatures(fmodel);
         
         updateBookmarks();
 
         pack();
 
+        dom.getOptions().addPropertyChangeListener(optionsListener);
+        
         applicationModel.getCanvas().resizeAllComponents();
         applicationModel.getCanvas().repaint();
         applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
@@ -306,27 +309,22 @@ public class AutoPlotUI extends javax.swing.JFrame {
         };
     }
 
-    private Runnable addLayout() {
-        return new Runnable() {
-            public void run() {
-                LayoutUI lui= new LayoutUI();
-                lui.setApplication(dom);
-                tabs.insertTab("layout",null, lui, TABS_TOOLTIP, 3 );
-            }
-        };
-    }
-
     private void addFeatures( ApplicationModel model ) {
+        if (model.getDocumentModel().getOptions().isLayoutVisible() ) {
+            LayoutPanel lui= new LayoutPanel();
+            lui.setApplication(dom);
+            tabs.insertTab("layout",null, lui, TABS_TOOLTIP, tabs.getTabCount() );
+        }
 
         if (model.getDocumentModel().getOptions().isDataVisible()) {
             final DataPanel dp= new DataPanel(dom);
-            tabs.insertTab("data", null, dp, TABS_TOOLTIP, 4);
+            tabs.insertTab("data", null, dp, TABS_TOOLTIP, tabs.getTabCount() );
         }
 
         final MetaDataPanel mdp = new MetaDataPanel(applicationModel);
         JScrollPane sp= new JScrollPane();
         sp.setViewportView(mdp);
-        tabs.insertTab("metadata", null, sp, TABS_TOOLTIP, 4);
+        tabs.insertTab("metadata", null, sp, TABS_TOOLTIP, tabs.getTabCount() );
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector));
@@ -438,6 +436,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         bind( bc, dom.getOptions(), Options.PROP_AUTOLABELLING, autoLabellingCheckBoxMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_AUTOLAYOUT, autoLayoutCheckBoxMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_AUTORANGING, autoRangingCheckBoxMenuItem, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_DATAVISIBLE, dataPanelCheckBoxMenuItem, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_LAYOUTVISIBLE, layoutPanelCheckBoxMenuItem, "selected" );
         bc.bind();
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
@@ -871,6 +871,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         logConsoleMenuItem = new javax.swing.JCheckBoxMenuItem();
         serverCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         dataPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        layoutPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -1094,12 +1095,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         dataPanelCheckBoxMenuItem.setText("Data Panel");
         dataPanelCheckBoxMenuItem.setToolTipText("the \"data\" panel allows for explicitly setting valid range and fill values for the dataset, and additional controls for data reduction before plotting.\n");
-        dataPanelCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataPanelCheckBoxMenuItemActionPerformed(evt);
-            }
-        });
         jMenu1.add(dataPanelCheckBoxMenuItem);
+
+        layoutPanelCheckBoxMenuItem.setText("Layout Panel");
+        layoutPanelCheckBoxMenuItem.setToolTipText("Enables the layout panel, which shows all the plots and panels in thier relative positions.\n");
+        jMenu1.add(layoutPanelCheckBoxMenuItem);
 
         optionsMenu.add(jMenu1);
 
@@ -1448,17 +1448,35 @@ private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     }
 }//GEN-LAST:event_jMenuItem6ActionPerformed
 
-private void dataPanelCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataPanelCheckBoxMenuItemActionPerformed
-    applicationModel.getDocumentModel().getOptions().setDataVisible(dataPanelCheckBoxMenuItem.isSelected());
-    if (dataPanelCheckBoxMenuItem.isSelected() ) {
-        if ( dataPanel == null ) {
-            dataPanel = new DataPanel(applicationModel.dom);
+private PropertyChangeListener optionsListener= new PropertyChangeListener() {
+    public void propertyChange( PropertyChangeEvent ev ) {
+        if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
+            if ( Boolean.TRUE==ev.getNewValue() ) {
+                if ( layoutPanel == null ) {
+                    layoutPanel = new LayoutPanel();
+                    layoutPanel.setApplication(dom);
+                }
+                int idx= tabs.indexOfTab("style");
+                if ( idx==-1 ) idx=  tabs.getTabCount();
+                tabs.insertTab("layout", null, layoutPanel, TABS_TOOLTIP, idx+1 );
+            } else {
+                if ( layoutPanel!=null ) tabs.remove(layoutPanel);
+            }
+        } else if ( ev.getPropertyName().equals(Options.PROP_DATAVISIBLE ) ) {
+            if ( Boolean.TRUE==ev.getNewValue() ) {
+                if ( dataPanel == null ) {
+                    dataPanel = new DataPanel(applicationModel.dom);
+                }
+                int idx= tabs.indexOfTab("metadata");
+                if ( idx==-1 ) idx=  tabs.getTabCount();
+                tabs.insertTab("data", null, dataPanel, TABS_TOOLTIP, idx );
+            } else {
+                if ( dataPanel!=null ) tabs.remove(dataPanel);
+            }
         }
-        tabs.insertTab("data", null, dataPanel, TABS_TOOLTIP, 4);
-    } else {
-        if ( dataPanel!=null ) tabs.remove(dataPanel);
     }
-}//GEN-LAST:event_dataPanelCheckBoxMenuItemActionPerformed
+};
+
 
     /**
      * @param args the command line arguments
@@ -1666,6 +1684,7 @@ private void dataPanelCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JCheckBoxMenuItem overRenderingMenuItem;

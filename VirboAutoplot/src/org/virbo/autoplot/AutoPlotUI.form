@@ -232,9 +232,12 @@
                     <Property name="text" type="java.lang.String" value="Data Panel"/>
                     <Property name="toolTipText" type="java.lang.String" value="the &quot;data&quot; panel allows for explicitly setting valid range and fill values for the dataset, and additional controls for data reduction before plotting.&#xa;"/>
                   </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataPanelCheckBoxMenuItemActionPerformed"/>
-                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="layoutPanelCheckBoxMenuItem">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Layout Panel"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Enables the layout panel, which shows all the plots and panels in thier relative positions.&#xa;"/>
+                  </Properties>
                 </MenuItem>
               </SubComponents>
             </Menu>
