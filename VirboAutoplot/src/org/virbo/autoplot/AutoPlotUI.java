@@ -1643,7 +1643,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
                     Runnable run= new Runnable() {
                         public void run() {
                             try {
-                                model.runScript(script, scriptArgs.toArray(new String[scriptArgs.size()]));
+                                JythonUtil.runScript( model, script, scriptArgs.toArray(new String[scriptArgs.size()]) );
                                 app.setStatus("ready");
                             } catch (IOException ex) {
                                 throw new IllegalArgumentException(ex);
