@@ -358,6 +358,8 @@ public class TsmlNcml {
         }
 
         ReadableByteChannel bin = Channels.newChannel(in);
+        
+        logger.finer( String.format( "allocating space for dataset (%9.1f KB)",(size/1000.)));
 
         ByteBuffer bbuf = ByteBuffer.allocate(size);
         int totalBytesRead = 0;
