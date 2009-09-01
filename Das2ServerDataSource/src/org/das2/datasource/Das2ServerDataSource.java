@@ -38,7 +38,9 @@ class Das2ServerDataSource extends AbstractDataSource {
 
     public Das2ServerDataSource(URL url) {
         super(url);
-        addCability( TimeSeriesBrowse.class, getTimeSeriesBrowse() );
+        if ( !"no".equals( params.get("tsb") ) ) {
+            addCability( TimeSeriesBrowse.class, getTimeSeriesBrowse() );
+        }
         HashMap params2 = new HashMap(params);
         params2.put("server", "dataset");
         timeRange= DatumRangeUtil.parseTimeRangeValid( params2.get("start_time") + " to "+ params2.get("end_time" ) );
@@ -61,6 +63,8 @@ class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("end_time");
         otherParams.remove("resolution");
         otherParams.remove("dataset");
+        otherParams.remove("tsb");
+
         dsParams= (String)  URLSplit.formatParams(otherParams);
 
         params2.put("server", "dataset");
@@ -97,7 +101,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         DataSet ds = handler.getDataSet();
 
         if ( ds==null ) {
-            throw new RuntimeException("failed to get dataset, without explanation!");
+            throw new RuntimeException("failed to get dataset, without explanation!  (Possibly no records)");
         }
 
         if ( timeRange==null ) timeRange= DatumRangeUtil.parseTimeRange( params2.get("start_time") + " to "+ params2.get("end_time" ) );
@@ -139,7 +143,12 @@ class Das2ServerDataSource extends AbstractDataSource {
     @Override
     public String getURL() {
         // TODO: Cheesy.  ApplicationModel shouldn't call getURL when TimeSeriesBrowse exists.
-        return getCapability( TimeSeriesBrowse.class ).getURL().toString();
+        TimeSeriesBrowse tsb= getCapability( TimeSeriesBrowse.class );
+        if ( tsb!=null ) {
+            return getCapability( TimeSeriesBrowse.class ).getURL().toString();
+        } else {
+            return super.getURL();
+        }
     }
 
 
