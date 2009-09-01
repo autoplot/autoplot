@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.net.URISyntaxException;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -150,9 +150,9 @@ public class Util {
      * @throws java.net.MalformedURLException
      * @throws java.io.IOException
      */
-    public static String[] list(String surl) throws MalformedURLException, IOException {
+    public static String[] list(String surl) throws IOException, URISyntaxException {
         String[] ss = FileSystem.splitUrl(surl);
-        FileSystem fs = FileSystem.create(new URL(ss[2]));
+        FileSystem fs = FileSystem.create(new URI(ss[2]));
         String glob = ss[3].substring(ss[2].length());
         String[] result;
         if (glob.length() == 0) {
