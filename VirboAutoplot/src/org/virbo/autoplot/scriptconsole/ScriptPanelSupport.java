@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.datasource.DataSetSelector;
@@ -244,7 +245,7 @@ public class ScriptPanelSupport {
                 }
 
                 boolean updateSurl = false;
-                if (file == null || file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
+                if (file == null || file.getCanonicalPath().startsWith( FileSystem.settings().getLocalCacheDir().toString())) {
                     if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
                         updateSurl = true;
                     } else {

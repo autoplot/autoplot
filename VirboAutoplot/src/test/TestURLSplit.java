@@ -5,6 +5,7 @@
 
 package test;
 
+import java.io.File;
 import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURL;
@@ -16,6 +17,7 @@ import org.virbo.datasource.URLSplit;
  */
 public class TestURLSplit {
     public static void main( String[] args ) throws Exception {
+        testContext( );
         test( 10, "http://goes.ngdc.noaa.gov/data/avg/2004/A1050412.TXT?skip=23&timeFormat=%y%m%d %H%M&column=E1&time=YYMMDD", 76 );
         test( 899,"vap:file:///c:/Documents+and+Settings/jbf/Desktop/Product+Summary.xls?sheet=nist+lo&firstRow=&column=B",93);
         test( 2,"vap:/home/jbf/mydata.qds", 3  );
@@ -56,5 +58,21 @@ public class TestURLSplit {
             result= DataSetURL.getCompletions( string, i, new NullProgressMonitor() );
             System.err.println( ""+id+"@"+i+":  "+result.size() +"   "+string.substring(0,i) );
         }
+    }
+
+    private static void testContext1( String t, String scontext, String expect ) throws Exception {
+        if ( scontext.equals("") ) {
+            System.err.println( URLSplit.format(  URLSplit.parse( t ) ) );
+        } else {
+            URLSplit context= URLSplit.parse(scontext);
+            //TODO: restore with context-enabled version System.err.println( URLSplit.format(  URLSplit.parse( t, context ) ) );
+        }
+    }
+    private static void testContext( ) throws Exception {
+        String pwd= new File("").toURI().toURL().toString();
+        testContext1( "/file.dat", "", "file:///file.dat" );
+        testContext1( "file.dat", "", pwd+"file.dat" );
+        testContext1( "file.dat", "http://www.myweb.org/path", "http://www.myweb.org/path/file.dat" );
+        testContext1( "/file.dat", "http://www.myweb.org/path", "http://www.myweb.org/file.dat" );
     }
 }

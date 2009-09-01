@@ -7,8 +7,8 @@ package org.autoplot.pngwalk;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,9 +50,9 @@ public class WalkUtil {
         return i;
     }
 
-    public static boolean fileExists(String surl) throws FileSystemOfflineException, MalformedURLException {
+    public static boolean fileExists(String surl) throws FileSystemOfflineException, URISyntaxException {
         int i= splitIndex( surl );
-        FileSystem fs = FileSystem.create( new URL(surl.substring(0,i+1) ) );
+        FileSystem fs = FileSystem.create( new URI(surl.substring(0,i+1) ) );
         return fs.getFileObject(surl.substring(i+1)).exists();
     }
 
@@ -66,7 +66,7 @@ public class WalkUtil {
      * @throws java.io.IOException if the remote folder cannot be listed.
      * @throws java.text.ParseException if the timerange cannot be parsed.
      */
-    public static List<URL> getFilesFor( String surl, String timeRange, List<DatumRange> timeRanges, boolean download, ProgressMonitor mon ) throws IOException, ParseException {
+    public static List<URI> getFilesFor( String surl, String timeRange, List<DatumRange> timeRanges, boolean download, ProgressMonitor mon ) throws IOException, ParseException, URISyntaxException {
         DatumRange dr = null;
         if ( timeRange!=null && timeRange.trim().length()>0 ) dr= DatumRangeUtil.parseTimeRange(timeRange);
 
@@ -75,7 +75,7 @@ public class WalkUtil {
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
 
         i = splitIndex(sansArgs);
-        FileSystem fs = FileSystem.create( new URL(sansArgs.substring(0, i+1)) );
+        FileSystem fs = FileSystem.create( new URI(sansArgs.substring(0, i+1)) );
         String spec= sansArgs.substring(i+1).replaceAll("\\$", "%");
 
         spec= spec.replaceAll("\\*", ".*");
@@ -94,7 +94,7 @@ public class WalkUtil {
 
         Arrays.sort(ss);
         
-        List<URL> result= new ArrayList(ss.length);
+        List<URI> result= new ArrayList(ss.length);
         timeRanges.clear();
 
         for ( i = 0; i < ss.length; i++) {
@@ -103,9 +103,9 @@ public class WalkUtil {
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
                 if ( fs.getFileObject(ss[i]).isLocal() ) {
                     File f= fs.getFileObject(ss[i]).getFile();
-                    result.add( f.toURI().toURL() );
+                    result.add( f.toURI() );
                 } else {
-                    result.add( new URL( fs.getRootURL(), ss[i]) );
+                    result.add( fs.getRootURI().resolve(ss[i]) );
                 }
                 timeRanges.add(dr2);
             }

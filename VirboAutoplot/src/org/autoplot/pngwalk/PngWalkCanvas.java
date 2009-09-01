@@ -18,6 +18,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -476,7 +477,7 @@ public class PngWalkCanvas extends JPanel {
         }
     }
     List<Image> images = new ArrayList();
-    List<URL> urls = new ArrayList<URL>();
+    List<URI> urls = new ArrayList<URI>();
     List<DatumRange> ranges = new ArrayList<DatumRange>();
     Map<Rectangle, Integer> imagebounds;
 
@@ -517,7 +518,7 @@ public class PngWalkCanvas extends JPanel {
             urls = WalkUtil.getFilesFor(template, timeRange, ranges, true, new NullProgressMonitor() );
             images = new ArrayList();
             for (int i = 0; i < urls.size(); i++) {
-                images.add(i, getToolkit().createImage(urls.get(i)));
+                images.add(i, getToolkit().createImage(urls.get(i).toURL()));
             }
             exception = null;
             if (currentRange != null) {

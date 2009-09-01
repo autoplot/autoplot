@@ -6,7 +6,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,7 +77,7 @@ public class DemoPngWalk {
                 } catch (FileSystemOfflineException ex) {
                     Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                     return false;
-                } catch (MalformedURLException ex) {
+                } catch (URISyntaxException ex) {
                     Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                     return false;
                 }
