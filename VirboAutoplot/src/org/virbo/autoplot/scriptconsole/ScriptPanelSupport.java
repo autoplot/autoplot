@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import org.das2.components.DasProgressPanel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
@@ -291,6 +292,7 @@ public class ScriptPanelSupport {
                             try {
                                 PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
                                 interp.set("dom", model.getDocumentModel() );
+                                interp.set("monitor", DasProgressPanel.createComponentPanel(model.getCanvas(),"running script") );
                                 boolean dirty0 = panel.isDirty();
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
