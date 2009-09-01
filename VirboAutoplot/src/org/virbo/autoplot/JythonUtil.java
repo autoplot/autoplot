@@ -6,7 +6,12 @@
 package org.virbo.autoplot;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.datasource.DataSetURL;
 
 /**
  *
@@ -27,6 +32,17 @@ public class JythonUtil {
         PythonInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(sandbox);
         if ( appContext ) interp.execfile( JythonUtil.class.getResource("appContextImports.py").openStream(), "appContextImports.py" );
         return interp;
+    }
+
+    protected static void runScript( ApplicationModel model, String script, String[] argv ) throws IOException {
+        if ( argv==null ) argv= new String[] {""};
+        PySystemState.initialize( PySystemState.getBaseProperties(), null, argv );
+        PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+        interp.set("dom", model.getDocumentModel() );
+        URL url= DataSetURL.getURL(script);
+        InputStream in= url.openStream();
+        interp.execfile(in);
+        in.close();
     }
 
 }
