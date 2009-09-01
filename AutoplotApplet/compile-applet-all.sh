@@ -41,10 +41,18 @@ find . -name '*EditorPanel.java' -exec rm {} \;
 rm -rf org/das2/dasml/*
 
 # compile key java classes.
-$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java
-$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java
-$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java
-$JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java
+echo "compile sources..."
+hasErrors=0
+if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
+echo "done compile sources."
+
+if [ $hasErrors -eq 1 ]; then
+  echo "Error somewhere in compile, see above"
+  exit 1
+fi
 
 # special handling of the META-INF stuff.
 
