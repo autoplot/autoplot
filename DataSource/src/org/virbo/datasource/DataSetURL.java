@@ -401,7 +401,7 @@ public class DataSetURL {
         URLSplit split = URLSplit.parse(url.toString());
 
         try {
-            URL spath = getWebURL(new URI(split.path));
+            URI spath = getWebURL(new URI(split.path)).toURI();
             FileSystem fs = FileSystem.create(spath);
             String filename = split.file.substring(split.path.length());
             if (fs instanceof LocalFileSystem)
@@ -439,7 +439,7 @@ public class DataSetURL {
         URLSplit split = URLSplit.parse(url.toString());
 
         try {
-            FileSystem fs = FileSystem.create(getWebURL( toURL(split.path).toURI() ) );
+            FileSystem fs = FileSystem.create( getWebURL( toURL(split.path).toURI() ).toURI() );
             String filename = split.file.substring(split.path.length());
             if (fs instanceof LocalFileSystem)
                 filename = DataSourceUtil.unescape(filename);
@@ -606,7 +606,7 @@ public class DataSetURL {
         FileSystem fs = null;
         String[] s;
 
-        fs = FileSystem.create(new URL(surlDir));
+        fs = FileSystem.create( new URI(surlDir) );
 
         s = fs.listDirectory("/");
 
@@ -807,7 +807,7 @@ public class DataSetURL {
 
                 URI url = getURI(surlDir);
                 String prefix = surl.substring(i + 1, carotPos);
-                FileSystem fs = FileSystem.create(getWebURL(url));
+                FileSystem fs = FileSystem.create(getWebURL(url),new NullProgressMonitor());
                 String[] s = fs.listDirectory("/");
                 mon.finished();
                 for (int j = 0; j < s.length; j++) {

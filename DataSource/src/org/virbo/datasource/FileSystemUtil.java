@@ -11,7 +11,8 @@ package org.virbo.datasource;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
@@ -23,7 +24,9 @@ import org.das2.util.monitor.ProgressMonitor;
 public class FileSystemUtil {
     
     public static String getNameRelativeTo( FileSystem fs, String resource ) {
-        String s= fs.getRootURL().toString();
+        String s= fs.getRootURI().toString();
+        //TODO:
+        //return new URI(resource).relativize(fs.getRootURI()).toString();
         if ( resource.startsWith(s) ) return resource.substring(s.length()); else return resource;
     }
 
@@ -35,9 +38,9 @@ public class FileSystemUtil {
      * @param context URI, such as http://server.org/data/asciitable.dat
      * @return
      */
-    public static boolean resourceExists( String context ) throws FileSystemOfflineException, MalformedURLException {
+    public static boolean resourceExists( String context ) throws FileSystemOfflineException, URISyntaxException {
         URLSplit split= URLSplit.parse(context);
-        FileSystem fs= FileSystem.create( new URL( split.path ) );
+        FileSystem fs= FileSystem.create( new URI( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).exists() ) {
             return true;
         } else {
@@ -51,9 +54,9 @@ public class FileSystemUtil {
      * @param context URI, such as http://server.org/data/asciitable.dat
      * @return
      */
-    public static void doDownload(String context,ProgressMonitor mon) throws FileSystemOfflineException, MalformedURLException, IOException  {
+    public static void doDownload(String context,ProgressMonitor mon) throws FileSystemOfflineException, IOException, URISyntaxException  {
         URLSplit split= URLSplit.parse(context);
-        FileSystem fs= FileSystem.create( new URL( split.path ) );
+        FileSystem fs= FileSystem.create( new URI( split.path ) );
         fs.getFileObject(split.file.substring(split.path.length())).getFile(mon);
     }
 
@@ -65,9 +68,9 @@ public class FileSystemUtil {
      * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
      * @throws java.net.MalformedURLException
      */
-    static boolean resourceIsLocal(String context) throws FileSystemOfflineException, MalformedURLException {
+    static boolean resourceIsLocal(String context) throws FileSystemOfflineException, URISyntaxException {
         URLSplit split= URLSplit.parse(context);
-        FileSystem fs= FileSystem.create( new URL( split.path ) );
+        FileSystem fs= FileSystem.create( new URI( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).isLocal() ) {
             return true;
         } else {

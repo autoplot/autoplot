@@ -9,9 +9,9 @@
 
 package ftpfs;
 
+import java.net.URI;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemFactory;
-import java.net.URL;
 
 /**
  *
@@ -23,7 +23,7 @@ public class FTPBeanFileSystemFactory implements FileSystemFactory {
     public FTPBeanFileSystemFactory() {
     }
 
-    public FileSystem createFileSystem(URL root) throws FileSystem.FileSystemOfflineException {
+    public FileSystem createFileSystem(URI root) throws FileSystem.FileSystemOfflineException {
         return new FTPBeanFileSystem(root);
     }
     

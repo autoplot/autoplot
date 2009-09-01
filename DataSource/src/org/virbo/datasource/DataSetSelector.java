@@ -720,6 +720,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                     }
                 } catch (IOException ex) {
                     FileSystem.getExceptionHandler().handle(ex);
+                } catch (URISyntaxException ex) {
+                    FileSystem.getExceptionHandler().handle(ex);
                 }
             } else {
                 showCompletions();

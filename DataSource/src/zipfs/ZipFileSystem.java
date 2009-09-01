@@ -3,6 +3,7 @@ package zipfs;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -25,9 +26,9 @@ public class ZipFileSystem extends FileSystem {
     private ZipFile zipFile;
     private TreeMap<String, ZipFileObject> filemap = new TreeMap<String, ZipFileObject>();
 
-    protected ZipFileSystem(URL root) throws IOException {
+    protected ZipFileSystem(URI root) throws IOException {
         super(root);
-        if ( !("file".equals(root.getProtocol()) ) ) {
+        if ( !("file".equals(root.getScheme()) ) ) {
             throw new IllegalArgumentException("Cannot access non-local zip file: "+root);
         }
         if ( !root.toString().endsWith(".zip") ) {
@@ -35,12 +36,7 @@ public class ZipFileSystem extends FileSystem {
         }
 
         File f;
-        try {
-            f = new File(root.toURI());
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(ZipFileSystem.class.getName()).log(Level.SEVERE, null, ex);
-            throw new IOException("URI Syntax Exception: "+ex.getMessage());
-        }
+        f = new File(root);
 
         // This may throw ZipException, IOException, or SecurityException
         zipFile = new ZipFile( f );

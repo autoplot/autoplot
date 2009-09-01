@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.InterruptedIOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -45,7 +46,7 @@ import org.virbo.datasource.DataSourceUtil;
  */
 public class FTPBeanFileSystem extends WebFileSystem {
 
-    FTPBeanFileSystem(URL root) {
+    FTPBeanFileSystem(URI root) {
         super(root, localRoot(root));
     }
 

@@ -83,7 +83,12 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
 
         i = splitIndex(sansArgs);
-        FileSystem fs = FileSystem.create( new URL(sansArgs.substring(0, i)) );
+        FileSystem fs;
+        try {
+            fs = FileSystem.create(new URI(sansArgs.substring(0, i)));
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
         if ( sansArgs.charAt(i)=='/' ) i=i+1; // kludgy
         String spec= sansArgs.substring(i).replaceAll("\\$", "%");
         FileStorageModelNew fsm = FileStorageModelNew.create(fs, spec );
@@ -108,7 +113,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         URLSplit split = URLSplit.parse(surl);
 
-        String delegateFfile = new URL(fsm.getFileSystem().getRootURL(), delegateFile).toString();
+        String delegateFfile = fsm.getFileSystem().getRootURI().resolve(delegateFile).toString();
         urlLen += delegateFfile.length();
         carotPos -= urlLen - delegateFfile.length();
         split.file = delegateFfile;
@@ -157,7 +162,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         split.params = URLSplit.formatParams(parms);
 
         try {
-            String scompUrl = fsm.getFileSystem().getRootURL() + file;
+            String scompUrl = fsm.getFileSystem().getRootURI().resolve(file).toString();
             if (split.params.length() > 0) {
                 scompUrl += "?" + split.params;
             }
