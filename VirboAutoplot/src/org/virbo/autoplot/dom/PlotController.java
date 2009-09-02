@@ -8,6 +8,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.swing.JMenuItem;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -31,7 +32,8 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
 /**
- *
+ * Manages a Plot node, for example listening for autorange updates and layout
+ * changes.
  * @author jbf
  */
 public class PlotController extends DomNodeController {
@@ -172,10 +174,6 @@ public class PlotController extends DomNodeController {
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
         colorbar.setVisible(false);
 
-        if (!application.controller.headless) {
-            boxmm.setAutoUpdate(true);
-        }
-
         MouseModule zoomPan = new ZoomPanMouseModule(dasPlot1, dasPlot1.getXAxis(), dasPlot1.getYAxis());
         dasPlot1.getDasMouseInputAdapter().setSecondaryModule(zoomPan);
 
@@ -223,6 +221,9 @@ public class PlotController extends DomNodeController {
 
         this.dasPlot = dasPlot1;
         this.dasColorBar = colorbar;
+
+        dasPlot.setEnableRenderPropertiesAction(false);
+        //dasPlot.getDasMouseInputAdapter().removeMenuItem("Render Properties");
 
         application.controller.maybeAddContextMenus( this );
 
@@ -532,6 +533,20 @@ public class PlotController extends DomNodeController {
 
     public BindingModel getBindings(int index) {
         return getBindings()[index];
+    }
+
+
+    protected JMenuItem panelPropsMenuItem = null;
+    public static final String PROP_PANELPROPSMENUITEM = "panelPropsMenuItem";
+
+    public JMenuItem getPanelPropsMenuItem() {
+        return panelPropsMenuItem;
+    }
+
+    public void setPanelPropsMenuItem(JMenuItem panelPropsMenuItem) {
+        JMenuItem oldPanelPropsMenuItem = this.panelPropsMenuItem;
+        this.panelPropsMenuItem = panelPropsMenuItem;
+        propertyChangeSupport.firePropertyChange(PROP_PANELPROPSMENUITEM, oldPanelPropsMenuItem, panelPropsMenuItem);
     }
 
     public Application getApplication() {
