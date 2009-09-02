@@ -126,7 +126,7 @@ public class AggregatingDataSource extends AbstractDataSource {
         DatumRange cacheRange1 = null;
 
         for (int i = 0; i < ss.length; i++) {
-            String scompUrl = getFsm().getFileSystem().getRootURI() + ss[i];
+            String scompUrl = getFsm().getFileSystem().getRootURI().toString() + ss[i];
             if (!sparams.equals("")) {
                 scompUrl += "?" + sparams;
             }
