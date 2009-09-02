@@ -259,22 +259,19 @@ public class ApplicationController extends DomNodeController implements RunLater
                 return;
             }
 
-            DasPlot plot = domPlot.controller.getDasPlot();
+            DasPlot dasPlot = domPlot.controller.getDasPlot();
 
             Panel p = null;
 
-            Renderer r = plot.getFocusRenderer();
+            Renderer r = dasPlot.getFocusRenderer();
+
             if (r != null) {
-                try {
-                    p = findPanel(r);
-                } catch ( RuntimeException ex ) {
-                    System.err.println("here where i couldn't find the panel for "+r);
-                    ex.printStackTrace();
-                    //TODO: track this down, it's probably a left over listener.
-                    return;
+                p = findPanel(r);
+                if (getPanel() != p) {
+                    setPanel(p);
                 }
             }
-
+            
             // if there's just one panel in the plot, then go ahead and set the focus uri.
             List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
             if ( p==null && ps.size() == 1) {
@@ -650,8 +647,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         public void propertyChange(PropertyChangeEvent evt) {
-            DasPlot plot = (DasPlot) evt.getSource();
-            Renderer r = plot.getFocusRenderer();
+            DasPlot dasPlot = (DasPlot) evt.getSource();
+            Renderer r = dasPlot.getFocusRenderer();
             if (r == null) {
                 return;
             }
@@ -748,6 +745,21 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         }
         throw new IllegalArgumentException("unable to find panel for das renderer");
+    }
+
+    /**
+     * find the panelId using this renderer.
+     * @param rend
+     * @return
+     */
+    private Plot findPlot(DasPlot plot) {
+        for (Plot p : application.getPlots()) {
+            PlotController pc = p.controller;
+            if (pc.getDasPlot() == plot ) {
+                return p;
+            }
+        }
+        throw new IllegalArgumentException("unable to find plot for das plot");
     }
 
     /**
@@ -1473,13 +1485,21 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public void setPanel(Panel panel) {
+        Panel oldPanel = this.panel;
         if ( panel==null ) {
             setStatus("no panel selected");
         } else {
-            setStatus(panel + " selected");
-            canvas.controller.indicateSelection( Collections.singletonList((DomNode)panel) );
+            if ( panel!=oldPanel ) {
+                setStatus(panel + " selected");
+                canvas.controller.indicateSelection( Collections.singletonList((DomNode)panel) );
+                Plot plot= getPlotFor(panel);
+                if ( plot!=null && plot.getController()!=null ) {
+                    JMenuItem mi= plot.getController().getPanelPropsMenuItem();
+                    if ( mi!=null && panel.getController()!=null && panel.getController().getRenderer()!=null )
+                        mi.setIcon( panel.getController().getRenderer().getListIcon() );
+                }
+            }
         }
-        Panel oldPanel = this.panel;
         this.panel = panel;
         propertyChangeSupport.firePropertyChange(PROP_PANEL, oldPanel, panel);
     }
