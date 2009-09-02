@@ -10,11 +10,11 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JMenuItem;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
@@ -749,6 +749,8 @@ public class PanelController extends DomNodeController {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
         }
+        JMenuItem mi= ac.getPlotFor(panel).getController().getPanelPropsMenuItem();
+        if ( mi!=null ) mi.setIcon( renderer.getListIcon() );
         renderer.setId( "rend_"+panel.getId());
         ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL, getLabelConverter() );
         ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
