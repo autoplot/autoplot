@@ -100,6 +100,8 @@ public class BinaryDataSource extends AbstractDataSource {
             rank2 = new int[]{first, last};
             col = first;
             if ( col<0 ) col= fieldCount + col;
+            if ( first>fieldCount ) throw new IndexOutOfBoundsException("rank 2 index is greater than field count");
+            if ( last>fieldCount ) throw new IndexOutOfBoundsException("rank 2 index is greater than field count");
         }
 
 
