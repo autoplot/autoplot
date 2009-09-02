@@ -94,6 +94,13 @@ for i in `ls ../*/src/META-INF/$file` ; do
    cat $i >> temp-volatile-classes/META-INF/$file
 done
 
+
+file=org.virbo.datasource.DataSourceEditorPanel.extensions
+touch temp-volatile-classes/META-INF/$file
+for i in `ls ../*/src/META-INF/$file` ; do
+   cat $i >> temp-volatile-classes/META-INF/$file
+done
+
 echo "Main-Class: org.virbo.autoplot.AutoPlotUI" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
