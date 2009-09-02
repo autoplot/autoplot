@@ -622,6 +622,8 @@ public class AutoplotApplet extends JApplet {
             plot.getDasMouseInputAdapter().setPrimaryModule(mm);
         }
 
+        p.getController().getDasPlot().getDasMouseInputAdapter().removeMenuItem("Properties");
+
         System.err.println("done start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
     }
 
