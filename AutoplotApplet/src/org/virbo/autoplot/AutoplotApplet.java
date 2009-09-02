@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -367,12 +369,18 @@ public class AutoplotApplet extends JApplet {
             appmodel.canvas.setBaseFont(Font.decode(fontParam));
         }
 
-        JMenuItem item = new JMenuItem(new AbstractAction("Edit DOM") {
-
+//        JMenuItem item = new JMenuItem(new AbstractAction("Edit DOM") {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                new PropertyEditor(dom).showDialog(AutoplotApplet.this);
+//            }
+//        });
+        JMenuItem item = new JMenuItem(new AbstractAction("Reset Zoom") {
             public void actionPerformed(ActionEvent e) {
-                new PropertyEditor(dom).showDialog(AutoplotApplet.this);
+                resetZoom();
             }
         });
+        
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item);
 
         /*        item= new JMenuItem( new AbstractAction( "Execute DOM command..." ) {
@@ -651,7 +659,7 @@ public class AutoplotApplet extends JApplet {
 
     private void testDownload() {
         try {
-            FileSystem fs = FileSystem.create(new URL("http://www.das2.org/wiki/data/"));
+            FileSystem fs = FileSystem.create(new URI("http://www.das2.org/wiki/data/"));
             String[] files = fs.listDirectory("/");
             FileObject fo = fs.getFileObject("afile.dat");
 
@@ -662,6 +670,8 @@ public class AutoplotApplet extends JApplet {
                 System.err.println(s);
                 s = r.readLine();
             }
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
         }
