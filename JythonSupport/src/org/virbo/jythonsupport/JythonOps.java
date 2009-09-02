@@ -16,7 +16,6 @@ import org.python.core.PyObject;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
 
 /**
  * Contains operations that are only available to Jython code, and is dependent
