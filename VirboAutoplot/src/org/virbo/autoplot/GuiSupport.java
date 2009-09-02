@@ -744,10 +744,10 @@ public class GuiSupport {
             }
         }));
 
-       JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Panel Properties") {
+       JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Panel Style Properties") {
             public void actionPerformed(ActionEvent e) {
                 Panel p = controller.getPanel();
-                PropertyEditor pp = new PropertyEditor(p);
+                PropertyEditor pp = new PropertyEditor(p.getStyle());
                 pp.showDialog(plot.getCanvas());
             }
         });
