@@ -751,6 +751,7 @@ public class GuiSupport {
                 pp.showDialog(plot.getCanvas());
             }
         });
+        plotController.setPanelPropsMenuItem(panelPropsMenuItem);
         
         plot.getDasMouseInputAdapter().addMenuItem(panelPropsMenuItem);
 
