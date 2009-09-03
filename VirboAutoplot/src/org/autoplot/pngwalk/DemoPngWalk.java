@@ -84,6 +84,8 @@ public class DemoPngWalk {
             }
         };
 
+        final int op= parent==null ? JFrame.EXIT_ON_CLOSE : JFrame.DISPOSE_ON_CLOSE;
+        
         tool.addFileAction( enabler, "autoplot", new AbstractAction("Launch Autoplot") {
             public void actionPerformed(ActionEvent e) {
                 String s = tool.getSelectedFile();
@@ -103,10 +105,13 @@ public class DemoPngWalk {
                 String productFile = template.substring(0, i0) + ".vap";
 
                 final String suri = productFile + "?timeRange=" + timeRange;
+
                 Runnable run = new Runnable() {
                     public void run() {
                         try {
+                            ScriptContext.createGui();
                             ScriptContext.plot(suri);
+                            ((JFrame)ScriptContext.getViewWindow()).setDefaultCloseOperation(op);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                         }

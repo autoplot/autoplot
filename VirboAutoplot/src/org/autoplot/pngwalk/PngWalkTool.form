@@ -83,6 +83,8 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jumpToFirstButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="prevSetButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="prevButton" min="-2" max="-2" attributes="0"/>
@@ -92,7 +94,9 @@
                   <Component id="nextButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="nextSetButton" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="238" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="jumpToLastButton" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="196" max="32767" attributes="0"/>
                   <Component id="addFileActionButton" min="-2" pref="188" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -107,6 +111,8 @@
                   <Component id="scaleComboBox" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="prevSetButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="addFileActionButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jumpToFirstButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jumpToLastButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -164,6 +170,24 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="----"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jumpToFirstButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="|&lt;"/>
+            <Property name="toolTipText" type="java.lang.String" value="jump to first"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jumpToFirstButtonActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jumpToLastButton">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="&gt;|"/>
+            <Property name="toolTipText" type="java.lang.String" value="jump to last"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jumpToLastButtonActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

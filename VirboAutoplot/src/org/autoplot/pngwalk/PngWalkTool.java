@@ -93,6 +93,8 @@ public class PngWalkTool extends javax.swing.JPanel {
         nextButton = new javax.swing.JButton();
         nextSetButton = new javax.swing.JButton();
         addFileActionButton = new javax.swing.JButton();
+        jumpToFirstButton = new javax.swing.JButton();
+        jumpToLastButton = new javax.swing.JButton();
 
         pngsPanel.setLayout(new java.awt.BorderLayout());
 
@@ -160,12 +162,30 @@ public class PngWalkTool extends javax.swing.JPanel {
 
         addFileActionButton.setText("----");
 
+        jumpToFirstButton.setText("|<");
+        jumpToFirstButton.setToolTipText("jump to first");
+        jumpToFirstButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jumpToFirstButtonActionPerformed(evt);
+            }
+        });
+
+        jumpToLastButton.setText(">|");
+        jumpToLastButton.setToolTipText("jump to last");
+        jumpToLastButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jumpToLastButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .add(jumpToFirstButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(prevSetButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(prevButton)
@@ -175,7 +195,9 @@ public class PngWalkTool extends javax.swing.JPanel {
                 .add(nextButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(nextSetButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 238, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jumpToLastButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 196, Short.MAX_VALUE)
                 .add(addFileActionButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 188, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -187,7 +209,9 @@ public class PngWalkTool extends javax.swing.JPanel {
                 .add(nextSetButton)
                 .add(scaleComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(prevSetButton)
-                .add(addFileActionButton))
+                .add(addFileActionButton)
+                .add(jumpToFirstButton)
+                .add(jumpToLastButton))
         );
 
         jPanel1Layout.linkSize(new java.awt.Component[] {addFileActionButton, nextButton, nextSetButton, prevButton, prevSetButton, scaleComboBox}, org.jdesktop.layout.GroupLayout.VERTICAL);
@@ -227,6 +251,8 @@ public class PngWalkTool extends javax.swing.JPanel {
     private void scaleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scaleComboBoxActionPerformed
         nextSetButton.setEnabled(true);
         prevSetButton.setEnabled(true);
+        nextSetButton.setText(">>>");
+        prevSetButton.setText("<<<");
         switch ( scaleComboBox.getSelectedIndex() ) {
             case 0:
                 canvas.setMode( DisplayMode.day );
@@ -235,12 +261,18 @@ public class PngWalkTool extends javax.swing.JPanel {
                 break;
             case 1:
                 canvas.setMode( DisplayMode.week );
+                nextSetButton.setText("skip 7 >>>");
+                prevSetButton.setText("<<< back 7");
                 break;
             case 2:
                 canvas.setMode( DisplayMode.month );
+                nextSetButton.setText("skip 35 >>>");
+                prevSetButton.setText("<<< back 35");
                 break;
             case 3:
                 canvas.setMode( DisplayMode.coverFlow );
+                nextSetButton.setText("skip 7 >>>");
+                prevSetButton.setText("<<< back 7");
                 break;
             default:
                 throw new IllegalArgumentException("bad index");
@@ -294,11 +326,21 @@ public class PngWalkTool extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_timeFilterTextFieldFocusLost
 
+    private void jumpToLastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpToLastButtonActionPerformed
+        canvas.setCurrentIndex( canvas.getTotalCount()-1 );
+    }//GEN-LAST:event_jumpToLastButtonActionPerformed
+
+    private void jumpToFirstButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpToFirstButtonActionPerformed
+        canvas.setCurrentIndex( 0 );
+    }//GEN-LAST:event_jumpToFirstButtonActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addFileActionButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton jumpToFirstButton;
+    private javax.swing.JButton jumpToLastButton;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton nextSetButton;
     private javax.swing.JPanel pngsPanel;

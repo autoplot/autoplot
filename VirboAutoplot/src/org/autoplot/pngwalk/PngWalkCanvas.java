@@ -413,11 +413,11 @@ public class PngWalkCanvas extends JPanel {
             }
 
         } else if (mode == DisplayMode.month) {
-            if (currentIndex < minIndex) {
+            while (currentIndex < minIndex) {
                 minIndex -= 35;
                 maxIndex = minIndex + 35;
             }
-            if (currentIndex >= maxIndex) {
+            while (currentIndex >= maxIndex) {
                 maxIndex += 35;
                 minIndex = maxIndex - 35;
             }
@@ -599,6 +599,13 @@ public class PngWalkCanvas extends JPanel {
 
     public synchronized int getCurrentIndex() {
         return currentIndex;
+    }
+
+    /**
+     * return the total number of images, not just the number displayed.
+     */
+    public synchronized int getTotalCount() {
+        return this.images.size();
     }
 
     public synchronized void setCurrentIndex(int currentIndex) {
