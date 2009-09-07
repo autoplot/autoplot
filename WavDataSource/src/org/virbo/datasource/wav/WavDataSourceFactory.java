@@ -7,6 +7,7 @@ package org.virbo.datasource.wav;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,8 @@ import org.virbo.datasource.DataSource;
 public class WavDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
-    public DataSource getDataSource(URL url) throws Exception {
-        return new WavDataSource2(url);
+    public DataSource getDataSource(URI uri) throws Exception {
+        return new WavDataSource2(uri);
     }
 
     @Override

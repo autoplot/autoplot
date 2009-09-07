@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import org.das2.DasApplication;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.LocalFileSystem;
+import org.das2.util.filesystem.VFSFileSystemFactory;
 import org.virbo.aggragator.AggregatingDataSourceFactory;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -63,6 +64,8 @@ public class DataSetURL {
     static {
         FileSystem.registerFileSystemFactory("zip", new zipfs.ZipFileSystemFactory());
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
+        // The following is commented out until the svn version of dasCore.jar is updated
+        //FileSystem.registerFileSystemFactory("sftp", new VFSFileSystemFactory());
         FileSystem.settings().setPersistence(FileSystemSettings.Persistence.EXPIRES);
 
         if (DasApplication.hasAllPermission()) {
@@ -141,7 +144,7 @@ public class DataSetURL {
     public static DataSource getDataSource(URI uri) throws Exception {
         DataSourceFactory factory = getDataSourceFactory(uri, new NullProgressMonitor());
         URI ruri = getResourceURI(uri);
-        DataSource result = factory.getDataSource(ruri.toURL());  // TODO: this doesn't support jdbc:mysql:...
+        DataSource result = factory.getDataSource(ruri);
         dsToFactory.put(result, factory);
         return result;
 
@@ -417,6 +420,13 @@ public class DataSetURL {
         }
     }
 
+    public static InputStream getInputStream(URI uri, ProgressMonitor mon) throws IOException {
+        FileSystem fs = FileSystem.create(uri);
+        String filename = uri.getPath();
+        FileObject fo = fs.getFileObject(filename);
+        return fo.getInputStream(mon);
+    }
+
     /**
      * canonical method for converting string from the wild into a URI-safe string.
      * The string should already have a scheme part, such as "http" or "file".
@@ -454,6 +464,18 @@ public class DataSetURL {
         } catch (URISyntaxException ex) {
             throw new IOException("URI Syntax Exception: " + ex.getMessage());
         }
+    }
+
+    public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
+        String uristring = uri.toString();
+        // copy the URI so we don't clobber the contents of the original
+        URI luri = URI.create(uristring.substring(0, uristring.lastIndexOf('/')));
+        FileSystem fs = FileSystem.create(getResourceURI(luri));
+        String filename = uri.getPath();
+        filename = filename.substring(filename.lastIndexOf('/'));
+        FileObject fo = fs.getFileObject(filename);
+        File tfile = fo.getFile(mon);
+        return tfile;
     }
 
     /**

@@ -9,8 +9,8 @@
 
 package org.virbo.ascii;
 
+import java.net.URI;
 import org.das2.util.monitor.NullProgressMonitor;
-import java.net.URL;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSource;
 
@@ -34,7 +34,7 @@ public class AsciiTableDataSetSourceTest {
         //url= "file:///N:/data/examples/asciitable/omni2_1965.dat?fixedColumns=0to11,54to60&time=field0&timeFormat=%Y %j %H";
         //url= "file:///N:/data/examples/asciitable/omni2_1965.dat?timeFormat=%Y %j %H&time=field0&column=field27";
         url= "file:///media/mini/data.backup/examples/dat/omni2_1965.dat?timeFormat=$Y+$j&skip=22";
-        ds= new AsciiTableDataSourceFactory().getDataSource( new URL(url) );
+        ds= new AsciiTableDataSourceFactory().getDataSource( new URI(url) );
         d= ds.getDataSet( new NullProgressMonitor() );
         
         System.err.println(d);

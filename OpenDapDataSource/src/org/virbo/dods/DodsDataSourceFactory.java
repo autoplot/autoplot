@@ -12,10 +12,9 @@ package org.virbo.dods;
 import dods.dap.DDSException;
 import dods.dap.parser.ParseException;
 import java.net.MalformedURLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.virbo.metatree.IstpMetadataModel;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,8 +36,8 @@ public class DodsDataSourceFactory implements DataSourceFactory {
     public DodsDataSourceFactory() {
     }
     
-    public DataSource getDataSource(URL url) throws IOException {
-        return new DodsDataSource( url );
+    public DataSource getDataSource(URI uri) throws IOException {
+        return new DodsDataSource( uri );
     }
     
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {

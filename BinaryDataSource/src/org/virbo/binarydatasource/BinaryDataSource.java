@@ -6,7 +6,7 @@ package org.virbo.binarydatasource;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
@@ -24,8 +24,8 @@ import org.virbo.datasource.AbstractDataSource;
  */
 public class BinaryDataSource extends AbstractDataSource {
     
-    public BinaryDataSource(URL url) {
-        super(url);
+    public BinaryDataSource(URI uri) {
+        super(uri);
     }
 
     private int getIntParameter(String name, int deflt) {

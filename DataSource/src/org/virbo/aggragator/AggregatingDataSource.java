@@ -19,6 +19,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Map;
@@ -71,9 +72,9 @@ public class AggregatingDataSource extends AbstractDataSource {
     }
 
     /** Creates a new instance of AggregatingDataSource */
-    public AggregatingDataSource(URL url,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
-        super(url);
-        String surl = url.toString();
+    public AggregatingDataSource(URI uri,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
+        super(uri);
+        String surl = uri.toString();
         surl= surl.replaceAll( "%25", "%");
         this.delegateDataSourceFactory = delegateFactory;
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
@@ -132,7 +133,7 @@ public class AggregatingDataSource extends AbstractDataSource {
             }
             URL compUrl = new URL(scompUrl);
 
-            DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(compUrl);
+            DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(compUrl.toURI());
             metadataModel = delegateDataSource.getMetadataModel();
 
             ProgressMonitor mon1;
@@ -265,7 +266,7 @@ public class AggregatingDataSource extends AbstractDataSource {
 
     @Override
     public String getURL() {
-        String surl = this.resourceURL.toString() + "?" ;
+        String surl = this.resourceURI.toString() + "?" ;
         if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
         surl += "timerange=" + String.valueOf(viewRange);
 

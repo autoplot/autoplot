@@ -8,19 +8,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.das2.util.monitor.ProgressMonitor;
@@ -28,7 +21,6 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URLSplit;
 
@@ -40,8 +32,8 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
 
     private static final String FIRST_ROW_DOC = "the row that contains the either the first record of data, or data column headings.  1 is the first row.";
 
-    public DataSource getDataSource(URL url) throws IOException {
-        return new ExcelSpreadsheetDataSource(url);
+    public DataSource getDataSource(URI uri) throws IOException {
+        return new ExcelSpreadsheetDataSource(uri);
     }
 
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws IOException {

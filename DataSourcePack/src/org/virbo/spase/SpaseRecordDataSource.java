@@ -9,20 +9,15 @@
 
 package org.virbo.spase;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
-import javax.swing.tree.TreeModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -67,9 +62,13 @@ public class SpaseRecordDataSource implements DataSource {
     
     
     /** Creates a new instance of SpaseRecordDataSource */
-    public SpaseRecordDataSource( URL url ) throws IllegalArgumentException, IOException, SAXException, Exception {
-        this.url= url;
-        
+    public SpaseRecordDataSource( URI uri ) throws IllegalArgumentException, IOException, SAXException, Exception {
+        try {
+            this.url= uri.toURL();
+        } catch (MalformedURLException ex) {
+            System.err.println("Failed to convert URI to URL");
+            throw new RuntimeException(ex);
+        }
         readXML();
         
         String surl=null;

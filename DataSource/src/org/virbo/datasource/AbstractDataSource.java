@@ -12,7 +12,8 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,15 +27,15 @@ import org.virbo.datasource.capability.Updating;
  */
 public abstract class AbstractDataSource implements DataSource {
 
-    protected URL url;
+    protected URI uri;
     /**
      * available to subclasses for convenience.  This is the name of the file,
      * without the parameters.
      */
-    protected URL resourceURL;
+    protected URI resourceURI;
 
     /**
-     * returns the url's canonical extension for convenience.  
+     * returns the uri's canonical extension for convenience.
      * The extension does contain the initial period and is folded to lower case.  
      * Returns an empty string if no extension is found.
      * 
@@ -44,8 +45,24 @@ public abstract class AbstractDataSource implements DataSource {
      * @return lower-case extension with a period, or empty string.
      */
     protected String getExt(URL url) {
-        String s = url.getFile();
+        try {
+            return getExt(url.toURI());
+        } catch (URISyntaxException e) {
+            System.err.println("Failed to convert URL to URI.");
+            e.printStackTrace();
+            return "";
+        }
+        /*String s = url.getFile();
         int i = s.lastIndexOf("."); // URI okay
+        if (i == -1) {
+        return "";
+        } else {
+        return s.substring(i).toLowerCase();
+        }*/    }
+
+    protected String getExt(URI uri) {
+        String s = uri.getPath();
+        int i = s.lastIndexOf(".");
         if (i == -1) {
             return "";
         } else {
@@ -57,15 +74,15 @@ public abstract class AbstractDataSource implements DataSource {
      */
     protected Map<String, String> params;
 
-    public AbstractDataSource(URL url) {
+    public AbstractDataSource(java.net.URI uri) {
         try {
-            this.url = url;
-            String s = url.toString();
+            this.uri = uri;
+            String s = uri.toString();
             URLSplit split = URLSplit.parse(s);
 
             params = URLSplit.parseParams(split.params);
-            resourceURL = new URL(split.file);
-        } catch (MalformedURLException ex) {
+            resourceURI = new URI(split.file);
+        } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -78,11 +95,11 @@ public abstract class AbstractDataSource implements DataSource {
 
     @Override
     public String toString() {
-        return url.toString();
+        return uri.toString();
     }
 
     public String getURL() {
-        return url.toString();
+        return uri.toString();
     }
 
 
@@ -92,9 +109,19 @@ public abstract class AbstractDataSource implements DataSource {
      * make the remote file available.
      */
     protected File getFile(ProgressMonitor mon) throws IOException {
-        return getFile( resourceURL, mon );
+        return getFile( resourceURI, mon );
     }
 
+    // Practically identical to the URL version below...
+    protected File getFile(URI uri, ProgressMonitor mon) throws IOException {
+        File f = DataSetURL.getFile(uri, mon);
+         if (params.containsKey("filePollUpdates")) {
+            pollingUpdater= new FilePollUpdating();
+            pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("filePollUpdates")) ) );
+            capabilities.put(Updating.class,pollingUpdater );
+        }
+        return f;
+    }
     /**
      * make the remote file available.  If the parameter "filePollUpdates" is set to
      * a float, a thread will be started to monitor the local file for updates.

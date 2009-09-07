@@ -12,6 +12,7 @@ package org.virbo.netCDF;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,14 +38,14 @@ public class NetCDFDataSource extends AbstractDataSource {
     String svariable;
     
     /** Creates a new instance of NetCDFDataSource */
-    public NetCDFDataSource( URL url ) throws IOException {
-        super(url);
+    public NetCDFDataSource( URI uri ) throws IOException {
+        super(uri);
         parseUrl();
         
     }
     
     private void parseUrl() {
-        String surl= url.toString();
+        String surl= uri.toString();
         int i= surl.lastIndexOf('?');
         URL myUrl;
         if ( i>-1 ) {
@@ -119,7 +120,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             File file= getFile(mon);
             location= file.toURI().toURL().toString();
         } else {
-            location= resourceURL.toString();
+            location= resourceURI.toString();
         }
         
         NetcdfDataset dataset=null;

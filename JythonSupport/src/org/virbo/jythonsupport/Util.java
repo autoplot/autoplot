@@ -43,9 +43,9 @@ public class Util {
      * @param ds
      */
     public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
-        URI url = DataSetURL.getURI(surl);
-        DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
-        DataSource result = factory.getDataSource(DataSetURL.getWebURL(url));
+        URI uri = DataSetURL.getURI(surl);
+        DataSourceFactory factory = DataSetURL.getDataSourceFactory(uri, new NullProgressMonitor());
+        DataSource result = factory.getDataSource(DataSetURL.getResourceURI(uri));
         if (mon == null) {
             mon = new NullProgressMonitor();
         }
@@ -93,7 +93,7 @@ public class Util {
         } else {
             URI url = DataSetURL.getURI(surl);
             DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
-            DataSource result = factory.getDataSource(DataSetURL.getWebURL(url));
+            DataSource result = factory.getDataSource(DataSetURL.getResourceURI(url));
             if (mon == null) {
                 mon = new NullProgressMonitor();
             }

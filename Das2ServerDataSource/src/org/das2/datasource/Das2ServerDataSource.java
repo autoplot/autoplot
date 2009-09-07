@@ -16,6 +16,7 @@ import org.das2.util.DasProgressMonitorInputStream;
 import org.das2.util.StreamTool;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.channels.Channels;
@@ -36,8 +37,8 @@ import org.virbo.datasource.capability.TimeSeriesBrowse;
  */
 class Das2ServerDataSource extends AbstractDataSource {
 
-    public Das2ServerDataSource(URL url) {
-        super(url);
+    public Das2ServerDataSource(URI uri) {
+        super(uri);
         if ( !"no".equals( params.get("tsb") ) ) {
             addCability( TimeSeriesBrowse.class, getTimeSeriesBrowse() );
         }
@@ -77,7 +78,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         }
         params2.put("dataset", URLEncoder.encode(params.get("dataset") ) );
         params2.put("params", URLEncoder.encode(dsParams) );
-        URL url2 = new URL("" + this.resourceURL + "?" + URLSplit.formatParams(params2));
+        URL url2 = new URL("" + this.resourceURI + "?" + URLSplit.formatParams(params2));
 
         System.err.println("opening "+url2);
         InputStream in = url2.openStream();
@@ -124,7 +125,7 @@ class Das2ServerDataSource extends AbstractDataSource {
                         + "&resolution=" + resolution.doubleValue(Units.seconds);
                 if ( dsParams!=null )  sparams+= "&" + dsParams;
                 try {
-                    return new URL( "" + resourceURL + "?" + sparams);
+                    return new URL( "" + resourceURI + "?" + sparams);
                 } catch (MalformedURLException ex) {
                     throw new RuntimeException(ex);
                 }

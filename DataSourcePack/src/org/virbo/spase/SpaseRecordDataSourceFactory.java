@@ -9,13 +9,12 @@
 
 package org.virbo.spase;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.MetadataModel;
 
 /**
  *
@@ -27,8 +26,8 @@ public class SpaseRecordDataSourceFactory implements DataSourceFactory {
     public SpaseRecordDataSourceFactory() {
     }
     
-    public DataSource getDataSource(URL url) throws Exception {
-        return new SpaseRecordDataSource(url);
+    public DataSource getDataSource(URI uri) throws Exception {
+        return new SpaseRecordDataSource(uri);
     }
     
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {

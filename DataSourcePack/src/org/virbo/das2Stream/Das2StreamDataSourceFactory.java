@@ -7,6 +7,7 @@ package org.virbo.das2Stream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.util.ArrayList;
@@ -28,8 +29,8 @@ import org.virbo.qstream.StreamException;
  */
 public class Das2StreamDataSourceFactory implements DataSourceFactory {
 
-    public DataSource getDataSource(URL url) throws IOException {
-        return new Das2StreamDataSource(url);
+    public DataSource getDataSource(URI uri) throws IOException {
+        return new Das2StreamDataSource(uri);
     }
 
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws IOException, StreamException {

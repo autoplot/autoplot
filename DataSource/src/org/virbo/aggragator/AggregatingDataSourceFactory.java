@@ -41,12 +41,12 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     public AggregatingDataSourceFactory() {
     }
 
-    public DataSource getDataSource(URL url) throws Exception {
+    public DataSource getDataSource(URI uri) throws Exception {
         if ( delegateFactory==null ) {
-            delegateFactory= AggregatingDataSourceFactory.getDelegateDataSourceFactory(url.toString());
+            delegateFactory= AggregatingDataSourceFactory.getDelegateDataSourceFactory(uri.toString());
         }
-        AggregatingDataSource ads = new AggregatingDataSource(url,delegateFactory);
-        String surl = url.toString();
+        AggregatingDataSource ads = new AggregatingDataSource(uri,delegateFactory);
+        String surl = uri.toString();
         surl= surl.replaceAll("%25","%");
         FileStorageModelNew fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);

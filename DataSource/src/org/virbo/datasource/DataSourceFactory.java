@@ -9,7 +9,7 @@
 
 package org.virbo.datasource;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
 
@@ -22,7 +22,7 @@ public interface DataSourceFactory {
     /**
      *return a dataSource for the url
      */
-    DataSource getDataSource( URL url ) throws Exception;
+    DataSource getDataSource( URI uri ) throws Exception;
         
     /**
      * return a list of context-sensitive completions.  If an exception is thrown, then an

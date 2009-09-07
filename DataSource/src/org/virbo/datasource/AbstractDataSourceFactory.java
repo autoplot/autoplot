@@ -4,6 +4,7 @@
  */
 package org.virbo.datasource;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,7 @@ public abstract class AbstractDataSourceFactory implements DataSourceFactory {
     public AbstractDataSourceFactory() {
     }
     
-    public abstract DataSource getDataSource(URL url) throws Exception;
+    public abstract DataSource getDataSource(java.net.URI uri) throws Exception;
 
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         return Collections.emptyList();

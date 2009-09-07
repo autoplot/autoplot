@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +40,8 @@ import org.virbo.jythonsupport.JythonOps;
 public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
-    public DataSource getDataSource(URL url) throws Exception {
-        JythonDataSource result = new JythonDataSource(url,this);
+    public DataSource getDataSource(URI uri) throws Exception {
+        JythonDataSource result = new JythonDataSource(uri,this);
         return result;
     }
 

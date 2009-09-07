@@ -15,6 +15,7 @@ import org.das2.util.StreamTool;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -39,17 +40,17 @@ import org.virbo.qstream.QDataSetStreamHandler;
 public class Das2StreamDataSource extends AbstractDataSource {
 
     /** Creates a new instance of Das2StreamDataSource */
-    public Das2StreamDataSource(URL url) throws IOException {
-        super(url);
+    public Das2StreamDataSource(URI uri) throws IOException {
+        super(uri);
     }
 
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException, org.virbo.qstream.StreamException {
 
-        InputStream in = DataSetURL.getInputStream(url, mon);
+        InputStream in = DataSetURL.getInputStream(uri, mon);
 
         ReadableByteChannel channel = Channels.newChannel(in);
 
-        URLSplit split = URLSplit.parse(url.toString());
+        URLSplit split = URLSplit.parse(uri.toString());
         
         if (split.ext.equals(".qds")) {
             QDataSetStreamHandler h= new QDataSetStreamHandler();
@@ -64,7 +65,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
         } else {
 
             HashMap<String,String> props = new HashMap<String,String>();
-            props.put("file", url.toString());
+            props.put("file", uri.toString());
 
             DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
 
@@ -84,8 +85,8 @@ public class Das2StreamDataSource extends AbstractDataSource {
     public static DataSourceFactory getFactory() {
         return new DataSourceFactory() {
 
-            public DataSource getDataSource(URL url) throws IOException {
-                return new Das2StreamDataSource(url);
+            public DataSource getDataSource(URI uri) throws IOException {
+                return new Das2StreamDataSource(uri);
             }
 
             public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) {

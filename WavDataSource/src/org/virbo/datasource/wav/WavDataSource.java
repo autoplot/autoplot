@@ -8,7 +8,7 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -31,8 +31,8 @@ import org.virbo.datasource.AbstractDataSource;
  */
 public class WavDataSource extends AbstractDataSource {
 
-    public WavDataSource(URL url) {
-        super(url);
+    public WavDataSource(URI uri) {
+        super(uri);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class WavDataSource extends AbstractDataSource {
 
     @Override
     public Map<String,Object> getMetaData(ProgressMonitor mon) throws Exception {
-        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(resourceURL);
+        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(resourceURI.toURL());
         AudioFormat audioFormat= fileFormat.getFormat();
         Map<String,Object> properties= new HashMap( audioFormat.properties() );
         properties.put( "encoding", audioFormat.getEncoding() );

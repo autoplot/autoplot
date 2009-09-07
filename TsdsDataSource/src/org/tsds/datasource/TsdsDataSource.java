@@ -16,16 +16,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
@@ -42,18 +41,14 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.TagGenDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -65,8 +60,8 @@ class TsdsDataSource extends AbstractDataSource {
 
     long t0 = System.currentTimeMillis();
 
-    public TsdsDataSource(URL url) {
-        super(url);
+    public TsdsDataSource(URI uri) {
+        super(uri);
         try {
             addCability(TimeSeriesBrowse.class, getTimeSeriesBrowse());
 
@@ -74,7 +69,7 @@ class TsdsDataSource extends AbstractDataSource {
 
             ProgressMonitor mon = new NullProgressMonitor();
 
-            URL url0 = new URL("" + this.resourceURL + "?" + URLSplit.formatParams(params));
+            URL url0 = new URL("" + this.resourceURI + "?" + URLSplit.formatParams(params));
             logger.fine("tsds url= " + url0);
 
             if (params.get("out") == null) {
@@ -92,7 +87,7 @@ class TsdsDataSource extends AbstractDataSource {
             sparams = sparams.replace("out=tsml", "out=tsml&ext=" + params.get("out"));
 
             logit("post first request in construct TsdsDataSource", t0);
-            URL url3 = new URL("" + this.resourceURL + "?" + sparams);
+            URL url3 = new URL("" + this.resourceURI + "?" + sparams);
             logger.fine("opening " + url3);
             initialTsml(url3.openStream());
 
@@ -198,7 +193,7 @@ class TsdsDataSource extends AbstractDataSource {
         //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
         //&start_time=2004-01-01&end_time=2004-01-06&server=dataset&ascii=1
 
-        // datasource url:
+        // datasource uri:
         //     tsds.http://timeseries.org/cgi-bin/get.cgi?StartDate=20010101&EndDate=20010101&ext=bin&ppd=24&param1=SourceAcronym_Subset-1-v0
         //     tsds.http://timeseries.org/cgi-bin/get.cgi?StartDate=20010101&EndDate=20010101&ext=bin&out=tsml&ppd=24&param1=SourceAcronym_Subset-1-v0
         // translates to:
@@ -237,7 +232,7 @@ class TsdsDataSource extends AbstractDataSource {
             LinkedHashMap params3 = new LinkedHashMap(params2);
             params3.remove("ppd");
             params3.put("out", "tsml");
-            URL url3 = new URL("" + this.resourceURL + "?" + URLSplit.formatParams(params3));
+            URL url3 = new URL("" + this.resourceURI + "?" + URLSplit.formatParams(params3));
             logger.fine("opening " + url3);
             initialTsml(url3.openStream());
             haveInitialTsml = true;
@@ -252,7 +247,7 @@ class TsdsDataSource extends AbstractDataSource {
         }
 
 
-        URL url2 = new URL("" + this.resourceURL + "?" + URLSplit.formatParams(params2));
+        URL url2 = new URL("" + this.resourceURI + "?" + URLSplit.formatParams(params2));
 
 
         int points = (int) Math.ceil(timeRange.width().doubleValue(Units.days)) * ppd;
@@ -615,7 +610,7 @@ class TsdsDataSource extends AbstractDataSource {
                 "&out=" + params.get("out") +
                 "&param1=" + params.get("param1");
 
-        return this.resourceURL.toString() + "?" + sparams;
+        return this.resourceURI.toString() + "?" + sparams;
 
     }
 }

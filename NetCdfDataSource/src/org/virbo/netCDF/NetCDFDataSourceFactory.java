@@ -10,13 +10,13 @@
 package org.virbo.netCDF;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
@@ -36,8 +36,8 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
     public NetCDFDataSourceFactory() {
     }
     
-    public DataSource getDataSource(URL url) throws IOException {
-        return new NetCDFDataSource( url );
+    public DataSource getDataSource(URI uri) throws IOException {
+        return new NetCDFDataSource( uri );
     }
     
     

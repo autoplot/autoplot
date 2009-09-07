@@ -5,12 +5,11 @@
 
 package org.virbo.binarydatasource;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
@@ -22,8 +21,8 @@ import org.virbo.datasource.DataSource;
 public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
-    public DataSource getDataSource(URL url) throws Exception {
-        return new BinaryDataSource( url );
+    public DataSource getDataSource(URI uri) throws Exception {
+        return new BinaryDataSource( uri );
     }
 
     @Override

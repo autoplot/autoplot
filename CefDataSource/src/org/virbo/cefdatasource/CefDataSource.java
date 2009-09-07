@@ -11,7 +11,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
@@ -40,13 +40,13 @@ public class CefDataSource extends AbstractDataSource {
 
     Cef cef;
 
-    public CefDataSource(URL url) {
-        super(url);
+    public CefDataSource(URI uri) {
+        super(uri);
     }
 
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        File f = DataSetURL.getFile(url, new NullProgressMonitor());
+        File f = DataSetURL.getFile(uri, new NullProgressMonitor());
         ReadableByteChannel c = Channels.newChannel(new FileInputStream(f));
 
         DasProgressMonitorReadableByteChannel cmon = new DasProgressMonitorReadableByteChannel(c, mon);

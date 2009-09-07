@@ -18,14 +18,13 @@ import gsfc.nssdc.cdf.Entry;
 import gsfc.nssdc.cdf.Variable;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.UnitsConverter;
 import org.virbo.dataset.DDataSet;
@@ -52,8 +51,8 @@ public class CdfFileDataSource extends AbstractDataSource {
     private final static Logger logger= Logger.getLogger(CdfFileDataSource.class.getName());
 
     /** Creates a new instance of CdfFileDataSource */
-    public CdfFileDataSource(URL url) {
-        super(url);
+    public CdfFileDataSource(URI uri) {
+        super(uri);
     }
 
     /* read all the variable attributes into a Map */

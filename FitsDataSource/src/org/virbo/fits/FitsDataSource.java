@@ -4,7 +4,7 @@
  */
 package org.virbo.fits;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,15 +27,15 @@ import org.virbo.datasource.MetadataModel;
  */
 public class FitsDataSource extends AbstractDataSource {
 
-    FitsDataSource(URL url) {
-        super(url);
+    FitsDataSource(URI uri) {
+        super(uri);
     }
 
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         int ihdu = 0;
-        Map<String, Integer> plottable = FitsDataSourceFactory.getPlottable(url, mon);
+        Map<String, Integer> plottable = FitsDataSourceFactory.getPlottable(uri, mon);
 
         String name = (String) getParams().get("arg_0");
         if (name != null) {
@@ -91,7 +91,7 @@ public class FitsDataSource extends AbstractDataSource {
     @Override
     public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
         int ihdu = 0;
-        Map<String, Integer> plottable = FitsDataSourceFactory.getPlottable(url, mon);
+        Map<String, Integer> plottable = FitsDataSourceFactory.getPlottable(uri, mon);
 
         String name = (String) getParams().get("arg_0");
         if (name != null) {

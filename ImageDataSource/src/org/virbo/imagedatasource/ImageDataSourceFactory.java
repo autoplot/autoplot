@@ -4,13 +4,12 @@
  */
 package org.virbo.imagedatasource;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 
@@ -20,8 +19,8 @@ import org.virbo.datasource.DataSourceFactory;
  */
 public class ImageDataSourceFactory implements DataSourceFactory {
 
-    public DataSource getDataSource(URL url) throws Exception {
-        return new ImageDataSource(url);
+    public DataSource getDataSource(URI uri) throws Exception {
+        return new ImageDataSource(uri);
     }
     Map<String, List<String>> datasetsList = null;
 

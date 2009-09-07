@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -28,8 +29,8 @@ import org.virbo.datasource.DataSource;
 public class CefDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
-    public DataSource getDataSource(URL url) throws Exception {
-        return new CefDataSource(url);
+    public DataSource getDataSource(URI uri) throws Exception {
+        return new CefDataSource(uri);
     }
 
     private List<String> getPlottable(URL url, ProgressMonitor mon ) throws IOException {

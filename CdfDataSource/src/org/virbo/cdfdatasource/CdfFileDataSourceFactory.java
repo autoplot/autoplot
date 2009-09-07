@@ -11,7 +11,7 @@ package org.virbo.cdfdatasource;
 
 import gsfc.nssdc.cdf.CDF;
 import java.io.File;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,9 +79,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     }
     
     
-    public DataSource getDataSource(URL url) throws Exception {
-        URLSplit split= URLSplit.parse( url.toString() );
-        return new CdfFileDataSource( url );
+    public DataSource getDataSource(URI uri) throws Exception {
+        URLSplit split= URLSplit.parse( uri.toString() );
+        return new CdfFileDataSource( uri );
     }
     
     

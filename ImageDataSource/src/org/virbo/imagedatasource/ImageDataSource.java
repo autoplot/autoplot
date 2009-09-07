@@ -13,7 +13,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,8 +39,8 @@ class ImageDataSource extends AbstractDataSource {
     public static final int CHANNEL_SATURATION = 2;
     public static final int CHANNEL_VALUE = 3;
 
-    public ImageDataSource(URL url) {
-        super(url);
+    public ImageDataSource(URI uri) {
+        super(uri);
     }
 
     private final double toHSV(int rgb, int channel) {
@@ -103,8 +103,8 @@ class ImageDataSource extends AbstractDataSource {
 
         mon.started();
 
-        //BufferedImage image = ImageIO.read(DataSetURL.getFile(url, mon));
-        BufferedImage image = ImageIO.read(DataSetURL.getInputStream(url, mon));
+        //BufferedImage image = ImageIO.read(DataSetURL.getFile(uri, mon));
+        BufferedImage image = ImageIO.read(DataSetURL.getInputStream(uri, mon));
 
         String channel = params.get("channel");
 
@@ -161,7 +161,7 @@ class ImageDataSource extends AbstractDataSource {
     }
 
     public Map<String, Object> getJpegExifMetaData(ProgressMonitor mon) throws Exception {
-        InputStream in = DataSetURL.getInputStream(url, mon);
+        InputStream in = DataSetURL.getInputStream(uri, mon);
         Metadata metadata = JpegMetadataReader.readMetadata(in);
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -180,14 +180,14 @@ class ImageDataSource extends AbstractDataSource {
     @Override
     public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
 
-        String ext = getExt(resourceURL);
+        String ext = getExt(resourceURI);
 
         if (ext.equals(".jpg")) {
             return getJpegExifMetaData(mon);
 
         } else {
 
-            File f = DataSetURL.getFile(url, new NullProgressMonitor());
+            File f = DataSetURL.getFile(uri, new NullProgressMonitor());
 
             Map<String, Object> map = new HashMap<String, Object>();
 

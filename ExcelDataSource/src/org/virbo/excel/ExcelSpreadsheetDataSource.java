@@ -14,9 +14,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,10 +27,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URLSplit;
 
 /**
@@ -51,8 +47,8 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
      *     depend0=id the column ID for the x tags
      * file://C:/iowaCitySales2004-2006.latlong.xls?column=M[2:]&depend0=B[2:]&plane0=C[2:]
      */
-    public ExcelSpreadsheetDataSource(URL url) throws IOException {
-        super(url);
+    public ExcelSpreadsheetDataSource(URI uri) throws IOException {
+        super(uri);
     }
 
     public QDataSet getDataSet(ProgressMonitor mon) throws IOException {
@@ -61,7 +57,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         fs = new POIFSFileSystem(in);
         HSSFWorkbook wb = new HSSFWorkbook(fs);
 
-        String query = url.getQuery(); // the part after the ?
+        String query = uri.getQuery(); // the part after the ?
         Map m = URLSplit.parseParams(query);
 
         String ssheet = (String) m.get("sheet");

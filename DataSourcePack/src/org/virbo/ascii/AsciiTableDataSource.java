@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
@@ -91,8 +92,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
     private double validMax = Double.POSITIVE_INFINITY;
 
     /** Creates a new instance of AsciiTableDataSource */
-    public AsciiTableDataSource(URL url) throws FileNotFoundException, IOException {
-        super(url);
+    public AsciiTableDataSource(URI uri) throws FileNotFoundException, IOException {
+        super(uri);
 
     }
 

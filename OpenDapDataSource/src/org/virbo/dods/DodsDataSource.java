@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import dods.dap.Attribute;
+import java.net.URI;
 import org.das2.CancelledOperationException;
 import org.das2.datum.Units;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public class DodsDataSource extends AbstractDataSource {
     String variable;
     String sMyUrl;
     /**
-     * null if not specfied in url.
+     * null if not specfied in uri.
      */
     String constraint;
     /**
@@ -64,12 +65,12 @@ public class DodsDataSource extends AbstractDataSource {
      * http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/polar/hyd_h0/1997/po_h0_hyd_19970102_v01.cdf.dds?ELECTRON_DIFFERENTIAL_ENERGY_FLUX
      *
      */
-    public DodsDataSource(URL url) throws IOException {
+    public DodsDataSource(URI uri) throws IOException {
 
-        super(url);
+        super(uri);
 
         // remove the .dds (or .html) extension.
-        String surl = url.toString();
+        String surl = uri.toString();
         int k= surl.lastIndexOf("?");
         int i = k==-1 ? surl.lastIndexOf('.')  : surl.lastIndexOf('.',k);
         sMyUrl = surl.substring(0, i);
@@ -208,7 +209,7 @@ public class DodsDataSource extends AbstractDataSource {
 
     @Override
     public MetadataModel getMetadataModel() {
-        if (url.toString().contains(".cdf.dds")) {
+        if (uri.toString().contains(".cdf.dds")) {
             return new IstpMetadataModel();
         } else {
             return super.getMetadataModel();

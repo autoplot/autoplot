@@ -11,6 +11,7 @@ package org.virbo.ascii;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,8 +37,8 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
     public AsciiTableDataSourceFactory() {
     }
 
-    public DataSource getDataSource(URL url) throws FileNotFoundException, IOException {
-        return new AsciiTableDataSource(url);
+    public DataSource getDataSource(URI uri) throws FileNotFoundException, IOException {
+        return new AsciiTableDataSource(uri);
     }
 
     public String editPanel(String surl) throws Exception {

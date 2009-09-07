@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Date;
 import java.util.Iterator;
@@ -45,8 +46,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private final static String PARAM_SCRIPT= "script";
     private static Logger logger= Logger.getLogger("vap.jythondatasource");
 
-    public JythonDataSource(URL url, JythonDataSourceFactory factory) {
-        super(url);
+    public JythonDataSource(URI uri, JythonDataSourceFactory factory) {
+        super(uri);
         addCability(Caching.class, this);
         this.listener = factory.listener;
 
@@ -75,8 +76,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         
         if ( params.get( PARAM_SCRIPT )!=null ) {
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
-            mon.setProgressMessage( "loading "+url );            
-            URLSplit split= URLSplit.parse(url.toString());
+            mon.setProgressMessage( "loading "+uri );
+            URLSplit split= URLSplit.parse(uri.toString());
             split.params= null;
             resourceURI= URLSplit.format(split);
 
@@ -139,8 +140,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
 
                 if (causedBy == null) {
-                    cacheDate = resourceDate(this.url);
-                    cacheUrl = cacheUrl(this.url);
+                    cacheDate = resourceDate(this.uri);
+                    cacheUrl = cacheUrl(this.uri);
                 }
             }
 
@@ -228,24 +229,24 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     
     PythonInterpreter interp = null;
 
-    private String cacheUrl(URL url) {
-        URLSplit split = URLSplit.parse(url.toString());
+    private String cacheUrl(URI uri) {
+        URLSplit split = URLSplit.parse(uri.toString());
         Map<String, String> params = URLSplit.parseParams(split.params);
         params.remove("arg_0");
         split.params = URLSplit.formatParams(params);
         return URLSplit.format(split);
     }
 
-    private Date resourceDate(URL url) throws IOException {
-        File src = DataSetURL.getFile(url, new NullProgressMonitor());
+    private Date resourceDate(URI uri) throws IOException {
+        File src = DataSetURL.getFile(uri, new NullProgressMonitor());
         return new Date(src.lastModified());
     }
     Date cacheDate = null;
     String cacheUrl = null;
 
-    private boolean useCache(URL url) {
+    private boolean useCache(URI uri) {
         try {
-            if ((cacheDate != null && !resourceDate(url).after(cacheDate)) && (cacheUrl != null && cacheUrl.equals(cacheUrl(url)))) {
+            if ((cacheDate != null && !resourceDate(uri).after(cacheDate)) && (cacheUrl != null && cacheUrl.equals(cacheUrl(uri)))) {
                 return true;
             }
             return false;
@@ -256,19 +257,19 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
     public boolean satisfies(String surl) {
         try {
-            return useCache(new URL(surl));
-        } catch (IOException ex) {
+            return useCache(new URI(surl));
+        } catch (URISyntaxException ex) {
             return false;
         }
     }
 
     public void resetURL(String surl) {
         try {
-            this.url = new URL(surl);
-            URLSplit split = URLSplit.parse(url.toString());
+            this.uri = new URI(surl);
+            URLSplit split = URLSplit.parse(uri.toString());
             params = URLSplit.parseParams(split.params);
-            resourceURL = new URL(split.file);
-        } catch (MalformedURLException ex) {
+            resourceURI = new URI(split.file);
+        } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
 

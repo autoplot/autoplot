@@ -6,6 +6,7 @@
 package org.virbo.datasource.wav;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +33,13 @@ import org.virbo.datasource.URLSplit;
  */
 public class WavDataSource2 extends AbstractDataSource {
 
-    public WavDataSource2(URL url) {
-        super(url);
+    public WavDataSource2(URI uri) {
+        super(uri);
     }
 
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        File wavFile = DataSetURL.getFile(this.url, mon);
+        File wavFile = DataSetURL.getFile(this.uri, mon);
 
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(wavFile);
         AudioFormat audioFormat = fileFormat.getFormat();
@@ -103,7 +104,7 @@ public class WavDataSource2 extends AbstractDataSource {
 
         URL lurl= new URL( ""+wavFile.toURI().toURL() + "?" + URLSplit.formatParams(params) );
 
-        BinaryDataSource bds= new BinaryDataSource( lurl );
+        BinaryDataSource bds= new BinaryDataSource( lurl.toURI() );
         MutablePropertyDataSet result= (BufferDataSet) bds.getDataSet( new NullProgressMonitor() );
 
         MutablePropertyDataSet timeTags= DataSetUtil.tagGenDataSet( frameCount, 0., 1./audioFormat.getSampleRate(), Units.seconds );
@@ -115,7 +116,7 @@ public class WavDataSource2 extends AbstractDataSource {
 
     @Override
     public Map<String,Object> getMetaData(ProgressMonitor mon) throws Exception {
-        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(resourceURL);
+        AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(resourceURI.toURL());
         AudioFormat audioFormat= fileFormat.getFormat();
         Map<String,Object> properties= new HashMap( audioFormat.properties() );
         properties.put( "encoding", audioFormat.getEncoding() );

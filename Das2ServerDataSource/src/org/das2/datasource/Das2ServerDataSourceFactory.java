@@ -7,6 +7,7 @@ package org.das2.datasource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,8 +27,8 @@ import org.virbo.datasource.URLSplit;
  */
 public class Das2ServerDataSourceFactory implements DataSourceFactory {
 
-    public DataSource getDataSource(URL url) throws Exception {
-        return new Das2ServerDataSource(url);
+    public DataSource getDataSource(URI uri) throws Exception {
+        return new Das2ServerDataSource(uri);
     }
     Map<String, List<String>> datasetsList = null;
 
