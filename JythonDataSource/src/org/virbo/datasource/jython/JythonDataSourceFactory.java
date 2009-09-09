@@ -88,10 +88,24 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
-        Map<String, Object> po = getNames( cc.resource, mon);
         List<CompletionContext> result = new ArrayList<CompletionContext>();
-        for (String n : po.keySet()) {
-            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
+        if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
+            String ext= cc.resource.toString();
+            int i= ext.lastIndexOf(".");
+            if ( i!=-1 ) ext= ext.substring(i+1);
+            if ( ext.equals(".jyds" ) || ext.equals("jy") || ext.equals("py") ) {
+                Map<String, Object> po = getNames( cc.resource, mon);
+                for (String n : po.keySet()) {
+                    result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
+                }
+            } else {
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "script=", "the name of the python script to run"));
+            }
+        } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
+            String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
+            if ( paramName.equals("script") ) {
+                //TODO: filesystem completions.
+            }
         }
         return result;
     }
