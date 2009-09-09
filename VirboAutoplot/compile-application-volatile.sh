@@ -162,13 +162,13 @@ fi
 echo "make jumbo jar files..."
 mkdir -p dist/
 cd temp-volatile-classes
-$JAVA5_HOME/bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotAllVolatile.jar *
+$JAVA5_HOME/bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotVolatile.jar *
 cd ..
 
 echo "done make jumbo jar files..."
 
 echo "sign the jar files..."
-$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotAllVolatile.jar virbo
+$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
 
 echo "create jnlp file for build..."
 cp src/autoplot_two_jar.jnlp dist
