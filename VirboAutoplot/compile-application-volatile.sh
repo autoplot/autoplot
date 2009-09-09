@@ -39,6 +39,7 @@ mkdir temp-volatile-classes
 
 echo "copy jar file classes..."
 wget -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar
+wget -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz
 echo "done copy jar file classes."
 
 echo "copy sources..."
@@ -181,6 +182,8 @@ $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/a
 echo "proguard/pack200 stuff..."
 $JAVA6_HOME/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 echo "done proguard/pack200 stuff."
+
+mv AutoplotStable.jar.pack.gz dist/
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
 cp src/htaccess.txt dist/
