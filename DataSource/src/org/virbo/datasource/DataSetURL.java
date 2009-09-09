@@ -8,6 +8,7 @@
  */
 package org.virbo.datasource;
 
+import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
@@ -65,7 +66,7 @@ public class DataSetURL {
         FileSystem.registerFileSystemFactory("zip", new zipfs.ZipFileSystemFactory());
         FileSystem.registerFileSystemFactory("ftp", new FTPBeanFileSystemFactory());
         // The following is commented out until the svn version of dasCore.jar is updated
-        //FileSystem.registerFileSystemFactory("sftp", new VFSFileSystemFactory());
+        FileSystem.registerFileSystemFactory("sftp", new VFSFileSystemFactory());
         FileSystem.settings().setPersistence(FileSystemSettings.Persistence.EXPIRES);
 
         if (DasApplication.hasAllPermission()) {
@@ -212,7 +213,9 @@ public class DataSetURL {
     }
 
     /**
-     * returns the URI to be interpretted by the DataSource.
+     * returns the URI to be interpretted by the DataSource.  For file-based
+     * data sources, this will probably be the filename plus server-side
+     * parameters, and can be converted to a URL.
      * @param uri, the URI understood in the context of all datasources.  This should contain "vap" or "vap+" for the scheme.
      * @return the URI for the datasource resource, or null if it is not valid.
      */
@@ -421,10 +424,22 @@ public class DataSetURL {
     }
 
     public static InputStream getInputStream(URI uri, ProgressMonitor mon) throws IOException {
-        FileSystem fs = FileSystem.create(uri);
-        String filename = uri.getPath();
-        FileObject fo = fs.getFileObject(filename);
-        return fo.getInputStream(mon);
+        URLSplit split = URLSplit.parse(uri.toString());
+        FileSystem fs;
+        try {
+            fs = FileSystem.create(new URI(split.path));
+            String filename = split.file.substring(split.path.length());
+            if (fs instanceof LocalFileSystem)
+                filename = DataSourceUtil.unescape(filename);
+            FileObject fo = fs.getFileObject(filename);
+            if (!fo.isLocal()) {
+                Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
+            }
+            return fo.getInputStream(mon);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(DataSetURL.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);  // shouldn't happen
+        }
     }
 
     /**
