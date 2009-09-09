@@ -179,10 +179,7 @@ echo $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace d
 $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 echo "proguard/pack200 stuff..."
-#proguard is compiled for Java 6.  This needs to be fixed.
-#$JAVA6_HOME/bin/java -jar ../APLibs/lib/proguard.jar @apApplicationAll.proguard
-#$JAVA6_HOME/bin/pack200 dist/AutoplotAll.pro.jar.pack.gz dist/AutoplotAll.pro.jar
-$JAVA6_HOME/bin/pack200 dist/AutoplotAllVolatile.jar.pack.gz dist/AutoplotAllVolatile.jar
+$JAVA6_HOME/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 echo "done proguard/pack200 stuff."
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
