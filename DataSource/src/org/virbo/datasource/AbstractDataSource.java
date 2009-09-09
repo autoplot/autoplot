@@ -22,6 +22,11 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.capability.Updating;
 
 /**
+ * Base class for file-based DataSources that keeps track of the uri, makes
+ * the parameters available, manages capabilities and has do-nothing
+ * implementations for rarely-used methods of DataSource.
+ *
+ * Also this provides the filePollUpdating parameter and Updating capability.
  *
  * @author jbf
  */
@@ -33,6 +38,19 @@ public abstract class AbstractDataSource implements DataSource {
      * without the parameters.
      */
     protected URI resourceURI;
+
+    public AbstractDataSource(java.net.URI uri) {
+        try {
+            this.uri = uri;
+            String s = uri.toString();
+            URLSplit split = URLSplit.parse(s);
+
+            params = URLSplit.parseParams(split.params);
+            resourceURI = new URI(split.file);
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 
     /**
      * returns the uri's canonical extension for convenience.
@@ -73,19 +91,6 @@ public abstract class AbstractDataSource implements DataSource {
      * available to subclasses for convenience.  
      */
     protected Map<String, String> params;
-
-    public AbstractDataSource(java.net.URI uri) {
-        try {
-            this.uri = uri;
-            String s = uri.toString();
-            URLSplit split = URLSplit.parse(s);
-
-            params = URLSplit.parseParams(split.params);
-            resourceURI = new URI(split.file);
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
 
     public abstract QDataSet getDataSet(ProgressMonitor mon) throws Exception;
 
