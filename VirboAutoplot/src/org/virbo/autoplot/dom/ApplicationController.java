@@ -347,15 +347,15 @@ public class ApplicationController extends DomNodeController implements RunLater
         return plot;
     }
 
-    public void plot(Plot plot, Panel panel, String secondaryUri, String teriaryUri, String primaryUri) {
+    public void doplot(Plot plot, Panel panel, String secondaryUri, String teriaryUri, String primaryUri) {
         support.plot(plot, panel, secondaryUri, teriaryUri, primaryUri);
     }
 
-    public void plot(Plot plot, Panel panel, String secondaryUri, String primaryUri) {
+    public void doplot(Plot plot, Panel panel, String secondaryUri, String primaryUri) {
         support.plot(plot, panel, secondaryUri, primaryUri);
     }
 
-    public void plot(Plot plot, Panel panel, String primaryUri) {
+    public void doplot(Plot plot, Panel panel, String primaryUri) {
         support.plot(plot, panel, primaryUri);
     }
 
@@ -763,7 +763,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * copy plot and panels into a new plot.
+     * copy doplot and panels into a new doplot.
      * @param domPlot
      * @param dsf
      * @return
