@@ -39,7 +39,7 @@
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="AutoplotVolatile.jar" />
-        <jar href="#{codebase}/../autoplot-jar-stable/lastStableBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
+        <jar href="#{codebase}../../../../../autoplot-jar-stable/lastStableBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
                 
         <!-- cdf -->
         <jar href="http://www.autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
