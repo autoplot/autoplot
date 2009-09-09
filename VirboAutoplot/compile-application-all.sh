@@ -34,6 +34,12 @@ for i in ../../APLibs/lib/netCDF/*.jar; do
    echo jar xf $i
    jar xf $i
 done
+
+for i in ../../APLibs/lib/commons/*.jar; do
+   echo jar xf $i
+   jar xf $i
+done
+
 cd ..
 echo "done copy jar file classes."
 
