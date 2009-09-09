@@ -83,6 +83,9 @@ $JAVA5_HOME/bin/jar cf ../dist/AutoplotStable.jar *
 cd ..
 echo "done make jumbo jar file..."
 
+echo "sign the jar files..."
+$JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotStable.jar virbo
+
 echo "proguard/pack200 stuff..."
 $JAVA6_HOME/bin/pack200 dist/AutoplotStable.jar.pack.gz dist/AutoplotStable.jar
 echo "done proguard/pack200 stuff."
