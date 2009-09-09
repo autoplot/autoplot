@@ -5,7 +5,7 @@
 
 package org.virbo.asdatasource;
 
-import java.net.URL;
+import java.net.URI;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.DataSource;
 
@@ -16,8 +16,8 @@ import org.virbo.datasource.DataSource;
 public class AudioSystemDataSourceFactory extends AbstractDataSourceFactory {
 
     @Override
-    public DataSource getDataSource(URL url) throws Exception {
-        return new AudioSystemDataSource(url);
+    public DataSource getDataSource(URI uri) throws Exception {
+        return new AudioSystemDataSource(uri);
     }
 
 }

@@ -7,7 +7,7 @@ package org.virbo.asdatasource;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
@@ -35,8 +35,8 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
     public static final double LEN_SECONDS = 1.0;
     public static final int SAMPLE_RATE = 8000; // SAMPLE_RATE * SAMPLE_LENGTH_SEC should be multiple of BUFSIZE
 
-    public AudioSystemDataSource(URL url) {
-        super(url);
+    public AudioSystemDataSource( URI uri ) {
+        super(uri);
         String sspec= (String) getParams().get("spec");
         if ( sspec!=null ) spec= Integer.parseInt(sspec);
         addCability( Updating.class, this );
