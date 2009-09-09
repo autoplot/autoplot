@@ -27,6 +27,7 @@ echo "done copy sources"
 
 cd temp-classes
 jar xvf ../../APLibs/lib/beansbinding-1.2.1.jar
+jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support for applet
 #jar xvf ../../APLibs/lib/swing-layout-1.0.3.jar
 
 cd ../temp-src
