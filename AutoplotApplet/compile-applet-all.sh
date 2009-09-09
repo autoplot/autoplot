@@ -102,6 +102,16 @@ $JAVA6_HOME/bin/pack200 dist/AutoplotAppletAll.jar.pack.gz dist/AutoplotAppletAl
 
 echo "copy example html."
 cp src/AutoplotApplet.html dist/
+cp src/AutoplotAppletAurora.html dist/
+
+if [ "" != "$EXAMPLE_URI" ]; then
+   cd temp-src
+   echo $JAVA5_HOME/bin/javac -d ../temp-classes external/FileSearchReplace.java
+   $JAVA5_HOME/bin/javac -d ../temp-classes external/FileSearchReplace.java
+   cd ..
+   echo $JAVA5_HOME/bin/java -cp temp-classes external.FileSearchReplace dist/AutoplotApplet.html 'http://www.sarahandjeremy.net/jeremy/data/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14' $EXAMPLE_URI
+   $JAVA5_HOME/bin/java -cp temp-classes external.FileSearchReplace dist/AutoplotApplet.html 'http://www.sarahandjeremy.net/jeremy/data/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14' $EXAMPLE_URI
+fi
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pro.jar.pack.gz."
 cp src/htaccess.txt dist/
