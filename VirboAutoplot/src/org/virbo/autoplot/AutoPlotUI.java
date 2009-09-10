@@ -1143,6 +1143,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
         autoLayoutCheckBoxMenuItem.setSelected(true);
         autoLayoutCheckBoxMenuItem.setText("AutoLayout");
         autoLayoutCheckBoxMenuItem.setToolTipText("<html><p>Allow the application to reposition axes so labels are not clipped and unused space is reduced.  </P><p>Axes can be positioned manually by turning off this option, then hold shift down to enable plot corner drag anchors.</p></html>");
+        autoLayoutCheckBoxMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                autoLayoutCheckBoxMenuItemActionPerformed(evt);
+            }
+        });
         jMenu4.add(autoLayoutCheckBoxMenuItem);
 
         optionsMenu.add(jMenu4);
@@ -1450,6 +1455,12 @@ private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
     }
 }//GEN-LAST:event_jMenuItem6ActionPerformed
+
+private void autoLayoutCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoLayoutCheckBoxMenuItemActionPerformed
+    if ( autoLayoutCheckBoxMenuItem.isSelected() ) {
+        dom.getController().doAutoLayout();
+    }
+}//GEN-LAST:event_autoLayoutCheckBoxMenuItemActionPerformed
 
 private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {

@@ -295,6 +295,9 @@
                     <Property name="text" type="java.lang.String" value="AutoLayout"/>
                     <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&lt;p&gt;Allow the application to reposition axes so labels are not clipped and unused space is reduced.  &lt;/P&gt;&lt;p&gt;Axes can be positioned manually by turning off this option, then hold shift down to enable plot corner drag anchors.&lt;/p&gt;&lt;/html&gt;"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autoLayoutCheckBoxMenuItemActionPerformed"/>
+                  </Events>
                 </MenuItem>
               </SubComponents>
             </Menu>
