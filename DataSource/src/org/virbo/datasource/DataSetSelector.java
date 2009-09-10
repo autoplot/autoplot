@@ -54,6 +54,7 @@ import org.virbo.datasource.DataSetURL.CompletionResult;
  * @author  jbf
  */
 public class DataSetSelector extends javax.swing.JPanel {
+    public static final String PROP_RECENT = "recent";
 
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
@@ -856,7 +857,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
             //dataSetSelector.setSelectedItem(value); causes event to fire
         }
         support.refreshRecentFilesMenu();
-        firePropertyChange("recent", oldRecent, recent);
+        firePropertyChange( PROP_RECENT, oldRecent, recent);
     }
     /**
      * Holds value of property message.
