@@ -284,6 +284,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         if (split.carotPos > split.file.length() && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
             showFactoryCompletions(URLSplit.format(split), split.formatCarotPos);
 
+        } else if ( carotpos==0 || surl.substring(0,carotpos).startsWith("vap") ) {
+            showTypesCompletions( surl, carotpos );
+            
         } else {
 
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
@@ -297,13 +300,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     }
 
-    /**
-     * create completions on hostnames based on cached resources.
-     * @param surl
-     * @param carotpos
-     */
-    private void showHostCompletions(final String surl, final int carotpos) {
-
+    private void calcAndShowCompletions( Runnable run ) {
         if (completionsRunnable != null) {
             completionsMonitor.cancel();
             completionsRunnable = null;
@@ -311,14 +308,99 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         completionsMonitor = getMonitor();
         completionsMonitor.setLabel("getting completions");
-        completionsRunnable = new Runnable() {
+
+        completionsRunnable= run;
+
+        new Thread(completionsRunnable, "completionsThread").start();
+    }
+
+    private void showCompletionsGui( final String labelPrefix, List<CompletionResult> completions ) {
+
+        CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
+
+            public void itemSelected(CompletionResult s1) {
+                dataSetSelector.setSelectedItem(s1.completion);
+                if (s1.maybePlot) {
+                    maybePlot(false);
+                }
+            }
+        };
+
+        completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JPopupMenu(), listener);
+
+        setMessage("done getting completions");
+
+        SwingUtilities.invokeLater(new Runnable() {
+
+            public void run() {
+                try {
+                    int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
+                    BoundedRangeModel model = editor.getHorizontalVisibility();
+
+                    int xpos = xpos2 - model.getValue();
+                    xpos = Math.min(model.getExtent(), xpos);
+
+                    completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
+                    completionsRunnable = null;
+                } catch (NullPointerException ex) {
+                    ex.printStackTrace(); // TODO: look into this
+
+                }
+            }
+        } );
+
+    }
+
+/**
+     * create completions on hostnames based on cached resources.
+     * @param surl
+     * @param carotpos
+     */
+    private void showTypesCompletions(final String surl, final int carotpos) {
+
+        calcAndShowCompletions( new Runnable() {
+
+            public void run() {
+
+                List<CompletionContext> exts= DataSourceRegistry.getPlugins();
+
+                List<CompletionResult> completions = new ArrayList();
+
+                String prefix= surl.substring(0,carotpos);
+                String suffix = "";
+                if ( surl.startsWith("vap:") ) {
+                    suffix= surl.substring( 4 );
+                }
+
+                for ( CompletionContext cc: exts ) {
+                    if ( cc.completable.startsWith(prefix) ) {
+                        completions.add( new CompletionResult( cc.completable + suffix, cc.completable, null, cc.completable, false ) );
+                    }
+                }
+
+                String labelPrefix= "";
+
+                showCompletionsGui( labelPrefix, completions );
+            }
+        } );
+
+    }
+
+    /**
+     * create completions on hostnames based on cached resources.
+     * @param surl
+     * @param carotpos
+     */
+    private void showHostCompletions(final String surl, final int carotpos) {
+
+        calcAndShowCompletions( new Runnable() {
 
             public void run() {
                 ProgressMonitor mon = getMonitor();
 
                 List<CompletionResult> completions = null;
 
-                URLSplit split = DataSetURL.parse(surl);
+                URLSplit split = URLSplit.parse(surl);
                 String surlDir = split.path;
 
                 final String labelPrefix = surlDir;
@@ -331,55 +413,15 @@ public class DataSetSelector extends javax.swing.JPanel {
                     return;
                 }
 
-                CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
-
-                    public void itemSelected(CompletionResult s1) {
-                        dataSetSelector.setSelectedItem(s1.completion);
-                        if (s1.maybePlot) {
-                            maybePlot(false);
-                        }
-                    }
-                };
-
-                completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JPopupMenu(), listener);
-
-                setMessage("done getting completions");
-
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        try {
-                            int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
-                            BoundedRangeModel model = editor.getHorizontalVisibility();
-
-                            int xpos = xpos2 - model.getValue();
-                            xpos = Math.min(model.getExtent(), xpos);
-
-                            completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
-                            completionsRunnable = null;
-                        } catch (NullPointerException ex) {
-                            ex.printStackTrace(); // TODO: look into this
-
-                        }
-                    }
-                });
-
+                showCompletionsGui( labelPrefix, completions );
             }
-        };
+        } );
 
-        new Thread(completionsRunnable, "completionsThread").start();
     }
 
     private void showFileSystemCompletions(final String surl, final int carotpos) {
 
-        if (completionsRunnable != null) {
-            completionsMonitor.cancel();
-            completionsRunnable = null;
-        }
-
-        completionsMonitor = getMonitor();
-        completionsMonitor.setLabel("getting completions");
-        completionsRunnable = new Runnable() {
+        calcAndShowCompletions( new Runnable() {
 
             public void run() {
                 ProgressMonitor mon = getMonitor();
@@ -402,57 +444,16 @@ public class DataSetSelector extends javax.swing.JPanel {
                     return;
                 }
 
-                CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
-
-                    public void itemSelected(CompletionResult s1) {
-                        dataSetSelector.setSelectedItem(s1.completion);
-                        if (s1.maybePlot) {
-                            maybePlot(false);
-                        }
-                    }
-                };
-
-                completionsPopupMenu = CompletionsList.fillPopupNew(completions, labelPrefix, new JPopupMenu(), listener);
-
-                setMessage("done getting completions");
-
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        try {
-
-                            int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(labelPrefix);
-                            BoundedRangeModel model = editor.getHorizontalVisibility();
-
-                            int xpos = xpos2 - model.getValue();
-                            xpos = Math.min(model.getExtent(), xpos);
-
-                            completionsPopupMenu.show(dataSetSelector, xpos, dataSetSelector.getHeight());
-                            completionsRunnable = null;
-                        } catch (NullPointerException ex) {
-                            ex.printStackTrace(); // TODO: look into this
-
-                        }
-                    }
-                });
+                showCompletionsGui( labelPrefix, completions );
 
             }
-        };
+        } );
 
-        new Thread(completionsRunnable, "completionsThread").start();
     }
 
     private void showFactoryCompletions(final String surl, final int carotpos) {
 
-        if (completionsRunnable != null) {
-            System.err.println("cancel existing completion task");
-            completionsMonitor.cancel();
-            completionsRunnable = null;
-        }
-
-        completionsMonitor = getMonitor();
-        completionsMonitor.setLabel("getting completions");
-        completionsRunnable = new Runnable() {
+        calcAndShowCompletions( new Runnable() {
 
             public void run() {
 
@@ -466,47 +467,19 @@ public class DataSetSelector extends javax.swing.JPanel {
                     return;
                 }
 
-                int i = surl.indexOf('?');
-                final String labelPrefix = (i == -1) ? "" : surl.substring(0, i + 1);
+                int n = Math.min( carotpos, editor.getText().length() );
+                String labelPrefix;
+                try {
+                    labelPrefix = editor.getText(0, n);
+                } catch (BadLocationException ex) {
+                    throw new RuntimeException(ex);
+                }
 
-                CompletionsList.CompletionListListener listener = new CompletionsList.CompletionListListener() {
-
-                    public void itemSelected(CompletionResult s1) {
-                        dataSetSelector.setSelectedItem(s1.completion);
-                        if (s1.maybePlot) {
-                            maybePlot(false);
-                        }
-                    }
-                };
-
-                completionsPopupMenu = CompletionsList.fillPopupNew(completions2, labelPrefix, new JPopupMenu(), listener);
-
-                SwingUtilities.invokeLater(new Runnable() {
-
-                    public void run() {
-                        try {
-                            double xpos;
-                            //int n = editor.getCaretPosition();
-                            int n = Math.min(carotpos, editor.getText().length());
-                            String t = editor.getText(0, n);
-                            int xpos2 = editor.getGraphics().getFontMetrics().stringWidth(t);
-
-                            BoundedRangeModel model = editor.getHorizontalVisibility();
-                            xpos = xpos2 - model.getValue();
-                            xpos = Math.min(model.getExtent(), xpos);
-                            completionsPopupMenu.show(dataSetSelector, (int) xpos, dataSetSelector.getHeight());
-                            completionsRunnable = null;
-                        } catch (BadLocationException ex) {
-                            Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-
-                    }
-                });
+                showCompletionsGui(labelPrefix, completions2);
 
             }
-        };
+        } );
 
-        new Thread(completionsRunnable, "completionsThread").start();
     }
 
     /**
@@ -684,14 +657,18 @@ public class DataSetSelector extends javax.swing.JPanel {
         final String context = (String) dataSetSelector.getSelectedItem();
 
         String ext = DataSetURL.getExt(context);
-        if ((!context.contains("/?") && context.contains("?")) || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
+
+        if ( context.trim().length()==0 || context.trim().equals("vap+") ) {
+            showCompletions();
+
+        } else if ((!context.contains("/?") && context.contains("?")) || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
             browseSourceType();
 
         } else {
             final URLSplit split = URLSplit.parse(context);
             if ( split.scheme.equals("file") || split.scheme.equals("http") || split.scheme.equals("https") || split.scheme.equals("ftp")) {
                 try {
-                    if (FileSystemUtil.resourceExists(context)) {
+                    if (FileSystemUtil.resourceExists(context)  && FileSystemUtil.resourceIsFile(context) ) {
                         if ( !FileSystemUtil.resourceIsLocal(context) ) {
                             Runnable run= new Runnable() {
                                 public void run() {

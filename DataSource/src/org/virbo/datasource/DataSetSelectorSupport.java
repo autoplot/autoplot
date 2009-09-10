@@ -149,4 +149,8 @@ public class DataSetSelectorSupport {
         }
         return recentMenu;
     }
+
+    protected void browseSourceTypes() {
+        
+    }
 }

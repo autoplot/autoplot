@@ -279,5 +279,15 @@ public class DataSourceRegistry {
         buf.append("</html>");
         return buf.toString();
     }
-    
+
+    public static List<CompletionContext> getPlugins() {
+        List<CompletionContext> result= new ArrayList();
+
+        Map m = DataSourceRegistry.getInstance().dataSourcesByExt;
+        for (Object k : m.keySet()) {
+            result.add( new CompletionContext( CompletionContext.CONTEXT_AUTOPLOT_SCHEME, "vap+"+k.toString().substring(1)+":" ) );
+        }
+        return result;
+    }
+
 }

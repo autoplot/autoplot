@@ -78,6 +78,16 @@ public class FileSystemUtil {
         }
     }
 
+    static boolean resourceIsFile(String context) throws FileSystemOfflineException, URISyntaxException {
+        URLSplit split= URLSplit.parse(context);
+        FileSystem fs= FileSystem.create( new URI( split.path ) );
+        if ( fs.getFileObject(split.file.substring(split.path.length())).isData() ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
     
 }

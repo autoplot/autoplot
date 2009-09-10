@@ -551,10 +551,17 @@ public class DataSetURL {
             this(completion, null, doc, null, false);
         }
 
+        /**
+         * @param completion
+         * @param label the presentation string
+         * @param doc a descriptive string, for example used in a tooltip
+         * @param completable the string that is being completed. (not used)
+         * @param maybePlot true indicates accepting the completion should result in a valid URI.
+         */
         protected CompletionResult(String completion, String label, String doc, String completable, boolean maybePlot) {
             this.completion = completion;
             this.completable = completable;
-            this.label = label == null ? completable : label;
+            this.label = label != null ? label : ( completable!= null ? completable : completion );
             this.doc = doc;
             this.maybePlot = maybePlot;
         }
