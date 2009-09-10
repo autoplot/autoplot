@@ -8,11 +8,9 @@ package org.virbo.datasource;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.Window;
-import java.net.MalformedURLException;
 import org.das2.DasApplication;
 import java.util.logging.Level;
 import javax.swing.text.BadLocationException;
-import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -44,11 +42,9 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import org.das2.DasException;
 import org.das2.components.DasProgressPanel;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
-import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.DataSetURL.CompletionResult;
 
@@ -135,6 +131,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                 action.actionPerformed(new ActionEvent(this, 123, "dataSetSelect"));
                 return;
             }
+        }
+
+        if ( !enableDataSource ) { // just fire off an event, don't validate it or do completions.
+            firePlotDataSetURL();
+            return;
         }
 
         try {
@@ -280,7 +281,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void showCompletions(final String surl, final int carotpos) {
-        URLSplit split = URLSplit.parse(surl, carotpos);
+        URLSplit split = URLSplit.parse(surl, carotpos, true);
         if (split.carotPos > split.file.length() && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
             showFactoryCompletions(URLSplit.format(split), split.formatCarotPos);
 
@@ -288,7 +289,10 @@ public class DataSetSelector extends javax.swing.JPanel {
             showTypesCompletions( surl, carotpos );
             
         } else {
-
+            if ( !enableDataSource ) {
+                split.formatCarotPos= split.formatCarotPos - split.vapScheme.length() - 1;
+                split.vapScheme=null;
+            }
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
             if (split.carotPos <= firstSlashAfterHost) {
                 showHostCompletions(URLSplit.format(split), split.formatCarotPos);
@@ -658,10 +662,10 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         String ext = DataSetURL.getExt(context);
 
-        if ( context.trim().length()==0 || context.trim().equals("vap+") ) {
+        if ( enableDataSource && ( context.trim().length()==0 || context.trim().equals("vap+") ) ) {
             showCompletions();
 
-        } else if ((!context.contains("/?") && context.contains("?")) || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null) {
+        } else if ( enableDataSource &&  ( (!context.contains("/?") && context.contains("?")) || DataSourceRegistry.getInstance().dataSourcesByExt.get(ext) != null ) ) {
             browseSourceType();
 
         } else {
@@ -906,4 +910,26 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     public JMenu getRecentMenu() {
         return support.recentMenu();
     }
+
+    /**
+     * allows the dataSetSelector to be used to select files.
+     * @param b
+     */
+    public void setDisableDataSources(boolean b) {
+        this.enableDataSource= !b;
+    }
+
+    protected boolean enableDataSource = true;
+    public static final String PROP_ENABLEDATASOURCE = "enableDataSource";
+
+    public boolean isEnableDataSource() {
+        return enableDataSource;
+    }
+
+    public void setEnableDataSource(boolean enableDataSource) {
+        boolean oldEnableDataSource = this.enableDataSource;
+        this.enableDataSource = enableDataSource;
+        firePropertyChange(PROP_ENABLEDATASOURCE, oldEnableDataSource, enableDataSource);
+    }
+
 }
