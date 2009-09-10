@@ -55,6 +55,7 @@ import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.Row;
+import org.virbo.autoplot.layout.LayoutUtil;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURL;
@@ -610,6 +611,18 @@ public class ApplicationModel {
 
     void doOpen(File f) throws IOException {
         doOpen(f,null);
+    }
+
+    /**
+     * trigger autolayout, which adjusts the margins so that labels aren't cut off.  Note
+     * LayoutListener has similar code.
+     */
+    public void doAutoLayout() {
+        ApplicationModel model= this;
+        ApplicationController applicationController= this.getDocumentModel().getController();
+        model.dom.getController().getCanvas().getController().performingChange(this,LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
+        LayoutUtil.autolayout( applicationController.getDasCanvas(), applicationController.getRow(), applicationController.getColumn() );
+        model.dom.getController().getCanvas().getController().changePerformed(this,LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
     }
 
     /**

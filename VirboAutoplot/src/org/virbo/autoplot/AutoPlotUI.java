@@ -1458,7 +1458,7 @@ private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 private void autoLayoutCheckBoxMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoLayoutCheckBoxMenuItemActionPerformed
     if ( autoLayoutCheckBoxMenuItem.isSelected() ) {
-        dom.getController().doAutoLayout();
+        applicationModel.doAutoLayout();
     }
 }//GEN-LAST:event_autoLayoutCheckBoxMenuItemActionPerformed
 

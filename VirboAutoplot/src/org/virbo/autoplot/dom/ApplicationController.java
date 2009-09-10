@@ -1650,13 +1650,4 @@ public class ApplicationController extends DomNodeController implements RunLater
         };
     }
 
-    public void doAutoLayout() {
-        getCanvas().getController().performingChange( this, LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
-        getDasCanvas().performingChange( this, LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
-        LayoutUtil.autolayout( getDasCanvas(), getRow(), getColumn() );
-        getDasCanvas().changePerformed( this, LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
-        getCanvas().getController().changePerformed( this, LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
-
-    }
-
 }
