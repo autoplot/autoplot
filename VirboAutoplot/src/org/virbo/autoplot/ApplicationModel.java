@@ -73,6 +73,7 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class ApplicationModel {
+    public static final String PREF_RECENT = "recent";
 
     DasApplication application;
     DasCanvas canvas;
@@ -104,7 +105,7 @@ public class ApplicationModel {
      */
     public static final String PROPERTY_FILL = "fill";
     public static final String PROPERTY_FILE = "file";
-    public static final String PROPERTY_RECENT = "recent";
+    public static final String PROPERTY_RECENT = PREF_RECENT;
     public static final String PROPERTY_BOOKMARKS = "bookmarks";
     private static final int MAX_RECENT = 20;
 
@@ -309,7 +310,7 @@ public class ApplicationModel {
     public List<Bookmark> getRecent() {
         if (recent != null) return recent;
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        String srecent = prefs.get("recent", "");
+        String srecent = prefs.get(PREF_RECENT,"");
 
         if (srecent.equals("") || !srecent.startsWith("<")) {
             String srecenturl = AutoplotUtil.getProperty("autoplot.default.recent", "http://www.cottagesystems.com/virbo/apps/autoplot/recent.xml");
@@ -317,7 +318,7 @@ public class ApplicationModel {
                 try {
                     URL url = new URL(srecenturl);
                     recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(url.openStream()).getDocumentElement());
-                    prefs.put("recent", Bookmark.formatBooks(recent));
+                    prefs.put(PREF_RECENT, Bookmark.formatBooks(recent));
                     try {
                         prefs.flush();
                     } catch (BackingStoreException ex) {
@@ -422,7 +423,7 @@ public class ApplicationModel {
             newValue.remove(0);
             s = Bookmark.formatBooks(newValue);
         }
-        prefs.put("recent", s);
+        prefs.put( PREF_RECENT, s);
 
         try {
             prefs.flush();
