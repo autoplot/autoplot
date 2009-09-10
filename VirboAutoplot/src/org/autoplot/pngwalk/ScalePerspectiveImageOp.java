@@ -62,7 +62,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         if ( p!=0 ) {
             this.ssy= 1;
         } else {
-            this.ssy= h / h1;
+            this.ssy= Math.max( 1, h / h1 );
         }
     }
 
