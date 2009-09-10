@@ -255,6 +255,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                 dataSetSelector.setSelectedItem(edit.getUrl());
                 keyModifiers = dialog.getModifiers();
                 maybePlot(true);
+            } else {
+                setMessage("editor cancelled");
             }
 
         } else {
