@@ -258,7 +258,7 @@ public class DataSetURL {
      * @return
      */
     static String newUri(String context, String newUri) {
-        URLSplit scontext = URLSplit.parse(context);
+        URLSplit scontext = URLSplit.parse(context,0,false);
         URLSplit newURLSplit = URLSplit.parse(newUri);
         if (newURLSplit.file != null && !newURLSplit.file.equals(""))
             scontext.file = newURLSplit.file;
@@ -568,7 +568,7 @@ public class DataSetURL {
     }
 
     public static List<CompletionResult> getCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws Exception {
-        URLSplit split = URLSplit.parse(surl, carotpos);
+        URLSplit split = URLSplit.parse(surl, carotpos, true);
         if (split.file == null || (split.carotPos > split.file.length()) && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
             return getFactoryCompletions(URLSplit.format(split), split.formatCarotPos, mon);
         } else {
@@ -633,7 +633,7 @@ public class DataSetURL {
     }
 
     public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException, URISyntaxException {
-        URLSplit split = URLSplit.parse(surl.substring(0, carotpos));
+        URLSplit split = URLSplit.parse(surl.substring(0, carotpos),carotpos,false);
         String prefix = URLSplit.uriDecode(split.file.substring(split.path.length()));
         String surlDir = URLSplit.uriDecode(split.path);
         String params = null; // possibly the params, not with question mark.
