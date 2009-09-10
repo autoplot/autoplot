@@ -55,6 +55,7 @@ import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
@@ -663,7 +664,9 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
 
             public void actionPerformed(ActionEvent e) {
+                BindingModel[] bms= controller.getBindingsFor(axis);
                 controller.unbind(axis);  // TODO: check for application timerange
+                controller.setStatus("removed "+bms.length+" bindings");
             }
         });
         item.setToolTipText("remove any plot and panel property bindings");
