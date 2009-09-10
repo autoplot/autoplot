@@ -511,7 +511,7 @@ public class DataSetURL {
         surl = surl.replaceAll("%([^0-9])", "%25$1");
         surl = surl.replaceAll("<", "%3C");
         surl = surl.replaceAll(">", "%3E");
-        surl = surl.replaceAll(" ", "+");
+        surl = surl.replaceAll(" ", "%20"); // drop the spaces are pluses in filenames.
         //}
         surl = URLSplit.format(URLSplit.parse(surl)); // add "vap:" if it's not there
         URI result = new URI(surl);
