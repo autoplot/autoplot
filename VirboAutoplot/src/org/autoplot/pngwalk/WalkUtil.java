@@ -88,7 +88,7 @@ public class WalkUtil {
         if ( fsm!=null ) {
             ss= fsm.getNamesFor(dr);
         } else {
-            if ( spec.substring(1).contains("/") ) throw new IllegalArgumentException("nested wildcards (*/*) not supported");
+            if ( spec.length()>0 && spec.substring(1).contains("/") ) throw new IllegalArgumentException("nested wildcards (*/*) not supported");
             ss= fs.listDirectory( "/", spec );
         }
 
