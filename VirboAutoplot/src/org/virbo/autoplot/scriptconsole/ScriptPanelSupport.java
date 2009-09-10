@@ -35,6 +35,7 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURL;
 import org.das2.util.filesystem.WebFileSystem;
+import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyException;
 import org.python.core.PyInteger;
 import org.python.core.PySyntaxError;
@@ -289,10 +290,11 @@ public class ScriptPanelSupport {
                             if (file != null && file.canWrite() ) {
                                 save();
                             }
+                            ProgressMonitor mon= DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
                             try {
                                 PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
                                 interp.set("dom", model.getDocumentModel() );
-                                interp.set("monitor", DasProgressPanel.createComponentPanel(model.getCanvas(),"running script") );
+                                interp.set("monitor", mon );
                                 boolean dirty0 = panel.isDirty();
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
@@ -323,12 +325,16 @@ public class ScriptPanelSupport {
                                 } else {
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
+                                mon.finished();
                                 applicationController.setStatus("done executing script");
                             } catch (IOException ex) {
+                                mon.finished();
                                 Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
                                 applicationController.setStatus("error: I/O exception: " + ex.toString());
                             } catch (PyException ex) {
+                                mon.finished();
                                 annotateError(ex, offset);
+
                                 ex.printStackTrace();
                                 applicationController.setStatus("error: " + ex.toString());
                             }
