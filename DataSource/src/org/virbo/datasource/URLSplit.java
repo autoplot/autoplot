@@ -145,7 +145,7 @@ public class URLSplit {
      *   params, myVariable or null
      */
     public static URLSplit parse(String surl) {
-        return parse(surl, 0);
+        return parse(surl, 0, true);
     }
 
     /**
@@ -169,7 +169,7 @@ public class URLSplit {
      * valid, then this will be set as well.  surl may be modified.
      * @param result
      */
-    private static void parseScheme(URLSplit result) throws URISyntaxException {
+    private static void parseScheme(URLSplit result, boolean normalize) throws URISyntaxException {
         String surl = result.surl;
         int h = surl.indexOf(":"); // "c:" should be "file:///c:"
 
@@ -201,7 +201,7 @@ public class URLSplit {
                     // do nothing, this field may be null.
                 }
             } else {
-                if (result.vapScheme == null) {
+                if (result.vapScheme == null && normalize ) {
                     result.vapScheme = "vap";
                     result.formatCarotPos = result.carotPos + 4;
                 }
@@ -224,24 +224,28 @@ public class URLSplit {
      * get mime type.  This inserts the scheme "file://" when the scheme is 
      * absent.
      * The string http://www.example.com/data/myfile.nc?myVariable is split into:
+     *   vapScheme, vap+nc
      *   scheme, http
      *   authority, http://www.example.com
      *   path, the directory with http://www.example.com/data/
      *   file, the file, http://www.example.com/data/myfile.nc
      *   ext, the extenion, .nc
      *   params, myVariable or null
+     * @param surl  the string to parse
+     * @param carotPos the position of the carot, the relative position will be preserved through normalization in formatCarotPos
+     * @param normalize normalize the surl by adding implicit "vap", etc.
      */
-    public static URLSplit parse(String surl, int carotPos) {
+    public static URLSplit parse( String surl, int carotPos , boolean normalize) {
         URLSplit result = maybeAddFile(surl, carotPos);
 
         try {
             if ( result.vapScheme==null || !result.vapScheme.equals("vap+internal") ) {
-                parseScheme(result);
+                parseScheme(result, normalize);
             }
         } catch (URISyntaxException ex) {
             result.surl = uriEncode(result.surl); //TODO: move carotPos
             try {
-                parseScheme(result);
+                parseScheme(result, normalize);
             } catch (URISyntaxException ex1) {
                 throw new RuntimeException(ex1);
             }
@@ -389,7 +393,9 @@ public class URLSplit {
 
     public static String format(URLSplit split) {
         String surl;
-        String result = split.vapScheme + ":" + split.file;
+        String result = "";
+        if ( split.vapScheme!=null ) result= result + split.vapScheme + ":";
+        result= result + split.file;
         if (split.params != null) {
             result += "?" + split.params;
         }
