@@ -25,7 +25,7 @@ public class LayoutListener implements PropertyChangeListener {
     ApplicationModel model;  
     Timer t;
     static Logger logger = Logger.getLogger("virbo.autoplot.autolayout");
-    private static final String PENDING_CHANGE_AUTOLAYOUT= "autolayout";
+    public static final String PENDING_CHANGE_AUTOLAYOUT= "autolayout";
 
     public LayoutListener(ApplicationModel model) {
         this.model = model;
@@ -53,12 +53,7 @@ public class LayoutListener implements PropertyChangeListener {
                         public synchronized void actionPerformed(ActionEvent e) {
                             logger.fine("do autolayout");
                             ApplicationController applicationController= model.getDocumentModel().getController();
-                            model.dom.getController().getCanvas().getController().performingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
-                            model.canvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
-                            LayoutUtil.autolayout( applicationController.getDasCanvas(), 
-                                    applicationController.getRow(), applicationController.getColumn() );
-                            model.canvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
-                            model.dom.getController().getCanvas().getController().changePerformed(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                            applicationController.doAutoLayout();
                         }
                     });
                     t.setRepeats(false);

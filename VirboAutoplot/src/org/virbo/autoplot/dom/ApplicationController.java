@@ -52,6 +52,7 @@ import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.layout.LayoutConstants;
+import org.virbo.autoplot.layout.LayoutUtil;
 import org.virbo.autoplot.util.RunLaterListener;
 
 /**
@@ -1647,6 +1648,15 @@ public class ApplicationController extends DomNodeController implements RunLater
                 return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(getDasCanvas(), label, description);
             }
         };
+    }
+
+    public void doAutoLayout() {
+        getCanvas().getController().performingChange( this, LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
+        getDasCanvas().performingChange( this, LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
+        LayoutUtil.autolayout( getDasCanvas(), getRow(), getColumn() );
+        getDasCanvas().changePerformed( this, LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
+        getCanvas().getController().changePerformed( this, LayoutListener.PENDING_CHANGE_AUTOLAYOUT);
+
     }
 
 }
