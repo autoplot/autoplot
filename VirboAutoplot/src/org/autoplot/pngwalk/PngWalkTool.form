@@ -18,27 +18,26 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
           <Group type="102" alignment="1" attributes="0">
+              <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                      <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="timeFilterTextField" min="-2" pref="236" max="-2" attributes="0"/>
-                  </Group>
-                  <Component id="templateTextField" alignment="0" pref="713" max="32767" attributes="0"/>
-              </Group>
+              <Component id="timeFilterTextField" min="-2" pref="236" max="-2" attributes="0"/>
+              <EmptySpace pref="407" max="32767" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="dataSetSelector1" pref="737" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="pngsPanel" alignment="1" pref="737" max="32767" attributes="0"/>
+          <Component id="pngsPanel" alignment="1" pref="761" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="pngsPanel" pref="633" max="32767" attributes="0"/>
+              <Component id="pngsPanel" pref="621" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="templateTextField" min="-2" max="-2" attributes="0"/>
+              <Component id="dataSetSelector1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -55,15 +54,6 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
     </Container>
-    <Component class="javax.swing.JTextField" name="templateTextField">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="jTextField1"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="templateTextFieldActionPerformed"/>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="templateTextFieldFocusLost"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JTextField" name="timeFilterTextField">
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeFilterTextFieldActionPerformed"/>
@@ -191,5 +181,10 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="org.virbo.datasource.DataSetSelector" name="dataSetSelector1">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="dataSetSelector1ActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

@@ -14,15 +14,26 @@ package org.autoplot.pngwalk;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import org.autoplot.pngwalk.PngWalkCanvas.DisplayMode;
+import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.datasource.DataSetSelector;
+import org.xml.sax.SAXException;
 
 /**
  *
  * @author jbf
  */
 public class PngWalkTool extends javax.swing.JPanel {
+    public static final String PREF_RECENT = "pngWalkRecent";
 
     PngWalkCanvas canvas;
 
@@ -32,6 +43,42 @@ public class PngWalkTool extends javax.swing.JPanel {
     /** Creates new form PngWalkTool */
     public PngWalkTool() {
         initComponents();
+        dataSetSelector1.setEnableDataSource(false);
+
+        Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
+        String srecent = prefs.get(PREF_RECENT,"");
+
+        if ( !srecent.equals("") ) {
+            try {
+                List<String> urls = new ArrayList<String>();
+                List<Bookmark> recent = Bookmark.parseBookmarks(srecent);
+                for (Bookmark b : recent) {
+                    urls.add(((Bookmark.Item) b).getUrl());
+                }
+                dataSetSelector1.setRecent(urls);
+                if (urls.size() > 1) {
+                    dataSetSelector1.setValue(urls.get(urls.size() - 1));
+                }
+                dataSetSelector1.setRecent(urls);
+            } catch (SAXException ex) {
+                Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(PngWalkTool.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        dataSetSelector1.addPropertyChangeListener( DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
+                List<String> srecent= dataSetSelector1.getRecent();
+                List<Bookmark> recent = new ArrayList<Bookmark>();
+                for ( String s : srecent ) {
+                    recent.add( new Bookmark.Item( s ) );
+                }
+                prefs.put( PREF_RECENT, Bookmark.formatBooks( recent ) );
+            }
+        } );
+
         canvas= new PngWalkCanvas();
         pngsPanel.add( canvas );
         canvas.addPropertyChangeListener( PngWalkCanvas.PROP_CURRENTITEM, new PropertyChangeListener() {
@@ -47,7 +94,7 @@ public class PngWalkTool extends javax.swing.JPanel {
     }
 
     public void setTemplate( String template ) {
-        templateTextField.setText(template);
+        dataSetSelector1.setValue(template);
         canvas.setTemplate(template);
     }
 
@@ -83,7 +130,6 @@ public class PngWalkTool extends javax.swing.JPanel {
     private void initComponents() {
 
         pngsPanel = new javax.swing.JPanel();
-        templateTextField = new javax.swing.JTextField();
         timeFilterTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
@@ -95,20 +141,9 @@ public class PngWalkTool extends javax.swing.JPanel {
         addFileActionButton = new javax.swing.JButton();
         jumpToFirstButton = new javax.swing.JButton();
         jumpToLastButton = new javax.swing.JButton();
+        dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
 
         pngsPanel.setLayout(new java.awt.BorderLayout());
-
-        templateTextField.setText("jTextField1");
-        templateTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                templateTextFieldActionPerformed(evt);
-            }
-        });
-        templateTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                templateTextFieldFocusLost(evt);
-            }
-        });
 
         timeFilterTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -216,29 +251,35 @@ public class PngWalkTool extends javax.swing.JPanel {
 
         jPanel1Layout.linkSize(new java.awt.Component[] {addFileActionButton, nextButton, nextSetButton, prevButton, prevSetButton, scaleComboBox}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
+        dataSetSelector1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataSetSelector1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(24, 24, 24)
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(407, Short.MAX_VALUE))
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(templateTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE))
+                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 737, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 737, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 761, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
+                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 621, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(templateTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
@@ -296,24 +337,12 @@ public class PngWalkTool extends javax.swing.JPanel {
         canvas.setCurrentIndex( canvas.getCurrentIndex() - canvas.getCount() );
 }//GEN-LAST:event_prevSetButtonActionPerformed
 
-    private void templateTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_templateTextFieldFocusLost
-        String template= templateTextField.getText();
-        if ( ! canvas.getTemplate().equals(template) ) {
-            canvas.setTemplate(template);
-        }
-    }//GEN-LAST:event_templateTextFieldFocusLost
-
-    private void templateTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_templateTextFieldActionPerformed
-        String template= templateTextField.getText();
-        canvas.setTemplate(template);
-    }//GEN-LAST:event_templateTextFieldActionPerformed
-
     private void timeFilterTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFilterTextFieldActionPerformed
         canvas.setTimeRange( timeFilterTextField.getText() );
         if ( !canvas.getTimeRange().equals(timeFilterTextField.getText() ) ) {
             timeFilterTextField.setBackground( Color.PINK );
         } else {
-            timeFilterTextField.setBackground( templateTextField.getBackground() );
+            timeFilterTextField.setBackground( dataSetSelector1.getBackground() );
         }
     }//GEN-LAST:event_timeFilterTextFieldActionPerformed
 
@@ -322,7 +351,7 @@ public class PngWalkTool extends javax.swing.JPanel {
         if ( !canvas.getTimeRange().equals(timeFilterTextField.getText() ) ) {
             timeFilterTextField.setBackground( Color.PINK );
         } else {
-            timeFilterTextField.setBackground( templateTextField.getBackground() );
+            timeFilterTextField.setBackground( dataSetSelector1.getBackground() );
         }
     }//GEN-LAST:event_timeFilterTextFieldFocusLost
 
@@ -334,9 +363,14 @@ public class PngWalkTool extends javax.swing.JPanel {
         canvas.setCurrentIndex( 0 );
     }//GEN-LAST:event_jumpToFirstButtonActionPerformed
 
+    private void dataSetSelector1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelector1ActionPerformed
+        setTemplate( dataSetSelector1.getValue() );
+    }//GEN-LAST:event_dataSetSelector1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addFileActionButton;
+    private org.virbo.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton jumpToFirstButton;
@@ -347,7 +381,6 @@ public class PngWalkTool extends javax.swing.JPanel {
     private javax.swing.JButton prevButton;
     private javax.swing.JButton prevSetButton;
     private javax.swing.JComboBox scaleComboBox;
-    private javax.swing.JTextField templateTextField;
     private javax.swing.JTextField timeFilterTextField;
     // End of variables declaration//GEN-END:variables
 
