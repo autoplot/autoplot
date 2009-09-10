@@ -298,14 +298,22 @@ public class ApplicationController extends DomNodeController implements RunLater
         item = new JMenuItem(new AbstractAction("Remove Bindings") {
 
             public void actionPerformed(ActionEvent e) {
+                List<BindingModel> bms= new ArrayList<BindingModel>();
+
                 List<Panel> panels = getPanelsFor(domPlot);
                 for (Panel pan : panels) {
+                    bms.addAll( Arrays.asList( getBindingsFor(pan) ) );
                     unbind(pan);
                 }
+                bms.addAll( Arrays.asList( getBindingsFor(domPlot) ) );
                 unbind(domPlot);
+                bms.addAll( Arrays.asList( getBindingsFor(domPlot.xaxis) ) );
                 unbind(domPlot.xaxis);
+                bms.addAll( Arrays.asList( getBindingsFor(domPlot.yaxis) ) );
                 unbind(domPlot.yaxis);
+                bms.addAll( Arrays.asList( getBindingsFor(domPlot.zaxis) ) );
                 unbind(domPlot.zaxis);
+                setStatus("removed "+bms.size()+" bindings");
             }
         });
         item.setToolTipText("remove any plot and panel property bindings");
