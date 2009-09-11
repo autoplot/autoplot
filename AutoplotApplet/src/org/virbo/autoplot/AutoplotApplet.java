@@ -432,7 +432,9 @@ public class AutoplotApplet extends JApplet {
                 timeRange = DatumRangeUtil.parseTimeRangeValid(stimeRange);
                 TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                 if (tsb != null) {
+                    System.err.println("do tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
                     tsb.setTimeRange(timeRange);
+                    System.err.println("done tsb.setTimeRange @ " + (System.currentTimeMillis() - t0) + " msec");
                 }
             }
 
