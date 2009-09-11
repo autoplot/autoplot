@@ -88,7 +88,7 @@ public class AutoplotApplet extends JApplet {
     String clickCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090911.1";
+    public static final String VERSION = "20090911.2";
     private Image splashImage;
 
     private String getStringParameter(String name, String deft) {
