@@ -88,7 +88,7 @@ public class AutoplotApplet extends JApplet {
     String clickCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090911.2";
+    public static final String VERSION = "20090911.3";
     private Image splashImage;
 
     private String getStringParameter(String name, String deft) {
@@ -438,11 +438,18 @@ public class AutoplotApplet extends JApplet {
                 }
             }
 
-            QDataSet ds;
-            try {
-                ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
+            QDataSet ds; // why again must we load the data?
+            if ( dsource!=null ) {
+                TimeSeriesBrowse tsb= dsource.getCapability(TimeSeriesBrowse.class);
+                if ( tsb==null ) {
+                    try {
+                        System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
+                        ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
+                        System.err.println("done getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
 
             System.err.println("do setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
