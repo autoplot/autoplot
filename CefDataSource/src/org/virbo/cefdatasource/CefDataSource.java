@@ -159,7 +159,7 @@ public class CefDataSource extends AbstractDataSource {
                 for (int i = 0; i < dds.length(); i++) {
                     for (int j = 0; j < dds.length(i); j++) {
                         if (dds.value(i, j) == ceffill) {
-                            dds.putValue(i, j, fill);
+                            dds.putValue(i, j, fill); //TODO: QDataSet has QDataSet.FILL now.
                         }
                     }
                 }
@@ -256,7 +256,7 @@ public class CefDataSource extends AbstractDataSource {
             }
         }
 
-        if (param.entries.containsKey("COORDINATE_SYSTEM")) {
+        if (param.entries.containsKey("COORDINATE_SYSTEM") && ds.length(0)==3 ) { // TODO: C1_CP_PEACE_CP3DXPH_DNFlux has this set SR2, Frame is array>na
             String type = (String) param.entries.get("COORDINATE_SYSTEM");
             int size = 3; // this will be derived from sizes attr.
             if (size == 3) {
