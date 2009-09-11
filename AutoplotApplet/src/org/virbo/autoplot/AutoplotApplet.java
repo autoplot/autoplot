@@ -444,13 +444,18 @@ public class AutoplotApplet extends JApplet {
                 throw new RuntimeException(ex);
             }
 
+            System.err.println("do setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
+
             appmodel.setDataSource(dsource);
+            System.err.println("done setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
 
             setInitializationStatus("dataSourceSet");
 
             if (stimeRange != null && !stimeRange.equals("")) {
                 try {
+                    System.err.println("wait for idle @ " + (System.currentTimeMillis() - t0) + " msec (due to stimeRange)");
                     appmodel.waitUntilIdle(true);
+                    System.err.println("done wait for idle @ " + (System.currentTimeMillis() - t0) + " msec");
                 } catch (InterruptedException ex) {
                     Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -606,8 +611,18 @@ public class AutoplotApplet extends JApplet {
         });
 
         if ( !clickCallback.equals("") ) {
+            String clickCallbackLabel="Applet Click";
+            int i= clickCallback.indexOf(",");
+            if ( i!=-1 ) {
+                int i2= clickCallback.indexOf("label=");
+                if ( i2!=-1 ) clickCallbackLabel= clickCallback.substring(i2+6).trim();
+                clickCallback= clickCallback.substring(0,i).trim();
+            }
+
             final DasPlot plot= dom.getPlots(0).getController().getDasPlot();
-            MouseModule mm= new MouseModule( plot, new CrossHairRenderer( plot, null, plot.getXAxis(), plot.getYAxis() ), "appletClick" ) {
+            MouseModule mm= new MouseModule( plot, 
+                    new CrossHairRenderer( plot, null, plot.getXAxis(), plot.getYAxis() ),
+                    clickCallbackLabel ) {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     e= SwingUtilities.convertMouseEvent( plot, e, plot.getCanvas() );
