@@ -286,7 +286,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         if (split.carotPos > split.file.length() && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
             showFactoryCompletions(URLSplit.format(split), split.formatCarotPos);
 
-        } else if ( carotpos==0 || surl.substring(0,carotpos).startsWith("vap") ) {
+        } else if ( carotpos==0 || surl.substring(0,carotpos).equals("vap") ) {
             showTypesCompletions( surl, carotpos );
             
         } else {
