@@ -38,13 +38,13 @@ public class TestURLSplit {
         System.out.println("\n");
         System.out.println(string);
         char c= string.length()>carotpos ? string.charAt(carotpos) : 0;
-        URLSplit split= URLSplit.parse(string, carotpos );
+        URLSplit split= URLSplit.parse(string, carotpos , true);
         System.out.println(split);
-        if ( split.carotPos>=0 ) {
-            char c1= split.surl.length()>split.carotPos ? split.surl.charAt(split.carotPos) : 0;
-            System.out.println(""+c+"(@"+carotpos+") == "+c1 +"(@"+split.carotPos+"):  "+(c==c1) );
+        if ( split.resourceUriCarotPos>=0 ) {
+            char c1= split.surl.length()>split.resourceUriCarotPos ? split.surl.charAt(split.resourceUriCarotPos) : 0;
+            System.out.println(""+c+"(@"+carotpos+") == "+c1 +"(@"+split.resourceUriCarotPos+"):  "+(c==c1) );
         }
-        System.out.println( "carotPosAssert="+ ( split.formatCarotPos-split.carotPos == split.vapScheme.length()+1 ) ) ;
+        System.out.println( "carotPosAssert="+ ( split.formatCarotPos-split.resourceUriCarotPos == split.vapScheme.length()+1 ) ) ;
     }
     
     private static void testComplete( int id, String string, int carotpos ) throws Exception {
