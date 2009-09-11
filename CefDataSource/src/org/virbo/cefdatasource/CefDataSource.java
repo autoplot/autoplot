@@ -245,7 +245,7 @@ public class CefDataSource extends AbstractDataSource {
                                 QDataSet sort = org.virbo.dataset.DataSetOps.sort(dep0ds);
                                 dep0ds = new SortDataSet(dep0ds, sort);
                                 ds = makeMonotonic(ds, newDim, sort);
-                                System.err.println(org.virbo.dataset.DataSetUtil.statsString(ds));
+                                //System.err.println(org.virbo.dataset.DataSetUtil.statsString(ds));
                             }
 
                         }
