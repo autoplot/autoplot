@@ -58,7 +58,7 @@ public class URLSplit {
      * position of the carot after modifications to the surl are made.  This
      * is with respect to surl, the URI for the datasource, without the "vap" scheme.
      */
-    public int carotPos;
+    public int resourceUriCarotPos;
     /**
      * position of the carot after modifications to the surl are made.  This
      * is with respect to formatted uri, which probably includes the explcit "vap:" scheme.
@@ -84,7 +84,7 @@ public class URLSplit {
             carotPos = surl.length();
             result.surl = surl;
             result.vapScheme = "vap";
-            result.carotPos = carotPos;
+            result.resourceUriCarotPos = carotPos;
             result.formatCarotPos = carotPos + 4;
         }
 
@@ -106,23 +106,23 @@ public class URLSplit {
             } else {
                 URLSplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));
                 result.surl = resourceSplit.surl;
-                result.formatCarotPos = (carotPos > i0) ? resourceSplit.carotPos + (i0 + 1) : carotPos;
-                result.carotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
+                result.formatCarotPos = (carotPos > i0) ? resourceSplit.resourceUriCarotPos + (i0 + 1) : carotPos;
+                result.resourceUriCarotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
             }
 
         } else {
             result.surl = surl;
-            result.carotPos = carotPos;
+            result.resourceUriCarotPos = carotPos;
         }
 
         if (scheme.equals("")) {
             result.surl = "file://";
-            result.carotPos += 7;
+            result.resourceUriCarotPos += 7;
             if ((surl.charAt(0) == '/')) {
                 result.surl += surl;
             } else {
                 result.surl += ('/' + surl); // Windows c:
-                result.carotPos += 1;
+                result.resourceUriCarotPos += 1;
             }
             result.surl = result.surl.replaceAll("\\\\", "/");
             result.surl = result.surl.replaceAll(" ", "+");
@@ -177,7 +177,7 @@ public class URLSplit {
 
         if (scheme.startsWith("vap")) {
             result.vapScheme = scheme;
-            result.formatCarotPos = result.carotPos + scheme.length() + 1;
+            result.formatCarotPos = result.resourceUriCarotPos + scheme.length() + 1;
             result.surl = surl.substring(h + 1);
             result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
             try {
@@ -191,8 +191,8 @@ public class URLSplit {
                 int j = scheme.indexOf(".");
                 result.vapScheme = "vap+" + scheme.substring(0, j);
                 result.surl = result.surl.substring(j + 1);
-                if (result.carotPos > j) result.carotPos -= (j + 1);
-                result.formatCarotPos = result.carotPos + result.vapScheme.length() + 1;
+                if (result.resourceUriCarotPos > j) result.resourceUriCarotPos -= (j + 1);
+                result.formatCarotPos = result.resourceUriCarotPos + result.vapScheme.length() + 1;
                 result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
                 try {
                     result.resourceUri = new URI(result.surl);
@@ -203,7 +203,7 @@ public class URLSplit {
             } else {
                 if (result.vapScheme == null && normalize ) {
                     result.vapScheme = "vap";
-                    result.formatCarotPos = result.carotPos + 4;
+                    result.formatCarotPos = result.resourceUriCarotPos + 4;
                 }
                 result.surl = surl;
                 result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
@@ -232,7 +232,7 @@ public class URLSplit {
      *   ext, the extenion, .nc
      *   params, myVariable or null
      * @param surl  the string to parse
-     * @param carotPos the position of the carot, the relative position will be preserved through normalization in formatCarotPos
+     * @param resourceUriCarotPos the position of the carot, the relative position will be preserved through normalization in formatCarotPos
      * @param normalize normalize the surl by adding implicit "vap", etc.
      */
     public static URLSplit parse( String surl, int carotPos , boolean normalize) {
@@ -243,7 +243,7 @@ public class URLSplit {
                 parseScheme(result, normalize);
             }
         } catch (URISyntaxException ex) {
-            result.surl = uriEncode(result.surl); //TODO: move carotPos
+            result.surl = uriEncode(result.surl); //TODO: move resourceUriCarotPos
             try {
                 parseScheme(result, normalize);
             } catch (URISyntaxException ex1) {
@@ -435,6 +435,6 @@ public class URLSplit {
     }
 
     public String toString() {
-        return "\nvapScheme: " + vapScheme + "\nscheme: " + scheme + "\nresourceUri: " + resourceUri + "\npath: " + path + "\nfile: " + file + "\next: " + ext + "\nparams: " + params + "\nsurl: " + surl + "\ncarotPos: " + carotPos + "\nformatCarotPos: " + formatCarotPos;
+        return "\nvapScheme: " + vapScheme + "\nscheme: " + scheme + "\nresourceUri: " + resourceUri + "\npath: " + path + "\nfile: " + file + "\next: " + ext + "\nparams: " + params + "\nsurl: " + surl + "\ncarotPos: " + resourceUriCarotPos + "\nformatCarotPos: " + formatCarotPos;
     }
 }

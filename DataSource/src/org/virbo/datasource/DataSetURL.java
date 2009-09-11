@@ -569,11 +569,11 @@ public class DataSetURL {
 
     public static List<CompletionResult> getCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws Exception {
         URLSplit split = URLSplit.parse(surl, carotpos, true);
-        if (split.file == null || (split.carotPos > split.file.length()) && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
+        if (split.file == null || (split.resourceUriCarotPos > split.file.length()) && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
             return getFactoryCompletions(URLSplit.format(split), split.formatCarotPos, mon);
         } else {
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
-            if (split.carotPos <= firstSlashAfterHost) {
+            if (split.resourceUriCarotPos <= firstSlashAfterHost) {
                 return getHostCompletions(URLSplit.format(split), split.formatCarotPos, mon);
             } else {
                 return getFileSystemCompletions(URLSplit.format(split), split.formatCarotPos, mon);
@@ -699,7 +699,7 @@ public class DataSetURL {
         int qpos = surl1.lastIndexOf('?', carotPos);
 
         cc.surl = surl1;
-        cc.surlpos = carotPos; //carotPos
+        cc.surlpos = carotPos; //resourceUriCarotPos
 
 
         List<CompletionResult> result = new ArrayList<CompletionResult>();

@@ -283,7 +283,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     private void showCompletions(final String surl, final int carotpos) {
         URLSplit split = URLSplit.parse(surl, carotpos, true);
-        if (split.carotPos > split.file.length() && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
+        if (split.resourceUriCarotPos > split.file.length() && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
             showFactoryCompletions(URLSplit.format(split), split.formatCarotPos);
 
         } else if ( carotpos==0 || surl.substring(0,carotpos).equals("vap") ) {
@@ -295,7 +295,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 split.vapScheme=null;
             }
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
-            if (split.carotPos <= firstSlashAfterHost) {
+            if (split.resourceUriCarotPos <= firstSlashAfterHost) {
                 showHostCompletions(URLSplit.format(split), split.formatCarotPos);
             } else {
                 showFileSystemCompletions(URLSplit.format(split), split.formatCarotPos);
