@@ -969,7 +969,7 @@ public class AutoplotApplet extends JApplet {
             }
         };
 
-        JFrame frame = new JFrame("autoplot applet");
+        //JFrame frame = new JFrame("autoplot applet");
         AutoplotApplet applet = new AutoplotApplet();
         applet.setStub(stub);
 
@@ -988,13 +988,19 @@ public class AutoplotApplet extends JApplet {
         }
         Dimension size = new Dimension(width,height);
         applet.setPreferredSize(size);
-        frame.getContentPane().add(applet);
-        frame.pack();
+        //frame.getContentPane().add(applet);
+        //frame.pack();
         applet.init();
         applet.start();
-        frame.setVisible(true);
+        //frame.setVisible(true);
 
         applet.dom.getController().waitUntilIdle();
+        
+        try {
+            applet.dom.getController().getCanvas().getController().getDasCanvas().writeToPng("test-applet.png");
+        } catch (IOException ex) {
+            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }
 
