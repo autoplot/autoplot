@@ -993,6 +993,9 @@ public class AutoplotApplet extends JApplet {
         applet.init();
         applet.start();
         frame.setVisible(true);
+
+        applet.dom.getController().waitUntilIdle();
+        
     }
 
     public static void main(String[] args) {
@@ -1014,5 +1017,6 @@ public class AutoplotApplet extends JApplet {
 
         doTest( params, "height", "200", "width", "600" );
 
+        System.exit(0);
     }
 }
