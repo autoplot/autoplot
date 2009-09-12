@@ -4,8 +4,10 @@
  */
 package org.virbo.autoplot;
 
+import java.applet.Applet;
 import java.applet.AppletContext;
 import java.applet.AppletStub;
+import java.applet.AudioClip;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -21,6 +23,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -28,7 +31,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -129,16 +134,16 @@ public class AutoplotApplet extends JApplet {
         }
     }
 
-    private void clickCallback( String plotid, DasPlot plot, MouseEvent e ) {
+    private void clickCallback(String plotid, DasPlot plot, MouseEvent e) {
         try {
-            Datum xdatum= plot.getXAxis().invTransform(e.getX());
-            Datum ydatum= plot.getYAxis().invTransform(e.getY());
+            Datum xdatum = plot.getXAxis().invTransform(e.getX());
+            Datum ydatum = plot.getYAxis().invTransform(e.getY());
 
-            String jscall= String.format("%s('%s','%s','%s',%d,%d,%d )", clickCallback, plotid, xdatum, ydatum, e.getX(), e.getY(), e.getID() );
-                getAppletContext().showDocument(new URL("javascript:" + jscall ));
-            } catch (MalformedURLException ex) {
-                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            String jscall = String.format("%s('%s','%s','%s',%d,%d,%d )", clickCallback, plotid, xdatum, ydatum, e.getX(), e.getY(), e.getID());
+            getAppletContext().showDocument(new URL("javascript:" + jscall));
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void drawString(Graphics g, String s, int x, int y) {
@@ -165,7 +170,6 @@ public class AutoplotApplet extends JApplet {
             }
         };
     }
-    
     private JComponent progressComponent = new JComponent() {
 
         @Override
@@ -247,7 +251,7 @@ public class AutoplotApplet extends JApplet {
         }
 
         initializing = true;
-        getContentPane().add( progressComponent );
+        getContentPane().add(progressComponent);
         validate();
 
         System.err.println("init AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
@@ -265,10 +269,10 @@ public class AutoplotApplet extends JApplet {
 
     @Override
     public void stop() {
-        System.err.println("stop AutoplotApplet" + VERSION );
+        System.err.println("stop AutoplotApplet" + VERSION);
         remove(model.getCanvas());
         this.model = null;
-        this.dom= null;
+        this.dom = null;
     }
 
     @Override
@@ -277,7 +281,7 @@ public class AutoplotApplet extends JApplet {
         super.start();
 
         model = new ApplicationModel();
-        model.setExceptionHandler( new ExceptionHandler() {
+        model.setExceptionHandler(new ExceptionHandler() {
 
             public void handle(Throwable t) {
                 t.printStackTrace();
@@ -338,7 +342,7 @@ public class AutoplotApplet extends JApplet {
         String zdrawTickLabels = getStringParameter("plot.zaxis.drawTickLabels", "");
         statusCallback = getStringParameter("statusCallback", "");
         timeCallback = getStringParameter("timeCallback", "");
-        clickCallback= getStringParameter("clickCallback", "" );
+        clickCallback = getStringParameter("clickCallback", "");
 
         if (srenderType.equals("fill_to_zero")) {
             srenderType = "fillToZero";
@@ -375,11 +379,12 @@ public class AutoplotApplet extends JApplet {
 //            }
 //        });
         JMenuItem item = new JMenuItem(new AbstractAction("Reset Zoom") {
+
             public void actionPerformed(ActionEvent e) {
                 resetZoom();
             }
         });
-        
+
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item);
 
         /*        item= new JMenuItem( new AbstractAction( "Execute DOM command..." ) {
@@ -439,9 +444,9 @@ public class AutoplotApplet extends JApplet {
             }
 
             QDataSet ds; // why again must we load the data?
-            if ( dsource!=null ) {
-                TimeSeriesBrowse tsb= dsource.getCapability(TimeSeriesBrowse.class);
-                if ( tsb==null ) {
+            if (dsource != null) {
+                TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
+                if (tsb == null) {
                     try {
                         System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                         ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
@@ -480,7 +485,7 @@ public class AutoplotApplet extends JApplet {
         Plot p = dom.getController().getPlot();
 
         if (!title.equals("")) {
-            p.setTitle(title);            
+            p.setTitle(title);
         }
 
         Axis axis = p.getXaxis();
@@ -618,37 +623,38 @@ public class AutoplotApplet extends JApplet {
             }
         });
 
-        if ( !clickCallback.equals("") ) {
-            String clickCallbackLabel="Applet Click";
-            int i= clickCallback.indexOf(",");
-            if ( i!=-1 ) {
-                int i2= clickCallback.indexOf("label=");
-                if ( i2!=-1 ) clickCallbackLabel= clickCallback.substring(i2+6).trim();
-                clickCallback= clickCallback.substring(0,i).trim();
+        if (!clickCallback.equals("")) {
+            String clickCallbackLabel = "Applet Click";
+            int i = clickCallback.indexOf(",");
+            if (i != -1) {
+                int i2 = clickCallback.indexOf("label=");
+                if (i2 != -1)
+                    clickCallbackLabel = clickCallback.substring(i2 + 6).trim();
+                clickCallback = clickCallback.substring(0, i).trim();
             }
 
-            final DasPlot plot= dom.getPlots(0).getController().getDasPlot();
-            MouseModule mm= new MouseModule( plot, 
-                    new CrossHairRenderer( plot, null, plot.getXAxis(), plot.getYAxis() ),
-                    clickCallbackLabel ) {
+            final DasPlot plot = dom.getPlots(0).getController().getDasPlot();
+            MouseModule mm = new MouseModule(plot,
+                    new CrossHairRenderer(plot, null, plot.getXAxis(), plot.getYAxis()),
+                    clickCallbackLabel) {
+
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    e= SwingUtilities.convertMouseEvent( plot, e, plot.getCanvas() );
-                    clickCallback( dom.getPlots(0).getId(), plot, e );
+                    e = SwingUtilities.convertMouseEvent(plot, e, plot.getCanvas());
+                    clickCallback(dom.getPlots(0).getId(), plot, e);
                 }
 
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    e= SwingUtilities.convertMouseEvent( plot, e, plot.getCanvas() );
-                    clickCallback( dom.getPlots(0).getId(), plot, e );
+                    e = SwingUtilities.convertMouseEvent(plot, e, plot.getCanvas());
+                    clickCallback(dom.getPlots(0).getId(), plot, e);
                 }
 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    e= SwingUtilities.convertMouseEvent( plot, e, plot.getCanvas() );
-                    clickCallback( dom.getPlots(0).getId(), plot, e );
+                    e = SwingUtilities.convertMouseEvent(plot, e, plot.getCanvas());
+                    clickCallback(dom.getPlots(0).getId(), plot, e);
                 }
-
             };
             plot.getDasMouseInputAdapter().setPrimaryModule(mm);
         }
@@ -671,8 +677,8 @@ public class AutoplotApplet extends JApplet {
                 System.err.println("************************************************");
                 System.err.println("************************************************");
                 setDataSetURL(surl);
-            // setDataSetURL("file:/media/mini/data.backup/examples/jpg/Capture_00158.jpg?channel=red");
-            // testDownload();
+                // setDataSetURL("file:/media/mini/data.backup/examples/jpg/Capture_00158.jpg?channel=red");
+                // testDownload();
             }
         });
         frame.getContentPane().add(button);
@@ -895,26 +901,8 @@ public class AutoplotApplet extends JApplet {
         SwingUtilities.invokeLater(run);
     }
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("autoplot applet");
+    private static void doTest( final Map<String, String> params, String ... args ) {
         AppletStub stub = new AppletStub() {
-
-            Map<String, String> params = new HashMap<String, String>();
-
-
-            {
-                //"tsds.http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0";
-                params.put("dataSetURL", "http://autoplot.org/data/alpha_proton_ratio.qds");
-                params.put("column", "5em,100%-10em");
-                params.put("font", "sans-8");
-                params.put("row", "3em,100%-3em");
-                params.put("renderType", "fill_to_zero");
-                params.put("color", "#0000ff");
-                params.put("fillColor", "#aaaaff");
-                params.put("foregroundColor", "#ffffff");
-                params.put("backgroundColor", "#000000");
-
-            }
 
             public boolean isActive() {
                 return true;
@@ -933,22 +921,98 @@ public class AutoplotApplet extends JApplet {
             }
 
             public AppletContext getAppletContext() {
-                return null;
+                return new AppletContext() {
+
+                    public AudioClip getAudioClip(URL url) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    public Image getImage(URL url) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    public Applet getApplet(String name) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    public Enumeration<Applet> getApplets() {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    public void showDocument(URL url) {
+                        System.err.println("showDocument: " + url);
+                    }
+
+                    public void showDocument(URL url, String target) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    public void showStatus(String status) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    public void setStream(String key, InputStream stream) throws IOException {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    public InputStream getStream(String key) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    public Iterator<String> getStreamKeys() {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+                };
             }
 
             public void appletResize(int width, int height) {
             }
         };
 
+        JFrame frame = new JFrame("autoplot applet");
         AutoplotApplet applet = new AutoplotApplet();
         applet.setStub(stub);
 
-        Dimension size = new Dimension(400, 300);
+        int width= 400;
+        int height= 300;
+        for ( int i=0; i<args.length; i++ ) {
+            if ( args[i].equals("height") ) {
+                height= Integer.parseInt(args[i+1]);
+                i++;
+            } else if ( args[i].equals("width") ) {
+                width= Integer.parseInt(args[i+1]);
+                i++;
+            } else {
+                throw new IllegalArgumentException("bad param: "+args[i]);
+            }
+        }
+        Dimension size = new Dimension(width,height);
         applet.setPreferredSize(size);
         frame.getContentPane().add(applet);
         frame.pack();
         applet.init();
         applet.start();
         frame.setVisible(true);
+    }
+
+    public static void main(String[] args) {
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("dataSetURL", "tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
+        params.put("column", "5em,100%-10em");
+        params.put("font", "sans-italic-10");
+        params.put("row", "3em,100%-3em");
+        params.put("renderType", "fillToZero");
+        params.put("color", "#0000ff");
+        params.put("fillColor", "#aaaaff");
+        params.put("foregroundColor", "#ffffff");
+        params.put("backgroundColor", "#000000");
+        params.put("clickCallback", "onClick,label=Show Coordinates");
+        //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
+        params.put("codebase_lookup", "false");
+        params.put("java_arguments", "-Djnlp.packEnabled=true");
+
+        doTest( params, "height", "200", "width", "600" );
+
     }
 }
