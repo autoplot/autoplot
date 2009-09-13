@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.virbo.autoplot.AutoplotApplet;
-import static org.virbo.autoplot.ScriptContext.*;
+
 /**
  * Andrew's server
  * @author jbf
