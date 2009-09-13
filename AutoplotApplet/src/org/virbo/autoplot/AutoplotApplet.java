@@ -806,6 +806,14 @@ public class AutoplotApplet extends JApplet {
         SwingUtilities.invokeLater(run);
     }
 
+    /**
+     * return the application dom.
+     * @return
+     */
+    public Application getDom() {
+        return this.dom;
+    }
+
     public void dumpDom() {
         List<Diff> diffs = new Application().diffs(dom);
         for (Diff d : diffs) {
@@ -901,128 +909,4 @@ public class AutoplotApplet extends JApplet {
         SwingUtilities.invokeLater(run);
     }
 
-    private static void doTest( final Map<String, String> params, String ... args ) {
-        AppletStub stub = new AppletStub() {
-
-            public boolean isActive() {
-                return true;
-            }
-
-            public URL getDocumentBase() {
-                return null;
-            }
-
-            public URL getCodeBase() {
-                return null;
-            }
-
-            public String getParameter(String name) {
-                return params.get(name);
-            }
-
-            public AppletContext getAppletContext() {
-                return new AppletContext() {
-
-                    public AudioClip getAudioClip(URL url) {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-
-                    public Image getImage(URL url) {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-
-                    public Applet getApplet(String name) {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-
-                    public Enumeration<Applet> getApplets() {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-
-                    public void showDocument(URL url) {
-                        System.err.println("showDocument: " + url);
-                    }
-
-                    public void showDocument(URL url, String target) {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-
-                    public void showStatus(String status) {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-
-                    public void setStream(String key, InputStream stream) throws IOException {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-
-                    public InputStream getStream(String key) {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-
-                    public Iterator<String> getStreamKeys() {
-                        throw new UnsupportedOperationException("Not supported yet.");
-                    }
-                };
-            }
-
-            public void appletResize(int width, int height) {
-            }
-        };
-
-        //JFrame frame = new JFrame("autoplot applet");
-        AutoplotApplet applet = new AutoplotApplet();
-        applet.setStub(stub);
-
-        int width= 400;
-        int height= 300;
-        for ( int i=0; i<args.length; i++ ) {
-            if ( args[i].equals("height") ) {
-                height= Integer.parseInt(args[i+1]);
-                i++;
-            } else if ( args[i].equals("width") ) {
-                width= Integer.parseInt(args[i+1]);
-                i++;
-            } else {
-                throw new IllegalArgumentException("bad param: "+args[i]);
-            }
-        }
-        Dimension size = new Dimension(width,height);
-        applet.setPreferredSize(size);
-        //frame.getContentPane().add(applet);
-        //frame.pack();
-        applet.init();
-        applet.start();
-        //frame.setVisible(true);
-
-        applet.dom.getController().waitUntilIdle();
-        
-        try {
-            applet.dom.getController().getCanvas().getController().getDasCanvas().writeToPng("test-applet.png");
-        } catch (IOException ex) {
-            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
-
-    public static void main(String[] args) {
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("dataSetURL", "tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
-        params.put("column", "5em,100%-10em");
-        params.put("font", "sans-italic-10");
-        params.put("row", "3em,100%-3em");
-        params.put("renderType", "fillToZero");
-        params.put("color", "#0000ff");
-        params.put("fillColor", "#aaaaff");
-        params.put("foregroundColor", "#ffffff");
-        params.put("backgroundColor", "#000000");
-        params.put("clickCallback", "onClick,label=Show Coordinates");
-        //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
-        params.put("codebase_lookup", "false");
-        params.put("java_arguments", "-Djnlp.packEnabled=true");
-
-        doTest( params, "height", "200", "width", "600" );
-
-        System.exit(0);
-    }
 }
