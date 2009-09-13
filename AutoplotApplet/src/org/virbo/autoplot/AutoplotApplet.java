@@ -445,8 +445,8 @@ public class AutoplotApplet extends JApplet {
 
             QDataSet ds; // why again must we load the data?
             if (dsource != null) {
-                //TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
-                //if (tsb == null) {
+                TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
+                if (tsb == null) {
                     try {
                         System.err.println("do getDataSet @ " + (System.currentTimeMillis() - t0) + " msec");
                         ds = dsource == null ? null : dsource.getDataSet(loadInitialMonitor);
@@ -454,7 +454,7 @@ public class AutoplotApplet extends JApplet {
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     }
-                //}
+                }
             }
 
             System.err.println("do setDataSource @ " + (System.currentTimeMillis() - t0) + " msec");
