@@ -45,6 +45,7 @@ rm -rf org/das2/dasml/*
 echo "compile sources..."
 hasErrors=0
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotApplet.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/TestApplet*.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
