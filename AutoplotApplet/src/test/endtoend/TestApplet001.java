@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 import org.virbo.autoplot.AutoplotApplet;
 
 /**
@@ -27,7 +28,7 @@ import org.virbo.autoplot.AutoplotApplet;
  */
 public class TestApplet001 {
 
-    private static void doTest( final Map<String, String> params, String ... args ) {
+    private static void doTest( final Map<String, String> params, boolean headless, String ... args ) {
         AppletStub stub = new AppletStub() {
 
             public boolean isActive() {
@@ -95,7 +96,11 @@ public class TestApplet001 {
             }
         };
 
-        //JFrame frame = new JFrame("autoplot applet");
+        
+        JFrame frame= null;
+        if ( !headless) {
+            frame= new JFrame("autoplot applet");
+        }
         AutoplotApplet applet = new AutoplotApplet();
         applet.setStub(stub);
 
@@ -114,11 +119,15 @@ public class TestApplet001 {
         }
         Dimension size = new Dimension(width,height);
         applet.setPreferredSize(size);
-        //frame.getContentPane().add(applet);
-        //frame.pack();
+
+        if ( !headless ) {
+          frame.getContentPane().add(applet);
+          frame.pack();
+          frame.setVisible(true);
+        }
+
         applet.init();
         applet.start();
-        //frame.setVisible(true);
 
         applet.getDom().getController().waitUntilIdle();
         
@@ -131,6 +140,8 @@ public class TestApplet001 {
     }
 
     public static void main(String[] args) {
+
+        boolean headless= true; // true for Hudson (though it's not really headless), false for debugging
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("dataSetURL", "tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
@@ -148,12 +159,12 @@ public class TestApplet001 {
         params.put("java_arguments", "-Djnlp.packEnabled=true");
 
         try {
-            doTest( params, "height", "200", "width", "600" );
+            doTest( params, headless, "height", "200", "width", "600" );
         } catch ( Exception ex ) {
-            System.exit(1);
+            if ( headless ) System.exit(1);
         }
 
-        System.exit(0);
+        if ( headless ) System.exit(0);
     }
 
 }
