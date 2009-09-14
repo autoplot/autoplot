@@ -63,6 +63,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.Diff;
 import org.virbo.autoplot.dom.DomUtil;
@@ -95,6 +96,7 @@ public class AutoplotApplet extends JApplet {
     long t0 = System.currentTimeMillis();
     public static final String VERSION = "20090911.3";
     private Image splashImage;
+    private JMenuItem overviewMenuItem= null;
 
     private String getStringParameter(String name, String deft) {
         String result = getParameter(name);
@@ -384,8 +386,14 @@ public class AutoplotApplet extends JApplet {
                 resetZoom();
             }
         });
-
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item);
+        overviewMenuItem = new JMenuItem(new AbstractAction("Context Overview") {
+            public void actionPerformed(ActionEvent e) {
+                addOverview();
+            }
+        });
+        dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(overviewMenuItem);
+        
 
         /*        item= new JMenuItem( new AbstractAction( "Execute DOM command..." ) {
         public void actionPerformed(ActionEvent e) {
@@ -873,6 +881,25 @@ public class AutoplotApplet extends JApplet {
 
             public void run() {
                 dom.getController().getPlot().getController().resetZoom(true, true, true);
+            }
+        };
+        SwingUtilities.invokeLater(run);
+    }
+
+    public void addOverview( ) {
+        Runnable run = new Runnable() {
+            public void run() {
+                Plot domPlot= dom.getPlots(0);
+                ApplicationController controller= dom.getController();
+                Plot that = controller.copyPlotAndPanels(domPlot, null, false, false);
+                that.setTitle("");
+                controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
+                controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
+                controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
+                controller.addConnector(domPlot, that);
+                dom.getCanvases(0).getRows(0).setBottom("60%-2em");
+                dom.getCanvases(0).getRows(1).setTop("60%+2em");
+                overviewMenuItem.setEnabled(false);
             }
         };
         SwingUtilities.invokeLater(run);
