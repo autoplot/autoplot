@@ -214,22 +214,28 @@ public class DataSourceController extends DomNodeController {
 
     public synchronized void setDataSource(boolean valueWasAdjusting,DataSource dataSource) {
 
+        if ( dataSource==null ) {
+            setDataSetNeedsLoading(false);
+        } else {
+            setDataSetNeedsLoading(true);
+        }
+
         if (timeSeriesBrowseController != null) {
             timeSeriesBrowseController.release();
         }
 
-        DataSource oldSource = _getDataSource();
+        DataSource oldSource = getDataSource();
 
         if (dataSource == null) {
-            _setCaching(null);
-            _setTsb(null);
-            _setTsbSuri(null);
+            setCaching(null);
+            setTsb(null);
+            setTsbSuri(null);
             if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal" ) ) dsf.setUri("vap+internal:");
 
         } else {
 
-            _setCaching(dataSource.getCapability(Caching.class));
-            _setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
+            setCaching(dataSource.getCapability(Caching.class));
+            setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
 
         }
 
@@ -239,13 +245,13 @@ public class DataSourceController extends DomNodeController {
         if ( valueWasAdjusting ) {
             this.dataSource = dataSource;
         } else {
-            _setDataSource(dataSource);
+            setDataSource(dataSource);
             setResetDimensions(true);
         }
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
             if (getTsb() != null) {
-                _setDataSet(null);
+                setDataSet(null);
                 List<Panel> ps = dom.controller.getPanelsFor(dsf);
                 if (ps.size() > 0) {
 //TODO: flakey
@@ -318,14 +324,16 @@ public class DataSourceController extends DomNodeController {
                 }
             };
         } else {
-            _setDataSet(ds);
+            setDataSet(ds);
             setRawProperties(rawProperties); 
 
+            setDataSetNeedsLoading(false);
+            
             if (ds == null) {
-                _setDataSet(null);
-                _setProperties(null);
-                _setFillProperties(null);
-                _setFillDataSet(null);
+                setDataSet(null);
+                setProperties(null);
+                setFillProperties(null);
+                setFillDataSet(null);
                 return;
             }
 
@@ -335,7 +343,7 @@ public class DataSourceController extends DomNodeController {
 
             doDimensionNames();
 
-            _setHistogram(new AutoHistogram().doit(ds, null));
+            setHistogram(new AutoHistogram().doit(ds, null));
             //doFillValidRange();  the QDataSet returned 
             updateFill();
 
@@ -475,11 +483,11 @@ public class DataSourceController extends DomNodeController {
         Map<String, Object> properties; // QDataSet properties.
 
         properties = AutoplotUtil.extractProperties(getDataSet());
-        if (_getDataSource() != null) {
-            properties = AutoplotUtil.mergeProperties(_getDataSource().getProperties(), properties);
+        if (getDataSource() != null) {
+            properties = AutoplotUtil.mergeProperties(getDataSource().getProperties(), properties);
         }
 
-        _setProperties(properties);
+        setProperties(properties);
 
     }
 
@@ -601,7 +609,7 @@ public class DataSourceController extends DomNodeController {
             } else {
                 reduceRankString = PanelUtil.describe(names.get(sliceDimension), dep, sliceIndex);
             }
-            _setReduceDataSetString(reduceRankString);
+            setReduceDataSetString(reduceRankString);
 
             props = MetadataUtil.sliceProperties(props, sliceDimension);
 
@@ -614,7 +622,7 @@ public class DataSourceController extends DomNodeController {
 
         } else {
             fillDs = DataSetOps.makePropertiesMutable(getDataSet());
-            _setReduceDataSetString(null);
+            setReduceDataSetString(null);
         }
 
         //props.put( QDataSet.RENDER_TYPE, null );
@@ -636,11 +644,11 @@ public class DataSourceController extends DomNodeController {
         // check the dataset for fill data, inserting canonical fill values.
         AutoplotUtil.applyFillValidRange(fillDs, vmin, vmax, fill);
 
-        _setFillProperties(props);
+        setFillProperties(props);
         if (fillDs == getDataSet()) { //kludge to force reset renderer, because QDataSet is mutable.
             this.fillDataSet = null;
         }
-        _setFillDataSet(fillDs);
+        setFillDataSet(fillDs);
         changesSupport.changePerformed(this, PENDING_FILL_DATASET);
     }
 
@@ -653,9 +661,9 @@ public class DataSourceController extends DomNodeController {
         /*** here is the data load ***/
         
         try {
-            if (_getDataSource() != null) {
+            if (getDataSource() != null) {
                 setStatus("busy: loading dataset");
-                logger.fine("loading dataset "+_getDataSource() );
+                logger.fine("loading dataset "+getDataSource() );
                 loadDataSet();
                 setStatus("done loading dataset");
             } else {
@@ -707,7 +715,7 @@ public class DataSourceController extends DomNodeController {
     public synchronized void update(final boolean autorange, final boolean interpretMeta) {
         changesSupport.performingChange(this, PENDING_UPDATE);
 
-        _setDataSet(null);
+        setDataSet(null);
 
         Runnable run = new Runnable() {
 
@@ -728,7 +736,7 @@ public class DataSourceController extends DomNodeController {
             }
         };
 
-        if (_getDataSource() != null && _getDataSource().asynchronousLoad() && !dom.controller.isHeadless()) {
+        if (getDataSource() != null && getDataSource().asynchronousLoad() && !dom.controller.isHeadless()) {
             logger.info("invoke later do load");
             if (mon != null) {
                 System.err.println("double load!");
@@ -764,7 +772,7 @@ public class DataSourceController extends DomNodeController {
         return tsb;
     }
 
-    public void _setTsb(TimeSeriesBrowse tsb) {
+    public void setTsb(TimeSeriesBrowse tsb) {
         TimeSeriesBrowse oldTsb = this.tsb;
         this.tsb = tsb;
         propertyChangeSupport.firePropertyChange(PROP_TSB, oldTsb, tsb);
@@ -776,11 +784,12 @@ public class DataSourceController extends DomNodeController {
         return tsbSuri;
     }
 
-    public void _setTsbSuri(String tsbSuri) {
+    public void setTsbSuri(String tsbSuri) {
         String oldTsbSuri = this.tsbSuri;
         this.tsbSuri = tsbSuri;
         propertyChangeSupport.firePropertyChange(PROP_TSBSURI, oldTsbSuri, tsbSuri);
     }
+    
     protected Caching caching = null;
     public static final String PROP_CACHING = "caching";
 
@@ -788,19 +797,24 @@ public class DataSourceController extends DomNodeController {
         return caching;
     }
 
-    public void _setCaching(Caching caching) {
+    public void setCaching(Caching caching) {
         Caching oldCaching = this.caching;
         this.caching = caching;
         propertyChangeSupport.firePropertyChange(PROP_CACHING, oldCaching, caching);
     }
-    protected DataSource dataSource = null;
+
+    /**
+     * object that can provide data sets and capabilities.
+     */
     public static final String PROP_DATASOURCE = "dataSource";
 
-    public DataSource _getDataSource() {
+    protected DataSource dataSource = null;
+    
+    public DataSource getDataSource() {
         return dataSource;
     }
 
-    public void _setDataSource(DataSource dataSource) {
+    public void setDataSource(DataSource dataSource) {
         DataSource oldDataSource = this.dataSource;
         this.dataSource = dataSource;
         propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, oldDataSource, dataSource);
@@ -815,7 +829,7 @@ public class DataSourceController extends DomNodeController {
         return dataSet;
     }
 
-    public void _setDataSet(QDataSet dataSet) {
+    public void setDataSet(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet;
         propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
@@ -831,7 +845,7 @@ public class DataSourceController extends DomNodeController {
         return fillDataSet;
     }
 
-    public void _setFillDataSet(QDataSet fillDataSet) {
+    public void setFillDataSet(QDataSet fillDataSet) {
         QDataSet oldFillDataSet = this.fillDataSet;
         this.fillDataSet = fillDataSet;
         propertyChangeSupport.firePropertyChange(PROP_FILLDATASET, oldFillDataSet, fillDataSet);
@@ -858,7 +872,7 @@ public class DataSourceController extends DomNodeController {
         return histogram;
     }
 
-    public void _setHistogram(QDataSet histogram) {
+    public void setHistogram(QDataSet histogram) {
         QDataSet oldHistogram = this.histogram;
         this.histogram = histogram;
         propertyChangeSupport.firePropertyChange(PROP_HISTOGRAM, oldHistogram, histogram);
@@ -884,7 +898,7 @@ public class DataSourceController extends DomNodeController {
         return properties;
     }
 
-    public void _setProperties(Map<String, Object> properties) {
+    public void setProperties(Map<String, Object> properties) {
         Map<String, Object> oldProperties = this.properties;
         this.properties = properties;
         propertyChangeSupport.firePropertyChange(PROP_PROPERTIES, oldProperties, properties);
@@ -896,7 +910,7 @@ public class DataSourceController extends DomNodeController {
         return fillProperties;
     }
 
-    public void _setFillProperties(Map<String, Object> fillProperties) {
+    public void setFillProperties(Map<String, Object> fillProperties) {
         Map<String, Object> oldFillProperties = this.fillProperties;
         this.fillProperties = fillProperties;
         propertyChangeSupport.firePropertyChange(PROP_FILLPROPERTIES, oldFillProperties, fillProperties);
@@ -908,7 +922,7 @@ public class DataSourceController extends DomNodeController {
         return reduceDataSetString;
     }
 
-    public void _setReduceDataSetString(String reduceDataSetString) {
+    public void setReduceDataSetString(String reduceDataSetString) {
         String oldReduceDataSetString = this.reduceDataSetString;
         this.reduceDataSetString = reduceDataSetString;
         propertyChangeSupport.firePropertyChange(PROP_REDUCEDATASETSTRING, oldReduceDataSetString, reduceDataSetString);
@@ -922,22 +936,22 @@ public class DataSourceController extends DomNodeController {
         ProgressMonitor mymon;
 
         QDataSet result = null;
-        mymon = getMonitor("loading data", "loading " + _getDataSource());
+        mymon = getMonitor("loading data", "loading " + getDataSource());
         this.mon = mymon;
         try {
-            result = _getDataSource().getDataSet(mymon);
-            Map<String,Object> props= _getDataSource().getMetaData(new NullProgressMonitor());
+            result = getDataSource().getDataSet(mymon);
+            Map<String,Object> props= getDataSource().getMetaData(new NullProgressMonitor());
             setDataSetInternal(result,props);
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
             setException(ex);
-            _setDataSet(null);
+            setDataSet(null);
         } catch (CancelledOperationException ex) {
             setException(ex);
-            _setDataSet(null);
+            setDataSet(null);
         } catch (Exception e) {
             setException(e);
-            _setDataSet(null);
+            setDataSet(null);
             setStatus("error: " + e.getMessage());
             handleException(e);
         } finally {
@@ -996,6 +1010,7 @@ public class DataSourceController extends DomNodeController {
         if (surl == null) {
             setDataSource(valueWasAdjusting,null);
             setUriNeedsResolution(false);
+            setDataSetNeedsLoading(false);
             changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
         } else {
             URLSplit split = URLSplit.parse(surl);
@@ -1036,11 +1051,12 @@ public class DataSourceController extends DomNodeController {
         }
     }
 
-    protected boolean uriNeedsResolution = false;
     /**
      * true if the URI has been changed, and must be resolved into a DataSource.
      */
     public static final String PROP_URINEEDSRESOLUTION = "uriNeedsResolution";
+
+    protected boolean uriNeedsResolution = false;
 
     public boolean isUriNeedsResolution() {
         return uriNeedsResolution;
@@ -1050,6 +1066,23 @@ public class DataSourceController extends DomNodeController {
         boolean oldUriNeedsResolution = this.uriNeedsResolution;
         this.uriNeedsResolution = uriNeedsResolution;
         propertyChangeSupport.firePropertyChange(PROP_URINEEDSRESOLUTION, oldUriNeedsResolution, uriNeedsResolution);
+    }
+
+    /**
+     * true is the DataSource has been changed, and we need to reload.
+     */
+    public static final String PROP_DATASETNEEDSLOADING = "dataSetNeedsLoading";
+
+    protected boolean dataSetNeedsLoading = false;
+
+    public boolean isDataSetNeedsLoading() {
+        return dataSetNeedsLoading;
+    }
+
+    public void setDataSetNeedsLoading(boolean dataSetNeedsLoading) {
+        boolean oldDataSetNeedsLoading = this.dataSetNeedsLoading;
+        this.dataSetNeedsLoading = dataSetNeedsLoading;
+        propertyChangeSupport.firePropertyChange(PROP_DATASETNEEDSLOADING, oldDataSetNeedsLoading, dataSetNeedsLoading);
     }
 
     protected boolean resetDimensions = false;
