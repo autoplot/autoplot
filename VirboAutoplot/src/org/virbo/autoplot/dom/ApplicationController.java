@@ -884,18 +884,28 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param dsf
      */
     protected void copyDataSourceFilter(DataSourceFilter dsfsrc, DataSourceFilter dsfnew) {
-        dsfnew.controller.setRawProperties(dsfsrc.controller.getRawProperties());
-        dsfnew.controller._setProperties(dsfsrc.controller.getProperties());
+        MutatorLock lock= dsfnew.getController().mutatorLock();
+        lock.lock();
+
+        final boolean dataSetNeedsLoading = dsfsrc.controller.isDataSetNeedsLoading();
+
         dsfnew.controller.setResetDimensions(false);
-        dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet());
         if (dsfsrc.getUri() != null) {
             dsfnew.setUri(dsfsrc.getUri());
         }
-        dsfnew.controller.setDataSource(false,dsfsrc.controller._getDataSource());
-        dsfnew.controller.setUriNeedsResolution(false);
-        dsfnew.controller.setResetDimensions(false);
-        dsfnew.setSliceDimension( dsfsrc.getSliceDimension() );
-        dsfnew.setSliceIndex( dsfsrc.getSliceIndex() );
+
+        if ( !dataSetNeedsLoading ) {
+            dsfnew.controller.setUriNeedsResolution( false );
+            dsfnew.controller.setDataSource(false,dsfsrc.controller.getDataSource());
+            dsfnew.controller.setDataSetNeedsLoading( false );
+            dsfnew.controller.setResetDimensions(false);
+            dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),dsfsrc.controller.getRawProperties()); // fire off data event.
+            dsfnew.controller.setProperties(dsfsrc.controller.getProperties());
+            dsfnew.setSliceDimension( dsfsrc.getSliceDimension() );
+            dsfnew.setSliceIndex( dsfsrc.getSliceIndex() );
+        }
+
+        lock.unlock();
     }
 
     /**
