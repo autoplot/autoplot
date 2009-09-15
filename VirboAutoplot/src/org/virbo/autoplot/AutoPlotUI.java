@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Handler;
@@ -44,6 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.help.CSH;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -887,6 +887,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
+        autoplotHelpMenuItem = new javax.swing.JMenuItem();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         aboutDas2MenuItem = new javax.swing.JMenuItem();
@@ -1184,6 +1185,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
+        CSH.setHelpIDString(autoplotHelpMenuItem, "aphelp_main");
+        autoplotHelpMenuItem.setText("Autoplot Help...");
+        autoplotHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                autoplotHelpMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(autoplotHelpMenuItem);
+
         aboutAutoplotMenuItem.setText("About Autoplot");
         aboutAutoplotMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1462,6 +1472,10 @@ private void autoLayoutCheckBoxMenuItemActionPerformed(java.awt.event.ActionEven
     }
 }//GEN-LAST:event_autoLayoutCheckBoxMenuItemActionPerformed
 
+private void autoplotHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoplotHelpMenuItemActionPerformed
+    applicationModel.displayDefaultHelp();
+}//GEN-LAST:event_autoplotHelpMenuItemActionPerformed
+
 private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -1715,6 +1729,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     private javax.swing.JCheckBoxMenuItem autoLabellingCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLayoutCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem autoRangingCheckBoxMenuItem;
+    private javax.swing.JMenuItem autoplotHelpMenuItem;
     private javax.swing.JMenuItem autoplotHomepageButton;
     private javax.swing.JMenu bookmarksMenu;
     private javax.swing.JMenuItem copyDataSetURLMenuItem;

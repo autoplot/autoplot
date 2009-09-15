@@ -92,7 +92,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
 
             DataSource dsrc = null;
             if (dsf != null) {
-                dsrc = dsf.getController()._getDataSource();
+                dsrc = dsf.getController().getDataSource();
             }
             if (dsrc != null) {
                 tree = new CombinedTreeModel("" + dsrc.getURL());

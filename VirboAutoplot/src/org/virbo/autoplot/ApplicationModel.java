@@ -17,6 +17,7 @@ import org.virbo.qstream.StreamException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,6 +37,7 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.help.*;
 import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import javax.xml.parsers.ParserConfigurationException;
@@ -148,7 +150,7 @@ public class ApplicationModel {
      */
     void setDataSet(QDataSet ds) {
         dom.getController().getPanel().getController().setResetRanges(true);
-        dom.getController().getDataSourceFilter().getController()._setDataSource(null);
+        dom.getController().getDataSourceFilter().getController().setDataSource(null);
         dom.getController().getDataSourceFilter().setUri("vap+internal:");
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(null); // clear out properties and metadata
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(ds);
@@ -173,7 +175,7 @@ public class ApplicationModel {
         for ( Panel p: panels ) {
             p.getController().setResetPanel(true);
         }
-        dsf.getController()._setDataSource(null);
+        dsf.getController().setDataSource(null);
         dsf.setUri("vap+internal:");
         dsf.getController().setDataSetInternal(null); // clear out properties and metadata
         dsf.getController().setDataSetInternal(ds);
@@ -205,7 +207,7 @@ public class ApplicationModel {
         for ( Panel p: panels ) {
             p.getController().setResetPanel(true);
         }
-        dsf.getController()._setDataSource(null);
+        dsf.getController().setDataSource(null);
         dsf.setUri(suri);
         if ( label!=null ) {
             for ( Panel p: panels ) {
@@ -221,7 +223,7 @@ public class ApplicationModel {
     }
 
     public DataSource dataSource() {
-        return dom.getController().getDataSourceFilter().getController()._getDataSource();
+        return dom.getController().getDataSourceFilter().getController().getDataSource();
     }
 
     public void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
@@ -788,6 +790,45 @@ public class ApplicationModel {
      */
     public DataSourceController getDataSourceFilterController() {
         return dom.getController().getDataSourceFilter().getController();
+    }
+
+
+    /* fields related to the help system */
+    private final static String helpPath = "/helpfiles/autoplotHelp.hs";  //must be in classpath
+    private HelpSet mainHS;
+    private HelpBroker broker;
+    private CSH.DisplayHelpFromSource helper;
+
+    private void initializeHelpSystem() {
+        //ClassLoader cl = ApplicationModel.class.getClassLoader();
+        try {
+            URL hsurl = getClass().getResource(helpPath);
+            mainHS = new HelpSet(null, hsurl);
+        } catch (Exception ex) {
+            System.err.println("Error loading helpset " + helpPath);
+            System.err.println(ex.getMessage());
+        }
+        broker = mainHS.createHelpBroker();
+        helper = new CSH.DisplayHelpFromSource(broker);
+        
+    }
+    
+    /* A component action listener can pass the event here and the
+     * approriate help topic will be displayed, assuming it has
+     * been asigned a help id string by CSH.setHelpID(comp, string);
+     */
+    public void displayHelpFromEvent(ActionEvent e) {
+        if (broker == null) initializeHelpSystem();
+        helper.actionPerformed(e);
+        
+    }
+    /* Display the help window with default page displayed */
+
+    public void displayDefaultHelp() {
+        if (broker == null) initializeHelpSystem();
+
+        broker.setCurrentID("aphelp_main");
+        broker.setDisplayed(true);
     }
 }
 

@@ -119,13 +119,13 @@ public class TimeSeriesBrowseController {
                 dataSourceController.getTsb().setTimeRange(visibleRange);
                 dataSourceController.getTsb().setTimeResolution(newResolution);
                 String surl;
-                surl = DataSetURL.getDataSourceUri( dataSourceController._getDataSource());
+                surl = DataSetURL.getDataSourceUri( dataSourceController.getDataSource());
                 // check the registry for URLs, compare to surl, append prefix if necessary.
                 if (!autorange && surl.equals( dataSourceController.getTsbSuri())) {
                     logger.fine("we do no better with tsb");
                 } else {
                     dataSourceController.update(autorange, autorange);
-                    dataSourceController._setTsbSuri(surl);
+                    dataSourceController.setTsbSuri(surl);
                 }
             } else {
                 logger.fine("loaded dataset satifies request");
