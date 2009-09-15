@@ -31,6 +31,7 @@ import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURL;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URLSplit;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
@@ -40,9 +41,18 @@ import org.virbo.dsutil.DataSetBuilder;
 public class CefDataSource extends AbstractDataSource {
 
     Cef cef;
+    String dsid;
 
     public CefDataSource(URI uri) {
         super(uri);
+        URLSplit split= URLSplit.parse(uri.toString());
+        String file= split.file.substring(split.path.length());
+        int i= file.indexOf("__");
+        if ( i!=-1 ) {
+            dsid= file.substring(0,i);
+        } else {
+            dsid= null;
+        }
     }
 
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
@@ -108,7 +118,7 @@ public class CefDataSource extends AbstractDataSource {
     /**
      * read in the vars, interpret the metadata.  
      * @param var variable to read in.
-     * @param ds, null or non-null if the table is already read in.
+     * @param dsid, null or non-null if the table is already read in.
      * @param cmon, channel available when table must be read in.
      * @return dataset
      * @throws java.io.IOException
@@ -147,7 +157,7 @@ public class CefDataSource extends AbstractDataSource {
                 }
             }
             ds = DDataSet.wrap(ddata);
-            ds.putProperty(QDataSet.NAME, var);
+            setDsName( var, ds );
             rank0 = ds.rank();
 
         // TODO: check for fill
@@ -181,7 +191,7 @@ public class CefDataSource extends AbstractDataSource {
                 ds = dds;
 
 
-                ds.putProperty(QDataSet.NAME, var);
+                setDsName( var, ds );
 
                 if (param.sizes.length > 2) {
                     int[] sizes = new int[param.sizes.length + 1];
@@ -193,9 +203,9 @@ public class CefDataSource extends AbstractDataSource {
                     ds = new ReformDataSet(ds, sizes);
                     rank0 = ds.rank();
 
-                    //if (ds.rank() == 4) {
+                    //if (dsid.rank() == 4) {
                     //    collapseDim = 2;
-                    //    ds = DataSetOps.collapse2(ds); // for PEACE -- this is why we have to plug in units.
+                    //    dsid = DataSetOps.collapse2(dsid); // for PEACE -- this is why we have to plug in units.
                     //}
                 } else {
                     rank0 = ds.rank();
@@ -220,8 +230,8 @@ public class CefDataSource extends AbstractDataSource {
                     }
                 }
                 ds = dds;
-
-                ds.putProperty(QDataSet.NAME, var);
+                setDsName(var, ds);
+                
             }
         }
 
@@ -253,14 +263,15 @@ public class CefDataSource extends AbstractDataSource {
                         QDataSet dp02 = (QDataSet) ds.property(QDataSet.DEPEND_0);
                         if (dp01 != null && dp02 != null && dp01.length() == dp02.length()) {
                             dep0ds = org.virbo.dataset.DataSetOps.slice0(dep0ds, 0); // kludge for CLUSTER/PEACE
+                            dep0ds.putProperty( QDataSet.CONTEXT_0, null );
                             if (dep0ds.length() > qube[newDim]) { // second kludge for CLUSTER/PEACE
                                 dep0ds = org.virbo.dataset.DataSetOps.trim(dep0ds, 0, qube[newDim]);
                             }
                             //if (!org.virbo.dataset.DataSetUtil.isMonotonic(dep0ds)) {
                             //    QDataSet sort = org.virbo.dataset.DataSetOps.sort(dep0ds);
                             //    dep0ds = new SortDataSet(dep0ds, sort);
-                            //    ds = makeMonotonic(ds, newDim, sort);
-                            //    //System.err.println(org.virbo.dataset.DataSetUtil.statsString(ds));
+                            //    dsid = makeMonotonic(dsid, newDim, sort);
+                            //    //System.err.println(org.virbo.dataset.DataSetUtil.statsString(dsid));
                             //}
 
                         }
@@ -300,11 +311,11 @@ public class CefDataSource extends AbstractDataSource {
     }
 
     /**
-     * Applies the sort index to the idim-th dimension of the qube dataset ds.
+     * Applies the sort index to the idim-th dimension of the qube dataset dsid.
      * Note this does not rearrange the tags or planes!
      * TODO: consider sorting multiple dimensions at once, to reduce excessive
      *    copying
-     * @param ds, rank 1,2, or 3 qube dataset
+     * @param dsid, rank 1,2, or 3 qube dataset
      * @param idim the dimension being sorted.
      * @param sort rank 1 dataset of new indeces.
      * @return new dataset that is a copy of the first, resorted.
@@ -370,6 +381,14 @@ public class CefDataSource extends AbstractDataSource {
         }
 
         return cds;
+    }
+
+    private void setDsName(String var, MutablePropertyDataSet ds) {
+        if (dsid != null && var.endsWith("__" + dsid)) {
+            ds.putProperty(QDataSet.NAME, var.substring(0, var.length() - (dsid.length() + 2)));
+        } else {
+            ds.putProperty(QDataSet.NAME, var);
+        }
     }
 
     private void setParseFlags(Cef cef, String var, CefReaderData readerd) {
