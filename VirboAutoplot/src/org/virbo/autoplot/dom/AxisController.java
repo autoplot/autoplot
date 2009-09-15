@@ -50,10 +50,10 @@ public class AxisController extends DomNodeController {
                 changed = true;
             }
             if ( log && dmin <= 0.) {
-                dmin = dmax / 10000;
+                dmin = dmax / 10000000;
                 changed = true;
             }
-            if ( !log && dmin>0 && dmin<=dmax/10000 ) {
+            if ( !log && dmin>0 && dmin<=dmax/10000000 ) {
                 dmin = 0;
                 changed = true;
             }
