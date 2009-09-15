@@ -18,6 +18,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.das2.datum.EnumerationUnits;
 import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
@@ -68,11 +69,26 @@ public class CefDataSource extends AbstractDataSource {
     }
 
     @Override
-    public synchronized Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public synchronized Map<String, Object> getMetaData( ProgressMonitor mon) throws Exception {
         String var = (String) getParams().get("arg_0");
-
         CefReaderHeader.ParamStruct param = cef.parameters.get(var);
-        Map<String, Object> entries = new HashMap(param.entries);
+
+        return getMetaData( param, mon );
+    }
+
+    public synchronized Map<String, Object> getMetaData( CefReaderHeader.ParamStruct param, ProgressMonitor mon) throws Exception {
+
+        Map<String, Object> entries = new LinkedHashMap();
+
+        for ( int i=0; i<QDataSet.MAX_RANK; i++ ) {
+            String dep= (String) param.entries.get("DEPEND_"+i);
+            if ( dep!=null && !dep.equals("") ) {
+                Map<String,Object> depMeta= getMetaData( cef.parameters.get(dep), new NullProgressMonitor() );
+                entries.put( "DEPEND_"+i, depMeta );
+            }
+        }
+
+        entries.putAll(param.entries);
 
         Map<String, Object> restEntries = new HashMap();
         for (Iterator<String> i = cef.parameters.keySet().iterator(); i.hasNext();) {
@@ -86,7 +102,6 @@ public class CefDataSource extends AbstractDataSource {
                 restEntries.put(key, "[*," + s + "] " + parm.entries.get("CATDESC"));
             }
         }
-        entries.put("CEF", restEntries);
         return entries;
     }
 
@@ -178,10 +193,10 @@ public class CefDataSource extends AbstractDataSource {
                     ds = new ReformDataSet(ds, sizes);
                     rank0 = ds.rank();
 
-                    if (ds.rank() == 4) {
-                        collapseDim = 2;
-                        ds = DataSetOps.collapse2(ds); // for PEACE -- this is why we have to plug in units.
-                    }
+                    //if (ds.rank() == 4) {
+                    //    collapseDim = 2;
+                    //    ds = DataSetOps.collapse2(ds); // for PEACE -- this is why we have to plug in units.
+                    //}
                 } else {
                     rank0 = ds.rank();
                 }
@@ -241,12 +256,12 @@ public class CefDataSource extends AbstractDataSource {
                             if (dep0ds.length() > qube[newDim]) { // second kludge for CLUSTER/PEACE
                                 dep0ds = org.virbo.dataset.DataSetOps.trim(dep0ds, 0, qube[newDim]);
                             }
-                            if (!org.virbo.dataset.DataSetUtil.isMonotonic(dep0ds)) {
-                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(dep0ds);
-                                dep0ds = new SortDataSet(dep0ds, sort);
-                                ds = makeMonotonic(ds, newDim, sort);
-                                //System.err.println(org.virbo.dataset.DataSetUtil.statsString(ds));
-                            }
+                            //if (!org.virbo.dataset.DataSetUtil.isMonotonic(dep0ds)) {
+                            //    QDataSet sort = org.virbo.dataset.DataSetOps.sort(dep0ds);
+                            //    dep0ds = new SortDataSet(dep0ds, sort);
+                            //    ds = makeMonotonic(ds, newDim, sort);
+                            //    //System.err.println(org.virbo.dataset.DataSetUtil.statsString(ds));
+                            //}
 
                         }
                     }
