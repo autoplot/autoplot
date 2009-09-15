@@ -747,6 +747,14 @@ public class GuiSupport {
             }
         }));
 
+        plot.getDasMouseInputAdapter().addMenuItem( new JMenuItem(new AbstractAction("Panel Properties") {
+            public void actionPerformed(ActionEvent e) {
+                Panel p = controller.getPanel();
+                PropertyEditor pp = new PropertyEditor(p);
+                pp.showDialog(plot.getCanvas());
+            }
+        } ) );
+
        JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Panel Style Properties") {
             public void actionPerformed(ActionEvent e) {
                 Panel p = controller.getPanel();
