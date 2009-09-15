@@ -533,6 +533,10 @@ public class PanelController extends DomNodeController {
             result+="|transpose()";
         }
 
+        //if ( fillDs.rank()>3 ) {
+        //    result="|slice0(0)"+result;
+        //}
+
         return result;
 
     }
@@ -595,7 +599,12 @@ public class PanelController extends DomNodeController {
 
             if ( shouldSlice ) {
                 String component= guessSlice( fillDs );
-                panel.setComponent(component);  // it'll reenter this code now.  problem--autorange is based on slice.
+                String existingComponent= panel.getComponent();
+                if ( !existingComponent.equals("") ) {
+                    panel.setComponent( existingComponent + component );
+                } else {
+                    panel.setComponent(component);  // it'll reenter this code now.  problem--autorange is based on slice.
+                }
                 doResetRenderType(panel.getRenderType());
                 return;
             }
