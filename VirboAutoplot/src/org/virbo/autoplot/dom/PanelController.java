@@ -655,7 +655,9 @@ public class PanelController extends DomNodeController {
      */
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            if ( panel.getComponent().startsWith("|") ) panel.component=""; //TODO yuck danger code.
+            if ( !dom.getController().isValueAdjusting() ) {
+                if ( panel.getComponent().startsWith("|") ) panel.component=""; //TODO yuck danger code.
+            }
             setResetPanel(true);
             setResetRanges(true);
             panel.setAutolabel(true);
