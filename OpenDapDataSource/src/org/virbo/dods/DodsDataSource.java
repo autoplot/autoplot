@@ -70,7 +70,7 @@ public class DodsDataSource extends AbstractDataSource {
         super(uri);
 
         // remove the .dds (or .html) extension.
-        String surl = uri.toString();
+        String surl = uri.getRawSchemeSpecificPart();
         int k= surl.lastIndexOf("?");
         int i = k==-1 ? surl.lastIndexOf('.')  : surl.lastIndexOf('.',k);
         sMyUrl = surl.substring(0, i);
