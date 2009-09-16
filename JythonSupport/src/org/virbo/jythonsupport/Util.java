@@ -24,7 +24,7 @@ import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceUtil;
@@ -43,9 +43,9 @@ public class Util {
      * @param ds
      */
     public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
-        URI uri = DataSetURL.getURI(surl);
-        DataSourceFactory factory = DataSetURL.getDataSourceFactory(uri, new NullProgressMonitor());
-        DataSource result = factory.getDataSource(DataSetURL.getResourceURI(uri));
+        URI uri = DataSetURI.getURI(surl);
+        DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
+        DataSource result = factory.getDataSource(DataSetURI.getResourceURI(uri));
         if (mon == null) {
             mon = new NullProgressMonitor();
         }
@@ -53,7 +53,7 @@ public class Util {
         //Logger.getLogger("virbo.jythonsupport").fine( "created dataset #"+rds.getClass().gethashCode() );
 
         try {
-            metadata= result.getMetaData( new NullProgressMonitor() );
+            metadata= result.getMetadata( new NullProgressMonitor() );
         } catch ( Exception e ) {
             
         }
@@ -91,14 +91,14 @@ public class Util {
         if (surl.equals(metadataSurl)) {
             return metadata;
         } else {
-            URI url = DataSetURL.getURI(surl);
-            DataSourceFactory factory = DataSetURL.getDataSourceFactory(url, new NullProgressMonitor());
-            DataSource result = factory.getDataSource(DataSetURL.getResourceURI(url));
+            URI url = DataSetURI.getURI(surl);
+            DataSourceFactory factory = DataSetURI.getDataSourceFactory(url, new NullProgressMonitor());
+            DataSource result = factory.getDataSource(DataSetURI.getResourceURI(url));
             if (mon == null) {
                 mon = new NullProgressMonitor();
             }
             //result.getDataSet(mon);  some data sources may assume that getDataSet comes before getMetaData
-            return result.getMetaData(mon);
+            return result.getMetadata(mon);
         }
     }
 
