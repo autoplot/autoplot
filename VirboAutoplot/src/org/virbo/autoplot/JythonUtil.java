@@ -11,7 +11,7 @@ import java.net.URL;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 
 /**
  *
@@ -39,7 +39,7 @@ public class JythonUtil {
         PySystemState.initialize( PySystemState.getBaseProperties(), null, argv );
         PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
         interp.set("dom", model.getDocumentModel() );
-        URL url= DataSetURL.getURL(script);
+        URL url= DataSetURI.getURL(script);
         InputStream in= url.openStream();
         interp.execfile(in);
         in.close();
