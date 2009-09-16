@@ -474,7 +474,7 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
         }
     }
 
-    public void setUrl(String url) {
+    public void setURI(String url) {
         try {
             split = URLSplit.parse(url);
             params = URLSplit.parseParams(split.params);
@@ -498,7 +498,7 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
 
     }
 
-    public String getUrl() {
+    public String getURI() {
 
         split.params = URLSplit.formatParams(params);
 

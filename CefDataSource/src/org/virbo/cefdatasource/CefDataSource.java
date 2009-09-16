@@ -79,7 +79,7 @@ public class CefDataSource extends AbstractDataSource {
     }
 
     @Override
-    public synchronized Map<String, Object> getMetaData( ProgressMonitor mon) throws Exception {
+    public synchronized Map<String, Object> getMetadata( ProgressMonitor mon) throws Exception {
         String var = (String) getParams().get("arg_0");
         CefReaderHeader.ParamStruct param = cef.parameters.get(var);
 
@@ -298,7 +298,7 @@ public class CefDataSource extends AbstractDataSource {
         }
         
         try {
-            Map<String, Object> m = this.getMetaData(new NullProgressMonitor());
+            Map<String, Object> m = this.getMetadata(new NullProgressMonitor());
             Map props = new CefMetadataModel().properties(m);
             DataSetUtil.putProperties(props, ds);
         } catch (Exception e) {

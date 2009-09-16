@@ -17,11 +17,11 @@ public class EditorTest {
 
         //String url= "file:///media/mini/data.backup/examples/dat/omni2_1965.dat?timeFormat=$Y+$j&skip=22";
         String url= "file:///media/mini/data.backup/examples/dat/A1050412.TXT";
-        panel.setUrl(url);
+        panel.setURI(url);
 
         JOptionPane.showConfirmDialog( null, panel );
         
-        System.err.println( panel.getUrl() );
+        System.err.println( panel.getURI() );
         
         
     }

@@ -562,7 +562,7 @@ private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
         return this;
     }
 
-    public void setUrl(String url) {
+    public void setURI(String url) {
         try {
             split = URLSplit.parse(url);
             params = URLSplit.parseParams(split.params);
@@ -612,7 +612,7 @@ private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
 
     }
 
-    public String getUrl() {
+    public String getURI() {
 
         String args = "";
         if ( skipLines > 0 ) {

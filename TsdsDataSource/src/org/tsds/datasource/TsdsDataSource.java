@@ -298,13 +298,8 @@ class TsdsDataSource extends AbstractDataSource {
                 }
             }
 
-            public URL getURL() {
-                try {
-                    return new URL(TsdsDataSource.this.getURL());
-                } catch (MalformedURLException ex) {
-                    Logger.getLogger(TsdsDataSource.class.getName()).log(Level.SEVERE, null, ex);
-                    throw new RuntimeException(ex);
-                }
+            public String getURI() {
+                return TsdsDataSource.this.getURI();
             }
 
             public DatumRange getTimeRange() {
@@ -594,13 +589,13 @@ class TsdsDataSource extends AbstractDataSource {
     }
 
     @Override
-    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         Node n = initialDocument.getFirstChild();
         return MetadataUtil.toMetaTree(n);
     }
 
     @Override
-    public String getURL() {
+    public String getURI() {
         TimeParser tp = TimeParser.create("%Y%m%d");
 
         String sparams =

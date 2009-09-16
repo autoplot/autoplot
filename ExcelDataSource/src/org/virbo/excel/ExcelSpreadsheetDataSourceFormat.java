@@ -22,6 +22,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -170,9 +171,11 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
         }
     }
     
-    public void formatData(File url, java.util.Map<String,String> params, QDataSet data, ProgressMonitor mon) throws IOException {
-	
-        FileOutputStream out = new FileOutputStream(url);
+    public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
+	URLSplit split= URLSplit.parse(uri);
+        java.util.Map<String,String> params= URLSplit.parseParams(split.params);
+
+        FileOutputStream out = new FileOutputStream( new File( split.resourceUri ) );
         
         HSSFWorkbook wb= new HSSFWorkbook();
         HSSFSheet sheet= wb.createSheet();

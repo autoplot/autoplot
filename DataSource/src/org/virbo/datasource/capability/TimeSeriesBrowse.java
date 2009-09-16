@@ -52,9 +52,9 @@ public interface TimeSeriesBrowse {
     Datum getTimeResolution();
         
     /**
-     * return the URL for the current time range and resolution.  This is also
+     * return the URI for the current time range and resolution.  This is also
      * used to identify the dataset, so the same urls returned from here must
      * return the same dataset!
      */
-    URL getURL( );
+    String getURI( );
 }

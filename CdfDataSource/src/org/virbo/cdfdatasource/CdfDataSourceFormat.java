@@ -19,6 +19,7 @@ import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 import static gsfc.nssdc.cdf.CDFConstants.*;
 
@@ -55,10 +56,15 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         return name;
     }
 
-    public void formatData(File url, java.util.Map<String, String> params, QDataSet data, ProgressMonitor mon) throws IOException, CDFException {
+    public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException, CDFException {
 
+        URLSplit split= URLSplit.parse( uri );
+        java.util.Map<String, String> params= URLSplit.parseParams( split.params );
+
+        File url= new File(split.file);
+        
         url.delete();
-        cdf = CDF.create(url.toString());
+        cdf = CDF.create( new File( split.resourceUri ).toString() );
 
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
 

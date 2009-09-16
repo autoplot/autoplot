@@ -336,7 +336,7 @@ public class CdfFileDataSource extends AbstractDataSource {
     }
 
     @Override
-    public synchronized Map<String, Object> getMetaData(ProgressMonitor mon) {
+    public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) {
         if (attributes == null) {
             return null; // transient state
         }

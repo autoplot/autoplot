@@ -89,7 +89,7 @@ public class FitsDataSource extends AbstractDataSource {
     }
 
     @Override
-    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         int ihdu = 0;
         Map<String, Integer> plottable = FitsDataSourceFactory.getPlottable(uri, mon);
 

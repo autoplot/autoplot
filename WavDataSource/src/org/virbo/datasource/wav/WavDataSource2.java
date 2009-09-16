@@ -115,7 +115,7 @@ public class WavDataSource2 extends AbstractDataSource {
     }
 
     @Override
-    public Map<String,Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String,Object> getMetadata(ProgressMonitor mon) throws Exception {
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(resourceURI.toURL());
         AudioFormat audioFormat= fileFormat.getFormat();
         Map<String,Object> properties= new HashMap( audioFormat.properties() );

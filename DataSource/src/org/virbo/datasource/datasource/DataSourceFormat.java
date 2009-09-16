@@ -5,14 +5,21 @@
 
 package org.virbo.datasource.datasource;
 
-import java.io.File;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 
 /**
- *
  * @author jbf
  */
 public interface DataSourceFormat {
-    public void formatData( File url,java.util.Map<String,String> params, QDataSet data, ProgressMonitor mon  ) throws Exception;
+    /**
+     * Format the dataset using the specified URI.  This should be parsed the same way 
+     * read URIs are parsed, and arguments should reflect those of the reader 
+     * when possible.
+     * @param uri
+     * @param data
+     * @param mon
+     * @throws Exception
+     */
+    public void formatData( String uri, QDataSet data, ProgressMonitor mon  ) throws Exception;
 }

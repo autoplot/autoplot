@@ -140,7 +140,7 @@ public class SpaseRecordDataSource implements DataSource {
         
     }
     
-    public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
+    public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
         // If we're using a DOM Level 2 implementation, then our Document
         // object ought to implement DocumentTraversal
         DocumentTraversal traversal = (DocumentTraversal)document;
@@ -173,13 +173,13 @@ public class SpaseRecordDataSource implements DataSource {
         
     }
     
-    public String getURL() {
+    public String getURI() {
         return url.toString();
     }
     
     public Map<String, Object> getProperties() {
         try {
-            return new SpaseMetadataModel().properties( getMetaData( new NullProgressMonitor() ) );
+            return new SpaseMetadataModel().properties( getMetadata( new NullProgressMonitor() ) );
         } catch (Exception ex) {
             return Collections.singletonMap( "Exception", (Object)ex );
         } 

@@ -103,7 +103,7 @@ public abstract class AbstractDataSource implements DataSource {
         return uri.toString();
     }
 
-    public String getURL() {
+    public String getURI() {
         return uri.toString();
     }
 
@@ -153,7 +153,7 @@ public abstract class AbstractDataSource implements DataSource {
      * abstract class version returns an empty tree.  Override this method
      * to provide metadata.
      */
-    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         return new HashMap<String, Object>();
     }
 
@@ -163,7 +163,7 @@ public abstract class AbstractDataSource implements DataSource {
 
     public Map<String, Object> getProperties() {
         try {
-            Map<String, Object> meta = getMetaData(new NullProgressMonitor());
+            Map<String, Object> meta = getMetadata(new NullProgressMonitor());
             return getMetadataModel().properties(meta);
         } catch (Exception e) {
             e.printStackTrace();

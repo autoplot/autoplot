@@ -21,5 +21,11 @@ public interface Caching {
      * @return
      */
     boolean satisfies( String surl );
-    void resetURL( String surl );
+
+    /**
+     * Set the DataSource's URI to this new one.  This must be a URI where
+     * satisifies() is true.
+     * @param surl
+     */
+    void resetURI( String surl );
 }

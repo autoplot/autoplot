@@ -217,7 +217,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
     File cdfFile;
 
-    public void setUrl(String url) {
+    public void setURI(String url) {
         split= URLSplit.parse(url);
         params= URLSplit.parseParams(split.params);
 
@@ -279,7 +279,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
     }
 
-    public String getUrl() {
+    public String getURI() {
         String slice= subsetTextField.getText();
         params.put( "arg_0", parameter + ( slice==null ? "" : slice ) );
         split.params= URLSplit.formatParams(params);

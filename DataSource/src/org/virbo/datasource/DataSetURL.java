@@ -167,12 +167,12 @@ public class DataSetURL {
     public static String getDataSourceUri(DataSource ds) {
         DataSourceFactory factory = dsToFactory.get(ds);
         if (factory instanceof AggregatingDataSourceFactory) {
-            return ds.getURL();
+            return ds.getURI();
         }
         if (factory == null) {
-            return ds.getURL();  // nothing we can do
+            return ds.getURI();  // nothing we can do
         } else {
-            URLSplit split = URLSplit.parse(ds.getURL());
+            URLSplit split = URLSplit.parse(ds.getURI());
             String fext;
             fext = DataSourceRegistry.getInstance().getExtensionFor(factory).substring(1);
             if (DataSourceRegistry.getInstance().hasSourceByExt(split.ext)) {

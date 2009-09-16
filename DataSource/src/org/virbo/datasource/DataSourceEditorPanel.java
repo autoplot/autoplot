@@ -13,6 +13,19 @@ import javax.swing.JPanel;
  */
 public interface DataSourceEditorPanel {
     public JPanel getPanel();
-    public void setUrl( String url );
-    public String getUrl();
+
+    /**
+     * initialize the editor to edit this URI.  This may be incomplete, and the editor
+     * should make it valid so getUri is valid.
+     * @param url
+     */
+    public void setURI( String uri );
+
+    /**
+     * return the URI configured by the editor.  This should be the fully-qualified
+     * URI, with the "vap+<ext>:" scheme.
+     *
+     * @return
+     */
+    public String getURI();
 }

@@ -239,7 +239,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
 
         if (edit != null) {
-            edit.setUrl(surl);
+            edit.setURI(surl);
             DataSourceEditorDialog dialog;
             Window window = SwingUtilities.getWindowAncestor(this);
             String title = "Editing " + surl;
@@ -254,7 +254,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             dialog.setVisible(true);
 
             if (!dialog.isCancelled()) {
-                dataSetSelector.setSelectedItem(edit.getUrl());
+                dataSetSelector.setSelectedItem(edit.getURI());
                 keyModifiers = dialog.getModifiers();
                 maybePlot(true);
             } else {

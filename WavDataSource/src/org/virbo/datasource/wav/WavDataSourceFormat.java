@@ -23,6 +23,7 @@ import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 import org.virbo.metatree.MetadataUtil;
 
@@ -98,7 +99,10 @@ public class WavDataSourceFormat implements DataSourceFormat {
         };
     }
 
-    public void formatData(File url, java.util.Map<String, String> params, QDataSet data, ProgressMonitor mon) throws IOException {
+    public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
+
+        URLSplit split= URLSplit.parse(uri);
+        java.util.Map<String, String> params= URLSplit.parseParams(split.params);
 
         QDataSet dep0= (QDataSet) data.property( QDataSet.DEPEND_0 );
 
@@ -129,7 +133,7 @@ public class WavDataSourceFormat implements DataSourceFormat {
 
         AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity() );
 
-        File outFile= url;
+        File outFile=  new File( split.resourceUri );
         
         if (AudioSystem.isFileTypeSupported(
                 AudioFileFormat.Type.WAVE, inFileAIS)) {

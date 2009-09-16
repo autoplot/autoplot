@@ -44,12 +44,18 @@ public interface DataSource {
      * implementation.  Even though this takes a monitor, it will be called after getDataSet,
      * and the monitor may be safely ignored.
      */
-    Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception ;
+    Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception ;
 
-    String getURL();
+    /**
+     * return the fully-qualified URI of this data source, including the "vap+<ext>:" scheme.
+     * @return
+     */
+    String getURI();
     
     /**
-     * discovery properties for the dataset
+     * discovery properties for the dataset.  These should follow the QDataSet conventions, such as
+     * TITLE, LABEL, etc, and should mirror the structure of the dataset.  Note
+     * getMetadataModel().getProperties( getMetaData() ) should return the same thing.
      */
     Map<String,Object> getProperties();
    

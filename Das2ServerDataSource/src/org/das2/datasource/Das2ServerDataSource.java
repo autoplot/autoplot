@@ -119,16 +119,12 @@ class Das2ServerDataSource extends AbstractDataSource {
                 resolution= d;
             }
 
-            public URL getURL() {
+            public String getURI() {
                 String sparams= "dataset="+params.get( "dataset" ) + "&start_time=" + URLEncoder.encode( timeRange.min().toString() )
                         + "&end_time=" + URLEncoder.encode( timeRange.max().toString() )
                         + "&resolution=" + resolution.doubleValue(Units.seconds);
                 if ( dsParams!=null )  sparams+= "&" + dsParams;
-                try {
-                    return new URL( "" + resourceURI + "?" + sparams);
-                } catch (MalformedURLException ex) {
-                    throw new RuntimeException(ex);
-                }
+                return "vap+das2Server:" + resourceURI + "?" + sparams;
             }
 
             public DatumRange getTimeRange() {
@@ -142,13 +138,13 @@ class Das2ServerDataSource extends AbstractDataSource {
     }
 
     @Override
-    public String getURL() {
+    public String getURI() {
         // TODO: Cheesy.  ApplicationModel shouldn't call getURL when TimeSeriesBrowse exists.
         TimeSeriesBrowse tsb= getCapability( TimeSeriesBrowse.class );
         if ( tsb!=null ) {
-            return getCapability( TimeSeriesBrowse.class ).getURL().toString();
+            return getCapability( TimeSeriesBrowse.class ).getURI();
         } else {
-            return super.getURL();
+            return super.getURI();
         }
     }
 

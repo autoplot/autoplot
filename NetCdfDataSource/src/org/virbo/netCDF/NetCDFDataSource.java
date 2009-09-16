@@ -156,7 +156,7 @@ public class NetCDFDataSource extends AbstractDataSource {
         return new NetCDFDataSourceFactory();
     }
     
-    public Map<String,Object> getMetaData( ProgressMonitor mon ) throws Exception {
+    public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
         readData( mon );
         List attr= variable.getAttributes();
         

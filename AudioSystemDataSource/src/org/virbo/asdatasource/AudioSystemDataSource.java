@@ -138,7 +138,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
                 }
             }
         };
-        new Thread( run, "updater for " + getURL() ).start();
+        new Thread( run, "updater for " + getURI() ).start();
     }
 
 }

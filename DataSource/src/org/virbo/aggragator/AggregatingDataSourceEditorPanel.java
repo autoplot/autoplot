@@ -113,7 +113,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         delegatePanel.validate();
     }
 
-    public void setUrl(String url) {
+    public void setURI(String url) {
         split= URLSplit.parse(url);
         params= URLSplit.parseParams(split.params);
 
@@ -132,7 +132,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 delegateP.add(delegateDataSetSelector,BorderLayout.SOUTH );
                 setDelegateComponent(delegateP);
             } else {
-                delegateEditorPanel.setUrl(delegateUrl);
+                delegateEditorPanel.setURI(delegateUrl);
                 setDelegateComponent(delegateEditorPanel.getPanel());
             }
 
@@ -146,10 +146,10 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
     }
 
-    public String getUrl() {
+    public String getURI() {
         String delegateUrl;
         if ( delegateEditorPanel!=null ) {
-            delegateUrl= delegateEditorPanel.getUrl();
+            delegateUrl= delegateEditorPanel.getURI();
         } else {
             delegateUrl= delegateDataSetSelector.getValue();
         }

@@ -23,19 +23,22 @@ import org.virbo.datasource.datasource.DataSourceFormat;
  */
 public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
-    public void formatData(File url, java.util.Map<String, String> params, QDataSet data, ProgressMonitor mon) throws Exception {
-        URLSplit split = URLSplit.parse(url.toURI().toString());
+    public void formatData( String url, QDataSet data, ProgressMonitor mon) throws Exception {
+
+        URLSplit split = URLSplit.parse(url.toString());
+        java.util.Map<String, String> params= URLSplit.parseParams(split.params);
+
         boolean binary= "binary".equals( params.get( "type" ) );
         if (split.ext.equals(".qds")) {
             if ( binary ) {
-                new org.virbo.qstream.SimpleStreamFormatter().format( data, new FileOutputStream(url), false );
+                new org.virbo.qstream.SimpleStreamFormatter().format( data, new FileOutputStream( new File( split.resourceUri ) ), false );
             } else {
-                new org.virbo.qstream.SimpleStreamFormatter().format( data, new FileOutputStream(url), true );
+                new org.virbo.qstream.SimpleStreamFormatter().format( data, new FileOutputStream(  new File( split.resourceUri ) ), true );
             }
         } else {
             if (data.rank() == 2) {
                 TableDataSet tds = TableDataSetAdapter.create(data);
-                FileOutputStream fo = new FileOutputStream(url);
+                FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
                 if ( binary ) {
                     TableUtil.dumpToBinaryStream(tds, fo);
                 } else {
@@ -44,7 +47,7 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
                 fo.close();
             } else if (data.rank() == 1) {
                 VectorDataSet vds = VectorDataSetAdapter.create(data);
-                FileOutputStream fo = new FileOutputStream(url);
+                FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
                 if ( binary ) {
                     VectorUtil.dumpToBinaryStream(vds, fo);
                 } else {

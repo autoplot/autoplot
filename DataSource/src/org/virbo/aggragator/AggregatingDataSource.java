@@ -93,13 +93,8 @@ public class AggregatingDataSource extends AbstractDataSource {
             public void setTimeResolution(Datum d) {
             }
 
-            public URL getURL() {
-                try {
-                    return DataSetURL.getURL( AggregatingDataSource.this.getURL() ) ;
-                } catch (MalformedURLException ex) {
-                    Logger.getLogger(AggregatingDataSource.class.getName()).log(Level.SEVERE, null, ex);
-                    return null;
-                }
+            public String getURI() {
+                return AggregatingDataSource.this.getURI();
             }
 
             public DatumRange getTimeRange() {
@@ -150,7 +145,7 @@ public class AggregatingDataSource extends AbstractDataSource {
 
             if (result == null) {
                 result = DDataSet.copy(ds1);
-                this.metadata = delegateDataSource.getMetaData(new NullProgressMonitor());
+                this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
                 cacheRange1 = dr1;
             } else {
                 result.append(DDataSet.copy(ds1));
@@ -184,10 +179,10 @@ public class AggregatingDataSource extends AbstractDataSource {
     /**
      * returns the metadata provided by the first delegate dataset.
      */
-    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         if (metadata == null) {
             Map<String, Object> retValue;
-            retValue = super.getMetaData(mon);
+            retValue = super.getMetadata(mon);
             return retValue;
         } else {
             return metadata;
@@ -265,7 +260,7 @@ public class AggregatingDataSource extends AbstractDataSource {
     }
 
     @Override
-    public String getURL() {
+    public String getURI() {
         String surl = this.resourceURI.toString() + "?" ;
         if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
         surl += "timerange=" + String.valueOf(viewRange);

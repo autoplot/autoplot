@@ -642,7 +642,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
     }
 
     @Override
-    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         if (ds == null) {
             return new HashMap<String, Object>();
         }

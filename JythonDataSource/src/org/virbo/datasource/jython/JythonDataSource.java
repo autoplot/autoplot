@@ -222,7 +222,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     }
 
     @Override
-    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
         return metadata;
     }
     
@@ -263,7 +263,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         }
     }
 
-    public void resetURL(String surl) {
+    public void resetURI(String surl) {
         try {
             this.uri = new URI(surl);
             URLSplit split = URLSplit.parse(uri.toString());

@@ -158,7 +158,7 @@ public class DodsDataSource extends AbstractDataSource {
         MyDDSParser parser = new MyDDSParser();
         parser.parse( new URL(adapter.getSource().toString() + ".dds").openStream());
 
-        getMetaData(mon);
+        getMetadata(mon);
 
         Map<String,Object> interpretedMetadata = null;
 
@@ -275,7 +275,7 @@ public class DodsDataSource extends AbstractDataSource {
 
 
     @Override
-    public synchronized Map<String, Object> getMetaData(ProgressMonitor mon) throws IOException, DASException, ParseException {
+    public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) throws IOException, DASException, ParseException {
         if (metadata == null) {
             MyDASParser parser = new MyDASParser();
             URL url = new URL(adapter.getSource().toString() + ".das");

@@ -16,6 +16,7 @@ import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.datasource.URLSplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -129,8 +130,11 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
         return result;
     }
 
-    public void formatData(File url, java.util.Map<String,String> params, QDataSet data, ProgressMonitor mon) throws IOException {
+    public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
         
+        URLSplit split= URLSplit.parse(uri);
+        java.util.Map<String,String> params= URLSplit.parseParams(split.params);
+
         ByteBuffer result;
         if (data.rank() == 2) {
             result= formatRank2( data, mon, params );
@@ -140,7 +144,7 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
             throw new IllegalArgumentException("rank not supported");
         }
         
-        WritableByteChannel channel= Channels.newChannel( new FileOutputStream(url) );
+        WritableByteChannel channel= Channels.newChannel( new FileOutputStream( new File( split.resourceUri ) ) );
         channel.write(result);
         
         channel.close();

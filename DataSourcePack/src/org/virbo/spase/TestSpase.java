@@ -28,7 +28,7 @@ public class TestSpase {
      */
     public static void main(String[] args) throws Exception {
         SpaseRecordDataSource ds= new SpaseRecordDataSource( new URI( "file:/L:/ct/virbo/autoplot/sample2.xml" ) );
-        Map<String,Object> meta= ds.getMetaData(new NullProgressMonitor());
+        Map<String,Object> meta= ds.getMetadata(new NullProgressMonitor());
         SpaseMetadataModel metamodel= new SpaseMetadataModel();
         Map props= metamodel.properties( meta );
         

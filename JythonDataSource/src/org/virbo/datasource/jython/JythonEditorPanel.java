@@ -77,7 +77,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return this;
     }
 
-    public void setUrl(String url) {
+    public void setURI(String url) {
         try {
             File f = DataSetURL.getFile( DataSetURL.getWebURL( new URI(url) ), new NullProgressMonitor());
             support.loadFile(f);
@@ -88,7 +88,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
     }
 
-    public String getUrl() {
+    public String getURI() {
         return support.getFile().toURI().toString();
     }
 
