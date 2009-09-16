@@ -58,9 +58,9 @@ import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.layout.LayoutUtil;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.qstream.QDataSetStreamHandler;
 import org.virbo.qstream.SerializeDelegate;
@@ -111,7 +111,7 @@ public class ApplicationModel {
 
     public ApplicationModel() {
 
-        DataSetURL.init();
+        DataSetURI.init();
 
         dom = new Application();
 
@@ -234,7 +234,7 @@ public class ApplicationModel {
 
     /**
      * Create a dataSource object and set autoplot to display this datasource.
-     * A dataSource object is created by DataSetURL._getDataSource, which looks
+     * A dataSource object is created by DataSetURI._getDataSource, which looks
      * at registered data sources to get a factory object, then the datasource is
      * created with the factory object.
      *
@@ -252,19 +252,19 @@ public class ApplicationModel {
             return;
         }  // not really supported
 
-        URLSplit split = URLSplit.parse(surl);
-        surl = URLSplit.format(split);
-        //surl = DataSetURL.maybeAddFile(surl);
+        URISplit split = URISplit.parse(surl);
+        surl = URISplit.format(split);
+        //surl = DataSetURI.maybeAddFile(surl);
 
         try {
             if (split.file.endsWith(".vap")) {
                 try {
-                    URL url = DataSetURL.getURL(surl);
+                    URL url = DataSetURI.getURL(surl);
                     mon.started();
                     mon.setProgressMessage("loading vap file");
-                    File openable = DataSetURL.getFile(url, application.getMonitorFactory().getMonitor(canvas, "loading vap", ""));
+                    File openable = DataSetURI.getFile(url, application.getMonitorFactory().getMonitor(canvas, "loading vap", ""));
                     if (split.params != null) {
-                        LinkedHashMap<String, String> params = URLSplit.parseParams(split.params);
+                        LinkedHashMap<String, String> params = URISplit.parseParams(split.params);
                         doOpen(openable, params);
                     } else {
                         doOpen(openable);
@@ -437,7 +437,7 @@ public class ApplicationModel {
     public Bookmark addBookmark(final String surl) {
 
         Bookmark.Item item = new Bookmark.Item(surl);
-        URLSplit split = URLSplit.parse(surl);
+        URISplit split = URISplit.parse(surl);
         String autoTitle = split.file.substring(split.path.length());
         if (autoTitle.length() == 0) autoTitle = surl;
         item.setTitle(autoTitle);
