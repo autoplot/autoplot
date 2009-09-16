@@ -85,7 +85,7 @@ import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -558,7 +558,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             } else {
                 surlDir = surl.substring(0, i);
             }
-            File dir = DataSetURL.getFile(DataSetURL.getURL(surlDir), new NullProgressMonitor());
+            File dir = DataSetURI.getFile(DataSetURI.getURL(surlDir), new NullProgressMonitor());
             JFileChooser chooser = new JFileChooser(dir);
             int r = chooser.showOpenDialog(this);
             String result;
