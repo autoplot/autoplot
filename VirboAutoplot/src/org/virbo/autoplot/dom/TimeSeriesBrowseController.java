@@ -85,7 +85,7 @@ public class TimeSeriesBrowseController {
             }
         };
 
-        this.plot.getXAxis().addPropertyChangeListener(timeSeriesBrowseListener);
+        this.plot.getXAxis().addPropertyChangeListener( DasAxis.PROPERTY_DATUMRANGE, timeSeriesBrowseListener);
 
     }
 
@@ -139,7 +139,7 @@ public class TimeSeriesBrowseController {
     }
 
     void release() {
-        this.plot.getXAxis().removePropertyChangeListener(timeSeriesBrowseListener);
+        this.plot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
         timeSeriesBrowseListener = null;
     }
     
