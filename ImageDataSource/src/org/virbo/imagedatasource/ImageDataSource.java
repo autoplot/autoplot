@@ -25,7 +25,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.metatree.MetadataUtil;
 import org.w3c.dom.Node;
 
@@ -103,8 +103,8 @@ class ImageDataSource extends AbstractDataSource {
 
         mon.started();
 
-        //BufferedImage image = ImageIO.read(DataSetURL.getFile(uri, mon));
-        BufferedImage image = ImageIO.read(DataSetURL.getInputStream(uri, mon));
+        //BufferedImage image = ImageIO.read(DataSetURI.getFile(uri, mon));
+        BufferedImage image = ImageIO.read(DataSetURI.getInputStream(uri, mon));
 
         String channel = params.get("channel");
 
@@ -161,7 +161,7 @@ class ImageDataSource extends AbstractDataSource {
     }
 
     public Map<String, Object> getJpegExifMetaData(ProgressMonitor mon) throws Exception {
-        InputStream in = DataSetURL.getInputStream(uri, mon);
+        InputStream in = DataSetURI.getInputStream(uri, mon);
         Metadata metadata = JpegMetadataReader.readMetadata(in);
 
         Map<String, Object> map = new HashMap<String, Object>();
@@ -178,7 +178,7 @@ class ImageDataSource extends AbstractDataSource {
     }
 
     @Override
-    public Map<String, Object> getMetaData(ProgressMonitor mon) throws Exception {
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
 
         String ext = getExt(resourceURI);
 
@@ -187,7 +187,7 @@ class ImageDataSource extends AbstractDataSource {
 
         } else {
 
-            File f = DataSetURL.getFile(uri, new NullProgressMonitor());
+            File f = DataSetURI.getFile(uri, new NullProgressMonitor());
 
             Map<String, Object> map = new HashMap<String, Object>();
 
