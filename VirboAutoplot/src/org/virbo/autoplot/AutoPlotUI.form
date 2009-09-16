@@ -341,7 +341,7 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="autoplotHelpMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Autoplot Help..."/>
+                <Property name="text" type="java.lang.String" value="Help Contents..."/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autoplotHelpMenuItemActionPerformed"/>

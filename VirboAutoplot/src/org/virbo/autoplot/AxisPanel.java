@@ -115,6 +115,7 @@ public class AxisPanel extends javax.swing.JPanel {
         run.run();
         //RequestProcessor.invokeLater(run);
 
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axisPanel");
 
     }
 

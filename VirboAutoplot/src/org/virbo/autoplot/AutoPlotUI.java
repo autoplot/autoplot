@@ -44,6 +44,8 @@ import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.help.CSH;
+import javax.help.HelpBroker;
+import javax.help.HelpSet;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -124,7 +126,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
     private RequestListener rlistener;
     private JDialog fontAndColorsDialog = null;
     private BookmarksManager bookmarksManager = null;
-    
+    private AutoplotHelpSystem helpSystem;
+
     private static String RESOURCES= "/org/virbo/autoplot/resources/";
     public static final Icon WARNING_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"warning-icon.png") );
     public static final Icon ERROR_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"error-icon.png") );
@@ -135,6 +138,10 @@ public class AutoPlotUI extends javax.swing.JFrame {
     
     /** Creates new form AutoPlotMatisse */
     public AutoPlotUI(ApplicationModel model) {
+
+        // Initialize help system now so it's ready for components to register IDs with
+        AutoplotHelpSystem.initialize(getRootPane());
+        helpSystem = AutoplotHelpSystem.getHelpSystem();
 
         if ( DasApplication.getDefaultApplication().isHeadless() ) {
             model.setExceptionHandler( DasApplication.getDefaultApplication().getExceptionHandler() );
@@ -1186,7 +1193,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         });
 
         CSH.setHelpIDString(autoplotHelpMenuItem, "aphelp_main");
-        autoplotHelpMenuItem.setText("Autoplot Help...");
+        autoplotHelpMenuItem.setText("Help Contents...");
         autoplotHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 autoplotHelpMenuItemActionPerformed(evt);
@@ -1473,7 +1480,7 @@ private void autoLayoutCheckBoxMenuItemActionPerformed(java.awt.event.ActionEven
 }//GEN-LAST:event_autoLayoutCheckBoxMenuItemActionPerformed
 
 private void autoplotHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoplotHelpMenuItemActionPerformed
-    applicationModel.displayDefaultHelp();
+    helpSystem.displayHelpFromEvent(evt);
 }//GEN-LAST:event_autoplotHelpMenuItemActionPerformed
 
 private PropertyChangeListener optionsListener= new PropertyChangeListener() {
@@ -1722,7 +1729,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
         this.statusLabel.setText(myMess);
         this.statusLabel.setToolTipText(message);
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;

@@ -10,4 +10,4 @@
         <label>Table Of Contents</label>
         <data>toc.xml</data>
     </view>
-</helpset>
+<title>Autoplot Help</title><view><type>javax.help.IndexView</type><name>Index</name><label>Index</label><data>index.xml</data></view></helpset>
