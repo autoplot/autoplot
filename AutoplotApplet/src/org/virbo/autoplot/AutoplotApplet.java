@@ -4,13 +4,8 @@
  */
 package org.virbo.autoplot;
 
-import java.applet.Applet;
-import java.applet.AppletContext;
-import java.applet.AppletStub;
-import java.applet.AudioClip;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,7 +18,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -31,22 +25,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -71,7 +63,7 @@ import org.virbo.autoplot.dom.Plot;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -96,7 +88,7 @@ public class AutoplotApplet extends JApplet {
     long t0 = System.currentTimeMillis();
     public static final String VERSION = "20090914.1";
     private Image splashImage;
-    private JMenuItem overviewMenuItem= null;
+    private JCheckBoxMenuItem overviewMenuItem = null;
 
     private String getStringParameter(String name, String deft) {
         String result = getParameter(name);
@@ -374,26 +366,30 @@ public class AutoplotApplet extends JApplet {
             appmodel.canvas.setBaseFont(Font.decode(fontParam));
         }
 
-//        JMenuItem item = new JMenuItem(new AbstractAction("Edit DOM") {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                new PropertyEditor(dom).showDialog(AutoplotApplet.this);
-//            }
-//        });
-        JMenuItem item = new JMenuItem(new AbstractAction("Reset Zoom") {
 
+        JMenuItem item;
+
+        item = new JMenuItem(new AbstractAction("Edit DOM") {
+            public void actionPerformed(ActionEvent e) {
+                new PropertyEditor(dom).showDialog(AutoplotApplet.this);
+            }
+        });
+        dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item);
+
+        item = new JMenuItem(new AbstractAction("Reset Zoom") {
             public void actionPerformed(ActionEvent e) {
                 resetZoom();
             }
         });
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item);
-        overviewMenuItem = new JMenuItem(new AbstractAction("Context Overview") {
+        
+        overviewMenuItem = new JCheckBoxMenuItem(new AbstractAction("Context Overview") {
             public void actionPerformed(ActionEvent e) {
                 addOverview();
             }
         });
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(overviewMenuItem);
-        
+
 
         /*        item= new JMenuItem( new AbstractAction( "Execute DOM command..." ) {
         public void actionPerformed(ActionEvent e) {
@@ -432,7 +428,7 @@ public class AutoplotApplet extends JApplet {
         if (surl != null && !surl.equals("")) {
             DataSource dsource;
             try {
-                dsource = DataSetURL.getDataSource(surl);
+                dsource = DataSetURI.getDataSource(surl);
             } catch (NullPointerException ex) {
                 throw new RuntimeException("No such data source: ", ex);
             } catch (Exception ex) {
@@ -609,6 +605,10 @@ public class AutoplotApplet extends JApplet {
 
         getContentPane().remove(progressComponent);
         getContentPane().add(model.getCanvas());
+
+        if ( getStringParameter("contextOverview","off").equals("on") ) {
+            doSetOverview(true);
+        }
 
         System.err.println("done add to applet @ " + (System.currentTimeMillis() - t0) + " msec");
 
@@ -886,20 +886,32 @@ public class AutoplotApplet extends JApplet {
         SwingUtilities.invokeLater(run);
     }
 
-    public void addOverview( ) {
+    private void doSetOverview(boolean t) {
+        Plot domPlot = dom.getPlots(0);
+        if (t) {
+            ApplicationController controller = dom.getController();
+            Plot that = controller.copyPlotAndPanels(domPlot, null, false, false);
+            that.setTitle("");
+            controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
+            controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
+            controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
+            controller.addConnector(domPlot, that);
+            domPlot.getXaxis().getController().setRangeAutomatically( DatumRangeUtil.rescale( domPlot.getXaxis().getRange(), 0.2, 0.8 ), domPlot.getXaxis().isLog() );
+            dom.getCanvases(0).getRows(0).setBottom("60%-2em");
+            dom.getCanvases(0).getRows(1).setTop("60%+2em");
+        } else {
+            ApplicationController controller = dom.getController();
+            controller.deletePanel(dom.getPanels(1));
+            controller.deletePlot(dom.getPlots(1));
+        }
+        overviewMenuItem.setSelected(t);
+
+    }
+
+    public void addOverview() {
         Runnable run = new Runnable() {
             public void run() {
-                Plot domPlot= dom.getPlots(0);
-                ApplicationController controller= dom.getController();
-                Plot that = controller.copyPlotAndPanels(domPlot, null, false, false);
-                that.setTitle("");
-                controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
-                controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
-                controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
-                controller.addConnector(domPlot, that);
-                dom.getCanvases(0).getRows(0).setBottom("60%-2em");
-                dom.getCanvases(0).getRows(1).setTop("60%+2em");
-                overviewMenuItem.setEnabled(false);
+                doSetOverview(overviewMenuItem.isSelected());
             }
         };
         SwingUtilities.invokeLater(run);
@@ -935,5 +947,4 @@ public class AutoplotApplet extends JApplet {
         };
         SwingUtilities.invokeLater(run);
     }
-
 }
