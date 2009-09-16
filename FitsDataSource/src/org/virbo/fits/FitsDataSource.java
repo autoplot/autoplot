@@ -35,7 +35,7 @@ public class FitsDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         int ihdu = 0;
-        Map<String, Integer> plottable = FitsDataSourceFactory.getPlottable(uri, mon);
+        Map<String, Integer> plottable = FitsDataSourceFactory.getPlottable(resourceURI, mon);
 
         String name = (String) getParams().get("arg_0");
         if (name != null) {
