@@ -179,8 +179,10 @@ public class URISplit {
             result.formatCarotPos = result.resourceUriCarotPos + scheme.length() + 1;
             result.surl = surl.substring(h + 1);
             result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
+            int iq= result.surl.indexOf("?");
+            if ( iq==-1 ) iq= result.surl.length();
             try {
-                result.resourceUri = new URI(result.surl);
+                result.resourceUri = new URI(uriEncode(result.surl.substring(0,iq)));
                 result.scheme = result.resourceUri.getScheme();
             } catch (URISyntaxException ex) {
                 // do nothing, this field may be null.
@@ -193,8 +195,10 @@ public class URISplit {
                 if (result.resourceUriCarotPos > j) result.resourceUriCarotPos -= (j + 1);
                 result.formatCarotPos = result.resourceUriCarotPos + result.vapScheme.length() + 1;
                 result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
+                int iq= result.surl.indexOf("?");
+                if ( iq==-1 ) iq= surl.length();
                 try {
-                    result.resourceUri = new URI(result.surl);
+                    result.resourceUri = new URI(uriEncode(result.surl.substring(0,iq)));
                     result.scheme = result.resourceUri.getScheme();
                 } catch (URISyntaxException ex) {
                     // do nothing, this field may be null.
@@ -206,8 +210,10 @@ public class URISplit {
                 }
                 result.surl = surl;
                 result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
+                int iq= result.surl.indexOf("?");
+                if ( iq==-1 ) iq= surl.length();
                 try {
-                    result.resourceUri = new URI(uriEncode(surl));
+                    result.resourceUri = new URI(uriEncode(result.surl.substring(0,iq)));
                     result.scheme = result.resourceUri.getScheme();
                 } catch (URISyntaxException ex) {
                     // do nothing, this field may be null.
