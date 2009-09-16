@@ -19,7 +19,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 
 /**
  *
@@ -119,7 +119,7 @@ public class TimeSeriesBrowseController {
                 dataSourceController.getTsb().setTimeRange(visibleRange);
                 dataSourceController.getTsb().setTimeResolution(newResolution);
                 String surl;
-                surl = DataSetURL.getDataSourceUri( dataSourceController.getDataSource());
+                surl = DataSetURI.getDataSourceUri( dataSourceController.getDataSource());
                 // check the registry for URLs, compare to surl, append prefix if necessary.
                 if (!autorange && surl.equals( dataSourceController.getTsbSuri())) {
                     logger.fine("we do no better with tsb");
