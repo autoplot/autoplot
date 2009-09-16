@@ -45,7 +45,7 @@ public class Util {
     public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
         URI uri = DataSetURI.getURI(surl);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
-        DataSource result = factory.getDataSource(DataSetURI.getResourceURI(uri));
+        DataSource result = factory.getDataSource( uri );
         if (mon == null) {
             mon = new NullProgressMonitor();
         }
