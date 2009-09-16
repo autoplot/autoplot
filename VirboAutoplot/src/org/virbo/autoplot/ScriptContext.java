@@ -44,8 +44,8 @@ import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -558,27 +558,15 @@ public class ScriptContext extends PyJavaInstance {
         if (!file.contains(":/")) {
             file = new File(file).getCanonicalFile().toString();
         }
-        URI uri = DataSetURL.getURI(file);
-        URL url = DataSetURL.getResourceURI(uri).toURL(); //TODO: prevents jdbc:mysql:...
+        URI uri = DataSetURI.getURI(file);
 
-        DataSourceFormat format = DataSetURL.getDataSourceFormat(uri);
-        if (!url.getProtocol().equals("file")) {
-            throw new IllegalArgumentException("data may only be formatted to local files: " + url);
-        }
+        DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
+        
         if (format == null) {
             throw new IllegalArgumentException("no format for extension: " + file);
         }
 
-        File f;
-        if ( url.getProtocol().equals("file" ) ) {
-            f= new File( url.getPath() );
-        } else {
-            f = DataSetURL.getFile(url, new NullProgressMonitor());
-        }
-        String sparams = url.getQuery();
-        HashMap<String, String> params = sparams == null ? new HashMap<String, String>() : URLSplit.parseParams(sparams);
-
-        format.formatData(f, params, ds, new NullProgressMonitor());
+        format.formatData( file, ds, new NullProgressMonitor());
 
     }
 
