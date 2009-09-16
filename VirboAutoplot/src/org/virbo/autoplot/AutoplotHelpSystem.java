@@ -6,9 +6,10 @@ import java.net.URL;
 import javax.help.CSH;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
+import javax.help.SwingHelpUtilities;
 
 /**
- * This class
+ * Encapsulates JavaHelp functionality for convenient access by components.
  * @author ed
  */
 public class AutoplotHelpSystem {
@@ -21,6 +22,9 @@ public class AutoplotHelpSystem {
     private CSH.DisplayHelpFromSource helper;
     
     private AutoplotHelpSystem(Component uiBase) {
+        // custom viewer supports external web links
+        SwingHelpUtilities.setContentViewerUI("org.virbo.autoplot.AutoplotHelpViewer");
+
         try {
             URL hsurl = getClass().getResource(helpPath);
             mainHS = new HelpSet(null, hsurl);
@@ -38,7 +42,7 @@ public class AutoplotHelpSystem {
         
     }
     
-    public static void initialize(Component uiBase) {
+    public static synchronized void initialize(Component uiBase) {
         if (instance == null) {
             instance = new AutoplotHelpSystem(uiBase);
         } else {
@@ -66,8 +70,8 @@ public class AutoplotHelpSystem {
     }
 
     /** A component action listener can pass the event here and the
-     * approriate help topic will be displayed, assuming it has
-     * been asigned a help id string by CSH.setHelpID(comp, string);
+     * help topic corresponding to the event source will be displayed, assuming an
+     * appropriate call has been made to <code>registerHelpID</code>.
      */
     public void displayHelpFromEvent(ActionEvent e) {
         helper.actionPerformed(e);
@@ -78,5 +82,5 @@ public class AutoplotHelpSystem {
         broker.setCurrentID("aphelp_main");
         broker.setDisplayed(true);
     }
-    
+
 }
