@@ -64,7 +64,7 @@ public class SpaseRecordDataSource implements DataSource {
     /** Creates a new instance of SpaseRecordDataSource */
     public SpaseRecordDataSource( URI uri ) throws IllegalArgumentException, IOException, SAXException, Exception {
         try {
-            this.url= uri.toURL();
+            this.url= new URL( uri.getSchemeSpecificPart() );
         } catch (MalformedURLException ex) {
             System.err.println("Failed to convert URI to URL");
             throw new RuntimeException(ex);
