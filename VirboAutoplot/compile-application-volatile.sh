@@ -129,6 +129,24 @@ done
 cd ..
 echo "done copy resources."
 
+echo "copy help files..."
+for i in \
+  QDataSet QStream dasCore DataSource \
+  JythonSupport \
+  IdlMatlabSupport \
+  AudioSystemDataSource \
+  BinaryDataSource DataSourcePack JythonDataSource \
+  Das2ServerDataSource TsdsDataSource  \
+  NetCdfDataSource CdfDataSource CefDataSource \
+  WavDataSource ImageDataSource ExcelDataSource \
+  FitsDataSource OpenDapDataSource \
+  VirboAutoplot; do
+    echo rsync -a --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+    rsync -a --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+done
+
+echo "done copy help files."
+
 hasErrors=0
 
 # compile key java classes.
