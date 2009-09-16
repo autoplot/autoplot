@@ -29,9 +29,9 @@ import javax.swing.event.ListSelectionListener;
 import org.das2.components.DasProgressPanel;
 import org.das2.util.DasExceptionHandler;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -192,7 +192,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     JComponent delegateComponent = null;
     DataSetSelector delegateDataSetSelector=null;
     DataSourceEditorPanel delegateEditorPanel= null;
-    URLSplit split;
+    URISplit split;
     /**
      * URI parameters
      */
@@ -218,12 +218,12 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     File cdfFile;
 
     public void setURI(String url) {
-        split= URLSplit.parse(url);
-        params= URLSplit.parseParams(split.params);
+        split= URISplit.parse(url);
+        params= URISplit.parseParams(split.params);
 
         try {
 
-            cdfFile= DataSetURL.getFile( split.resourceUri.toURL(), DasProgressPanel.createFramed("downloading file") );
+            cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), DasProgressPanel.createFramed("downloading file") );
             
             String fileName= cdfFile.toString();
 
@@ -282,8 +282,8 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     public String getURI() {
         String slice= subsetTextField.getText();
         params.put( "arg_0", parameter + ( slice==null ? "" : slice ) );
-        split.params= URLSplit.formatParams(params);
-        return URLSplit.format(split);
+        split.params= URISplit.formatParams(params);
+        return URISplit.format(split);
     }
 
 }

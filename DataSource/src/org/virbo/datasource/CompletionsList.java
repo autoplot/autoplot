@@ -20,10 +20,10 @@ import javax.swing.JPopupMenu;
 public class CompletionsList {
     
     public interface CompletionListListener {
-        public void itemSelected( DataSetURL.CompletionResult item );
+        public void itemSelected( DataSetURI.CompletionResult item );
     }
     
-    public static JPopupMenu fillPopupNew( final List<DataSetURL.CompletionResult> completions, 
+    public static JPopupMenu fillPopupNew( final List<DataSetURI.CompletionResult> completions,
             final String labelprefix, 
             JPopupMenu popupMenu, 
             final CompletionListListener listener ) {
@@ -34,7 +34,7 @@ public class CompletionsList {
         while (i < completions.size()) {
             int stopAt = Math.min(i + 30, completions.size());
             while (i < stopAt) {
-                final DataSetURL.CompletionResult s1 = completions.get(i);
+                final DataSetURI.CompletionResult s1 = completions.get(i);
                 String label = s1.label;
                 if (label.startsWith(labelprefix)) {
                     label = label.substring(labelprefix.length());

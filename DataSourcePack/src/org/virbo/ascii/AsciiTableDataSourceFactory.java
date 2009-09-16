@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.AsciiParser.DelimParser;
 
@@ -154,9 +154,9 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
 
     private List<CompletionContext> getFieldNames(CompletionContext cc, ProgressMonitor mon) throws IOException {
 
-        Map<String,String> params = URLSplit.parseParams(cc.params);
+        Map<String,String> params = URISplit.parseParams(cc.params);
         Object o;
-        File file = DataSetURL.getFile(cc.resource, mon);
+        File file = DataSetURI.getFile(cc.resource, mon);
 
         AsciiParser parser = AsciiParser.newParser(5);
         if (params.containsKey("skip")) {

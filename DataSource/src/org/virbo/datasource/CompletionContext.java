@@ -153,7 +153,7 @@ public class CompletionContext {
      */
     public static String get( Object context, CompletionContext cc ) {
         if ( context==CONTEXT_FILESYSTEM || context==CONTEXT_FILE ) {
-            URLSplit split= URLSplit.parse( cc.surl );
+            URISplit split= URISplit.parse( cc.surl );
             return split.file;
             
         } else if ( context==CONTEXT_PARAMETER_NAME || context==CONTEXT_PARAMETER_VALUE ) {
@@ -195,9 +195,9 @@ public class CompletionContext {
             //    surl= surl.substring( surl.indexOf('.')+1 );
             //    isURI= true;
             //}
-            URLSplit split= URLSplit.parse( surl );
+            URISplit split= URISplit.parse( surl );
             split.file= ccnew.completable;
-            return URLSplit.format( split );
+            return URISplit.format( split );
             
         } else if ( context==CONTEXT_PARAMETER_NAME || context==CONTEXT_PARAMETER_VALUE ) {
             

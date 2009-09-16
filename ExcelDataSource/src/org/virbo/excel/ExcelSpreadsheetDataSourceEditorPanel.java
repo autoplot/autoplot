@@ -32,9 +32,9 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.ui.TableRowHeader;
 
 /**
@@ -47,7 +47,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
     Map<Integer, String> columns;
     boolean focusDepend0 = false;
     Map<String, String> params;
-    URLSplit split;
+    URISplit split;
 
     private enum Tool {
 
@@ -476,10 +476,10 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
 
     public void setURI(String url) {
         try {
-            split = URLSplit.parse(url);
-            params = URLSplit.parseParams(split.params);
+            split = URISplit.parse(url);
+            params = URISplit.parseParams(split.params);
 
-            File f = DataSetURL.getFile(new URL(split.file), new NullProgressMonitor());
+            File f = DataSetURI.getFile(new URL(split.file), new NullProgressMonitor());
             setFile(f);
 
             if ( params.get(PROP_SHEET)!=null ) {
@@ -500,9 +500,9 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
 
     public String getURI() {
 
-        split.params = URLSplit.formatParams(params);
+        split.params = URISplit.formatParams(params);
 
-        return URLSplit.format(split);
+        return URISplit.format(split);
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JComboBox columnsComboBox;

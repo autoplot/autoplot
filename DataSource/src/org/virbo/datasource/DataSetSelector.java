@@ -46,7 +46,7 @@ import org.das2.components.DasProgressPanel;
 import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileSystem;
-import org.virbo.datasource.DataSetURL.CompletionResult;
+import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
  * Swing Component for selecting dataset URIs.  This provides hooks for completions.
@@ -157,12 +157,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
             } else {
                 try {
-                    DataSourceFactory f = DataSetURL.getDataSourceFactory(DataSetURL.getURI(surl), getMonitor());
+                    DataSourceFactory f = DataSetURI.getDataSourceFactory(DataSetURI.getURI(surl), getMonitor());
                     if (f == null) {
                         throw new RuntimeException("unable to identify data source for URI, try \"about:plugins\"");
                     }
                     setMessage("check to see if uri looks acceptable");
-                    String surl1 = URLSplit.uriDecode(DataSetURL.getResourceURI(surl).toString());
+                    String surl1 = URISplit.uriDecode(DataSetURI.getResourceURI(surl).toString());
                     if (f.reject(surl1, getMonitor())) {
                         if (!surl.contains("?")) {
                             surl += "?";
@@ -177,7 +177,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         setMessage("resolving uri to data set as " + DataSourceRegistry.getInstance().getExtensionFor(f));
                         firePlotDataSetURL();
                     }
-                } catch (DataSetURL.NonResourceException ex) { // see if it's a folder.
+                } catch (DataSetURI.NonResourceException ex) { // see if it's a folder.
                     int carotpos = surl.length();
                     setMessage("no extension or mime type, try filesystem completions");
                     showCompletions(surl, carotpos);
@@ -233,7 +233,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         DataSourceEditorPanel edit = null;
         try {
-            edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURL.getURI(surl));
+            edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURI(surl));
         } catch (URISyntaxException ex) {
             Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -282,9 +282,9 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     private void showCompletions(final String surl, final int carotpos) {
-        URLSplit split = URLSplit.parse(surl, carotpos, true);
-        if (split.resourceUriCarotPos > split.file.length() && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURL.getExt(surl))) {
-            showFactoryCompletions(URLSplit.format(split), split.formatCarotPos);
+        URISplit split = URISplit.parse(surl, carotpos, true);
+        if (split.resourceUriCarotPos > split.file.length() && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl))) {
+            showFactoryCompletions(URISplit.format(split), split.formatCarotPos);
 
         } else if ( carotpos==0 || surl.substring(0,carotpos).equals("vap") ) {
             showTypesCompletions( surl, carotpos );
@@ -296,9 +296,9 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
             if (split.resourceUriCarotPos <= firstSlashAfterHost) {
-                showHostCompletions(URLSplit.format(split), split.formatCarotPos);
+                showHostCompletions(URISplit.format(split), split.formatCarotPos);
             } else {
-                showFileSystemCompletions(URLSplit.format(split), split.formatCarotPos);
+                showFileSystemCompletions(URISplit.format(split), split.formatCarotPos);
             }
 
         }
@@ -405,13 +405,13 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                 List<CompletionResult> completions = null;
 
-                URLSplit split = URLSplit.parse(surl);
+                URISplit split = URISplit.parse(surl);
                 String surlDir = split.path;
 
                 final String labelPrefix = surlDir;
 
                 try {
-                    completions = DataSetURL.getHostCompletions(surl, carotpos, mon);
+                    completions = DataSetURI.getHostCompletions(surl, carotpos, mon);
                 } catch (IOException ex) {
                     setMessage(ex.toString());
                     JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
@@ -436,7 +436,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 final String labelPrefix = surl.substring(0, carotpos);
 
                 try {
-                    completions = DataSetURL.getFileSystemCompletions(surl, carotpos, mon);
+                    completions = DataSetURI.getFileSystemCompletions(surl, carotpos, mon);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     setMessage(ex.toString());
@@ -462,9 +462,9 @@ public class DataSetSelector extends javax.swing.JPanel {
 
             public void run() {
 
-                List<DataSetURL.CompletionResult> completions2;
+                List<DataSetURI.CompletionResult> completions2;
                 try {
-                    completions2 = DataSetURL.getFactoryCompletions(surl, carotpos, completionsMonitor);
+                    completions2 = DataSetURI.getFactoryCompletions(surl, carotpos, completionsMonitor);
                     setMessage("done getting completions");
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -661,7 +661,7 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         final String context = (String) dataSetSelector.getSelectedItem();
 
-        String ext = DataSetURL.getExt(context);
+        String ext = DataSetURI.getExt(context);
 
         if ( enableDataSource && ( context.trim().length()==0 || context.trim().equals("vap+") ) ) {
             showCompletions();
@@ -670,7 +670,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             browseSourceType();
 
         } else {
-            final URLSplit split = URLSplit.parse(context);
+            final URISplit split = URISplit.parse(context);
             if ( split.scheme.equals("file") || split.scheme.equals("http") || split.scheme.equals("https") || split.scheme.equals("ftp")) {
                 try {
                     if (FileSystemUtil.resourceExists(context)  && FileSystemUtil.resourceIsFile(context) ) {
@@ -696,7 +696,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         JFileChooser chooser = new JFileChooser( split.path );
                         int result = chooser.showOpenDialog(this);
                         if (result == JFileChooser.APPROVE_OPTION) {
-                            String suri = DataSetURL.newUri(context, chooser.getSelectedFile().toString());
+                            String suri = DataSetURI.newUri(context, chooser.getSelectedFile().toString());
                             dataSetSelector.setSelectedItem(suri);
                         }
                     } else {

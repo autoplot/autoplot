@@ -14,7 +14,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TableDataSetAdapter;
 import org.virbo.dataset.VectorDataSetAdapter;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -25,8 +25,8 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
     public void formatData( String url, QDataSet data, ProgressMonitor mon) throws Exception {
 
-        URLSplit split = URLSplit.parse(url.toString());
-        java.util.Map<String, String> params= URLSplit.parseParams(split.params);
+        URISplit split = URISplit.parse(url.toString());
+        java.util.Map<String, String> params= URISplit.parseParams(split.params);
 
         boolean binary= "binary".equals( params.get( "type" ) );
         if (split.ext.equals(".qds")) {

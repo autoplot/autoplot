@@ -29,8 +29,8 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
@@ -77,9 +77,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         if ( params.get( PARAM_SCRIPT )!=null ) {
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
             mon.setProgressMessage( "loading "+uri );
-            URLSplit split= URLSplit.parse(uri.toString());
+            URISplit split= URISplit.parse(uri.toString());
             split.params= null;
-            resourceURI= URLSplit.format(split);
+            resourceURI= URISplit.format(split);
 
         } else {
             resourceURI= null;
@@ -230,15 +230,15 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     PythonInterpreter interp = null;
 
     private String cacheUrl(URI uri) {
-        URLSplit split = URLSplit.parse(uri.toString());
-        Map<String, String> params = URLSplit.parseParams(split.params);
+        URISplit split = URISplit.parse(uri.toString());
+        Map<String, String> params = URISplit.parseParams(split.params);
         params.remove("arg_0");
-        split.params = URLSplit.formatParams(params);
-        return URLSplit.format(split);
+        split.params = URISplit.formatParams(params);
+        return URISplit.format(split);
     }
 
     private Date resourceDate(URI uri) throws IOException {
-        File src = DataSetURL.getFile(uri, new NullProgressMonitor());
+        File src = DataSetURI.getFile(uri, new NullProgressMonitor());
         return new Date(src.lastModified());
     }
     Date cacheDate = null;
@@ -266,8 +266,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     public void resetURI(String surl) {
         try {
             this.uri = new URI(surl);
-            URLSplit split = URLSplit.parse(uri.toString());
-            params = URLSplit.parseParams(split.params);
+            URISplit split = URISplit.parse(uri.toString());
+            params = URISplit.parseParams(split.params);
             resourceURI = new URI(split.file);
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);

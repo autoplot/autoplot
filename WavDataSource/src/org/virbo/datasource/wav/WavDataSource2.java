@@ -23,8 +23,8 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.URISplit;
 
 /**
  * This version of the DataSource works by wrapping BinaryDataSource.  It
@@ -39,7 +39,7 @@ public class WavDataSource2 extends AbstractDataSource {
 
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        File wavFile = DataSetURL.getFile(this.uri, mon);
+        File wavFile = DataSetURI.getFile(this.uri, mon);
 
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(wavFile);
         AudioFormat audioFormat = fileFormat.getFormat();
@@ -102,7 +102,7 @@ public class WavDataSource2 extends AbstractDataSource {
         params.put( "type", type );
         params.put( "byteOrder", byteOrder );
 
-        URL lurl= new URL( ""+wavFile.toURI().toURL() + "?" + URLSplit.formatParams(params) );
+        URL lurl= new URL( ""+wavFile.toURI().toURL() + "?" + URISplit.formatParams(params) );
 
         BinaryDataSource bds= new BinaryDataSource( lurl.toURI() );
         MutablePropertyDataSet result= (BufferDataSet) bds.getDataSet( new NullProgressMonitor() );

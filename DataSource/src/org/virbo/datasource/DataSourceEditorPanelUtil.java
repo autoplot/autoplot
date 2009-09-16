@@ -20,10 +20,10 @@ public class DataSourceEditorPanelUtil {
      */
     public static DataSourceEditorPanel getDataSourceEditorPanel(URI uri) {
         String surl = uri.toString();
-        String ext = DataSetURL.getExt(surl);
+        String ext = DataSetURI.getExt(surl);
 
-        if (DataSetURL.isAggregating(uri.toString())) {
-            String eext = DataSetURL.getExplicitExt(uri.toString());
+        if (DataSetURI.isAggregating(uri.toString())) {
+            String eext = DataSetURI.getExplicitExt(uri.toString());
             if (eext != null) {
                 AggregatingDataSourceEditorPanel result = new AggregatingDataSourceEditorPanel();
                 DataSourceEditorPanel edit = getEditorByExt(eext);

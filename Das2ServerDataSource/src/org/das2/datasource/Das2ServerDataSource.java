@@ -28,7 +28,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -66,7 +66,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         otherParams.remove("dataset");
         otherParams.remove("tsb");
 
-        dsParams= (String)  URLSplit.formatParams(otherParams);
+        dsParams= (String)  URISplit.formatParams(otherParams);
 
         params2.put("server", "dataset");
         if ( timeRange!=null ) {
@@ -78,7 +78,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         }
         params2.put("dataset", URLEncoder.encode(params.get("dataset") ) );
         params2.put("params", URLEncoder.encode(dsParams) );
-        URL url2 = new URL("" + this.resourceURI + "?" + URLSplit.formatParams(params2));
+        URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
 
         System.err.println("opening "+url2);
         InputStream in = url2.openStream();

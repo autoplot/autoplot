@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
@@ -79,7 +79,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     public void setURI(String url) {
         try {
-            File f = DataSetURL.getFile( DataSetURL.getWebURL( new URI(url) ), new NullProgressMonitor());
+            File f = DataSetURI.getFile( DataSetURI.getWebURL( new URI(url) ), new NullProgressMonitor());
             support.loadFile(f);
         } catch (URISyntaxException ex) {
             Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);

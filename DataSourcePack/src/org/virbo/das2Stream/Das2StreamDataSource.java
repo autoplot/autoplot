@@ -26,11 +26,11 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.qstream.QDataSetStreamHandler;
 
 /**
@@ -46,11 +46,11 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
     public QDataSet getDataSet(ProgressMonitor mon) throws FileNotFoundException, StreamException, IOException, org.virbo.qstream.StreamException {
 
-        InputStream in = DataSetURL.getInputStream(uri, mon);
+        InputStream in = DataSetURI.getInputStream(uri, mon);
 
         ReadableByteChannel channel = Channels.newChannel(in);
 
-        URLSplit split = URLSplit.parse(uri.toString());
+        URISplit split = URISplit.parse(uri.toString());
         
         if (split.ext.equals(".qds")) {
             QDataSetStreamHandler h= new QDataSetStreamHandler();

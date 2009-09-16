@@ -19,7 +19,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 
 /**
@@ -34,7 +34,7 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     private List<String> getPlottable(URL url, ProgressMonitor mon ) throws IOException {
-        File f = DataSetURL.getFile(url, mon );
+        File f = DataSetURI.getFile(url, mon );
         ReadableByteChannel in = Channels.newChannel(new FileInputStream(f));
         CefReaderHeader reader = new CefReaderHeader();
         Cef cef = reader.read(in);

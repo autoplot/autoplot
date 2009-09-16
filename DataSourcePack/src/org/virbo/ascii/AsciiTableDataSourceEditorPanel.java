@@ -34,9 +34,9 @@ import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsutil.AsciiParser;
 
 /**
@@ -492,7 +492,7 @@ private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
     }
 }//GEN-LAST:event_commentComboBoxActionPerformed
 
-    URLSplit split = null;
+    URISplit split = null;
     Map<String,String> params;
 
     protected File file = null;
@@ -564,10 +564,10 @@ private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
 
     public void setURI(String url) {
         try {
-            split = URLSplit.parse(url);
-            params = URLSplit.parseParams(split.params);
+            split = URISplit.parse(url);
+            params = URISplit.parseParams(split.params);
 
-            File f = DataSetURL.getFile(new URL(split.file), new NullProgressMonitor());
+            File f = DataSetURI.getFile(new URL(split.file), new NullProgressMonitor());
             setFile(f);
 
             int tab=0;
@@ -647,9 +647,9 @@ private void commentComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//G
             params.remove("timeFormat");
         }
         
-        split.params = URLSplit.formatParams(params);
+        split.params = URISplit.formatParams(params);
 
-        return URLSplit.format(split);
+        return URISplit.format(split);
 
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

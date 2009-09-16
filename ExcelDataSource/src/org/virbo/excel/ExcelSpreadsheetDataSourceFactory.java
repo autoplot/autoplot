@@ -18,11 +18,11 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -67,13 +67,13 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
     List<CompletionContext> toCC(Object context, List<String> results, String doc) {
         List<CompletionContext> result = new ArrayList<CompletionContext>();
         for (String s : results) {
-            result.add(new CompletionContext(context, URLSplit.uriEncode(s), s, doc));
+            result.add(new CompletionContext(context, URISplit.uriEncode(s), s, doc));
         }
         return result;
     }
 
     private HSSFWorkbook getWorkbook(URL url, ProgressMonitor mon) throws IOException {
-        File file = DataSetURL.getFile(url, mon);
+        File file = DataSetURI.getFile(url, mon);
         InputStream in = new FileInputStream(file);
         POIFSFileSystem fs = new POIFSFileSystem(in);
         HSSFWorkbook wb = new HSSFWorkbook(fs);
@@ -97,7 +97,7 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
      */
     private List<String> getColumns( CompletionContext cc, ProgressMonitor mon) throws IOException {
         HSSFWorkbook wb = getWorkbook(cc.resource, mon);
-        Map params = URLSplit.parseParams(cc.params);
+        Map params = URISplit.parseParams(cc.params);
         return new LinkedList<String>( ExcelUtil.getColumns(wb,  (String) params.get("sheet"),  (String) params.get("firstRow"), mon).values() );
     }
 

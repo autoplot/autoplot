@@ -19,7 +19,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -96,8 +96,8 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject(String surl, ProgressMonitor mon) {
-        URLSplit split= URLSplit.parse( surl );
-        Map params= URLSplit.parseParams(split.params);
+        URISplit split= URISplit.parse( surl );
+        Map params= URISplit.parseParams(split.params);
         return !( params.containsKey("start_time") && params.containsKey("end_time") && params.containsKey("dataset") );
     }
 }

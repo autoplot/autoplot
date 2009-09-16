@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.qstream.QDataSetStreamHandler;
 import org.virbo.qstream.StreamException;
 
@@ -57,9 +57,9 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
     
     private List<String> getNames( CompletionContext cc, ProgressMonitor mon ) throws IOException, StreamException {
         
-        Map params= URLSplit.parseParams( cc.params );
+        Map params= URISplit.parseParams( cc.params );
         Object o;
-        File file= DataSetURL.getFile( cc.resource, mon  );
+        File file= DataSetURI.getFile( cc.resource, mon  );
         
         QDataSetStreamHandler h= new QDataSetStreamHandler();
         h.setReadPackets(false); // don't read any records, just scan for datasets.

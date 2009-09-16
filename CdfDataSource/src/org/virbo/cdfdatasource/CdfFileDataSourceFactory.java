@@ -20,10 +20,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -80,7 +80,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     
     
     public DataSource getDataSource(URI uri) throws Exception {
-        URLSplit split= URLSplit.parse( uri.toString() );
+        URISplit split= URISplit.parse( uri.toString() );
         return new CdfFileDataSource( uri );
     }
     
@@ -92,7 +92,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
             
-            File cdfFile= DataSetURL.getFile( cc.resource, mon );
+            File cdfFile= DataSetURI.getFile( cc.resource, mon );
             String fileName= cdfFile.toString();
             //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
@@ -118,7 +118,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             if ( parmname.equals("id") ) {
                 String file= CompletionContext.get( CompletionContext.CONTEXT_FILE, cc );
                 
-                File cdfFile= DataSetURL.getFile( DataSetURL.getURL(file), mon );
+                File cdfFile= DataSetURI.getFile( DataSetURI.getURL(file), mon );
                 String fileName= cdfFile.toString();
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 

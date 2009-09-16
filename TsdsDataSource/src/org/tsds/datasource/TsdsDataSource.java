@@ -43,7 +43,7 @@ import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
@@ -69,7 +69,7 @@ class TsdsDataSource extends AbstractDataSource {
 
             ProgressMonitor mon = new NullProgressMonitor();
 
-            URL url0 = new URL("" + this.resourceURI + "?" + URLSplit.formatParams(params));
+            URL url0 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params));
             logger.fine("tsds url= " + url0);
 
             if (params.get("out") == null) {
@@ -83,7 +83,7 @@ class TsdsDataSource extends AbstractDataSource {
             params3.put("out", "tsml");
             params3.remove("ppd");
 
-            String sparams = URLSplit.formatParams(params3);
+            String sparams = URISplit.formatParams(params3);
             sparams = sparams.replace("out=tsml", "out=tsml&ext=" + params.get("out"));
 
             logit("post first request in construct TsdsDataSource", t0);
@@ -232,7 +232,7 @@ class TsdsDataSource extends AbstractDataSource {
             LinkedHashMap params3 = new LinkedHashMap(params2);
             params3.remove("ppd");
             params3.put("out", "tsml");
-            URL url3 = new URL("" + this.resourceURI + "?" + URLSplit.formatParams(params3));
+            URL url3 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params3));
             logger.fine("opening " + url3);
             initialTsml(url3.openStream());
             haveInitialTsml = true;
@@ -247,7 +247,7 @@ class TsdsDataSource extends AbstractDataSource {
         }
 
 
-        URL url2 = new URL("" + this.resourceURI + "?" + URLSplit.formatParams(params2));
+        URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
 
 
         int points = (int) Math.ceil(timeRange.width().doubleValue(Units.days)) * ppd;

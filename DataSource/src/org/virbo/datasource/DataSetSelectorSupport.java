@@ -61,7 +61,7 @@ public class DataSetSelectorSupport {
                         }
                         String t = f.toString();
                         
-                        String ext = DataSetURL.getExt(t);
+                        String ext = DataSetURI.getExt(t);
                         if ( ext!=null ) ext= "."+ext;
                         return t.endsWith(".vap") || (ext != null && exts.containsKey(ext));
                     }
@@ -86,7 +86,7 @@ public class DataSetSelectorSupport {
                                 return true;
                             }
                             String t = f.toString();
-                            String ext = DataSetURL.getExt(t);
+                            String ext = DataSetURI.getExt(t);
                             if ( ext!=null ) ext= "."+ext;
                             return (ext != null && extf.equals(ext));
                         }

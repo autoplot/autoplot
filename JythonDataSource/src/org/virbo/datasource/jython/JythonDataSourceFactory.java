@@ -28,9 +28,9 @@ import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.JythonOps;
 
 /**
@@ -52,10 +52,10 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         interp.set("monitor", mon);
         interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py");
 
-        File src = DataSetURL.getFile(url, new NullProgressMonitor());
+        File src = DataSetURI.getFile(url, new NullProgressMonitor());
 
-        URLSplit split = URLSplit.parse(url.toString());
-        Map<String, String> params = URLSplit.parseParams(split.params);
+        URISplit split = URISplit.parse(url.toString());
+        Map<String, String> params = URISplit.parseParams(split.params);
         try {
             interp.exec("params=dict()");
             for (String s : params.keySet()) {
@@ -116,7 +116,7 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             return false;
         } else {
             try {
-                File src = DataSetURL.getFile(DataSetURL.getURL(surl), new NullProgressMonitor());
+                File src = DataSetURI.getFile(DataSetURI.getURL(surl), new NullProgressMonitor());
                 BufferedReader reader = new BufferedReader(new FileReader(src));
                 String s = reader.readLine();
                 boolean haveResult = false;

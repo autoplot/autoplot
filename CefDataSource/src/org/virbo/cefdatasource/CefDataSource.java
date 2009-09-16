@@ -29,9 +29,9 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SortDataSet;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
@@ -45,7 +45,7 @@ public class CefDataSource extends AbstractDataSource {
 
     public CefDataSource(URI uri) {
         super(uri);
-        URLSplit split= URLSplit.parse(uri.toString());
+        URISplit split= URISplit.parse(uri.toString());
         String file= split.file.substring(split.path.length());
         int i= file.indexOf("__");
         if ( i!=-1 ) {
@@ -57,7 +57,7 @@ public class CefDataSource extends AbstractDataSource {
 
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
-        File f = DataSetURL.getFile(uri, new NullProgressMonitor());
+        File f = DataSetURI.getFile(uri, new NullProgressMonitor());
         ReadableByteChannel c = Channels.newChannel(new FileInputStream(f));
 
         DasProgressMonitorReadableByteChannel cmon = new DasProgressMonitorReadableByteChannel(c, mon);

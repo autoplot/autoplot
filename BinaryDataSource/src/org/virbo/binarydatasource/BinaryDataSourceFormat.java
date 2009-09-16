@@ -16,7 +16,7 @@ import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -132,8 +132,8 @@ public class BinaryDataSourceFormat implements DataSourceFormat {
 
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
         
-        URLSplit split= URLSplit.parse(uri);
-        java.util.Map<String,String> params= URLSplit.parseParams(split.params);
+        URISplit split= URISplit.parse(uri);
+        java.util.Map<String,String> params= URISplit.parseParams(split.params);
 
         ByteBuffer result;
         if (data.rank() == 2) {

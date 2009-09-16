@@ -43,9 +43,9 @@ public abstract class AbstractDataSource implements DataSource {
         try {
             this.uri = uri;
             String s = uri.toString();
-            URLSplit split = URLSplit.parse(s);
+            URISplit split = URISplit.parse(s);
 
-            params = URLSplit.parseParams(split.params);
+            params = URISplit.parseParams(split.params);
             resourceURI = new URI(split.file);
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
@@ -119,7 +119,7 @@ public abstract class AbstractDataSource implements DataSource {
 
     // Practically identical to the URL version below...
     protected File getFile(URI uri, ProgressMonitor mon) throws IOException {
-        File f = DataSetURL.getFile(uri, mon);
+        File f = DataSetURI.getFile(uri, mon);
          if (params.containsKey("filePollUpdates")) {
             pollingUpdater= new FilePollUpdating();
             pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("filePollUpdates")) ) );
@@ -133,7 +133,7 @@ public abstract class AbstractDataSource implements DataSource {
      * This is done by monitoring for file length and modification time changes.
      */
     protected File getFile( URL url, ProgressMonitor mon ) throws IOException {
-        File f = DataSetURL.getFile( url, mon );
+        File f = DataSetURI.getFile( url, mon );
         if (params.containsKey("filePollUpdates")) {
             pollingUpdater= new FilePollUpdating();
             pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("filePollUpdates")) ) );

@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.datasource.DataSourceUtil;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -79,7 +79,7 @@ public class DodsDataSource extends AbstractDataSource {
         i = surl.indexOf('?');
         String variableConstraint= null;
         if ( i!=-1 ) {
-            variableConstraint = URLSplit.uriDecode(surl.substring(i + 1));
+            variableConstraint = URISplit.uriDecode(surl.substring(i + 1));
             StringTokenizer tok= new StringTokenizer(variableConstraint,"[<>",true);
             String name= tok.nextToken();
             

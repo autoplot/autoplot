@@ -18,7 +18,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 
 /**
@@ -54,7 +54,7 @@ public class WavDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     private int getChannels( URL url, ProgressMonitor mon  ) throws IOException, UnsupportedAudioFileException {
-        File wavFile = DataSetURL.getFile(url, mon);
+        File wavFile = DataSetURI.getFile(url, mon);
 
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(wavFile);
         AudioFormat audioFormat = fileFormat.getFormat();

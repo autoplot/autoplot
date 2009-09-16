@@ -39,7 +39,7 @@ public class FileSystemUtil {
      * @return
      */
     public static boolean resourceExists( String context ) throws FileSystemOfflineException, URISyntaxException {
-        URLSplit split= URLSplit.parse(context);
+        URISplit split= URISplit.parse(context);
         FileSystem fs= FileSystem.create( new URI( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).exists() ) {
             return true;
@@ -55,7 +55,7 @@ public class FileSystemUtil {
      * @return
      */
     public static void doDownload(String context,ProgressMonitor mon) throws FileSystemOfflineException, IOException, URISyntaxException  {
-        URLSplit split= URLSplit.parse(context);
+        URISplit split= URISplit.parse(context);
         FileSystem fs= FileSystem.create( new URI( split.path ) );
         fs.getFileObject(split.file.substring(split.path.length())).getFile(mon);
     }
@@ -69,7 +69,7 @@ public class FileSystemUtil {
      * @throws java.net.MalformedURLException
      */
     static boolean resourceIsLocal(String context) throws FileSystemOfflineException, URISyntaxException {
-        URLSplit split= URLSplit.parse(context);
+        URISplit split= URISplit.parse(context);
         FileSystem fs= FileSystem.create( new URI( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).isLocal() ) {
             return true;
@@ -79,7 +79,7 @@ public class FileSystemUtil {
     }
 
     static boolean resourceIsFile(String context) throws FileSystemOfflineException, URISyntaxException {
-        URLSplit split= URLSplit.parse(context);
+        URISplit split= URISplit.parse(context);
         FileSystem fs= FileSystem.create( new URI( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).isData() ) {
             return true;

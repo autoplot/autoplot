@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  * ftp://cdaweb.gsfc.nasa.gov/pub/istp/noaa/noaa14/%Y/noaa14_meped1min_sem_%Y%m%d_v01.cdf?timerange=2000-01-01
@@ -50,13 +50,13 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         surl= surl.replaceAll("%25","%");
         FileStorageModelNew fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
-        URLSplit split = URLSplit.parse(surl);
-        Map parms = URLSplit.parseParams(split.params);
+        URISplit split = URISplit.parse(surl);
+        Map parms = URISplit.parseParams(split.params);
         String stimeRange= (String) parms.get("timerange");
         ads.setViewRange(DatumRangeUtil.parseTimeRange(stimeRange));
         parms.remove("timerange");
         if (parms.size() > 0) {
-            ads.setParams(URLSplit.formatParams(parms));
+            ads.setParams(URISplit.formatParams(parms));
         }
 
         return ads;
@@ -76,7 +76,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public static FileStorageModelNew getFileStorageModel(String suri) throws IOException {
-        URLSplit split= URLSplit.parse(suri);
+        URISplit split= URISplit.parse(suri);
         String surl= split.surl; // support cases where resource URI is not yet valid.
         int i = surl.indexOf('?');
 
@@ -111,7 +111,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             throw new IllegalArgumentException("unable to find any files");
         }
 
-        URLSplit split = URLSplit.parse(surl);
+        URISplit split = URISplit.parse(surl);
 
         String delegateFfile = fsm.getFileSystem().getRootURI().resolve(delegateFile).toString();
         urlLen += delegateFfile.length();
@@ -125,13 +125,13 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             carotPos -= (i1 - i);
         }
 
-        Map parms = URLSplit.parseParams(split.params);
+        Map parms = URISplit.parseParams(split.params);
 
         Object value = parms.remove("timerange");
 
-        split.params = URLSplit.formatParams(parms);
+        split.params = URISplit.formatParams(parms);
 
-        String delegateUrl = URLSplit.format(split);
+        String delegateUrl = URISplit.format(split);
 
         CompletionContext delegatecc = new CompletionContext();
         delegatecc.surl = delegateUrl;
@@ -155,11 +155,11 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             throw new IllegalArgumentException("unable to find any files");
         }
 
-        URLSplit split = URLSplit.parse(surl);
+        URISplit split = URISplit.parse(surl);
 
-        Map parms = URLSplit.parseParams(split.params);
+        Map parms = URISplit.parseParams(split.params);
         parms.remove("timerange");
-        split.params = URLSplit.formatParams(parms);
+        split.params = URISplit.formatParams(parms);
 
         try {
             String scompUrl = fsm.getFileSystem().getRootURI().resolve(file).toString();
@@ -175,12 +175,12 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
     public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException {
         String delegateSurl = getDelegateDataSourceFactoryUrl(surl);
-        URLSplit split= URLSplit.parse(surl);
-        URLSplit delegateSplit= URLSplit.parse(delegateSurl);
+        URISplit split= URISplit.parse(surl);
+        URISplit delegateSplit= URISplit.parse(delegateSurl);
         try {
             delegateSplit.vapScheme= split.vapScheme;
-            URI uri= new URI( URLSplit.format(delegateSplit) );
-            return DataSetURL.getDataSourceFactory( uri, new NullProgressMonitor());
+            URI uri= new URI( URISplit.format(delegateSplit) );
+            return DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
         } catch (URISyntaxException ex) {
             Logger.getLogger(AggregatingDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
@@ -218,8 +218,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject( String surl, ProgressMonitor mon) {
-        URLSplit split = URLSplit.parse(surl);
-        Map map = URLSplit.parseParams(split.params);
+        URISplit split = URISplit.parse(surl);
+        Map map = URISplit.parseParams(split.params);
 
         try {
             if (!map.containsKey("timerange")) {

@@ -28,7 +28,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -58,7 +58,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         HSSFWorkbook wb = new HSSFWorkbook(fs);
 
         String query = uri.getQuery(); // the part after the ?
-        Map m = URLSplit.parseParams(query);
+        Map m = URISplit.parseParams(query);
 
         String ssheet = (String) m.get("sheet");
         if (ssheet == null) {

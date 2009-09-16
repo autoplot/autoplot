@@ -24,7 +24,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -63,7 +63,7 @@ public class DodsDataSourceFactory implements DataSourceFactory {
             return false;
         } else {
             try {
-                URLSplit split= URLSplit.parse(surl);
+                URISplit split= URISplit.parse(surl);
                 List<CompletionContext> cc = getVars(split.file);
                 return cc.size() > 1;
             } catch ( Exception ex ) {

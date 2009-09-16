@@ -22,10 +22,10 @@ import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -101,7 +101,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     JComponent delegateComponent = null;
     DataSetSelector delegateDataSetSelector=null;
     DataSourceEditorPanel delegateEditorPanel= null;
-    URLSplit split;
+    URISplit split;
     Map<String,String> params;
 
     private void setDelegateComponent(JComponent c) {
@@ -114,8 +114,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }
 
     public void setURI(String url) {
-        split= URLSplit.parse(url);
-        params= URLSplit.parseParams(split.params);
+        split= URISplit.parse(url);
+        params= URISplit.parseParams(split.params);
 
         try {
 
@@ -153,13 +153,13 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         } else {
             delegateUrl= delegateDataSetSelector.getValue();
         }
-        URLSplit dsplit= URLSplit.parse(delegateUrl);
+        URISplit dsplit= URISplit.parse(delegateUrl);
         Map<String,String> allParams= new LinkedHashMap<String,String>();
         allParams.putAll( params );
-        allParams.putAll( URLSplit.parseParams(dsplit.params) );
+        allParams.putAll( URISplit.parseParams(dsplit.params) );
         allParams.put( "timerange", timeRangeTextField.getText() );
-        split.params= URLSplit.formatParams(allParams);
-        return URLSplit.format(split);
+        split.params= URISplit.formatParams(allParams);
+        return URISplit.format(split);
     }
 
 }

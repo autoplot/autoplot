@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,7 +15,7 @@ import java.util.regex.Pattern;
  * routines for working with URIs.
  * @author jbf
  */
-public class URLSplit {
+public class URISplit {
 
     /**
      * scheme for Autoplot, if provided.  e.g.  vap+cdf.  If not provided,
@@ -72,12 +71,12 @@ public class URLSplit {
      * @return surl, maybe with "file:/" prepended.
      */
     public static String maybeAddFile(String surl) {
-        URLSplit result = maybeAddFile(surl, 0);
+        URISplit result = maybeAddFile(surl, 0);
         return result.surl;
     }
 
-    public static URLSplit maybeAddFile(String surl, int carotPos) {
-        URLSplit result = new URLSplit();
+    public static URISplit maybeAddFile(String surl, int carotPos) {
+        URISplit result = new URISplit();
 
         if (surl.length() == 0) {
             surl = "file:///";
@@ -104,7 +103,7 @@ public class URLSplit {
             if (scheme.equals("vap+internal")) { // leave the resourcePart alone. TODO: jdbc and other non-file URIs.
                 result.surl= resourcePart;
             } else {
-                URLSplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));
+                URISplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));
                 result.surl = resourceSplit.surl;
                 result.formatCarotPos = (carotPos > i0) ? resourceSplit.resourceUriCarotPos + (i0 + 1) : carotPos;
                 result.resourceUriCarotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
@@ -144,7 +143,7 @@ public class URLSplit {
      *   ext, the extenion, .nc
      *   params, myVariable or null
      */
-    public static URLSplit parse(String surl) {
+    public static URISplit parse(String surl) {
         return parse(surl, 0, true);
     }
 
@@ -169,7 +168,7 @@ public class URLSplit {
      * valid, then this will be set as well.  surl may be modified.
      * @param result
      */
-    private static void parseScheme(URLSplit result, boolean normalize) throws URISyntaxException {
+    private static void parseScheme(URISplit result, boolean normalize) throws URISyntaxException {
         String surl = result.surl;
         int h = surl.indexOf(":"); // "c:" should be "file:///c:"
 
@@ -235,8 +234,8 @@ public class URLSplit {
      * @param resourceUriCarotPos the position of the carot, the relative position will be preserved through normalization in formatCarotPos
      * @param normalize normalize the surl by adding implicit "vap", etc.
      */
-    public static URLSplit parse( String surl, int carotPos , boolean normalize) {
-        URLSplit result = maybeAddFile(surl, carotPos);
+    public static URISplit parse( String surl, int carotPos , boolean normalize) {
+        URISplit result = maybeAddFile(surl, carotPos);
 
         try {
             if ( result.vapScheme==null || !result.vapScheme.equals("vap+internal") ) {
@@ -344,7 +343,7 @@ public class URLSplit {
             return result;
         }
 
-        params = URLSplit.uriDecode(params);
+        params = URISplit.uriDecode(params);
 
         String[] ss = params.split("&");
 
@@ -391,7 +390,7 @@ public class URLSplit {
         return (result.length() == 0) ? "" : result.substring(1);
     }
 
-    public static String format(URLSplit split) {
+    public static String format(URISplit split) {
         String surl;
         String result = "";
         if ( split.vapScheme!=null ) result= result + split.vapScheme + ":";

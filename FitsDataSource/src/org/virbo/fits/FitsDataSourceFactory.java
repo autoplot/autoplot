@@ -19,7 +19,7 @@ import org.eso.fits.FitsFile;
 import org.eso.fits.FitsHDUnit;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 
 /**
@@ -56,7 +56,7 @@ public class FitsDataSourceFactory extends AbstractDataSourceFactory {
     }
 
     protected static Map<String,Integer> getPlottable(URI uri, ProgressMonitor mon) throws IOException, FitsException {
-        File f = DataSetURL.getFile(uri, mon);
+        File f = DataSetURI.getFile(uri, mon);
         FitsFile file = new FitsFile(f);
 
         Map<String,Integer> result= new LinkedHashMap<String,Integer>();

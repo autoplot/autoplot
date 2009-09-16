@@ -24,7 +24,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.MetadataModel;
 import org.w3c.dom.Document;
@@ -81,7 +81,7 @@ public class SpaseRecordDataSource implements DataSource {
             //XPathExpression expr= xpath.compile( "//book/title/text()" );
             //surl= xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
             surl= findSurl();
-            delegate= DataSetURL.getDataSource( DataSetURL.getURI( surl ) );
+            delegate= DataSetURI.getDataSource( DataSetURI.getURI( surl ) );
         } catch ( XPathExpressionException ex) {
             throw new IllegalArgumentException("unable to get /Spase/NumericalData/AccessInformation/AccessURL/URL(): "+ex.getMessage() );
         } catch ( MalformedURLException ex) {

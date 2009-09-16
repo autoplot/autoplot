@@ -14,7 +14,7 @@ import java.util.List;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -181,8 +181,8 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
      * @throws IOException
      */
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
-        URLSplit split= URLSplit.parse(uri);
-        //java.util.Map<String,String> params= URLSplit.parseParams(split.params);
+        URISplit split= URISplit.parse(uri);
+        //java.util.Map<String,String> params= URISplit.parseParams(split.params);
 
         PrintWriter out = new PrintWriter( new File( split.resourceUri ) );
 

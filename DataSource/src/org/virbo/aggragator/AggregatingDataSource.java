@@ -29,11 +29,11 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
@@ -265,12 +265,12 @@ public class AggregatingDataSource extends AbstractDataSource {
         if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
         surl += "timerange=" + String.valueOf(viewRange);
 
-        URLSplit split = URLSplit.parse(surl);
-        Map<String,String> mparams = URLSplit.parseParams(split.params);
+        URISplit split = URISplit.parse(surl);
+        Map<String,String> mparams = URISplit.parseParams(split.params);
         String stimeRange = viewRange.toString();
         mparams.put("timerange", stimeRange);
-        split.params = URLSplit.formatParams(mparams);
+        split.params = URISplit.formatParams(mparams);
 
-        return URLSplit.format(split);
+        return URISplit.format(split);
     }
 }

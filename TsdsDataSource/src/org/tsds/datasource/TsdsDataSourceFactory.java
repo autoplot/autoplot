@@ -19,7 +19,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -103,8 +103,8 @@ public class TsdsDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject(String surl, ProgressMonitor mon) {
-        URLSplit split= URLSplit.parse( surl );
-        Map params= URLSplit.parseParams(split.params);
+        URISplit split= URISplit.parse( surl );
+        Map params= URISplit.parseParams(split.params);
         if ( params.equals("") ) {
             return !( surl.contains("tf_") && surl.contains("to_") ); // looks like a redirect url.
         } else {
