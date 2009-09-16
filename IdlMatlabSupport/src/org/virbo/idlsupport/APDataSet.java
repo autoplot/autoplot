@@ -8,7 +8,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.dsops.Ops;
 
@@ -38,7 +38,7 @@ public class APDataSet extends QDataSetBridge {
     }
 
     QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
-        DataSource dsource = DataSetURL.getDataSource(surl);
+        DataSource dsource = DataSetURI.getDataSource(surl);
 
         QDataSet result = dsource.getDataSet( mon);
 
