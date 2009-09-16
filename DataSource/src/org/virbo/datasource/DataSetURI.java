@@ -497,15 +497,17 @@ public class DataSetURI {
      * @throws IOException
      */
     public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
-        String uristring = uri.toString();
-        // copy the URI so we don't clobber the contents of the original
-        URI luri = URI.create(uristring.substring(0, uristring.lastIndexOf('/')));
-        FileSystem fs = FileSystem.create(getResourceURI(luri));
-        String filename = uri.getPath();
-        filename = filename.substring(filename.lastIndexOf('/'));
-        FileObject fo = fs.getFileObject(filename);
-        File tfile = fo.getFile(mon);
-        return tfile;
+        try {
+            URISplit split = URISplit.parse(uri.toString());
+            FileSystem fs = FileSystem.create(new URI(split.path));
+            String filename = split.file.substring(split.path.length());
+            FileObject fo = fs.getFileObject(filename);
+            File tfile = fo.getFile(mon);
+            return tfile;
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IOException(ex.getMessage());
+        }
     }
 
     /**
