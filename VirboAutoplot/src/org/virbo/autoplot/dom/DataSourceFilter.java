@@ -7,7 +7,7 @@ package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  * Model for a source of data plus additional processing.
@@ -24,8 +24,8 @@ public class DataSourceFilter extends DomNode {
 
     public void setUri(String uri) {
         if ( uri!=null ) {
-            URLSplit split= URLSplit.parse(uri);
-            uri= URLSplit.format(split); // make canonical
+            URISplit split= URISplit.parse(uri);
+            uri= URISplit.format(split); // make canonical
         }
         
         String oldUri = this.uri;

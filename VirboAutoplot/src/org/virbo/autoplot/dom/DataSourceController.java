@@ -30,9 +30,9 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.TransposeRank2DataSet;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
@@ -236,6 +236,10 @@ public class DataSourceController extends DomNodeController {
 
             setCaching(dataSource.getCapability(Caching.class));
             setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
+            if ( dsf.getUri()==null ) {
+                dsf.setUri( dataSource.getURI() );
+                setUriNeedsResolution(false);
+            }
 
         }
 
@@ -370,7 +374,7 @@ public class DataSourceController extends DomNodeController {
 
     private synchronized void resolveParents() {
         if ( dsf.getUri()==null ) return; //TODO: remove
-        URLSplit split= URLSplit.parse(dsf.getUri());
+        URISplit split= URISplit.parse(dsf.getUri());
         String[] ss = split.surl.split(",", -2);
         for (int i = 0; i < ss.length; i++) {
             DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
@@ -672,13 +676,13 @@ public class DataSourceController extends DomNodeController {
 
             if (getTsb() != null) {
                 String oldsurl = dsf.getUri();
-                String newsurl = getTsb().getURL().toString();
-                URLSplit split = URLSplit.parse(newsurl);
+                String newsurl = getTsb().getURI().toString();
+                URISplit split = URISplit.parse(newsurl);
                 if (oldsurl != null) {
-                    URLSplit oldSplit = URLSplit.parse(oldsurl);
+                    URISplit oldSplit = URISplit.parse(oldsurl);
                     split.vapScheme = oldSplit.vapScheme;
                 }
-                newsurl = URLSplit.format(split);
+                newsurl = URISplit.format(split);
                 dsf.uri = newsurl; // don't fire off event. TODO: should we?
             }
             setStatus("ready");
@@ -940,7 +944,7 @@ public class DataSourceController extends DomNodeController {
         this.mon = mymon;
         try {
             result = getDataSource().getDataSet(mymon);
-            Map<String,Object> props= getDataSource().getMetaData(new NullProgressMonitor());
+            Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
             setDataSetInternal(result,props);
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
@@ -1013,8 +1017,8 @@ public class DataSourceController extends DomNodeController {
             setDataSetNeedsLoading(false);
             changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
         } else {
-            URLSplit split = URLSplit.parse(surl);
-            surl = URLSplit.format(split);
+            URISplit split = URISplit.parse(surl);
+            surl = URISplit.format(split);
 
             try {
                 mon.started();
@@ -1022,7 +1026,7 @@ public class DataSourceController extends DomNodeController {
 
                 if (caching != null) {
                     if (caching.satisfies(surl)) {
-                        caching.resetURL(surl);
+                        caching.resetURI(surl);
                         update(true, true);
                         return;
                     }
@@ -1033,7 +1037,7 @@ public class DataSourceController extends DomNodeController {
                     doInternal(split.path);
                     setDataSource(valueWasAdjusting,null);
                 } else {
-                    DataSource source = DataSetURL.getDataSource(surl);
+                    DataSource source = DataSetURI.getDataSource(surl);
                     setDataSource(valueWasAdjusting,source);
                 }
                 setUriNeedsResolution(false);

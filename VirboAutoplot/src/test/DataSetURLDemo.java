@@ -13,7 +13,7 @@ import java.net.URI;
 import java.net.URL;
 import org.das2.components.DasProgressPanel;
 import java.util.List;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 
 /**
  *
@@ -66,12 +66,12 @@ public class DataSetURLDemo {
                 throw new IllegalArgumentException("bad test number");
         }
         
-        List<DataSetURL.CompletionResult> ccs= DataSetURL.getFactoryCompletions( context, carotPos, new DasProgressPanel("completions" ) );
+        List<DataSetURI.CompletionResult> ccs= DataSetURI.getFactoryCompletions( context, carotPos, new DasProgressPanel("completions" ) );
        
         System.err.println(context);
         System.err.println(spaces.substring(0,carotPos)+"L" );
         
-        for ( DataSetURL.CompletionResult cc: ccs ) {
+        for ( DataSetURI.CompletionResult cc: ccs ) {
             System.err.println( ""+cc.completion );
         }
         

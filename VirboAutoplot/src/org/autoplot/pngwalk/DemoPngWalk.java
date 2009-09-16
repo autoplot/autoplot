@@ -17,7 +17,7 @@ import org.das2.util.ArgumentList;
 import org.das2.util.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 
 /**
  *
@@ -27,7 +27,7 @@ public class DemoPngWalk {
 
     public static void main(String[] args) {
 
-        DataSetURL.init();  // FtpFileSystem implementation
+        DataSetURI.init();  // FtpFileSystem implementation
         
         System.err.println("this is pngwalk 20090529");
         final ArgumentList alm = new ArgumentList("AutoPlotUI");
