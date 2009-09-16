@@ -40,7 +40,7 @@ import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelectorSupport;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
@@ -211,7 +211,7 @@ public class SimpleServlet extends HttpServlet {
             if (surl!=null && !"".equals(surl)) {
                 DataSource dsource;
                 try {
-                    dsource = DataSetURL.getDataSource(surl);
+                    dsource = DataSetURI.getDataSource(surl);
                 } catch (NullPointerException ex) {
                     throw new RuntimeException("No such data source: ", ex);
                 } catch (Exception ex) {
