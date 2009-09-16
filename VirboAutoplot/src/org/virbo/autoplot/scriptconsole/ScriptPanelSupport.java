@@ -33,7 +33,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PyException;
@@ -42,7 +42,7 @@ import org.python.core.PySyntaxError;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.dom.ApplicationController;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.jython.JythonDataSourceFactory;
 
 /**
@@ -81,13 +81,13 @@ public class ScriptPanelSupport {
      * @throws java.lang.NullPointerException
      */
     private boolean maybeDisplayDataSourceScript() throws HeadlessException, NullPointerException {
-        URLSplit split;
+        URISplit split;
         try {
             String sfile = applicationController.getFocusUri();
             if (sfile == null) {
                 return false;
             }
-            split = URLSplit.parse(sfile);
+            split = URISplit.parse(sfile);
             if (!(split.vapScheme.endsWith("jyds") || split.file.endsWith(".jyds"))) {
                 return false;
             }
@@ -99,7 +99,7 @@ public class ScriptPanelSupport {
                 }
                 saveAs();
             }
-            file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
+            file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
             loadFile(file);
             panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
             panel.setFilename(sfile);
@@ -187,12 +187,12 @@ public class ScriptPanelSupport {
         if (i1 == -1) {
             i1 = surl1.length();
         }
-        URI uri1 = DataSetURL.getURI(surl1.substring(0, i1));
+        URI uri1 = DataSetURI.getURI(surl1.substring(0, i1));
         int i2 = surl2.indexOf("?");
         if (i2 == -1) {
             i2 = surl2.length();
         }
-        URI uri2 = DataSetURL.getURI(surl2.substring(0, i2));
+        URI uri2 = DataSetURI.getURI(surl2.substring(0, i2));
         return uri1.equals(uri2);
     }
 
@@ -229,7 +229,7 @@ public class ScriptPanelSupport {
                     } catch (URISyntaxException ex) {
                         throw new RuntimeException(ex);
                     }
-                    JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURL.getDataSourceFactory( uri, new NullProgressMonitor());
+                    JythonDataSourceFactory factory = (JythonDataSourceFactory) DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
                     if (factory != null) {
                         factory.addExeceptionListener(new ExceptionListener() {
 
@@ -405,14 +405,14 @@ public class ScriptPanelSupport {
         try {
             if (this.file == null) {
                 String sfile = selector.getValue();
-                URLSplit split = null;
+                URISplit split = null;
                 if (sfile != null) {
-                    split = URLSplit.parse(sfile);
+                    split = URISplit.parse(sfile);
                 }
                 if (split == null || !(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
                     file = null;
                 } else {
-                    file = DataSetURL.getFile(DataSetURL.getURL(sfile), new NullProgressMonitor());
+                    file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
                 }
             }
 
