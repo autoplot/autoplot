@@ -144,8 +144,7 @@ public class DataSetURI {
      */
     public static DataSource getDataSource(URI uri) throws Exception {
         DataSourceFactory factory = getDataSourceFactory(uri, new NullProgressMonitor());
-        URI ruri = getResourceURI(uri);
-        DataSource result = factory.getDataSource(ruri);
+        DataSource result = factory.getDataSource(uri);
         dsToFactory.put(result, factory);
         return result;
 
@@ -219,6 +218,9 @@ public class DataSetURI {
      * returns the URI to be interpretted by the DataSource.  For file-based
      * data sources, this will probably be the filename plus server-side
      * parameters, and can be converted to a URL.
+     *
+     * Changes:
+     *   20090916: client-side parameters removed from URI.
      * @param uri, the URI understood in the context of all datasources.  This should contain "vap" or "vap+" for the scheme.
      * @return the URI for the datasource resource, or null if it is not valid.
      */
