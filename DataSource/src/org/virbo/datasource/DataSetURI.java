@@ -487,6 +487,15 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * retrieve the file specified in the URI, possibly using the VFS library to
+     * download the resource to a local cache.  The URI should be a downloadable
+     * file, and not the vap scheme URI.
+     * @param uri resource to download, such as "sftp://user@host/file.dat."
+     * @param mon
+     * @return
+     * @throws IOException
+     */
     public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
         String uristring = uri.toString();
         // copy the URI so we don't clobber the contents of the original
