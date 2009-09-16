@@ -13,8 +13,8 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.Axis;
-import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.DataSetURL.CompletionResult;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
  *
@@ -54,7 +54,7 @@ public class Test005 {
 
             {
                 String suri = "ftp://ftp.virbo.org/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?";
-                List<CompletionResult> completionResult = DataSetURL.getCompletions(suri, suri.length(), new NullProgressMonitor());
+                List<CompletionResult> completionResult = DataSetURI.getCompletions(suri, suri.length(), new NullProgressMonitor());
                 PrintWriter out = new PrintWriter("test005_demo3.txt");
                 for (CompletionResult l : completionResult) {
                     out.println(l.completion);

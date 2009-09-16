@@ -141,10 +141,10 @@ public class TestApplet001 {
 
     public static void main(String[] args) {
 
-        boolean headless= true; // true for Hudson (though it's not really headless), false for debugging
+        boolean headless= false; // true for Hudson (though it's not really headless), false for debugging
 
         Map<String, String> params = new HashMap<String, String>();
-        params.put("dataSetURL", "tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
+        params.put("dataSetURL", "vap+tsds:http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
         params.put("column", "5em,100%-10em");
         params.put("font", "sans-italic-10");
         params.put("row", "3em,100%-3em");
@@ -154,6 +154,7 @@ public class TestApplet001 {
         params.put("foregroundColor", "#ffffff");
         params.put("backgroundColor", "#000000");
         params.put("clickCallback", "onClick,label=Show Coordinates");
+        params.put("contextOverview", "on");
         //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
         params.put("codebase_lookup", "false");
         params.put("java_arguments", "-Djnlp.packEnabled=true");

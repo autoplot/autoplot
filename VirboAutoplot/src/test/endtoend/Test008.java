@@ -13,7 +13,7 @@ import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 
 /**
- *
+ * Andrew's server
  * @author jbf
  */
 public class Test008 {

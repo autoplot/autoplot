@@ -13,7 +13,7 @@ import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 
 /**
- *
+ * Tests of TSDS products 
  * @author jbf
  */
 public class Test007 {
@@ -56,7 +56,7 @@ public class Test007 {
             doTest( 1, "vap+tsds:http://timeseries.org/cgi-bin/get.cgi?StartDate=19900301&EndDate=19900302&ppd=24&ext=bin&out=bin&param1=SourceAcronym_Subset2-1-v0");
             doTest( 2, "vap+tsds:http://timeseries.org/get3.cgi?StartDate=19900301&EndDate=19900301&ppd=24&ext=bin&out=ncml&param1=SourceAcronym_Subset2-1-v0" );
             doTest( 3, "vap+tsds:http://timeseries.org/get3.cgi?StartDate=19930101&EndDate=20031231&ppd=1&ext=bin&out=ncml&param1=Kanekal_SAMPEX_elo_1hour-1-v0" );
-            //s -lrdoTest( 4, "vap+tsds:http://timeseries.org/get3.cgi?StartDate=19950101&EndDate=20050201&ppd=24&ext=bin&out=ncml&param1=Kanekal_SAMPEX_elo_1hour-1-v0" );
+            //doTest( 4, "vap+tsds:http://timeseries.org/get3.cgi?StartDate=19950101&EndDate=20050201&ppd=24&ext=bin&out=ncml&param1=Kanekal_SAMPEX_elo_1hour-1-v0" );
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (RuntimeException ex) {

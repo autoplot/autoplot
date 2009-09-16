@@ -10,7 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 
 /**
  * checks to see if our favorite servers are responsive.
@@ -19,7 +19,7 @@ import org.virbo.datasource.DataSetURL;
 public class Test010 {
 
     public static void doTest( String uri ) throws Exception {
-        URL url= DataSetURL.getWebURL( new URI( uri ) );
+        URL url= DataSetURI.getWebURL( new URI( uri ) );
 
         URLConnection connect= url.openConnection();
         connect.setConnectTimeout(500);
