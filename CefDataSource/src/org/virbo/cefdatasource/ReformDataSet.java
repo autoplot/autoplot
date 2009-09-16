@@ -149,7 +149,7 @@ public class ReformDataSet extends AbstractDataSet implements RankNDataSet {
             name = "dataSet";
         }
 
-        int[] qube = (int[]) property(QDataSet.QUBE);
+        int[] qube = DataSetUtil.qubeDims(this);
         String qubeStr = qube == null ? "*" : "";
 
         StringBuffer dimStr = new StringBuffer("" + length());
