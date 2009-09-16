@@ -16,7 +16,7 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import org.das2.jythoncompletion.support.CompletionItem;
 import org.das2.jythoncompletion.support.CompletionTask;
-import org.virbo.datasource.DataSetURL.CompletionResult;
+import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
  * adapts CompletionResult to Netbeans model.

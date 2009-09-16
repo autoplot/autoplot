@@ -126,7 +126,14 @@ public class JythonCompletionTask implements CompletionTask {
             return;
         }
 
-        PyList po2 = (PyList) context.__dir__();
+        PyList po2;
+        try {
+            po2= (PyList) context.__dir__();
+        } catch ( PyException e ) {
+            e.printStackTrace();
+            return;
+        }
+        
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();

@@ -14,10 +14,10 @@ import javax.swing.text.JTextComponent;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.DataSetURL.CompletionResult;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.DataSourceRegistry;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -55,11 +55,11 @@ class DataSetUrlCompletionTask implements CompletionTask {
             
             List<CompletionResult> rs;
              
-            URLSplit split = URLSplit.parse(surl1);            
+            URISplit split = URISplit.parse(surl1);
             if ( surl1.contains("?") || DataSourceRegistry.getInstance().hasSourceByExt(split.ext) ) {
-                rs= DataSetURL.getFactoryCompletions( surl1, carotPos,  new NullProgressMonitor() );
+                rs= DataSetURI.getFactoryCompletions( surl1, carotPos,  new NullProgressMonitor() );
             } else {
-                rs= DataSetURL.getFileSystemCompletions(surl1, carotPos, new NullProgressMonitor() );
+                rs= DataSetURI.getFileSystemCompletions(surl1, carotPos, new NullProgressMonitor() );
             }
             
             for ( CompletionResult rs1:rs ) {
