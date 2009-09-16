@@ -66,7 +66,7 @@ import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURL;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -260,7 +260,7 @@ public class GuiSupport {
 
                         String s = chooser.getSelectedFile().toString();
 
-                        String ext = DataSetURL.getExt(s);
+                        String ext = DataSetURI.getExt(s);
                         if (ext == null) {
                             ext = "";
                         }
@@ -281,9 +281,8 @@ public class GuiSupport {
                                 return;
                             }
                         }
-                        format.formatData(new File(s), new java.util.HashMap<String, String>(),
-                                dsc.getFillDataSet(), new DasProgressPanel("formatting data"));
-                        parent.setStatus("Wrote file " + s);
+                        format.formatData( s, dsc.getFillDataSet(), new DasProgressPanel("formatting data"));
+                        parent.setStatus("Wrote " + s);
 
                     } catch (IOException ex) {
                         parent.applicationModel.getExceptionHandler().handle(ex);
