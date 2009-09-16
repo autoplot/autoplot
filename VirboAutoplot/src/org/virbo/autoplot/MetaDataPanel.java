@@ -95,7 +95,7 @@ public class MetaDataPanel extends javax.swing.JPanel {
                 dsrc = dsf.getController().getDataSource();
             }
             if (dsrc != null) {
-                tree = new CombinedTreeModel("" + dsrc.getURL());
+                tree = new CombinedTreeModel("" + dsrc.getURI());
                 Map<String, Object> meta = dsf.getController().getRawProperties();
                 MetadataModel model = dsrc.getMetadataModel();
                 String root = "Metadata";
