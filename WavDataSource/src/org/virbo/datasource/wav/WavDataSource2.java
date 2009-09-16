@@ -39,7 +39,7 @@ public class WavDataSource2 extends AbstractDataSource {
 
     @Override
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        File wavFile = DataSetURI.getFile(this.uri, mon);
+        File wavFile = DataSetURI.getFile(this.resourceURI, mon);
 
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(wavFile);
         AudioFormat audioFormat = fileFormat.getFormat();
