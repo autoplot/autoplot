@@ -8,8 +8,8 @@ package test;
 import java.io.File;
 import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.datasource.DataSetURL;
-import org.virbo.datasource.URLSplit;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.URISplit;
 
 /**
  *
@@ -38,7 +38,7 @@ public class TestURLSplit {
         System.out.println("\n");
         System.out.println(string);
         char c= string.length()>carotpos ? string.charAt(carotpos) : 0;
-        URLSplit split= URLSplit.parse(string, carotpos , true);
+        URISplit split= URISplit.parse(string, carotpos , true);
         System.out.println(split);
         if ( split.resourceUriCarotPos>=0 ) {
             char c1= split.surl.length()>split.resourceUriCarotPos ? split.surl.charAt(split.resourceUriCarotPos) : 0;
@@ -50,22 +50,22 @@ public class TestURLSplit {
     private static void testComplete( int id, String string, int carotpos ) throws Exception {
         System.err.println("testComplete!!!!");
         System.err.println( string.substring(0,carotpos) );
-        List<DataSetURL.CompletionResult> result= DataSetURL.getCompletions( string, carotpos, new NullProgressMonitor() );
-        for ( DataSetURL.CompletionResult cr: result ) {
+        List<DataSetURI.CompletionResult> result= DataSetURI.getCompletions( string, carotpos, new NullProgressMonitor() );
+        for ( DataSetURI.CompletionResult cr: result ) {
             System.err.print( "  "+ cr.label );
         }
         for ( int i=0; i<string.length(); i++ ) {
-            result= DataSetURL.getCompletions( string, i, new NullProgressMonitor() );
+            result= DataSetURI.getCompletions( string, i, new NullProgressMonitor() );
             System.err.println( ""+id+"@"+i+":  "+result.size() +"   "+string.substring(0,i) );
         }
     }
 
     private static void testContext1( String t, String scontext, String expect ) throws Exception {
         if ( scontext.equals("") ) {
-            System.err.println( URLSplit.format(  URLSplit.parse( t ) ) );
+            System.err.println( URISplit.format(  URISplit.parse( t ) ) );
         } else {
-            URLSplit context= URLSplit.parse(scontext);
-            //TODO: restore with context-enabled version System.err.println( URLSplit.format(  URLSplit.parse( t, context ) ) );
+            URISplit context= URISplit.parse(scontext);
+            //TODO: restore with context-enabled version System.err.println( URISplit.format(  URISplit.parse( t, context ) ) );
         }
     }
     private static void testContext( ) throws Exception {
