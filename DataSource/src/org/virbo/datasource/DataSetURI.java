@@ -205,7 +205,8 @@ public class DataSetURI {
     }
 
     /**
-     * returns the URI to be interpretted by the DataSource.
+     * returns the URI to be interpretted by the DataSource.  This identifies
+     * a file (or database) resource that can be passed to VFS.
      * @param uri, the URI understood in the context of all datasources.  This should contain "vap" or "vap+" for the scheme.
      * @return the URI for the datasource resource, or null if it is not valid.
      */
