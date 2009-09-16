@@ -57,10 +57,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         fs = new POIFSFileSystem(in);
         HSSFWorkbook wb = new HSSFWorkbook(fs);
 
-        String query = uri.getQuery(); // the part after the ?
-        Map m = URISplit.parseParams(query);
-
-        String ssheet = (String) m.get("sheet");
+        String ssheet = (String) params.get("sheet");
         if (ssheet == null) {
             sheet = wb.getSheetAt(0);
         } else {
@@ -70,11 +67,11 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             throw new IllegalArgumentException("Sheet not found: " + ssheet);
         }
 
-        String firstRowString = (String) m.get("firstRow");
+        String firstRowString = (String) params.get("firstRow");
         int firstRow = firstRowString == null ? -1 : Integer.parseInt(firstRowString) - 1;
 
         
-        String d = (String) m.get("column");
+        String d = (String) params.get("column");
 
         int[] spec = parseDataSetSpec(d, firstRow, -1);
         
@@ -93,7 +90,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             }
         }
         
-        String recCountString= (String) m.get("recCount" ) ;
+        String recCountString= (String) params.get("recCount" ) ;
         if ( recCountString!=null ) {
             int recCount= Integer.parseInt(recCountString);
             spec[2]= Math.min( spec[2], spec[1]+recCount );
@@ -102,7 +99,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         data = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );        
         if ( d.length()>1 ) data.putProperty( QDataSet.NAME, d );
 
-        d = (String) m.get("depend0");
+        d = (String) params.get("depend0");
         if (d != null) {
             int[] spec2 = parseDataSetSpec(d, firstRow, -1);
             spec[0]= spec2[0];
@@ -111,7 +108,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             data.putProperty(QDataSet.DEPEND_0, depend0);
         }
 
-        d = (String) m.get("plane0");
+        d = (String) params.get("plane0");
         if (d != null) {
             int[] spec2 = parseDataSetSpec(d, firstRow, -1);
             spec[0]= spec2[0];
