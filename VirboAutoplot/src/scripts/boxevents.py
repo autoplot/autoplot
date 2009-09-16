@@ -57,8 +57,6 @@ from org.das2.event import BoxSelectorMouseModule
 
 mm= BoxSelectorMouseModule.create( plot, 'show images' )
 
-from java.lang import Runtime
-
 def boxSelected(event):
     tmin= event.getYRange().min().doubleValue( Units.us2000 )
     tmax= event.getYRange().max().doubleValue( Units.us2000 )
