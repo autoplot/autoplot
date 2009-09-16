@@ -605,7 +605,7 @@ class TsdsDataSource extends AbstractDataSource {
                 "&out=" + params.get("out") +
                 "&param1=" + params.get("param1");
 
-        return this.resourceURI.toString() + "?" + sparams;
+        return "vap+tsds:" + this.resourceURI.toString() + "?" + sparams;
 
     }
 }
