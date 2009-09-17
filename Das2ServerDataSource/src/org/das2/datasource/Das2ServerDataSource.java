@@ -15,7 +15,6 @@ import org.das2.stream.StreamException;
 import org.das2.util.DasProgressMonitorInputStream;
 import org.das2.util.StreamTool;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -139,13 +138,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 
     @Override
     public String getURI() {
-        // TODO: Cheesy.  ApplicationModel shouldn't call getURL when TimeSeriesBrowse exists.
-        TimeSeriesBrowse tsb= getCapability( TimeSeriesBrowse.class );
-        if ( tsb!=null ) {
-            return getCapability( TimeSeriesBrowse.class ).getURI();
-        } else {
-            return super.getURI();
-        }
+        return super.getURI();
     }
 
 
