@@ -20,7 +20,12 @@ public class Test003 {
 
             ScriptContext.load( "file:///home/jbf/ct/lanl/hudson/geo_pitch_stack_test1_local.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
-            ScriptContext.writeToPng( "test003.png" );
+            ScriptContext.writeToPng( "test003_001.png" );
+
+            ScriptContext.load( "file:///home/jbf/ct/lanl/hudson/contextOveriew2.vap" );
+            ScriptContext.setCanvasSize( 800, 600 );
+            ScriptContext.writeToPng( "test003_002.png" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( RuntimeException ex ) {
             ex.printStackTrace();
