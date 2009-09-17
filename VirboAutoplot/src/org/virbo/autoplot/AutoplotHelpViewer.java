@@ -36,7 +36,7 @@ public class AutoplotHelpViewer extends BasicContentViewerUI {
                 if (u.getProtocol().equalsIgnoreCase("mailto") ||
                         u.getProtocol().equalsIgnoreCase("http") ||
                         u.getProtocol().equalsIgnoreCase("ftp")) {
-                    Desktop.getDesktop().browse(u.toURI());
+                    AutoplotUtil.openBrowser(u.toString());
                     return;
                 }
             } catch (Throwable t) {
