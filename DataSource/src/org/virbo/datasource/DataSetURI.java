@@ -26,6 +26,7 @@ import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -498,7 +499,7 @@ public class DataSetURI {
      */
     public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
         try {
-            URISplit split = URISplit.parse(uri.toString());
+            URISplit split = URISplit.parse( URLDecoder.decode(uri.toString(),"US-ASCII") );
             FileSystem fs = FileSystem.create(new URI(split.path));
             String filename = split.file.substring(split.path.length());
             FileObject fo = fs.getFileObject(filename);
