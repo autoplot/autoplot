@@ -154,7 +154,7 @@ public class TestApplet001 {
         params.put("foregroundColor", "#ffffff");
         params.put("backgroundColor", "#000000");
         params.put("clickCallback", "onClick,label=Show Coordinates");
-        params.put("contextOverview", "on");
+        //params.put("contextOverview", "on");
         //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
         params.put("codebase_lookup", "false");
         params.put("java_arguments", "-Djnlp.packEnabled=true");
