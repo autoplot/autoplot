@@ -1,6 +1,5 @@
 package org.virbo.autoplot;
 
-import java.awt.Desktop;
 import java.net.URL;
 import javax.help.JHelpContentViewer;
 import javax.help.plaf.basic.BasicContentViewerUI;
