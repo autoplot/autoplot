@@ -11,6 +11,7 @@ package org.virbo.datasource.capability;
 
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -59,9 +60,4 @@ public interface TimeSeriesBrowse {
      */
     String getURI( );
 
-    /**
-     * get the dataset for this URI.  This URI must be produced by getURI(),
-     * and implementations may throw IllegalArgumentException.
-     */
-    QDataSet getDataSet( String suri );
 }
