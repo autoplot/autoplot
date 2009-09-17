@@ -22,9 +22,17 @@ public class Test003 {
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_001.png" );
 
-            ScriptContext.load( "file:///home/jbf/ct/lanl/hudson/contextOveriew2.vap" );
+            ScriptContext.reset();
+
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/contextOverview2.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_002.png" );
+
+            ScriptContext.reset();
+            
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_2.vap" );
+            ScriptContext.setCanvasSize( 800, 600 );
+            ScriptContext.writeToPng( "test003_003.png" );
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( RuntimeException ex ) {
