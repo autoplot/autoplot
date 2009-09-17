@@ -97,7 +97,26 @@ for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.p
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
+cd ..
 echo "done copy resources."
+
+echo "copy help files..."
+for i in \
+  QDataSet QStream dasCore DataSource \
+  JythonSupport \
+  IdlMatlabSupport \
+  AudioSystemDataSource \
+  BinaryDataSource DataSourcePack JythonDataSource \
+  Das2ServerDataSource TsdsDataSource  \
+  NetCdfDataSource CdfDataSource CefDataSource \
+  WavDataSource ImageDataSource ExcelDataSource \
+  FitsDataSource OpenDapDataSource \
+  VirboAutoplot; do
+    echo rsync -a --exclude .svn ../${i}/javahelp/ temp-classes/
+    rsync -a --exclude .svn ../${i}/javahelp/ temp-classes/
+done
+
+echo "done copy help files."
 
 hasErrors=0
 
