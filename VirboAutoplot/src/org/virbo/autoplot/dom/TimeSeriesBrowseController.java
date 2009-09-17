@@ -41,7 +41,7 @@ public class TimeSeriesBrowseController {
     Timer updateTsbTimer;
     PropertyChangeListener timeSeriesBrowseListener;
 
-    TimeSeriesBrowseController( Panel p ) {
+    TimeSeriesBrowseController( DataSourceController dataSourceController, Panel p ) {
 
         this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         
@@ -55,8 +55,8 @@ public class TimeSeriesBrowseController {
         updateTsbTimer.setRepeats(false);
         this.p = p;
         this.panelController = p.getController();
-        this.dsf= p.getController().getDataSourceFilter();
-        this.dataSourceController= dsf.getController();
+        this.dsf= dataSourceController.dsf;
+        this.dataSourceController= dataSourceController;
 
         this.plot = panelController.getDasPlot();
         this.xAxis = panelController.getDasPlot().getXAxis();
@@ -65,9 +65,13 @@ public class TimeSeriesBrowseController {
     public void setup( boolean valueWasAdjusting ) {
         boolean setTsbInitialResolution = true;
         if (setTsbInitialResolution) {
-            DatumRange tr = dataSourceController.getTsb().getTimeRange();
-            if ( !valueWasAdjusting ) this.plot.getXAxis().resetRange(tr);
-            updateTsb(true);
+            try {
+                DatumRange tr = dataSourceController.getTsb().getTimeRange();
+                if ( !valueWasAdjusting ) this.plot.getXAxis().resetRange(tr);
+                updateTsb(true);
+            } catch ( RuntimeException e ) {
+                throw e;
+            }
         }
 
         timeSeriesBrowseListener = new PropertyChangeListener() {

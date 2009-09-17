@@ -259,7 +259,7 @@ public class DataSourceController extends DomNodeController {
                 List<Panel> ps = dom.controller.getPanelsFor(dsf);
                 if (ps.size() > 0) {
 //TODO: flakey
-                    timeSeriesBrowseController = new TimeSeriesBrowseController(ps.get(0));
+                    timeSeriesBrowseController = new TimeSeriesBrowseController(this,ps.get(0));
                     timeSeriesBrowseController.setup(valueWasAdjusting);
                 }
 
