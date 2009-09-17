@@ -11,15 +11,16 @@ package org.virbo.datasource.capability;
 
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
-import java.net.URL;
+import org.virbo.dataset.QDataSet;
 
 /**
  * This capability allows DataSources that know how to produce data sets
  * from a long time series to provide views of the DataSource for different
  * times and resolutions.
  * 
- * The getURL() method of the DataSource should return the URL that would return
- * the same dataset as getDataSet.  getURL() must return the correct URL.
+ * The getURI() method of the DataSource should return the original URI and
+ * getDataSet should return the original dataset.  getURI if TimeSeriesBrowse
+ * should return the URI for the range and resolution specified.
  *
  * Note DataSources providing this capability must insert CacheTags into the
  * QDataSets they produce.
@@ -57,4 +58,10 @@ public interface TimeSeriesBrowse {
      * return the same dataset!
      */
     String getURI( );
+
+    /**
+     * get the dataset for this URI.  This URI must be produced by getURI(),
+     * and implementations may throw IllegalArgumentException.
+     */
+    QDataSet getDataSet( String suri );
 }
