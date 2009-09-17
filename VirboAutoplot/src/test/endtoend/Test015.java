@@ -44,7 +44,7 @@ public class Test015 {
         setCanvasSize( 750, 300 );
         int i= uri.lastIndexOf("/");
         setTitle(uri.substring(i+1));
-        writeToPng( String.format( "test007_%03d.png", id ) );
+        writeToPng( String.format( "test015_%03d.png", id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
