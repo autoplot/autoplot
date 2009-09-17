@@ -93,7 +93,17 @@ public class AggregatingDataSource extends AbstractDataSource {
             }
 
             public String getURI() {
-                return AggregatingDataSource.this.getURI();
+                String surl = AggregatingDataSource.this.resourceURI.toString() + "?" ;
+                if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
+                surl += "timerange=" + String.valueOf(viewRange);
+
+                URISplit split = URISplit.parse(surl);
+                Map<String,String> mparams = URISplit.parseParams(split.params);
+                String stimeRange = viewRange.toString();
+                mparams.put("timerange", stimeRange);
+                split.params = URISplit.formatParams(mparams);
+
+                return URISplit.format(split);
             }
 
             public DatumRange getTimeRange() {
@@ -260,16 +270,7 @@ public class AggregatingDataSource extends AbstractDataSource {
 
     @Override
     public String getURI() {
-        String surl = this.resourceURI.toString() + "?" ;
-        if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
-        surl += "timerange=" + String.valueOf(viewRange);
-
-        URISplit split = URISplit.parse(surl);
-        Map<String,String> mparams = URISplit.parseParams(split.params);
-        String stimeRange = viewRange.toString();
-        mparams.put("timerange", stimeRange);
-        split.params = URISplit.formatParams(mparams);
-
-        return URISplit.format(split);
+        return super.getURI();
     }
+    
 }
