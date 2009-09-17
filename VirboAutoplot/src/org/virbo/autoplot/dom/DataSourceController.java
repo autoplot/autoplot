@@ -673,18 +673,6 @@ public class DataSourceController extends DomNodeController {
             } else {
                 setDataSetInternal(null);
             }
-
-            if (getTsb() != null) {
-                String oldsurl = dsf.getUri();
-                String newsurl = getTsb().getURI().toString();
-                URISplit split = URISplit.parse(newsurl);
-                if (oldsurl != null) {
-                    URISplit oldSplit = URISplit.parse(oldsurl);
-                    split.vapScheme = oldSplit.vapScheme;
-                }
-                newsurl = URISplit.format(split);
-                dsf.uri = newsurl; // don't fire off event. TODO: should we?
-            }
             setStatus("ready");
         } catch (RuntimeException ex) {
             ex.printStackTrace();
