@@ -7,7 +7,7 @@ package org.virbo.datasource;
 
 import java.lang.reflect.Constructor;
 import java.net.URI;
-import org.virbo.aggragator.AggregatingDataSourceEditorPanel;
+import org.virbo.aggregator.AggregatingDataSourceEditorPanel;
 
 /**
  *
