@@ -6,7 +6,7 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-package org.virbo.aggragator;
+package org.virbo.aggregator;
 
 import org.das2.datum.DatumRangeUtil;
 import java.net.URISyntaxException;

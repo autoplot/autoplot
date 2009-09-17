@@ -9,7 +9,7 @@
  * Created on Apr 22, 2009, 8:37:48 AM
  */
 
-package org.virbo.aggragator;
+package org.virbo.aggregator;
 
 import java.awt.BorderLayout;
 import java.io.IOException;

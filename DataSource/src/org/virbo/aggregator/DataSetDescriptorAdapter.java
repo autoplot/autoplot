@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package org.virbo.aggragator;
+package org.virbo.aggregator;
 
 import org.das2.DasException;
 import org.das2.dataset.DataSet;
