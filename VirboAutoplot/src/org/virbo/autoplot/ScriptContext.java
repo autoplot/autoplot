@@ -37,7 +37,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.python.core.PyJavaInstance;
-import org.virbo.aggragator.AggregatingDataSourceFactory;
+import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
