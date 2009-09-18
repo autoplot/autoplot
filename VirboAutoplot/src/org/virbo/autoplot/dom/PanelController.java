@@ -1108,6 +1108,14 @@ public class PanelController extends DomNodeController {
         return dsf;
     }
 
+    /**
+     * return the application that the panel belongs to.
+     * @return
+     */
+    public Application getApplication() {
+        return dom;
+    }
+
     protected void maybeCreateDasPeer(){
         Renderer oldRenderer = getRenderer();
         Renderer newRenderer = AutoplotUtil.maybeCreateRenderer( panel.getRenderType(), oldRenderer, getColorbar() );
