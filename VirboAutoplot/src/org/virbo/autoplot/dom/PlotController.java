@@ -129,7 +129,10 @@ public class PlotController extends DomNodeController {
         DatumRange y = this.plot.yaxis.range;
         DasAxis xaxis = new DasAxis(x.min(), x.max(), DasAxis.HORIZONTAL);
         DasAxis yaxis = new DasAxis(y.min(), y.max(), DasAxis.VERTICAL);
-        
+
+        xaxis.setEnableHistory(false);
+        yaxis.setEnableHistory(false);
+
         if (UnitsUtil.isTimeLocation(xaxis.getUnits())) {
             xaxis.setUserDatumFormatter(new DateTimeDatumFormatter());
         } else {
@@ -157,6 +160,7 @@ public class PlotController extends DomNodeController {
         DasColorBar colorbar = new DasColorBar(colorRange.min(), colorRange.max(), false);
         colorbar.addFocusListener(application.controller.focusAdapter);
         colorbar.setFillColor(new java.awt.Color(0, true));
+        colorbar.setEnableHistory(false);
 
         DasCanvas dasCanvas = canvas.controller.getDasCanvas();
 
