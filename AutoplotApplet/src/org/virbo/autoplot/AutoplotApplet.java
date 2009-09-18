@@ -606,9 +606,6 @@ public class AutoplotApplet extends JApplet {
         getContentPane().remove(progressComponent);
         getContentPane().add(model.getCanvas());
 
-        if ( getStringParameter("contextOverview","off").equals("on") ) {
-            doSetOverview(true);
-        }
 
         System.err.println("done add to applet @ " + (System.currentTimeMillis() - t0) + " msec");
 
@@ -668,6 +665,22 @@ public class AutoplotApplet extends JApplet {
         }
 
         p.getController().getDasPlot().getDasMouseInputAdapter().removeMenuItem("Properties");
+
+        if ( getStringParameter("contextOverview","off").equals("on") ) {
+            Runnable run= new Runnable() {
+                public void run() {
+                    dom.getController().waitUntilIdle();
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    dom.getController().waitUntilIdle();
+                    doSetOverview(true);
+                }
+            };
+            new Thread(run).start();
+        }
 
         System.err.println("done start AutoplotApplet " + VERSION + " @ " + (System.currentTimeMillis() - t0) + " msec");
     }
@@ -896,7 +909,6 @@ public class AutoplotApplet extends JApplet {
             controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
             controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
             controller.addConnector(domPlot, that);
-            domPlot.getXaxis().getController().setRangeAutomatically( DatumRangeUtil.rescale( domPlot.getXaxis().getRange(), 0.2, 0.8 ), domPlot.getXaxis().isLog() );
             dom.getCanvases(0).getRows(0).setBottom("60%-2em");
             dom.getCanvases(0).getRows(1).setTop("60%+2em");
         } else {
@@ -947,4 +959,5 @@ public class AutoplotApplet extends JApplet {
         };
         SwingUtilities.invokeLater(run);
     }
+
 }
