@@ -3,6 +3,7 @@ package org.virbo.autoplot;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.net.URL;
+import java.util.Enumeration;
 import javax.help.CSH;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
@@ -16,7 +17,8 @@ public class AutoplotHelpSystem {
     
     private static AutoplotHelpSystem instance;
 
-    private final static String helpPath = "/helpfiles/autoplotHelp.hs";  //must be in classpath
+    //This is the pathname used for all help EXCEPT main autplot help:
+    private final static String helpPath = "helpfiles/javahelp.hs";  //must be in classpath
     private HelpSet mainHS;
     private HelpBroker broker;
     private CSH.DisplayHelpFromSource helper;
@@ -26,8 +28,17 @@ public class AutoplotHelpSystem {
         SwingHelpUtilities.setContentViewerUI("org.virbo.autoplot.AutoplotHelpViewer");
 
         try {
-            URL hsurl = getClass().getResource(helpPath);
+            // First, load the main autoplot helpset.
+            URL hsurl = getClass().getResource("/helpfiles/autoplotHelp.hs");
             mainHS = new HelpSet(null, hsurl);
+            // Now find and merge any additional helpsets that are present
+            Enumeration<URL> hsurls = getClass().getClassLoader().getResources(helpPath);
+            while(hsurls.hasMoreElements()) {
+                hsurl = hsurls.nextElement();
+                System.out.println("Merging external helpset: " + hsurl);
+                mainHS.add(new HelpSet(null, hsurl));
+            }
+            //mainHS = new HelpSet(null, hsurl);
         } catch (Exception ex) {
             System.err.println("Error loading helpset " + helpPath);
             System.err.println(ex.getMessage());
@@ -38,6 +49,8 @@ public class AutoplotHelpSystem {
         // until it reaches one that has had a helpID defined, allowing context sensitivity.
         // If it reaches root pane, dispaly default help.
         broker.enableHelpKey(uiBase, "aphelp_main", mainHS);
+
+        // This is the actionListener used by displayHelpFromEvent
         helper = new CSH.DisplayHelpFromSource(broker);
         
     }
@@ -83,4 +96,20 @@ public class AutoplotHelpSystem {
         broker.setDisplayed(true);
     }
 
+    /** Request another helpset be merged with the main help. This way, plugin
+     * authors can have their help displayed in the main help window.
+     * @param hsPath
+     */
+    /*public void addHelpSet(String hsPath) {
+    HelpSet newHS;
+    try {
+    URL hsurl = getClass().getResource(hsPath);
+    newHS = new HelpSet(null, hsurl);
+    } catch (Exception e) {
+    System.err.println("Error merging helpset: " + hsPath);
+    return;
+    }
+
+    mainHS.add(newHS);
+    }*/
 }

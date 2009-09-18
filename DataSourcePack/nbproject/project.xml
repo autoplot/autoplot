@@ -6,6 +6,7 @@
             <name>DataSourcePack</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <source-roots>
+                <root id="src.javahelp.dir" name="JavaHelp Files"/>
                 <root id="src.dir"/>
             </source-roots>
             <test-roots>
