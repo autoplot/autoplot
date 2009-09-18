@@ -14,10 +14,15 @@ import org.virbo.autoplot.util.TransparentLogger;
 
 /**
  * Support class for encapsulating implementation of pendingChanges and mutator locks.
+ *
  * PendingChanges are a way of notifying the bean and other clients using the bean that changes are coming to
- * the bean.
- * mutatorLock() is a way for a client to get exclusive, read-only access to a bean.  This also sets the valueAdjusting
- * property.
+ * the bean.  Clients should use registerPendingChange to indicate that changes are coming.
+ * performingChange indicates the change is in progress.  changePerformed indicates to other clients
+ * and the bean that the change is complete.
+ *
+ * mutatorLock() is a way for a client to get exclusive, read-only access to a bean.
+ * This also sets the valueAdjusting property.  WARNING: this is improperly implemented,
+ * and clients must check valueIsAdjusting to see if another lock is out.
  *
  * See http://das2.org/wiki/index.php/Pending_changes
  * @author jbf
