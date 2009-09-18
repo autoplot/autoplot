@@ -19,7 +19,6 @@ import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.DataSetURI;
 
 /**
  *
@@ -30,6 +29,7 @@ public class TimeSeriesBrowseController {
     Panel p;
     DasAxis xAxis;
     DasPlot plot;
+    Plot domPlot;
     PanelController panelController;
     DataSourceController dataSourceController;
     DataSourceFilter dsf;
@@ -54,6 +54,7 @@ public class TimeSeriesBrowseController {
         
         updateTsbTimer.setRepeats(false);
         this.p = p;
+        this.domPlot= p.getController().getApplication().getController().getPlotFor(p);
         this.panelController = p.getController();
         this.dsf= dataSourceController.dsf;
         this.dataSourceController= dataSourceController;
@@ -67,7 +68,7 @@ public class TimeSeriesBrowseController {
         if (setTsbInitialResolution) {
             try {
                 DatumRange tr = dataSourceController.getTsb().getTimeRange();
-                if ( !valueWasAdjusting ) this.plot.getXAxis().resetRange(tr);
+                if ( this.domPlot.getXaxis().isAutorange() ) this.plot.getXAxis().resetRange(tr);
                 updateTsb(true);
             } catch ( RuntimeException e ) {
                 throw e;
