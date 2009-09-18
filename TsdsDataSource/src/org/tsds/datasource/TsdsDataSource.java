@@ -298,7 +298,16 @@ class TsdsDataSource extends AbstractDataSource {
             }
 
             public String getURI() {
-                return TsdsDataSource.this.getURI();
+                TimeParser tp = TimeParser.create("%Y%m%d");
+
+                String sparams =
+                    "StartDate=" + tp.format(timeRange.min(), null) + "&EndDate=" + tp.format(timeRange.max(), null) +
+                    "&ppd=" + currentPpd +
+                    "&ext=" + params.get("ext") +
+                    "&out=" + params.get("out") +
+                    "&param1=" + params.get("param1");
+
+                return "vap+tsds:" + TsdsDataSource.this.resourceURI.toString() + "?" + sparams;
             }
 
             public DatumRange getTimeRange() {
@@ -595,16 +604,6 @@ class TsdsDataSource extends AbstractDataSource {
 
     @Override
     public String getURI() {
-        TimeParser tp = TimeParser.create("%Y%m%d");
-
-        String sparams =
-                "StartDate=" + tp.format(timeRange.min(), null) + "&EndDate=" + tp.format(timeRange.max(), null) +
-                "&ppd=" + currentPpd +
-                "&ext=" + params.get("ext") +
-                "&out=" + params.get("out") +
-                "&param1=" + params.get("param1");
-
-        return "vap+tsds:" + this.resourceURI.toString() + "?" + sparams;
-
+        return super.getURI();
     }
 }
