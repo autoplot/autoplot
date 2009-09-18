@@ -85,9 +85,7 @@ public class DataSourceController extends DomNodeController {
         }
     };
 
-    //TODO: This is the only thing listening to the dsf.uri.  TSB resets uri by setting the field directly
-    // to avoid the property change event.  This should probably be refactored so other clients can
-    // listen for changes in dsf.uri.  TSB must reset the URI without triggering reset ranges,etc.
+    //TODO: This is the only thing listening to the dsf.uri.  
     private PropertyChangeListener resetMePropertyChangeListener = new PropertyChangeListener() {
 
         public String toString() {
@@ -99,6 +97,7 @@ public class DataSourceController extends DomNodeController {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
+                if ( changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE ).size()>0 ) return;
                 DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 setUriNeedsResolution(true);
                 if (!dom.controller.isValueAdjusting()) {
@@ -121,6 +120,7 @@ public class DataSourceController extends DomNodeController {
     private TimeSeriesBrowseController timeSeriesBrowseController;
     private static final String PENDING_DATA_SOURCE = "dataSource";
     private static final String PENDING_RESOLVE_DATA_SOURCE = "resolveDataSource";
+    private static final String PENDING_SET_DATA_SOURCE = "setDataSource"; //we are setting the datasource, so don't try to resolve, etc.
     private static final String PENDING_FILL_DATASET = "fillDataSet";
     private static final String PENDING_UPDATE = "update";
 
@@ -233,15 +233,15 @@ public class DataSourceController extends DomNodeController {
             if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal" ) ) dsf.setUri("vap+internal:");
 
         } else {
-
+            changesSupport.performingChange( this, PENDING_SET_DATA_SOURCE );
             setCaching(dataSource.getCapability(Caching.class));
             setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
             if ( dsf.getUri()==null ) {
                 dsf.setUri( dataSource.getURI() );
                 setUriNeedsResolution(false);
             }
-
-        }
+            changesSupport.changePerformed( this, PENDING_SET_DATA_SOURCE );
+       }
 
         this.dsf.setValidRange("");
         this.dsf.setFill("");
@@ -668,6 +668,9 @@ public class DataSourceController extends DomNodeController {
             if (getDataSource() != null) {
                 setStatus("busy: loading dataset");
                 logger.fine("loading dataset "+getDataSource() );
+                if ( tsb!=null ) {
+                    logger.fine("   tsb= "+ tsb.getURI() );
+                }
                 loadDataSet();
                 setStatus("done loading dataset");
             } else {
@@ -994,8 +997,6 @@ public class DataSourceController extends DomNodeController {
      *   if this is headless, then the dataset has been loaded sychronously.
      */
     private void resolveDataSource( boolean valueWasAdjusting, ProgressMonitor mon ) {
-        changesSupport.performingChange(this, PENDING_DATA_SOURCE);
-
         Caching caching = getCaching();
 
         String surl = dsf.getUri();
@@ -1003,7 +1004,6 @@ public class DataSourceController extends DomNodeController {
             setDataSource(valueWasAdjusting,null);
             setUriNeedsResolution(false);
             setDataSetNeedsLoading(false);
-            changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
         } else {
             URISplit split = URISplit.parse(surl);
             surl = URISplit.format(split);
@@ -1030,8 +1030,6 @@ public class DataSourceController extends DomNodeController {
                 }
                 setUriNeedsResolution(false);
                 
-                changesSupport.changePerformed(this, PENDING_DATA_SOURCE);
-
                 mon.setProgressMessage("done getting data source");
 
             } catch (Exception e) {
