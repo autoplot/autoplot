@@ -6,7 +6,6 @@ package test.endtoend;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import javax.script.ScriptContext;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
