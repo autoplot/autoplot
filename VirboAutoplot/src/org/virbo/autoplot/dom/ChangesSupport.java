@@ -6,7 +6,9 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.das2.system.MutatorLock;
@@ -18,7 +20,9 @@ import org.virbo.autoplot.util.TransparentLogger;
  * PendingChanges are a way of notifying the bean and other clients using the bean that changes are coming to
  * the bean.  Clients should use registerPendingChange to indicate that changes are coming.
  * performingChange indicates the change is in progress.  changePerformed indicates to other clients
- * and the bean that the change is complete.
+ * and the bean that the change is complete.  For example, event thread registers pending change
+ * and creates runnable object.  A new thread is started.  On the new thread, performingChange
+ * and changePerformed is called.
  *
  * mutatorLock() is a way for a client to get exclusive, read-only access to a bean.
  * This also sets the valueAdjusting property.  WARNING: this is improperly implemented,
@@ -45,6 +49,23 @@ public final class ChangesSupport {
             pcs= new PropertyChangeSupport(parent);
         }
         this.propertyChangeSupport= pcs;
+    }
+
+    /**
+     * returns the clients who have registed the change.  Note this
+     * implementation only allows for one client for each lock object.
+     * @param lockObject object identifying the change.
+     * @return clients who have registered the change.
+     */
+    synchronized List<Object> whoIsChanging( Object lockObject ) {
+        String msg= "whoIsChanging "+lockObject;
+        logger.fine( msg );
+        Object client= changesPending.get(lockObject);
+        if ( client==null ) {
+            return Collections.emptyList();
+        } else {
+            return Collections.singletonList(client);
+        }
     }
     
     /**
