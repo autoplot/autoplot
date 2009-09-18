@@ -40,6 +40,8 @@ public class Test014 {
         t= (System.currentTimeMillis()-t0)/1000.;
         System.err.printf( "Read data in %9.3f seconds (%s): %s\n", t, label, uri );
 
+        if ( dep0==null ) dep0= ds;
+
         final QDataSet cadence= DataSetUtil.guessCadenceNew( dep0, null );
         
         t= (System.currentTimeMillis()-t0)/1000.;
