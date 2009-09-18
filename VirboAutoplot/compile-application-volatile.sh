@@ -170,6 +170,11 @@ for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceF
    echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
    if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
+cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
+for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+   echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
+   if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+done
 cd ..
 echo "done compile sources."
 
