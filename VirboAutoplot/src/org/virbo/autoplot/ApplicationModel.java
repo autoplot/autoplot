@@ -272,13 +272,14 @@ public class ApplicationModel {
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
                 } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(canvas, "<html>Unable to open resource: <br>" + surl);
+                    throw new RuntimeException(ex);
                 }
             } else {
                 getDataSourceFilterController().resetSuri(surl, mon);
-
             }
-
+        } catch ( RuntimeException e ) {
+            throw e;
+            
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
