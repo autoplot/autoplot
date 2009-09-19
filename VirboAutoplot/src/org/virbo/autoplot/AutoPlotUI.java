@@ -452,7 +452,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
             public void propertyChange(PropertyChangeEvent evt) {
-                applicationModel.setDataSourceURL(dataSetSelector.getValue());
+                    applicationModel.setDataSourceURL(dataSetSelector.getValue());
             }
         });
 
@@ -633,10 +633,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
             applicationModel.addRecent(surl);
             applicationModel.resetDataSetSourceURL(surl, getStatusBarProgressMonitor("Finished "+surl) );
         } catch (RuntimeException ex) {
-            applicationModel.getExceptionHandler().handleUncaught(ex);
-            String msg= ex.getMessage();
-            if ( msg==null ) msg= ex.toString();
-            setStatus(ERROR_ICON,msg);
+            if ( ex.getCause()!=null && ex.getCause() instanceof IOException ) {
+                JOptionPane.showMessageDialog( this, "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause() );
+            } else {
+                applicationModel.getExceptionHandler().handleUncaught(ex);
+                String msg= ex.getMessage();
+                if ( msg==null ) msg= ex.toString();
+                setStatus(ERROR_ICON,msg);
+            }
         }
     }
 
