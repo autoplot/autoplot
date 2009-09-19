@@ -899,7 +899,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             dsfnew.controller.setDataSource(false,dsfsrc.controller.getDataSource());
             dsfnew.controller.setDataSetNeedsLoading( false );
             dsfnew.controller.setResetDimensions(false);
-            dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),dsfsrc.controller.getRawProperties()); // fire off data event.
+            dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),dsfsrc.controller.getRawProperties(),isValueAdjusting()); // fire off data event.
             dsfnew.controller.setProperties(dsfsrc.controller.getProperties());
             dsfnew.setSliceDimension( dsfsrc.getSliceDimension() );
             dsfnew.setSliceIndex( dsfsrc.getSliceIndex() );
@@ -1071,7 +1071,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         c.setFitted(true);
         
         application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
-        application.getDataSourceFilters(0).getController().setDataSetInternal(null);
+        application.getDataSourceFilters(0).getController().setDataSetInternal(null,null,true);
         application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
         application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID) );
 
