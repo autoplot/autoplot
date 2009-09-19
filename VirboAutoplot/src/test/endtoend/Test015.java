@@ -52,6 +52,8 @@ public class Test015 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
             getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            
             doTest( 0, "vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux" );
             doTest( 1, "vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_CIS-CODIF_HS_H1_PSD__20020117_000000_20020117_240000_V070824.cef?3d_ions__C1_CP_CIS-CODIF_HS_H1_PSD");
             doTest( 2, "vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_EDI_EGD__20050215_V03.cef?tof__C1_CP_EDI_EGD" );
