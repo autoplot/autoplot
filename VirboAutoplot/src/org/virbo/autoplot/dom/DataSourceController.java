@@ -271,7 +271,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     public synchronized void setDataSetInternal( QDataSet ds ) {
-        setDataSetInternal( ds, null );
+        setDataSetInternal( ds, null , this.dom.controller.isValueAdjusting() );
     }
 
     /**
@@ -290,8 +290,9 @@ public class DataSourceController extends DomNodeController {
      * @param ds
      * @param autorange if false, autoranging will not be done.  if false, autoranging
      *   might be done.
+     * @param immediately if false, then this is done after the application is done adjusting.
      */
-    public synchronized void setDataSetInternal(QDataSet ds, Map<String,Object> rawProperties) {
+    public synchronized void setDataSetInternal( QDataSet ds, Map<String,Object> rawProperties, boolean immediately) {
 
         List<String> problems = new ArrayList<String>();
 
@@ -319,7 +320,7 @@ public class DataSourceController extends DomNodeController {
 
         ApplicationController ac= this.dom.controller;
 
-        if (ac.isValueAdjusting()) {
+        if ( !immediately && ac.isValueAdjusting() ) {
             final QDataSet fds = ds;
             new RunLaterListener( ChangesSupport.PROP_VALUEADJUSTING, ac, false ) {
                 @Override
@@ -338,6 +339,7 @@ public class DataSourceController extends DomNodeController {
                 setProperties(null);
                 setFillProperties(null);
                 setFillDataSet(null);
+                setDepnames( Arrays.asList( "first", "second", "third" ) );
                 return;
             }
 
@@ -936,7 +938,7 @@ public class DataSourceController extends DomNodeController {
         try {
             result = getDataSource().getDataSet(mymon);
             Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
-            setDataSetInternal(result,props);
+            setDataSetInternal(result,props,dom.controller.isValueAdjusting());
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
             setException(ex);
