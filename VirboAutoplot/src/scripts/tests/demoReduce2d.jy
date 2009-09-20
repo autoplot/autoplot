@@ -1,0 +1,10 @@
+ds= getDataSet('vap:file:///media/mini/data.backup/examples/dat/iowaRiverDischarge1900-2008.dat?delim=tab&skipLines=34385&time=field2&column=field3')
+plot(0,ds)
+
+xres= org.virbo.dataset.DataSetUtil.asDataSet(5,Units.days)
+yres= org.virbo.dataset.DataSetUtil.asDataSet(.01,Units.log10Ratio)
+yres.putProperty( QDataSet.SCALE_TYPE, "log")
+
+
+rds= org.virbo.dsutil.Reduction.reduce2D(ds, xres, yres )
+plot( 1, rds )
