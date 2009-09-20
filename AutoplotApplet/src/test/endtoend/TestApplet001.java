@@ -141,7 +141,7 @@ public class TestApplet001 {
 
     public static void main(String[] args) {
 
-        boolean headless= false; // true for Hudson (though it's not really headless), false for debugging
+        boolean headless= true; // true for Hudson (though it's not really headless), false for debugging
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("dataSetURL", "vap+tsds:http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0");
