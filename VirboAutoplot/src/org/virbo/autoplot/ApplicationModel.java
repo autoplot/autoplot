@@ -8,6 +8,7 @@
  */
 package org.virbo.autoplot;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import java.util.logging.Level;
@@ -583,12 +584,26 @@ public class ApplicationModel {
                 logger.finest("applying to vap " + e.getKey() + "=" + e.getValue());
                 String node = e.getKey();
                 String sval = e.getValue();
-                BeanProperty prop = BeanProperty.create(node);
-                if (!prop.isWriteable(state)) {
-                    logger.warning("the node " + node + " of " + state + " is not writable");
+
+//                BeanProperty prop = BeanProperty.create(node);
+//                if (!prop.isWriteable(state)) {
+//                    logger.warning("the node " + node + " of " + state + " is not writable");
+//                    continue;
+//                }
+//                Class c = prop.getWriteType(state);
+                Class c;
+                try {
+                    c = DomUtil.getPropertyType(state, node);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    continue;
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                    continue;
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                     continue;
                 }
-                Class c = prop.getWriteType(state);
                 SerializeDelegate sd = SerializeRegistry.getDelegate(c);
                 if (sd == null) {
                     System.err.println("unable to find serialize delegate for " + c.getCanonicalName());
@@ -597,7 +612,14 @@ public class ApplicationModel {
                 Object val;
                 try {
                     val = sd.parse(sd.typeId(c), sval);
-                    prop.setValue(state, val);
+//                    prop.setValue(state, val);
+                    DomUtil.setPropertyValue(state, node, val);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (ParseException ex) {
                     Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 }
