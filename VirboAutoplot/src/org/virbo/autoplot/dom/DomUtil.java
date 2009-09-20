@@ -86,6 +86,7 @@ public class DomUtil {
      * @param node
      * @param propertyName the value, (or the old value if we were setting it.)
      * @param getClass return the property class type instead of the value.
+     * @throws IllegalArgumentException if the property cannot be found
      * @return propertyDescriptor or null.
      */
     private static Object setGetPropertyInt( DomNode node, String propertyName, boolean setit, boolean getClass, Object value ) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
@@ -140,7 +141,8 @@ public class DomUtil {
             iprop++;
         }
 
-        return result; // TODO: when do we get here?
+        if ( result==null ) throw new IllegalArgumentException( "unable to find property \""+propertyName+"\" in "+node );
+        return result;
     }
 
     public static Object getPropertyValue(DomNode node, String propertyName) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
