@@ -1,0 +1,89 @@
+<html>
+<head>
+<title>DataSourcePack index</title>
+</head>
+<body>
+    <H1>Reading Data from ASCII Tables</H1>
+<p>The ASCII Table reader reads in a flat ascii file with one record per line.  Each
+    line of the file is identified as a record or non-record.  Autoplot URIs are
+    the name of the ascii file and parameters that specify how to parse the file,
+    listed below. A GUI is also provided that allows the URI to be created graphically.
+    This does not provide access to all the available controls, but is much easier to
+    use.
+
+</p>
+<ul><li> mime type: text/plain
+</li><li> extensions: .dat, .txt, .csv
+</li><li> example URLs:
+</li></ul>
+<pre><a href="ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_1963.dat&amp;column=field17" class="external free" title="ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_1963.dat&amp;column=field17" rel="nofollow">ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_1963.dat&amp;column=field17</a>
+<a href="ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?time=field0&amp;timeFormat=$Y+$d+$H&amp;column=field17" class="external free" title="ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?time=field0&amp;timeFormat=$Y+$d+$H&amp;column=field17" rel="nofollow">ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?time=field0&amp;timeFormat=$Y+$d+$H&amp;column=field17</a>
+<a href="http://goes.ngdc.noaa.gov/data/avg/2004/A1050412.TXT?skip=23&amp;timeFormat=$y$m$d+$H$M&amp;column=E1&amp;time=YYMMDD" class="external free" title="http://goes.ngdc.noaa.gov/data/avg/2004/A1050412.TXT?skip=23&amp;timeFormat=$y$m$d+$H$M&amp;column=E1&amp;time=YYMMDD" rel="nofollow">http://goes.ngdc.noaa.gov/data/avg/2004/A1050412.TXT?skip=23&amp;timeFormat=$y$m$d+$H$M&amp;column=E1&amp;time=YYMMDD</a>
+
+<a href="ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?column=field17&amp;timerange=1963&amp;timeFormat=$Y+$j+$H&amp;time=field0&amp;validMax=999" class="external free" title="ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?column=field17&amp;timerange=1963&amp;timeFormat=$Y+$j+$H&amp;time=field0&amp;validMax=999" rel="nofollow">ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?column=field17&amp;timerange=1963&amp;timeFormat=$Y+$j+$H&amp;time=field0&amp;validMax=999</a>
+</pre>
+<ul><li> parameters
+<ul><li> <b>fixedColumns</b> an optimized parser should be used since each row of the file has a fixed column width.  By default the row are split into columns using a delimiter.  The value may take several forms:
+<ul><li> value contains ",": specify column locations as in "0-10,20-34"
+
+</li><li> value is int: specify the number of columns in each row.  Actual may be less.
+</li><li> value is unspecified: the first row is split to determine the column locations.
+</li></ul>
+</li><li> <b>columnCount</b> override the number of columns.
+</li><li> <b>column</b> identifies the field in each record to treat as the dependent variable.  By default the columns are named field0, field1, field2, etc.
+</li><li> <b>depend0</b> identifies a field as the independent variable.
+
+</li><li> <b>rank2</b> when in the URL indicates that the dataset produced should be a rank 2 dataset, and the number of fixed columns indicates the number of elements per row.  When the value contains a colon (:), this indicates a range.  The range is &lt;firstColumn&gt;:&lt;lastColumn exclusive&gt; or &lt;firstColumn&gt;-&lt;lastColumn inclusive&gt;.
+<ul><li> value may be empty, meaning use all columns
+</li><li> 1: means the second row and up.
+
+</li><li> -5: means the last five rows.
+</li><li> 20:24 means the four rows starting at the 21st row.
+</li><li> field3:field6 three columns
+</li><li> B_x_gsm-B_z_gsm three columns.
+</li></ul>
+</li><li> <b>depend1Labels</b> indicates the first record contains the labels for the rank 2 dataset. (&lt;firstColumn&gt;:&lt;lastColumn exclusive&gt;)
+
+</li><li> <b>depend1Values</b> indicates the first record contains the values for the rank 2 dataset (so it is displayed as a spectrogram). (&lt;firstColumn&gt;:&lt;lastColumn exclusive&gt;)
+</li><li> <b>skip</b> is an integer indicating the number of lines that should be skipped before processing begins.
+</li><li> <b>fill</b> is the number that indicates missing or fill data.
+</li><li> <b>timeFormat</b> specifies the time format, based on the Unix <code>date</code> command.  "ISO8601" means the times are ISO8601 conforment, or use template with fields from <a href="http://autoplot.org/autoplot/index.php/Main_Page#Wildcards_and_Aggregation" class="external autonumber" title="http://autoplot.org/autoplot/index.php/Main_Page#Wildcards_and_Aggregation" rel="nofollow">[1]</a>.
+
+</li><li> <b>time</b> specifies the field that is the time record.  This also sets the independent variable.
+</li><li> <b>delim</b> identifies the delimiter character.  By default, the first record is inspected for commas, tabs and then whitespace.
+</li><li> <b>comment</b> prefix string that indicates records to ignore.
+</li><li> <b>fill</b> values to be treated as fill data.
+</li></ul>
+
+</li></ul>
+<h1>ASCII Table Data Source Editor Panel</h1>
+A GUI editor can be used to make it easier to read in data.  A table is displayed showing
+how the reader would parse the file.  Darker lines that are not broken into columns are
+lines identified as non-records, such as header lines.  Here is an explaination of the controls:
+
+<h2>header tab: identify records and non-records.</h2>
+<br>Skip Lines: the number of lines to skip before attempting to parse records.  Press "Select" then click on the first parseable line.
+<br>Comment Prefix: lines starting with this are treated as non-records.
+<h2>times tab: specify how times are parsed</h2>
+<br>Time Format: format for interpretting times.
+For example "$Y $m $d" means the first three fields are interpretted as year, month, and day.  "$Y$m$d" means the first field is
+an 8-digit date.  Press "Select" and highlite the fields in one of the records.   This will copy the fields up into the
+Time Format text field.  Then in the text field, highlite each field and use the droplist to identify the field type.  Note
+if the field is already ISO8601 compliant, the parser should not need the time format to be specified.
+<h2>data: identify data to plot and interdependence.</h2>
+<br>Column: the column to plot.  Note if the first record is column labels, then these labels can be used to identify columns.
+Press "Select", then click on a field to select the column.  If a several adjacent fields are selected, then a rank 2 table is plotted (e.g.
+as a spectrogram)
+<br>Depends On: the column that tags the column to plot.  This is the independent parameter upon which the dependent parameter
+depends.  Press "Select" then click on the field to select the column.
+<br>Time checkbox: identify the "Depends On" as times.
+
+
+<h1>Formatting to ASCII Tables</h1>
+Data can also be formatted to ascii tables.  Presently data is formatted to a comma-separated-values (csv) file, and
+    no formatting options are provided.  Use Autoplot's "File->Export Data", then select a file name with a .csv, .dat, or .txt
+    extension.
+</li>
+</body>
+</html>
+
