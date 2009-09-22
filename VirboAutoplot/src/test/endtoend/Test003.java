@@ -25,21 +25,21 @@ public class Test003 {
             getDocumentModel().getCanvases(0).setFitted(false);
             setCanvasSize( 800, 600 );
             
-            load( "file:///home/jbf/ct/lanl/hudson/geo_pitch_stack_test1_local.vap?canvases[0].fitted=false" );
+            load( "file:///home/jbf/ct/lanl/hudson/geo_pitch_stack_test1_local.vap" );
             setCanvasSize( 800, 600 );
             writeToPng( "test003_001.png" );
             save( "/home/jbf/tmp/test003_001.vap");
 
             reset();
             
-            load( "file:///home/jbf/ct/hudson/vap/contextOverview2.vap?canvases[0].fitted=false" );
+            load( "file:///home/jbf/ct/hudson/vap/contextOverview2.vap" );
             setCanvasSize( 800, 600 );
             writeToPng( "test003_002.png" );
             save( "/home/jbf/tmp/test003_002.vap");
 
             reset();
 
-            load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_2.vap?canvases[0].fitted=false" );
+            load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_2.vap" );
             setCanvasSize( 800, 600 );
             writeToPng( "test003_003.png" );
             save( "/home/jbf/tmp/test003_003.vap");
