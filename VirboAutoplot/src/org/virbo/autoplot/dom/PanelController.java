@@ -410,13 +410,13 @@ public class PanelController extends DomNodeController {
         if (fillDs != null) {
             if (resetPanel) {
                 if (panel.getComponent().equals("")) {
-                    RenderType renderType = AutoplotUtil.getRenderType(fillDs);
+                    RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
                     panel.renderType = renderType;
                     resetPanel(fillDs, renderType);
                     setResetPanel(false);
                 } else if ( panel.getComponent().startsWith("|") ) {
                     QDataSet fillDs2 = processDataSet( panel.getComponent(), fillDs );
-                    RenderType renderType = AutoplotUtil.getRenderType(fillDs2);
+                    RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
                     panel.renderType = renderType;
                     resetPanel(fillDs2, renderType);
                     setResetPanel(false);
@@ -842,6 +842,7 @@ public class PanelController extends DomNodeController {
         }
 
         panel.setPlotDefaults( panelCopy.getPlotDefaults() );
+        panel.style.syncTo( panelCopy.style );
         // and hope that the plot is listening.
 
         setStatus("done, autorange");
@@ -971,6 +972,9 @@ public class PanelController extends DomNodeController {
      * ranges and preferred symbol settings, and puts the values in panelCopy.plotDefaults.
      * The dom Plot containing this panel should be listening for changes in panel.plotDefaults,
      * and can then decide if it wants to use the autorange settings.
+     *
+     * This also sets the style node of the panel copy, so its values sould be sync'ed as well.
+     * 
      * @param cpanel
      * @param props
      * @param spec

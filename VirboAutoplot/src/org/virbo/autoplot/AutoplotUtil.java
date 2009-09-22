@@ -99,7 +99,7 @@ public class AutoplotUtil {
         }
         List<Renderer> recycleRends = Arrays.asList(result.getRenderers());
 
-        RenderType type = AutoplotUtil.getRenderType(ds);
+        RenderType type = AutoplotUtil.guessRenderType(ds);
 
         Renderer rend1= maybeCreateRenderer( type, recycleRends.get(0), cb);
 
@@ -887,7 +887,7 @@ public class AutoplotUtil {
         return result;
     }
 
-    public static RenderType getRenderType(QDataSet fillds) {
+    public static RenderType guessRenderType(QDataSet fillds) {
         RenderType spec;
 
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
