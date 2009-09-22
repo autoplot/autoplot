@@ -4,24 +4,19 @@
  */
 package org.virbo.cefdatasource;
 
-import org.das2.util.TimeParser;
 import org.das2.datum.Units;
-import org.das2.util.monitor.ProgressMonitor;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.text.ParseException;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.QDataSet;
-import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.DataSetBuilder;
 
 /**
- *
+ * CEF reader based on Chris Perry's IDL CEF Reader code.
  * @author jbf
  */
 public class CefReaderData {
