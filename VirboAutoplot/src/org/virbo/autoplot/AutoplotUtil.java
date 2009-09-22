@@ -635,7 +635,7 @@ public class AutoplotUtil {
                 Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
             } else if (osName.equals("applet")) {
                 throw new RuntimeException("applets can't start browser yet");
-
+                //TODO: this shouldn't be difficult, just get the AppletContext.
             } else { //assume Unix or Linux
                 String[] browsers = {"firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape"};
                 String browser = null;
