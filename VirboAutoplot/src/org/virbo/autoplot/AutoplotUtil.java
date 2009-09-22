@@ -37,6 +37,8 @@ import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.datum.DomainDivider;
+import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColorBar;
@@ -392,6 +394,9 @@ public class AutoplotUtil {
         double[] dd;
 
         boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC)) || null != ds.property(QDataSet.CADENCE);
+        
+        // the autoranging will be in log space only if the data are not time locations.
+        boolean isLog= "log".equals(ds.property(QDataSet.SCALE_TYPE)) && !UnitsUtil.isTimeLocation(u);
 
         if (mono) {
             RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds, null);
@@ -407,7 +412,7 @@ public class AutoplotUtil {
                 double min = Math.min(ds.value(firstValid), ds.value(lastValid));
                 double max = Math.max(ds.value(firstValid), ds.value(lastValid));
                 double dcadence = Math.abs(cadence.value());
-                if ("log".equals(cadence.property(QDataSet.SCALE_TYPE))) {
+                if ( isLog ) {
                     Units cu = (Units) cadence.property(QDataSet.UNITS);
                     double factor = (cu.convertDoubleTo(Units.percentIncrease, dcadence) + 100) / 100.;
                     dd = new double[]{min / factor, max * factor};
@@ -498,23 +503,18 @@ public class AutoplotUtil {
             }
 
             if (clog > clin && nomMax / nomMin > 1e2) {
-                result.log = true;
+                isLog = true;
             }
 
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
 
         }
 
-        if ("log".equals(ds.property(QDataSet.SCALE_TYPE))) {
-            result.log = true;
-        }
+        result.log = isLog;
 
         // interpret properties, looking for hints about scale type and ranges.
         if (properties != null) {
-            String log1 = (String) properties.get(QDataSet.SCALE_TYPE);
-            if (log1 != null) {
-                result.log = log1.equals("log");
-            }
+
             Number tmin = (Number) properties.get(QDataSet.TYPICAL_MIN);
             Number tmax = (Number) properties.get(QDataSet.TYPICAL_MAX);
             DatumRange range = getRange(
@@ -584,6 +584,18 @@ public class AutoplotUtil {
                     result.robustMin = result.robustMax / 1e3;
                 result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
                         DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
+            } else if ( UnitsUtil.isTimeLocation(u) ) {
+                DomainDivider div= DomainDividerUtil.getDomainDivider( result.range.min(), result.range.max() );
+                while ( div.boundaryCount( result.range.min(), result.range.max() ) > 40 ) {
+                    div= div.coarserDivider(false);
+                }
+                while ( div.boundaryCount( result.range.min(), result.range.max() ) < 20 ) {
+                    div= div.finerDivider(true);
+                }
+                result.range = new DatumRange(
+                        div.rangeContaining(result.range.min()).min(),
+                        div.rangeContaining(result.range.max()).max() );
+
             } else {
                 result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
                 if (result.robustMin < result.robustMax)
