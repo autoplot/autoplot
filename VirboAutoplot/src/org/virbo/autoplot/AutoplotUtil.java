@@ -414,8 +414,16 @@ public class AutoplotUtil {
                 double dcadence = Math.abs(cadence.value());
                 if ( isLog ) {
                     Units cu = (Units) cadence.property(QDataSet.UNITS);
-                    double factor = (cu.convertDoubleTo(Units.percentIncrease, dcadence) + 100) / 100.;
-                    dd = new double[]{min / factor, max * factor};
+                    if ( UnitsUtil.isRatiometric(cu) ) {
+                        double factor = (cu.convertDoubleTo(Units.percentIncrease, dcadence) + 100) / 100.;
+                        dd = new double[]{min / factor, max * factor};
+                    } else {
+                        dcadence= cu.convertDoubleTo( u.getOffsetUnits(), dcadence );
+                        dd = new double[]{min - dcadence, max + dcadence};
+                        if ( dd[0]<0 ) {
+                            dd[0]= min / 2.; // this is a fall-back mode
+                        }
+                    }
                 } else {
                     dd = new double[]{min - dcadence, max + dcadence};
                 }
