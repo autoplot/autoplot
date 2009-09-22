@@ -52,8 +52,11 @@ public class Test008 {
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
 
-            doTest( 0, "file:///home/jbf/ct/hudson/data.backup/dat/ACE_sis_level2_data_1hr_1283.txt?time=year&timeFormat=%Y+%j+%H+%M+%S&depend1Labels=5:13&rank2=5:13&skip=2&validMin=2e-09" );
             getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
+            
+            doTest( 0, "file:///home/jbf/ct/hudson/data.backup/dat/ACE_sis_level2_data_1hr_1283.txt?time=year&timeFormat=%Y+%j+%H+%M+%S&depend1Labels=5:13&rank2=5:13&skip=2&validMin=2e-09" );
+            
             load( "/home/jbf/ct/hudson/vap/ace_sis_level2_data_server.vap" );
             setCanvasSize( 750, 300 );
             writeToPng( "test008_001.png" );
