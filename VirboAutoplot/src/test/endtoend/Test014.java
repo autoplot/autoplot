@@ -46,14 +46,15 @@ public class Test014 {
         
         t= (System.currentTimeMillis()-t0)/1000.;
         System.err.printf( "Guess cadence in %9.3f seconds (%s): %s\n", t, label, uri );
-        System.err.printf( "cadence= %s (scale type=%s): \n", cadence.toString(), cadence.property(QDataSet.SCALE_TYPE) );
+        String type= cadence==null ? null : (String) cadence.property(QDataSet.SCALE_TYPE);
+        System.err.printf( "cadence= %s (scale type=%s): \n", String.valueOf(cadence), type  );
 
         QDataSet diff= Ops.diff(dep0);
         System.err.printf( "diffs(dep0)[0:3]= %f %f %f %s\n",
                 diff.value(0), diff.value(1), diff.value(2),
                 String.valueOf(diff.property(QDataSet.UNITS)) );
         MutablePropertyDataSet hist;
-        if ( "log".equals( cadence.property(QDataSet.SCALE_TYPE) ) ) {
+        if ( "log".equals( type ) ) {
             hist= (MutablePropertyDataSet) Ops.autoHistogram( Ops.diff( Ops.log(dep0) ) );
             ((MutablePropertyDataSet)hist.property(QDataSet.DEPEND_0)).putProperty( QDataSet.UNITS, Units.logERatio );
         } else {
@@ -73,8 +74,12 @@ public class Test014 {
         Painter p = new Painter() {
             public void paint(Graphics2D g) {
                 DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
-                final int ix= (int)xAxis.transform( DataSetUtil.asDatum((RankZeroDataSet)cadence) );
-                g.drawLine( ix, 0, ix, cc.getHeight() );
+                if ( cadence==null ) {
+                 
+                } else {
+                    final int ix= (int)xAxis.transform( DataSetUtil.asDatum((RankZeroDataSet)cadence) );
+                    g.drawLine( ix, 0, ix, cc.getHeight() );
+                }
             }
         };
         cc.addTopDecorator( p );
@@ -113,7 +118,7 @@ public class Test014 {
             doTest( 1, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/i8_15sec_mag_19731030_v02.cdf?F1_Average_B_15s", null );
             doTest( 2, "file:/home/jbf/ct/hudson/data.backup/xls/2008-lion and tiger summary.xls?sheet=Samantha+tiger+lp+lofreq&firstRow=53&column=Complex_Modulus&depend0=Frequency", null );
             doTest( 3, "file:/home/jbf/ct/hudson/data.backup/dat/cl_ttag_study.dat?column=field0", null );
-            
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (RuntimeException ex) {
             ex.printStackTrace();
