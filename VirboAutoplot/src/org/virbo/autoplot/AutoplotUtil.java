@@ -580,10 +580,18 @@ public class AutoplotUtil {
         // round out to frame the data with empty space, so that the data extent is known.
         if (UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u)) {
             if (result.log) {
-                if (result.robustMin <= 0.0)
-                    result.robustMin = result.robustMax / 1e3;
-                result.range = DatumRange.newDatumRange(DasMath.exp10(Math.floor(DasMath.log10(result.robustMin))),
-                        DasMath.exp10(Math.ceil(DasMath.log10(result.robustMax))), u);
+                if (result.robustMin <= 0.0) result.robustMin = result.robustMax / 1e3;
+                Datum min= u.createDatum(result.robustMin);
+                Datum max= u.createDatum(result.robustMax );
+                DomainDivider div= DomainDividerUtil.getDomainDivider(
+                        min, max, true );
+                while ( div.boundaryCount( min, max ) > 40 ) {
+                    div= div.coarserDivider(false);
+                }
+                while ( div.boundaryCount( min, max ) < 20 ) {
+                    div= div.finerDivider(true);
+                }
+                result.range = new DatumRange( div.rangeContaining(min).min(), div.rangeContaining(max).max() );
             } else if ( UnitsUtil.isTimeLocation(u) ) {
                 DomainDivider div= DomainDividerUtil.getDomainDivider( result.range.min(), result.range.max() );
                 while ( div.boundaryCount( result.range.min(), result.range.max() ) > 40 ) {
