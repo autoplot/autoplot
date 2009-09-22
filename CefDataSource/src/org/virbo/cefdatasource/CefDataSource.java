@@ -128,6 +128,9 @@ public class CefDataSource extends AbstractDataSource {
     private MutablePropertyDataSet createDataSet(String var, MutablePropertyDataSet tds, DasProgressMonitorReadableByteChannel cmon) throws IOException, NumberFormatException, ParseException {
         CefReaderHeader.ParamStruct param = cef.parameters.get(var);
 
+        if ( param==null ) {
+            throw new IllegalArgumentException("no such dataset: "+var);
+        }
         int collapseDim = 999; // >999 indicates a dimension was collapsed to reduce rank.
         int rank0; // rank before collapse
 
