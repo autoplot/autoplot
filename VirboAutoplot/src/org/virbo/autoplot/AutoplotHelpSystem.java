@@ -2,6 +2,9 @@ package org.virbo.autoplot;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.logging.Logger;
@@ -21,7 +24,6 @@ public class AutoplotHelpSystem {
     private static Logger log= Logger.getLogger("org.virbo.autoplot.help");
 
     //This is the pathname used for all help EXCEPT main autplot help:
-    private final static String helpPath = "helpfiles/javahelp.hs";  //must be in classpath
     private HelpSet mainHS;
     private HelpBroker broker;
     private CSH.DisplayHelpFromSource helper;
@@ -30,21 +32,54 @@ public class AutoplotHelpSystem {
         // custom viewer supports external web links
         SwingHelpUtilities.setContentViewerUI("org.virbo.autoplot.AutoplotHelpViewer");
 
+        // First, load the main autoplot helpset.
+        URL hsurl;
         try {
-            // First, load the main autoplot helpset.
-            URL hsurl = getClass().getResource("/helpfiles/autoplotHelp.hs");
+            hsurl= getClass().getResource("/helpfiles/autoplotHelp.hs");
             mainHS = new HelpSet(null, hsurl);
-            // Now find and merge any additional helpsets that are present
-            Enumeration<URL> hsurls = getClass().getClassLoader().getResources(helpPath);
-            while(hsurls.hasMoreElements()) {
-                hsurl = hsurls.nextElement();
-                log.fine("Merging external helpset: " + hsurl);
-                mainHS.add(new HelpSet(null, hsurl));
+        } catch ( Exception ex ) {
+            log.warning("Error loading helpset " + "/helpfiles/autoplotHelp.hs" );
+        }
+        // Now find and merge any additional helpsets that are present
+        Enumeration<URL> hsurls=null;
+        try {
+            hsurls = getClass().getClassLoader().getResources("META-INF/helpsets.txt");
+        } catch (IOException ex) {
+            log.warning(ex.toString());
+        }
+
+        while( hsurls!=null && hsurls.hasMoreElements()) {
+            hsurl = hsurls.nextElement();
+            log.fine("found /META-INF/helpsets.txt at " + hsurl);
+            try {
+                BufferedReader read= new BufferedReader( new InputStreamReader( hsurl.openStream() ) );
+                String spec= read.readLine();
+                while ( spec!=null ) {
+                    int i= spec.indexOf("#");
+                    if ( i!=-1 ) {
+                        spec= spec.substring(0,i);
+                    }
+                    spec= spec.trim();
+                    if ( spec.length()>0 ) {
+                        URL hsurl1=null;
+                        try {
+                            log.fine("Merging external helpset: " + hsurl);
+                            if ( spec.startsWith("/") ) {
+                                hsurl1= getClass().getResource(spec);
+                            } else {
+                                hsurl1= new URL(spec);
+                            }
+                            mainHS.add(new HelpSet(null, hsurl1));
+                        } catch ( Exception ex ) {
+                            log.warning("Error loading helpset " + hsurl1);
+                        }
+                    }
+                    spec= read.readLine();
+                }
+            } catch ( IOException ex ) {
+                log.warning(ex.toString());
             }
-            //mainHS = new HelpSet(null, hsurl);
-        } catch (Exception ex) {
-            log.warning("Error loading helpset " + helpPath);
-            log.warning(ex.getMessage());
+
         }
         broker = mainHS.createHelpBroker();
 
