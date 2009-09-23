@@ -53,10 +53,11 @@ public class AxisController extends DomNodeController {
                 dmin = dmax / 10000;
                 changed = true;
             }
-            if ( !log && dmin>0 && dmin<=dmax/10000 ) {
-                dmin = 0;
-                changed = true;
-            }
+            //disable this near-zero test because with lightweight bindings we get stuck in a loop.
+            //if ( !log && dmin>0 && dmin<=dmax/10000 ) {
+            //    dmin = 0;
+            //    changed = true;
+            //}
 
             if (changed) {
                 return new DatumRange(dmin, dmax, u);
