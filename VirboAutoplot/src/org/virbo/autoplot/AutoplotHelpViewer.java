@@ -34,6 +34,7 @@ public class AutoplotHelpViewer extends BasicContentViewerUI {
                 URL u = he.getURL();
                 if (u.getProtocol().equalsIgnoreCase("mailto") ||
                         u.getProtocol().equalsIgnoreCase("http") ||
+                        u.getProtocol().equalsIgnoreCase("https") ||
                         u.getProtocol().equalsIgnoreCase("ftp")) {
                     AutoplotUtil.openBrowser(u.toString());
                     return;
