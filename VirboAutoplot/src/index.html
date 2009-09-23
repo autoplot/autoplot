@@ -6,8 +6,10 @@
     <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 	<img src="screen.png">
-        <p><small>A suite of Hudson tests are used to detect inadvertent changes in Autoplot and improve software quality.  Behind,
-                ViRBO's TSDS server supports arrays-of-vectors and spectrograms.</small></p>
+        <p><small>A Polar/Hydra spectrogram is sliced at two points in time.  Data can now be loaded once, and
+                panels can display different slices of the data.  A new "Data" panel simplifies the axis panel
+                and specifies data operations (such as slice or histogram) before display.
+            </small></p>
         
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
@@ -19,23 +21,22 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Recent changes include:</p>
 <ul>
-    <li>introduce test suites for Hudson Continuous Integration Server.</li>
-<li> minor bugfixes.</li>
-<li>ascii table columns can have labels like "10.3-11.6"</li>
-<li>introduce build script to relax dependence on Apache Ant.</li>
-<li>initial support for vector datasets and spectrograms in TSDS</li>
-<li>component property of panel can reduce data as well. (bug 2837674 panel rank reduction via component property)
-<li>bugfix 2833854: cluster vector plotted as spectrogram.
-<li>bugfix 2837756: fail to autorange/autolabel when replacing panel family
+    <li>Panel slicing fixes many problems with the rank 3 slicing, and allows for alternate views of the data. (bug 2837674) </li>
+    <li>template specs like %{RANGE}, %{CONTEXT}, %{UNITS} can be used in labels.</li>
+    <li>Data Source refactorings finalize Data Source API.</li>
+    <li>Apache VFS introduced, adding initial support for sftp (public keys only)</li>
+    <li>Initial help documents added, including "getting started"</li>
+    <li>new Data tab simplifies Axis tab.</li>
+    <li>"Data" and "Layout" tabs are hidden by default, simplifying interface for new users.</li>
+    
+
+
+<li>minor bugfixes.</li>
 </ul>
 <p>
         
 <p>Known issues:</p>
 <ul>
-<li> Applet suffers from same seven second delay, applet can show display
-</li><li>
-lingering issues with rank 3 data/slice Dimension in vaps.
-</li>
 <li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
 </li><li> last URI is not added to DataSetSelector.
 </li>
