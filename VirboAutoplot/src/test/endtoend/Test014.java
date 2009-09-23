@@ -6,6 +6,7 @@ package test.endtoend;
 
 import java.awt.Graphics2D;
 import java.io.IOException;
+import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
@@ -62,6 +63,11 @@ public class Test014 {
         }
 
         DasAxis xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
+        
+        // kludge: since in das2 Units.dimensionless is convertable to logERatio, force the units change to something not dimensionless.
+        if ( "log".equals(type) ) {
+            getDocumentModel().getPlots(0).getXaxis().setRange( DatumRange.newDatumRange( 0, 10, Units.seconds ) );
+        }
 
         plot( hist );
         setCanvasSize( 600, 600 );
@@ -109,6 +115,10 @@ public class Test014 {
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             QDataSet ds;
+
+            ds= Util.getDataSet( "vap+cdf:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX" );
+            ds= DataSetOps.slice0(ds, 10);
+            doTest( 4, "slice of Hydra DEF", ds );
 
             ds= Util.getDataSet( "vap:file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?WBD_Elec[::1090]" );
             QDataSet ant= Util.getDataSet( "vap:file:/home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?ANTENNA[::1090]" );
