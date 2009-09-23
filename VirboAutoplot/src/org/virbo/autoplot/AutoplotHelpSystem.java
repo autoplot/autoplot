@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.logging.Logger;
 import javax.help.CSH;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
@@ -16,6 +17,8 @@ import javax.help.SwingHelpUtilities;
 public class AutoplotHelpSystem {
     
     private static AutoplotHelpSystem instance;
+
+    private static Logger log= Logger.getLogger("org.virbo.autoplot.help");
 
     //This is the pathname used for all help EXCEPT main autplot help:
     private final static String helpPath = "helpfiles/javahelp.hs";  //must be in classpath
@@ -35,13 +38,13 @@ public class AutoplotHelpSystem {
             Enumeration<URL> hsurls = getClass().getClassLoader().getResources(helpPath);
             while(hsurls.hasMoreElements()) {
                 hsurl = hsurls.nextElement();
-                System.out.println("Merging external helpset: " + hsurl);
+                log.fine("Merging external helpset: " + hsurl);
                 mainHS.add(new HelpSet(null, hsurl));
             }
             //mainHS = new HelpSet(null, hsurl);
         } catch (Exception ex) {
-            System.err.println("Error loading helpset " + helpPath);
-            System.err.println(ex.getMessage());
+            log.warning("Error loading helpset " + helpPath);
+            log.warning(ex.getMessage());
         }
         broker = mainHS.createHelpBroker();
 
