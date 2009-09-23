@@ -857,6 +857,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy, boolean addPanel) {
         Plot that = addPlot(LayoutConstants.BELOW);
+        that.getController().setAutoBinding(false);
         if (addPanel) {
             addPanel(that, null);
         }

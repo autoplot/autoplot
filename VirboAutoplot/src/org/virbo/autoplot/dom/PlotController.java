@@ -97,6 +97,24 @@ public class PlotController extends DomNodeController {
     }
 
     /**
+     * true indicates that the controller is allowed to automatically add
+     * bindings to the plot axes.
+     */
+    public static final String PROP_AUTOBINDING = "autoBinding";
+
+    protected boolean autoBinding = true;
+
+    public boolean isAutoBinding() {
+        return autoBinding;
+    }
+
+    public void setAutoBinding(boolean autoBinding) {
+        boolean oldAutoBinding = this.autoBinding;
+        this.autoBinding = autoBinding;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOBINDING, oldAutoBinding, autoBinding);
+    }
+
+    /**
      * return the Canvas containing this plot, or null if this cannot be resolved.
      * 
      * @return
@@ -375,7 +393,7 @@ public class PlotController extends DomNodeController {
             }
         }
         
-        if ( panel!=null ) doCheckBindings( plot, panel.getPlotDefaults() );
+        if ( panel!=null && isAutoBinding() ) doCheckBindings( plot, panel.getPlotDefaults() );
 
         List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
         BindingModel existingBinding= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.xaxis, Axis.PROP_RANGE );
