@@ -82,6 +82,12 @@ for i in `ls ../*/src/META-INF/$file` ; do
    cat $i >> temp-classes/META-INF/$file
 done
 
+file=helpsets.txt
+touch temp-classes/META-INF/$file
+for i in `ls ../*/src/META-INF/$file` ; do
+   cat $i >> temp-classes/META-INF/$file
+done
+
 echo "Main-Class: org.virbo.autoplot.AutoPlotUI" > temp-src/MANIFEST.MF
 
 # remove signatures
