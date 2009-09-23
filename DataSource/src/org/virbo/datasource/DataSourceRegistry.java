@@ -8,11 +8,22 @@
  */
 package org.virbo.datasource;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -51,6 +62,253 @@ public class DataSourceRegistry {
         }
         return result;
     }
+
+
+    /**
+     * look for META-INF/org.virbo.datasource.DataSourceFactory, create the
+     * factory, then query for its extensions.  This is the orginal method
+     * and is not used.
+     */
+    protected void discoverFactories() {
+
+        DataSourceRegistry registry= this;
+
+        // discover Factories on the path
+        try {
+            ClassLoader loader = DataSetURI.class.getClassLoader();
+            Enumeration<URL> urls;
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory");
+            } else {
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory");
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String s = reader.readLine();
+                while (s != null) {
+                    if (s.trim().length() > 0) {
+                        List<String> extensions = null;
+                        List<String> mimeTypes = null;
+                        String factoryClassName = s;
+                        try {
+                            Class c = Class.forName(factoryClassName);
+                            DataSourceFactory f = (DataSourceFactory) c.newInstance();
+                            try {
+                                Method m = c.getMethod("extensions", new Class[0]);
+                                extensions = (List<String>) m.invoke(f, new Object[0]);
+                            } catch (NoSuchMethodException ex) {
+                            } catch (InvocationTargetException ex) {
+                                ex.printStackTrace();
+                            }
+                            try {
+                                Method m = c.getMethod("mimeTypes", new Class[0]);
+                                mimeTypes = (List<String>) m.invoke(f, new Object[0]);
+                            } catch (NoSuchMethodException ex) {
+                            } catch (InvocationTargetException ex) {
+                                ex.printStackTrace();
+                            }
+                        } catch (ClassNotFoundException ex) {
+                            ex.printStackTrace();
+                        } catch (InstantiationException ex) {
+                            ex.printStackTrace();
+                        } catch (IllegalAccessException ex) {
+                            ex.printStackTrace();
+                        }
+
+                        if (extensions != null) {
+                            for (String e : extensions) {
+                                registry.registerExtension(factoryClassName, e, null);
+                            }
+                        }
+
+                        if (mimeTypes != null) {
+                            for (String m : mimeTypes) {
+                                registry.registerMimeType(factoryClassName, m);
+                            }
+                        }
+                    }
+                    s = reader.readLine();
+                }
+                reader.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * returns a list of something to class, which is dependent on the client
+     * @param urls
+     * @return
+     */
+    private Map<String,String> readStuff( Iterator<URL> urls ) throws IOException {
+
+        Map<String,String> result= new LinkedHashMap();
+        while (urls.hasNext()) {
+            URL url = urls.next();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            String s = reader.readLine();
+            while (s != null) {
+                s = s.trim();
+                if (s.length() > 0) {
+                    String[] ss = s.split("\\s");
+                    for (int i = 1; i < ss.length; i++) {
+                        result.put( ss[i], ss[0] );
+                    }
+                }
+                s = reader.readLine();
+            }
+            reader.close();
+        }
+        return result;
+
+    }
+    /**
+     * look for META-INF/org.virbo.datasource.DataSourceFactory.extensions
+     */
+    protected void discoverRegistryEntries() {
+        DataSourceRegistry registry= this;
+        try {
+            ClassLoader loader = DataSetURI.class.getClassLoader();
+            Enumeration<URL> urls;
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+            } else {
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String s = reader.readLine();
+                while (s != null) {
+                    s = s.trim();
+                    if (s.length() > 0) {
+                        String[] ss = s.split("\\s");
+                        for (int i = 1; i < ss.length; i++) {
+                            registry.registerExtension(ss[0], ss[i], null);
+                        }
+                    }
+                    s = reader.readLine();
+                }
+                reader.close();
+            }
+
+
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+            } else {
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.mimeTypes");
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String s = reader.readLine();
+                while (s != null) {
+                    s = s.trim();
+                    if (s.length() > 0) {
+                        String[] ss = s.split("\\s");
+                        for (int i = 1; i < ss.length; i++) {
+                            registry.registerMimeType(ss[0], ss[i]);
+                        }
+                    }
+                    s = reader.readLine();
+                }
+                reader.close();
+            }
+
+
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+            } else {
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFormat.extensions");
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String s = reader.readLine();
+                while (s != null) {
+                    s = s.trim();
+                    if (s.length() > 0) {
+                        String[] ss = s.split("\\s");
+                        for (int i = 1; i < ss.length; i++) {
+                            registry.registerFormatter(ss[0], ss[i]);
+                        }
+                    }
+                    s = reader.readLine();
+                }
+                reader.close();
+            }
+
+
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions");
+            } else {
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions");
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String s = reader.readLine();
+                while (s != null) {
+                    s = s.trim();
+                    if (s.length() > 0) {
+                        String[] ss = s.split("\\s");
+                        for (int i = 1; i < ss.length; i++) {
+                            registry.registerEditor(ss[0], ss[i]);
+                        }
+                    }
+                    s = reader.readLine();
+                }
+                reader.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void registerDataSourceJar( String ext, URL jarFile ) throws IOException {
+        URLClassLoader loader= new URLClassLoader( new URL[] {jarFile}, DataSourceRegistry.class.getClassLoader() );
+        List<String> exts= new ArrayList();
+
+        Enumeration<URL> re= loader.getResources("META-INF/org.virbo.datasource.DataSourceFactory.extensions");
+        List<URL> rre= new ArrayList();
+        while ( re.hasMoreElements() ) {
+            URL u= re.nextElement();
+            if ( u.toString().startsWith( "jar:"+ jarFile.toString() ) ) {
+                rre.add(u);
+            }
+        }
+        
+        Map<String,String> stuff= readStuff( rre.iterator() );
+
+        for ( Entry<String,String> ent: stuff.entrySet() ) {
+            try {
+                Class clas= loader.loadClass(ent.getValue());
+                if ( ext!=null ) {
+                    this.dataSourcesByExt.put( getExtension(ext), clas.getConstructor().newInstance());
+                } else {
+                    this.dataSourcesByExt.put( ent.getKey(), clas.getConstructor().newInstance() );
+                }
+            } catch ( ClassNotFoundException ex ) {
+                throw new IllegalArgumentException(ex);
+            } catch ( NoSuchMethodException ex ) {
+                throw new IllegalArgumentException(ex);
+            } catch (InstantiationException ex) {
+                throw new IllegalArgumentException( ex);
+            } catch (IllegalAccessException ex) {
+                throw new IllegalArgumentException(ex);
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException(ex);
+            } catch (InvocationTargetException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+
+        }
+
+    }
+
 
     public boolean hasSourceByExt(String ext) {
         if ( ext==null ) return false;
