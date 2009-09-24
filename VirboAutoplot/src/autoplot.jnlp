@@ -60,6 +60,7 @@
         <jar href="http://www.autoplot.org/jnlp-lib/jfits-0.93.jar" />
         <jar href="http://www.autoplot.org/jnlp-lib/beansbinding-1.2.1.jar"/>
         <jar href="http://www.autoplot.org/jnlp-lib/metadata-extractor-2.1.0.jar" />
+        <jar href="http://www.autoplot.org/jnlp-lib/jh.jar" />
         
         <!-- cdf -->
         <jar href="http://www.autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
