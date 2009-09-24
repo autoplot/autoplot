@@ -315,7 +315,7 @@ public class ApplicationModel {
         String srecent = prefs.get(PREF_RECENT,"");
 
         if (srecent.equals("") || !srecent.startsWith("<")) {
-            String srecenturl = AutoplotUtil.getProperty("autoplot.default.recent", "http://www.cottagesystems.com/virbo/apps/autoplot/recent.xml");
+            String srecenturl = AutoplotUtil.getProperty("autoplot.default.recent", "");
             if (!srecenturl.equals("")) {
                 try {
                     URL url = new URL(srecenturl);
