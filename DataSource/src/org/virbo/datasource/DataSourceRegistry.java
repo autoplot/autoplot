@@ -289,7 +289,7 @@ public class DataSourceRegistry {
                 if ( ext!=null ) {
                     this.dataSourcesByExt.put( getExtension(ext), clas.getConstructor().newInstance());
                 } else {
-                    this.dataSourcesByExt.put( ent.getKey(), clas.getConstructor().newInstance() );
+                    this.dataSourcesByExt.put( getExtension(ent.getKey()), clas.getConstructor().newInstance() );
                 }
             } catch ( ClassNotFoundException ex ) {
                 throw new IllegalArgumentException(ex);
