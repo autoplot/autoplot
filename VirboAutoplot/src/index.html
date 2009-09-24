@@ -5,12 +5,13 @@
 <body>
     <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
-	<img src="screen.png">
-        <p><small>A Polar/Hydra spectrogram is sliced at two points in time.  Data can now be loaded once, and
-                panels can display different slices of the data.  A new "Data" panel simplifies the axis panel
-                and specifies data operations (such as slice or histogram) before display.
+
+	<img src="screen2.png">
+        <p><small>Autoplot GUI is simplified for new users by hiding the data and
+                layout tabs.  These tabs aren't needed for plotting a single-panel
+                of lineplots or spectrograms.
             </small></p>
-        
+
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
@@ -28,13 +29,17 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
     <li>Initial help documents added, including "getting started"</li>
     <li>new Data tab simplifies Axis tab.</li>
     <li>"Data" and "Layout" tabs are hidden by default, simplifying interface for new users.</li>
-    
-
-
+    <li>Improvements to CEF reading and bugfixes.</li>
 <li>minor bugfixes.</li>
 </ul>
 <p>
-        
+
+	<img src="screen.png">
+        <p><small>A Polar/Hydra spectrogram is sliced at two points in time.  Data can now be loaded once, and
+                panels can display different slices of the data.  A new "Data" panel simplifies the axis panel
+                and specifies data operations (such as slice or histogram) before display.
+            </small></p>
+
 <p>Known issues:</p>
 <ul>
 <li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
