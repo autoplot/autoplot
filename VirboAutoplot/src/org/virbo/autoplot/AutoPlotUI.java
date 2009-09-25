@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot;
 
+import java.net.URISyntaxException;
 import javax.swing.Icon;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
@@ -86,7 +87,10 @@ import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.SourceTypesBrowser;
+import org.virbo.datasource.URISplit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -628,11 +632,34 @@ public class AutoPlotUI extends javax.swing.JFrame {
         plotUrl( (String) dataSetSelector.getValue() );
     }
 
-    private void plotUrl(final String surl) {
+    private void plotUrl( String surl ) {
         try {
             Logger.getLogger("ap").fine("plotUrl("+surl+")");
+            URISplit split= URISplit.parse(surl);
+            ProgressMonitor mon= getStatusBarProgressMonitor("Finished "+surl);
+            if ( !split.file.endsWith(".vap")) {
+                if ( ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false")) ) {
+                    try {
+                        DataSourceFactory sourcef = DataSetURI.getDataSourceFactory(DataSetURI.getURI(surl),mon);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch ( IllegalArgumentException ex ) {
+                        SourceTypesBrowser browser= new SourceTypesBrowser();
+                        browser.getDataSetSelector().setValue(DataSetURI.fromUri(DataSetURI.getResourceURI(surl)));
+                        int r= JOptionPane.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
+                        if ( r==JOptionPane.OK_OPTION ) {
+                            surl= browser.getUri();
+                            dataSetSelector.setValue(surl);
+                        } else {
+                            return;
+                        }
+                    }
+                }
+            }
             applicationModel.addRecent(surl);
-            applicationModel.resetDataSetSourceURL(surl, getStatusBarProgressMonitor("Finished "+surl) );
+            applicationModel.resetDataSetSourceURL(surl, mon );
         } catch (RuntimeException ex) {
             if ( ex.getCause()!=null && ex.getCause() instanceof IOException ) {
                 JOptionPane.showMessageDialog( this, "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause() );
