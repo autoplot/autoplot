@@ -86,6 +86,7 @@ import org.virbo.autoplot.state.UndoRedoSupport;
 import org.virbo.autoplot.util.TickleTimer;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceRegistry;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -886,6 +887,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         serverCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         dataPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         layoutPanelCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        jMenuItem7 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -1117,6 +1120,18 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu1.add(layoutPanelCheckBoxMenuItem);
 
         optionsMenu.add(jMenu1);
+
+        jMenu5.setText("Plugins");
+
+        jMenuItem7.setText("Add Data Source");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jMenuItem7);
+
+        optionsMenu.add(jMenu5);
 
         jMenu2.setText("Text Size");
 
@@ -1487,6 +1502,22 @@ private void autoplotHelpMenuItemActionPerformed(java.awt.event.ActionEvent evt)
     helpSystem.displayHelpFromEvent(evt);
 }//GEN-LAST:event_autoplotHelpMenuItemActionPerformed
 
+private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+    AddDataSourcePanel add= new AddDataSourcePanel();
+    int r= JOptionPane.showConfirmDialog( this, add, "Add Data Source",  JOptionPane.OK_CANCEL_OPTION );
+    if ( r==JOptionPane.OK_OPTION ) {
+        String jar= add.getDataSetSelector().getValue();
+        if ( jar.endsWith("jar") ) {
+            try {
+                DataSourceRegistry.getInstance().registerDataSourceJar(null, new URL(jar));
+            } catch (IOException ex) {
+                Logger.getLogger(AddDataSourcePanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+    }
+}//GEN-LAST:event_jMenuItem7ActionPerformed
+
 private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -1758,6 +1789,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -1765,6 +1797,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
