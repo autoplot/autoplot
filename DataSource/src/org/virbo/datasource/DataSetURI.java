@@ -8,6 +8,7 @@
  */
 package org.virbo.datasource;
 
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -27,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -453,12 +455,44 @@ public class DataSetURI {
      * canonical method for converting string from the wild into a URI-safe string.
      * The string should already have a scheme part, such as "http" or "file".
      * @param surl
+     * @deprecated use toURI().toURL() instead.
      * @return
      * @throws java.net.MalformedURLException
      */
     public static URL toURL( String surl ) throws MalformedURLException {
         surl= surl.replaceAll(" ", "%20");
         return new URL(surl);
+    }
+
+    /**
+     * canonical method for converting string from the wild into a URI-safe string.
+     * For example:
+     *    space is converted to "%20"
+     *    %Y is converted to $Y
+     * This does not add file: or vap:.
+     * @param suri
+     * @throws IllegalArgumentException if the uri cannot be made safe.
+     * @return
+     */
+    public static URI toUri( String suri ) {
+        try {
+            suri = suri.replaceAll("%([^0-9])", "%25$1");
+            suri = suri.replaceAll("<", "%3C");
+            suri = suri.replaceAll(">", "%3E");
+            suri = suri.replaceAll(" ", "%20");
+            return new URI(suri);
+        } catch (URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    public static String fromUri( URI uri ) {
+        try {
+            String r = URLDecoder.decode(uri.toASCIIString(), "US-ASCII");
+            return r;
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
@@ -471,7 +505,7 @@ public class DataSetURI {
         URISplit split = URISplit.parse(url.toString());
 
         try {
-            FileSystem fs = FileSystem.create( getWebURL( toURL(split.path).toURI() ).toURI() );
+            FileSystem fs = FileSystem.create( getWebURL( toUri(split.path) ).toURI() );
             String filename = split.file.substring(split.path.length());
             if (fs instanceof LocalFileSystem)
                 filename = DataSourceUtil.unescape(filename);
@@ -498,17 +532,12 @@ public class DataSetURI {
      * @throws IOException
      */
     public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
-        try {
-            URISplit split = URISplit.parse( URLDecoder.decode(uri.toString(),"US-ASCII") );
-            FileSystem fs = FileSystem.create(new URI(split.path));
-            String filename = split.file.substring(split.path.length());
-            FileObject fo = fs.getFileObject(filename);
-            File tfile = fo.getFile(mon);
-            return tfile;
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
-            throw new IOException(ex.getMessage());
-        }
+        URISplit split = URISplit.parse( fromUri( uri ) );
+        FileSystem fs = FileSystem.create(toUri(split.path));
+        String filename = split.file.substring(split.path.length());
+        FileObject fo = fs.getFileObject(filename);
+        File tfile = fo.getFile(mon);
+        return tfile;
     }
 
     /**
@@ -668,7 +697,7 @@ public class DataSetURI {
         FileSystem fs = null;
         String[] s;
 
-        fs = FileSystem.create( new URI(surlDir) );
+        fs = FileSystem.create( new URI(surlDir.replaceAll(" ", "%20")) );
 
         s = fs.listDirectory("/");
 
