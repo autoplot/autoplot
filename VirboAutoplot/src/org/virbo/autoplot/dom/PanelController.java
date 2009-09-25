@@ -7,6 +7,7 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -182,6 +183,23 @@ public class PanelController extends DomNodeController {
                 updateDataSet();
             } else if ( evt.getPropertyName().equals( Panel.PROP_LEGENDLABEL ) ) {
                 panel.setAutolabel(false);
+            }
+        }
+    };
+
+    /**
+     * listen for changes in the parent panel that this child can respond to.
+     */
+    PropertyChangeListener parentStyleListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            try {
+                DomUtil.setPropertyValue(panel.style, evt.getPropertyName(), evt.getNewValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(PanelController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(PanelController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(PanelController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     };
@@ -581,6 +599,7 @@ public class PanelController extends DomNodeController {
                     if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
                         dom.controller.deletePanel(p);
                     }
+                    panel.style.removePropertyChangeListener( p.getController().parentStyleListener );
                 }
             }
 
@@ -624,6 +643,7 @@ public class PanelController extends DomNodeController {
                     cpanel.controller.getRenderer().setActive(false);
                     cp.add(cpanel);
                     cpanel.setParentPanel( panel.getId() );
+                    panel.getStyle().addPropertyChangeListener( cpanel.controller.parentStyleListener );
                     cpanel.getStyle().setColor(deriveColor(c, i));
                     cpanel.getStyle().setFillColor( deriveColor(fc,i).brighter() );
                     cpanel.setComponent(labels[i]);
