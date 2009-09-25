@@ -783,6 +783,21 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.browseTypeExt = browseTypeExt;
         firePropertyChange("browseTypeExt", oldBrowseTypeExt, browseTypeExt);
     }
+
+    protected boolean hidePlayButton = false;
+    public static final String PROP_HIDEPLAYBUTTON = "hidePlayButton";
+
+    public boolean isHidePlayButton() {
+        return hidePlayButton;
+    }
+
+    public void setHidePlayButton(boolean hidePlayButton) {
+        boolean oldHidePlayButton = this.hidePlayButton;
+        this.hidePlayButton = hidePlayButton;
+        plotItButton.setVisible( !hidePlayButton );
+        firePropertyChange(PROP_HIDEPLAYBUTTON, oldHidePlayButton, hidePlayButton);
+    }
+
     /**
      * Utility field holding list of ActionListeners.
      */
