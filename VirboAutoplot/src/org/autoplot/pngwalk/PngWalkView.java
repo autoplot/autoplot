@@ -23,9 +23,14 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     //protected boolean showMissing = false;  //Should view show placeholder for missing files?
 
     protected PngWalkView(WalkImageSequence sequence) {
-        super(true);
+        setSequence(sequence);
+    }
+
+    public void setSequence(WalkImageSequence sequence) {
         seq = sequence;
-        seq.addPropertyChangeListener(this);
+        if (seq != null) {
+            seq.addPropertyChangeListener(this);
+        }
     }
 
     /** Respond to property changes on the {@list WalkImageSequence} this view

@@ -7,32 +7,67 @@ package org.autoplot.pngwalk;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.prefs.Preferences;
+import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.datasource.DataSetSelector;
 
 /**
  *
  * @author ed
  */
-public class PngWalkTool2 extends javax.swing.JPanel implements PropertyChangeListener {
-
+public class PngWalkTool2 extends javax.swing.JPanel {
+    public static final String PREF_RECENT = "pngWalkRecent";
+    
     private WalkImageSequence sequence;
+    private PngWalkView view;
+    private String template;
 
     /** Creates new form PngWalkTool2 */
     public PngWalkTool2() {
         initComponents();
-        //fill things in for testing:
-        sequence = new WalkImageSequence("file:/tmp/pngwalk/product_%Y%m%d.png");
-        sequence.addPropertyChangeListener(this);
-        PngWalkView v = new ViewSingleImage(sequence);
-        viewPanel.add(v);
+        dataSetSelector1.setEnableDataSource(false);
+       
+        view = new ViewSingleImage(null);
+        viewPanel.add(view);
+
+        setTemplate("file:/tmp/pngwalk/product_%Y%m%d.png");  //for testing
+        dataSetSelector1.setValue(template);
+
+        dataSetSelector1.addPropertyChangeListener(DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent e) {
+                Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
+                List<String> srecent= dataSetSelector1.getRecent();
+                List<Bookmark> recent = new ArrayList<Bookmark>();
+                for ( String s : srecent ) {
+                    recent.add( new Bookmark.Item( s ) );
+                }
+                prefs.put( PREF_RECENT, Bookmark.formatBooks( recent ) );
+                
+            }
+        });
+
+    }
+
+    private void setTemplate(String template) {
+        this.template = template;
+        sequence = new WalkImageSequence(this.template);
+        view.setSequence(sequence);
+
+        sequence.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent e) {
+                if (e.getPropertyName().equals(WalkImageSequence.PROP_INDEX)) {
+                    indexSlider.setValue(sequence.getIndex());
+                }
+            }
+        });
+
         indexSlider.setMinimum(0);
         indexSlider.setMaximum(sequence.size() - 1);
         indexSlider.setValue(0);
-    }
 
-    public void propertyChange(PropertyChangeEvent e) {
-        if (e.getPropertyName().equals(WalkImageSequence.PROP_INDEX)) {
-            indexSlider.setValue(sequence.getIndex());
-        }
+        view.repaint();
     }
 
     /** This method is called from within the constructor to
@@ -44,18 +79,16 @@ public class PngWalkTool2 extends javax.swing.JPanel implements PropertyChangeLi
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        indexSlider = new javax.swing.JSlider();
+        viewPanel = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         buttonFirst = new javax.swing.JButton();
         buttonPrev = new javax.swing.JButton();
-        buttonNext = new javax.swing.JButton();
+        indexSlider = new javax.swing.JSlider();
         buttonLast = new javax.swing.JButton();
-        viewPanel = new javax.swing.JPanel();
+        buttonNext = new javax.swing.JButton();
+        dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
 
-        indexSlider.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                indexSliderStateChanged(evt);
-            }
-        });
+        viewPanel.setLayout(new java.awt.BorderLayout());
 
         buttonFirst.setText("|<");
         buttonFirst.addActionListener(new java.awt.event.ActionListener() {
@@ -71,10 +104,9 @@ public class PngWalkTool2 extends javax.swing.JPanel implements PropertyChangeLi
             }
         });
 
-        buttonNext.setText(">");
-        buttonNext.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonNextActionPerformed(evt);
+        indexSlider.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                indexSliderStateChanged(evt);
             }
         });
 
@@ -85,16 +117,26 @@ public class PngWalkTool2 extends javax.swing.JPanel implements PropertyChangeLi
             }
         });
 
-        viewPanel.setLayout(new java.awt.BorderLayout());
+        buttonNext.setText(">");
+        buttonNext.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonNextActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
+        dataSetSelector1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataSetSelector1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(buttonFirst)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttonPrev)
@@ -103,21 +145,40 @@ public class PngWalkTool2 extends javax.swing.JPanel implements PropertyChangeLi
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(buttonLast))
                     .addComponent(indexSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(293, Short.MAX_VALUE))
+                .addContainerGap(281, Short.MAX_VALUE))
+            .addComponent(dataSetSelector1, javax.swing.GroupLayout.DEFAULT_SIZE, 554, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(dataSetSelector1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(indexSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(buttonFirst)
+                    .addComponent(buttonPrev)
+                    .addComponent(buttonLast)
+                    .addComponent(buttonNext)))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(12, 12, 12))
             .addComponent(viewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 578, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(viewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 321, Short.MAX_VALUE)
+                .addComponent(viewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(indexSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(buttonFirst)
-                    .addComponent(buttonPrev)
-                    .addComponent(buttonLast)
-                    .addComponent(buttonNext))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -141,12 +202,19 @@ public class PngWalkTool2 extends javax.swing.JPanel implements PropertyChangeLi
     private void indexSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_indexSliderStateChanged
         sequence.setIndex(indexSlider.getValue());
     }//GEN-LAST:event_indexSliderStateChanged
+
+    private void dataSetSelector1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelector1ActionPerformed
+        setTemplate(dataSetSelector1.getValue());
+    }//GEN-LAST:event_dataSetSelector1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonFirst;
     private javax.swing.JButton buttonLast;
     private javax.swing.JButton buttonNext;
     private javax.swing.JButton buttonPrev;
+    private org.virbo.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JSlider indexSlider;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel viewPanel;
     // End of variables declaration//GEN-END:variables
 }
