@@ -26,6 +26,7 @@ public class ExcelUtil {
     
     public static short getColumnNumber( HSSFSheet sheet, String id, int firstRow ) {
         HSSFRow row = sheet.getRow(firstRow);
+        if ( row==null ) throw new IllegalArgumentException("no such row "+(firstRow+1)+" in sheet");
         for (short i = 0; i < row.getLastCellNum(); i++) {
             HSSFCell cell = row.getCell(i);
             if (cell != null && cell.getCellType() == 1) {

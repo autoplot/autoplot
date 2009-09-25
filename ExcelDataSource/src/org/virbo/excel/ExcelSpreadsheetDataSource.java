@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -39,6 +40,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
     POIFSFileSystem fs;
     HSSFSheet sheet;
     ExcelSpreadsheetDataSet data;
+    static Logger logger= Logger.getLogger("org.autoplot.ExcelSpreadsheetDataSource");
 
     /** Creates a new instance of ExcelSpreadsheetDataSource.
      * file://c:/myfile.xls?column=N&depend0=G
@@ -62,6 +64,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             sheet = wb.getSheetAt(0);
         } else {
             sheet = wb.getSheet(ssheet);
+            logger.fine("found sheet "+ssheet+" with "+sheet.getLastRowNum() +" rows");
         }
         if (sheet == null) {
             throw new IllegalArgumentException("Sheet not found: " + ssheet);
@@ -156,6 +159,13 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         }
     }
 
+    /**
+     *
+     * @param id
+     * @param firstRow
+     * @throws IllegalArgumentException if there is no row in the sheet.
+     * @return
+     */
     private short getColumnNumber(String id, int firstRow) {
         return ExcelUtil.getColumnNumber( sheet, id, firstRow);
     }
