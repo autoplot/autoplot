@@ -35,6 +35,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -159,7 +160,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         buttonPanel2.setBorder(new javax.swing.border.EmptyBorder(10, 0, 0, 0));
         JButton dump = new JButton("Dump to Console");
         JButton save = new JButton("Save to File");
-        JButton submit= new JButton("Submit Error Report");
+        JButton submit= new JButton("Submit Error Report...");
         submit.setToolTipText("<html>Submit exception, platform information, source tags, and possibly log records to RTE server</html>");
 
         buttonPanel2.add(dump);
@@ -369,7 +370,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         buf.append("  </platform>\n");
     }
     
-    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs ,boolean uncaught ) {
+    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs ,boolean uncaught, String userComments ) {
         StringBuffer buf= new StringBuffer();
         buf.append("<?xml version=\"1.0\"");
 
@@ -386,6 +387,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         formatException( buf, t );
 
         buf.append("  <uncaught>"+uncaught+"</uncaught>\n" );
+        
+        buf.append("  <userComments><![CDATA[\n" + userComments + "]]>\n</userComments>\n");
         
         formatBuildInfos( buf, bis );
 
@@ -422,10 +425,20 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         if ( lc!=null ) recs= lc.records;
 
-        String report= formatReport(t, bis, recs, uncaught );
+        String report= formatReport( t, bis, recs, uncaught, "USER COMMENTS" );
 
         String url =
          "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
+
+        GuiExceptionHandlerSubmitForm form= new GuiExceptionHandlerSubmitForm();
+        form.getDataTextArea().setText( report );
+
+        if ( JOptionPane.showConfirmDialog( null, form, "Submit Exception Report",
+                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null ) == JOptionPane.CANCEL_OPTION ) {
+            return;
+        }
+
+        report= formatReport( t, bis, recs, uncaught, form.getUserTextArea().getText() );
 
         HttpClient client = new HttpClient();
         PostMethod postMethod = new PostMethod(url);
