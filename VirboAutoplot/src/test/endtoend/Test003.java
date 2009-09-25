@@ -28,23 +28,21 @@ public class Test003 {
             ScriptContext.load( "file:///home/jbf/ct/lanl/hudson/geo_pitch_stack_test1_local.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_001.png" );
-            ScriptContext.save( "/home/jbf/tmp/test003_001.vap");
 
             ScriptContext.reset();
             
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/contextOverview2.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_002.png" );
-            ScriptContext.save( "/home/jbf/tmp/test003_002.vap");
 
             ScriptContext.reset();
 
             ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_2.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_003.png" );
-            ScriptContext.save( "/home/jbf/tmp/test003_003.vap");
 
             if ( headless ) System.exit(0);
+            
         } catch ( RuntimeException ex ) {
             ex.printStackTrace();
             if ( headless ) System.exit(1);
