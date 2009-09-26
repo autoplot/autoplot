@@ -37,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.autoplot.imagerender.ImageRenderer;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
@@ -397,6 +398,10 @@ public class AutoplotUtil {
         
         // the autoranging will be in log space only if the data are not time locations.
         boolean isLog= "log".equals(ds.property(QDataSet.SCALE_TYPE)) && !UnitsUtil.isTimeLocation(u);
+
+        if ( properties!=null && "log".equals(properties.get(QDataSet.SCALE_TYPE) ) ) {
+            isLog= true;
+        }
 
         if (mono) {
             RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(ds, null);
@@ -987,6 +992,15 @@ public class AutoplotUtil {
                 return recyclable;
             } else {
                 Renderer result = new DigitalRenderer();
+                result.setDataSetLoader(null);
+                colorbar.setVisible(false);
+                return result;
+            }
+        } else if ( renderType==RenderType.image ) {
+            if (recyclable != null && recyclable instanceof ImageRenderer) {
+                return recyclable;
+            } else {
+                Renderer result = new ImageRenderer();
                 result.setDataSetLoader(null);
                 colorbar.setVisible(false);
                 return result;
