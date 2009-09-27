@@ -37,7 +37,7 @@ import javax.swing.JOptionPane;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.autoplot.imagerender.ImageRenderer;
+//import org.autoplot.imagerender.ImageRenderer;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
@@ -996,15 +996,15 @@ public class AutoplotUtil {
                 colorbar.setVisible(false);
                 return result;
             }
-        } else if ( renderType==RenderType.image ) {
-            if (recyclable != null && recyclable instanceof ImageRenderer) {
-                return recyclable;
-            } else {
-                Renderer result = new ImageRenderer();
-                result.setDataSetLoader(null);
-                colorbar.setVisible(false);
-                return result;
-            }
+//        } else if ( renderType==RenderType.image ) {
+//            if (recyclable != null && recyclable instanceof ImageRenderer) {
+//                return recyclable;
+//            } else {
+//                Renderer result = new ImageRenderer();
+//                result.setDataSetLoader(null);
+//                colorbar.setVisible(false);
+//                return result;
+//            }
         } else {
             SeriesRenderer result;
             if (recyclable != null && recyclable instanceof SeriesRenderer) {
