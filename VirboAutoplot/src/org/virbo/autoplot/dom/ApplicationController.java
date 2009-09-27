@@ -249,6 +249,21 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         }
     };
+
+    /**
+     * returns the URI for the panel, or "".
+     * @param p
+     * @return
+     */
+    private static String getFocusUriFor( Panel p ) {
+        DataSourceFilter dsf= p.controller.getDataSourceFilter();
+        if ( dsf!=null ) {
+                     return dsf.getUri();
+        } else {
+                    return "";
+        }
+    }
+    
     FocusAdapter focusAdapter = new FocusAdapter() {
 
         @Override
@@ -276,14 +291,14 @@ public class ApplicationController extends DomNodeController implements RunLater
             // if there's just one panel in the plot, then go ahead and set the focus uri.
             List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
             if ( p==null && ps.size() == 1) {
-                setFocusUri(ps.get(0).controller.getDataSourceFilter().getUri());
+                setFocusUri( getFocusUriFor( ps.get(0) ) );
             }
 
             setPlot(domPlot);
 
             if (p != null) {
                 logger.fine("focus due to plot getting focus: " + p);
-                setFocusUri(p.controller.getDataSourceFilter().getUri());
+                setFocusUri( getFocusUriFor( p ) );
                 if (getPanel() != p) {
                     setPanel(p);
                     setStatus("" + domPlot + ", " + p + " selected");
