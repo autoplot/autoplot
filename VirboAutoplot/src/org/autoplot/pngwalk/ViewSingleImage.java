@@ -2,9 +2,13 @@ package org.autoplot.pngwalk;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 
 /**
  * An implementation of PngWalkView to display a single image.
@@ -13,7 +17,7 @@ import java.awt.event.MouseWheelEvent;
 public class ViewSingleImage extends PngWalkView {
 
 //    private boolean sizeValid = false;
-    private Image cacheImage;
+    private BufferedImage cacheImage;
 
     public ViewSingleImage(WalkImageSequence s) {
         super(s);
@@ -33,34 +37,32 @@ public class ViewSingleImage extends PngWalkView {
         Graphics2D g2 = (Graphics2D) g1;
 
         //drawCenteredString(g2, "This is a long string of nonsense.");
-        Image i = seq.currentImage().getImage();
+        BufferedImage i = seq.currentImage().getImage();
 
-        if (i.getWidth(this) > 0 && i.getHeight(this) > 0) {
+        if (i!=null && i.getWidth(this) >0 && i.getHeight(this) > 0) {
             paintImageCentered(i, g2);
             cacheImage = i;
-        } else if (cacheImage != null) {
-            paintImageCentered(cacheImage, g2);
+        } else {
+            if (cacheImage != null)
+                paintImageCentered(cacheImage, g2);
+            paintImageCentered(WalkImage.LOADING_IMAGE, g2);
         }
 
     }
 
-    private void paintImageCentered(Image i, Graphics g) {
+    private void paintImageCentered(BufferedImage i, Graphics2D g2) {
             double xfactor = (double) getWidth() / (double) i.getWidth(null);
             double yfactor = (double) getHeight() / (double) i.getHeight(null);
             double s = Math.min(xfactor, yfactor);
             s = Math.min(1.0, s);
 
-            //TODO: update to use ScalePerspectiveImageOp
-            //AffineTransformOp resizeOp = new AffineTransformOp(AffineTransform.getScaleInstance(s, s), AffineTransformOp.TYPE_BILINEAR);
-            //AffineTransform xform = AffineTransform.getScaleInstance(s,s);
-
             int xpos = (int)(this.getWidth() - i.getWidth(null)*s) / 2;
             int ypos = (int)(this.getHeight() - i.getHeight(null)*s) / 2;
             int xs = (int)(i.getWidth(null)*s);
             int ys = (int)(i.getHeight(null)*s);
-            //xform.translate(xpos, ypos);
 
-            g.drawImage(i, xpos, ypos, xs, ys, this);
+           BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0 ,0, false);
 
+            g2.drawImage(i, resizeOp, xpos, ypos);
     }
 }

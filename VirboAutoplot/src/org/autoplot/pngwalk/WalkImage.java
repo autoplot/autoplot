@@ -1,13 +1,15 @@
 package org.autoplot.pngwalk;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.URISplit;
@@ -20,10 +22,12 @@ import org.virbo.datasource.URISplit;
  */
 public class WalkImage implements Comparable<WalkImage>, ImageObserver {
 
+    public static final BufferedImage LOADING_IMAGE = initLoadingImage();
+
     final String uriString;  // Used for sorting
     private URI imgURI;
-    private Image im;
-    private Image thumb;
+    private BufferedImage im;
+    private BufferedImage thumb;
     private String caption;
     private Status  status;
 
@@ -42,27 +46,26 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
         // image and thumbnail are initialized lazily
     }
 
-    public Image getImage() {
+    public BufferedImage getImage() {
         if (im == null && status != Status.LOADING) {
             loadImage();
         }
         return im;
     }
 
-    public Image getThumbnail() {
+    public BufferedImage getThumbnail() {
         // check validity of current thumbnail, i.e. it exists at correct size
         // if not valid, create it from the image
-        if (im == null) {
-            //loadImage();
-        }
-        // create thumb
 
-        //return thumb;
-        throw new UnsupportedOperationException("Method not implemented.");
+        //temporarily just return the image
+        return getImage();
     }
 
     private void loadImage() {
+        //TODO: Put image loading in a different thread so this method doesn't block on slow sites
         try {
+            //Image tkImage;
+
             URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path);
             FileSystem fs = FileSystem.create(fsRoot);
 
@@ -70,11 +73,9 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
             FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/')+1));
 
             File localFile = fo.getFile();
-            im = Toolkit.getDefaultToolkit().createImage(localFile.getPath());
 
-            // Do this to register us as an ImageObserver:
-            im.getWidth(this);
-
+            im = ImageIO.read(localFile);
+            
         } catch (Exception ex) {
             System.err.println("Error loading image file from " + imgURI.toString());
             Logger.getLogger(WalkImage.class.getName()).log(Level.SEVERE, null, ex);
@@ -82,6 +83,15 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
             throw new RuntimeException(ex);
         }
         status = Status.LOADING;
+    }
+
+    private static BufferedImage initLoadingImage() {
+        BufferedImage li = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = li.createGraphics();
+        g2.setColor(new Color(0.0F, 0.0F, 0.0F, 0.5F));
+        g2.fillRoundRect(0, 0, 100, 100, 10, 10);
+        //TODO: Add text or hourglass or something
+        return li;
     }
 
     // Implements ImageObserver
@@ -96,6 +106,7 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
     }
 
     // Implementing the Comparable interface lets List sort
+    //TODO: Compare on date information first
     public int compareTo(WalkImage o) {
         return uriString.compareTo(o.uriString);
     }

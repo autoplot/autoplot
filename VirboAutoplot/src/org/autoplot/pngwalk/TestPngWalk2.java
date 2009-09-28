@@ -2,6 +2,8 @@ package org.autoplot.pngwalk;
 
 import javax.swing.JFrame;
 import org.das2.util.ArgumentList;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.VFSFileSystemFactory;
 
 /**
  *
@@ -36,6 +38,7 @@ public class TestPngWalk2 extends JFrame {
             }
         }
 
+        //FileSystem.registerFileSystemFactory("ftp", new VFSFileSystemFactory());
         Runnable r = new Runnable() {
             public void run() {
                 JFrame win = new TestPngWalk2("PNGWalk Test");
