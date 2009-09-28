@@ -141,6 +141,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                 result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
             // apply properties.
             }
+
+            result.putProperty( QDataSet.METADATA, attributes );
+            result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+            
             return result;
         } catch (CDFException ex) {
             throw new IllegalArgumentException("no such variable: " + svariable);
