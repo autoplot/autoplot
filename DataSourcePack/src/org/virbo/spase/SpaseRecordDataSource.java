@@ -9,6 +9,7 @@
 
 package org.virbo.spase;
 
+import org.virbo.metatree.SpaseMetadataModel;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
