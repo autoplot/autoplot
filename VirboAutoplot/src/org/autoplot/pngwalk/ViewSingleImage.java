@@ -2,11 +2,8 @@ package org.autoplot.pngwalk;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 
@@ -48,21 +45,5 @@ public class ViewSingleImage extends PngWalkView {
             paintImageCentered(WalkImage.LOADING_IMAGE, g2);
         }
 
-    }
-
-    private void paintImageCentered(BufferedImage i, Graphics2D g2) {
-            double xfactor = (double) getWidth() / (double) i.getWidth(null);
-            double yfactor = (double) getHeight() / (double) i.getHeight(null);
-            double s = Math.min(xfactor, yfactor);
-            s = Math.min(1.0, s);
-
-            int xpos = (int)(this.getWidth() - i.getWidth(null)*s) / 2;
-            int ypos = (int)(this.getHeight() - i.getHeight(null)*s) / 2;
-            int xs = (int)(i.getWidth(null)*s);
-            int ys = (int)(i.getHeight(null)*s);
-
-           BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0 ,0, false);
-
-            g2.drawImage(i, resizeOp, xpos, ypos);
     }
 }

@@ -29,7 +29,7 @@ public class PngWalkTool2 extends javax.swing.JPanel {
         initComponents();
         dataSetSelector1.setEnableDataSource(false);
        
-        view = new ViewSingleImage(null);
+        view = new ViewRow(null);
         viewPanel.add(view);
 
         setTemplate("file:/tmp/pngwalk/product_%Y%m%d.png");  //for testing

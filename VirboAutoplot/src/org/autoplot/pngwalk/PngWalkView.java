@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
@@ -26,11 +27,21 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         setSequence(sequence);
     }
 
-    public void setSequence(WalkImageSequence sequence) {
+    public final void setSequence(WalkImageSequence sequence) {
         seq = sequence;
         if (seq != null) {
             seq.addPropertyChangeListener(this);
         }
+        sequenceChanged();
+    }
+
+    /**
+     * Subclasses should override this method if they need to do anything special
+     * when the view gets a new image sequence.
+     * @param seq
+     */
+    protected void sequenceChanged() {
+
     }
 
     /** Respond to property changes on the {@list WalkImageSequence} this view
@@ -77,6 +88,19 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         System.err.println("Scale factor = " + s);
         AffineTransformOp resizeOp = new AffineTransformOp(AffineTransform.getScaleInstance(s, s), AffineTransformOp.TYPE_BILINEAR);
         return resizeOp.filter(im, null);
+    }
+
+    protected void paintImageCentered(BufferedImage i, Graphics2D g2) {
+        double xfactor = (double) getWidth() / (double) i.getWidth(null);
+        double yfactor = (double) getHeight() / (double) i.getHeight(null);
+        double s = Math.min(xfactor, yfactor);
+        s = Math.min(1.0, s);
+        int xpos = (int) (this.getWidth() - i.getWidth(null) * s) / 2;
+        int ypos = (int) (this.getHeight() - i.getHeight(null) * s) / 2;
+        int xs = (int) (i.getWidth(null) * s);
+        int ys = (int) (i.getHeight(null) * s);
+        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, 0, false);
+        g2.drawImage(i, resizeOp, xpos, ypos);
     }
   
 }
