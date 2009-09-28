@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Scanner;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.MetadataModel;
 import org.w3c.dom.Node;
 
 /**
@@ -167,4 +168,19 @@ public class MetadataUtil {
         return properties;
     }
 
+    /**
+     * return the MetadataModel object for this identifier, or null.
+     * @param t the id of the model, such as "ISTP-CDF", or null.
+     * @return
+     */
+    public static MetadataModel getMetadataModel( String t ) {
+        if ( t==null ) return null;
+        if ( t.equals(QDataSet.VALUE_METADATA_MODEL_ISTP ) ) {
+            return new IstpMetadataModel();
+        } else if ( t.equals( QDataSet.VALUE_METADATA_MODEL_SPASE ) ) {
+            return new SpaseMetadataModel();
+        } else {
+            return null;
+        }
+    }
 }
