@@ -118,7 +118,7 @@ public class PngWalkCanvas extends JPanel {
             addBorder(im,0.1);
             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
                     0, 0, bounds.width, bounds.height, bounds.height/4,
-                    magp );
+                    magp , true);
             cacheImage= op.filter( im, null );
             rightThumbsCache.put( image, cacheImage );
             return (BufferedImage)cacheImage;
@@ -144,7 +144,7 @@ public class PngWalkCanvas extends JPanel {
             addBorder(im,0.1);
             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
                     0, 0, bounds.width, bounds.height, bounds.height/4,
-                    -1*magp );
+                    -1*magp , true);
             cacheImage= op.filter( im, null );
             leftThumbsCache.put( image, cacheImage );
             return (BufferedImage)cacheImage;
@@ -170,7 +170,7 @@ public class PngWalkCanvas extends JPanel {
             addBorder(im,0.1);
             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
                     0, 0, bounds.width, bounds.height, bounds.height/2,
-                    -1*magp );
+                    -1*magp , true);
             cacheImage= op.filter( im, null );
             thumbsCache.put( image, cacheImage );
             return (BufferedImage)cacheImage;
@@ -381,7 +381,7 @@ public class PngWalkCanvas extends JPanel {
                      addBorder(im,1);
                     ScalePerspectiveImageOp op = new ScalePerspectiveImageOp( width, height,
                             0, 0, bounds.width, bounds.height,100,
-                           0. );
+                           0. , true);
                     g.drawImage(im, op, bounds.x, bounds.y );
                         lastImage = image;
                         
