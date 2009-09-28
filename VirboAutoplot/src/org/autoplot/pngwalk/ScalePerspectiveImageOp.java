@@ -35,6 +35,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
     private int w1;
     private int h1;
     private int rh1; // reflection height
+    private boolean reflect; // enable/disable reflections
 
     /**
      *
@@ -45,13 +46,14 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
      * @param w1 new width
      * @param h1 new height at the middle
      * @param rh1 extra height for the reflection
-     * @param p rockiness
+     * @param p rockiness, similar to the tan of the angle.  0. means no perspective.
      */
-    public ScalePerspectiveImageOp(int w, int h, int x1, int y1, int w1, int h1, int rh1, double p) {
+    public ScalePerspectiveImageOp(int w, int h, int x1, int y1, int w1, int h1, int rh1, double p, boolean reflect) {
         this.w = w;
         this.h = h;
         this.w1 = w1;
         this.h1= h1;
+        this.reflect= reflect;
         this.rh1= rh1 * h / h1;
         this.x1= x1;
         this.y1= y1;
@@ -115,8 +117,6 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         for ( int k2=0; k2<w/ssx; k2++ ) ii[k2]= k2*ssx;
         ii[w/ssx]= w-1;
 
-        boolean reflect= true;
-
         for ( int k1 = 0; k1 < jj.length; k1++ ) {
             int j= jj[k1];
             for ( int k2 = 0; k2<ii.length; k2++ ) {
@@ -143,7 +143,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                 aa[didx] += weight;
                 nn[didx] += 255;
 
-                if ( reflect ) {
+                if ( this.reflect ) {
 
                     j1= (int) ( pp + hai + (h-j) * ( hai / h ) );
                     //j1 = ( y1 + (int) (((j * (1000 - pp * 2)) + pp * h) * h1 / h / 1000 ) ) + j/10;
