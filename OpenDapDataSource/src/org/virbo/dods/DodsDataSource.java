@@ -201,6 +201,13 @@ public class DodsDataSource extends AbstractDataSource {
 
         mon.finished();
 
+        AttributeTable at = das.getAttributeTable(variable);
+        ds.putProperty(QDataSet.METADATA,at);
+
+        if ( uri.toString().contains(".cdf.dds") ) {
+            ds.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+        }
+
         //ds.putProperty( QDataSet.UNITS, null );
         //ds.putProperty( QDataSet.DEPEND_0, null );
         return ds;
