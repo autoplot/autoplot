@@ -71,6 +71,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -929,6 +930,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenuItem4 = new javax.swing.JMenuItem();
         toolsMenu = new javax.swing.JMenu();
         pngWalkMenuItem = new javax.swing.JMenuItem();
+        createPngWalkMenuItem = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
         autoplotHelpMenuItem = new javax.swing.JMenuItem();
@@ -1240,6 +1242,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
         toolsMenu.add(pngWalkMenuItem);
+
+        createPngWalkMenuItem.setText("Create PNG Walk...");
+        createPngWalkMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createPngWalkMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(createPngWalkMenuItem);
 
         jMenuBar1.add(toolsMenu);
 
@@ -1564,6 +1574,10 @@ private void pngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
     new DemoPngWalk().start( null, this);
 }//GEN-LAST:event_pngWalkMenuItemActionPerformed
 
+private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPngWalkMenuItemActionPerformed
+    AutoplotUtil.invokeScriptSoon( AutoPlotUI.class.getResource("/scripts/pngwalk/makePngWalk.jy") );
+}//GEN-LAST:event_createPngWalkMenuItemActionPerformed
+
 private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -1822,6 +1836,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     private javax.swing.JMenu bookmarksMenu;
     private javax.swing.JMenuItem copyDataSetURLMenuItem;
     private javax.swing.JMenuItem copyImageMenuItem;
+    private javax.swing.JMenuItem createPngWalkMenuItem;
     private javax.swing.JCheckBoxMenuItem dataPanelCheckBoxMenuItem;
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
