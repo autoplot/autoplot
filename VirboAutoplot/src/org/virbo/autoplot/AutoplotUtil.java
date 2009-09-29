@@ -54,6 +54,7 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -364,6 +365,18 @@ public class AutoplotUtil {
 
         log.fine("exit autoRange");
 
+        return result;
+    }
+
+    public static QDataSet toDataSet( AutoRangeDescriptor ard ) {
+        DDataSet result= DDataSet.createRank1(2);
+        Units u= ard.range.getUnits();
+        if ( u==null ) u= Units.dimensionless;
+        result.putValue(0,ard.range.min().doubleValue(u));
+        result.putValue(1,ard.range.max().doubleValue(u));
+        result.putProperty( QDataSet.BINS_0, "min,max" );
+        if (ard.log) result.putProperty( QDataSet.SCALE_TYPE, "log" );
+        if ( u!=Units.dimensionless ) result.putProperty(QDataSet.UNITS,u);
         return result;
     }
 
