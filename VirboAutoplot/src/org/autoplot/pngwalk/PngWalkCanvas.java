@@ -170,7 +170,7 @@ public class PngWalkCanvas extends JPanel {
             addBorder(im,0.1);
             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
                     0, 0, bounds.width, bounds.height, bounds.height/2,
-                    -1*magp , true);
+                    0, false);
             cacheImage= op.filter( im, null );
             thumbsCache.put( image, cacheImage );
             return (BufferedImage)cacheImage;
