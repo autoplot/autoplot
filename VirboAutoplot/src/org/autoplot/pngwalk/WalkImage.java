@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import java.awt.image.ImageObserver;
 import java.io.File;
 import java.net.URI;
@@ -28,6 +29,7 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
     private URI imgURI;
     private BufferedImage im;
     private BufferedImage thumb;
+    private int thumbSize = 0;
     private String caption;
     private Status  status;
 
@@ -53,12 +55,24 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
         return im;
     }
 
-    public BufferedImage getThumbnail() {
+    public BufferedImage getThumbnail(int size) {
         // check validity of current thumbnail, i.e. it exists at correct size
         // if not valid, create it from the image
 
+        if (thumbSize != size) {
+            if(im == null) loadImage();
+            double aspect = (double)im.getWidth()/(double)im.getHeight();
+
+            int height = (int)Math.round(Math.sqrt((size*size)/(aspect*aspect + 1)));
+            int width = (int)Math.round(height*aspect);
+    
+            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
+            thumb = resizeOp.filter(im, null);
+
+            thumbSize = size;
+        }
         //temporarily just return the image
-        return getImage();
+        return thumb;
     }
 
     private void loadImage() {

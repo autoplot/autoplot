@@ -99,7 +99,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         int ypos = (int) (this.getHeight() - i.getHeight(null) * s) / 2;
         int xs = (int) (i.getWidth(null) * s);
         int ys = (int) (i.getHeight(null) * s);
-        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, 0, false);
+        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, -1, -1, 0, false);
         g2.drawImage(i, resizeOp, xpos, ypos);
     }
   

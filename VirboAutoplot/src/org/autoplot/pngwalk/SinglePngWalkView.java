@@ -5,18 +5,17 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.BufferedImageOp;
 
 /**
  * An implementation of PngWalkView to display a single image.
  * @author Ed Jackson
  */
-public class ViewSingleImage extends PngWalkView {
+public class SinglePngWalkView extends PngWalkView {
 
 //    private boolean sizeValid = false;
     private BufferedImage cacheImage;
 
-    public ViewSingleImage(WalkImageSequence s) {
+    public SinglePngWalkView(WalkImageSequence s) {
         super(s);
 
         addMouseWheelListener(new MouseAdapter() {

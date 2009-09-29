@@ -10,6 +10,8 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.datasource.DataSetSelector;
 
@@ -21,7 +23,7 @@ public class PngWalkTool2 extends javax.swing.JPanel {
     public static final String PREF_RECENT = "pngWalkRecent";
     
     private WalkImageSequence sequence;
-    private PngWalkView view;
+    private PngWalkView view, view2;
     private String template;
 
     /** Creates new form PngWalkTool2 */
@@ -29,8 +31,11 @@ public class PngWalkTool2 extends javax.swing.JPanel {
         initComponents();
         dataSetSelector1.setEnableDataSource(false);
        
-        view = new ViewRow(null);
-        viewPanel.add(view);
+        view = new RowPngWalkView(null);
+        JScrollPane scrollpane = new JScrollPane(view);
+        view2 = new SinglePngWalkView(null);
+        JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollpane, view2);
+        viewPanel.add(p);
 
         setTemplate("file:/tmp/pngwalk/product_%Y%m%d.png");  //for testing
         dataSetSelector1.setValue(template);
@@ -54,6 +59,7 @@ public class PngWalkTool2 extends javax.swing.JPanel {
         this.template = template;
         sequence = new WalkImageSequence(this.template);
         view.setSequence(sequence);
+        view2.setSequence(sequence);
 
         sequence.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent e) {
