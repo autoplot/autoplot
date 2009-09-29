@@ -61,6 +61,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
+import org.autoplot.pngwalk.DemoPngWalk;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
@@ -926,6 +927,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
+        toolsMenu = new javax.swing.JMenu();
+        pngWalkMenuItem = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
         autoplotHelpMenuItem = new javax.swing.JMenuItem();
@@ -1150,7 +1153,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         jMenu5.setText("Plugins");
 
-        jMenuItem7.setText("Add Data Source");
+        jMenuItem7.setText("Add Data Source...");
         jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem7ActionPerformed(evt);
@@ -1228,6 +1231,18 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu3);
 
+        toolsMenu.setText("Tools");
+
+        pngWalkMenuItem.setText("PNG Walk");
+        pngWalkMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pngWalkMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(pngWalkMenuItem);
+
+        jMenuBar1.add(toolsMenu);
+
         bookmarksMenu.setText("Bookmarks");
         jMenuBar1.add(bookmarksMenu);
 
@@ -1300,12 +1315,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 533, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 535, Short.MAX_VALUE)
                 .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                     .add(46, 46, 46)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 525, Short.MAX_VALUE)
                     .add(26, 26, 26)))
         );
 
@@ -1544,6 +1559,10 @@ private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
     }
 }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+private void pngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pngWalkMenuItemActionPerformed
+    new DemoPngWalk().start( null, this);
+}//GEN-LAST:event_pngWalkMenuItemActionPerformed
 
 private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
@@ -1833,6 +1852,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     private javax.swing.JCheckBoxMenuItem overRenderingMenuItem;
     private javax.swing.JMenuItem pasteDataSetURLMenuItem;
     private javax.swing.JMenu plotStyleMenu;
+    private javax.swing.JMenuItem pngWalkMenuItem;
     private javax.swing.JMenuItem redoMenuItem;
     private javax.swing.JMenu renderingOptionsMenu;
     private javax.swing.JMenuItem resetZoomMenuItem;
@@ -1842,6 +1862,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     private javax.swing.JLabel statusLabel;
     private javax.swing.JPanel tabbedPanelContainer;
     private javax.swing.JCheckBoxMenuItem textAntiAlias;
+    private javax.swing.JMenu toolsMenu;
     private javax.swing.JMenuItem undoMenuItem;
     private javax.swing.JMenu undoMultipleMenu;
     private javax.swing.JMenu viewMenu;

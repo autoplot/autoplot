@@ -248,7 +248,7 @@
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="jMenuItem7">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="Add Data Source"/>
+                    <Property name="text" type="java.lang.String" value="Add Data Source..."/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem7ActionPerformed"/>
@@ -337,6 +337,21 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem4ActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="toolsMenu">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Tools"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="pngWalkMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="PNG Walk"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="pngWalkMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -441,13 +456,13 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dataSetSelector" min="-2" pref="27" max="-2" attributes="0"/>
-              <EmptySpace pref="533" max="32767" attributes="0"/>
+              <EmptySpace pref="535" max="32767" attributes="0"/>
               <Component id="statusLabel" min="-2" pref="23" max="-2" attributes="0"/>
           </Group>
           <Group type="103" rootIndex="1" groupAlignment="0" attributes="0">
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
-                  <Component id="tabbedPanelContainer" pref="523" max="32767" attributes="0"/>
+                  <Component id="tabbedPanelContainer" pref="525" max="32767" attributes="0"/>
                   <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
               </Group>
           </Group>
