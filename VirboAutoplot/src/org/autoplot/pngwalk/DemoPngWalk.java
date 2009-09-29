@@ -6,10 +6,13 @@ package org.autoplot.pngwalk;
 
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import org.das2.datum.DatumRange;
@@ -17,7 +20,9 @@ import org.das2.util.ArgumentList;
 import org.das2.util.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
+import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.datasource.DataSetURI;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -60,7 +65,26 @@ public class DemoPngWalk {
 
         final PngWalkTool tool = new PngWalkTool();
 
-        tool.setTemplate(template);
+        if ( template!=null ) {
+            tool.setTemplate(template);
+        } else {
+            Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
+            String srecent = prefs.get( PngWalkTool.PREF_RECENT,"");
+            if ( srecent.equals("") ) {
+                tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");
+            } else {
+                try {
+                    List<Bookmark> books = Bookmark.parseBookmarks(srecent);
+                    tool.setTemplate( ((Bookmark.Item)books.get(0)).getUrl() );
+                } catch (SAXException ex) {
+                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");
+            }
+
+        }
 
         PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
             public boolean isActionEnabled(String filename) {
