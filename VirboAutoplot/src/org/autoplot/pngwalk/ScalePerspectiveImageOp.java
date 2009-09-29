@@ -45,10 +45,12 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
      * @param y1 upper left hand corner ( when p=0 )
      * @param w1 new width
      * @param h1 new height at the middle
+     * @param ssx subsampling factor.  =1 no subsampling.  -1 means subsampling allowed, and will be picked automatically.
+     * @param ssy subsampling factor.  =1 no subsampling.  -1 means subsampling allowed, and will be picked automatically.
      * @param rh1 extra height for the reflection
-     * @param p rockiness, similar to the tan of the angle.  0. means no perspective.
+     * @param p rockiness, similar to the tan of the angle of the top of the image. Zero means no perspective (flat).
      */
-    public ScalePerspectiveImageOp(int w, int h, int x1, int y1, int w1, int h1, int rh1, double p, boolean reflect) {
+    public ScalePerspectiveImageOp(int w, int h, int x1, int y1, int w1, int h1, int rh1, int ssx, int ssy, double p, boolean reflect) {
         this.w = w;
         this.h = h;
         this.w1 = w1;
@@ -60,11 +62,19 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         this.p = p;
         this.nw = (int) w1;
         this.nh = (int) h1 + rh1;
-        this.ssx= Math.max( 1, w / w1 / 2 );
-        if ( p!=0 ) {
-            this.ssy= 1;
+        if ( ssx==-1 ) {
+            this.ssx= Math.max( 1, w / w1 / 2 );
         } else {
-            this.ssy= Math.max( 1, h / h1 );
+            this.ssx= ssx;
+        }
+        if ( ssy==-1 ) {
+            if ( p!=0 ) {
+               this.ssy= 1;
+            } else {
+               this.ssy= Math.max( 1, h / h1 );
+            }
+        } else {
+            this.ssy= ssy;
         }
     }
 
@@ -102,11 +112,11 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         final int AVG = 0;
 
         boolean hasBg = true;
-        int bgColor = src.getRGB(0, 0);
-        if (src.getRGB(0, 0) != bgColor) hasBg = false;
-        if (src.getRGB(0, h - 1) != bgColor) hasBg = false;
-        if (src.getRGB(w - 1, 0) != bgColor) hasBg = false;
-        if (src.getRGB(w - 1, h - 1) != bgColor) hasBg = false;
+        int bgColor = src.getRGB(3, 3);
+        if (src.getRGB(3, 3) != bgColor) hasBg = false;
+        if (src.getRGB(3, h - 4) != bgColor) hasBg = false;
+        if (src.getRGB(w - 4, 3) != bgColor) hasBg = false;
+        if (src.getRGB(w - 4, h - 4) != bgColor) hasBg = false;
 
         // make sure that all the borders are included in the averages.
         int[] jj= new int[h/ssy+1];
@@ -137,12 +147,20 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                     weight = (color >> 24 & 0xff);
                 }
 
+                int rr1= color >> 16 & 0xff;
+                if ( rr1==0 ) {
+                   // System.err.println("here black");
+                }
                 rr[didx] += weight * ((color >> 16 & 0xff) - AVG);
                 gg[didx] += weight * ((color >> 8 & 0xff) - AVG);
                 bb[didx] += weight * ((color >> 0 & 0xff) - AVG);
-                aa[didx] += weight;
-                nn[didx] += 255;
+                aa[didx] += 255 * weight;
+                nn[didx] += weight;
 
+                if ( i1==150 && j1==47 ) {
+                    System.err.printf( "rr=%d aa=%d nn=%d\n", rr[didx], aa[didx], nn[didx] );
+                }
+                
                 if ( this.reflect ) {
 
                     j1= (int) ( pp + hai + (h-j) * ( hai / h ) );
@@ -170,12 +188,20 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                 int didx = index(i, j);
                 int n = nn[didx];
                 if (n > 0) {
-                    int weight = aa[didx] * 255 / nn[didx];
+                    int weight = aa[didx] / nn[didx];
                     if (hasBg) {
                         int color;
                         if (weight == 0) {
                             color = bgColor;
+                        } else if ( weight<255 ) {
+                            color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         } else {
+                            int rr1= (rr[didx] / n + AVG);
+                            if ( rr1==0 ) {
+//                                System.err.println("here");
+                            } else {
+//                                System.err.println("rather here");
+                            }
                             color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         }
                         dest.setRGB(i, j, color);

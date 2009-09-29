@@ -11,7 +11,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -29,8 +28,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.DasExceptionHandler;
@@ -117,7 +114,7 @@ public class PngWalkCanvas extends JPanel {
             }
             addBorder(im,0.1);
             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
-                    0, 0, bounds.width, bounds.height, bounds.height/4,
+                    0, 0, bounds.width, bounds.height, bounds.height/4, -1, -1,
                     magp , true);
             cacheImage= op.filter( im, null );
             rightThumbsCache.put( image, cacheImage );
@@ -143,7 +140,7 @@ public class PngWalkCanvas extends JPanel {
             }
             addBorder(im,0.1);
             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
-                    0, 0, bounds.width, bounds.height, bounds.height/4,
+                    0, 0, bounds.width, bounds.height, bounds.height/4, -1, -1,
                     -1*magp , true);
             cacheImage= op.filter( im, null );
             leftThumbsCache.put( image, cacheImage );
@@ -170,7 +167,7 @@ public class PngWalkCanvas extends JPanel {
             addBorder(im,0.1);
             ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(),
                     0, 0, bounds.width, bounds.height, bounds.height/2,
-                    0, false);
+                    1, 1, 0, false);
             cacheImage= op.filter( im, null );
             thumbsCache.put( image, cacheImage );
             return (BufferedImage)cacheImage;
@@ -380,7 +377,7 @@ public class PngWalkCanvas extends JPanel {
                             }
                      addBorder(im,1);
                     ScalePerspectiveImageOp op = new ScalePerspectiveImageOp( width, height,
-                            0, 0, bounds.width, bounds.height,100,
+                            0, 0, bounds.width, bounds.height,100, -1, -1,
                            0. , true);
                     g.drawImage(im, op, bounds.x, bounds.y );
                         lastImage = image;
