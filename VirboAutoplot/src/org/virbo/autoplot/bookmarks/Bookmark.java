@@ -310,6 +310,12 @@ public abstract class Bookmark {
             bookmarks = new ArrayList<Bookmark>();
         }
 
+        /**
+         * return the bookmarks, the mutable internal store.  use copy() to
+         * get a deep copy.
+         *
+         * @return
+         */
         public List<Bookmark> getBookmarks() {
             return bookmarks;
         }
