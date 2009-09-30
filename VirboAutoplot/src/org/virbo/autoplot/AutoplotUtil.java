@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -53,6 +55,8 @@ import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
+import org.das2.system.RequestProcessor;
+import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DRank0DataSet;
@@ -1069,4 +1073,21 @@ public class AutoplotUtil {
 
     }
 
+    /**
+     * invoke the python script on another thread.
+     * @param url
+     */
+    public static void invokeScriptSoon( final URL url ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
+                    PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+                    interp.execfile(url.openStream(), url.toString());
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+        RequestProcessor.invokeLater(run);
+    }
 }
