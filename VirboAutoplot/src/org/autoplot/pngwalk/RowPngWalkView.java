@@ -53,7 +53,7 @@ public class RowPngWalkView extends PngWalkView {
         int i = (int)Math.floor(bounds.x / cellSize);
         int imax =Math.min(seq.size()-1,(int)Math.ceil((bounds.x + bounds.width) / cellSize) );
         
-        System.out.printf("First: %d, Last: %d%n", i, imax);
+        //System.out.printf("First: %d, Last: %d%n", i, imax);
         for(; i<=imax; i++) {          
             if (i == seq.getIndex()) {
                 g2.setColor(java.awt.Color.orange);
