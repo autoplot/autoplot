@@ -51,8 +51,13 @@ public class BookmarksManagerModel {
         int r = chooser.showOpenDialog(c);
         if (r == JFileChooser.APPROVE_OPTION) {
             try {
-                List<Bookmark> recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(chooser.getSelectedFile())).getDocumentElement());
-                setList(recent);
+                List<Bookmark> importBook = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(chooser.getSelectedFile())).getDocumentElement());
+                List<Bookmark> newList= new ArrayList(this.list.size());
+                for ( int i=0; i<this.list.size(); i++ ) {
+                    newList.add(i,this.list.get(i).copy());
+                }
+                mergeList(importBook,newList);
+                setList(newList);
             } catch (SAXException ex) {
                 Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -63,7 +68,12 @@ public class BookmarksManagerModel {
         }
     }
 
+
     protected void doExport(Component c) {
+        doExport( c, getList() );
+    }
+
+    protected void doExport(Component c, List<Bookmark> list) {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
@@ -81,7 +91,7 @@ public class BookmarksManagerModel {
             try {
                 File f= chooser.getSelectedFile();
                 if ( !f.toString().endsWith(".xml") ) f= new File( f.toString()+".xml" );
-                String format = Bookmark.formatBooks(getList());
+                String format = Bookmark.formatBooks( list );
                 out = new FileOutputStream(f);
                 out.write(format.getBytes());
                 
@@ -188,6 +198,55 @@ public class BookmarksManagerModel {
     }
 
     /**
+     * return the first item with this name and type, or null.  This does
+     * not recurse through the folders.
+     * @param oldList
+     * @param title
+     * @return
+     */
+    private Bookmark findItem( List<Bookmark> oldList, String title, boolean findFolder ) {
+        for ( int i=0; i<oldList.size(); i++ ) {
+            final Bookmark item = oldList.get(i);
+            boolean isFolder=  item instanceof Bookmark.Folder;
+            if ( ( findFolder == isFolder ) && oldList.get(i).getTitle().equals(title) ) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * merge in the bookmarks.  Items with the same title are repeated, and
+     * folders with the same name are merged.
+     * @param list
+     */
+     void mergeList( List<Bookmark> src, List<Bookmark> dest ) {
+        if ( src.size()==0 ) return;
+
+        for ( int i=0; i<src.size(); i++ ) {
+            Bookmark item= src.get(i);
+            if ( item instanceof Bookmark.Folder ) {
+                String folderName= item.getTitle();
+                Bookmark.Folder old= (Bookmark.Folder)findItem( dest, folderName, true );
+                if ( old!=null ) {
+                    mergeList( ((Bookmark.Folder)item).getBookmarks(), old.getBookmarks() );
+                } else {
+                    dest.add(item);
+                }
+            } else {
+                String id= item.getTitle();
+                Bookmark.Item old= (Bookmark.Item) findItem( dest, id, false );
+                if ( old!=null ) {
+                    if ( old.equals(item) ) continue;
+                } else {
+                    dest.add(item);
+                }
+            }
+        }
+    }
+
+
+    /**
      * kludge to trigger list change when a title is changed.
      */
     void fireBookmarkChange(Bookmark book) {
@@ -264,7 +323,8 @@ public class BookmarksManagerModel {
     protected List<Bookmark> getSelectedBookmarks(TreeModel model, TreePath[] paths) {
         List<Bookmark> result= new ArrayList<Bookmark>();
         for ( TreePath path: paths ) {
-            if (path == null || path.getPathCount() == 1) return null;
+            if (path == null ) return null;
+            if (path.getPathCount() == 1) return list;
             Object sel = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
             Bookmark b;
             if (sel.equals("(empty)")) {
@@ -302,8 +362,13 @@ public class BookmarksManagerModel {
         }
         try {
             Document doc = AutoplotUtil.readDoc(url.openStream());
-            List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement());
-            this.setList(book);
+            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
+            List<Bookmark> newList= new ArrayList(this.list.size());
+            for ( int i=0; i<this.list.size(); i++ ) {
+                newList.add(i,this.list.get(i).copy());
+            }
+            mergeList(importBook,newList);
+            setList(newList);
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
