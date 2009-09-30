@@ -5,20 +5,28 @@
  */
 package org.virbo.autoplot.bookmarks;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
 import org.virbo.autoplot.*;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
@@ -39,6 +47,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         initComponents();
         this.model = new BookmarksManagerModel();
         this.jTree1.setModel(model.getTreeModel());
+        this.jTree1.addMouseListener( createContextMenuMouseListener() );
         /*this.jTree1.setCellRenderer( new TreeCellRenderer() {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         Object o= ((DefaultMutableTreeNode)value).getUserObject();
@@ -75,6 +84,8 @@ public class BookmarksManager extends javax.swing.JDialog {
     
     BookmarksManagerModel model;
     Bookmark dirtyBookmark;
+
+    JPopupMenu contextMenu= createContextMenu();
 
     public BookmarksManagerModel getModel() {
         return model;
@@ -130,6 +141,7 @@ public class BookmarksManager extends javax.swing.JDialog {
         importMenuItem = new javax.swing.JMenuItem();
         importUrlMenuItem = new javax.swing.JMenuItem();
         resetToDefaultMenuItem = new javax.swing.JMenuItem();
+        mergeInDefaultMenuItem = new javax.swing.JMenuItem();
         exportMenuItem = new javax.swing.JMenuItem();
         closeMenuItem = new javax.swing.JMenuItem();
         editMenu = new javax.swing.JMenu();
@@ -237,6 +249,14 @@ public class BookmarksManager extends javax.swing.JDialog {
             }
         });
         jMenu1.add(resetToDefaultMenuItem);
+
+        mergeInDefaultMenuItem.setText("Merge in Default");
+        mergeInDefaultMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mergeInDefaultMenuItemActionPerformed(evt);
+            }
+        });
+        jMenu1.add(mergeInDefaultMenuItem);
 
         exportMenuItem.setText("Export...");
         exportMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -499,6 +519,27 @@ private void URLTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:even
     dirtyBookmark= model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath());
 }//GEN-LAST:event_URLTextFieldKeyTyped
 
+private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mergeInDefaultMenuItemActionPerformed
+        try {
+            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
+            URL url = new URL(surl);
+            Document doc = AutoplotUtil.readDoc(url.openStream());
+            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
+            List<Bookmark> newList = new ArrayList(model.list.size());
+            for (int i = 0; i < model.list.size(); i++) {
+                newList.add(i, model.list.get(i).copy());
+            }
+            model.mergeList(importBook, newList);
+            model.setList(newList);
+        } catch (SAXException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+}//GEN-LAST:event_mergeInDefaultMenuItemActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -536,9 +577,75 @@ private void URLTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:even
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTree jTree1;
+    private javax.swing.JMenuItem mergeInDefaultMenuItem;
     private javax.swing.JMenuItem newFolderMenuItem;
     private javax.swing.JMenuItem resetToDefaultMenuItem;
     private javax.swing.JTextField titleTextField;
     // End of variables declaration//GEN-END:variables
 
+    private MouseListener createContextMenuMouseListener() {
+        return new MouseAdapter() {
+
+            public void mouseClicked(MouseEvent e) {
+                if ( e.isPopupTrigger() ) {
+                    contextMenu.show( jTree1, e.getX(), e.getY() );
+                }
+            }
+
+            public void mousePressed(MouseEvent e) {
+                TreePath path= jTree1.getPathForLocation( e.getX(), e.getY() );
+                if ( !jTree1.getSelectionModel().isPathSelected(path) ) {
+                    jTree1.getSelectionModel().setSelectionPath(path);
+                }
+                if ( e.isPopupTrigger() ) {
+                    contextMenu.show( jTree1, e.getX(), e.getY() );
+                }
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                if ( e.isPopupTrigger() ) {
+                    contextMenu.show( jTree1, e.getX(), e.getY() );
+                }
+            }
+
+        };
+    }
+
+    private JPopupMenu createContextMenu() {
+        JPopupMenu menu= new JPopupMenu();
+        menu.add( createExportFolderAction() );
+        menu.add( createDeleteAction() );
+        return menu;
+    }
+
+    Action createDeleteAction() {
+        return new AbstractAction("Delete") {
+            public void actionPerformed(ActionEvent e) {
+                boolean confirm = false; // the user has confirmed
+                List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
+                if (bs.size() > 1 && JOptionPane.showConfirmDialog(BookmarksManager.this, "Delete "+bs.size()+" bookmarks?", "Delete Bookmarks", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                    confirm = true;
+                }
+
+                for (Bookmark b : bs) {
+                    if (b instanceof Bookmark.Folder) {
+                        if (confirm || JOptionPane.showConfirmDialog(BookmarksManager.this, "Delete all bookmarks and folder?", "Delete Bookmarks Folder", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
+                            model.removeBookmark(b);
+                        }
+                    } else {
+                        model.removeBookmark(b);
+                    }
+                }
+            }
+        };
+    }
+
+    Action createExportFolderAction() {
+        return new AbstractAction("Export Items...") {
+            public void actionPerformed(ActionEvent e) {
+                List<Bookmark> bs = model.getSelectedBookmarks(jTree1.getModel(), jTree1.getSelectionPaths());
+                model.doExport(BookmarksManager.this,bs);
+            }
+        };
+    }
 }
