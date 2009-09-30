@@ -124,7 +124,9 @@ public class BookmarksManagerTransferrable {
                     }
                 } else {
                     List<Bookmark> books= new ArrayList<Bookmark>();
-                    for ( TreePath tp: jTree1.getSelectionPaths() ) {
+                    TreePath[] tps= jTree1.getSelectionPaths();
+                    if ( tps==null ) return;
+                    for ( TreePath tp: tps ) {
                         Bookmark b = model.getSelectedBookmark( jTree1.getModel(), tp );
                         books.add(b);
                     }
