@@ -6,6 +6,8 @@ package org.autoplot.pngwalk;
 
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -15,12 +17,16 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import org.das2.datum.DatumRange;
 import org.das2.util.ArgumentList;
 import org.das2.util.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.bookmarks.BookmarksManager;
+import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.datasource.DataSetURI;
 import org.xml.sax.SAXException;
 
@@ -146,6 +152,8 @@ public class DemoPngWalk {
         });
 
         JFrame frame = new JFrame("PNG Walk Tool");
+        frame.setJMenuBar( createMenuBar(tool,frame) );
+        
         frame.getContentPane().add(tool);
 
         if ( parent==null ) {
@@ -159,5 +167,33 @@ public class DemoPngWalk {
         frame.setVisible(true);
 
         return tool;
+    }
+
+    private static JMenuBar createMenuBar( final PngWalkTool tool, final JFrame f ) {
+        JMenuBar result= new JMenuBar();
+        JMenu fileMenu= new JMenu("File");
+        fileMenu.add( new AbstractAction( f.getDefaultCloseOperation()==JFrame.EXIT_ON_CLOSE ? "Exit" : "Close" ) {
+            public void actionPerformed(ActionEvent e) {
+                f.dispose();
+            }
+        } );
+        result.add(fileMenu);
+
+        final JMenu bookmarksMenu= new JMenu("Bookmarks");
+        final BookmarksManager man= new BookmarksManager(f,true);
+
+        man.getModel().addPropertyChangeListener( BookmarksManagerModel.PROP_LIST, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                man.updateBookmarks( bookmarksMenu, tool.getSelector() );
+            }
+        });
+        man.setVisible(false);
+        man.setPrefNode("pngwalk");
+
+        man.updateBookmarks( bookmarksMenu, tool.getSelector() );
+
+        result.add( bookmarksMenu );
+        
+        return result;
     }
 }
