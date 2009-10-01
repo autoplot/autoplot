@@ -2,8 +2,8 @@ package org.autoplot.pngwalk;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 
 /**
@@ -18,8 +18,7 @@ public class SinglePngWalkView extends PngWalkView {
     public SinglePngWalkView(WalkImageSequence s) {
         super(s);
 
-        addMouseWheelListener(new MouseAdapter() {
-
+        addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 seq.skipBy(e.getWheelRotation());
