@@ -52,7 +52,7 @@
         
     </resources> 
     
-    <application-desc  main-class="org.autoplot.DemoPngWalk">
+    <application-desc  main-class="org.autoplot.pngwalk.DemoPngWalk">
         <argument>--nativeLAF</argument>
         <!--<argument>http://www.cottagesystems.com/virbo/apps/autoplot/data/ascii/omni2_1972.dat?column=field17</argument>-->
     </application-desc>
