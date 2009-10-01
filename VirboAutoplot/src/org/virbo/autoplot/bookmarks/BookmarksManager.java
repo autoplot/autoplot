@@ -15,23 +15,37 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.xml.parsers.ParserConfigurationException;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
+import org.virbo.datasource.DataSetSelector;
+import org.virbo.datasource.URISplit;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -648,4 +662,195 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             }
         };
     }
+
+    String prefNode= null;
+
+    /**
+     * setting this makes the manager the authority on bookmarks.
+     * @param nodeName
+     */
+    public void setPrefNode( String nodeName ) {
+        prefNode= nodeName;
+        
+        BufferedReader read = null;
+        try {
+            new File(FileSystem.settings().getLocalCacheDir(), "bookmarks/" ).mkdirs();
+            
+            final File f = new File(FileSystem.settings().getLocalCacheDir(), "bookmarks/" + nodeName + ".xml");
+            if ( !f.exists() )  {
+                model.setList( new ArrayList<Bookmark>() );
+            } else {
+                read = new BufferedReader(new FileReader(f));
+                StringBuffer buff= new StringBuffer();
+                String s= "";
+                do {
+                    buff.append(s);
+                    s= read.readLine();
+                } while ( s!=null );
+
+                List<Bookmark> book= Bookmark.parseBookmarks(buff.toString());
+                model.setList(book);
+            }
+
+            model.addPropertyChangeListener( new PropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent evt) {
+                    PrintWriter out= null;
+                    try {
+                        String s = Bookmark.formatBooks(model.getList());
+                        out = new PrintWriter( new FileOutputStream(f) );
+                        out.print(s);
+                        out.close();
+
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        out.close();
+                    }
+
+                }
+            } );
+            
+        } catch (SAXException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if ( read!=null ) read.close();
+            } catch (IOException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public void updateBookmarks( JMenu bookmarksMenu, final DataSetSelector dataSetSelector ) {
+        JMenuItem item;
+
+        List<Bookmark> bookmarks= model.getList();
+
+        bookmarksMenu.removeAll();
+
+        bookmarksMenu.add(new AbstractAction("Add Bookmark...") {
+
+            public void actionPerformed(ActionEvent e) {
+                Bookmark bookmark = addBookmark(dataSetSelector.getEditor().getText());
+                setAddBookmark(bookmark);
+                setVisible(true);
+            }
+        });
+
+        bookmarksMenu.add(new AbstractAction("Manage Bookmarks") {
+
+            public void actionPerformed(ActionEvent e) {
+                setVisible(true);
+            }
+        });
+
+//        item= bookmarksMenu.add( new AbstractAction("Export Recent...") {
+//            public void actionPerformed(ActionEvent e) {
+//                support.exportRecent(AutoPlotUI.this);
+//            }
+//        } );
+//        item.setToolTipText("Export recent URIs to a bookmarks file.  (There is no method for importing recent URIs.)");
+
+//        bookmarksMenu.add(new JSeparator());
+//        item = new JMenuItem(new AbstractAction("Make Aggregation From URL") {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                String s = dataSetSelector.getValue();
+//                String agg = org.virbo.datasource.DataSourceUtil.makeAggregation(s);
+//                if (agg != null) {
+//                    dataSetSelector.setValue(agg);
+//                } else {
+//                    JOptionPane.showMessageDialog(AutoPlotUI.this, "Unable to create aggregation spec, couldn't find yyyymmdd.");
+//                }
+//            }
+//        });
+//        item.setToolTipText("<html>create aggregation template from the URL to combine a time series spanning multiple files</html>");
+//        bookmarksMenu.add(item);
+//
+//        item = new JMenuItem(new AbstractAction("Decode URL") {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                String s = dataSetSelector.getEditor().getText();
+//                s = org.virbo.datasource.DataSourceUtil.unescape(s);
+//                dataSetSelector.getEditor().setText(s);
+//            }
+//        });
+//        item.setToolTipText("<html>decode escapes to correct URL</html>");
+//        bookmarksMenu.add(item);
+        bookmarksMenu.add(new JSeparator());
+
+        addBookmarks( bookmarksMenu, bookmarks, dataSetSelector );
+
+    }
+
+    private void addBookmarks( JMenu bookmarksMenu, List<Bookmark> bookmarks, final DataSetSelector sel ) {
+
+        for (int i = 0; i < bookmarks.size(); i++) {
+            final Bookmark book = bookmarks.get(i);
+
+            if (book instanceof Bookmark.Item) {
+                JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
+                    public void actionPerformed(ActionEvent e) {
+                        sel.setValue(((Bookmark.Item) book).getUrl());
+                        sel.maybePlot(false);
+                    }
+                });
+
+                mi.setToolTipText(((Bookmark.Item) book).getUrl());
+                if (book.getIcon() != null) {
+                    mi.setIcon(AutoplotUtil.scaleIcon(book.getIcon(), -1, 16));
+                }
+                bookmarksMenu.add(mi);
+            } else {
+                Bookmark.Folder folder = (Bookmark.Folder) book;
+                JMenu subMenu = new JMenu(book.getTitle());
+                addBookmarks(subMenu, folder.getBookmarks(),sel);
+                bookmarksMenu.add(subMenu);
+            }
+        }
+    }
+
+    public Bookmark addBookmark(final String surl) {
+
+        Bookmark.Item item = new Bookmark.Item(surl);
+        URISplit split = URISplit.parse(surl);
+        String autoTitle = split.file.substring(split.path.length());
+        if (autoTitle.length() == 0) autoTitle = surl;
+        item.setTitle(autoTitle);
+
+        List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
+
+        List<Bookmark> bookmarks= model.getList();
+
+        if ( bookmarks==null ) bookmarks= new ArrayList<Bookmark>();
+        List<Bookmark> newValue = new ArrayList<Bookmark>(bookmarks);
+
+        if (newValue.contains(item)) { // move it to the front of the list
+            Bookmark.Item old = (Bookmark.Item) newValue.get(newValue.indexOf(item));
+            item = old;  // preserve titles and other future metadata.
+            newValue.remove(old);
+        }
+
+        newValue.add(item);
+
+        if ( prefNode==null ) {
+            Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+            prefs.put("bookmarks", Bookmark.formatBooks(newValue));
+
+            try {
+                prefs.flush();
+            } catch (BackingStoreException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            // should already have a listener
+        }
+
+        model.setList(newValue);
+
+        return item;
+    }
+
 }
