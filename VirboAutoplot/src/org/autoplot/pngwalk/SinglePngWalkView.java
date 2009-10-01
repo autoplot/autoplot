@@ -19,7 +19,6 @@ public class SinglePngWalkView extends PngWalkView {
         super(s);
 
         addMouseWheelListener(new MouseWheelListener() {
-            @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
                 seq.skipBy(e.getWheelRotation());
             }
