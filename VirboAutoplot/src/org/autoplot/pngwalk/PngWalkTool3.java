@@ -37,11 +37,13 @@ public class PngWalkTool3 extends javax.swing.JPanel {
         initComponents();
         dataSetSelector1.setEnableDataSource(false);
 
-        view = new RowPngWalkView(null);
+        view = new GridPngWalkView(null);
         JScrollPane scrollpane = new JScrollPane(view);
-        view2 = new SinglePngWalkView(null);
-        JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollpane, view2);
-        viewPanel.add(p);
+        scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        //view2 = new SinglePngWalkView(null);
+        //JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollpane, view2);
+        viewPanel.add(scrollpane);
 
         setTemplate("file:/tmp/pngwalk/product_%Y%m%d.png");  //for testing
         dataSetSelector1.setValue(template);
@@ -65,7 +67,7 @@ public class PngWalkTool3 extends javax.swing.JPanel {
         this.template = template;
         sequence = new WalkImageSequence(this.template);
         view.setSequence(sequence);
-        view2.setSequence(sequence);
+//        view2.setSequence(sequence);
 
         sequence.addPropertyChangeListener(new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent e) {
