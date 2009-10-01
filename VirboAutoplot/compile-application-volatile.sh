@@ -203,6 +203,7 @@ $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/Autoplot
 
 echo "create jnlp file for build..."
 cp src/autoplot_two_jar.jnlp dist
+cp src/pngwalk_two_jar.jnlp dist
 
 cd temp-volatile-src
 $JAVA5_HOME/bin/javac -d ../temp-volatile-classes external/FileSearchReplace.java
