@@ -176,7 +176,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                     rr[didx] += 255*((color >> 16 & 0xff) - AVG);
                     gg[didx] += 255*((color >> 8 & 0xff) - AVG);
                     bb[didx] += 255*((color >> 0 & 0xff) - AVG);
-                    aa[didx] += ww1;
+                    aa[didx] += 255* ww1;
                     nn[didx] += 255;
 
                 }
@@ -208,6 +208,10 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                     } else {
                         int color = (weight << 24) + ((rr[didx] / n + AVG) << 16) + ((gg[didx] / n + AVG) << 8) + (bb[didx] / n + AVG);
                         dest.setRGB(i, j, color);
+                    }
+                } else {
+                    if ( hasBg && j<=h1 ) {  // if it's not part of the reflection
+                        dest.setRGB(i, j, bgColor );
                     }
                 }
             }
