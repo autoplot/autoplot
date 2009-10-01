@@ -152,15 +152,17 @@ public class DemoPngWalk {
         });
 
         JFrame frame = new JFrame("PNG Walk Tool");
-        frame.setJMenuBar( createMenuBar(tool,frame) );
-        
-        frame.getContentPane().add(tool);
 
         if ( parent==null ) {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } else {
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         }
+        
+        frame.setJMenuBar( createMenuBar(tool,frame) );
+        
+        frame.getContentPane().add(tool);
+
 
         frame.pack();
 
