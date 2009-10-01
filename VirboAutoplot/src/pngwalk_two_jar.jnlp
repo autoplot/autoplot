@@ -4,13 +4,13 @@
 <jnlp 
     spec="1.0+" 
     codebase="#{codebase}"
-    href="autoplot_two_jar.jnlp">
+    href="pngwalk_two_jar.jnlp">
     
     <information> 
-        <title>Autoplot(#{tag})</title> 
+        <title>Autoplot PNG Walk(#{tag})</title>
         <vendor>VxOware</vendor> 
-        <description>plots data from various sources, such as ascii tables, opendap, cdf, and netcdf using das2</description>
-        <description kind="short">data plotter and more</description>
+        <description>Tool for rapidly browsing pre-rendered plot images, which can launch Autoplot for deeper inspection</description>
+        <description kind="short">PNG Walk tool for pre-rendered plot images.</description>
         <icon href="logo16x16.png" width="16" height="16" />
         <icon href="logo32x32.png" width="32" height="32" />
         <icon href="logo64x64.png" width="64" height="64" />
