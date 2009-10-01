@@ -1073,21 +1073,4 @@ public class AutoplotUtil {
 
     }
 
-    /**
-     * invoke the python script on another thread.
-     * @param url
-     */
-    public static void invokeScriptSoon( final URL url ) {
-        Runnable run= new Runnable() {
-            public void run() {
-                try {
-                    PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
-                    interp.execfile(url.openStream(), url.toString());
-                } catch (IOException ex) {
-                    Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        };
-        RequestProcessor.invokeLater(run);
-    }
 }

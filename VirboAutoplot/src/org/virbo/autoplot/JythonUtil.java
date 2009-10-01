@@ -8,9 +8,11 @@ package org.virbo.autoplot;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.system.RequestProcessor;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
-import org.virbo.autoplot.dom.Application;
 import org.virbo.datasource.DataSetURI;
 
 /**
@@ -45,4 +47,21 @@ public class JythonUtil {
         in.close();
     }
 
+    /**
+     * invoke the python script on another thread.
+     * @param url
+     */
+    public static void invokeScriptSoon( final URL url ) {
+        Runnable run= new Runnable() {
+            public void run() {
+                try {
+                    PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+                    interp.execfile(url.openStream(), url.toString());
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+        RequestProcessor.invokeLater(run);
+    }
 }
