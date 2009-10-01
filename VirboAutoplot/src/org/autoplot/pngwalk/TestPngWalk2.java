@@ -2,8 +2,6 @@ package org.autoplot.pngwalk;
 
 import javax.swing.JFrame;
 import org.das2.util.ArgumentList;
-import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.VFSFileSystemFactory;
 
 /**
  *
@@ -17,7 +15,7 @@ public class TestPngWalk2 extends JFrame {
         //WalkImageSequence seq = new WalkImageSequence("file:/tmp/pngwalk/product_%Y%m%d.png");
         //PngWalkView v = new ViewSingleImage(seq);
         //setLayout(new BorderLayout());
-        PngWalkTool2 tool = new PngWalkTool2();
+        PngWalkTool3 tool = new PngWalkTool3();
         add(tool);
         pack();
     }
