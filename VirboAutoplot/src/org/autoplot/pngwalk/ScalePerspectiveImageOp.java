@@ -147,19 +147,11 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                     weight = (color >> 24 & 0xff);
                 }
 
-                int rr1= color >> 16 & 0xff;
-                if ( rr1==0 ) {
-                   // System.err.println("here black");
-                }
                 rr[didx] += weight * ((color >> 16 & 0xff) - AVG);
                 gg[didx] += weight * ((color >> 8 & 0xff) - AVG);
                 bb[didx] += weight * ((color >> 0 & 0xff) - AVG);
                 aa[didx] += 255 * weight;
                 nn[didx] += weight;
-
-                if ( i1==150 && j1==47 ) {
-                    System.err.printf( "rr=%d aa=%d nn=%d\n", rr[didx], aa[didx], nn[didx] );
-                }
                 
                 if ( this.reflect ) {
 
@@ -171,7 +163,6 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                     weight = (color >> 24 & 0xff);
 
                     double	ww1 = Math.max( 1,weight * ( ( (0.4 ) / (rh1) ) *(j - (h-rh1) ) ) );
-
 
                     rr[didx] += 255*((color >> 16 & 0xff) - AVG);
                     gg[didx] += 255*((color >> 8 & 0xff) - AVG);
