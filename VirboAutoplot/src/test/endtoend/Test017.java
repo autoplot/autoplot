@@ -179,7 +179,7 @@ public class Test017 {
         //German umlaut is not handled when creating column name:
 
 
-//comment because of SVN        "032 file:/media/mini/data.backup/examples/xls/2.25_carbopol_summary.xls?firstRow=51&sheet=125 um hifreq 2&depend0=Frequenz&column=Komplexe_Viskosität",
+//comment because of SVN.  Need to get from wiki to get umlaut.        "032 file:/media/mini/data.backup/examples/xls/2.25_carbopol_summary.xls?firstRow=51&sheet=125 um hifreq 2&depend0=Frequenz&column=Komplexe_Viskosit<umlautA>t",
         //[edit] 8 Aggregation
 
         //Here is aggregation with CDF subsampling. This has issues. It doesn't reload when I change the parameter.
