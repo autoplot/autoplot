@@ -5,10 +5,22 @@
 package test.endtoend;
 
 import java.awt.Graphics2D;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
@@ -74,28 +86,7 @@ public class Test017 {
                     // we'll just skip these odd local file references for now.
                     System.err.println("skipping local " + s);
                 } else {
-                    ds = Util.getDataSet( s );
-                    MutablePropertyDataSet hist = (MutablePropertyDataSet) Ops.autoHistogram(ds);
-                    hist.putProperty(QDataSet.TITLE, s);
-                    
-                    hist.putProperty(QDataSet.LABEL, label);
-                    formatDataSet(hist, label + ".qds");
-
-                    QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
-                    if (dep0 != null) {
-                        MutablePropertyDataSet hist2 = (MutablePropertyDataSet) Ops.autoHistogram(dep0);
-                        formatDataSet(hist2, label + ".dep0.qds");
-                    } else {
-                        PrintWriter pw = new PrintWriter(label + ".dep0.qds");
-                        pw.println("no dep0");
-                        pw.close();
-                    }
-
-                    plot( ds );
-                    setCanvasSize( 750, 300 );
-                    int i= s.lastIndexOf("/");
-                    setTitle(s.substring(i+1));
-                    writeToPng( label + ".png" );
+                    doTest( s, label);
 
                 }
             } catch (Exception ex) {
@@ -118,6 +109,7 @@ public class Test017 {
     }
     static String[] uris = new String[]{
         //[edit] 1 Tsds
+        "033 http://cdaweb.gsfc.nasa.gov/istp_public/data/omni/hro_5min/%Y/omni_hro_5min_%Y%m%d_v...cdf?HR[::100]&timerange=1995+to+2000",
 
         "001 vap+tsds:http://timeseries.org/get.cgi?StartDate=19890101&EndDate=19890101&ext=bin&out=tsml&ppd=1440&param1=SourceAcronym_Subset3-1-v0",
         "002 vap+tsds:http://timeseries.org/get.cgi?StartDate=19950101&EndDate=19950104&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-22-v0",
@@ -263,5 +255,56 @@ public class Test017 {
 
         //From VMO, the data here contains the search date, but the time axis is not properly located:
 
-        "046 http://vmo.nasa.gov/vxotmp/vap/VMO/Granule/OMNI/PT1H/omni2_1994.vap",};
+        "046 http://vmo.nasa.gov/vxotmp/vap/VMO/Granule/OMNI/PT1H/omni2_1994.vap",
+    };
+
+    private static void doTest( final String s, final String label) throws IOException, InterruptedException, Exception {
+
+        Runnable run= new Runnable() {
+            public void run()  {
+                try {
+                    QDataSet ds;
+                    ds = Util.getDataSet(s);
+                    MutablePropertyDataSet hist = (MutablePropertyDataSet) Ops.autoHistogram(ds);
+                    hist.putProperty(QDataSet.TITLE, s);
+                    hist.putProperty(QDataSet.LABEL, label);
+                    formatDataSet(hist, label + ".qds");
+                    QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
+                    if (dep0 != null) {
+                        MutablePropertyDataSet hist2 = (MutablePropertyDataSet) Ops.autoHistogram(dep0);
+                        formatDataSet(hist2, label + ".dep0.qds");
+                    } else {
+                        PrintWriter pw = new PrintWriter(label + ".dep0.qds");
+                        pw.println("no dep0");
+                        pw.close();
+                    }
+                    plot(ds);
+                    setCanvasSize(750, 300);
+                    int i = s.lastIndexOf("/");
+                    setTitle(s.substring(i + 1));
+                    writeToPng(label + ".png");
+                    
+                } catch (Exception ex) {
+                    Logger.getLogger(Test017.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+
+        int timeoutSeconds= 60;
+
+        ThreadPoolExecutor exec= new ThreadPoolExecutor(1,1,1,TimeUnit.DAYS, new ArrayBlockingQueue<Runnable>(1) );
+        exec.execute( run );
+        if ( exec.awaitTermination(  timeoutSeconds, TimeUnit.SECONDS ) ) {
+            System.err.println("okay!");
+        } else {
+            PrintWriter pw = new PrintWriter(label + ".error");
+            pw.println(s);
+            pw.println("\ntimeout in "+timeoutSeconds+" seconds.");
+
+            pw.close();
+        }
+
+
+    }
+
 }
