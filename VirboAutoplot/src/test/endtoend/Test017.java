@@ -270,7 +270,7 @@ public class Test017 {
 
         int timeoutSeconds= 60;
 
-        ThreadPoolExecutor exec= new ThreadPoolExecutor(1,1,1,TimeUnit.DAYS, new ArrayBlockingQueue<Runnable>(1) );
+        ThreadPoolExecutor exec= new ThreadPoolExecutor(1,1,3600,TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1) );
         exec.execute( run );
         if ( exec.awaitTermination(  timeoutSeconds, TimeUnit.SECONDS ) ) {
             System.err.println("okay!");
