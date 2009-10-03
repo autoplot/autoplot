@@ -4,41 +4,18 @@
  */
 package test.endtoend;
 
-import java.awt.Graphics2D;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.datum.DatumRange;
-import org.das2.datum.TimeUtil;
-import org.das2.datum.Units;
-import org.das2.graph.DasAxis;
-import org.das2.graph.DasCanvas;
-import org.das2.graph.Painter;
-import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.autoplot.AutoplotUtil;
-import org.virbo.autoplot.AutoplotUtil.AutoRangeDescriptor;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
-import org.virbo.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
-import org.virbo.metatree.MetadataUtil;
 
 /**
  * giant list of URIs for testing.  These are generally URIs that caused problems in the past, so
@@ -201,7 +178,8 @@ public class Test017 {
 
         //German umlaut is not handled when creating column name:
 
-        "032 file:/media/mini/data.backup/examples/xls/2.25_carbopol_summary.xls?firstRow=51&sheet=125 um hifreq 2&depend0=Frequenz&column=Komplexe_Viskosität",
+
+//comment because of SVN        "032 file:/media/mini/data.backup/examples/xls/2.25_carbopol_summary.xls?firstRow=51&sheet=125 um hifreq 2&depend0=Frequenz&column=Komplexe_Viskosität",
         //[edit] 8 Aggregation
 
         //Here is aggregation with CDF subsampling. This has issues. It doesn't reload when I change the parameter.
