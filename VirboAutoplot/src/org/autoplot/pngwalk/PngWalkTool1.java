@@ -393,6 +393,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         PngWalkTool1 r= new PngWalkTool1();
 
+        r.setTemplate( "file:///tmp/pngwalk/*.png" );
+        
         parent.getContentPane().add(r);
 
         parent.pack();
