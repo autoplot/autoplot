@@ -22,6 +22,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
+import javax.swing.JScrollPane;
 import org.das2.components.TearoffTabbedPane;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.datasource.DataSetSelector;
@@ -41,6 +42,22 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     
     Pattern actionMatch=null;
     String actionCommand=null;
+
+    public static void main( String[] args ) {
+        JFrame parent= new JFrame("PNG Walk Tool 1");
+
+        PngWalkTool1 r= new PngWalkTool1();
+
+        r.setTemplate( "file:///tmp/pngwalk/*.gif" );
+        
+        parent.getContentPane().add(r);
+
+        parent.pack();
+        parent.setVisible(true);
+        parent.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
+
+    }
+
 
     /** Creates new form PngWalkTool */
     public PngWalkTool1() {
@@ -89,8 +106,9 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         
         tabs= new TearoffTabbedPane();
 
-        tabs.addTab( "Grid", views[0] );
-        tabs.addTab( "One", views[2] );
+        tabs.addTab( "Grid", new JScrollPane( views[0] ) );
+        tabs.addTab( "Row", new JScrollPane( views[1] ) );
+        tabs.addTab( "One", new JScrollPane( views[2] ) );
 
         pngsPanel.add( tabs );
         pngsPanel.revalidate();
@@ -386,22 +404,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private void dataSetSelector1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataSetSelector1ActionPerformed
         setTemplate( dataSetSelector1.getValue() );
     }//GEN-LAST:event_dataSetSelector1ActionPerformed
-
-
-    public static void main( String[] args ) {
-        JFrame parent= new JFrame("PNG Walk Tool 1");
-
-        PngWalkTool1 r= new PngWalkTool1();
-
-        r.setTemplate( "file:///tmp/pngwalk/*.png" );
-        
-        parent.getContentPane().add(r);
-
-        parent.pack();
-        parent.setVisible(true);
-        parent.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
-
-    }
 
 
 
