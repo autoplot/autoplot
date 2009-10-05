@@ -25,6 +25,12 @@ public class WalkImageSequence  {
     //private List<URI> locations;
     //private boolean showMissing = false;
     private int index;
+
+    /**
+     * template used to create list.  This may be null.
+     */
+    private String template;
+
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     //public static final String PROP_SHOWMISSING = "showMissing";
@@ -32,17 +38,25 @@ public class WalkImageSequence  {
 
     /** Create an image sequence based on a URI template.
      *
-     * @param template
+     * @param template a template, or null will produce an empty walk sequence.
      */
     public WalkImageSequence(String template) {
+
         List<DatumRange> datumRanges = new ArrayList<DatumRange>();
         List<URI> uris;
-        try {
-            uris = WalkUtil.getFilesFor(template, null, datumRanges, false, null);
-        } catch (Exception ex) {
-            Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
+        
+        if ( template==null ) {
+            uris= new ArrayList<URI>();
+        } else {
+            try {
+                uris = WalkUtil.getFilesFor(template, null, datumRanges, false, null);
+            } catch (Exception ex) {
+                Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
+                throw new RuntimeException(ex);
+            }
         }
+
+        if ( uris.size()>20 ) {uris= uris.subList(0,30); }
         
         images = new ArrayList<WalkImage>();
         for (URI u : uris) {
@@ -50,16 +64,17 @@ public class WalkImageSequence  {
         }
     }
 
-    /** Create an image sequence using an explicit list of image locations.  Images
-     * in a list created via this constructor will not have any date/time information
-     * associated with them.
-     * 
-     * @param seq
-     */
-    // Could we get date/time stamps from files and use those?  Do we care?
-    public WalkImageSequence(List<URI> seq) {
-        throw new UnsupportedOperationException("Constructor not implemented.");
-    }
+//commented until questions are resolved.
+//    /** Create an image sequence using an explicit list of image locations.  Images
+//     * in a list created via this constructor will not have any date/time information
+//     * associated with them.
+//     *
+//     * @param seq
+//     */
+//    // Could we get date/time stamps from files and use those?  Do we care?
+//    public WalkImageSequence(List<URI> seq) {
+//        throw new UnsupportedOperationException("Constructor not implemented.");
+//    }
 
     public WalkImage currentImage() {
         return imageAt(index);
@@ -167,6 +182,10 @@ public class WalkImageSequence  {
 
     public void removePropertyChangeListener(PropertyChangeListener l) {
         pcs.removePropertyChangeListener(l);
+    }
+
+    public String getTemplate() {
+        return this.template;
     }
 
 }
