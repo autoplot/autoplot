@@ -21,7 +21,6 @@
               <Component id="jPanel1" max="32767" attributes="0"/>
               <EmptySpace min="12" pref="12" max="12" attributes="0"/>
           </Group>
-          <Component id="viewPanel" alignment="0" pref="605" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">

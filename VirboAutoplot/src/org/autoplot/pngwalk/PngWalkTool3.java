@@ -37,15 +37,15 @@ public class PngWalkTool3 extends javax.swing.JPanel {
         initComponents();
         dataSetSelector1.setEnableDataSource(false);
 
-        view = new GridPngWalkView(null);
+        view = new RowPngWalkView(null);
         JScrollPane scrollpane = new JScrollPane(view);
-        scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        //scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        //scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         //view2 = new SinglePngWalkView(null);
         //JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollpane, view2);
         viewPanel.add(scrollpane);
 
-        setTemplate("file:///home/jbf/autoplot_data/http/www.swpc.noaa.gov/ftpdir/lists/hpi/plots/*.gif");
+        setTemplate("file:/tmp/pngwalk/product_%Y%m%d.png");
         //setTemplate("file:/tmp/pngwalk/product_%Y%m%d.png");  //for testing
         dataSetSelector1.setValue(template);
 
@@ -195,18 +195,16 @@ public class PngWalkTool3 extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 605, Short.MAX_VALUE)
+            .add(viewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(12, 12, 12)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(12, 12, 12))
-            .add(viewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 605, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 402, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(viewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+                .add(viewPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 252, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
