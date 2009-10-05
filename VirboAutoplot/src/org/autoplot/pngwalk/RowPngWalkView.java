@@ -4,21 +4,24 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import javax.swing.Scrollable;
 
 /**
  *
  * @author Ed Jackson
  */
-public class RowPngWalkView extends PngWalkView {
+public class RowPngWalkView extends PngWalkView implements Scrollable {
 
     private int cellSize = 0;
     //private List<PngWalkThumbPanel> thumbs = new ArrayList();
 
     /** Creates new form RowPngWalkView */
-    public RowPngWalkView(WalkImageSequence seq) {
+    public RowPngWalkView(final WalkImageSequence seq) {
         super(seq);
 
         addMouseListener(new MouseAdapter() {
@@ -30,6 +33,26 @@ public class RowPngWalkView extends PngWalkView {
             }
         });
 
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                cellSize = getHeight();
+                //System.err.printf("Set cell size to %d.%n", cellSize);
+                updateLayout();
+            }
+        });
+        
+    }
+    
+    @Override
+    protected void sequenceChanged() {
+        updateLayout();
+    }
+
+    private void updateLayout() {
+        if (seq != null) setPreferredSize(new Dimension(cellSize*(seq.size()), cellSize));
+        else setPreferredSize(new Dimension(100,100));
+        revalidate();
     }
 
     private void selectCell(int n) {
@@ -38,17 +61,12 @@ public class RowPngWalkView extends PngWalkView {
     }
 
     @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(getParent().getHeight() * seq.size(), getParent().getHeight() );
-    }
-
-    @Override
     public  void paintComponent(Graphics g1) {
         super.paintComponent(g1);
         Graphics2D g2 = (Graphics2D) g1;
 
         Rectangle bounds = g2.getClipBounds();
-        cellSize = this.getHeight();
+        //cellSize = this.getHeight();
 
         int i = (int)Math.floor(bounds.x / cellSize);
         int imax =Math.min(seq.size()-1,(int)Math.ceil((bounds.x + bounds.width) / cellSize) );
@@ -63,6 +81,28 @@ public class RowPngWalkView extends PngWalkView {
             BufferedImage thumb = seq.imageAt(i).getThumbnail(cellSize-4);
             g2.drawImage(thumb, i*cellSize+(cellSize-thumb.getWidth())/2, (cellSize-thumb.getHeight())/2 , null);
         }
+    }
+
+    public Dimension getPreferredScrollableViewportSize() {
+        System.err.println("getPreferredScrollableViewportSize called");
+        return getPreferredSize();
+    }
+
+    public int getScrollableUnitIncrement(Rectangle arg0, int arg1, int arg2) {
+        return cellSize;
+    }
+
+    public int getScrollableBlockIncrement(Rectangle arg0, int arg1, int arg2) {
+        // There is integer division here, so not as redundant as it looks
+        return (this.getWidth()/cellSize) * cellSize;
+    }
+
+    public boolean getScrollableTracksViewportWidth() {
+        return false;
+    }
+
+    public boolean getScrollableTracksViewportHeight() {
+        return true;
     }
 
 }
