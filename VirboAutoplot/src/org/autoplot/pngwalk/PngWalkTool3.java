@@ -16,8 +16,8 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
+import javax.swing.JFrame;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.datasource.DataSetSelector;
 
@@ -45,7 +45,8 @@ public class PngWalkTool3 extends javax.swing.JPanel {
         //JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, scrollpane, view2);
         viewPanel.add(scrollpane);
 
-        setTemplate("file:/tmp/pngwalk/product_%Y%m%d.png");  //for testing
+        setTemplate("file:///home/jbf/autoplot_data/http/www.swpc.noaa.gov/ftpdir/lists/hpi/plots/*.gif");
+        //setTemplate("file:/tmp/pngwalk/product_%Y%m%d.png");  //for testing
         dataSetSelector1.setValue(template);
 
         dataSetSelector1.addPropertyChangeListener(DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
@@ -60,6 +61,19 @@ public class PngWalkTool3 extends javax.swing.JPanel {
 
             }
         });
+
+    }
+
+    public static void main( String[] args ) {
+        JFrame parent= new JFrame("PNG Walk Tool 3");
+
+        PngWalkTool3 r= new PngWalkTool3();
+
+        parent.getContentPane().add(r);
+
+        parent.pack();
+        parent.setVisible(true);
+        parent.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );
 
     }
 
@@ -208,7 +222,11 @@ public class PngWalkTool3 extends javax.swing.JPanel {
 }//GEN-LAST:event_buttonPrevActionPerformed
 
     private void indexSliderStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_indexSliderStateChanged
-        sequence.setIndex(indexSlider.getValue());
+        try {
+            sequence.setIndex(indexSlider.getValue());
+        } catch ( IndexOutOfBoundsException ex ) {
+            ex.printStackTrace();
+        }
 }//GEN-LAST:event_indexSliderStateChanged
 
     private void buttonLastActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLastActionPerformed
