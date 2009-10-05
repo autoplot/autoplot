@@ -32,6 +32,9 @@ public class GridPngWalkView extends PngWalkView {
 
     @Override
     public Dimension getPreferredSize() {
+        if (seq==null ) {
+            return new Dimension(200,200);
+        }
         int w = getParent().getWidth();
         int h = thumbSize * (1 + (seq.size() + 1) / Math.max(1, w / thumbSize));
         //System.err.printf("w=%d, h=%d%n",w ,h);
@@ -76,6 +79,8 @@ public class GridPngWalkView extends PngWalkView {
         // Fit as many thumbnails as possible horizontally (at least one), then go to a new row
         int cellsPerRow = Math.max(1, this.getWidth() / thumbSize);
 
+        if ( seq==null ) return;
+        
         for (int row = 0; row < (seq.size() / cellsPerRow + 1); row++) {
             for (int col = 0; col < cellsPerRow; col++) {
                 int n = (row * cellsPerRow) + col;
