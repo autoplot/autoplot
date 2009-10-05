@@ -9,6 +9,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
 import javax.swing.Scrollable;
 
 /**
@@ -61,7 +62,7 @@ public class RowPngWalkView extends PngWalkView implements Scrollable {
     }
 
     @Override
-    public  void paintComponent(Graphics g1) {
+    public void paintComponent(Graphics g1) {
         super.paintComponent(g1);
         Graphics2D g2 = (Graphics2D) g1;
 
@@ -75,10 +76,17 @@ public class RowPngWalkView extends PngWalkView implements Scrollable {
         for(; i<=imax; i++) {          
             if (i == seq.getIndex()) {
                 g2.setColor(java.awt.Color.orange);
-                g2.fillRect(i*cellSize+2, 2, cellSize-4, cellSize-4);
+                g2.fillRect(i*cellSize, 0, cellSize, cellSize);
             }
             //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
-            BufferedImage thumb = seq.imageAt(i).getThumbnail(cellSize-4);
+            BufferedImage thumb = seq.imageAt(i).getThumbnail();
+            double s = Math.min((double)(cellSize-4)/thumb.getWidth(), (double)(cellSize-4)/thumb.getHeight());
+            if (s < 1.0) {
+                int w = (int) (s * thumb.getWidth());
+                int h = (int) (s * thumb.getHeight());
+                BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
+                thumb = resizeOp.filter(thumb, null);
+            }
             g2.drawImage(thumb, i*cellSize+(cellSize-thumb.getWidth())/2, (cellSize-thumb.getHeight())/2 , null);
         }
     }

@@ -2,10 +2,10 @@ package org.autoplot.pngwalk;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
-import java.awt.image.ImageObserver;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.net.URI;
 import java.util.logging.Level;
@@ -21,17 +21,19 @@ import org.virbo.datasource.URISplit;
  * 
  * @author Ed Jackson
  */
-public class WalkImage implements Comparable<WalkImage>, ImageObserver {
+public class WalkImage implements Comparable<WalkImage> {
 
-    public static final BufferedImage LOADING_IMAGE = initLoadingImage();
+    public static final BufferedImage LOADING_IMAGE = initLoadingImage();  //get rid of this?
+    public static final String PROP_STATUS_CHANGE = "statusChange";
+    public static final int THUMB_SIZE=300;
 
     final String uriString;  // Used for sorting
     private URI imgURI;
     private BufferedImage im;
     private BufferedImage thumb;
-    private int thumbSize = 0;
     private String caption;
     private Status  status;
+    private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
     public URI getUri() {
         return imgURI;
@@ -52,6 +54,16 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
         // image and thumbnail are initialized lazily
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    private void setStatus(Status s) {
+        Status oldStatus = status;
+        status = s;
+        pcs.firePropertyChange(PROP_STATUS_CHANGE, oldStatus, status);
+    }
+
     public BufferedImage getImage() {
         if (im == null && status != Status.LOADING) {
             loadImage();
@@ -59,30 +71,28 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
         return im;
     }
 
-    public BufferedImage getThumbnail(int size) {
+    public BufferedImage getThumbnail() {
         // check validity of current thumbnail, i.e. it exists at correct size
         // if not valid, create it from the image
 
-        if (thumbSize != size) {
-            if(im == null) loadImage();
-            double aspect = (double)im.getWidth()/(double)im.getHeight();
+        if (thumb == null) {
+            if (im == null) loadImage();
 
-            int height = (int)Math.round(Math.sqrt((size*size)/(aspect*aspect + 1)));
-            int width = (int)Math.round(height*aspect);
-    
+            double aspect = (double) im.getWidth() / (double) im.getHeight();
+
+            int height = (int) Math.round(Math.sqrt((THUMB_SIZE * THUMB_SIZE) / (aspect * aspect + 1)));
+            int width = (int) Math.round(height * aspect);
+
             BufferedImageOp resizeOp = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
             thumb = resizeOp.filter(im, null);
-
-            thumbSize = size;
         }
-        //temporarily just return the image
         return thumb;
     }
 
     private void loadImage() {
         //TODO: Put image loading in a different thread so this method doesn't block on slow sites
         try {
-            //Image tkImage;
+            setStatus(Status.LOADING);
 
             URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path);
             FileSystem fs = FileSystem.create(fsRoot);
@@ -93,6 +103,7 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
             File localFile = fo.getFile();
 
             im = ImageIO.read(localFile);
+            setStatus(Status.LOADED);
             
         } catch (Exception ex) {
             System.err.println("Error loading image file from " + imgURI.toString());
@@ -100,7 +111,6 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
             status = Status.MISSING;
             throw new RuntimeException(ex);
         }
-        status = Status.LOADING;
     }
 
     private static BufferedImage initLoadingImage() {
@@ -112,20 +122,18 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
         return li;
     }
 
-    // Implements ImageObserver
-    public boolean imageUpdate(Image img, int infoflags, int x, int y, int width, int height) {
-        if ((infoflags & ImageObserver.ALLBITS) != 0) {
-            //im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            //im.getGraphics().drawImage(img, 0, 0, null);
-            status = Status.LOADED;
-            return false;
-        }
-        return true;
-    }
-
     // Implementing the Comparable interface lets List sort
     //TODO: Compare on date information first
     public int compareTo(WalkImage o) {
         return uriString.compareTo(o.uriString);
     }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+
 }
