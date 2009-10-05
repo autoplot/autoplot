@@ -33,6 +33,10 @@ public class WalkImage implements Comparable<WalkImage>, ImageObserver {
     private String caption;
     private Status  status;
 
+    public URI getUri() {
+        return imgURI;
+    }
+
     public enum Status {
         UNKNOWN,
         LOADING,
