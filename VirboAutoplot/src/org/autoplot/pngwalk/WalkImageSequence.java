@@ -195,15 +195,15 @@ public class WalkImageSequence implements PropertyChangeListener  {
     }
     // Get status changes from the images in the list
     public void propertyChange(PropertyChangeEvent e) {
-        System.err.print("Status of image " + ((WalkImage)e.getSource()).getUri());
-        System.err.println(" changed to " + e.getNewValue());
+//        System.err.print("Status of image " + ((WalkImage)e.getSource()).getUri());
+//        System.err.println(" changed to " + e.getNewValue());
         if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.LOADED) {
             int i = images.indexOf(e.getSource());
             if (i == -1) {
                 //panic because something is very very wrong
                 throw new RuntimeException("Status change from unknown image object");
             }
-            System.err.println("  Loaded index is " + i);
+            //System.err.println("  Loaded index is " + i);
             // imageLoaded is a bogus property so there's no old value.
             pcs.firePropertyChange(PROP_IMAGE_LOADED, 0, i);
         }

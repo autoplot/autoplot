@@ -26,7 +26,7 @@ public class WalkImage implements Comparable<WalkImage> {
 
     public static final BufferedImage LOADING_IMAGE = initLoadingImage();  //get rid of this?
     public static final String PROP_STATUS_CHANGE = "statusChange";
-    public static final int THUMB_SIZE=300;
+    public static final int THUMB_SIZE=200;
 
     final String uriString;  // Used for sorting
     private URI imgURI;
@@ -100,8 +100,6 @@ public class WalkImage implements Comparable<WalkImage> {
         Runnable r = new Runnable() {
             public void run() {
                 try {
-                    setStatus(Status.LOADING);
-
                     URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path);
                     FileSystem fs = FileSystem.create(fsRoot);
 

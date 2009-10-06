@@ -3,8 +3,6 @@ package org.autoplot.pngwalk;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
@@ -22,6 +20,8 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     protected WalkImageSequence seq;
     //protected boolean showMissing = false;  //Should view show placeholder for missing files?
+
+    protected static BufferedImage loadingImage = initLoadingImage();
 
     protected PngWalkView(WalkImageSequence sequence) {
         setSequence(sequence);
@@ -73,23 +73,6 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     }
 
-    /** Scale an image to the largest size that will fit in the given dimensions,
-     * but never larger than the original.
-     * @param im
-     * @param maxWidth
-     * @param maxHeight
-     * @return
-     */
-    protected static BufferedImage scaleImage(BufferedImage im, int maxWidth, int maxHeight) {
-        double xfactor = (double) maxWidth / (double) im.getWidth();
-        double yfactor = (double) maxHeight / (double) im.getHeight();
-        double s = Math.min(xfactor, yfactor);
-        s = Math.min(1.0, s);
-        System.err.println("Scale factor = " + s);
-        AffineTransformOp resizeOp = new AffineTransformOp(AffineTransform.getScaleInstance(s, s), AffineTransformOp.TYPE_BILINEAR);
-        return resizeOp.filter(im, null);
-    }
-
     protected void paintImageCentered(BufferedImage i, Graphics2D g2) {
         double xfactor = (double) getWidth() / (double) i.getWidth(null);
         double yfactor = (double) getHeight() / (double) i.getHeight(null);
@@ -101,6 +84,19 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         int ys = (int) (i.getHeight(null) * s);
         BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, -1, -1, 0, false);
         g2.drawImage(i, resizeOp, xpos, ypos);
+    }
+
+    private static BufferedImage initLoadingImage() {
+        BufferedImage li = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = li.createGraphics();
+        g2.setColor(new java.awt.Color(0.0F, 0.0F, 0.0F, 0.5F));
+        g2.fillRoundRect(0, 0, 80, 80, 10, 10);
+        //TODO: Add text or hourglass or something
+        g2.setColor(java.awt.Color.WHITE);
+        g2.fillOval(16, 54, 8, 8);
+        g2.fillOval(36, 54, 8, 8);
+        g2.fillOval(56, 54, 8, 8);
+        return li;
     }
   
 }

@@ -11,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.beans.PropertyChangeEvent;
 import javax.swing.Scrollable;
 
 /**
@@ -54,16 +55,6 @@ public class GridPngWalkView extends PngWalkView implements Scrollable {
     protected void sequenceChanged() {
         updateLayout();
     }
-//    @Override
-//    public Dimension getPreferredSize() {
-//        if (seq==null ) {
-//            return new Dimension(200,200);
-//        }
-//        int w = getParent().getWidth();
-//        int h = thumbSize * (1 + (seq.size() + 1) / Math.max(1, w / thumbSize));
-//        //System.err.printf("w=%d, h=%d%n",w ,h);
-//        return new Dimension(w, h);
-//    }
 
     private void selectCellAt(int x, int y) {
         if (x > nCols * thumbSize) {
@@ -99,13 +90,16 @@ public class GridPngWalkView extends PngWalkView implements Scrollable {
         super.paintComponent(g1);
         Graphics2D g2 = (Graphics2D) g1;
 
-        // Fit as many thumbnails as possible horizontally (at least one), then go to a new row
-        //int cellsPerRow = Math.max(1, this.getWidth() / thumbSize);
-
         if ( seq==null ) return;
-        
-        for (int row = 0; row < (seq.size() / nCols + 1); row++) {
-            for (int col = 0; col < nCols; col++) {
+
+        Rectangle bounds = g2.getClipBounds();
+        int rowMin = bounds.y / thumbSize;
+        int rowMax = Math.min((bounds.y+bounds.height)/thumbSize+1, seq.size() / nCols + 1);
+        int colMin = Math.min(bounds.x / thumbSize, nCols);
+        int colMax = Math.min((bounds.x+bounds.width)/thumbSize+1, nCols);
+
+        for (int row = rowMin; row < rowMax; row++) {
+            for (int col = colMin; col < colMax; col++) {
                 int n = (row * nCols) + col;
                 if (n >= seq.size()) {
                     break;
@@ -118,20 +112,43 @@ public class GridPngWalkView extends PngWalkView implements Scrollable {
                 }
                 //g2.draw(new Ellipse2D.Double(col * thumbSize + 2, row * thumbSize + 2, thumbSize - 4, thumbSize - 4));
                 BufferedImage thumb = seq.imageAt(n).getThumbnail();
-                if (thumb == null) continue;  //TODO: placeholder for loading image
-                double s = Math.min((double)(thumbSize-4)/thumb.getWidth(), (double)(thumbSize-4)/thumb.getHeight());
-                if (s < 1.0) {
-                    int w = (int) (s * thumb.getWidth());
-                    int h = (int) (s * thumb.getHeight());
-                    BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
-                    thumb = resizeOp.filter(thumb, null);
+                if (thumb != null) {  //TODO: placeholder for loading image
+                    double s = Math.min((double) (thumbSize - 4) / thumb.getWidth(), (double) (thumbSize - 4) / thumb.getHeight());
+                    if (s < 1.0) {
+                        int w = (int) (s * thumb.getWidth());
+                        int h = (int) (s * thumb.getHeight());
+                        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
+                        thumb = resizeOp.filter(thumb, null);
+                    }
+                    g2.drawImage(thumb, col * thumbSize + (thumbSize - thumb.getWidth()) / 2, row * thumbSize + (thumbSize - thumb.getHeight()) / 2, null);
+                } else {
+                    g2.drawImage(loadingImage, col * thumbSize + (thumbSize - loadingImage.getWidth()) / 2, row * thumbSize + (thumbSize - loadingImage.getHeight()) / 2, null);
                 }
-                g2.drawImage(thumb, col * thumbSize + (thumbSize - thumb.getWidth()) / 2, row * thumbSize + (thumbSize - thumb.getHeight()) / 2, null);
-
             }
         }
     }
 
+    @Override
+    public void propertyChange(PropertyChangeEvent e) {
+        if (e.getPropertyName().equals(WalkImageSequence.PROP_INDEX)) {
+            System.err.printf("Index changed from %d to %d%n", e.getOldValue(), e.getNewValue());
+            int i = (Integer)e.getOldValue();
+            int x = (i%nCols) * thumbSize;
+            int y = (i/nCols) * thumbSize;
+            repaint(new Rectangle(x, y, thumbSize, thumbSize));
+            i = (Integer)e.getNewValue();
+            x = (i%nCols) * thumbSize;
+            y = (i/nCols) * thumbSize;
+            repaint(new Rectangle(x, y, thumbSize, thumbSize));
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {
+            int i = (Integer)e.getNewValue();
+            System.err.printf("Image number %d finished loading%n", i);
+            int y = (i/nCols) * thumbSize;
+            int x = (i%nCols) * thumbSize;
+            repaint(new Rectangle(x, y, thumbSize, thumbSize));
+        }
+    }
+    
     public Dimension getPreferredScrollableViewportSize() {
         return getPreferredSize();
     }
