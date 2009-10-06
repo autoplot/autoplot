@@ -1,5 +1,6 @@
 package org.autoplot.pngwalk;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URI;
@@ -20,7 +21,7 @@ import org.das2.datum.DatumRange;
  * 
  * @author Ed Jackson
  */
-public class WalkImageSequence  {
+public class WalkImageSequence implements PropertyChangeListener  {
     private List<WalkImage> images;
     //private List<URI> locations;
     //private boolean showMissing = false;
@@ -35,6 +36,7 @@ public class WalkImageSequence  {
 
     //public static final String PROP_SHOWMISSING = "showMissing";
     public static final String PROP_INDEX = "index";
+    public static final String PROP_IMAGE_LOADED = "imageLoaded";
 
     /** Create an image sequence based on a URI template.
      *
@@ -56,11 +58,15 @@ public class WalkImageSequence  {
             }
         }
 
-        if ( uris.size()>20 ) {uris= uris.subList(0,30); }
+        //if ( uris.size()>20 ) {uris= uris.subList(0,30); }
         
         images = new ArrayList<WalkImage>();
         for (URI u : uris) {
             images.add(new WalkImage(u));
+        }
+
+        for (WalkImage i : images) {
+            i.addPropertyChangeListener(this);
         }
     }
 
@@ -186,6 +192,21 @@ public class WalkImageSequence  {
 
     public String getTemplate() {
         return this.template;
+    }
+    // Get status changes from the images in the list
+    public void propertyChange(PropertyChangeEvent e) {
+        System.err.print("Status of image " + ((WalkImage)e.getSource()).getUri());
+        System.err.println(" changed to " + e.getNewValue());
+        if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.LOADED) {
+            int i = images.indexOf(e.getSource());
+            if (i == -1) {
+                //panic because something is very very wrong
+                throw new RuntimeException("Status change from unknown image object");
+            }
+            System.err.println("  Loaded index is " + i);
+            // imageLoaded is a bogus property so there's no old value.
+            pcs.firePropertyChange(PROP_IMAGE_LOADED, 0, i);
+        }
     }
 
 }

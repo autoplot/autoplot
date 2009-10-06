@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.URISplit;
@@ -76,7 +77,12 @@ public class WalkImage implements Comparable<WalkImage> {
         // if not valid, create it from the image
 
         if (thumb == null) {
-            if (im == null) loadImage();
+            if (im == null) {
+                //If the image isn't loaded, initiate loading and return.  Client
+                // can listen for property change on status to send new request for thumbnail
+                loadImage();
+                return null;
+            }
 
             double aspect = (double) im.getWidth() / (double) im.getHeight();
 
@@ -90,27 +96,34 @@ public class WalkImage implements Comparable<WalkImage> {
     }
 
     private void loadImage() {
-        //TODO: Put image loading in a different thread so this method doesn't block on slow sites
-        try {
-            setStatus(Status.LOADING);
+        if (status == Status.LOADING) return;
+        Runnable r = new Runnable() {
+            public void run() {
+                try {
+                    setStatus(Status.LOADING);
 
-            URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path);
-            FileSystem fs = FileSystem.create(fsRoot);
+                    URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path);
+                    FileSystem fs = FileSystem.create(fsRoot);
 
-            String s = imgURI.toString();
-            FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/')+1));
+                    String s = imgURI.toString();
+                    FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
 
-            File localFile = fo.getFile();
+                    File localFile = fo.getFile();
 
-            im = ImageIO.read(localFile);
-            setStatus(Status.LOADED);
-            
-        } catch (Exception ex) {
-            System.err.println("Error loading image file from " + imgURI.toString());
-            Logger.getLogger(WalkImage.class.getName()).log(Level.SEVERE, null, ex);
-            status = Status.MISSING;
-            throw new RuntimeException(ex);
-        }
+                    im = ImageIO.read(localFile);
+                    setStatus(Status.LOADED);
+
+                } catch (Exception ex) {
+                    System.err.println("Error loading image file from " + imgURI.toString());
+                    Logger.getLogger(WalkImage.class.getName()).log(Level.SEVERE, null, ex);
+                    setStatus(Status.MISSING);
+                    throw new RuntimeException(ex);
+                }
+
+            }
+        };
+        setStatus(Status.LOADING);
+        RequestProcessor.invokeLater(r);
     }
 
     private static BufferedImage initLoadingImage() {
@@ -125,7 +138,7 @@ public class WalkImage implements Comparable<WalkImage> {
     // Implementing the Comparable interface lets List sort
     //TODO: Compare on date information first
     public int compareTo(WalkImage o) {
-        return uriString.compareTo(o.uriString);
+        return imgURI.compareTo(o.imgURI);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {

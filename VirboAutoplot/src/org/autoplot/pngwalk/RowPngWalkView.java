@@ -80,6 +80,7 @@ public class RowPngWalkView extends PngWalkView implements Scrollable {
             }
             //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
             BufferedImage thumb = seq.imageAt(i).getThumbnail();
+            if (thumb==null) continue; //TODO: Placeholder for loading image.
             double s = Math.min((double)(cellSize-4)/thumb.getWidth(), (double)(cellSize-4)/thumb.getHeight());
             if (s < 1.0) {
                 int w = (int) (s * thumb.getWidth());

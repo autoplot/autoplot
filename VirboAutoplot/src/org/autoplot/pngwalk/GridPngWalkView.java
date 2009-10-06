@@ -118,6 +118,7 @@ public class GridPngWalkView extends PngWalkView implements Scrollable {
                 }
                 //g2.draw(new Ellipse2D.Double(col * thumbSize + 2, row * thumbSize + 2, thumbSize - 4, thumbSize - 4));
                 BufferedImage thumb = seq.imageAt(n).getThumbnail();
+                if (thumb == null) continue;  //TODO: placeholder for loading image
                 double s = Math.min((double)(thumbSize-4)/thumb.getWidth(), (double)(thumbSize-4)/thumb.getHeight());
                 if (s < 1.0) {
                     int w = (int) (s * thumb.getWidth());
