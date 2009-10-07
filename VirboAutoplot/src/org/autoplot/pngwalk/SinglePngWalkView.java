@@ -17,7 +17,7 @@ public class SinglePngWalkView extends PngWalkView {
 
     public SinglePngWalkView(WalkImageSequence s) {
         super(s);
-
+        setShowCaptions(true);
         addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 seq.skipBy(e.getWheelRotation());
@@ -34,11 +34,11 @@ public class SinglePngWalkView extends PngWalkView {
         BufferedImage i = seq.currentImage().getImage();
 
         if (i!=null && i.getWidth(this) >0 && i.getHeight(this) > 0) {
-            paintImageCentered(i, g2);
+            paintImageCentered(i, g2, seq.currentImage().getCaption());
             cacheImage = i;
         } else {
             if (cacheImage != null)
-                paintImageCentered(cacheImage, g2);
+                paintImageCentered(cacheImage, g2, seq.currentImage().getCaption());
             paintImageCentered(loadingImage, g2);
         }
 

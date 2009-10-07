@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 public abstract class PngWalkView extends JPanel implements PropertyChangeListener {
 
     protected WalkImageSequence seq;
+    protected boolean showCaptions = false;
     //protected boolean showMissing = false;  //Should view show placeholder for missing files?
 
     protected static BufferedImage loadingImage = initLoadingImage();
@@ -54,9 +55,15 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         repaint();
     }
 
-    // Add code for managing image sequence
-    // Caption painting
-    // Missing image painting
+    public boolean isShowCaptions() {
+        return showCaptions;
+    }
+
+    public void setShowCaptions(boolean showCaptions) {
+        this.showCaptions = showCaptions;
+    }
+
+
 
     // Error message painting (e.g. "No matching images")
     protected  void drawCenteredString(Graphics2D g, String msg) {
@@ -75,6 +82,10 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     }
 
     protected void paintImageCentered(BufferedImage i, Graphics2D g2) {
+        paintImageCentered(i, g2, null);
+    }
+
+    protected void paintImageCentered(BufferedImage i, Graphics2D g2, String caption) {
         double xfactor = (double) getWidth() / (double) i.getWidth(null);
         double yfactor = (double) getHeight() / (double) i.getHeight(null);
         double s = Math.min(xfactor, yfactor);
@@ -85,6 +96,12 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         int ys = (int) (i.getHeight(null) * s);
         BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, -1, -1, 0, false);
         g2.drawImage(i, resizeOp, xpos, ypos);
+        if ( showCaptions && caption != null) {
+            FontMetrics fm = this.getFontMetrics(this.getFont());
+            int cx = xpos;
+            int cy = ypos + ys + fm.getHeight();
+            g2.drawString(caption, cx, cy);
+        }
     }
 
     private static BufferedImage initLoadingImage() {

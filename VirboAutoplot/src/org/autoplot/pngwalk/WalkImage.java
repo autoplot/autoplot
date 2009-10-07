@@ -62,6 +62,14 @@ public class WalkImage implements Comparable<WalkImage> {
         pcs.firePropertyChange(PROP_STATUS_CHANGE, oldStatus, status);
     }
 
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
+    public String getCaption() {
+        return caption;
+    }
+    
     public BufferedImage getImage() {
         if (im == null && status != Status.LOADING) {
             loadImage();
