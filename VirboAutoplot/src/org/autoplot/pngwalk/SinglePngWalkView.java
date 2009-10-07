@@ -39,7 +39,7 @@ public class SinglePngWalkView extends PngWalkView {
         } else {
             if (cacheImage != null)
                 paintImageCentered(cacheImage, g2);
-            paintImageCentered(WalkImage.LOADING_IMAGE, g2);
+            paintImageCentered(loadingImage, g2);
         }
 
     }

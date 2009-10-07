@@ -1,7 +1,5 @@
 package org.autoplot.pngwalk;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeListener;
@@ -24,7 +22,6 @@ import org.virbo.datasource.URISplit;
  */
 public class WalkImage implements Comparable<WalkImage> {
 
-    public static final BufferedImage LOADING_IMAGE = initLoadingImage();  //get rid of this?
     public static final String PROP_STATUS_CHANGE = "statusChange";
     public static final int THUMB_SIZE=200;
 
@@ -122,15 +119,6 @@ public class WalkImage implements Comparable<WalkImage> {
         };
         setStatus(Status.LOADING);
         RequestProcessor.invokeLater(r);
-    }
-
-    private static BufferedImage initLoadingImage() {
-        BufferedImage li = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = li.createGraphics();
-        g2.setColor(new Color(0.0F, 0.0F, 0.0F, 0.5F));
-        g2.fillRoundRect(0, 0, 100, 100, 10, 10);
-        //TODO: Add text or hourglass or something
-        return li;
     }
 
     // Implementing the Comparable interface lets List sort

@@ -120,10 +120,11 @@ public class GridPngWalkView extends PngWalkView implements Scrollable {
                         BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, 0, false);
                         thumb = resizeOp.filter(thumb, null);
                     }
-                    g2.drawImage(thumb, col * thumbSize + (thumbSize - thumb.getWidth()) / 2, row * thumbSize + (thumbSize - thumb.getHeight()) / 2, null);
                 } else {
-                    g2.drawImage(loadingImage, col * thumbSize + (thumbSize - loadingImage.getWidth()) / 2, row * thumbSize + (thumbSize - loadingImage.getHeight()) / 2, null);
+                    thumb = loadingImage;
                 }
+                g2.drawImage(thumb, col * thumbSize + (thumbSize - thumb.getWidth()) / 2, row * thumbSize + (thumbSize - thumb.getHeight()) / 2, null);
+
             }
         }
     }
@@ -131,7 +132,7 @@ public class GridPngWalkView extends PngWalkView implements Scrollable {
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         if (e.getPropertyName().equals(WalkImageSequence.PROP_INDEX)) {
-            System.err.printf("Index changed from %d to %d%n", e.getOldValue(), e.getNewValue());
+            //System.err.printf("Index changed from %d to %d%n", e.getOldValue(), e.getNewValue());
             int i = (Integer)e.getOldValue();
             int x = (i%nCols) * thumbSize;
             int y = (i/nCols) * thumbSize;
@@ -142,7 +143,7 @@ public class GridPngWalkView extends PngWalkView implements Scrollable {
             repaint(new Rectangle(x, y, thumbSize, thumbSize));
         } else if (e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {
             int i = (Integer)e.getNewValue();
-            System.err.printf("Image number %d finished loading%n", i);
+            //System.err.printf("Image number %d finished loading%n", i);
             int y = (i/nCols) * thumbSize;
             int x = (i%nCols) * thumbSize;
             repaint(new Rectangle(x, y, thumbSize, thumbSize));

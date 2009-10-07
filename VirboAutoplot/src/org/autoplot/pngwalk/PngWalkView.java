@@ -3,6 +3,7 @@ package org.autoplot.pngwalk;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
@@ -89,9 +90,10 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     private static BufferedImage initLoadingImage() {
         BufferedImage li = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = li.createGraphics();
+        g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
         g2.setColor(new java.awt.Color(0.0F, 0.0F, 0.0F, 0.5F));
         g2.fillRoundRect(0, 0, 80, 80, 10, 10);
-        //TODO: Add text or hourglass or something
+        //TODO: Add text or hourglass or something?
         g2.setColor(java.awt.Color.WHITE);
         g2.fillOval(16, 54, 8, 8);
         g2.fillOval(36, 54, 8, 8);
