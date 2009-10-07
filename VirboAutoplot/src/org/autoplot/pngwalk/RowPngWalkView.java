@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.beans.PropertyChangeEvent;
 import javax.swing.Scrollable;
 
 /**
@@ -92,6 +93,22 @@ public class RowPngWalkView extends PngWalkView implements Scrollable {
                 thumb = loadingImage;
             }
             g2.drawImage(thumb, i*cellSize+(cellSize-thumb.getWidth())/2, (cellSize-thumb.getHeight())/2 , null);
+        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent e) {
+        if (e.getPropertyName().equals(WalkImageSequence.PROP_INDEX)) {
+            int i = (Integer)e.getOldValue();
+            int x = (i%seq.size()) * cellSize;
+            repaint(new Rectangle(x, 0, cellSize, cellSize));
+            i = (Integer)e.getNewValue();
+            x = (i%seq.size()) * cellSize;
+            repaint(new Rectangle(x, 0, cellSize, cellSize));
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {
+            int i = (Integer)e.getNewValue();
+            int x = (i%seq.size()) * cellSize;
+            repaint(new Rectangle(x, 0, cellSize, cellSize));
         }
     }
 

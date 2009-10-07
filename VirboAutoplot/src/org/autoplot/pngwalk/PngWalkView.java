@@ -30,6 +30,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     }
 
     public final void setSequence(WalkImageSequence sequence) {
+        if (seq != null) seq.removePropertyChangeListener(this);
         seq = sequence;
         if (seq != null) {
             seq.addPropertyChangeListener(this);
@@ -39,11 +40,12 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     /**
      * Subclasses should override this method if they need to do anything special
-     * when the view gets a new image sequence.
+     * when the view gets a new image sequence.  The default implementation just
+     * calls <code>repaint()</code>.
      * @param seq
      */
     protected void sequenceChanged() {
-
+        repaint();
     }
 
     /** Respond to property changes on the {@list WalkImageSequence} this view

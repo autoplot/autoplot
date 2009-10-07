@@ -64,8 +64,16 @@ public class WalkImageSequence implements PropertyChangeListener  {
         for (int i=0; i < uris.size(); i++) {
             images.add(new WalkImage(uris.get(i)));
             //System.err.println(i + ": " + datumRanges.get(i));
-            if(datumRanges.get(i) != null) images.get(i).setCaption(datumRanges.get(i).toString());
-            else images.get(i).setCaption(uris.get(i).getPath());
+
+            String captionString;
+            if (datumRanges.get(i) != null) {
+                captionString = datumRanges.get(i).toString();
+            } else {
+                captionString = uris.get(i).getPath();
+                captionString = captionString.substring(captionString.lastIndexOf('/')+1);
+            }
+
+            images.get(i).setCaption(captionString);
         }
 
         for (WalkImage i : images) {

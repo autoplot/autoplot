@@ -20,7 +20,7 @@ public class SinglePngWalkView extends PngWalkView {
         setShowCaptions(true);
         addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
-                seq.skipBy(e.getWheelRotation());
+                if (seq!=null && seq.size()!=0 ) seq.skipBy(e.getWheelRotation());
             }
         });
     }
@@ -30,7 +30,8 @@ public class SinglePngWalkView extends PngWalkView {
         super.paintComponent(g1);
         Graphics2D g2 = (Graphics2D) g1;
 
-        //drawCenteredString(g2, "This is a long string of nonsense.");
+        if (seq == null || seq.size()==0) return;
+
         BufferedImage i = seq.currentImage().getImage();
 
         if (i!=null && i.getWidth(this) >0 && i.getHeight(this) > 0) {
