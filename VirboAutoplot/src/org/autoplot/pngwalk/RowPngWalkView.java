@@ -18,8 +18,10 @@ import javax.swing.Scrollable;
  * @author Ed Jackson
  */
 public class RowPngWalkView extends PngWalkView implements Scrollable {
+    public static final int DEFAULT_CELL_SIZE = 100;
+    public static final int MINIMUM_CELL_SIZE = 20;
 
-    private int cellSize = 0;
+    private int cellSize = DEFAULT_CELL_SIZE;
     //private List<PngWalkThumbPanel> thumbs = new ArrayList();
 
     /** Creates new form RowPngWalkView */
@@ -38,7 +40,8 @@ public class RowPngWalkView extends PngWalkView implements Scrollable {
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
-                cellSize = getHeight();
+                //cellSize = getHeight();
+                cellSize= Math.max( MINIMUM_CELL_SIZE, getHeight() );
                 //System.err.printf("Set cell size to %d.%n", cellSize);
                 updateLayout();
             }
@@ -53,7 +56,7 @@ public class RowPngWalkView extends PngWalkView implements Scrollable {
 
     private void updateLayout() {
         if (seq != null) setPreferredSize(new Dimension(cellSize*(seq.size()), cellSize));
-        else setPreferredSize(new Dimension(100,100));
+        else setPreferredSize(new Dimension(DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE));
         revalidate();
     }
 
@@ -70,6 +73,10 @@ public class RowPngWalkView extends PngWalkView implements Scrollable {
         Rectangle bounds = g2.getClipBounds();
         //cellSize = this.getHeight();
 
+        if ( seq==null ) {
+            return;
+        }
+        
         int i = (int)Math.floor(bounds.x / cellSize);
         int imax =Math.min(seq.size()-1,(int)Math.ceil((bounds.x + bounds.width) / cellSize) );
         
@@ -113,7 +120,7 @@ public class RowPngWalkView extends PngWalkView implements Scrollable {
     }
 
     public Dimension getPreferredScrollableViewportSize() {
-        System.err.println("getPreferredScrollableViewportSize called");
+        System.err.println("getPreferredScrollableViewportSize called: preferredSize="+getPreferredSize());
         return getPreferredSize();
     }
 
