@@ -22,7 +22,7 @@ import org.virbo.datasource.URISplit;
  */
 public class WalkImage implements Comparable<WalkImage> {
 
-    public static final String PROP_STATUS_CHANGE = "statusChange";
+    public static final String PROP_STATUS_CHANGE = "status"; // this should to be the same as the property name to be beany.
     public static final int THUMB_SIZE=200;
 
     final String uriString;  // Used for sorting
@@ -105,6 +105,8 @@ public class WalkImage implements Comparable<WalkImage> {
         Runnable r = new Runnable() {
             public void run() {
                 try {
+                    System.err.println("download "+imgURI );
+                    
                     URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path);
                     FileSystem fs = FileSystem.create(fsRoot);
 
@@ -114,6 +116,9 @@ public class WalkImage implements Comparable<WalkImage> {
                     File localFile = fo.getFile();
 
                     im = ImageIO.read(localFile);
+
+                    getThumbnail(); // create the thumbnail on a separate thread as well.
+                    
                     setStatus(Status.LOADED);
 
                 } catch (Exception ex) {
