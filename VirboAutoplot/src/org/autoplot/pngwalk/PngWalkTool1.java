@@ -11,6 +11,9 @@
 
 package org.autoplot.pngwalk;
 
+import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
@@ -23,6 +26,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import org.das2.components.TearoffTabbedPane;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.datasource.DataSetSelector;
@@ -43,12 +47,14 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     Pattern actionMatch=null;
     String actionCommand=null;
 
+    int returnTabIndex=0; // index of the tab we left to look at the single panel view.  TODO: account for tear off.
+
     public static void main( String[] args ) {
         JFrame parent= new JFrame("PNG Walk Tool 1");
 
         PngWalkTool1 r= new PngWalkTool1();
 
-        r.setTemplate( "file:///tmp/pngwalk/*.gif" );
+        r.setTemplate( "file:///tmp/pngwalk/*.png" );
         
         parent.getContentPane().add(r);
 
@@ -98,17 +104,41 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         } );
 
-        views= new PngWalkView[3];
+        views= new PngWalkView[4];
 
         views[0]= new GridPngWalkView( null );
         views[1]= new RowPngWalkView( null );
         views[2]= new SinglePngWalkView( null );
-        
+        views[3]= new SinglePngWalkView( null );
+
+        //views[1].setMinimumSize( new Dimension(100,100) );
+        JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane( views[1] ), views[2] );
+        p.setDividerLocation((int)(views[1].getPreferredSize().getHeight()));
         tabs= new TearoffTabbedPane();
 
         tabs.addTab( "Grid", new JScrollPane( views[0] ) );
-        tabs.addTab( "Row", new JScrollPane( views[1] ) );
-        tabs.addTab( "One", new JScrollPane( views[2] ) );
+        tabs.addTab( "Film Strip", p );
+        tabs.addTab( "Single", new JScrollPane( views[3] ) );
+
+        tabs.setSelectedIndex(1);
+        
+        // add listener to jump to and from the single image view.
+        for ( int i=0; i<views.length; i++ ) {
+            views[i].addMouseListener( new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if ( e.getClickCount()==2 ) {
+                        int oldIndex= tabs.getSelectedIndex();
+                        if ( oldIndex==2 ) {
+                            tabs.setSelectedIndex( returnTabIndex );
+                        } else {
+                            tabs.setSelectedIndex(2);
+                            returnTabIndex= oldIndex;
+                        }
+                    }
+                }
+            });
+        }
 
         pngsPanel.add( tabs );
         pngsPanel.revalidate();
@@ -184,6 +214,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         jumpToLastButton = new javax.swing.JButton();
         dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
 
+        pngsPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         pngsPanel.setLayout(new java.awt.BorderLayout());
 
         timeFilterTextField.addActionListener(new java.awt.event.ActionListener() {
@@ -258,7 +289,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+            .add(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jumpToFirstButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -273,8 +304,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(nextSetButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jumpToLastButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 220, Short.MAX_VALUE)
-                .add(addFileActionButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 188, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 337, Short.MAX_VALUE)
+                .add(addFileActionButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 122, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -308,18 +339,18 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(431, Short.MAX_VALUE))
+                .addContainerGap(458, Short.MAX_VALUE))
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 761, Short.MAX_VALUE)
+                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 785, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 812, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 609, Short.MAX_VALUE)
+                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
