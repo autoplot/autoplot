@@ -58,6 +58,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
             }
         }
 
+        this.template= template;
+        
         //if ( uris.size()>20 ) {uris= uris.subList(0,30); }
         
         images = new ArrayList<WalkImage>();
