@@ -430,7 +430,7 @@ public class PyQDataSet extends PyJavaInstance {
                     Integer step = (Integer) slice.step.__tojava__(Integer.class);
                     fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
 
-                } else if (a.isNumberType()) {
+                } else if ( a.isNumberType() && ! ( a instanceof PyQDataSet ) ) {
                     int idx = (Integer) a.__tojava__(Integer.class);
                     fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
                 } else {
@@ -472,23 +472,7 @@ public class PyQDataSet extends PyJavaInstance {
         if (o == null || o == Py.NoConversion) {
             if (arg0.isNumberType()) {
                 double d = (Double) arg0.__tojava__(Double.class);
-                if (qube.length == 0) {
-                    return DataSetUtil.asDataSet(d);
-                } else {
-                    DDataSet that = DDataSet.create(qube);
-                    QubeDataSetIterator it = new QubeDataSetIterator(that);
-                    while (it.hasNext()) {
-                        it.next();
-                        it.putValue(that, d);
-                    }
-                    for (int i = 0; i < 4; i++) {
-                        Object op = ds.property("DEPEND_" + i);
-                        if (op != null) {
-                            that.putProperty("DEPEND_" + i, op);
-                        }
-                    }
-                    return that;
-                }
+                return DataSetUtil.asDataSet(d);
             } else if (arg0.isSequenceType()) {
                 return PyQDataSetAdapter.adaptList((PyList) arg0);
             } else {
@@ -497,19 +481,8 @@ public class PyQDataSet extends PyJavaInstance {
         } else {
             QDataSet ds = (QDataSet) o;
             if (ds.rank() == 0) {
-                RankZeroDataSet r0ds = (RankZeroDataSet) ds;
-                MutablePropertyDataSet mpds;
-                if (qube.length == 1) {
-                    mpds = Ops.replicate(r0ds.value(), qube[0]);
-                } else if (qube.length == 2) {
-                    mpds = Ops.replicate(r0ds.value(), qube[0], qube[1]);
-                } else if (qube.length == 3) {
-                    mpds = Ops.replicate(r0ds.value(), qube[0], qube[1], qube[2]);
-                } else {
-                    throw new IllegalArgumentException("rank limit");
-                }
-                DataSetUtil.putProperties(DataSetUtil.getProperties(ds), mpds);
-                return mpds;
+                // QDataSet library handles coerce logic.
+                return ds;
             } else {
                 return ds;
             }
