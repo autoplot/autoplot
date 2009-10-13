@@ -11,8 +11,11 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.system.RequestProcessor;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PySystemState;
 import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.dom.Application;
 import org.virbo.datasource.DataSetURI;
 
 /**
@@ -36,11 +39,17 @@ public class JythonUtil {
         return interp;
     }
 
+    public static PythonInterpreter createInterpreter( boolean appContext, boolean sandbox, Application dom, ProgressMonitor mon ) throws IOException {
+        PythonInterpreter interp= createInterpreter(appContext, sandbox);
+        if ( dom!=null ) interp.set("dom", dom );
+        if ( mon!=null ) interp.set("monitor", mon );
+        return interp;
+    }
+
     protected static void runScript( ApplicationModel model, String script, String[] argv ) throws IOException {
         if ( argv==null ) argv= new String[] {""};
         PySystemState.initialize( PySystemState.getBaseProperties(), null, argv );
-        PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
-        interp.set("dom", model.getDocumentModel() );
+        PythonInterpreter interp = JythonUtil.createInterpreter(true, false, model.getDocumentModel(), new NullProgressMonitor() );
         URL url= DataSetURI.getURL(script);
         InputStream in= url.openStream();
         interp.execfile(in);
@@ -52,11 +61,16 @@ public class JythonUtil {
      * @param url
      */
     public static void invokeScriptSoon( final URL url ) {
+        invokeScriptSoon( url, null, new NullProgressMonitor() );
+    }
+
+    public static void invokeScriptSoon( final URL url, final Application dom, final ProgressMonitor mon ) {
         Runnable run= new Runnable() {
             public void run() {
                 try {
-                    PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+                    PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
                     interp.execfile(url.openStream(), url.toString());
+                    mon.finished();
                 } catch (IOException ex) {
                     Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
