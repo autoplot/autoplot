@@ -23,7 +23,7 @@ import org.virbo.datasource.URISplit;
 public class WalkImage implements Comparable<WalkImage> {
 
     public static final String PROP_STATUS_CHANGE = "status"; // this should to be the same as the property name to be beany.
-    public static final int THUMB_SIZE=200;
+    public static final int THUMB_SIZE=400;
 
     final String uriString;  // Used for sorting
     private URI imgURI;
