@@ -119,7 +119,7 @@ public class ApplicationControllerSyncSupport {
             application.panels.get(i).syncTo(panels[i], 
                     Arrays.asList( Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE ) );
             application.panels.get(i).setPlotId( nameMap.get(panels[i].getPlotId() ) );
-            application.panels.get(i).setRenderType( panels[i].getRenderType() );
+            application.panels.get(i).setRenderType( panels[i].getRenderType() ); // create das2 peers after setting the plotid.
             application.panels.get(i).getController().maybeCreateDasPeer();
             //application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
             application.panels.get(i).setDataSourceFilterId( nameMap.get(panels[i].getDataSourceFilterId()) );
