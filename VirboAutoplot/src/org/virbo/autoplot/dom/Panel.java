@@ -70,14 +70,18 @@ public class Panel extends DomNode {
     }
 
     public void setRenderType(RenderType renderType) {
-        if ( renderType==null ) {
-            renderType= RenderType.series; // this is caused by old files.
-        }
         RenderType oldRenderType = this.renderType;
         this.renderType = renderType;
         propertyChangeSupport.firePropertyChange(PROP_RENDERTYPE, oldRenderType, renderType);
+        this.setAutoRenderType(false);
     }
-    
+
+    public void setRenderTypeAutomatically( RenderType renderType ) {
+        RenderType oldRenderType = this.renderType;
+        this.renderType = renderType;
+        propertyChangeSupport.firePropertyChange(PROP_RENDERTYPE, oldRenderType, renderType);
+        this.setAutoRenderType(true);
+    }
     /**
      * id of the plotDefaults containing the panel.
      */
@@ -129,8 +133,16 @@ public class Panel extends DomNode {
         String oldComponent = this.component;
         this.component = component;
         propertyChangeSupport.firePropertyChange(PROP_COMPONENT, oldComponent, component);
+        this.setAutoComponent(false);
     }
 
+    public void setComponentAutomatically( String component ) {
+        String oldComponent = this.component;
+        this.component = component;
+        propertyChangeSupport.firePropertyChange(PROP_COMPONENT, oldComponent, component);
+        this.setAutoComponent(true);
+    }
+    
      /**
      * A label to (optionally) display in the plot legend.  This string will be
      * rendered by the GrannyTextRenderer.
@@ -143,12 +155,17 @@ public class Panel extends DomNode {
     }
 
     public void setLegendLabel(String legendLabel) {
-        if ( legendLabel.equals("nT") && !parentPanel.equals("") ) {
-            System.err.println("WHO'S SETTING MY LABEL?!?!?");
-        }
         String oldLegendLabel = this.legendLabel;
         this.legendLabel = legendLabel;
         propertyChangeSupport.firePropertyChange(PROP_LEGENDLABEL, oldLegendLabel, legendLabel);
+        this.setAutoLabel( false );
+    }
+
+    public void setLegendLabelAutomatically( String legendLabel ) {
+        String oldLegendLabel = this.legendLabel;
+        this.legendLabel = legendLabel;
+        propertyChangeSupport.firePropertyChange(PROP_LEGENDLABEL, oldLegendLabel, legendLabel);
+        this.setAutoLabel( true );
     }
 
     /**
@@ -168,19 +185,53 @@ public class Panel extends DomNode {
     }
 
     /**
-     * true indicates the axis label hasn't been changed by a human and may/should be autoranged.
+     * true indicates the axis label hasn't been changed manually and may/should be set automatically.
      */
-    public static final String PROP_AUTOLABEL = "autolabel";
-    protected boolean autolabel = false;
+    public static final String PROP_AUTOLABEL = "autoLabel";
+    protected boolean autoLabel = false;
 
-    public boolean isAutolabel() {
-        return autolabel;
+    public boolean isAutoLabel() {
+        return autoLabel;
     }
 
-    public void setAutolabel(boolean autolabel) {
-        boolean oldAutolabel = this.autolabel;
-        this.autolabel = autolabel;
+    public void setAutoLabel(boolean autolabel) {
+        boolean oldAutolabel = this.autoLabel;
+        this.autoLabel = autolabel;
         propertyChangeSupport.firePropertyChange(PROP_AUTOLABEL, oldAutolabel, autolabel);
+    }
+
+    /**
+     * true indicates that the renderType hasn't been changed manually and may/should be set automatically.
+     */
+    public static final String PROP_AUTORENDERTYPE = "autoRenderType";
+
+    protected boolean autoRenderType = false;
+
+    public boolean isAutoRenderType() {
+        return autoRenderType;
+    }
+
+    public void setAutoRenderType(boolean autoRenderType) {
+        boolean oldAutoRenderType = this.autoRenderType;
+        this.autoRenderType = autoRenderType;
+        propertyChangeSupport.firePropertyChange(PROP_AUTORENDERTYPE, oldAutoRenderType, autoRenderType);
+    }
+
+    /**
+     * true indicates that the component hasn't been changed manually and may/should be set automatically.
+     * This is also used to determine if child panels should be added automatically.
+     */
+    protected boolean autoComponent = false;
+    public static final String PROP_AUTOCOMPONENT = "autoComponent";
+
+    public boolean isAutoComponent() {
+        return autoComponent;
+    }
+
+    public void setAutoComponent(boolean autoComponent) {
+        boolean oldAutoComponent = this.autoComponent;
+        this.autoComponent = autoComponent;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOCOMPONENT, oldAutoComponent, autoComponent);
     }
 
     /**
@@ -234,10 +285,17 @@ public class Panel extends DomNode {
             result.add( new PropertyChangeDiff( "legendLabel", that.legendLabel, this.legendLabel ) );
         }
 
-        if ( that.autolabel!=this.autolabel ) {
-            result.add( new PropertyChangeDiff( "autolabel", that.autolabel, this.autolabel ) );
+        if ( that.autoLabel!=this.autoLabel ) {
+            result.add( new PropertyChangeDiff( PROP_AUTOLABEL, that.autoLabel, this.autoLabel ) );
         }
 
+        if ( that.autoRenderType!=this.autoRenderType ) {
+            result.add( new PropertyChangeDiff( PROP_AUTORENDERTYPE, that.autoLabel, this.autoLabel ) );
+        }
+
+        if ( that.autoComponent!=this.autoComponent ) {
+            result.add( new PropertyChangeDiff( PROP_AUTOCOMPONENT, that.autoComponent, this.autoComponent ) );
+        }
         if ( !that.displayLegend==this.displayLegend ) {
             result.add( new PropertyChangeDiff( "displayLegend", that.displayLegend, this.displayLegend ) );
         }
@@ -277,10 +335,12 @@ public class Panel extends DomNode {
         if ( !exclude.contains( PROP_PARENTPANEL ) ) this.setParentPanel(that.getParentPanel());
         if ( !exclude.contains( PROP_COMPONENT ) ) this.setComponent(that.getComponent());
         if ( !exclude.contains( PROP_LEGENDLABEL ) ) this.setLegendLabel(that.getLegendLabel());
-        if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutolabel(that.isAutolabel());
         if ( !exclude.contains( PROP_DISPLAYLEGEND ) ) this.setDisplayLegend(that.isDisplayLegend());
         if ( !exclude.contains( PROP_ACTIVE ) ) this.setActive(that.isActive());
         if ( !exclude.contains( PROP_RENDERTYPE ) ) this.setRenderType( that.getRenderType() );
+        if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
+        if ( !exclude.contains( PROP_AUTORENDERTYPE ) ) this.setAutoRenderType(that.isAutoRenderType());
+        if ( !exclude.contains( PROP_AUTOCOMPONENT ) ) this.setAutoComponent(that.isAutoComponent());
         this.style.syncTo(that.style);
         this.plotDefaults.syncTo(that.plotDefaults);
 
