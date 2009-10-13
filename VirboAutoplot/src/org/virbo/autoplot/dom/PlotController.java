@@ -579,7 +579,7 @@ public class PlotController extends DomNodeController {
     }
 
     /**
-     * set the title, leaving autolabel true.
+     * set the title, leaving autoLabel true.
      * @param title
      */
     public void setTitleAutomatically(String title) {
