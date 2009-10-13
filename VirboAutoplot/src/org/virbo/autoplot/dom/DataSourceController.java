@@ -212,6 +212,26 @@ public class DataSourceController extends DomNodeController {
 
     }
 
+    /**
+     * We isolate the flakiness by introducing a method that encapsulates the 
+     * impossible logic of know if a panel will support timeSeriesBrowse.  If
+     * it doesn't, we would just want to load the data set and be done with it.
+     * If it can then we want a tsb.
+     *
+     * The problem is that until the panel does
+     * its slicing, we don't really know if it will or not.  For now we kludge up
+     * logic based on the component string or panels where the component string
+     * won't be set automatically.
+     *
+     * @param p
+     * @return
+     */
+    private boolean doesPanelSupportTsb( Panel p ) {
+        return p.isAutoComponent() || (
+                !( p.getComponent().contains("|slice0") || p.getComponent().contains("|collapse0") ) );
+
+    }
+
     public synchronized void setDataSource(boolean valueWasAdjusting,DataSource dataSource) {
 
         if ( dataSource==null ) {
@@ -235,7 +255,12 @@ public class DataSourceController extends DomNodeController {
         } else {
             changesSupport.performingChange( this, PENDING_SET_DATA_SOURCE );
             setCaching(dataSource.getCapability(Caching.class));
-            setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
+            List<Panel> ps = dom.controller.getPanelsFor(dsf);
+            if ( this.doesPanelSupportTsb( ps.get(0) ) ) {  //TODO: flakey
+                setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
+            } else {
+                setTsb(null);
+            }
             if ( dsf.getUri()==null ) {
                 dsf.setUri( dataSource.getURI() );
                 setUriNeedsResolution(false);
@@ -258,7 +283,6 @@ public class DataSourceController extends DomNodeController {
                 setDataSet(null);
                 List<Panel> ps = dom.controller.getPanelsFor(dsf);
                 if (ps.size() > 0) {
-//TODO: flakey
                     timeSeriesBrowseController = new TimeSeriesBrowseController(this,ps.get(0));
                     timeSeriesBrowseController.setup(valueWasAdjusting);
                 }
