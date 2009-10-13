@@ -110,6 +110,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         int[] nn = new int[nw * nh];
 
         final int AVG = 0;
+        final int BG_WEIGHT=100; // weight (1-255) applied when background color is detected.
 
         boolean hasBg = true;
         int bgColor = src.getRGB(3, 3);
@@ -142,7 +143,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                 int didx = index(i1, j1);
                 int weight;
                 if (hasBg) {
-                    weight = color == bgColor ? 0 : 255;
+                    weight = color == bgColor ? BG_WEIGHT : 255;
                 } else {
                     weight = (color >> 24 & 0xff);
                 }
@@ -178,6 +179,9 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
             for (int j = 0; j < nh; j++) {
                 int didx = index(i, j);
                 int n = nn[didx];
+                if ( i==nw-1 && j==0 ) {
+                    System.err.println("here n="+n);
+                }
                 if (n > 0) {
                     int weight = aa[didx] / nn[didx];
                     if (hasBg) {
@@ -201,9 +205,9 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
                         dest.setRGB(i, j, color);
                     }
                 } else {
-                    if ( hasBg && j<=h1 ) {  // if it's not part of the reflection
-                        dest.setRGB(i, j, bgColor );
-                    }
+                    //if ( hasBg && j<=h1 ) {  // if it's not part of the reflection
+                    //    dest.setRGB(i, j, bgColor );
+                    //}
                 }
             }
         }
