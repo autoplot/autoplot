@@ -181,8 +181,6 @@ public class PanelController extends DomNodeController {
                 }
                 if ( newv.startsWith("|") ) dom.getOptions().setDataVisible(true);
                 updateDataSet();
-            } else if ( evt.getPropertyName().equals( Panel.PROP_LEGENDLABEL ) ) {
-                panel.setAutolabel(false);
             }
         }
     };
@@ -361,7 +359,7 @@ public class PanelController extends DomNodeController {
 
 //        Plot plot= this.dom.getController().getPlotFor(panel);
 //        List<Panel> panels= dom.controller.getPanelsFor( plot );
-//        if ( DomUtil.oneFamily(panels) && plot.isAutolabel() ) {
+//        if ( DomUtil.oneFamily(panels) && plot.isAutoLabel() ) {
 //            final DataSourceFilter dsf = getDataSourceFilter();
 //            String reduceRankString = dsf.controller.getReduceDataSetString();
 //            if (dsf.controller.getReduceDataSetString() != null) {
@@ -429,13 +427,13 @@ public class PanelController extends DomNodeController {
             if (resetPanel) {
                 if (panel.getComponent().equals("")) {
                     RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
-                    panel.renderType = renderType;
+                    panel.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                     resetPanel(fillDs, renderType);
                     setResetPanel(false);
                 } else if ( panel.getComponent().startsWith("|") ) {
                     QDataSet fillDs2 = processDataSet( panel.getComponent(), fillDs );
                     RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
-                    panel.renderType = renderType;
+                    panel.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                     resetPanel(fillDs2, renderType);
                     setResetPanel(false);
                 } else {
@@ -577,7 +575,7 @@ public class PanelController extends DomNodeController {
 
         if (fillDs != null) {
 
-            boolean shouldSlice= fillDs.rank()>2;
+            boolean shouldSlice= fillDs.rank()>2 && panel.isAutoComponent();
 
             boolean shouldHaveChildren= fillDs.rank() == 2
                     &&  ( renderType != RenderType.spectrogram 
@@ -589,7 +587,7 @@ public class PanelController extends DomNodeController {
             if ( shouldHaveChildren ) labels= SemanticOps.getComponentLabels(fillDs);
 
             boolean weShallAddChildren=
-                    !dom.controller.isValueAdjusting()
+                    panel.isAutoComponent()
                     && shouldHaveChildren
                     && needNewChildren( labels, getChildPanels() );
 
@@ -599,7 +597,7 @@ public class PanelController extends DomNodeController {
                     if ( dom.panels.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
                         dom.controller.deletePanel(p);
                     }
-                    panel.style.removePropertyChangeListener( p.getController().parentStyleListener );
+                    panel.getStyle().removePropertyChangeListener( p.getController().parentStyleListener );
                 }
             }
 
@@ -622,7 +620,7 @@ public class PanelController extends DomNodeController {
                 if ( !existingComponent.equals("") ) {
                     panel.setComponent( existingComponent + component );
                 } else {
-                    panel.setComponent(component);  // it'll reenter this code now.  problem--autorange is based on slice.
+                    panel.setComponent( component );  // it'll reenter this code now.  problem--autorange is based on slice.
                 }
                 doResetRenderType(panel.getRenderType());
                 return;
@@ -646,10 +644,10 @@ public class PanelController extends DomNodeController {
                     panel.getStyle().addPropertyChangeListener( cpanel.controller.parentStyleListener );
                     cpanel.getStyle().setColor(deriveColor(c, i));
                     cpanel.getStyle().setFillColor( deriveColor(fc,i).brighter() );
-                    cpanel.setComponent(labels[i]);
+                    cpanel.setComponentAutomatically(labels[i]);
                     cpanel.setDisplayLegend(true);
-                    if ( cpanel.isAutolabel() ) cpanel.setLegendLabel(labels[i].trim());
-                    cpanel.setRenderType(panel.getRenderType()); // this creates the das2 SeriesRenderer.
+                    if ( cpanel.isAutoLabel() ) cpanel.setLegendLabelAutomatically(labels[i].trim());
+                    cpanel.setRenderTypeAutomatically(panel.getRenderType()); // this creates the das2 SeriesRenderer.
                     cpanel.controller.setDataSet(fillDs);
                 }
                 for ( Panel cpanel: cp ) {
@@ -680,14 +678,16 @@ public class PanelController extends DomNodeController {
             }
             setResetPanel(true);
             setResetRanges(true);
-            panel.setAutolabel(true);
+            panel.setAutoLabel(true);
+            panel.setAutoComponent(true);
+            panel.setAutoRenderType(true);
             maybeSetPlotAutorange();
         }
     };
 
     /**
      * we'd like the plot to autorange, so check to see if we are the only
-     * panel, and if so, set its autorange and autolabel flags.
+     * panel, and if so, set its autorange and autoLabel flags.
      */
     private void maybeSetPlotAutorange() {
         Plot p= dom.controller.getPlotFor(panel);
@@ -816,7 +816,7 @@ public class PanelController extends DomNodeController {
         QDataSet fillDs = processDataSet( panel.getComponent(), getDataSourceFilter().controller.getFillDataSet() );
         Map props= processProperties( panel.getComponent(), dsc.getFillProperties() ); //TODO: support components
 
-        if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autolabel property.
+        if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autoLabel property.
 
             doMetadata(panelCopy, props, fillDs );
 
@@ -849,7 +849,7 @@ public class PanelController extends DomNodeController {
             
         }
 
-        if ( panel.getComponent().equals("") && panel.isAutolabel() ) panel.setLegendLabel( panelCopy.getLegendLabel() );
+        if ( panel.getComponent().equals("") && panel.isAutoLabel() ) panel.setLegendLabelAutomatically( panelCopy.getLegendLabel() );
 
         panelCopy.getPlotDefaults().getXaxis().setAutorange(true); // this is how we distinguish it from the original, useless plot defaults.
         panelCopy.getPlotDefaults().getYaxis().setAutorange(true);
@@ -888,7 +888,7 @@ public class PanelController extends DomNodeController {
         panelCopy.getPlotDefaults().getYaxis().setLabel("");
         panelCopy.getPlotDefaults().getZaxis().setLabel("");
         panelCopy.getPlotDefaults().setTitle("");
-        panelCopy.setLegendLabel("");
+        panelCopy.setLegendLabelAutomatically("");
         
         doInterpretMetadata(panelCopy, properties, panelCopy.getRenderType());
 
@@ -912,7 +912,7 @@ public class PanelController extends DomNodeController {
             legendLabel= (String)v;
         }
         if ( legendLabel!=null ) {
-            panelCopy.setLegendLabel((String) legendLabel);
+            panelCopy.setLegendLabelAutomatically((String) legendLabel);
         }
 
         if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
