@@ -5,6 +5,7 @@
  */
 package org.virbo.autoplot;
 
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import javax.swing.Icon;
 import org.virbo.autoplot.bookmarks.Bookmark;
@@ -33,8 +34,11 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -291,6 +295,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         addFeatures(fmodel);
         
         updateBookmarks();
+        addTools();
 
         pack();
 
@@ -1799,6 +1804,9 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
+                    Socket socket= rlistener.getSocket();
+                    SocketAddress addr=  socket.getRemoteSocketAddress();
+                    System.err.println(addr);
                     rhandler.handleRequest(rlistener.getSocket().getInputStream(), model, rlistener.getSocket().getOutputStream());
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -1881,4 +1889,56 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     private javax.swing.JMenuItem zoomInMenuItem;
     private javax.swing.JMenuItem zoomOutMenuItem;
     // End of variables declaration//GEN-END:variables
+
+    private void addTools() {
+        List<Bookmark> tools= loadTools();
+        if ( tools.size()>0 ) {
+            toolsMenu.add( new JSeparator() );
+        }
+        for ( Bookmark t: tools ) {
+            final Bookmark tt= t;
+            toolsMenu.add( new AbstractAction(t.getTitle()) {
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        String surl = ((Bookmark.Item) tt).getUrl();
+                        JythonUtil.invokeScriptSoon(DataSetURI.getURL(surl),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
+                    } catch (MalformedURLException ex) {
+                        Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } );
+        }
+    }
+
+    private List<Bookmark> loadTools() {
+        List<Bookmark> tools= new ArrayList();
+        File toolsDir= new File( FileSystem.settings().getLocalCacheDir(), "tools" );
+        if ( toolsDir.exists() ) {
+            File[] ff= toolsDir.listFiles();
+            for ( int i=0; i<ff.length; i++ ) {
+                Bookmark book= new Bookmark.Item(ff[i].toURI().toString());
+                String toolLabel= ff[i].getName();
+                // read header comments for label and description.
+                try {
+                    BufferedReader reader = new BufferedReader(new FileReader(ff[i]));
+                    String s = reader.readLine();
+                    while (s != null) {
+                        if ( s.startsWith("#") ) {
+                            if ( s.startsWith("# label:" ) ) {
+                               toolLabel= s.substring(9).trim();
+                            }
+                        } else {
+                            break;
+                        }
+                        s = reader.readLine();
+                    }
+                    reader.close();
+                } catch (IOException iOException) {
+                }
+                book.setTitle(toolLabel);
+                tools.add(book);
+            }
+        }
+        return tools;
+    }
 }
