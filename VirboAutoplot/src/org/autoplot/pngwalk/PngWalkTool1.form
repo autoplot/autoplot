@@ -22,21 +22,21 @@
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeFilterTextField" min="-2" pref="236" max="-2" attributes="0"/>
-              <EmptySpace pref="458" max="32767" attributes="0"/>
+              <EmptySpace pref="491" max="32767" attributes="0"/>
           </Group>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="dataSetSelector1" pref="788" max="32767" attributes="0"/>
+              <Component id="dataSetSelector1" pref="821" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="pngsPanel" alignment="1" pref="812" max="32767" attributes="0"/>
+          <Component id="pngsPanel" alignment="1" pref="845" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="pngsPanel" pref="421" max="32767" attributes="0"/>
+              <Component id="pngsPanel" pref="532" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dataSetSelector1" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -63,6 +63,9 @@
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
     </Container>
     <Component class="javax.swing.JTextField" name="timeFilterTextField">
+      <Properties>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeFilterTextFieldActionPerformed"/>
         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="timeFilterTextFieldFocusLost"/>
@@ -72,6 +75,7 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Display Only:"/>
         <Property name="toolTipText" type="java.lang.String" value="Enter a time range, such as &quot;2009&quot; or &quot;May 2009&quot; to limit the images displayed."/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JPanel" name="jPanel1">
@@ -86,15 +90,13 @@
                   <Component id="prevSetButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="prevButton" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
-                  <Component id="scaleComboBox" min="-2" pref="115" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="139" max="-2" attributes="0"/>
                   <Component id="nextButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="nextSetButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jumpToLastButton" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="337" max="32767" attributes="0"/>
+                  <EmptySpace pref="346" max="32767" attributes="0"/>
                   <Component id="addFileActionButton" min="-2" pref="122" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -106,7 +108,6 @@
                   <Component id="prevButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                   <Component id="nextButton" linkSize="1" min="-2" max="-2" attributes="0"/>
                   <Component id="nextSetButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="scaleComboBox" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="prevSetButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="addFileActionButton" linkSize="1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jumpToFirstButton" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -130,22 +131,6 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prevButtonActionPerformed"/>
-          </Events>
-        </Component>
-        <Component class="javax.swing.JComboBox" name="scaleComboBox">
-          <Properties>
-            <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="4">
-                <StringItem index="0" value="1-Up"/>
-                <StringItem index="1" value="7-Up"/>
-                <StringItem index="2" value="35-Up"/>
-                <StringItem index="3" value="CoverFlow"/>
-              </StringArray>
-            </Property>
-            <Property name="selectedIndex" type="int" value="1"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="scaleComboBoxActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="nextButton">

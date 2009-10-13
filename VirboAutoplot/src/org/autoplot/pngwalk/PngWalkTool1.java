@@ -11,6 +11,7 @@
 
 package org.autoplot.pngwalk;
 
+import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -27,6 +28,7 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -40,6 +42,11 @@ import org.virbo.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 import org.das2.util.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
+import org.jdesktop.beansbinding.AutoBinding;
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.BindingGroup;
+import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
@@ -52,7 +59,7 @@ import org.virbo.datasource.DataSetURI;
 public class PngWalkTool1 extends javax.swing.JPanel {
     public static final String PREF_RECENT = "pngWalkRecent";
 
-    PngWalkView[] views;
+    public PngWalkView[] views;
     TearoffTabbedPane tabs;
     
     WalkImageSequence seq;
@@ -208,6 +215,15 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         } );
         result.add(fileMenu);
 
+        BindingGroup bg= new BindingGroup();
+
+        final JMenu optionsMenu= new JMenu( "Options" );
+        JCheckBoxMenuItem persMi= new JCheckBoxMenuItem("Use Perspective");
+        bg.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, tool.views[4], BeanProperty.create("perspective"), persMi, BeanProperty.create("selected") ) );
+        bg.bind();
+        optionsMenu.add(persMi);
+        result.add( optionsMenu );
+
         final JMenu bookmarksMenu= new JMenu("Bookmarks");
         final BookmarksManager man= new BookmarksManager(f,true);
 
@@ -266,23 +282,31 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         } );
 
-        views= new PngWalkView[4];
+        views= new PngWalkView[7];
 
         views[0]= new GridPngWalkView( null );
         views[1]= new RowPngWalkView( null );
         views[2]= new SinglePngWalkView( null );
         views[3]= new SinglePngWalkView( null );
+        views[4]= new CoversWalkView( null );
+        views[5]= new SinglePngWalkView( null );
+        views[6]= new ContextFlowView(null);
 
-        //views[1].setMinimumSize( new Dimension(100,100) );
+        views[1].setMinimumSize( new Dimension(100,100) );
+        views[4].setMinimumSize( new Dimension(100,100) );
         JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
         p.setDividerLocation((int)(views[1].getPreferredSize().getHeight()));
+        JSplitPane p2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[4], views[5] );
+        p.setDividerLocation((int)(views[4].getPreferredSize().getHeight()));
         tabs= new TearoffTabbedPane();
 
+        tabs.addTab( "Single", new JScrollPane( views[3] ) );
+        tabs.addTab( "ContextFlow", views[6] );
         tabs.addTab( "Grid", views[0] );
         tabs.addTab( "Film Strip", p );
-        tabs.addTab( "Single", new JScrollPane( views[3] ) );
+        tabs.addTab( "Covers", p2 );
 
-        tabs.setSelectedIndex(1);
+        tabs.setSelectedIndex(3);
         
         // add listener to jump to and from the single image view.
         for ( int i=0; i<views.length; i++ ) {
@@ -291,10 +315,10 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 public void mouseClicked(MouseEvent e) {
                     if ( e.getClickCount()==2 ) {
                         int oldIndex= tabs.getSelectedIndex();
-                        if ( oldIndex==2 ) {
+                        if ( oldIndex==0 ) {
                             tabs.setSelectedIndex( returnTabIndex );
                         } else {
-                            tabs.setSelectedIndex(2);
+                            tabs.setSelectedIndex(0);
                             returnTabIndex= oldIndex;
                         }
                     }
@@ -368,7 +392,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         prevSetButton = new javax.swing.JButton();
         prevButton = new javax.swing.JButton();
-        scaleComboBox = new javax.swing.JComboBox();
         nextButton = new javax.swing.JButton();
         nextSetButton = new javax.swing.JButton();
         addFileActionButton = new javax.swing.JButton();
@@ -379,6 +402,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         pngsPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         pngsPanel.setLayout(new java.awt.BorderLayout());
 
+        timeFilterTextField.setEnabled(false);
         timeFilterTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 timeFilterTextFieldActionPerformed(evt);
@@ -392,6 +416,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         jLabel1.setText("Display Only:");
         jLabel1.setToolTipText("Enter a time range, such as \"2009\" or \"May 2009\" to limit the images displayed.");
+        jLabel1.setEnabled(false);
 
         prevSetButton.setText("<<<");
         prevSetButton.addActionListener(new java.awt.event.ActionListener() {
@@ -404,14 +429,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         prevButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 prevButtonActionPerformed(evt);
-            }
-        });
-
-        scaleComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "1-Up", "7-Up", "35-Up", "CoverFlow" }));
-        scaleComboBox.setSelectedIndex(1);
-        scaleComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                scaleComboBoxActionPerformed(evt);
             }
         });
 
@@ -458,15 +475,13 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(prevSetButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(prevButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(scaleComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 115, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
+                .add(139, 139, 139)
                 .add(nextButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(nextSetButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jumpToLastButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 337, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 346, Short.MAX_VALUE)
                 .add(addFileActionButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 122, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -476,14 +491,13 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(prevButton)
                 .add(nextButton)
                 .add(nextSetButton)
-                .add(scaleComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(prevSetButton)
                 .add(addFileActionButton)
                 .add(jumpToFirstButton)
                 .add(jumpToLastButton))
         );
 
-        jPanel1Layout.linkSize(new java.awt.Component[] {addFileActionButton, nextButton, nextSetButton, prevButton, prevSetButton, scaleComboBox}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        jPanel1Layout.linkSize(new java.awt.Component[] {addFileActionButton, nextButton, nextSetButton, prevButton, prevSetButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
         dataSetSelector1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -501,18 +515,18 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(458, Short.MAX_VALUE))
+                .addContainerGap(491, Short.MAX_VALUE))
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
+                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 812, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 845, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
+                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -524,48 +538,20 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void scaleComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scaleComboBoxActionPerformed
-        nextSetButton.setEnabled(true);
-        prevSetButton.setEnabled(true);
-        nextSetButton.setText(">>>");
-        prevSetButton.setText("<<<");
-        switch ( scaleComboBox.getSelectedIndex() ) {
-            case 0:
-                nextSetButton.setEnabled(false);
-                prevSetButton.setEnabled(false);
-                break;
-            case 1:
-                nextSetButton.setText("skip 7 >>>");
-                prevSetButton.setText("<<< back 7");
-                break;
-            case 2:
-                nextSetButton.setText("skip 35 >>>");
-                prevSetButton.setText("<<< back 35");
-                break;
-            case 3:
-                nextSetButton.setText("skip 7 >>>");
-                prevSetButton.setText("<<< back 7");
-                break;
-            default:
-                throw new IllegalArgumentException("bad index");
-
-        }
-    }//GEN-LAST:event_scaleComboBoxActionPerformed
-
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
-        seq.setIndex( seq.getIndex() + 1 );
+        seq.skipBy( 1 );
 }//GEN-LAST:event_nextButtonActionPerformed
 
     private void prevButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevButtonActionPerformed
-        seq.setIndex( seq.getIndex()  - 1 );
+        seq.skipBy( -1 );
     }//GEN-LAST:event_prevButtonActionPerformed
 
     private void nextSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextSetButtonActionPerformed
-        seq.setIndex( seq.getIndex() + 7 );
+        seq.skipBy( 7 );
 }//GEN-LAST:event_nextSetButtonActionPerformed
 
     private void prevSetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prevSetButtonActionPerformed
-        seq.setIndex( seq.getIndex()  - 7 );
+        seq.skipBy( -7 );
 }//GEN-LAST:event_prevSetButtonActionPerformed
 
     private void timeFilterTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFilterTextFieldActionPerformed
@@ -612,7 +598,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private javax.swing.JPanel pngsPanel;
     private javax.swing.JButton prevButton;
     private javax.swing.JButton prevSetButton;
-    private javax.swing.JComboBox scaleComboBox;
     private javax.swing.JTextField timeFilterTextField;
     // End of variables declaration//GEN-END:variables
 
