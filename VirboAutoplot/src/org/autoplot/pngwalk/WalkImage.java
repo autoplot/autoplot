@@ -105,7 +105,7 @@ public class WalkImage implements Comparable<WalkImage> {
         Runnable r = new Runnable() {
             public void run() {
                 try {
-                    System.err.println("download "+imgURI );
+                    //System.err.println("download "+imgURI );
                     
                     URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path);
                     FileSystem fs = FileSystem.create(fsRoot);

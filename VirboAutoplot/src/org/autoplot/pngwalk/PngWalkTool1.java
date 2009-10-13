@@ -274,7 +274,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         views[3]= new SinglePngWalkView( null );
 
         //views[1].setMinimumSize( new Dimension(100,100) );
-        JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane( views[1] ), views[2] );
+        JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
         p.setDividerLocation((int)(views[1].getPreferredSize().getHeight()));
         tabs= new TearoffTabbedPane();
 

@@ -36,8 +36,6 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
             seq.addPropertyChangeListener(this);
         }
         sequenceChanged();
-//        setSize( getPreferredSize() );
-//        repaint();
     }
 
     public WalkImageSequence getSequence() {
