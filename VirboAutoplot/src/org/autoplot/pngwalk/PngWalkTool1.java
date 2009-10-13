@@ -278,7 +278,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         p.setDividerLocation((int)(views[1].getPreferredSize().getHeight()));
         tabs= new TearoffTabbedPane();
 
-        tabs.addTab( "Grid", new JScrollPane( views[0] ) );
+        tabs.addTab( "Grid", views[0] );
         tabs.addTab( "Film Strip", p );
         tabs.addTab( "Single", new JScrollPane( views[3] ) );
 
