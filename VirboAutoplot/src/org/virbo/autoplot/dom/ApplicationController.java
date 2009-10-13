@@ -644,7 +644,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         panel1.setPlotId(domPlot.getId());
         panel1.setDataSourceFilterId(dsf.getId());
 
-        panel1.setAutolabel(true);
+        panel1.setAutoLabel(true);
 
         synchronized (this) {
             Panel[] p = application.getPanels();
