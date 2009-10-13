@@ -110,10 +110,11 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         int[] nn = new int[nw * nh];
 
         final int AVG = 0;
-        final int BG_WEIGHT=100; // weight (1-255) applied when background color is detected.
+        final int BG_WEIGHT=1; // weight (1-255) applied when background color is detected.
 
         boolean hasBg = true;
         int bgColor = src.getRGB(3, 3);
+        if ( ( bgColor >> 24 & 0xFF ) !=255 ) hasBg= false;
         if (src.getRGB(3, 3) != bgColor) hasBg = false;
         if (src.getRGB(3, h - 4) != bgColor) hasBg = false;
         if (src.getRGB(w - 4, 3) != bgColor) hasBg = false;
