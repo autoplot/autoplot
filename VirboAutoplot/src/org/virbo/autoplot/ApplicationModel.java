@@ -181,7 +181,6 @@ public class ApplicationModel {
         if ( label!=null ) {
             for ( Panel p: panels ) {
                 p.setLegendLabel(label);
-                p.setAutolabel(false); // TODO: kludge, it should clear this automatically
                 p.setDisplayLegend(true);
             }
         }
@@ -211,7 +210,6 @@ public class ApplicationModel {
         if ( label!=null ) {
             for ( Panel p: panels ) {
                 p.setLegendLabel(label);
-                p.setAutolabel(false); // TODO: kludge, it should clear this automatically
                 p.setDisplayLegend(true);
             }
         }
