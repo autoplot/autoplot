@@ -22,6 +22,7 @@ import java.util.List;
 public class ContextFlowView extends PngWalkView {
 
     List<Rectangle> imageBounds;
+    boolean useSquashedThumbs= true;
 
     public ContextFlowView( WalkImageSequence s ) {
         super(s);
@@ -67,7 +68,9 @@ public class ContextFlowView extends PngWalkView {
     }
 
     synchronized BufferedImage getRightImage( Image image, int width, int height, Rectangle bounds ) {
-        double magp= 0.05;
+
+        double magp= useSquashedThumbs ? 0.5 : 0.05;
+        
         //Image cacheImage = rightThumbsCache.get(image);
         Image cacheImage = null;
 
@@ -94,7 +97,7 @@ public class ContextFlowView extends PngWalkView {
     }
 
     synchronized BufferedImage getLeftImage( Image image, int width, int height, Rectangle bounds ) {
-        double magp= 0.05;
+        double magp=  useSquashedThumbs ? 0.5 : 0.05;
         //Image cacheImage = leftThumbsCache.get(image);
         Image cacheImage = null;
         
@@ -148,6 +151,8 @@ public class ContextFlowView extends PngWalkView {
 
             int currentIndex= seq.getIndex();
 
+            double sh= useSquashedThumbs ? 1. : 10.;
+
             for (int i = 0; i < columns * 2 + 1; i++) {
 
                 int index;
@@ -161,7 +166,7 @@ public class ContextFlowView extends PngWalkView {
                 if (index >= seq.size() ) continue;
 
                 boolean usedLastImage = false;
-                BufferedImage image = seq.imageAt(index).getThumbnail();
+                BufferedImage image = useSquashedThumbs ? seq.imageAt(index).getSquishedThumbnail() : seq.imageAt(index).getThumbnail();
 
                 if ( image==null ) continue;
                 
@@ -169,12 +174,11 @@ public class ContextFlowView extends PngWalkView {
                 int width = image.getWidth();
 
                 Rectangle bounds;
-                final boolean newMethod = true;
 
                 if (index < currentIndex) {
                     int x = xm - currentWidth/2 + (index - currentIndex) * shelfWidth ; // fudge
 
-                        bounds = bounds( x, y, width, height, shelfWidth, Math.min( height, shelfWidth*10 ), 0.1, false);
+                        bounds = bounds( x, y, width, height, shelfWidth, Math.min( height, shelfWidth*10 ), 1/sh, false);
                         //bounds = bounds( x, y, width, height, shelfWidth, shelfWidth*10, 0.1, false);
 
                         BufferedImage cacheImage = getRightImage( image, width, height, bounds );
@@ -222,7 +226,7 @@ public class ContextFlowView extends PngWalkView {
                 } else {
                     int x = xm + currentWidth/2 + (index - currentIndex)  * shelfWidth;
 
-                    bounds = bounds(x, y, width, height, shelfWidth, Math.min( height, shelfWidth*10 ), 0.1, false);
+                    bounds = bounds(x, y, width, height, shelfWidth, Math.min( height, shelfWidth*10 ), 1/sh, false);
 
                         Image cacheImage = getLeftImage( image, width, height, bounds );
 

@@ -123,6 +123,8 @@ public class CoversWalkView extends PngWalkView  {
 
         @Override
         public void paintComponent(Graphics g1) {
+            boolean useSquished= true;
+
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
 
@@ -137,7 +139,9 @@ public class CoversWalkView extends PngWalkView  {
             int i = (int) Math.floor(bounds.x / cellWidth);
             int imax = Math.min(seq.size() - 1, (int) Math.ceil((bounds.x + bounds.width) / cellWidth));
 
-            double pp= perspective ? 0.05 : 0.0;
+            //double pp= perspective ? 0.05 : 0.0;
+            double pp= perspective ? ( useSquished ? 0.50 : 0.05 ) : 0.0;
+            double sh= useSquished ? 1.0 : HEIGHT_WIDTH_RATIO;  // scale horizontal
 
             //System.out.printf("First: %d, Last: %d%n", i, imax);
             for (; i <= imax; i++) {
@@ -146,12 +150,17 @@ public class CoversWalkView extends PngWalkView  {
                     g2.fillRect(i * cellWidth, 0, cellWidth, cellSize);
                 }
                 //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
-                BufferedImage thumb = seq.imageAt(i).getThumbnail();
+                BufferedImage thumb = useSquished ? seq.imageAt(i).getSquishedThumbnail() :  seq.imageAt(i).getThumbnail();
                 if (thumb != null) {
                     double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4) / thumb.getHeight());
                     if (s < 1.0) {
-                        int w = (int) (s * thumb.getWidth() / HEIGHT_WIDTH_RATIO);
+                        int w = (int) (s * thumb.getWidth()/sh );
                         int h = (int) (s * thumb.getHeight());
+                        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, pp, true);
+                        thumb = resizeOp.filter(thumb, null);
+                    } else {
+                        int w = (int) (  thumb.getWidth()/sh );
+                        int h = (int) (  thumb.getHeight());
                         BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, pp, true);
                         thumb = resizeOp.filter(thumb, null);
                     }
