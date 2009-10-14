@@ -1229,7 +1229,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     public void deleteBinding(BindingModel binding) {
         Binding b = bindingImpls.get(binding);
         if ( b==null ) {
-            new IllegalArgumentException("didn't find the binding implementation, ignoring").printStackTrace();
+            new IllegalArgumentException("didn't find the binding implementation for "+binding+", ignoring").printStackTrace();
             return; //TODO: why?
         }
         b.unbind();
