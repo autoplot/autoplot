@@ -1,0 +1,43 @@
+#label: Aggregate URIs
+
+from java.util.regex import Pattern
+from java.lang import String
+
+yyyy= "/\d{4}/"
+yyyymmdd= "(?<!\d)(\d{8})(?!\d)"  #"(\d{8})"
+yyyy_mm_dd= "\d{4}([\-_])\d{2}\1\d{2}"
+
+version= "([Vv])\\d{2}" 
+
+count=0
+
+for dsf in dom.dataSourceFilters:
+   result= String( dsf.uri )
+
+   timeRange= ''
+      
+   m= Pattern.compile(yyyymmdd).matcher(result);
+   if ( m.find() ):
+       timeRange= m.group(0)
+   else:
+       m= Pattern.compile(yyyy_mm_dd).matcher(result);
+       if ( m.find() ):
+            timeRange= m.group(0);
+
+   if ( timeRange !='' ):
+       result= String( result.replaceFirst(yyyy, '/\\$Y/') )   # force to java strings so Jeremy doesn't have to learn python
+       result= String( result.replaceFirst(yyyymmdd, '\\$Y\\$m\\$d') )
+       result= String( result.replaceFirst(yyyy_mm_dd, '\\$Y$1\\$m$1\\$d' ) )
+                
+       result= String( result.replaceFirst(version, '$1..') )
+       if ( result.contains("?") ):
+            result= '%s&timerange=%s' % ( result, timeRange )
+       else:
+            result= '%s?timerange=%s' % ( result, timeRange )
+   
+   if ( result!=dsf.uri ):
+       print dsf.uri, '-->', result
+       count= count + 1
+       dsf.uri= result
+
+setStatus('aggregated %d URIs.' % count )
