@@ -180,9 +180,6 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
             for (int j = 0; j < nh; j++) {
                 int didx = index(i, j);
                 int n = nn[didx];
-                if ( i==nw-1 && j==0 ) {
-                    System.err.println("here n="+n);
-                }
                 if (n > 0) {
                     int weight = aa[didx] / nn[didx];
                     if (hasBg) {
