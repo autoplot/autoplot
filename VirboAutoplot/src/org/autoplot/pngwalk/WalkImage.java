@@ -29,6 +29,7 @@ public class WalkImage implements Comparable<WalkImage> {
     private URI imgURI;
     private BufferedImage im;
     private BufferedImage thumb;
+    private BufferedImage squishedThumb; // like thumbnail, but squished horizontally to support coverflox.
     private String caption;
     private Status  status;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
@@ -98,6 +99,18 @@ public class WalkImage implements Comparable<WalkImage> {
             thumb = resizeOp.filter(im, null);
         }
         return thumb;
+    }
+
+    public BufferedImage getSquishedThumbnail() {
+         if (squishedThumb == null) {
+            if (thumb == null) {
+                getThumbnail();
+            }
+
+            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth()/10, thumb.getHeight(), 0, 1, 1, 0, false);
+            squishedThumb = resizeOp.filter(thumb, null);
+        }
+        return squishedThumb;
     }
 
     private void loadImage() {
