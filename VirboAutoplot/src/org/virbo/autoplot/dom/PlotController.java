@@ -441,6 +441,15 @@ public class PlotController extends DomNodeController {
         BindingModel bm= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
         bms.remove(bm);
 
+        // if we aren't autoranging, then only change the bindings if there will be a conflict.
+        if ( plot.getXaxis().isAutorange()==false ) {
+            shouldBindX= bm!=null;
+            if ( bm!=null && !newSettings.getXaxis().getRange().getUnits().isConvertableTo( plot.getXaxis().getRange().getUnits() ) ) {
+                shouldBindX= false;
+                logger.finer("remove timerange binding that would cause inconvertable units");
+            }
+        }
+
         if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutorange() ) {
             if ( bms.size()==0 ) {
                 dom.setTimeRange( plot.getXaxis().getRange() );
@@ -459,14 +468,14 @@ public class PlotController extends DomNodeController {
             }
         }
         if ( bm==null && shouldBindX ) {
-            logger.finer("add binding because ranges overlap");
+            logger.finer("add binding because ranges overlap: "+ plot.getXaxis());
             dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
             //if ( !CanvasUtil.getMostBottomPlot(dom.getController().getCanvasFor(plot))==plot ) {
             //    plot.getXaxis().setDrawTickLabels(false);
             //} //TODO: could disable tick label drawing automatically.
 
         } else if ( bm!=null && !shouldBindX ) {
-            logger.finer("remove timerange binding that would cause inconvertable units");
+            logger.finer("remove binding: "+bm);
             dom.getController().deleteBinding(bm);
         }
     }
