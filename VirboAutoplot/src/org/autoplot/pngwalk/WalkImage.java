@@ -104,7 +104,9 @@ public class WalkImage implements Comparable<WalkImage> {
     public BufferedImage getSquishedThumbnail() {
          if (squishedThumb == null) {
             if (thumb == null) {
-                getThumbnail();
+                if ( getThumbnail()==null ) {
+                   return null;
+                }
             }
 
             BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth()/10, thumb.getHeight(), 0, 1, 1, 0, false);
