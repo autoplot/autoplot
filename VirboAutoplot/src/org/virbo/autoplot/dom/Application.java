@@ -256,7 +256,7 @@ public class Application extends DomNode {
     public void syncTo(DomNode n,List<String> exclude) {
         super.syncTo(n,exclude);
         if ( this.controller!=null ) {
-            this.controller.syncTo( (Application)n );
+            this.controller.syncTo( (Application)n, exclude );
         }
     }
 
