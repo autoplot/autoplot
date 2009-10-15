@@ -256,7 +256,7 @@ public class DataSourceController extends DomNodeController {
             changesSupport.performingChange( this, PENDING_SET_DATA_SOURCE );
             setCaching(dataSource.getCapability(Caching.class));
             List<Panel> ps = dom.controller.getPanelsFor(dsf);
-            if ( this.doesPanelSupportTsb( ps.get(0) ) ) {  //TODO: flakey
+            if ( ps.size()>0 && this.doesPanelSupportTsb( ps.get(0) ) ) {  //TODO: flakey
                 setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
             } else {
                 setTsb(null);
