@@ -172,7 +172,8 @@ public class ApplicationModel {
         DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
         List<Panel> panels= dom.getController().getPanelsFor( dsf );
         for ( Panel p: panels ) {
-            p.getController().setResetPanel(true);
+            p.getController().setResetPanel(true); //TODO: I would think this would be set anyway with the new datasource.
+            p.getController().setResetComponent(true);
         }
         dsf.getController().setDataSource(null);
         dsf.setUri("vap+internal:");
@@ -204,6 +205,7 @@ public class ApplicationModel {
         List<Panel> panels= dom.getController().getPanelsFor( dsf );
         for ( Panel p: panels ) {
             p.getController().setResetPanel(true);
+            p.getController().setResetComponent(true);
         }
         dsf.getController().setDataSource(null);
         dsf.setUri(suri);
