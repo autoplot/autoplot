@@ -420,6 +420,50 @@ public class PyQDataSet extends PyJavaInstance {
 
         } else {
             PySequence slices = (PySequence) arg0;
+            QDataSet[] lists= new QDataSet[slices.__len__()];
+            boolean allLists= true;
+            for (int i = 0; i < slices.__len__(); i++) {
+                PyObject a = slices.__getitem__(i);
+                if ( ! ( a instanceof PyQDataSet ) ) {
+                    allLists= false;
+                } else {
+                    lists[i]= ((PyQDataSet)a).rods;
+                }
+            }
+            if ( allLists ) {
+                int n= lists[0].length();
+                QDataSet val= coerce_ds( new int[] { n }, arg1 );
+                QubeDataSetIterator it = new QubeDataSetIterator( val );
+                if ( ds.rank()==1 ) {
+                    for ( int i=0;i<n;i++ ) {
+                        it.next();
+                        ds.putValue( (int)lists[0].value(i), it.getValue(val));
+                    }
+                } else if ( ds.rank()==2 ) {
+                    for ( int i=0;i<n;i++ ) {
+                        it.next();
+                        ds.putValue( (int)lists[0].value(i),(int)lists[1].value(i), it.getValue(val));
+                    }
+
+                } else if ( ds.rank()==3 ) {
+                    for ( int i=0;i<n;i++ ) {
+                        it.next();
+                        ds.putValue( (int)lists[0].value(i),
+                                (int)lists[1].value(i),
+                                (int)lists[2].value(i), it.getValue(val));
+                    }
+
+                } else if ( ds.rank()==4 ) {
+                    for ( int i=0;i<n;i++ ) {
+                        it.next();
+                        ds.putValue( (int)lists[0].value(i),
+                                (int)lists[1].value(i),
+                                (int)lists[2].value(i),
+                                (int)lists[2].value(i), it.getValue(val));
+                    }
+                }
+                return;
+            }
             for (int i = 0; i < slices.__len__(); i++) {
                 PyObject a = slices.__getitem__(i);
                 QubeDataSetIterator.DimensionIteratorFactory fit;
@@ -528,5 +572,9 @@ public class PyQDataSet extends PyJavaInstance {
                 }
             }
         };
+    }
+
+    public String toString() {
+        return "PyQDataSet wrapping " + rods.toString();
     }
 }
