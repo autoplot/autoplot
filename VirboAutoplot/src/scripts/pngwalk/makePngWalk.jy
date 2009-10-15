@@ -2,8 +2,6 @@
 
 import math
 
-dom= getDocumentModel()
-
 def myWriteToPng( filename, appmodel, ldom, width, height ):
   appmodel.waitUntilIdle(False);
   from org.das2.util import DasPNGEncoder, DasPNGConstants
