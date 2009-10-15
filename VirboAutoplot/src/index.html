@@ -6,10 +6,10 @@
     <H3>Autoplot Application (#{tag})</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
-	<img src="screen2.png">
-        <p><small>Autoplot GUI is simplified for new users by hiding the data and
-                layout tabs.  These tabs aren't needed for plotting a single-panel
-                of lineplots or spectrograms.
+	<img src="screen.png">
+        <p><small>A Polar/Hydra spectrogram is sliced at two points in time.  Data can now be loaded once, and
+                panels can display different slices of the data.  A new "Data" panel simplifies the axis panel
+                and specifies data operations (such as slice or histogram) before display.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -22,28 +22,19 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Recent changes include:</p>
 <ul>
-    <li>Panel slicing fixes many problems with the rank 3 slicing, and allows for alternate views of the data. (bug 2837674) </li>
-    <li>template specs like %{RANGE}, %{CONTEXT}, %{UNITS} can be used in labels.</li>
-    <li>Data Source refactorings finalize Data Source API.</li>
-    <li>Apache VFS introduced, adding initial support for sftp (public keys only)</li>
-    <li>Initial help documents added, including "getting started"</li>
-    <li>new Data tab simplifies Axis tab.</li>
-    <li>"Data" and "Layout" tabs are hidden by default, simplifying interface for new users.</li>
-    <li>Improvements to CEF reading and bugfixes.</li>
-    <li>bugfix 2865975: spaces in filename directories caused problems again (bug 2865975)</li>
-    <li>bugfix 2866709: child panels (e.g. components of Bgsm) should listen to changes in parent.</li>
-    <li>Experimental Options->Add Data Source allows data source jars to be added at runtime</li>
-    <li>Data Source Types Browser invoked when data URI to select source type for unrecognized URI, instead of RTE dialog (bug 2865971)</li>
-    <li>Runtime Exception dialog allows user comment to be submitted along with RTE data</li>
-<li>minor bugfixes.</li>
+    <li>Bugfixes in loading and saving vaps, resolved by adding autoComponent, autoRenderType, autoBinding properties</li>
+    <li>bugfix with interaction of TimeSeriesBrowse and |slice0(0) component.
+    <li>Bugfix where time range binding would be deleted in vap load and sync to.</li>
+    <li>improvements to autoranging, to support CEPPAD archive</li>
+    <li>Experimental collapse1 operator for component.</li>
+    <li>Introduce Tools menu that includes PngWalk launcher and Make PNG Script launcher.</li>
+    <li>Experimental: Tools menu discovers scripts in HOME/autoplot_data/tools.  This will probably
+        become a set of bookmarks and the bookmarks manager will allow for managing tools.</li>
+    <li>Bookmarks and recent items in PNG Walk Tool.</li>
+    
 </ul>
 <p>
 
-	<img src="screen.png">
-        <p><small>A Polar/Hydra spectrogram is sliced at two points in time.  Data can now be loaded once, and
-                panels can display different slices of the data.  A new "Data" panel simplifies the axis panel
-                and specifies data operations (such as slice or histogram) before display.
-            </small></p>
 
 <p>Known issues:</p>
 <ul>
