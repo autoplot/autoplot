@@ -424,6 +424,10 @@ public class PanelController extends DomNodeController {
     private void updateDataSet() throws IllegalArgumentException {
         QDataSet fillDs = dsf.controller.getFillDataSet();
         if (fillDs != null) {
+            if ( resetComponent ) {
+                panel.setComponentAutomatically("");
+                setResetComponent(false);
+            }
             if (resetPanel) {
                 if (panel.getComponent().equals("")) {
                     RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
@@ -673,9 +677,7 @@ public class PanelController extends DomNodeController {
      */
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            if ( !dom.getController().isValueAdjusting() ) {
-                if ( panel.getComponent().startsWith("|") ) panel.component=""; //TODO yuck danger code.
-            }
+            setResetComponent(true);
             setResetPanel(true);
             setResetRanges(true);
             panel.setAutoLabel(true);
@@ -701,6 +703,7 @@ public class PanelController extends DomNodeController {
             p.getYaxis().setAutolabel(true);
             p.getZaxis().setAutolabel(true);
             p.setAutolabel(true);
+            p.setAutoBinding(true);
         }
     }
     private void setDataSourceFilterController(final DataSourceController dsc) {
@@ -740,6 +743,27 @@ public class PanelController extends DomNodeController {
         this.resetPanel = resetPanel;
         propertyChangeSupport.firePropertyChange(PROP_RESETPANEL, oldResetPanel, resetPanel);
     }
+
+    /**
+     * true indicates that the component should be reset when the dataset arrives.  This
+     * is added as a controller property so that clients can clear this setting if
+     * they do not want the component to be reset.  This is only considered if resetPanel is
+     * set.
+     */
+    public static final String PROP_RESETCOMPONENT = "resetComponent";
+
+    protected boolean resetComponent = true;
+
+    public boolean isResetComponent() {
+        return resetComponent;
+    }
+
+    public void setResetComponent(boolean resetComponent) {
+        boolean oldResetComponent = this.resetComponent;
+        this.resetComponent = resetComponent;
+        propertyChangeSupport.firePropertyChange(PROP_RESETCOMPONENT, oldResetComponent, resetComponent);
+    }
+
 
     /**
      * true indicates the peer should be reset to the current renderType.
