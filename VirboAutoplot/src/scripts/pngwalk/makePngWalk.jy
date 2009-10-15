@@ -1,20 +1,23 @@
 #Sample script to make a set of summary plots
 
+import math
+
 dom= getDocumentModel()
 
-def myWriteToPng( filename, appmodel, dom, width, height ):
+def myWriteToPng( filename, appmodel, ldom, width, height ):
   appmodel.waitUntilIdle(False);
   from org.das2.util import DasPNGEncoder, DasPNGConstants
   out= java.io.FileOutputStream( filename )
-  image = dom.canvases[0].controller.dasCanvas.getImage(width, height);
+  image = ldom.canvases[0].controller.dasCanvas.getImage(width, height);
   encoder = DasPNGEncoder();
-  encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, java.util.Date().toString() );
+  encoder.addText( DasPNGConstants.KEYWORD_CREATION_TIME, java.util.Date().toString() );
   encoder.write(image, out)
   out.close();
 
-def doBatch( times, dom, outputFolder, product, timeFormat, mon ):
+def doBatch( times, dom, outputFolder, product, timeFormat, createThumbs, mon ):
 
    java.io.File(outputFolder).mkdirs()
+   java.io.File(outputFolder+'thumbs400/').mkdirs()
 
    n= len(times)
    mon.setTaskSize( n )
@@ -27,21 +30,45 @@ def doBatch( times, dom, outputFolder, product, timeFormat, mon ):
 
    dom2= appmodel.getDocumentModel()
 
+   if ( createThumbs ):
+      appmodel3= ApplicationModel()
+      appmodel3.addDasPeersToApp()
+      dom3= appmodel3.getDocumentModel()
+   else:
+      dom3= dom2
+
    mon.setProgressMessage('synchronize to this application')
 
    dom2.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
-
    dom2.options.autolayout= False
+   if ( createThumbs ):
+      dom3.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
+      dom3.options.autolayout= False
 
    mon.setProgressMessage('write ' + product + '.vap' )
-   from org.virbo.autoplot.state import StatePersistence
-   StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom2 );
 
    dom2.canvases[0].fitted=False
+   if ( createThumbs ): dom3.canvases[0].fitted=False
+
+   thumbSize= 400
    w0= dom2.canvases[0].width
    h0= dom2.canvases[0].height
 
+   if ( createThumbs ):
+      aspect= 1. * w0 / h0
+      thumbH= (int)( math.sqrt( thumbSize**2 / (aspect * aspect + 1. ) ) )
+      thumbW= (int) ( thumbH * aspect )
+
+      dom3.canvases[0].width= thumbW
+      dom3.canvases[0].height= thumbH
+      dom3.options.canvasFont= 'Dialog-6'
+
+   from org.virbo.autoplot.state import StatePersistence
+   StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom2 );
+   if ( createThumbs ): StatePersistence.saveState( java.io.File( outputFolder + 'thumbs400/' + product + '.vap' ), dom3 );
+
    dom2.getController().waitUntilIdle();
+   if ( createThumbs ): dom3.getController().waitUntilIdle();
 
    mon.setProgressMessage('making images')
 
@@ -53,12 +80,15 @@ def doBatch( times, dom, outputFolder, product, timeFormat, mon ):
       if ( mon.cancelled ): break
       mon.setTaskProgress(count)
       dom2.timeRange= tp.parse(i).getTimeRange()
+      if ( createThumbs ): dom3.timeRange= tp.parse(i).getTimeRange()
       mon.setProgressMessage('write '+ product + '_%s.png' % i )
-      myWriteToPng( outputFolder + product + '_%s.png' % i, appmodel, dom2, w0, h0 )
+      myWriteToPng( '%s%s_%s.png' % ( outputFolder, product, i ), appmodel, dom2, w0, h0 )
+      if ( createThumbs ): myWriteToPng( '%sthumbs400/%s_%s.png' % ( outputFolder, product, i ), appmodel3, dom3, thumbW, thumbH )
+
 
    mon.finished()
 
-from javax.swing import JPanel, BoxLayout, JTextField, JLabel, JOptionPane
+from javax.swing import JPanel, BoxLayout, JTextField, JLabel, JOptionPane, JCheckBox
 
 p= JPanel(  )
 p.layout= BoxLayout( p, BoxLayout.Y_AXIS )
@@ -80,6 +110,9 @@ p.add( JLabel( 'Time Range:' ) )
 timeRangeTf= JTextField( '2009' )
 p.add( timeRangeTf )
 
+createThumbsCb= JCheckBox( 'Create Thumbs' )
+p.add( createThumbsCb )
+
 outputFolder=0
 timeRangeStr=0
 fln_root=0
@@ -90,6 +123,7 @@ if ( JOptionPane.showConfirmDialog( getViewWindow(), p, 'pngwalk options', JOpti
   timeRangeStr= timeRangeTf.text
   fln_root=  fln_rootTf.text
   timeFormat= timeFormatTf.text
+  createThumbs= createThumbsCb.selected
   proceed= True
 else:
   proceed= False
@@ -103,7 +137,7 @@ if ( proceed ):
 
    times= generateTimeRanges( timeFormat, timeRangeStr )
 
-   doBatch( times, dom, outputFolder, fln_root, timeFormat, mon )
+   doBatch( times, dom, outputFolder, fln_root, timeFormat, createThumbs, mon )
 
    if ( not mon.cancelled ):
 
