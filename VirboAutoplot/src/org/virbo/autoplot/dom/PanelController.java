@@ -405,7 +405,11 @@ public class PanelController extends DomNodeController {
                 return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
             }
             QDataSet fillDs = dsf.controller.getFillDataSet();
-            logger.fine("" + panel + " got new dataset: " + fillDs + "  resetPanel=" + resetPanel + "  resetRanges=" + resetRanges);
+            logger.fine("" + panel + " got new dataset: " + fillDs + "  resetComponent="+ resetComponent + "  resetPanel=" + resetPanel + "  resetRanges=" + resetRanges);
+            if ( resetComponent ) {
+                panel.component="";
+                setResetComponent(false);
+            }
             updateDataSet();
             changesSupport.changePerformed( this, PENDING_SET_DATASET );
         }
@@ -424,10 +428,6 @@ public class PanelController extends DomNodeController {
     private void updateDataSet() throws IllegalArgumentException {
         QDataSet fillDs = dsf.controller.getFillDataSet();
         if (fillDs != null) {
-            if ( resetComponent ) {
-                panel.setComponentAutomatically("");
-                setResetComponent(false);
-            }
             if (resetPanel) {
                 if (panel.getComponent().equals("")) {
                     RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
