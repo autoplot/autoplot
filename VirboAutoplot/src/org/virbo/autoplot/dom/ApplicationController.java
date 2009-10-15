@@ -52,7 +52,6 @@ import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.layout.LayoutConstants;
-import org.virbo.autoplot.layout.LayoutUtil;
 import org.virbo.autoplot.util.RunLaterListener;
 
 /**
@@ -720,6 +719,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         domPlot.getYaxis().setAutolabel(true);
         domPlot.getZaxis().setAutolabel(true);
         domPlot.setAutolabel(true);
+        domPlot.setAutoBinding(true);
 
         domPlot.setRowId( domRow.getId() );
         domPlot.setColumnId( canvas.getMarginColumn().getId() );
@@ -831,6 +831,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         for (Panel newp : newPanels) {
             newp.getController().setResetRanges(false);
+            newp.getController().setResetComponent(false);
             newp.getController().setResetPanel(false);
             newp.getController().setResetRenderType(false);
         }
@@ -1591,14 +1592,14 @@ public class ApplicationController extends DomNodeController implements RunLater
         ac.bind(application.options, "canvasFont", canvas, "baseFont", DomUtil.STRING_TO_FONT );
     }
 
-    protected synchronized void syncTo(Application that) {
+    protected synchronized void syncTo( Application that, List<String> exclude ) {
         MutatorLock lock = changesSupport.mutatorLock();
         lock.lock();
 
         canvasLock = canvas.controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
 
-        application.getOptions().syncTo(that.getOptions(),
+        if ( !exclude.contains("options") ) application.getOptions().syncTo(that.getOptions(),
                 Arrays.asList(Options.PROP_OVERRENDERING,
                 Options.PROP_LOGCONSOLEVISIBLE,
                 Options.PROP_SCRIPTVISIBLE,
@@ -1615,9 +1616,13 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         if ( !this.application.id.equals( that.id ) ) nameMap.put( that.id, this.application.id );
 
-        syncSupport.syncToCanvases(that.getCanvases(),nameMap);
+        if ( !exclude.contains("canvases") ) syncSupport.syncToCanvases(that.getCanvases(),nameMap);
 
-        syncSupport.syncToPlotsAndPanels( that.getPlots(), that.getPanels(), that.getDataSourceFilters(), nameMap );
+        if ( !exclude.contains("plots") ) syncSupport.syncToPlots( that.getPlots(),nameMap );
+
+        if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
+
+        if ( !exclude.contains("panels") )  syncSupport.syncToPanels(that.getPanels(), nameMap);
 
         application.setTimeRange(that.getTimeRange());
 
@@ -1632,6 +1637,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         for (Panel p : application.getPanels()) {  // kludge to avoid reset range
             p.controller.setResetPanel(false);
+            p.controller.setResetComponent(false);
             p.controller.doResetRenderType( p.getRenderType() );
             p.controller.setResetRenderType(false);
         }
