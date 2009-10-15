@@ -1587,7 +1587,7 @@ private void pngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//G
 }//GEN-LAST:event_pngWalkMenuItemActionPerformed
 
 private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPngWalkMenuItemActionPerformed
-    JythonUtil.invokeScriptSoon( AutoPlotUI.class.getResource("/scripts/pngwalk/makePngWalk.jy") );
+    JythonUtil.invokeScriptSoon( AutoPlotUI.class.getResource("/scripts/pngwalk/makePngWalk.jy"), applicationModel.dom, null );
 }//GEN-LAST:event_createPngWalkMenuItemActionPerformed
 
 private void aggregateAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aggregateAllMenuItemActionPerformed
