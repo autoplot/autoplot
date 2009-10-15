@@ -335,6 +335,8 @@ public class ApplicationModel {
                 } catch (ParserConfigurationException e) {
                     return new ArrayList<Bookmark>();
                 }
+            } else {
+                return new ArrayList<Bookmark>();
             }
         } else {
             try {
