@@ -64,7 +64,19 @@ public class JythonUtil {
         invokeScriptSoon( url, null, new NullProgressMonitor() );
     }
 
-    public static void invokeScriptSoon( final URL url, final Application dom, final ProgressMonitor mon ) {
+    /**
+     * run the script on its own thread.  
+     * @param url
+     * @param dom, if null, then null is passed into the script and the script must not use dom.
+     * @param mon, if null, then a NullProgressMonitor is created.
+     */
+    public static void invokeScriptSoon( final URL url, final Application dom, ProgressMonitor mon1 ) {
+        final ProgressMonitor mon;
+        if ( mon1==null ) {
+            mon= new NullProgressMonitor();
+        } else {
+            mon= mon1;
+        }
         Runnable run= new Runnable() {
             public void run() {
                 try {
