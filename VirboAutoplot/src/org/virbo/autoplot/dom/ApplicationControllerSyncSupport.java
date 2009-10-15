@@ -34,6 +34,30 @@ public class ApplicationControllerSyncSupport {
         }
     }
 
+    protected void syncToPanels(Panel[] panels, Map<String, String> nameMap) {
+        while (application.panels.size() < panels.length) {
+            int i = application.panels.size();
+            String idd = panels[i].getPlotId();
+            Plot p = null;
+            for (int j = 0; j < application.getPlots().length; j++) {
+                if (application.getPlots(j).getId().equals(idd))
+                    p = application.getPlots(j);
+            }
+            controller.addPanel(p, null);
+        }
+        while (application.panels.size() > panels.length) {
+            controller.deletePanel(application.panels.get(application.panels.size() - 1));
+        }
+        for (int i = 0; i < panels.length; i++) {
+            application.panels.get(i).syncTo(panels[i], Arrays.asList(Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE));
+            application.panels.get(i).setPlotId(nameMap.get(panels[i].getPlotId()));
+            application.panels.get(i).setRenderType(panels[i].getRenderType()); // create das2 peers after setting the plotid.
+            application.panels.get(i).getController().maybeCreateDasPeer();
+            //application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
+            application.panels.get(i).setDataSourceFilterId(nameMap.get(panels[i].getDataSourceFilterId()));
+        }
+    }
+
     protected void syncToPlots( Plot[] plots, Map<String,String> nameMap ) {
         List<Diff> diffs= DomUtil.getArrayDiffs( "plots", plots, application.getPlots() );
         for ( Diff d: diffs ) {
@@ -81,51 +105,6 @@ public class ApplicationControllerSyncSupport {
             }
             nameMap.put( p.getId(), p.getId() );  //DANGER--this is intentionally the same.
         }
-    }
-
-    protected void syncToPlotsAndPanels( Plot[] plots, Panel[] panels, DataSourceFilter[] dataSourceFilters ,Map<String,String> nameMap) {
-
-        syncToPlots(plots,nameMap);
-
-        while (application.dataSourceFilters.size() < dataSourceFilters.length) {
-            controller.addDataSourceFilter();
-        }
-        while (application.dataSourceFilters.size() > dataSourceFilters.length) {
-            DataSourceFilter dsf= application.dataSourceFilters.get(application.dataSourceFilters.size() - 1);
-            List<Panel> panelss= controller.getPanelsFor(dsf);
-            for ( Panel panell:panelss ) {
-                panell.setDataSourceFilterId(""); // make it an orphan -- it should get deleted
-            }
-        }
-        for (int i = 0; i < dataSourceFilters.length; i++) {
-            application.dataSourceFilters.get(i).syncTo(dataSourceFilters[i]);
-            nameMap.put( dataSourceFilters[i].getId(), application.dataSourceFilters.get(i).getId() );
-        }
-
-        while (application.panels.size() < panels.length) {
-            int i = application.panels.size();
-            String idd = panels[i].getPlotId();
-            Plot p = null;
-            for (int j = 0; j < plots.length; j++) {
-                if (application.getPlots(j).getId().equals(idd)) p = application.getPlots(j);
-            }
-            controller.addPanel(p,null);
-        }
-        while (application.panels.size() > panels.length) {
-            controller.deletePanel( application.panels.get(application.panels.size() - 1));
-        }
-
-        for (int i = 0; i < panels.length; i++) {
-            application.panels.get(i).syncTo(panels[i], 
-                    Arrays.asList( Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE ) );
-            application.panels.get(i).setPlotId( nameMap.get(panels[i].getPlotId() ) );
-            application.panels.get(i).setRenderType( panels[i].getRenderType() ); // create das2 peers after setting the plotid.
-            application.panels.get(i).getController().maybeCreateDasPeer();
-            //application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
-            application.panels.get(i).setDataSourceFilterId( nameMap.get(panels[i].getDataSourceFilterId()) );
-        }
-
-
     }
 
     protected void syncConnectors( Connector[] connectors ) {
@@ -215,6 +194,23 @@ public class ApplicationControllerSyncSupport {
         }
          */
 
+    }
+
+    protected void syncToDataSourceFilters(DataSourceFilter[] dataSourceFilters, Map<String, String> nameMap) {
+        while (application.dataSourceFilters.size() < dataSourceFilters.length) {
+            controller.addDataSourceFilter();
+        }
+        while (application.dataSourceFilters.size() > dataSourceFilters.length) {
+            DataSourceFilter dsf = application.dataSourceFilters.get(application.dataSourceFilters.size() - 1);
+            List<Panel> panelss = controller.getPanelsFor(dsf);
+            for (Panel panell : panelss) {
+                panell.setDataSourceFilterId(""); // make it an orphan -- it should get deleted
+            }
+        }
+        for (int i = 0; i < dataSourceFilters.length; i++) {
+            application.dataSourceFilters.get(i).syncTo(dataSourceFilters[i]);
+            nameMap.put(dataSourceFilters[i].getId(), application.dataSourceFilters.get(i).getId());
+        }
     }
 
 }
