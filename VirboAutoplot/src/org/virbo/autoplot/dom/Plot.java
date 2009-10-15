@@ -84,6 +84,23 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_AUTOLABEL, oldAutolabel, autolabel);
     }
 
+    /**
+     * indicates the application is allowed to automatically create bindings to
+     * the plot, typically when it is first created.
+     */
+    public static final String PROP_AUTOBINDING = "autoBinding";
+    protected boolean autoBinding = false;
+
+    public boolean isAutoBinding() {
+        return autoBinding;
+    }
+
+    public void setAutoBinding(boolean autoBinding) {
+        boolean oldAutoBinding = this.autoBinding;
+        this.autoBinding = autoBinding;
+        propertyChangeSupport.firePropertyChange(PROP_AUTOBINDING, oldAutoBinding, autoBinding);
+    }
+
     protected boolean isotropic = false;
     public static final String PROP_ISOTROPIC = "isotropic";
 
