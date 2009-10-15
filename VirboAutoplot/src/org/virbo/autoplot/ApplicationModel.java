@@ -366,7 +366,7 @@ public class ApplicationModel {
                 try {
                     URL url = new URL(surl);
                     bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(url.openStream()).getDocumentElement());
-                    prefs.put("bookmarks", Bookmark.formatBooks(recent));
+                    prefs.put("bookmarks", Bookmark.formatBooks(bookmarks));
                     try {
                         prefs.flush();
                     } catch (BackingStoreException ex) {
