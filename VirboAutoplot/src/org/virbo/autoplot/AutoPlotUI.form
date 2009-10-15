@@ -362,6 +362,15 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="createPngWalkMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="aggregateAllMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Aggregate All"/>
+                <Property name="toolTipText" type="java.lang.String" value="Attempt to aggregate all the URIs on the product, keeping other DOM settings.&#xa;"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="aggregateAllMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="bookmarksMenu">

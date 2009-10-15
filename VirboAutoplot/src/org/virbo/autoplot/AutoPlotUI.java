@@ -933,6 +933,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         toolsMenu = new javax.swing.JMenu();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
+        aggregateAllMenuItem = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
         autoplotHelpMenuItem = new javax.swing.JMenuItem();
@@ -1252,6 +1253,15 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
         toolsMenu.add(createPngWalkMenuItem);
+
+        aggregateAllMenuItem.setText("Aggregate All");
+        aggregateAllMenuItem.setToolTipText("Attempt to aggregate all the URIs on the product, keeping other DOM settings.\n");
+        aggregateAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aggregateAllMenuItemActionPerformed(evt);
+            }
+        });
+        toolsMenu.add(aggregateAllMenuItem);
 
         jMenuBar1.add(toolsMenu);
 
@@ -1580,6 +1590,10 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
     JythonUtil.invokeScriptSoon( AutoPlotUI.class.getResource("/scripts/pngwalk/makePngWalk.jy") );
 }//GEN-LAST:event_createPngWalkMenuItemActionPerformed
 
+private void aggregateAllMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aggregateAllMenuItemActionPerformed
+    JythonUtil.invokeScriptSoon( AutoPlotUI.class.getResource("/scripts/aggregateAll.jy"), applicationModel.dom, null );
+}//GEN-LAST:event_aggregateAllMenuItemActionPerformed
+
 private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -1833,6 +1847,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
+    private javax.swing.JMenuItem aggregateAllMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLabellingCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLayoutCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem autoRangingCheckBoxMenuItem;
