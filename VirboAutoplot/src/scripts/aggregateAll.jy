@@ -2,6 +2,7 @@
 
 from java.util.regex import Pattern
 from java.lang import String
+from java.util import Collections
 
 yyyy= "/\d{4}/"
 yyyymmdd= "(?<!\d)(\d{8})(?!\d)"  #"(\d{8})"
@@ -10,6 +11,8 @@ yyyy_mm_dd= "\d{4}([\-_])\d{2}\1\d{2}"
 version= "([Vv])\\d{2}" 
 
 count=0
+
+oldDom= dom.copy()
 
 for dsf in dom.dataSourceFilters:
    result= String( dsf.uri )
@@ -40,4 +43,18 @@ for dsf in dom.dataSourceFilters:
        count= count + 1
        dsf.uri= result
 
+   for p in dom.controller.getPanelsFor(dsf):  # kludge to avoid reset range see ApplicationController.syncTo
+       p.controller.setResetComponent(False)
+       p.controller.setResetPanel(False)
+       p.controller.doResetRenderType( p.getRenderType() )
+       p.controller.setResetRenderType(False)
+       p.setAutoLabel( False )
+       p.setAutoComponent( False )
+       p.setAutoRenderType( False )
+
 setStatus('aggregated %d URIs.' % count )
+
+dom.syncTo( oldDom, Collections.singletonList( 'dataSourceFilters' ) )
+
+for d in dom.diffs(oldDom):
+  print d.getDescription()
