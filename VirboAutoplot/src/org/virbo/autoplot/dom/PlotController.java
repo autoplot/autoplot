@@ -441,6 +441,10 @@ public class PlotController extends DomNodeController {
         BindingModel bm= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
         bms.remove(bm);
 
+        if ( ! plot.isAutoBinding() ) {
+            return;
+        }
+
         // if we aren't autoranging, then only change the bindings if there will be a conflict.
         if ( plot.getXaxis().isAutorange()==false ) {
             shouldBindX= bm!=null;
@@ -478,6 +482,9 @@ public class PlotController extends DomNodeController {
             logger.finer("remove binding: "+bm);
             dom.getController().deleteBinding(bm);
         }
+
+        plot.setAutoBinding(false);
+        
     }
 
     /**
