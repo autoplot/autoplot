@@ -192,14 +192,20 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * check that the string uri is aggregating by looking for %Y's (etc) in the
+     * file part of the URI.
+     * @param surl
+     * @return
+     */
     public static boolean isAggregating(String surl) {
         int iquest = surl.indexOf("?");
-        if (iquest == -1) iquest = surl.length();
-        int ipercy = surl.lastIndexOf("%Y", iquest);
-        if (ipercy == -1) ipercy = surl.lastIndexOf("%25", iquest);
-        if (ipercy == -1) ipercy = surl.lastIndexOf("$Y", iquest);
-        if (ipercy == -1) ipercy = surl.lastIndexOf("%y", iquest);
-        if (ipercy == -1) ipercy = surl.lastIndexOf("$y", iquest);
+        if ( iquest>0 ) surl= surl.substring(0,iquest);
+        surl= surl.replaceAll("%25", "%");
+        int ipercy = surl.lastIndexOf("%Y");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$Y");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("%y");
+        if (ipercy == -1) ipercy = surl.lastIndexOf("$y");
         if (ipercy != -1) {
             return true;
         } else {
