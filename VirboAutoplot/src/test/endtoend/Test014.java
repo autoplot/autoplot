@@ -22,7 +22,7 @@ import org.virbo.jythonsupport.Util;
 
 
 /**
- * challenging guess cadence
+ * tests of autoranging
  * @author jbf
  */
 public class Test014 {
