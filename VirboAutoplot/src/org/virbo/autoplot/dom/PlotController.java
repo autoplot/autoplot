@@ -149,9 +149,9 @@ public class PlotController extends DomNodeController {
         DasAxis yaxis = new DasAxis(y.min(), y.max(), DasAxis.VERTICAL);
 
         xaxis.setEnableHistory(false);
-        xaxis.setUseDomainDivider(true);
+        //xaxis.setUseDomainDivider(true);
         yaxis.setEnableHistory(false);
-        yaxis.setUseDomainDivider(true);
+        //yaxis.setUseDomainDivider(true);
 
         if (UnitsUtil.isTimeLocation(xaxis.getUnits())) {
             xaxis.setUserDatumFormatter(new DateTimeDatumFormatter());
@@ -181,7 +181,7 @@ public class PlotController extends DomNodeController {
         colorbar.addFocusListener(application.controller.focusAdapter);
         colorbar.setFillColor(new java.awt.Color(0, true));
         colorbar.setEnableHistory(false);
-        colorbar.setUseDomainDivider(true);
+        //colorbar.setUseDomainDivider(true);
 
         DasCanvas dasCanvas = canvas.controller.getDasCanvas();
 
