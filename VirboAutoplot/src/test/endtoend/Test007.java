@@ -41,7 +41,7 @@ public class Test007 {
         }
 
         plot( ds );
-        setCanvasSize( 750, 300 );
+        
         int i= uri.lastIndexOf("/");
         setTitle(uri.substring(i+1));
         writeToPng( String.format( "test007_%03d.png", id ) );
@@ -51,6 +51,10 @@ public class Test007 {
     
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
+
+            setCanvasSize(750, 300);
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             doTest( 0, "vap+tsds:http://timeseries.org/get.cgi?StartDate=19980101&EndDate=20090101&ppd=1&ext=bin&out=tsml&param1=NGDC_NOAA15_SEM2-33-v0" );
             doTest( 1, "vap+tsds:http://timeseries.org/cgi-bin/get.cgi?StartDate=19900301&EndDate=19900302&ppd=24&ext=bin&out=bin&param1=SourceAcronym_Subset2-1-v0");
