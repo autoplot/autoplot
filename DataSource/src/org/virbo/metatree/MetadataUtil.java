@@ -157,6 +157,9 @@ public class MetadataUtil {
                 int dim= cmd.charAt(6)-'0';
                 int idx= s.nextInt();
                 properties= sliceProperties( properties, dim );
+            } else if ( cmd.startsWith("|collapse") ) {
+                int dim= cmd.charAt(9)-'0';
+                properties= sliceProperties( properties, dim );
             } else if ( cmd.equals("|autoHistogram") ) {
                 Map<String,Object> newproperties= new HashMap<String,Object>();
                 newproperties.put( QDataSet.DEPEND_0, properties );
