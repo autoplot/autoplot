@@ -386,6 +386,14 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="helpMenuActionPerformed"/>
           </Events>
           <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="aboutAutoplotMenuItem">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="About Autoplot"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="aboutAutoplotMenuItemActionPerformed"/>
+              </Events>
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="autoplotHelpMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Help Contents..."/>
@@ -396,14 +404,6 @@
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="CSH.setHelpIDString(autoplotHelpMenuItem, &quot;aphelp_main&quot;);"/>
               </AuxValues>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="aboutAutoplotMenuItem">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="About Autoplot"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="aboutAutoplotMenuItemActionPerformed"/>
-              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem5">
               <Properties>

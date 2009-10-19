@@ -936,8 +936,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         aggregateAllMenuItem = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
-        autoplotHelpMenuItem = new javax.swing.JMenuItem();
         aboutAutoplotMenuItem = new javax.swing.JMenuItem();
+        autoplotHelpMenuItem = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         aboutDas2MenuItem = new javax.swing.JMenuItem();
         autoplotHomepageButton = new javax.swing.JMenuItem();
@@ -1275,6 +1275,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
 
+        aboutAutoplotMenuItem.setText("About Autoplot");
+        aboutAutoplotMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutAutoplotMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(aboutAutoplotMenuItem);
+
         CSH.setHelpIDString(autoplotHelpMenuItem, "aphelp_main");
         autoplotHelpMenuItem.setText("Help Contents...");
         autoplotHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1283,14 +1291,6 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
         helpMenu.add(autoplotHelpMenuItem);
-
-        aboutAutoplotMenuItem.setText("About Autoplot");
-        aboutAutoplotMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                aboutAutoplotMenuItemActionPerformed(evt);
-            }
-        });
-        helpMenu.add(aboutAutoplotMenuItem);
 
         jMenuItem5.setText("Release Notes");
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
