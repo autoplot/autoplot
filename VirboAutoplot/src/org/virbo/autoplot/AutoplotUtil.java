@@ -753,6 +753,9 @@ public class AutoplotUtil {
      * controls.  The user can override these values, so make sure the values that came
      * with the dataset are observed as well.
      *
+     * Note an old version of this would make fill canonical, now this simply resets the
+     * VALID_MIN, VALID_MAX, and FILL_VALUE properties.
+     *
      * Old values of vmin, vmax, and fill are ignored.
      * 
      */
