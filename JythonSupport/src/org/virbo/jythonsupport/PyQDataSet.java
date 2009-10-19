@@ -494,14 +494,24 @@ public class PyQDataSet extends PyJavaInstance {
         }
         QDataSet val = coerce_ds(qube, arg1);
 
-        QubeDataSetIterator it = new QubeDataSetIterator(val);
-        while (it.hasNext()) {
-            it.next();
-            double d = it.getValue(val);
-            iter.next();
-            iter.putValue(ds, d);
+        // see org.virbo.dsops.CoerceUtil, make version that makes iterators.
+        if ( val.rank()==0 ) {
+            double d = val.value();
+            while (iter.hasNext()) {
+                iter.next();
+                iter.putValue(ds, d);
+            }
+        } else if ( val.rank()!=iter.rank() ) {
+            throw new IllegalArgumentException("not supported, couldn't reconcile ranks: arg=" + val.rank() + " and ds=" + iter.rank());
+        } else {
+            QubeDataSetIterator it = new QubeDataSetIterator(val);
+            while (it.hasNext()) {
+                it.next();
+                double d = it.getValue(val);
+                iter.next();
+                iter.putValue(ds, d);
+            }
         }
-
     }
 
     /**
