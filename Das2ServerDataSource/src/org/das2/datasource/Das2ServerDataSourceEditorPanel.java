@@ -14,7 +14,9 @@ package org.das2.datasource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
@@ -58,11 +60,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel2 = new javax.swing.JLabel();
         timeRangeTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        ReaderParamsTextArea = new javax.swing.JTextArea();
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", " " }));
 
         jLabel1.setText("Das2 Server URL:");
 
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("loading DataSets list");
+        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jScrollPane1.setViewportView(jTree1);
 
         jLabel2.setText("Data Set Id:");
@@ -71,21 +78,33 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         jLabel3.setText("Time Range:");
 
+        jLabel4.setText("Reader Parameters:");
+
+        ReaderParamsTextArea.setColumns(20);
+        ReaderParamsTextArea.setRows(5);
+        jScrollPane2.setViewportView(ReaderParamsTextArea);
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .add(jComboBox1, 0, 376, Short.MAX_VALUE)
-                    .add(jLabel1)
-                    .add(jLabel2)
                     .add(layout.createSequentialGroup()
-                        .add(jLabel3)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 197, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 404, Short.MAX_VALUE)
+                            .add(jComboBox1, 0, 404, Short.MAX_VALUE)
+                            .add(jLabel1)
+                            .add(jLabel2)
+                            .add(layout.createSequentialGroup()
+                                .add(jLabel3)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 197, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(jLabel4)))
+                    .add(layout.createSequentialGroup()
+                        .add(24, 24, 24)
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -103,17 +122,24 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel3)
                     .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(96, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jLabel4)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JTextArea ReaderParamsTextArea;
     public javax.swing.JComboBox jComboBox1;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
+    public javax.swing.JLabel jLabel4;
     public javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTree jTree1;
     public javax.swing.JTextField timeRangeTextField;
     // End of variables declaration//GEN-END:variables
@@ -153,9 +179,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         URISplit split= URISplit.parse(uri);
         serverURL= split.resourceUri.toString();
         Map<String,String> params= URISplit.parseParams(split.params);
-        dataSetId= params.get("dataset");
-        String startTime= params.get("start_time");
-        String endTime= params.get("end_time");
+        dataSetId= params.remove("dataset");
+        String startTime= params.remove("start_time");
+        String endTime= params.remove("end_time");
         if ( startTime!=null ) {
             try {
                 DatumRange dr = DatumRangeUtil.parseTimeRange(startTime + " to " + endTime);
@@ -164,6 +190,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        String resolution= params.remove("resolution");
+        StringBuffer paramsStr= new StringBuffer();
+        for ( Entry<String,String> e: params.entrySet() ) {
+            paramsStr.append(e.getKey()+"="+e.getValue()+"\n");
+        }
+        ReaderParamsTextArea.setText(paramsStr.toString());
+
         new Thread( getDataSetsRunnable() ).start();
 
     }
@@ -228,11 +261,27 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         String dataSetId= (String) ((DefaultMutableTreeNode) tp0[1]).getUserObject();
         for ( int i=2; i<tp0.length; i++ ) dataSetId += "/"+ (String) ((DefaultMutableTreeNode) tp0[i]).getUserObject();
 
-        return "vap+das2server:"+serverURL + "?server=dataset" +
-                "&dataset="+dataSetId  +
-                "&start_time="+ timeRange.min() +
-                "&end_time="+ timeRange.max();
+        LinkedHashMap<String,String> map= new LinkedHashMap();
+        String readerParams= ReaderParamsTextArea.getText();
+        String[] ss= readerParams.split("\n");
+        for ( int i=0; i<ss.length; i++ ) {
+            String s= ss[i].trim();
+            if ( s.length()==0 ) continue;
+            String[] ss2= s.split("=",-2);
+            if ( ss2.length==1 ) {
+                map.put( ss2[0],"" );
+            } else {
+                map.put( ss2[0], ss2[1] );
+            }
+        }
+        String params= URISplit.formatParams(map);
 
+        return "vap+das2server:"+serverURL + "?" +
+                "dataset="+dataSetId  +
+                "&start_time="+ timeRange.min() +
+                "&end_time="+ timeRange.max() +
+                "&"+params;
+//TODO:test!
     }
 
 }
