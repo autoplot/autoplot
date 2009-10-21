@@ -55,6 +55,7 @@ public class ApplicationControllerSyncSupport {
             application.panels.get(i).getController().maybeCreateDasPeer();
             //application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
             application.panels.get(i).setDataSourceFilterId(nameMap.get(panels[i].getDataSourceFilterId()));
+            application.panels.get(i).getController().setDsfReset(false);
         }
     }
 
