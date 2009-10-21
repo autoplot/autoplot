@@ -167,8 +167,10 @@ public class PanelController extends DomNodeController {
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
                 changeDataSourceFilter();
                 if ( dsfReset ) {
-                    setResetPanel(true);
-                    setResetRanges(true);
+                    if ( evt.getOldValue()!=null ) {
+                        setResetPanel(true);
+                        setResetRanges(true);
+                    }
                     updateDataSet();
                 }
             } else if ( evt.getPropertyName().equals( Panel.PROP_COMPONENT ) ) {
