@@ -1678,6 +1678,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             p.controller.setResetComponent(false);
             p.controller.doResetRenderType( p.getRenderType() );
             p.controller.setResetRenderType(false);
+            p.controller.setDsfReset(true); // dataSourcesShould be resolved.
         }
         for (DataSourceFilter dsf: application.getDataSourceFilters() ) {
             dsf.controller.setResetDimensions(false);
