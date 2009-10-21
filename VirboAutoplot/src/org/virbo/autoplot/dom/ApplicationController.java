@@ -1676,6 +1676,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         for (Panel p : application.getPanels()) {  // kludge to avoid reset range
             p.controller.setResetPanel(false);
             p.controller.setResetComponent(false);
+            p.controller.setResetRanges(false);
             p.controller.doResetRenderType( p.getRenderType() );
             p.controller.setResetRenderType(false);
             p.controller.setDsfReset(true); // dataSourcesShould be resolved.
