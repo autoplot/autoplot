@@ -45,6 +45,7 @@ import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
@@ -258,7 +259,7 @@ public class GuiSupport {
                     try {
                         prefs.put("DumpDataCurrentFile", chooser.getSelectedFile().toString());
 
-                        String s = chooser.getSelectedFile().toString();
+                        String s = chooser.getSelectedFile().toURI().toString();
 
                         String ext = DataSetURI.getExt(s);
                         if (ext == null) {
@@ -282,7 +283,7 @@ public class GuiSupport {
                             }
                         }
                         format.formatData( s, dsc.getFillDataSet(), new DasProgressPanel("formatting data"));
-                        parent.setStatus("Wrote " + s);
+                        parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(s) );
 
                     } catch (IOException ex) {
                         parent.applicationModel.getExceptionHandler().handle(ex);
