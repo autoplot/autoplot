@@ -627,7 +627,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         new PanelController(this.model, application, panel1);
-
+        
         if (domPlot == null) {
             domPlot = addPlot(LayoutConstants.BELOW);
         }
@@ -757,6 +757,42 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
+     * adds a block of plots to the canvas below the focus plot.  A panel
+     * is added for each plot as well.
+     * @param nrow
+     * @param ncol
+     * @return a list of the newly added plots.
+     */
+    public List<Plot> addPlots( int nrow, int ncol ) {
+        List<Plot> result= new ArrayList<Plot>(nrow*ncol);
+        List<Column> cols;
+        final CanvasController ccontroller = getCanvas().getController();
+        if (ncol > 1) {
+            cols = ccontroller.addColumns(ncol);
+        } else {
+            cols = Collections.singletonList(getCanvas().getMarginColumn());
+        }
+        List<Row> rows;
+        rows = ccontroller.addRows(nrow);
+        for (int i = 0; i < nrow; i++) {
+            Plot masterp = null;
+            for (int j = 0; j < ncol; j++) {
+                Plot p = addPlot(rows.get(i), cols.get(j));
+                result.add(p);
+                if (j == 0) {
+                    masterp = p;
+                } else {
+                    bind(masterp.getZaxis(), Axis.PROP_RANGE, p.getZaxis(), Axis.PROP_RANGE);
+                    bind(masterp.getZaxis(), Axis.PROP_LOG, p.getZaxis(), Axis.PROP_LOG);
+                    bind(masterp.getZaxis(), Axis.PROP_LABEL, p.getZaxis(), Axis.PROP_LABEL);
+                }
+                Panel panel = addPanel(p, null);
+            }
+        }
+        return result;
+    }
+
+    /**
      * find the panelId using this renderer.
      * @param rend
      * @return 
@@ -793,18 +829,18 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     public Plot copyPlotAndPanels(Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
-        List<Panel> p = getPanelsFor(domPlot);
+        List<Panel> srcPanels = getPanelsFor(domPlot);
 
         MutatorLock lock = mutatorLock();
         lock.lock();
 
         Plot newPlot = copyPlot(domPlot, bindx, bindy, false);
-        if (p.size() == 0) {
+        if (srcPanels.size() == 0) {
             return newPlot;
         }
 
         List<Panel> newPanels = new ArrayList<Panel>();
-        for (Panel srcPanel : p) {
+        for (Panel srcPanel : srcPanels) {
             if (!srcPanel.getComponent().equals("")) {
                 if ( srcPanel.getController().getParentPanel()==null ) {
                     Panel newp = copyPanel(srcPanel, newPlot, dsf);
@@ -813,11 +849,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             } else {
                 Panel newp = copyPanel(srcPanel, newPlot, dsf);
                 newPanels.add(newp);
-                List<Panel> kids = srcPanel.controller.getChildPanels();
+                List<Panel> srcKids = srcPanel.controller.getChildPanels();
                 List<Panel> newKids = new ArrayList();
                 DataSourceFilter dsf1 = getDataSourceFilterFor(newp);
-                for (Panel k : kids) {
-                    if (p.contains(k)) {
+                for (Panel k : srcKids) {
+                    if (srcPanels.contains(k)) {
                         Panel kidp = copyPanel(k, newPlot, dsf1);
                         kidp.getController().setParentPanel(newp);
                         newPanels.add(kidp);
@@ -850,6 +886,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected Panel copyPanel(Panel srcPanel, Plot domPlot, DataSourceFilter dsf) {
         logger.finer( "copyPanel("+srcPanel+","+domPlot+","+dsf+")");
         Panel newp = addPanel(domPlot, dsf);
+        newp.getController().setResetPanel(false);// don't add children, trigger autorange, etc.
+        newp.getController().setDsfReset(false); // dont' reset when the dataset changes
         newp.syncTo(srcPanel, Arrays.asList(DomNode.PROP_ID,Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID));
         if (dsf == null) { // new DataSource, but with the same URI.
             DataSourceFilter dsfnew = newp.controller.getDataSourceFilter();
@@ -1385,9 +1423,9 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @throws IllegalArgumentException if the panelId is not a child of the application
      */
     public Plot getPlotFor(Panel panel) {
-        if (!application.panels.contains(panel)) {
-            throw new IllegalArgumentException("the panel is not a child of the application");
-        }
+     //   if ( !isValueAdjusting() && !application.panels.contains(panel) ) {
+     //       throw new IllegalArgumentException("the panel is not a child of the application");
+     //   }
         String id = panel.getPlotId();
         Plot result = null;
         for (Plot p : application.getPlots()) {

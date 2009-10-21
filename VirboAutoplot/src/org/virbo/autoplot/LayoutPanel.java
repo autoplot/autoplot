@@ -168,29 +168,7 @@ public class LayoutPanel extends javax.swing.JPanel {
                 if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(panelListComponent, dia, "Add Plots", JOptionPane.OK_CANCEL_OPTION ) ) {
                      int nr= (Integer)dia.getNumberOfRowsTextField().getValue();
                      int nc= (Integer)dia.getNumberOfColumnsTextField().getValue();
-                     List<Column> cols;
-                     final CanvasController ccontroller = app.getController().getCanvas().getController();
-                     if ( nc>1 ) {
-                         cols= ccontroller.addColumns(nc);
-                     } else {
-                         cols= Collections.singletonList( app.getController().getCanvas().getMarginColumn() );
-                     }
-                     List<Row> rows;
-                     rows= ccontroller.addRows(nr);
-                     for ( int i=0; i<nr; i++ ) {
-                         Plot masterp=null;
-                         for ( int j=0; j<nc; j++ ){
-                             Plot p= app.getController().addPlot( rows.get(i), cols.get(j));
-                             if ( j==0 ) {
-                                 masterp= p;
-                             } else {
-                                 app.getController().bind( masterp.getZaxis(), Axis.PROP_RANGE, p.getZaxis(), Axis.PROP_RANGE );
-                                 app.getController().bind( masterp.getZaxis(), Axis.PROP_LOG, p.getZaxis(), Axis.PROP_LOG );
-                                 app.getController().bind( masterp.getZaxis(), Axis.PROP_LABEL, p.getZaxis(), Axis.PROP_LABEL );
-                             }
-                             Panel panel= app.getController().addPanel(p, null);
-                         }
-                     }
+                     app.getController().addPlots( nr,nc );
                 }
             }
         };
@@ -410,6 +388,11 @@ public class LayoutPanel extends javax.swing.JPanel {
         plotMenu.add(deleteMenuItem);
 
         addPlotsBelowMenuItem.setText("Add Plots Below...");
+        addPlotsBelowMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addPlotsBelowMenuItemActionPerformed(evt);
+            }
+        });
         plotMenu.add(addPlotsBelowMenuItem);
 
         removeBindingsMenuItem.setText("Remove Bindings");
@@ -518,6 +501,10 @@ public class LayoutPanel extends javax.swing.JPanel {
             this.app.getController().setStatus("warning: select two plots");
         }
     }//GEN-LAST:event_swapMenuItemActionPerformed
+
+    private void addPlotsBelowMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addPlotsBelowMenuItemActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_addPlotsBelowMenuItemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addPlotsBelowMenuItem;

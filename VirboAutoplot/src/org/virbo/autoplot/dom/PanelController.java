@@ -166,7 +166,7 @@ public class PanelController extends DomNodeController {
                 }
             } else if (evt.getPropertyName().equals(Panel.PROP_DATASOURCEFILTERID)) {
                 changeDataSourceFilter();
-                if ( !dom.getController().isValueAdjusting() ) {
+                if ( isDsfReset() ) {
                     setResetPanel(true);
                     setResetRanges(true);
                     updateDataSet();
@@ -677,13 +677,15 @@ public class PanelController extends DomNodeController {
      */
     PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            setResetComponent(true);
-            setResetPanel(true);
-            setResetRanges(true);
-            panel.setAutoLabel(true);
-            panel.setAutoComponent(true);
-            panel.setAutoRenderType(true);
-            maybeSetPlotAutorange();
+            if ( dsfReset ) {
+                setResetComponent(true);
+                setResetPanel(true);
+                setResetRanges(true);
+                panel.setAutoLabel(true);
+                panel.setAutoComponent(true);
+                panel.setAutoRenderType(true);
+                maybeSetPlotAutorange();
+            }
         }
     };
 
@@ -732,7 +734,7 @@ public class PanelController extends DomNodeController {
      * This implies resetRenderType.
      */
     public static final String PROP_RESETPANEL = "resetPanel";
-    protected boolean resetPanel = true;
+    protected boolean resetPanel = false;
 
     public boolean isResetPanel() {
         return resetPanel;
@@ -752,7 +754,7 @@ public class PanelController extends DomNodeController {
      */
     public static final String PROP_RESETCOMPONENT = "resetComponent";
 
-    protected boolean resetComponent = true;
+    protected boolean resetComponent = false;
 
     public boolean isResetComponent() {
         return resetComponent;
@@ -779,6 +781,23 @@ public class PanelController extends DomNodeController {
         boolean oldResetRenderType = this.resetRenderType;
         this.resetRenderType = resetRenderType;
         propertyChangeSupport.firePropertyChange(PROP_RESETRENDERTYPE, oldResetRenderType, resetRenderType);
+    }
+
+    /**
+     * when true, a change in the DataSourceFilter should reset the panel.
+     */
+    public static final String PROP_DSFRESET = "dsfReset";
+
+    protected boolean dsfReset = true;
+
+    public boolean isDsfReset() {
+        return dsfReset;
+    }
+
+    public void setDsfReset(boolean dsfReset) {
+        boolean oldDsfReset = this.dsfReset;
+        this.dsfReset = dsfReset;
+        propertyChangeSupport.firePropertyChange(PROP_DSFRESET, oldDsfReset, dsfReset);
     }
 
     protected Renderer renderer = null;
