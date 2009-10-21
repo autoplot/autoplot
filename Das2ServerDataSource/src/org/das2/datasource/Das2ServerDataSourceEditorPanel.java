@@ -276,12 +276,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         String params= URISplit.formatParams(map);
 
-        return "vap+das2server:"+serverURL + "?" +
+        String result= "vap+das2server:"+serverURL + "?" +
                 "dataset="+dataSetId  +
                 "&start_time="+ timeRange.min() +
-                "&end_time="+ timeRange.max() +
-                "&"+params;
-//TODO:test!
+                "&end_time="+ timeRange.max();
+        if ( params.length()>0 ) result= result + "&" + params;
+        return result;
     }
 
 }
