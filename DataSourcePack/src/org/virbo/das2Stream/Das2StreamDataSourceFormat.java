@@ -30,11 +30,13 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
 
         boolean binary= "binary".equals( params.get( "type" ) );
         if (split.ext.equals(".qds")) {
+            FileOutputStream fo=  new FileOutputStream( new File( split.resourceUri ) );
             if ( binary ) {
-                new org.virbo.qstream.SimpleStreamFormatter().format( data, new FileOutputStream( new File( split.resourceUri ) ), false );
+                new org.virbo.qstream.SimpleStreamFormatter().format( data, fo, false );
             } else {
-                new org.virbo.qstream.SimpleStreamFormatter().format( data, new FileOutputStream(  new File( split.resourceUri ) ), true );
+                new org.virbo.qstream.SimpleStreamFormatter().format( data, fo, true );
             }
+            fo.close();
         } else {
             if (data.rank() == 2) {
                 TableDataSet tds = TableDataSetAdapter.create(data);
