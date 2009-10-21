@@ -569,8 +569,9 @@ public class ApplicationModel {
     /**
      * open the serialized DOM, apply additional modifications to the DOM, then
      * sync the application to this.
-     * @param f
-     * @param paramz
+     * @param f vap file containing the xml representation of the dom.
+     * @param deltas list property name, property value pairs to apply to the
+     *   vap DOM after it's loaded.
      * @throws java.io.IOException
      */
     void doOpen(File f, LinkedHashMap<String, String> deltas) throws IOException {
