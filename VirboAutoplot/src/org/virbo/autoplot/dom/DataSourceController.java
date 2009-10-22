@@ -29,6 +29,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.TransposeRank2DataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
@@ -579,6 +580,23 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
+     * guess the cadence of the dataset tags, putting the rank 0 dataset cadence
+     * into the property QDataSet.CADENCE of the tags ds.  fillDs is used to
+     * identify missing values, which are skipped for the cadence guess.
+     *
+     * @param xds the tags for which the cadence is determined.
+     * @param fillDs a dependent dataset possibly with fill values, or null.
+     */
+    private static void guessCadence( MutablePropertyDataSet xds, QDataSet fillDs ) {
+        if ( xds.length()<2 ) return;
+
+        RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
+        if ( cadence!=null && "log".equals(cadence.property(QDataSet.SCALE_TYPE) ) ) {
+            xds.putProperty( QDataSet.SCALE_TYPE, "log" );
+        }
+        xds.putProperty(QDataSet.CADENCE, cadence);
+    }
+    /**
      * the fill parameters have changed, so update the auto range stats.
      * This should not be run on the AWT event thread!
      * @param autorange if false, then no autoranging is done.
@@ -653,6 +671,21 @@ public class DataSourceController extends DomNodeController {
         } else {
             fillDs = DataSetOps.makePropertiesMutable(getDataSet());
             setReduceDataSetString(null);
+        }
+
+        // add the cadence property to each dimension of the dataset, so that
+        // the panel doesn't have to worry about it.
+        for ( int i=0; i<fillDs.rank(); i++ ) {
+            QDataSet dep= (QDataSet) fillDs.property("DEPEND_"+i);
+            if ( dep!=null ) {
+                dep= DataSetOps.makePropertiesMutable(dep);
+                if ( i==0 ) {
+                    guessCadence( (MutablePropertyDataSet) dep,fillDs);
+                } else {
+                    guessCadence( (MutablePropertyDataSet) dep,null);
+                }
+                fillDs.putProperty( "DEPEND_"+i, dep );
+            }
         }
 
         //props.put( QDataSet.RENDER_TYPE, null );
