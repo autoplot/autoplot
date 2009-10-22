@@ -1015,24 +1015,6 @@ public class PanelController extends DomNodeController {
     }
 
     /**
-     * guess the cadence of the dataset tags, putting the rank 0 dataset cadence
-     * into the property QDataSet.CADENCE of the tags ds.  fillDs is used to
-     * identify missing values, which are skipped for the cadence guess.
-     *
-     * @param xds the tags for which the cadence is determined.
-     * @param fillDs a dependent dataset possibly will fill values, or null.
-     */
-    private static void guessCadence( MutablePropertyDataSet xds, QDataSet fillDs ) {
-        if ( xds.length()<2 ) return;
-
-        RankZeroDataSet cadence = DataSetUtil.guessCadenceNew(xds, fillDs);
-        if ( cadence!=null && "log".equals(cadence.property(QDataSet.SCALE_TYPE) ) ) {
-            xds.putProperty( QDataSet.SCALE_TYPE, "log" );
-        }
-        xds.putProperty(QDataSet.CADENCE, cadence);
-    }
-
-    /**
      * this is the old updateFillSeries and updateFillSpectrogram code.  This calculates
      * ranges and preferred symbol settings, and puts the values in panelCopy.plotDefaults.
      * The dom Plot containing this panel should be listening for changes in panel.plotDefaults,
@@ -1068,9 +1050,6 @@ public class PanelController extends DomNodeController {
                     yds = DataSetUtil.indexGenDataSet(10); // later the user will get a message "renderer cannot plot..."
                 }
             }
-
-            guessCadence((MutablePropertyDataSet) xds, null);
-            guessCadence((MutablePropertyDataSet) yds, null);
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
@@ -1119,8 +1098,6 @@ public class PanelController extends DomNodeController {
             if (xds == null) {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
             }
-
-            guessCadence((MutablePropertyDataSet) xds, fillDs);
 
             AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
