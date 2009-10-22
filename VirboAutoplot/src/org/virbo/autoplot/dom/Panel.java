@@ -341,8 +341,8 @@ public class Panel extends DomNode {
         if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
         if ( !exclude.contains( PROP_AUTORENDERTYPE ) ) this.setAutoRenderType(that.isAutoRenderType());
         if ( !exclude.contains( PROP_AUTOCOMPONENT ) ) this.setAutoComponent(that.isAutoComponent());
-        this.style.syncTo(that.style);
-        this.plotDefaults.syncTo(that.plotDefaults);
+        if ( !exclude.contains( PROP_STYLE ) ) this.style.syncTo(that.style);
+        if ( !exclude.contains( PROP_PLOT_DEFAULTS ) )this.plotDefaults.syncTo(that.plotDefaults);
 
     }
 
