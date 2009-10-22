@@ -355,13 +355,7 @@ public class PlotController extends DomNodeController {
 
     PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            boolean needsColorbar= false;
-            for ( Panel p: dom.getController().getPanelsFor(plot) ) {
-                if ( RenderTypeUtil.needsColorbar( p.getRenderType() ) ) {
-                    needsColorbar= true;
-                }
-            }
-            dasColorBar.setVisible(needsColorbar);
+            checkRenderType();
         }
     };
 
@@ -381,6 +375,16 @@ public class PlotController extends DomNodeController {
         }
     };
 
+    private void checkRenderType() {
+        boolean needsColorbar = false;
+        for (Panel p : dom.getController().getPanelsFor(plot)) {
+            if (RenderTypeUtil.needsColorbar(p.getRenderType())) {
+                needsColorbar = true;
+            }
+        }
+        dasColorBar.setVisible(needsColorbar);
+    }
+
     void addPanel(Panel p) {
         Renderer rr= p.controller.getRenderer();
         if ( rr!=null ) {
@@ -395,7 +399,7 @@ public class PlotController extends DomNodeController {
         doPanelDefaultsChange(p);
         p.addPropertyChangeListener( Panel.PROP_PLOT_DEFAULTS, plotDefaultsListener );
         p.addPropertyChangeListener( Panel.PROP_RENDERTYPE, renderTypeListener );
-
+        checkRenderType();
     }
 
     void removePanel(Panel p) {
