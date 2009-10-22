@@ -408,6 +408,7 @@ public class PlotController extends DomNodeController {
         doPanelDefaultsChange(null);
         p.removePropertyChangeListener( Panel.PROP_PLOT_DEFAULTS, plotDefaultsListener );
         p.removePropertyChangeListener( Panel.PROP_RENDERTYPE, renderTypeListener );
+        checkRenderType();
     }
 
     /**
