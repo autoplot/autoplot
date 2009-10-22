@@ -977,7 +977,6 @@ public class AutoplotUtil {
             } else {
                 result = new SpectrogramRenderer(null, colorbar);
                 result.setDataSetLoader(null);
-                colorbar.setVisible(true);
             }
             result.setRebinner( SpectrogramRenderer.RebinnerEnum.binAverage );
             return result;
@@ -989,7 +988,6 @@ public class AutoplotUtil {
             } else {
                 result = new SpectrogramRenderer(null, colorbar);
                 result.setDataSetLoader(null);
-                colorbar.setVisible(true);
                 return result;
             }
             result.setRebinner( SpectrogramRenderer.RebinnerEnum.nearestNeighbor );
@@ -1000,7 +998,6 @@ public class AutoplotUtil {
             } else {
                 Renderer result = new ImageVectorDataSetRenderer(null);
                 result.setDataSetLoader(null);
-                colorbar.setVisible(false);
                 return result;
             }
         } else if ( renderType==RenderType.digital ) {
@@ -1009,7 +1006,6 @@ public class AutoplotUtil {
             } else {
                 Renderer result = new DigitalRenderer();
                 result.setDataSetLoader(null);
-                colorbar.setVisible(false);
                 return result;
             }
 //        } else if ( renderType==RenderType.image ) {
@@ -1033,10 +1029,8 @@ public class AutoplotUtil {
             if (renderType == RenderType.colorScatter) {
                 result.setColorBar(colorbar);
                 result.setColorByDataSetId(QDataSet.PLANE_0); //schema
-                colorbar.setVisible(true);
             } else {
                 result.setColorByDataSetId(""); //schema
-                colorbar.setVisible(false);
             }
 
             if (renderType == RenderType.series) {
