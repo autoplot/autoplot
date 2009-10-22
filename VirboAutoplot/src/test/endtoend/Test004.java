@@ -9,7 +9,7 @@ import java.io.IOException;
 import org.virbo.autoplot.ScriptContext;
 
 /**
- *
+ * Test Jan's products
  * @author jbf
  */
 public class Test004 {

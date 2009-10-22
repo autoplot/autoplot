@@ -17,7 +17,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
- *
+ * Test Autoplot's demo bookmarks
  * @author jbf
  */
 public class Test005 {

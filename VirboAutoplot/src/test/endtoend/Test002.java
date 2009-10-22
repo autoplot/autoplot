@@ -13,7 +13,7 @@ import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 
 /**
- *
+ * Test Autoplot use case: load wave file and add spectrogram
  * @author jbf
  */
 public class Test002 {

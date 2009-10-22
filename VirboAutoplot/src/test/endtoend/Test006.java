@@ -49,7 +49,7 @@ public class Test006 {
             doTest( 0, "ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?column=field17&timerange=1963&timeFormat=$Y+$j+$H&time=field0&validMax=999" );
             doTest( 1, "http://goes.ngdc.noaa.gov/data/avg/2004/A1050412.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD" );
             doTest( 2, "file:///home/jbf/ct/hudson/data.backup/dat/V11979066.CSV?depend0=field0&column=field13" );
-            doTest( 3, "file:///home/jbf/ct/hudson/data.backup/dat/power.dat.txt" );
+            doTest( 3, "file:///home/jbf/ct/hudson/data.backup/dat/power.dat.txt" );  //case where guess cadence is failing, though it shouldn't.
 
             //doTest( 2, "vap:http://vho.nasa.gov/mission/soho/celias_pm_30sec/1998.txt?time=YY&column=GSE_X&timeFormat=$y+$b+$d+$(ignore):$H:$M:$S" );
 

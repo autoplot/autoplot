@@ -13,7 +13,7 @@ import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.jythonsupport.Util;
 
 /**
- *
+ * Test Autoplot
  * @author jbf
  */
 public class Test001 {
