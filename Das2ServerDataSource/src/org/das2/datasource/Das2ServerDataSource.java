@@ -52,7 +52,7 @@ class Das2ServerDataSource extends AbstractDataSource {
     String dsParams;
 
     @Override
-    public QDataSet getDataSet( ProgressMonitor mon ) throws Exception {
+    public QDataSet getDataSet( final ProgressMonitor mon ) throws Exception {
         //http://www-pw.physics.uiowa.edu/das/das2Server
         //?dataset=das2_1/voyager1/pws/sa-4s-pf.new
         //&start_time=2004-01-01&end_time=2004-01-06&server=dataset&ascii=1
@@ -91,9 +91,9 @@ class Das2ServerDataSource extends AbstractDataSource {
             @Override
             public void streamDescriptor(StreamDescriptor sd) throws StreamException {
                 super.streamDescriptor(sd);
-            //if (super.taskSize != -1) {
-            //    mpin.setEnableProgressPosition(false);
-            //}
+                if ( mon.getTaskSize() != -1) { // progress messages are on the stream.
+                   mpin.setEnableProgressPosition(false);
+                }
             }
         };
 
