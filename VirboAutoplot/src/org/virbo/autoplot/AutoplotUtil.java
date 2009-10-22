@@ -969,7 +969,7 @@ public class AutoplotUtil {
      */
     public static Renderer maybeCreateRenderer(RenderType renderType,
             Renderer recyclable, DasColorBar colorbar) {
-        if ( colorbar!=null ) colorbar.setVisible( RenderTypeUtil.needsColorbar(renderType) );
+        if ( colorbar!=null && RenderTypeUtil.needsColorbar(renderType) ) colorbar.setVisible( true );
         
         if (renderType == RenderType.spectrogram) {
             SpectrogramRenderer result;
