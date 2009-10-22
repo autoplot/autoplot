@@ -1177,7 +1177,13 @@ public class PanelController extends DomNodeController {
                 if ( oldPlot!=null && oldPlot!=getDasPlot() ) oldRenderer.getParent().removeRenderer(oldRenderer);
                 if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
             }
-            if ( oldPlot==null || oldRenderer!=newRenderer ) plot.addRenderer(newRenderer);
+            if ( oldPlot==null || oldRenderer!=newRenderer ) {
+                if ( newRenderer instanceof SpectrogramRenderer ) {
+                    plot.addRenderer(0,newRenderer);
+                } else {
+                    plot.addRenderer(newRenderer);
+                }
+            }
 
             logger.finest("plot.addRenderer "+plot+" "+newRenderer);
             if (getDataSourceFilter().controller.getFillDataSet() != null) {
