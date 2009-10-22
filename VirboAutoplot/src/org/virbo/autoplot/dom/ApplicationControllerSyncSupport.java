@@ -49,10 +49,12 @@ public class ApplicationControllerSyncSupport {
             controller.deletePanel(application.panels.get(application.panels.size() - 1));
         }
         for (int i = 0; i < panels.length; i++) {
-            application.panels.get(i).syncTo(panels[i], Arrays.asList(Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE));
+            //application.panels.get(i).getStyle().syncTo(panels[i].getStyle());
+            application.panels.get(i).syncTo(panels[i], Arrays.asList(Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE, Panel.PROP_STYLE ) );
             application.panels.get(i).setPlotId(nameMap.get(panels[i].getPlotId()));
             application.panels.get(i).setRenderType(panels[i].getRenderType()); // create das2 peers after setting the plotid.
             application.panels.get(i).getController().maybeCreateDasPeer();
+            application.panels.get(i).getStyle().syncTo(panels[i].getStyle());
             //application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
             application.panels.get(i).setDataSourceFilterId(nameMap.get(panels[i].getDataSourceFilterId()));
             application.panels.get(i).getController().setDsfReset(false);
