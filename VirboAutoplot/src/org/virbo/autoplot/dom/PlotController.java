@@ -25,8 +25,10 @@ import org.das2.graph.DasColumn;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
+import org.das2.graph.SpectrogramRenderer;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.RenderType;
+import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -351,6 +353,18 @@ public class PlotController extends DomNodeController {
         }
     };
 
+    PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            boolean needsColorbar= false;
+            for ( Panel p: dom.getController().getPanelsFor(plot) ) {
+                if ( RenderTypeUtil.needsColorbar( p.getRenderType() ) ) {
+                    needsColorbar= true;
+                }
+            }
+            dasColorBar.setVisible(needsColorbar);
+        }
+    };
+
     Panel panel;
 
     PropertyChangeListener panelDataSetListener= new PropertyChangeListener() {
@@ -369,11 +383,18 @@ public class PlotController extends DomNodeController {
 
     void addPanel(Panel p) {
         Renderer rr= p.controller.getRenderer();
-        if ( rr!=null ) dasPlot.addRenderer(rr);
+        if ( rr!=null ) {
+            if ( rr instanceof SpectrogramRenderer ) {
+                dasPlot.addRenderer(0,rr);
+            } else {
+                dasPlot.addRenderer(rr);
+            }
+        }
         RenderType rt = p.getRenderType();
         p.controller.doResetRenderType(rt);
         doPanelDefaultsChange(p);
         p.addPropertyChangeListener( Panel.PROP_PLOT_DEFAULTS, plotDefaultsListener );
+        p.addPropertyChangeListener( Panel.PROP_RENDERTYPE, renderTypeListener );
 
     }
 
@@ -382,6 +403,7 @@ public class PlotController extends DomNodeController {
         if ( rr!=null ) dasPlot.removeRenderer(rr);
         doPanelDefaultsChange(null);
         p.removePropertyChangeListener( Panel.PROP_PLOT_DEFAULTS, plotDefaultsListener );
+        p.removePropertyChangeListener( Panel.PROP_RENDERTYPE, renderTypeListener );
     }
 
     /**
