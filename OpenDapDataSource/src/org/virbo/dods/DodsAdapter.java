@@ -107,6 +107,10 @@ public class DodsAdapter {
         this.constraint = c;
     }
 
+    public String getConstraint() {
+        return this.constraint;
+    }
+    
     private long getSizeForType( DArray v, boolean streaming ) {
         PrimitiveVector pv = v.getPrimitiveVector();
         if (pv instanceof Float32PrimitiveVector) {
