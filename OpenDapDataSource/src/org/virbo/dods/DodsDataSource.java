@@ -114,11 +114,21 @@ public class DodsDataSource extends AbstractDataSource {
 
         constraint1.append(variable);
 
-        int[] ii = parser.getRecDims(variable);
+        String dimsStr=null;
+        if ( da.getConstraint()!=null ) {
+            int i= da.getConstraint().indexOf('[');
+            if (i!=-1) {
+                dimsStr= da.getConstraint().substring(i);
+                constraint1.append( dimsStr );
+            }
+        }  else {
+            int[] ii = parser.getRecDims(variable);
 
-        if (ii != null) {
-            for (int i = 0; i < ii.length; i++) {
-                constraint1.append("[0:1:" + ii[i] + "]");
+            if (ii != null) {
+                for (int i = 0; i < ii.length; i++) {
+                    dimsStr= da.getConstraint().substring(i);
+                    constraint1.append(dimsStr);
+                }
             }
         }
 
@@ -128,7 +138,8 @@ public class DodsDataSource extends AbstractDataSource {
                 Map val = (Map) meta.get(dkey);
                 String var = (String) val.get("NAME");
                 int[] ii2 = parser.getRecDims(var);
-                constraint1.append(",").append(var).append("[0:1:" + ii2[0] + "]");
+                constraint1.append(",").append(var);
+                if ( dimsStr!=null) constraint1.append(dimsStr);
                 da.setDependName(i, var);
 
                 Map<String, Object> depMeta = getMetaData(var);
