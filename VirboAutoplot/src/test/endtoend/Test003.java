@@ -37,7 +37,7 @@ public class Test003 {
 
             ScriptContext.reset();
 
-            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_2.vap" );
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_3.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_003.png" );
 
