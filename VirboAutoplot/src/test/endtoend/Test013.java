@@ -20,6 +20,7 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.FDataSet;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -308,12 +309,30 @@ public class Test013 {
         }
     }
 
+    private static void writeLimitPrecision() throws StreamException, IOException {
+        QDataSetStreamHandler handler = new QDataSetStreamHandler();
+        StreamTool.readStream(Channels.newChannel( new FileInputStream( "/home/jbf/ct/hudson/data.backup/qds/too_many_decimals.qds") ), handler);
+
+        File f = new File("test013_writeLimitPrecision.qds");
+
+        QDataSet ds= handler.getDataSet("means");
+        QDataSet gcd= DataSetUtil.gcd( ds );
+
+        SimpleStreamFormatter format = new SimpleStreamFormatter();
+        format.format( ds, new FileOutputStream(f), true );
+
+
+    }
+
     public static void main(String[] args) throws InterruptedException, IOException, Exception {
         try {
 
             MutablePropertyDataSet ds;
 
             xxx("init");
+
+            writeLimitPrecision();
+            xxx("writeLimitPrecision");
 
             test0_rank2();
             xxx("test0_rank2()");
