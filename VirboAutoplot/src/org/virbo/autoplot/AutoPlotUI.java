@@ -927,20 +927,20 @@ public class AutoPlotUI extends javax.swing.JFrame {
         autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLayoutCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
+        bookmarksMenu = new javax.swing.JMenu();
+        toolsMenu = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
-        toolsMenu = new javax.swing.JMenu();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
         aggregateAllMenuItem = new javax.swing.JMenuItem();
-        bookmarksMenu = new javax.swing.JMenu();
         helpMenu = new javax.swing.JMenu();
-        aboutAutoplotMenuItem = new javax.swing.JMenuItem();
         autoplotHelpMenuItem = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         aboutDas2MenuItem = new javax.swing.JMenuItem();
         autoplotHomepageButton = new javax.swing.JMenuItem();
+        aboutAutoplotMenuItem = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Autoplot");
@@ -1216,6 +1216,11 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         jMenuBar1.add(optionsMenu);
 
+        bookmarksMenu.setText("Bookmarks");
+        jMenuBar1.add(bookmarksMenu);
+
+        toolsMenu.setText("Tools");
+
         jMenu3.setText("Cache");
 
         jMenuItem3.setText("Manage Files");
@@ -1234,9 +1239,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         });
         jMenu3.add(jMenuItem4);
 
-        jMenuBar1.add(jMenu3);
-
-        toolsMenu.setText("Tools");
+        toolsMenu.add(jMenu3);
 
         pngWalkMenuItem.setText("PNG Walk");
         pngWalkMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1265,23 +1268,12 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         jMenuBar1.add(toolsMenu);
 
-        bookmarksMenu.setText("Bookmarks");
-        jMenuBar1.add(bookmarksMenu);
-
         helpMenu.setText("Help");
         helpMenu.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 helpMenuActionPerformed(evt);
             }
         });
-
-        aboutAutoplotMenuItem.setText("About Autoplot");
-        aboutAutoplotMenuItem.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                aboutAutoplotMenuItemActionPerformed(evt);
-            }
-        });
-        helpMenu.add(aboutAutoplotMenuItem);
 
         CSH.setHelpIDString(autoplotHelpMenuItem, "aphelp_main");
         autoplotHelpMenuItem.setText("Help Contents...");
@@ -1315,6 +1307,14 @@ public class AutoPlotUI extends javax.swing.JFrame {
             }
         });
         helpMenu.add(autoplotHomepageButton);
+
+        aboutAutoplotMenuItem.setText("About Autoplot");
+        aboutAutoplotMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                aboutAutoplotMenuItemActionPerformed(evt);
+            }
+        });
+        helpMenu.add(aboutAutoplotMenuItem);
 
         jMenuBar1.add(helpMenu);
 
