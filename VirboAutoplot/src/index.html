@@ -7,9 +7,10 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>A Polar/Hydra spectrogram is sliced at two points in time.  Data can now be loaded once, and
-                panels can display different slices of the data.  A new "Data" panel simplifies the axis panel
-                and specifies data operations (such as slice or histogram) before display.
+        <p><small>Autoplot is used to plot data from IDL using the "applot" command.  Data in IDL is serialized
+                to a das2Stream (soon a QStream) and the server interface is used to command Autoplot to
+                plot the data.  This is useful for debugging in IDL when using IDL's plotting would interfere
+                with the process being debugged.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -22,16 +23,27 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Recent changes include:</p>
 <ul>
-    <li>Bugfixes in loading and saving vaps, resolved by adding autoComponent, autoRenderType, autoBinding properties</li>
-    <li>bugfix with interaction of TimeSeriesBrowse and |slice0(0) component.
-    <li>Bugfix where time range binding would be deleted in vap load and sync to.</li>
-    <li>improvements to autoranging, to support CEPPAD archive</li>
-    <li>Experimental collapse1 operator for component.</li>
-    <li>Introduce Tools menu that includes PngWalk launcher and Make PNG Script launcher.</li>
-    <li>Experimental: Tools menu discovers scripts in HOME/autoplot_data/tools.  This will probably
-        become a set of bookmarks and the bookmarks manager will allow for managing tools.</li>
-    <li>Bookmarks and recent items in PNG Walk Tool.</li>
-    
+    <li>bugfix in copy panels when the plot contains parent and child panels.</li>
+    <li>bugfix in QStreams, calculate resolution needed for time formatting.</li>
+    <li>bugfix OpenDAP subsetting works with ISTP CDFs.</li>
+    <li>bugfixes in hide/show colorbar, when overplots are used.</li>
+    <li>bugfix in stack order of panels, so that spectrograms are inserted under lineplots.</li>
+    <li>add das2 ripples dataset for demos and testing.</li>
+    <li>bugfixes in sync, style node changes didn't make it out to the view layer, which affects load and save.</li>
+    <li>bugfix: guess cadence is invoked when autorange is false, so that symbol connector is correct.</li>
+    <li>bugfix: das2 renderers use weights property so that original dataset fill values are not clobbered.</li>
+    <li>bugfix: introduce dsfReset property to panel controller to address perennial problems with syncing.</li>
+    <li>for das2server data source, introduce GUI for selecting data sets.</li>
+    <li>bugfix: spaces in filenames when exporting data is supported.</li>
+    <li>introduce Aggregate All to tools menu.</li>
+    <li>create pngwalk has option to create thumbnails as well</li>
+    <li>bugfix when no preferences exist for recent or bookmarks.</li>
+    <li>improvements to DomainDivider-based tick labelling, though it's not quite ready yet due to formatting</li>
+    <li>handle unit "days since 1-1-1T00:00:00"</li>
+    <li>bugfix in das2: toTimeStruct(Datum) rounded to nearest microsecond.</li>
+    <li>bugfix in das2: format to nanosecond resolution failed.</li>
+    <li>more tweaking of guess cadence code when there are <10 elements that are log spaced.</li>
+    <li>introduce experimental peakIds() and peaks() in AutoHistogram, to support statistical gcd.</li>
 </ul>
 <p>
 
