@@ -126,7 +126,7 @@ public class DodsDataSource extends AbstractDataSource {
 
             if (ii != null) {
                 for (int i = 0; i < ii.length; i++) {
-                    dimsStr= da.getConstraint().substring(i);
+                    dimsStr= "";
                     constraint1.append(dimsStr);
                 }
             }
