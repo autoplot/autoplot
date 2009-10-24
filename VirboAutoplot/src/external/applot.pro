@@ -129,7 +129,8 @@ function tryPortConnect, host, port, unit=unit
    return, error
 end
 
-pro applot, x, y, z, _extra=e, respawn=respawn
+pro applot, x, y, z, _extra=e, respawn=respawn, panel=panel, $
+   ytitle=ytitle, xtitle=xtitle, title=title
 
    common applot_common, appid
 
@@ -208,10 +209,22 @@ pro applot, x, y, z, _extra=e, respawn=respawn
        socket, unit, 'localhost', port, /get_lun, write_timeout=1
        ;cmd= 'plot( ''file:/'+tmpfile+'?depend0=field0&column=field1'' )'
        if ( !version.os_family eq 'Windows' ) then tmpfile= '/'+tmpfile
-       cmd= 'plot( ''file:'+tmpfile+''' );'  ; semicolon means no echo
+
+       if n_elements( panel ) eq 1 then begin
+          cmd= 'plot( '+strtrim(panel,2)+', ''file:'+tmpfile+''' );'  ; semicolon means no echo
+       endif else begin
+          cmd= 'plot( ''file:'+tmpfile+''' );'  ; semicolon means no echo
+       endelse
 
        print, cmd
        printf, unit, cmd
+
+       if n_elements( ytitle ) eq 1 then begin
+          cmd= 'print dom.controller.plot.yaxis'  ;.label='''+ytitle+'''
+          print, cmd
+          printf, unit, cmd
+       endif
+
        close, unit
        free_lun, unit
    endif else begin
