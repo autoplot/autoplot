@@ -55,7 +55,9 @@ public class Test012 {
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
+            //TODO: test012_000 shows a potential bug with autoHistogram: zero-point average is formatted to "2292-04-10T00:12:43...."
             doTest( 0, "vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c4/cp/2003/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN" );
+
             doTest( 1, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_efw_20080402_v01.cdf?tha_efw" );
             doTest( 2, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?dens_e" );
             doTest( 3, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Theta_l" );
