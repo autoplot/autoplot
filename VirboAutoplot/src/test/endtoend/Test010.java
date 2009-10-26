@@ -35,6 +35,7 @@ public class Test010 {
         tests.add("ftp://mrfrench.lanl.gov/autoplot_gifwalks/SOPA_pitch/");
         tests.add("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
         tests.add("ftp://cdaweb.gsfc.nasa.gov/pub/istp/");
+        tests.add("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/");
         tests.add("http://caa.estec.esa.int/caa/search.xml");
         tests.add("http://papco.org/data");
 
