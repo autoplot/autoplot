@@ -32,6 +32,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
@@ -41,7 +42,7 @@ import org.das2.util.AboutUtil;
  *
  * @author  jbf
  */
-public class APSplash extends JWindow {
+public class APSplash extends JFrame {
 
     private static APSplash instance=null;
 
@@ -105,6 +106,11 @@ public class APSplash extends JWindow {
     /** Creates a new instance of Splash */
     public APSplash() {
         super();
+
+        setUndecorated(true);
+        setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
+        setTitle("Starting Autoplot");
+        
         JPanel panel= new JPanel(new BorderLayout());
         panel.add(new JLabel(getSplashImage()),BorderLayout.CENTER);
 
