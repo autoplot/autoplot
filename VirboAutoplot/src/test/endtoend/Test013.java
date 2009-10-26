@@ -20,6 +20,7 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.FDataSet;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -316,7 +317,6 @@ public class Test013 {
         File f = new File("test013_writeLimitPrecision.qds");
 
         QDataSet ds= handler.getDataSet("means");
-        QDataSet gcd= DataSetUtil.gcd( ds );
 
         SimpleStreamFormatter format = new SimpleStreamFormatter();
         format.format( ds, new FileOutputStream(f), true );
