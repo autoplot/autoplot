@@ -17,7 +17,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -693,7 +695,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                             browseSourceType();
                         }
                     } else if (split.scheme.equals("file")) {
-                        JFileChooser chooser = new JFileChooser( split.path );
+                        JFileChooser chooser = new JFileChooser( new File( new URI(split.path) ) );
                         int result = chooser.showOpenDialog(this);
                         if (result == JFileChooser.APPROVE_OPTION) {
                             String suri = DataSetURI.newUri(context, chooser.getSelectedFile().toString());
