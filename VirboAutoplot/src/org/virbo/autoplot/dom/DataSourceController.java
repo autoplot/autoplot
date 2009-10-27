@@ -1213,7 +1213,11 @@ public class DataSourceController extends DomNodeController {
     }
 
     private void handleException(Exception e) {
-        model.getExceptionHandler().handle(e);
+        if ( model.getExceptionHandler()==null ) {
+            e.printStackTrace();
+        } else {
+            model.getExceptionHandler().handle(e);
+        }
     }
 
     /**
