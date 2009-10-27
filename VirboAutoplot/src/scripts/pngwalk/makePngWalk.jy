@@ -12,10 +12,10 @@ def myWriteToPng( filename, appmodel, ldom, width, height ):
   encoder.write(image, out)
   out.close();
 
-def doBatch( times, dom, outputFolder, product, timeFormat, createThumbs, mon ):
+def doBatch( times, dom, params, mon ):
 
-   java.io.File(outputFolder).mkdirs()
-   java.io.File(outputFolder+'thumbs400/').mkdirs()
+   java.io.File(params.outputFolder).mkdirs()
+   java.io.File(params.outputFolder+'thumbs400/').mkdirs()
 
    n= len(times)
    mon.setTaskSize( n )
@@ -28,7 +28,7 @@ def doBatch( times, dom, outputFolder, product, timeFormat, createThumbs, mon ):
 
    dom2= appmodel.getDocumentModel()
 
-   if ( createThumbs ):
+   if ( params.createThumbs ):
       appmodel3= ApplicationModel()
       appmodel3.addDasPeersToApp()
       dom3= appmodel3.getDocumentModel()
@@ -39,20 +39,20 @@ def doBatch( times, dom, outputFolder, product, timeFormat, createThumbs, mon ):
 
    dom2.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
    dom2.options.autolayout= False
-   if ( createThumbs ):
+   if ( params.createThumbs ):
       dom3.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
       dom3.options.autolayout= False
 
-   mon.setProgressMessage('write ' + product + '.vap' )
+   mon.setProgressMessage('write ' + params.product + '.vap' )
 
    dom2.canvases[0].fitted=False
-   if ( createThumbs ): dom3.canvases[0].fitted=False
+   if ( params.createThumbs ): dom3.canvases[0].fitted=False
 
    thumbSize= 400
    w0= dom2.canvases[0].width
    h0= dom2.canvases[0].height
 
-   if ( createThumbs ):
+   if ( params.createThumbs ):
       aspect= 1. * w0 / h0
       thumbH= (int)( math.sqrt( thumbSize**2 / (aspect * aspect + 1. ) ) )
       thumbW= (int) ( thumbH * aspect )
@@ -62,87 +62,98 @@ def doBatch( times, dom, outputFolder, product, timeFormat, createThumbs, mon ):
       dom3.options.canvasFont= 'Dialog-6'
 
    from org.virbo.autoplot.state import StatePersistence
-   StatePersistence.saveState( java.io.File( outputFolder + product + '.vap' ), dom2 );
-   if ( createThumbs ): StatePersistence.saveState( java.io.File( outputFolder + 'thumbs400/' + product + '.vap' ), dom3 );
+   StatePersistence.saveState( java.io.File( params.outputFolder + params.product + '.vap' ), dom2 );
+   if ( params.createThumbs ): StatePersistence.saveState( java.io.File( params.outputFolder + 'thumbs400/' + params.product + '.vap' ), dom3 );
 
    dom2.getController().waitUntilIdle();
-   if ( createThumbs ): dom3.getController().waitUntilIdle();
+   if ( params.createThumbs ): dom3.getController().waitUntilIdle();
 
    mon.setProgressMessage('making images')
 
-   tp= TimeParser.create(timeFormat)
+   tp= TimeParser.create(params.timeFormat)
 
+   t0= java.lang.System.currentTimeMillis()
    count= 0
+
    for i in times:
       count= count+1
       if ( mon.cancelled ): break
       mon.setTaskProgress(count)
       dom2.timeRange= tp.parse(i).getTimeRange()
-      if ( createThumbs ): dom3.timeRange= tp.parse(i).getTimeRange()
-      mon.setProgressMessage('write '+ product + '_%s.png' % i )
-      myWriteToPng( '%s%s_%s.png' % ( outputFolder, product, i ), appmodel, dom2, w0, h0 )
-      if ( createThumbs ): myWriteToPng( '%sthumbs400/%s_%s.png' % ( outputFolder, product, i ), appmodel3, dom3, thumbW, thumbH )
-
+      if ( params.createThumbs ): dom3.timeRange= tp.parse(i).getTimeRange()
+      mon.setProgressMessage('write '+ params.product + '_%s.png' %  i )
+      myWriteToPng( '%s%s_%s.png' % ( params.outputFolder, params.product, i ), appmodel, dom2, w0, h0 )
+      if ( params.createThumbs ): myWriteToPng( '%sthumbs400/%s_%s.png' % ( params.outputFolder, params.product, i ), appmodel3, dom3, thumbW, thumbH )
+      imagesPerSec= count * 1000. / ( java.lang.System.currentTimeMillis()-t0 )
+      #etaSec= (n-count) / imagesPerSec
+      #etaStr= org.das2.datum.DatumUtil.asOrderOneUnits( Units.seconds.createDatum(etaSec) )
+      mon.setAdditionalInfo( '(%.1f/sec)' % ( imagesPerSec ) );
 
    mon.finished()
 
-from javax.swing import JPanel, BoxLayout, JTextField, JLabel, JOptionPane, JCheckBox
+# display a modal dialog to get parameters for creating the png walk.
+# @return a python class containing the parameters, or None if cancelled.
+def showPngWalkInfoDialog():
+    from javax.swing import JPanel, BoxLayout, JTextField, JLabel, JOptionPane, JCheckBox
 
-p= JPanel(  )
-p.layout= BoxLayout( p, BoxLayout.Y_AXIS )
+    p= JPanel(  )
+    p.layout= BoxLayout( p, BoxLayout.Y_AXIS )
 
-p.add( JLabel( 'Filename Root:' ) )
-fln_rootTf= JTextField( 'product' )
-fln_rootTf.toolTipText='stem used to ensure unique filenames.'
-p.add( fln_rootTf )
+    p.add( JLabel( 'Filename Root:' ) )
+    fln_rootTf= JTextField( 'product' )
+    fln_rootTf.toolTipText='stem used to ensure unique filenames.'
+    p.add( fln_rootTf )
 
-p.add( JLabel( 'Output Folder:' ) )
-outputFolderTf= JTextField( '/tmp/pngwalk/' )
-p.add( outputFolderTf )
+    p.add( JLabel( 'Output Folder:' ) )
+    outputFolderTf= JTextField( '/tmp/pngwalk/' )
+    p.add( outputFolderTf )
 
-p.add( JLabel( 'Time Format:' ) )
-timeFormatTf= JTextField( '%Y%m%d' )
-p.add( timeFormatTf )
+    p.add( JLabel( 'Time Format:' ) )
+    timeFormatTf= JTextField( '%Y%m%d' )
+    p.add( timeFormatTf )
 
-p.add( JLabel( 'Time Range:' ) )
-timeRangeTf= JTextField( '2009' )
-p.add( timeRangeTf )
+    p.add( JLabel( 'Time Range:' ) )
+    timeRangeTf= JTextField( '2009' )
+    p.add( timeRangeTf )
 
-createThumbsCb= JCheckBox( 'Create Thumbs' )
-p.add( createThumbsCb )
+    createThumbsCb= JCheckBox( 'Create Thumbs' )
+    p.add( createThumbsCb )
 
-outputFolder=0
-timeRangeStr=0
-fln_root=0
-proceed= False
+    outputFolder=0
+    timeRangeStr=0
+    fln_root=0
+    proceed= False
 
-if ( JOptionPane.showConfirmDialog( getViewWindow(), p, 'pngwalk options', JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ):
-  outputFolder= outputFolderTf.text
-  timeRangeStr= timeRangeTf.text
-  fln_root=  fln_rootTf.text
-  timeFormat= timeFormatTf.text
-  createThumbs= createThumbsCb.selected
-  proceed= True
-else:
-  proceed= False
+    if ( JOptionPane.showConfirmDialog( getViewWindow(), p, 'pngwalk options', JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ):
+      class result:
+         "result of dialog"
+         outputFolder= outputFolderTf.text
+         timeRangeStr= timeRangeTf.text
+         product=  fln_rootTf.text
+         timeFormat= timeFormatTf.text
+         createThumbs= createThumbsCb.selected
+      return result
+    else:
+      return None
 
 from org.virbo.autoplot import ApplicationModel
 
-if ( proceed ):
+params= showPngWalkInfoDialog()
+if ( params!=None ):
 
    from org.das2.components import DasProgressPanel
    mon= DasProgressPanel.createFramed( getViewWindow(),"running batch")
 
-   times= generateTimeRanges( timeFormat, timeRangeStr )
+   times= generateTimeRanges( params.timeFormat, params.timeRangeStr )
 
-   doBatch( times, dom, outputFolder, fln_root, timeFormat, createThumbs, mon )
+   doBatch( times, dom, params, mon )
 
    if ( not mon.cancelled ):
 
      from org.autoplot.pngwalk import DemoPngWalk
-     if ( outputFolder[1]==':' ):
-       url= 'file:/'+outputFolder
+     if ( params.outputFolder[1]==':' ):
+       url= 'file:/'+params.outputFolder
      else:
-       url= 'file:'+outputFolder
+       url= 'file:'+params.outputFolder
 
-     DemoPngWalk.start( url + fln_root + '_' + timeFormat + '.png', getViewWindow() )
+     DemoPngWalk.start( url + params.product + '_' + params.timeFormat + '.png', getViewWindow() )
