@@ -83,6 +83,7 @@ import org.virbo.autoplot.scriptconsole.LogConsole;
 import org.virbo.autoplot.server.RequestHandler;
 import org.virbo.autoplot.server.RequestListener;
 import org.virbo.autoplot.dom.Options;
+import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.autoplot.state.StatePersistence;
@@ -932,6 +933,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JSeparator();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
         aggregateAllMenuItem = new javax.swing.JMenuItem();
@@ -1240,6 +1242,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         jMenu3.add(jMenuItem4);
 
         toolsMenu.add(jMenu3);
+        toolsMenu.add(jSeparator3);
 
         pngWalkMenuItem.setText("PNG Walk");
         pngWalkMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1726,6 +1729,9 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
                 } else {
                     System.err.println("this is autoplot"+APSplash.getVersion());
                 }
+
+                OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
+                opc.loadPreferences();
                 
                 model.addDasPeersToApp();
 
@@ -1881,6 +1887,7 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
     private javax.swing.JMenu optionsMenu;

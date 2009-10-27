@@ -18,33 +18,9 @@ public class Options extends DomNode {
 
     public static final String PROP_COLOR = "color";
     public static final String PROP_FILLCOLOR = "fillColor";
-    Preferences prefs;
 
     public Options() {
-        prefs = new NullPreferences(); //applet support
-    }
 
-    public void loadPreferences() {
-        prefs = Preferences.userNodeForPackage(Options.class);
-        autolabelling = prefs.getBoolean(PROP_AUTOLABELLING, autolabelling);
-        autolayout = prefs.getBoolean(PROP_AUTOLAYOUT, autolayout);
-        autoranging = prefs.getBoolean(PROP_AUTORANGING, autoranging);
-        background = Color.decode(prefs.get(PROP_BACKGROUND, DomUtil.encodeColor(background)));
-        canvasFont = prefs.get(PROP_CANVASFONT, canvasFont);
-        color = Color.decode(prefs.get(PROP_COLOR, DomUtil.encodeColor(color)));
-        drawAntiAlias = prefs.getBoolean(PROP_DRAWANTIALIAS, drawAntiAlias);
-        drawGrid = prefs.getBoolean(PROP_DRAWGRID, drawGrid);
-        drawMinorGrid = prefs.getBoolean(PROP_DRAWMINORGRID, drawMinorGrid);
-        fillColor = Color.decode(prefs.get(PROP_FILLCOLOR, DomUtil.encodeColor(fillColor)));
-        foreground = Color.decode(prefs.get(PROP_FOREGROUND, DomUtil.encodeColor(foreground)));
-        logConsoleVisible = prefs.getBoolean(PROP_LOGCONSOLEVISIBLE, logConsoleVisible);
-        overRendering = prefs.getBoolean(PROP_OVERRENDERING, overRendering);
-        scriptVisible = prefs.getBoolean(PROP_SCRIPTVISIBLE, scriptVisible);
-        dataVisible = prefs.getBoolean(PROP_DATAVISIBLE, dataVisible);
-        layoutVisible = prefs.getBoolean(PROP_LAYOUTVISIBLE, layoutVisible);
-        serverEnabled = prefs.getBoolean(PROP_SERVERENABLED, serverEnabled);
-        specialEffects = prefs.getBoolean(PROP_SPECIALEFFECTS, specialEffects);
-        textAntiAlias = prefs.getBoolean(PROP_TEXTANTIALIAS, textAntiAlias);
     }
 
     protected boolean scriptVisible = false;
@@ -57,7 +33,6 @@ public class Options extends DomNode {
     public void setScriptVisible(boolean scriptVisible) {
         boolean oldScriptVisible = this.scriptVisible;
         this.scriptVisible = scriptVisible;
-        prefs.putBoolean(PROP_SCRIPTVISIBLE, scriptVisible);
         propertyChangeSupport.firePropertyChange(PROP_SCRIPTVISIBLE, oldScriptVisible, scriptVisible);
     }
 
@@ -71,7 +46,6 @@ public class Options extends DomNode {
     public void setLogConsoleVisible(boolean logConsoleVisible) {
         boolean oldLogConsoleVisible = this.logConsoleVisible;
         this.logConsoleVisible = logConsoleVisible;
-        prefs.putBoolean(PROP_LOGCONSOLEVISIBLE, logConsoleVisible);
         propertyChangeSupport.firePropertyChange(PROP_LOGCONSOLEVISIBLE, oldLogConsoleVisible, logConsoleVisible);
     }
 
@@ -89,7 +63,6 @@ public class Options extends DomNode {
     public void setDataVisible(boolean dataVisible) {
         boolean oldDataVisible = this.dataVisible;
         this.dataVisible = dataVisible;
-        prefs.putBoolean(PROP_DATAVISIBLE, dataVisible );
         propertyChangeSupport.firePropertyChange(PROP_DATAVISIBLE, oldDataVisible, dataVisible);
     }
 
@@ -108,7 +81,6 @@ public class Options extends DomNode {
     public void setLayoutVisible(boolean layoutVisible) {
         boolean oldLayoutVisible = this.layoutVisible;
         this.layoutVisible = layoutVisible;
-        prefs.putBoolean(PROP_LAYOUTVISIBLE, layoutVisible );
         propertyChangeSupport.firePropertyChange(PROP_LAYOUTVISIBLE, oldLayoutVisible, layoutVisible);
     }
 
@@ -123,7 +95,6 @@ public class Options extends DomNode {
     public void setServerEnabled(boolean serverEnabled) {
         boolean oldServerEnabled = this.serverEnabled;
         this.serverEnabled = serverEnabled;
-        prefs.putBoolean(PROP_SERVERENABLED, serverEnabled);
         propertyChangeSupport.firePropertyChange(PROP_SERVERENABLED, oldServerEnabled, serverEnabled);
     }
 
@@ -137,7 +108,6 @@ public class Options extends DomNode {
     public void setCanvasFont(String canvasFont) {
         String oldCanvasFont = this.canvasFont;
         this.canvasFont = canvasFont;
-        prefs.put(PROP_CANVASFONT, canvasFont);
         propertyChangeSupport.firePropertyChange(PROP_CANVASFONT, oldCanvasFont, canvasFont);
     }
 
@@ -151,7 +121,6 @@ public class Options extends DomNode {
     public void setForeground(Color foreground) {
         Color oldForeground = this.foreground;
         this.foreground = new Color(foreground.getRGB()); //otherwise can't serialize
-        prefs.put(PROP_FOREGROUND, DomUtil.encodeColor(foreground));
         propertyChangeSupport.firePropertyChange(PROP_FOREGROUND, oldForeground, foreground);
     }
 
@@ -165,14 +134,13 @@ public class Options extends DomNode {
     public void setBackground(Color background) {
         Color oldBackground = this.background;
         this.background = new Color(background.getRGB()); //otherwise can't serialize
-        prefs.put(PROP_BACKGROUND, DomUtil.encodeColor(background));
         propertyChangeSupport.firePropertyChange(PROP_BACKGROUND, oldBackground, background);
     }
 
     /**
      * Holds value of property color.
      */
-    private Color color = Color.BLACK;
+    protected Color color = Color.BLACK;
 
     /**
      * Getter for property color.
@@ -189,14 +157,13 @@ public class Options extends DomNode {
     public void setColor(Color color) {
         Color oldColor = this.color;
         this.color = new Color(color.getRGB()); //otherwise can't serialize
-        prefs.put(PROP_COLOR, DomUtil.encodeColor(color));
         propertyChangeSupport.firePropertyChange(PROP_COLOR, oldColor, color);
     }
 
     /**
      * Holds value of property fillColor.
      */
-    private Color fillColor = Color.DARK_GRAY;
+    protected Color fillColor = Color.DARK_GRAY;
 
     /**
      * Getter for property fillColor.
@@ -213,7 +180,6 @@ public class Options extends DomNode {
     public void setFillColor(Color fillColor) {
         Color oldFillColor = this.fillColor;
         this.fillColor = new Color(fillColor.getRGB()); //otherwise can't serialize
-        prefs.put(PROP_FILLCOLOR, DomUtil.encodeColor(fillColor));
         propertyChangeSupport.firePropertyChange(PROP_FILLCOLOR, oldFillColor, fillColor);
     }
 
@@ -231,7 +197,6 @@ public class Options extends DomNode {
     public void setSpecialEffects(boolean specialEffects) {
         boolean oldSpecialEffects = this.specialEffects;
         this.specialEffects = specialEffects;
-        prefs.putBoolean(PROP_SPECIALEFFECTS, specialEffects);
         propertyChangeSupport.firePropertyChange(PROP_SPECIALEFFECTS, oldSpecialEffects, specialEffects);
     }
 
@@ -249,7 +214,6 @@ public class Options extends DomNode {
     public void setDrawAntiAlias(boolean drawAntiAlias) {
         boolean oldDrawAntiAlias = this.drawAntiAlias;
         this.drawAntiAlias = drawAntiAlias;
-        prefs.putBoolean(PROP_DRAWANTIALIAS, drawAntiAlias);
         propertyChangeSupport.firePropertyChange(PROP_DRAWANTIALIAS, oldDrawAntiAlias, drawAntiAlias);
     }
 
@@ -267,7 +231,6 @@ public class Options extends DomNode {
     public void setTextAntiAlias(boolean textAntiAlias) {
         boolean oldTextAntiAlias = this.textAntiAlias;
         this.textAntiAlias = textAntiAlias;
-        prefs.putBoolean(PROP_TEXTANTIALIAS, textAntiAlias);
         propertyChangeSupport.firePropertyChange(PROP_TEXTANTIALIAS, oldTextAntiAlias, textAntiAlias);
     }
 
@@ -281,7 +244,6 @@ public class Options extends DomNode {
     public void setDrawGrid(boolean drawGrid) {
         boolean oldDrawGrid = this.drawGrid;
         this.drawGrid = drawGrid;
-        prefs.putBoolean(PROP_DRAWGRID, drawGrid);
         propertyChangeSupport.firePropertyChange(PROP_DRAWGRID, oldDrawGrid, drawGrid);
     }
 
@@ -295,7 +257,6 @@ public class Options extends DomNode {
     public void setDrawMinorGrid(boolean drawMinorGrid) {
         boolean oldDrawMinorGrid = this.drawMinorGrid;
         this.drawMinorGrid = drawMinorGrid;
-        prefs.putBoolean(PROP_DRAWMINORGRID, drawMinorGrid);
         propertyChangeSupport.firePropertyChange(PROP_DRAWMINORGRID, oldDrawMinorGrid, drawMinorGrid);
     }
 
@@ -313,12 +274,11 @@ public class Options extends DomNode {
     public void setOverRendering(boolean overRendering) {
         boolean oldValue = this.overRendering;
         this.overRendering = overRendering;
-        prefs.putBoolean(PROP_OVERRENDERING, overRendering);
         propertyChangeSupport.firePropertyChange(PROP_OVERRENDERING, oldValue, overRendering);
     }
 
  
-    private boolean autoranging = true;
+    protected boolean autoranging = true;
     public static final String PROP_AUTORANGING = "autoranging";
 
     public boolean isAutoranging() {
@@ -328,7 +288,6 @@ public class Options extends DomNode {
     public void setAutoranging(boolean newautoranging) {
         boolean oldautoranging = autoranging;
         this.autoranging = newautoranging;
-        prefs.putBoolean(PROP_AUTORANGING, autoranging);
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGING, oldautoranging, newautoranging);
     }
 
@@ -342,7 +301,6 @@ public class Options extends DomNode {
     public void setAutolabelling(boolean autolabelling) {
         boolean oldAutolabelling = this.autolabelling;
         this.autolabelling = autolabelling;
-        prefs.putBoolean(PROP_AUTOLABELLING, autolabelling);
         propertyChangeSupport.firePropertyChange(PROP_AUTOLABELLING, oldAutolabelling, autolabelling);
     }
 
@@ -356,7 +314,6 @@ public class Options extends DomNode {
     public void setAutolayout(boolean autolayout) {
         boolean oldAutolayout = this.autolayout;
         this.autolayout = autolayout;
-        prefs.putBoolean(PROP_AUTOLAYOUT, autolayout);
         propertyChangeSupport.firePropertyChange(PROP_AUTOLAYOUT, oldAutolayout, autolayout);
     }
 

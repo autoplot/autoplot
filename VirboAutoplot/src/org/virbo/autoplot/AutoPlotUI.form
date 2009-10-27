@@ -351,6 +351,8 @@
                 </MenuItem>
               </SubComponents>
             </Menu>
+            <MenuItem class="javax.swing.JSeparator" name="jSeparator3">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="pngWalkMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="PNG Walk"/>

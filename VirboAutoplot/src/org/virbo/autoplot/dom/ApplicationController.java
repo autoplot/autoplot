@@ -106,10 +106,6 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         this.model = model;
         application.controller = this;
-        this.headless = "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false"));
-        if (!headless && DasApplication.hasAllPermission()) {
-            application.getOptions().loadPreferences();
-        }
         bindingContexts = new HashMap();
         //implBindingContexts= new HashMap();
         bindingImpls = new HashMap();
