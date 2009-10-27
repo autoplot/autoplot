@@ -24,7 +24,7 @@ public class RowPngWalkView extends PngWalkView {
     public static final int DEFAULT_CELL_SIZE = 100;
     public static final int MINIMUM_CELL_SIZE = 20;
     private int cellSize = DEFAULT_CELL_SIZE;
-    private JScrollPane scrollPane;
+    protected JScrollPane scrollPane;
     private RowViewCanvas canvas;
 
     public RowPngWalkView(final WalkImageSequence seq) {
@@ -48,7 +48,7 @@ public class RowPngWalkView extends PngWalkView {
             @Override
             public void componentResized(ComponentEvent e) {
                 //cellSize = getHeight();
-                cellSize = Math.max(MINIMUM_CELL_SIZE, getHeight());
+                cellSize = getThumbnailSize();
                 //System.err.printf("Set cell size to %d.%n", cellSize);
                 updateLayout();
             }
@@ -61,6 +61,15 @@ public class RowPngWalkView extends PngWalkView {
     protected void sequenceChanged() {
         updateLayout();
     }
+
+    @Override
+    protected void thumbnailSizeChanged() {
+        cellSize= getThumbnailSize();
+        updateLayout();
+        super.thumbnailSizeChanged();
+    }
+
+
 
     private void updateLayout() {
         if (canvas==null) return;  // super constructor causes this to be called before canvas init

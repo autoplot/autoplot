@@ -42,9 +42,9 @@ import org.virbo.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 import org.das2.util.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
-import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.ScriptContext;
@@ -222,6 +222,19 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         bg.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, tool.views[4], BeanProperty.create("perspective"), persMi, BeanProperty.create("selected") ) );
         bg.bind();
         optionsMenu.add(persMi);
+
+        final JMenu thumbsizeMenu= new JMenu("Thumbnail Size" );
+        final int[] sizes= new int[] { 50, 100, 200, 400 };
+        for ( int i=0; i<sizes.length; i++ ) {
+            final int fsize= sizes[i];
+            thumbsizeMenu.add( new AbstractAction(""+fsize+" px" ) {
+               public void actionPerformed( ActionEvent e ) {
+                  tool.setThumbnailSize(fsize);
+               }
+            });
+        }
+        optionsMenu.add( thumbsizeMenu );
+        
         result.add( optionsMenu );
 
         final JMenu bookmarksMenu= new JMenu("Bookmarks");
@@ -292,12 +305,27 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         views[5]= new SinglePngWalkView( null );
         views[6]= new ContextFlowView(null);
 
+        final int SCROLLBAR_HEIGHT = 20;
+
         views[1].setMinimumSize( new Dimension(100,100) );
         views[4].setMinimumSize( new Dimension(100,100) );
-        JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
-        p.setDividerLocation((int)(views[1].getPreferredSize().getHeight()));
-        JSplitPane p2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[4], views[5] );
-        p.setDividerLocation((int)(views[4].getPreferredSize().getHeight()));
+        final JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
+        p.setDividerLocation(getThumbnailSize());
+        views[1].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                p.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT );
+            }
+        });
+        
+        final JSplitPane p2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[4], views[5] );
+        p.setDividerLocation(getThumbnailSize());
+        views[4].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                p2.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT  );
+            }
+        });
+
+
         tabs= new TearoffTabbedPane();
 
         tabs.addTab( "Single", new JScrollPane( views[3] ) );
@@ -329,11 +357,21 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         pngsPanel.add( tabs );
         pngsPanel.revalidate();
 
+        BindingGroup bc= new BindingGroup();
+        for ( int i=0; i<views.length; i++ ) {
+            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, views[i],
+                    BeanProperty.create("thumbnailSize"), this, BeanProperty.create("thumbnailSize") );
+            bc.addBinding( b );
+        }
+        bc.bind();
+
     }
 
     public void setTemplate( String template ) {
         dataSetSelector1.setValue(template);
-        seq= new WalkImageSequence( template );
+
+        String surl= DataSetURI.fromUri( DataSetURI.getResourceURI(template) );
+        seq= new WalkImageSequence( surl );
         seq.addPropertyChangeListener( new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 String item= seq.currentImage().getUri().toString();
@@ -356,6 +394,20 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     public String getTemplate() {
         return seq.getTemplate();
     }
+
+    protected int thumbnailSize = 200;
+    public static final String PROP_THUMBNAILSIZE = "thumbnailSize";
+
+    public int getThumbnailSize() {
+        return thumbnailSize;
+    }
+
+    public void setThumbnailSize(int thumbnailSize) {
+        int oldThumbnailSize = this.thumbnailSize;
+        this.thumbnailSize = thumbnailSize;
+        firePropertyChange(PROP_THUMBNAILSIZE, oldThumbnailSize, thumbnailSize);
+    }
+
 
     static interface ActionEnabler {
         boolean isActionEnabled( String filename );

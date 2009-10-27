@@ -52,19 +52,6 @@ public class CoversWalkView extends PngWalkView  {
             }
         });
 
-        canvas.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent e) {
-                //cellSize = getHeight();
-                cellSize = Math.max(MINIMUM_CELL_SIZE, getHeight());
-                cellWidth= cellSize / HEIGHT_WIDTH_RATIO;
-                
-                //System.err.printf("Set cell size to %d.%n", cellSize);
-                updateLayout();
-            }
-        });
-
         add(scrollPane);
     }
 
@@ -92,6 +79,16 @@ public class CoversWalkView extends PngWalkView  {
         }
         revalidate();
     }
+
+    @Override
+    protected void thumbnailSizeChanged() {
+        cellSize= getThumbnailSize();
+        cellWidth= cellSize / HEIGHT_WIDTH_RATIO;
+        updateLayout();
+        super.thumbnailSizeChanged();
+    }
+
+
 
     @Override
     public void propertyChange(PropertyChangeEvent e) {
@@ -179,7 +176,6 @@ public class CoversWalkView extends PngWalkView  {
         }
 
         public Dimension getPreferredScrollableViewportSize() {
-            System.err.println("getPreferredScrollableViewportSize called: preferredSize=" + getPreferredSize());
             return getPreferredSize();
         }
 

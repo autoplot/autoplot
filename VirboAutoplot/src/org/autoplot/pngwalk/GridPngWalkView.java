@@ -67,6 +67,17 @@ public class GridPngWalkView extends PngWalkView {
         updateLayout();
     }
 
+    @Override
+    protected void thumbnailSizeChanged() {
+        thumbSize= getThumbnailSize();
+        nCols = getWidth() / thumbSize;
+        if (nCols == 0) nCols = 1;
+        updateLayout();
+
+        super.thumbnailSizeChanged();
+    }
+
+
     private void selectCellAt(int x, int y) {
         if (x > nCols * thumbSize) {
             return;
@@ -82,19 +93,6 @@ public class GridPngWalkView extends PngWalkView {
         seq.setIndex(n);
     }
 
-    public int getThumbSize() {
-        return thumbSize;
-    }
-
-    public void setThumbSize(int size) {
-        if (size < MIN_THUMB_SIZE) {
-            size = MIN_THUMB_SIZE;
-        }
-        if (size > MAX_THUMB_SIZE) {
-            size = MAX_THUMB_SIZE;
-        }
-        thumbSize = size;
-    }
 
     @Override
     public void propertyChange(PropertyChangeEvent e) {

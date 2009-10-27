@@ -52,6 +52,14 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         repaint();
     }
 
+    /**
+     * subclasses should override this if they need to take action when the
+     * thumbnail size changes.
+     */
+    protected void thumbnailSizeChanged() {
+        repaint();
+    }
+
     /** Respond to property changes on the {@list WalkImageSequence} this view
      * represents.  The default implementation just calls <code>repaint()</code>,
      * but subclasses may override.
@@ -70,6 +78,19 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     }
 
 
+    protected int thumbnailSize = 200;
+    public static final String PROP_THUMBNAILSIZE = "thumbnailSize";
+
+    public int getThumbnailSize() {
+        return thumbnailSize;
+    }
+
+    public void setThumbnailSize(int thumbnailSize) {
+        int oldThumbnailSize = this.thumbnailSize;
+        this.thumbnailSize = thumbnailSize;
+        thumbnailSizeChanged();
+        firePropertyChange(PROP_THUMBNAILSIZE, oldThumbnailSize, thumbnailSize);
+    }
 
     // Error message painting (e.g. "No matching images")
     protected  void drawCenteredString(Graphics2D g, String msg) {
