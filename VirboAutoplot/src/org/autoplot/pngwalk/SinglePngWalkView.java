@@ -2,6 +2,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
@@ -29,6 +30,8 @@ public class SinglePngWalkView extends PngWalkView {
     protected synchronized void paintComponent(Graphics g1) {
         super.paintComponent(g1);
         Graphics2D g2 = (Graphics2D) g1;
+
+        g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
 
         if (seq == null || seq.size()==0) return;
 
