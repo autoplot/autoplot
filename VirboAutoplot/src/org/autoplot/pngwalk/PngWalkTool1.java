@@ -310,7 +310,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         views[1].setMinimumSize( new Dimension(100,100) );
         views[4].setMinimumSize( new Dimension(100,100) );
         final JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
-        p.setDividerLocation(getThumbnailSize());
+        p.setDividerLocation(getThumbnailSize()+ SCROLLBAR_HEIGHT);
         views[1].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 p.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT );
@@ -318,7 +318,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         });
         
         final JSplitPane p2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[4], views[5] );
-        p.setDividerLocation(getThumbnailSize());
+        p.setDividerLocation(getThumbnailSize()+ SCROLLBAR_HEIGHT);
         views[4].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 p2.setDividerLocation( (Integer)evt.getNewValue() + SCROLLBAR_HEIGHT  );
@@ -338,7 +338,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         
         // add listener to jump to and from the single image view.
         for ( int i=0; i<views.length; i++ ) {
-            views[i].addMouseListener( new MouseAdapter() {
+            views[i].getMouseTarget().addMouseListener( new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if ( e.getClickCount()==2 ) {
@@ -371,8 +371,14 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         dataSetSelector1.setValue(template);
 
         String surl= DataSetURI.fromUri( DataSetURI.getResourceURI(template) );
-        seq= new WalkImageSequence( surl );
-        seq.addPropertyChangeListener( new PropertyChangeListener() {
+        try {
+            seq= new WalkImageSequence( surl );
+        } catch ( Exception ex ) {
+            seq= null;
+            ex.printStackTrace();
+        }
+        
+        if ( seq!=null ) seq.addPropertyChangeListener( new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 String item= seq.currentImage().getUri().toString();
 
