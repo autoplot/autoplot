@@ -32,6 +32,7 @@ public class RowPngWalkView extends PngWalkView {
 
     public RowPngWalkView(final WalkImageSequence seq) {
         super(seq);
+        setShowCaptions(true);
         setLayout(new java.awt.BorderLayout());
         canvas = new RowViewCanvas();
         scrollPane = new JScrollPane(canvas, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -170,6 +171,14 @@ public class RowPngWalkView extends PngWalkView {
                     thumb = loadingImage;
                 }
                 g2.drawImage(thumb, i * cellSize + (cellSize - thumb.getWidth()) / 2, (cellSize - thumb.getHeight()) / 2, null);
+                if (showCaptions && seq.imageAt(i).getCaption()!=null) {
+                    int cx = i*cellSize + 5;
+                    int cy = getHeight() - fm.getHeight();
+                    g2.setColor(Color.BLACK);
+                    g2.setClip(new Rectangle(i*cellSize, 0, cellSize-10, getHeight()));
+                    g2.drawString(seq.imageAt(i).getCaption(), cx, cy);
+                    g2.setClip(null);  // clear user clip
+                }
             }
         }
 
