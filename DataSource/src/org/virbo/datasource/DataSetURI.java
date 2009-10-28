@@ -492,6 +492,12 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * canonical mathos for converting URI to human-readable string, containing
+     * spaces and other illegal characters.
+     * @param uri
+     * @return
+     */
     public static String fromUri( URI uri ) {
         try {
             String r = URLDecoder.decode(uri.toASCIIString(), "US-ASCII");
