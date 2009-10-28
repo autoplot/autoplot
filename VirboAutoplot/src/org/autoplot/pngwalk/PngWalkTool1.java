@@ -18,7 +18,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -28,12 +30,16 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
 import org.das2.util.ArgumentList;
@@ -182,6 +188,72 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                     }
                 };
                 new Thread(run).start();
+            }
+        });
+
+        tool.addFileAction( PngWalkTool1.LOCAL_FILE_ENABLER, "problem", new AbstractAction("Problem...") {
+            public void actionPerformed( ActionEvent e ) {
+                String s = tool.getSelectedFile();
+                String problemFile= s + ".problem";
+                File pf;
+                try {
+                    pf = new File(new URI(problemFile));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+                    return;
+                }
+                JTextArea ta= new JTextArea(10,50);
+                if ( pf.exists() ) {
+                    try {
+                        String ss = WalkUtil.readFile(pf);
+                        ta.setText(ss);
+                    } catch (IOException ex) {
+                        Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+                        throw new RuntimeException(ex);
+                    }
+                }
+
+                if ( JOptionPane.showConfirmDialog( tool, new JScrollPane(ta), "Edit Problem File", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                    try {
+                        WalkUtil.writeFile(pf, ta.getText());
+                    } catch (IOException ex) {
+                        Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        });
+
+        tool.addFileAction( PngWalkTool1.LOCAL_FILE_ENABLER, "okay", new AbstractAction("Okay...") {
+            public void actionPerformed( ActionEvent e ) {
+                String s = tool.getSelectedFile();
+                String problemFile= s + ".okay";
+                File pf;
+                try {
+                    pf = new File(new URI(problemFile));
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+                    return;
+                }
+                JTextArea ta= new JTextArea(10,50);
+                if ( pf.exists() ) {
+                    try {
+                        String ss = WalkUtil.readFile(pf);
+                        ta.setText(ss);
+                    } catch (IOException ex) {
+                        Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+                        throw new RuntimeException(ex);
+                    }
+                }
+
+                if ( JOptionPane.showConfirmDialog( tool, new JScrollPane(ta), "Edit Okay File", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
+                    try {
+                        WalkUtil.writeFile(pf, ta.getText());
+                    } catch (IOException ex) {
+                        Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
         });
 
@@ -382,11 +454,11 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             public void propertyChange(PropertyChangeEvent evt) {
                 String item= seq.currentImage().getUri().toString();
 
-                if ( actionEnabler!=null ) {
-                    boolean actionEnabled= actionEnabler.isActionEnabled(item);
-                    addFileActionButton.setEnabled(actionEnabled);
+                for ( int i=0; i<actionEnablers.size(); i++ ) {
+                    boolean actionEnabled= actionEnablers.get(i).isActionEnabled(item);
+                    actionButtons.get(i).setEnabled(actionEnabled);
                     if ( actionEnabled ) {
-                        addFileActionButton.setActionCommand(actionCommand+" "+item);
+                       actionButtons.get(i).setActionCommand(actionCommand+" "+item);
                     }
                 }
             }
@@ -415,16 +487,26 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     }
 
 
-    static interface ActionEnabler {
+    public static interface ActionEnabler {
         boolean isActionEnabled( String filename );
     }
 
-    ActionEnabler actionEnabler;
+    public static ActionEnabler LOCAL_FILE_ENABLER = new ActionEnabler() {
+        public boolean isActionEnabled( String filename ) {
+            return DataSetURI.getResourceURI(filename).toString().startsWith("file:" );
+        }
+    };
 
-    void addFileAction( ActionEnabler match, String actionCommand, AbstractAction abstractAction ) {
-        this.actionEnabler= match;
-        this.actionCommand= actionCommand;
-        addFileActionButton.setAction(abstractAction);
+    List<ActionEnabler> actionEnablers= new ArrayList<ActionEnabler>();
+    List<String> actionCommands= new ArrayList<String>();
+    List<JButton> actionButtons= new ArrayList<JButton>();
+    
+    void addFileAction( ActionEnabler match, String actionCommand, Action abstractAction ) {
+        this.actionEnablers.add( match );
+        this.actionCommands.add( actionCommand );
+        JButton b= new JButton( abstractAction );
+        this.actionButtons.add( b );
+        actionButtonsPanel.add( b );
     }
 
     String getSelectedFile() {
@@ -447,12 +529,12 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         pngsPanel = new javax.swing.JPanel();
         timeFilterTextField = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
+        actionButtonsPanel = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         prevSetButton = new javax.swing.JButton();
         prevButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
         nextSetButton = new javax.swing.JButton();
-        addFileActionButton = new javax.swing.JButton();
         jumpToFirstButton = new javax.swing.JButton();
         jumpToLastButton = new javax.swing.JButton();
         dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
@@ -475,6 +557,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         jLabel1.setText("Display Only:");
         jLabel1.setToolTipText("Enter a time range, such as \"2009\" or \"May 2009\" to limit the images displayed.");
         jLabel1.setEnabled(false);
+
+        actionButtonsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         prevSetButton.setText("<<<");
         prevSetButton.addActionListener(new java.awt.event.ActionListener() {
@@ -504,8 +588,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
-        addFileActionButton.setText("----");
-
         jumpToFirstButton.setText("|<");
         jumpToFirstButton.setToolTipText("jump to first");
         jumpToFirstButton.addActionListener(new java.awt.event.ActionListener() {
@@ -527,7 +609,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jumpToFirstButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(prevSetButton)
@@ -538,10 +620,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(nextSetButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jumpToLastButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 346, Short.MAX_VALUE)
-                .add(addFileActionButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 122, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .add(jumpToLastButton))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -550,12 +629,11 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(nextButton)
                 .add(nextSetButton)
                 .add(prevSetButton)
-                .add(addFileActionButton)
                 .add(jumpToFirstButton)
                 .add(jumpToLastButton))
         );
 
-        jPanel1Layout.linkSize(new java.awt.Component[] {addFileActionButton, nextButton, nextSetButton, prevButton, prevSetButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        jPanel1Layout.linkSize(new java.awt.Component[] {nextButton, nextSetButton, prevButton, prevSetButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
         dataSetSelector1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -567,7 +645,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(24, 24, 24)
                 .add(jLabel1)
@@ -579,12 +656,19 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
                 .addContainerGap())
             .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 845, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(480, Short.MAX_VALUE))
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(layout.createSequentialGroup()
+                    .addContainerGap(382, Short.MAX_VALUE)
+                    .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -592,8 +676,15 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                     .add(jLabel1)
                     .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(12, 12, 12)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                    .addContainerGap(633, Short.MAX_VALUE)
+                    .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
+
+        layout.linkSize(new java.awt.Component[] {actionButtonsPanel, jPanel1}, org.jdesktop.layout.GroupLayout.VERTICAL);
+
     }// </editor-fold>//GEN-END:initComponents
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
@@ -645,7 +736,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton addFileActionButton;
+    private javax.swing.JPanel actionButtonsPanel;
     private org.virbo.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
