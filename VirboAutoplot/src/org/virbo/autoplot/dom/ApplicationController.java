@@ -972,8 +972,10 @@ public class ApplicationController extends DomNodeController implements RunLater
             throw new IllegalArgumentException("last plot cannot be deleted");
         }
         List<Panel> panels = this.getPanelsFor(domPlot);
-        if (panels.size() > 0) {
-            throw new IllegalArgumentException("plot must not have panels before deleting");
+        if (panels.size() > 0) { // transitional state
+            for ( Panel p: panels ) {
+                if ( application.panels.size()>1 ) deletePanel(p);
+            }
         }
         for (Connector c : DomUtil.asArrayList(application.getConnectors())) {
             if (c.getPlotA().equals(domPlot.getId()) || c.getPlotB().equals(domPlot.getId())) {
@@ -1075,6 +1077,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         MutatorLock lock= mutatorLock();
         lock.lock();
 
+        for ( int i=application.getPlots().length-1; i>0; i-- ) {
+            deletePlot( application.getPlots(i) );
+        }
+
         for ( int i=application.getPanels().length-1; i>0; i-- ) {
             deletePanel( application.getPanels(i) ); //may delete dsf and plots as well.
         }
@@ -1083,9 +1089,6 @@ public class ApplicationController extends DomNodeController implements RunLater
             deleteDataSourceFilter( application.getDataSourceFilters(i) );
         }
 
-        for ( int i=application.getPlots().length-1; i>0; i-- ) {
-            deletePlot( application.getPlots(i) );
-        }
         application.getPlots(0).getXaxis().setLog(false); // TODO kludge
         application.getPlots(0).getYaxis().setLog(false); // TODO kludge
         application.getPlots(0).getZaxis().setLog(false); // TODO kludge
@@ -1098,8 +1101,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             deleteBinding( application.getBindings(i) );
         }
 
+        application.getPlots(0).setColumnId("marginColumn_0");
+        application.getPlots(0).setRowId("marginRow_0");
+
         Canvas c= application.getCanvases(0);
-        for ( int i=c.getRows().length-1; i>0; i-- ) {
+        for ( int i=c.getRows().length-1; i>=0; i-- ) {
             c.getController().deleteRow(c.getRows(i));
         }
 
@@ -1109,8 +1115,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             c.getRows(0).setBottom("100%");
         }
 
-
-        for ( int i=c.getColumns().length-1; i>0; i-- ) {
+        for ( int i=c.getColumns().length-1; i>=0; i-- ) {
             c.getController().deleteColumn(c.getColumns(i));
         }
 
@@ -1124,7 +1129,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
         application.getDataSourceFilters(0).getController().setDataSetInternal(null,null,true);
         application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
-        application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID) );
+        application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE ) );
+        application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+        application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID ) );
 
         resetIdSequenceNumbers();
         
