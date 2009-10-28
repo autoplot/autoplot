@@ -1,6 +1,8 @@
 package org.autoplot.pngwalk;
 
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -11,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
@@ -70,7 +73,11 @@ public class RowPngWalkView extends PngWalkView {
     }
 
 
-
+    @Override
+    public JComponent getMouseTarget() {
+        return canvas;
+    }
+    
     private void updateLayout() {
         if (canvas==null) return;  // super constructor causes this to be called before canvas init
         if (seq != null) {
@@ -116,13 +123,25 @@ public class RowPngWalkView extends PngWalkView {
             this.setBorder(javax.swing.BorderFactory.createEmptyBorder());
         }
 
+        int psn= 0; // paint sequence number
+
         @Override
         public synchronized void paintComponent(Graphics g1) {
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
 
             Rectangle bounds = g2.getClipBounds();
-            //cellSize = this.getHeight();
+
+
+            Color cc= new Color( 220 + (int)(Math.random()*25), 220 + (int)(Math.random()*25), 220 + (int)(Math.random()*25) );
+            Color c0= g2.getColor();
+            g2.setColor( cc );
+            g2.fillRect( bounds.x, bounds.y, bounds.width, bounds.height );
+            g2.setColor( c0 );
+            psn++;
+            FontMetrics fm= g2.getFontMetrics();
+            g2.drawString(""+psn, bounds.x, fm.getHeight() );
+            g2.drawString(""+psn, bounds.x+bounds.width-fm.stringWidth(""+psn), fm.getHeight() );
 
             if (seq == null) {
                 return;

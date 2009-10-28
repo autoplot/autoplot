@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
@@ -92,6 +93,18 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
         firePropertyChange(PROP_THUMBNAILSIZE, oldThumbnailSize, thumbnailSize);
     }
 
+    /**
+     * return the component that will generate mouse events.  Some
+     * components have a JScrollPane, so simply adding a listener to the 
+     * PngWalkView doesn't work.  The base class implementation of this 
+     * simply returns the PngWalkView, but such components should override
+     * this method.
+     * @return
+     */
+    public JComponent getMouseTarget() {
+        return this;
+    }
+
     // Error message painting (e.g. "No matching images")
     protected  void drawCenteredString(Graphics2D g, String msg) {
         if (msg == null) {
@@ -113,18 +126,20 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     }
 
     protected void paintImageCentered(BufferedImage i, Graphics2D g2, String caption) {
+        FontMetrics fm = this.getFontMetrics(this.getFont());
+        double captionHeight=  ( showCaptions & caption!=null ) ? ( fm.getHeight() + fm.getDescent() ) : 0 ;
+        double imageHeight= i.getHeight();
         double xfactor = (double) getWidth() / (double) i.getWidth(null);
-        double yfactor = (double) getHeight() / (double) i.getHeight(null);
+        double yfactor = (double) ( getHeight()-captionHeight ) / (double) imageHeight;
         double s = Math.min(xfactor, yfactor);
         s = Math.min(1.0, s);
         int xpos = (int) (this.getWidth() - i.getWidth(null) * s) / 2;
-        int ypos = (int) (this.getHeight() - i.getHeight(null) * s) / 2;
+        int ypos = (int) ((this.getHeight()-captionHeight) - imageHeight * s) / 2;
         int xs = (int) (i.getWidth(null) * s);
         int ys = (int) (i.getHeight(null) * s);
         BufferedImageOp resizeOp = new ScalePerspectiveImageOp(i.getWidth(), i.getHeight(), 0, 0, xs, ys, 0, -1, -1, 0, false);
         g2.drawImage(i, resizeOp, xpos, ypos);
         if ( showCaptions && caption != null) {
-            FontMetrics fm = this.getFontMetrics(this.getFont());
             int cx = xpos;
             int cy = ypos + ys + fm.getHeight();
             g2.drawString(caption, cx, cy);

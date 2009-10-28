@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
@@ -76,6 +77,12 @@ public class GridPngWalkView extends PngWalkView {
 
         super.thumbnailSizeChanged();
     }
+
+    @Override
+    public JComponent getMouseTarget() {
+        return canvas;
+    }
+
 
 
     private void selectCellAt(int x, int y) {

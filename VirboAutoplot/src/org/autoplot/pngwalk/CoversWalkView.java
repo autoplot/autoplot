@@ -8,13 +8,12 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
@@ -88,7 +87,10 @@ public class CoversWalkView extends PngWalkView  {
         super.thumbnailSizeChanged();
     }
 
-
+    @Override
+    public JComponent getMouseTarget() {
+        return canvas;
+    }
 
     @Override
     public void propertyChange(PropertyChangeEvent e) {
