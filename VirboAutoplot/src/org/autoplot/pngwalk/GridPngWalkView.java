@@ -2,6 +2,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -34,6 +35,7 @@ public class GridPngWalkView extends PngWalkView {
     public GridPngWalkView(WalkImageSequence seq) {
         super(seq);
 
+        setShowCaptions(true);
         setLayout(new java.awt.BorderLayout());
         canvas = new GridViewCanvas();
         scrollPane = new JScrollPane(canvas);
@@ -146,6 +148,7 @@ public class GridPngWalkView extends PngWalkView {
             int rowMax = Math.min((bounds.y + bounds.height) / thumbSize + 1, seq.size() / nCols + 1);
             int colMin = Math.min(bounds.x / thumbSize, nCols);
             int colMax = Math.min((bounds.x + bounds.width) / thumbSize + 1, nCols);
+            FontMetrics fm = g2.getFontMetrics();
 
             for (int row = rowMin; row < rowMax; row++) {
                 for (int col = colMin; col < colMax; col++) {
@@ -161,7 +164,7 @@ public class GridPngWalkView extends PngWalkView {
                     }
                     //g2.draw(new Ellipse2D.Double(col * thumbSize + 2, row * thumbSize + 2, thumbSize - 4, thumbSize - 4));
                     BufferedImage thumb = seq.imageAt(n).getThumbnail();
-                    if (thumb != null) {  //TODO: placeholder for loading image
+                    if (thumb != null) {
                         double s = Math.min((double) (thumbSize - 4) / thumb.getWidth(), (double) (thumbSize - 4) / thumb.getHeight());
                         if (s < 1.0) {
                             int w = (int) (s * thumb.getWidth());
@@ -173,6 +176,14 @@ public class GridPngWalkView extends PngWalkView {
                         thumb = loadingImage;
                     }
                     g2.drawImage(thumb, col * thumbSize + (thumbSize - thumb.getWidth()) / 2, row * thumbSize + (thumbSize - thumb.getHeight()) / 2, null);
+                    if (showCaptions && seq.imageAt(n).getCaption()!=null) {
+                        int cx = col*thumbSize + 5;
+                        int cy = (row+1)*thumbSize - fm.getDescent();
+                        g2.setColor(Color.BLACK);
+                        g2.setClip(new Rectangle(col*thumbSize, row*thumbSize, thumbSize-10, thumbSize));
+                        g2.drawString(seq.imageAt(n).getCaption(), cx, cy);
+                        g2.setClip(null);  // clear user clip
+                    }
 
                 }
             }
