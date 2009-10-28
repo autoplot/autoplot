@@ -1142,7 +1142,7 @@ public class PanelController extends DomNodeController {
 
     private DasColorBar getColorbar() {
         Plot p= dom.controller.getPlotFor(panel);
-        if ( p==null ) throw new IllegalArgumentException("no plot found for panel");
+        if ( p==null ) throw new IllegalArgumentException("no plot found for panel ("+panel+","+panel.getPlotId()+")");
         return p.controller.getDasColorBar();
     }
 
