@@ -9,6 +9,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
@@ -22,6 +24,8 @@ import java.util.List;
 public class ContextFlowView extends PngWalkView {
 
     List<Rectangle> imageBounds;
+    int firstIndexPainted, lastIndexPainted;
+
     boolean useSquashedThumbs= true;
 
     public ContextFlowView( WalkImageSequence s ) {
@@ -30,6 +34,20 @@ public class ContextFlowView extends PngWalkView {
         addMouseWheelListener(new MouseWheelListener() {
             public void mouseWheelMoved(MouseWheelEvent e) {
                 if ( seq!=null && seq.size()!=0 ) seq.skipBy(e.getWheelRotation());
+            }
+        });
+
+        addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ( imageBounds==null ) return;
+                for ( int i=firstIndexPainted; i<lastIndexPainted; i++ ) {
+                    if ( imageBounds.get(i).contains(e.getPoint()) ) {
+                        seq.setIndex(i);
+                        break;
+                    }
+                }
             }
         });
     }
@@ -131,7 +149,7 @@ public class ContextFlowView extends PngWalkView {
     }
     
     @Override
-    protected void paintComponent(Graphics g1) {
+    protected synchronized void paintComponent(Graphics g1) {
 
         if ( seq==null ) return;
         
@@ -150,6 +168,9 @@ public class ContextFlowView extends PngWalkView {
             int columns = (xm - currentWidth/2 ) / shelfWidth;
 
             int currentIndex= seq.getIndex();
+
+            firstIndexPainted= Math.max( 0, currentIndex - columns );
+            lastIndexPainted= Math.min( seq.size(), currentIndex + columns + 1 ); // exclusive
 
             double sh= useSquashedThumbs ? 1. : 10.;
 
