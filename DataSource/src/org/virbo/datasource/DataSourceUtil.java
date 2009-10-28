@@ -12,6 +12,8 @@ package org.virbo.datasource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -19,11 +21,20 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.TimeParser;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 
 /**
  *
@@ -106,32 +117,91 @@ public class DataSourceUtil {
         }
         return s;
     }
-    
+
+    /**
+     * from org.autoplot.pngwalk.WalkUtil
+     * @param str
+     * @param targets
+     * @return
+     */
+    private static int firstIndexOf( String str, List<String> targets ) {
+        int i0= Integer.MAX_VALUE;
+        for ( String t: targets ) {
+            int i= str.indexOf(t);
+            if ( i>-1 && i<i0 ) i0= i;
+        }
+        return i0==Integer.MAX_VALUE ? -1 : i0;
+    }
+
+    /**
+     * returns the last index of slash, splitting the FileSystem part from the template part.
+     * @param surl
+     * @return
+     */
+    private static int splitIndex(String surl) {
+        int i= firstIndexOf( surl,Arrays.asList( "%Y","$Y","%y","$y",".*") );
+        if ( i!=-1 ) {
+            i = surl.lastIndexOf('/', i);
+        } else {
+            i = surl.lastIndexOf('/');
+        }
+        return i;
+    }
+
+    public static String makeAggregation( String surl, String[] surls ) {
+        try {
+            String sagg = makeAggregation(surl);
+            if (sagg.equals(surl))
+                return surl;
+            DatumRange dr = null;
+            // remove parameter
+            sagg = URISplit.removeParam(sagg, "timerange");
+            TimeParser tp = TimeParser.create(sagg);
+            tp.parse(surl);
+            dr = tp.getTimeRange();
+            
+            for (int i = 0; i < surls.length; i++) {
+                try {
+                    tp.parse(surls[i]);
+                    dr = DatumRangeUtil.union(dr, tp.getTimeRange());
+                } catch (ParseException ex) {
+                    Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            return URISplit.putParam(sagg, "timerange", dr.toString());
+        } catch (ParseException ex) {
+            Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, null, ex);
+            return surl;
+        }
+
+
+    }
+
     public static String makeAggregation( String surl ) {
         String yyyy= "/\\d{4}/";
         String yyyymmdd= "(?<!\\d)(\\d{8})(?!\\d)"; //"(\\d{8})";
         String yyyy_mm_dd= "\\d{4}([\\-_])\\d{2}\\1\\d{2}";
-
+        String yyyy_jjj= "\\d{4}([\\-_])\\d{3}";
         String version= "([Vv])\\d{2}";
         String result= surl;
-        
-        String timeRange;
-        Matcher m= Pattern.compile(yyyymmdd).matcher(surl);
-        if ( m.find() ) {
-            timeRange= m.group(0);
-        } else {
-            m= Pattern.compile(yyyy_mm_dd).matcher(surl);
+
+        String[] abs= new String[] { yyyymmdd, yyyy_mm_dd, yyyy_jjj };
+
+        String timeRange=null;
+        for ( int i= 0; i<abs.length; i++ ) {
+            Matcher m= Pattern.compile(abs[i]).matcher(surl);
             if ( m.find() ) {
                 timeRange= m.group(0);
-            } else {
-                return null;
             }
         }
 
-        result= result.replaceFirst(yyyy, "/\\$Y/");               
+        if ( timeRange==null ) return null;
+
+        result= result.replaceFirst(yyyy_jjj, "\\$Y$1\\$j");
         result= result.replaceFirst(yyyymmdd, "\\$Y\\$m\\$d");
         result= result.replaceFirst(yyyy_mm_dd, "\\$Y$1\\$m$1\\$d" );
-                
+        result= result.replaceFirst(yyyy, "/\\$Y/");
+
         result= result.replaceFirst(version, "$1..");
         
         return result 
