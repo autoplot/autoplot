@@ -5,7 +5,10 @@
 
 package org.autoplot.pngwalk;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,6 +22,7 @@ import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.DataSetURI;
 
 /**
  *
@@ -97,13 +101,15 @@ public class WalkUtil {
         List<URI> result= new ArrayList(ss.length);
         timeRanges.clear();
 
+        String dirsuri= DataSetURI.fromUri(fs.getRootURI());
+
         for ( i = 0; i < ss.length; i++) {
             DatumRange dr2=null;
             if ( fsm!=null ) dr2= fsm.getRangeFor(ss[i]);
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
                 if ( fs.getFileObject(ss[i]).isLocal() ) {
-                    File f= fs.getFileObject(ss[i]).getFile();
-                    result.add( f.toURI() );
+                    //File f= fs.getFileObject(ss[i]).getFile();
+                    result.add( new URI( dirsuri + ss[i] ) ); // make file:/// match template.
                 } else {
                     result.add( fs.getRootURI().resolve(ss[i]) );
                 }
@@ -112,5 +118,24 @@ public class WalkUtil {
         }
 
         return result;
+    }
+
+    static String readFile(File pf) throws IOException {
+        BufferedReader read= new BufferedReader( new FileReader(pf) );
+        String s=read.readLine();
+        StringBuffer result= new StringBuffer();
+        while ( s!=null ) {
+            result.append(s);
+            result.append("\n");
+            s=read.readLine();
+        }
+        read.close();
+        return result.toString();
+    }
+
+    static void writeFile( File pf, String s ) throws IOException {
+        FileWriter write= new FileWriter(pf);
+        write.write(s);
+        write.close();
     }
 }
