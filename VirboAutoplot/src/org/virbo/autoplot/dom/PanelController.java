@@ -29,6 +29,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -825,8 +826,11 @@ public class PanelController extends DomNodeController {
             bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
             bindToSeriesRenderer(new SeriesRenderer());
         }
-        JMenuItem mi= ac.getPlotFor(panel).getController().getPanelPropsMenuItem();
-        if ( mi!=null ) mi.setIcon( renderer.getListIcon() );
+        Plot mip= ac.getPlotFor(panel);
+        if ( mip!=null ) {  // transitional state
+            JMenuItem mi= mip.getController().getPanelPropsMenuItem();
+            if ( mi!=null ) mi.setIcon( renderer.getListIcon() );
+        }
         renderer.setId( "rend_"+panel.getId());
         ac.bind(panel, Panel.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL, getLabelConverter() );
         ac.bind(panel, Panel.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
@@ -1142,7 +1146,9 @@ public class PanelController extends DomNodeController {
 
     private DasColorBar getColorbar() {
         Plot p= dom.controller.getPlotFor(panel);
-        if ( p==null ) throw new IllegalArgumentException("no plot found for panel ("+panel+","+panel.getPlotId()+")");
+        if ( p==null ) {
+            throw new IllegalArgumentException("no plot found for panel ("+panel+","+panel.getPlotId()+")");
+        }
         return p.controller.getDasColorBar();
     }
 
@@ -1164,12 +1170,18 @@ public class PanelController extends DomNodeController {
 
     protected void maybeCreateDasPeer(){
         Renderer oldRenderer = getRenderer();
-        Renderer newRenderer = AutoplotUtil.maybeCreateRenderer( panel.getRenderType(), oldRenderer, getColorbar() );
+        DasColorBar cb= null;
+        if ( RenderTypeUtil.needsColorbar(panel.getRenderType()) ) cb= getColorbar();
+        Renderer newRenderer = AutoplotUtil.maybeCreateRenderer( panel.getRenderType(), oldRenderer, cb );
 
         if (oldRenderer != newRenderer || getDasPlot()!=newRenderer.getParent() ) {
             if ( oldRenderer != newRenderer ) setRenderer(newRenderer);
 
             DasPlot plot = getDasPlot();
+            if ( plot==null ) {
+                System.err.println("brace yourself for crash...");
+                plot = getDasPlot(); // for debugging  Spectrogram->Series
+            }
 
             DasPlot oldPlot=null;
             if (oldRenderer != null) {
