@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -27,6 +26,7 @@ import org.python.core.PyException;
 import org.python.core.PyList;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
@@ -79,7 +79,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             mon.setProgressMessage( "loading "+uri );
             URISplit split= URISplit.parse(uri.toString());
             split.params= null;
-            resourceURI= URISplit.format(split);
+            resourceURI= DataSetURI.fromUri( DataSetURI.getResourceURI(URISplit.format(split)) );
 
         } else {
             resourceURI= null;
@@ -148,6 +148,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             String expr = params.get("arg_0");
 
             PyObject result;
+
+            String label= null;
             
             if (expr == null) {
                 try {
@@ -165,6 +167,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
             } else {
                 result = interp.eval(expr);
+                label= expr;
             }
             
             metadata= new LinkedHashMap<String,Object>();
@@ -193,6 +196,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 res = JythonOps.coerce((PyList) result);
             } else {
                 res = (QDataSet) result.__tojava__(QDataSet.class);
+            }
+
+            if ( label!=null && res instanceof MutablePropertyDataSet ) {
+                if ( res.property( QDataSet.LABEL )==null ) {
+                   ((MutablePropertyDataSet)res).putProperty( QDataSet.LABEL, label );
+                }
             }
 
             if (causedBy != null) {
