@@ -148,6 +148,56 @@ public class URISplit {
     }
 
     /**
+     * convenient method to remove a parameter (or parameters) from the list of parameters
+     * @param surl
+     * @param parm
+     * @return
+     */
+    public static String removeParam( String surl, String ... parm ) {
+        URISplit split= URISplit.parse(surl);
+        Map <String,String> params= URISplit.parseParams( split.params );
+        for ( String p: parm ) {
+            params.remove(p);
+        }
+        split.params= URISplit.formatParams(params);
+        if ( params.size()==0 ) split.params=null;
+        if ( !surl.startsWith(split.vapScheme) ) split.vapScheme=null;
+        return split.format(split);
+    }
+
+
+    /**
+     * convenient method for adding or replacing a parameter to the URI.
+     * @param surl
+     * @param name
+     * @param value
+     * @return
+     */
+    public static String putParam( String surl, String name, String value ) {
+        URISplit split= URISplit.parse(surl);
+        Map <String,String> params= URISplit.parseParams( split.params );
+        params.put( name, value );
+        split.params= URISplit.formatParams(params);
+        if ( !surl.startsWith(split.vapScheme) ) split.vapScheme=null;
+        return split.format(split);
+    }
+
+    /**
+     * convenient method for getting a parameter in the URI.  
+     * @param surl
+     * @param name parameter name.
+     * @param deft default value if the parameter is not found.
+     * @return
+     */
+    public static String getParam( String surl, String name, String deft ) {
+        URISplit split= URISplit.parse(surl);
+        Map <String,String> params= URISplit.parseParams( split.params );
+        String val= params.get( name );
+        if ( val==null ) val= deft;
+        return val;
+    }
+    
+    /**
      * returns group 1 if there was a match, null otherwise.
      * @param s
      * @param regex
