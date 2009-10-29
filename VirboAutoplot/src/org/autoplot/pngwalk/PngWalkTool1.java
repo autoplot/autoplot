@@ -31,6 +31,8 @@ import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -53,6 +55,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
+import org.virbo.autoplot.AutoPlotUI;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
@@ -73,6 +76,14 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     Pattern actionMatch=null;
     String actionCommand=null;
 
+    static Logger logger= Logger.getLogger("org.autoplot.pngwalk");
+    private static String RESOURCES= "/org/virbo/autoplot/resources/";
+    public static final Icon WARNING_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"warning-icon.png") );
+    public static final Icon ERROR_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"error-icon.png") );
+    public static final Icon BUSY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"spinner.gif") );
+    public static final Icon READY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"indProgress0.png") );
+    public static final Icon IDLE_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"idle-icon.png") );
+        
     int returnTabIndex=0; // index of the tab we left to look at the single panel view.  TODO: account for tear off.
 
 
@@ -439,8 +450,36 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
     }
 
+    /**
+     * respond to changes of the current index.
+     */
+    private PropertyChangeListener indexListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            String item= seq.currentImage().getUri().toString();
+
+            for ( int i=0; i<actionEnablers.size(); i++ ) {
+                boolean actionEnabled= actionEnablers.get(i).isActionEnabled(item);
+                actionButtons.get(i).setEnabled(actionEnabled);
+                if ( actionEnabled ) {
+                   actionButtons.get(i).setActionCommand(actionCommand+" "+item);
+                }
+            }
+        }
+    };
+
+    /**
+     * listen for status updates from other agents, relay the status for the view.
+     */
+    private PropertyChangeListener statusListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+           setStatus((String)evt.getNewValue());
+        }
+    };
+
     public void setTemplate( String template ) {
         dataSetSelector1.setValue(template);
+
+        WalkImageSequence oldseq= this.seq;
 
         String surl= DataSetURI.fromUri( DataSetURI.getResourceURI(template) );
         try {
@@ -449,24 +488,28 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             seq= null;
             ex.printStackTrace();
         }
-        
-        if ( seq!=null ) seq.addPropertyChangeListener( new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                String item= seq.currentImage().getUri().toString();
 
-                for ( int i=0; i<actionEnablers.size(); i++ ) {
-                    boolean actionEnabled= actionEnablers.get(i).isActionEnabled(item);
-                    actionButtons.get(i).setEnabled(actionEnabled);
-                    if ( actionEnabled ) {
-                       actionButtons.get(i).setActionCommand(actionCommand+" "+item);
-                    }
+        if ( oldseq!=null ) {
+            oldseq.removePropertyChangeListener(WalkImageSequence.PROP_INDEX, indexListener );
+            oldseq.removePropertyChangeListener(WalkImageSequence.PROP_STATUS, statusListener);
+        }
+        if ( seq!=null ) {
+            seq.addPropertyChangeListener( WalkImageSequence.PROP_INDEX, indexListener );
+            seq.addPropertyChangeListener( WalkImageSequence.PROP_STATUS, statusListener );
+        }
+
+        Runnable run= new Runnable() {
+            public void run() {
+                seq.initialLoad();
+
+                for ( PngWalkView v:views ) {
+                    v.setSequence( seq );
                 }
             }
-        });
+        };
 
-        for ( PngWalkView v:views ) {
-            v.setSequence( seq );
-        }
+        new Thread(run).start();
+
     }
 
     public String getTemplate() {
@@ -486,6 +529,46 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         firePropertyChange(PROP_THUMBNAILSIZE, oldThumbnailSize, thumbnailSize);
     }
 
+    protected String status = "initializing...";
+    public static final String PROP_STATUS = "status";
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String message) {
+        String oldStatus = this.status;
+        this.status = message;
+        if ( message.startsWith("busy:" ) ) {
+            setMessage( BUSY_ICON, message.substring(5).trim() );
+            logger.info(message);
+        } else if ( message.startsWith("warning:" ) ) {
+            setMessage( WARNING_ICON, message.substring(8).trim() );
+            logger.warning(message);
+        } else if ( message.startsWith("error:" ) ) {
+            setMessage( ERROR_ICON, message.substring(6).trim() );
+            logger.severe(message);
+        } else {
+            logger.info(message);
+            setMessage(message);
+        }
+
+        firePropertyChange(PROP_STATUS, oldStatus, message);
+    }
+
+    public void setMessage(String message) {
+        this.statusLabel.setIcon( IDLE_ICON );
+        this.statusLabel.setText(message);
+    }
+
+    public void setMessage( Icon icon, String message ) {
+        String myMess= message;
+        if ( message==null ) message= "<null>"; // TODO: fix this later
+        if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
+        this.statusLabel.setIcon( icon );
+        this.statusLabel.setText(myMess);
+        this.statusLabel.setToolTipText(message);
+    }
 
     public static interface ActionEnabler {
         boolean isActionEnabled( String filename );
@@ -538,6 +621,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         jumpToFirstButton = new javax.swing.JButton();
         jumpToLastButton = new javax.swing.JButton();
         dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
+        statusLabel = new javax.swing.JLabel();
 
         pngsPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         pngsPanel.setLayout(new java.awt.BorderLayout());
@@ -641,46 +725,47 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
+        statusLabel.setText("starting application...");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(24, 24, 24)
+            .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(18, 18, 18)
+                .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(491, Short.MAX_VALUE))
-            .add(layout.createSequentialGroup()
+                .addContainerGap(528, Short.MAX_VALUE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 821, Short.MAX_VALUE)
+                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 845, Short.MAX_VALUE)
-            .add(layout.createSequentialGroup()
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(480, Short.MAX_VALUE))
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(layout.createSequentialGroup()
-                    .addContainerGap(382, Short.MAX_VALUE)
-                    .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
+                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(12, 12, 12)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                    .addContainerGap(633, Short.MAX_VALUE)
-                    .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(statusLabel))
         );
 
         layout.linkSize(new java.awt.Component[] {actionButtonsPanel, jPanel1}, org.jdesktop.layout.GroupLayout.VERTICAL);
@@ -747,6 +832,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private javax.swing.JPanel pngsPanel;
     private javax.swing.JButton prevButton;
     private javax.swing.JButton prevSetButton;
+    private javax.swing.JLabel statusLabel;
     private javax.swing.JTextField timeFilterTextField;
     // End of variables declaration//GEN-END:variables
 
