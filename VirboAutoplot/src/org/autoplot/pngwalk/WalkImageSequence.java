@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
+import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
 
 /**
  * <p>This class maintains a list of <code>WalkImage</code>s and provides functionality
@@ -32,7 +33,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      */
     private String template;
 
-    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new DebugPropertyChangeSupport(this);
 
     //public static final String PROP_SHOWMISSING = "showMissing";
     public static final String PROP_INDEX = "index";
@@ -42,26 +43,35 @@ public class WalkImageSequence implements PropertyChangeListener  {
      *
      * @param template a template, or null will produce an empty walk sequence.
      */
-    public WalkImageSequence(String template) {
+    public WalkImageSequence( String template ) {
+        this.template= template;
+        //call initialLoad before any other methods.
+    }
 
+    /**
+     * do the initial listing of the remote filesystem.  This should not
+     * be done on the event thread, and should be done before the
+     * sequence is used.
+     */
+    public void initialLoad() {
         List<DatumRange> datumRanges = new ArrayList<DatumRange>();
         List<URI> uris;
-        
+
         if ( template==null ) {
             uris= new ArrayList<URI>();
         } else {
             try {
+                setStatus( "busy: listing "+template );
                 uris = WalkUtil.getFilesFor(template, null, datumRanges, false, null);
+                setStatus( "done listing "+template );
             } catch (Exception ex) {
                 Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
                 throw new RuntimeException(ex);
             }
         }
 
-        this.template= template;
-        
         //if ( uris.size()>20 ) {uris= uris.subList(0,30); }
-        
+
         images = new ArrayList<WalkImage>();
         for (int i=0; i < uris.size(); i++) {
             images.add(new WalkImage(uris.get(i)));
@@ -203,9 +213,32 @@ public class WalkImageSequence implements PropertyChangeListener  {
         pcs.removePropertyChangeListener(l);
     }
 
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(propertyName, listener);
+    }
+
+
     public String getTemplate() {
         return this.template;
     }
+
+    protected String status = "idle";
+    public static final String PROP_STATUS = "status";
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        String oldStatus = this.status;
+        this.status = status;
+        pcs.firePropertyChange(PROP_STATUS, oldStatus, status);
+    }
+
     // Get status changes from the images in the list
     public void propertyChange(PropertyChangeEvent e) {
         if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.LOADED) {
@@ -217,6 +250,18 @@ public class WalkImageSequence implements PropertyChangeListener  {
             // imageLoaded is a bogus property so there's no old value
             // passing an illegal negative value in its place assures event is always fired
             pcs.firePropertyChange(PROP_IMAGE_LOADED, -1, i);
+        }
+
+        int loadingCount=0;
+        int loadedCount=0;
+        for ( WalkImage i : images ) {
+            if ( i.getStatus()==WalkImage.Status.LOADING ) loadingCount++;
+            if ( i.getStatus()==WalkImage.Status.LOADED ) loadedCount++;
+        }
+        if ( loadingCount==0 ) {
+            setStatus(""+loadedCount+" images loaded");
+        } else {
+            setStatus("busy: "+loadedCount+" images loaded, " + loadingCount + " are loading");
         }
     }
 
