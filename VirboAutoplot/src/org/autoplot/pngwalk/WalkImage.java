@@ -79,24 +79,39 @@ public class WalkImage implements Comparable<WalkImage> {
     }
 
     public BufferedImage getThumbnail() {
-        // check validity of current thumbnail, i.e. it exists at correct size
-        // if not valid, create it from the image
-
+        BufferedImage rawThumb;
         if (thumb == null) {
-            if (im == null) {
-                //If the image isn't loaded, initiate loading and return.  Client
-                // can listen for property change on status to send new request for thumbnail
-                loadImage();
-                return null;
+            // If the remote thumbs folder exists, get that image and use it
+            try {
+                URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path + "thumbs400");
+                //System.err.println("Thumb path: " + fsRoot);
+                FileSystem fs = FileSystem.create(fsRoot);
+                String s = imgURI.toString();
+                FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
+
+                File localFile = fo.getFile();
+                rawThumb = ImageIO.read(localFile);
+
+            } catch (Exception e) {
+                // Assume the error is that the thumbs folder doesn't exist; other errors
+                // will occur again in loadImage()
+                //System.err.println("Thumb dir doesn't exist; using image.");
+                if (im == null) {
+                    // Otherwise we'll have to create the thumb from the full-sized image
+                    // Initiate loading and return; clients listen for prop change
+                    loadImage();
+                    return null;
+                }
+                rawThumb = im;
             }
 
-            double aspect = (double) im.getWidth() / (double) im.getHeight();
+            double aspect = (double) rawThumb.getWidth() / (double) rawThumb.getHeight();
 
             int height = (int) Math.round(Math.sqrt((THUMB_SIZE * THUMB_SIZE) / (aspect * aspect + 1)));
             int width = (int) Math.round(height * aspect);
 
-            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(im.getWidth(), im.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
-            thumb = resizeOp.filter(im, null);
+            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
+            thumb = resizeOp.filter(rawThumb, null);
         }
         return thumb;
     }
