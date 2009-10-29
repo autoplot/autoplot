@@ -53,7 +53,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * be done on the event thread, and should be done before the
      * sequence is used.
      */
-    public void initialLoad() {
+    public void initialLoad() { 
         List<DatumRange> datumRanges = new ArrayList<DatumRange>();
         List<URI> uris;
 
