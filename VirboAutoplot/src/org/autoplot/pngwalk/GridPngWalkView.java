@@ -6,6 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -122,7 +123,7 @@ public class GridPngWalkView extends PngWalkView {
             if (scrollMin > y || scrollMax < y+thumbSize) {
                 scrollPane.getVerticalScrollBar().setValue(pos);
             }
-        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {           
             int i = (Integer) e.getNewValue();
             //System.err.printf("Image number %d finished loading%n", i);
             int y = (i / nCols) * thumbSize;
@@ -180,9 +181,10 @@ public class GridPngWalkView extends PngWalkView {
                         int cx = col*thumbSize + 5;
                         int cy = (row+1)*thumbSize - fm.getDescent();
                         g2.setColor(Color.BLACK);
+                        Shape oldClip = g2.getClip();
                         g2.setClip(new Rectangle(col*thumbSize, row*thumbSize, thumbSize-10, thumbSize));
                         g2.drawString(seq.imageAt(n).getCaption(), cx, cy);
-                        g2.setClip(null);  // clear user clip
+                        g2.setClip(oldClip);
                     }
 
                 }

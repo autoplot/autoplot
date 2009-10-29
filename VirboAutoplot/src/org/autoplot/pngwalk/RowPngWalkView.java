@@ -6,6 +6,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.Shape;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -175,9 +176,10 @@ public class RowPngWalkView extends PngWalkView {
                     int cx = i*cellSize + 5;
                     int cy = getHeight() - fm.getHeight();
                     g2.setColor(Color.BLACK);
+                    Shape oldClip = g2.getClip();
                     g2.setClip(new Rectangle(i*cellSize, 0, cellSize-10, getHeight()));
                     g2.drawString(seq.imageAt(i).getCaption(), cx, cy);
-                    g2.setClip(null);  // clear user clip
+                    g2.setClip(oldClip);
                 }
             }
         }
