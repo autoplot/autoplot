@@ -38,6 +38,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     //public static final String PROP_SHOWMISSING = "showMissing";
     public static final String PROP_INDEX = "index";
     public static final String PROP_IMAGE_LOADED = "imageLoaded";
+    public static final String PROP_THUMB_LOADED = "thumbLoaded";
 
     /** Create an image sequence based on a URI template.
      *
@@ -241,7 +242,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
     // Get status changes from the images in the list
     public void propertyChange(PropertyChangeEvent e) {
-        if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.LOADED) {
+        if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.IMAGE_LOADED ||
+                (WalkImage.Status)e.getNewValue() == WalkImage.Status.THUMB_LOADED)  {
             int i = images.indexOf(e.getSource());
             if (i == -1) {
                 //panic because something is very very wrong
@@ -249,14 +251,16 @@ public class WalkImageSequence implements PropertyChangeListener  {
             }
             // imageLoaded is a bogus property so there's no old value
             // passing an illegal negative value in its place assures event is always fired
-            pcs.firePropertyChange(PROP_IMAGE_LOADED, -1, i);
+            pcs.firePropertyChange(PROP_THUMB_LOADED, -1, i);
+            if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.IMAGE_LOADED)
+                pcs.firePropertyChange(PROP_IMAGE_LOADED, -1, i);
         }
-
+        
         int loadingCount=0;
         int loadedCount=0;
         for ( WalkImage i : images ) {
-            if ( i.getStatus()==WalkImage.Status.LOADING ) loadingCount++;
-            if ( i.getStatus()==WalkImage.Status.LOADED ) loadedCount++;
+            if ( i.getStatus()==WalkImage.Status.IMAGE_LOADING ) loadingCount++;
+            if ( i.getStatus()==WalkImage.Status.IMAGE_LOADED ) loadedCount++;
         }
         if ( loadingCount==0 ) {
             setStatus(""+loadedCount+" images loaded");

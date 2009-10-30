@@ -14,10 +14,14 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
@@ -31,8 +35,8 @@ public class RowPngWalkView extends PngWalkView {
     protected JScrollPane scrollPane;
     private RowViewCanvas canvas;
 
-    public RowPngWalkView(final WalkImageSequence seq) {
-        super(seq);
+    public RowPngWalkView(final WalkImageSequence sequence) {
+        super(sequence);
         setShowCaptions(true);
         setLayout(new java.awt.BorderLayout());
         canvas = new RowViewCanvas();
@@ -59,12 +63,38 @@ public class RowPngWalkView extends PngWalkView {
             }
         });
 
+        scrollPane.getHorizontalScrollBar().getModel().addChangeListener(new ChangeListener() {
+            Timer repaintTimer = new Timer("RowViewRepaintDelay", true);
+            TimerTask task;
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                // Cancel any pending timer events
+                if (task != null) task.cancel();
+                if (seq == null) return;
+                // Schedule a new one
+                task = new TimerTask() {
+
+                    public void run() {
+                        Rectangle bounds = scrollPane.getViewport().getViewRect();
+                        int first = (int) Math.floor(bounds.x / cellSize);
+                        int last = Math.min(seq.size(), (int) Math.ceil((bounds.x + bounds.width) / cellSize + 1));
+                        for(int i=first; i<last; i++) {
+                            seq.imageAt(i).getThumbnail(true);
+                        }
+                    }
+                };
+                repaintTimer.schedule(task, 200L);
+            }
+        });
+
         add(scrollPane);
     }
 
     @Override
     protected void sequenceChanged() {
         updateLayout();
+        if (scrollPane!=null) scrollPane.getHorizontalScrollBar().setValue(0);
     }
 
     @Override
@@ -87,7 +117,7 @@ public class RowPngWalkView extends PngWalkView {
         } else {
             canvas.setPreferredSize(new Dimension(DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE));
         }
-        revalidate();
+        canvas.revalidate();
     }
 
     private void selectCell(int n) {
@@ -112,12 +142,14 @@ public class RowPngWalkView extends PngWalkView {
             if ( scrollMin > i*cellSize || scrollMax < (i+1)*cellSize ) {
                 scrollPane.getHorizontalScrollBar().setValue(pos);
             }
-        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_THUMB_LOADED) ||
+                e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {
             int i = (Integer) e.getNewValue();
             int x = i * cellSize;
             canvas.repaint(new Rectangle(x, 0, cellSize, cellSize));
         }
     }
+
 
     private class RowViewCanvas extends JPanel implements Scrollable {
 
@@ -125,7 +157,7 @@ public class RowPngWalkView extends PngWalkView {
             this.setBorder(javax.swing.BorderFactory.createEmptyBorder());
         }
 
-        int psn= 0; // paint sequence number
+        //int psn= 0; // paint sequence number
 
         @Override
         public synchronized void paintComponent(Graphics g1) {
@@ -133,17 +165,17 @@ public class RowPngWalkView extends PngWalkView {
             Graphics2D g2 = (Graphics2D) g1;
 
             Rectangle bounds = g2.getClipBounds();
-
-
-            Color cc= new Color( 220 + (int)(Math.random()*25), 220 + (int)(Math.random()*25), 220 + (int)(Math.random()*25) );
-            Color c0= g2.getColor();
-            g2.setColor( cc );
-            g2.fillRect( bounds.x, bounds.y, bounds.width, bounds.height );
-            g2.setColor( c0 );
-            psn++;
             FontMetrics fm= g2.getFontMetrics();
-            g2.drawString(""+psn, bounds.x, fm.getHeight() );
-            g2.drawString(""+psn, bounds.x+bounds.width-fm.stringWidth(""+psn), fm.getHeight() );
+
+//            Color cc= new Color( 220 + (int)(Math.random()*25), 220 + (int)(Math.random()*25), 220 + (int)(Math.random()*25) );
+//            Color c0= g2.getColor();
+//            g2.setColor( cc );
+//            g2.fillRect( bounds.x, bounds.y, bounds.width, bounds.height );
+//            g2.setColor( c0 );
+//            psn++;
+//
+//            g2.drawString(""+psn, bounds.x, fm.getHeight() );
+//            g2.drawString(""+psn, bounds.x+bounds.width-fm.stringWidth(""+psn), fm.getHeight() );
 
             if (seq == null) {
                 return;
@@ -159,7 +191,7 @@ public class RowPngWalkView extends PngWalkView {
                     g2.fillRect(i * cellSize, 0, cellSize, cellSize);
                 }
                 //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
-                BufferedImage thumb = seq.imageAt(i).getThumbnail();
+                BufferedImage thumb = seq.imageAt(i).getThumbnail(!scrollPane.getHorizontalScrollBar().getValueIsAdjusting());
                 if (thumb != null) {
                     double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4) / thumb.getHeight());
                     if (s < 1.0) {
@@ -177,7 +209,7 @@ public class RowPngWalkView extends PngWalkView {
                     int cy = getHeight() - fm.getHeight();
                     g2.setColor(Color.BLACK);
                     Shape oldClip = g2.getClip();
-                    g2.setClip(new Rectangle(i*cellSize, 0, cellSize-10, getHeight()));
+                    g2.clip(new Rectangle(i*cellSize, 0, cellSize-10, getHeight()));
                     g2.drawString(seq.imageAt(i).getCaption(), cx, cy);
                     g2.setClip(oldClip);
                 }

@@ -63,7 +63,7 @@ public class GridPngWalkView extends PngWalkView {
         if (canvas == null) return;
         if (seq != null) canvas.setPreferredSize(new Dimension(thumbSize*nCols, thumbSize*(seq.size()/nCols + 1)));
         else canvas.setPreferredSize(new Dimension(100,100));
-        revalidate();
+        canvas.revalidate();
     }
 
     @Override
@@ -123,7 +123,7 @@ public class GridPngWalkView extends PngWalkView {
             if (scrollMin > y || scrollMax < y+thumbSize) {
                 scrollPane.getVerticalScrollBar().setValue(pos);
             }
-        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {           
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_THUMB_LOADED)) {
             int i = (Integer) e.getNewValue();
             //System.err.printf("Image number %d finished loading%n", i);
             int y = (i / nCols) * thumbSize;
@@ -182,7 +182,7 @@ public class GridPngWalkView extends PngWalkView {
                         int cy = (row+1)*thumbSize - fm.getDescent();
                         g2.setColor(Color.BLACK);
                         Shape oldClip = g2.getClip();
-                        g2.setClip(new Rectangle(col*thumbSize, row*thumbSize, thumbSize-10, thumbSize));
+                        g2.clip(new Rectangle(col*thumbSize, row*thumbSize, thumbSize-10, thumbSize));
                         g2.drawString(seq.imageAt(n).getCaption(), cx, cy);
                         g2.setClip(oldClip);
                     }
