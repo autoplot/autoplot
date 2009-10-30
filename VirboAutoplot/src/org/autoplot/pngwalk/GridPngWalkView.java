@@ -14,10 +14,14 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
@@ -33,8 +37,8 @@ public class GridPngWalkView extends PngWalkView {
     private JScrollPane scrollPane;
     private GridViewCanvas canvas;
 
-    public GridPngWalkView(WalkImageSequence seq) {
-        super(seq);
+    public GridPngWalkView(WalkImageSequence sequence) {
+        super(sequence);
 
         setShowCaptions(true);
         setLayout(new java.awt.BorderLayout());
@@ -56,6 +60,40 @@ public class GridPngWalkView extends PngWalkView {
            }
         });
 
+        scrollPane.getVerticalScrollBar().getModel().addChangeListener(new ChangeListener() {
+            Timer repaintTimer = new Timer("GridViewRepaintDelay", true);
+            TimerTask task;
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                // Cancel any pending timer events
+                if (task != null) task.cancel();
+                if (seq == null) return;
+                // Schedule a new one
+                task = new TimerTask() {
+
+                    public void run() {
+                        Rectangle bounds = scrollPane.getViewport().getViewRect();
+                        int rowMin = bounds.y / thumbSize;
+                        int rowMax = Math.min((bounds.y + bounds.height) / thumbSize + 1, seq.size() / nCols + 1);
+                        int colMin = Math.min(bounds.x / thumbSize, nCols);
+                        int colMax = Math.min((bounds.x + bounds.width) / thumbSize + 1, nCols);
+
+                        for (int row = rowMin; row < rowMax; row++) {
+                            for (int col = colMin; col < colMax; col++) {
+                                int n = (row * nCols) + col;
+                                if (n >= seq.size()) {
+                                    break;
+                                }
+                                seq.imageAt(n).getThumbnail(true);
+                            }
+                        }
+                    }
+                };
+                repaintTimer.schedule(task, 200L);
+            }
+        });
+
         add(scrollPane);
     }
 
@@ -69,6 +107,7 @@ public class GridPngWalkView extends PngWalkView {
     @Override
     protected void sequenceChanged() {
         updateLayout();
+        if (scrollPane!=null) scrollPane.getVerticalScrollBar().setValue(0);
     }
 
     @Override
@@ -164,7 +203,7 @@ public class GridPngWalkView extends PngWalkView {
                         g2.setColor(oldColor);
                     }
                     //g2.draw(new Ellipse2D.Double(col * thumbSize + 2, row * thumbSize + 2, thumbSize - 4, thumbSize - 4));
-                    BufferedImage thumb = seq.imageAt(n).getThumbnail();
+                BufferedImage thumb = seq.imageAt(n).getThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting());
                     if (thumb != null) {
                         double s = Math.min((double) (thumbSize - 4) / thumb.getWidth(), (double) (thumbSize - 4) / thumb.getHeight());
                         if (s < 1.0) {
