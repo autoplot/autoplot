@@ -97,7 +97,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 return result;
             } else if ( paramName.equals("byteOrder") ) {
                 List<CompletionContext> result= new ArrayList<CompletionContext>();
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "little", "first byte has little significance") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "little", "(default) first byte has little significance") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "big", "first byte has big significance") );
                 return result;
             } else {

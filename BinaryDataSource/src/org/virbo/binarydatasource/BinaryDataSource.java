@@ -40,6 +40,89 @@ public class BinaryDataSource extends AbstractDataSource {
         return result;
     }
 
+    private static Object getTypeFromCode( String code ) {
+        Object result;
+        if ( code.charAt(0)=='u' ) {
+            switch ( code.charAt(1) ) {
+                case 'x': result=null; break;
+                case 'b': result=BufferDataSet.UBYTE; break;
+                case 's': result=BufferDataSet.USHORT; break;
+                case 'i': result=BufferDataSet.UINT; break;
+                default: throw new IllegalArgumentException("bad format code: "+code);
+            }
+        } else {
+            switch ( code.charAt(0) ) {
+                case 'x': result=null; break;
+                case 'b': result=BufferDataSet.BYTE; break;
+                case 's': result=BufferDataSet.SHORT; break;
+                case 'i': result=BufferDataSet.INT; break;
+                case 'l': result=BufferDataSet.LONG; break;
+                case 'f': result=BufferDataSet.FLOAT; break;
+                case 'd': result=BufferDataSet.DOUBLE; break;
+                default: throw new IllegalArgumentException("bad format code: "+code);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * returns [ int[] offsets, Object[] types, Integer count, Integer recSizeBytes ].
+     * @param recFormat
+     * @return
+     */
+    public static Object[] parseRecFormat( String recFormat ) {
+        int[] offsets;
+        Object[] types;
+        Integer count;
+
+        count= 99;
+        offsets= new int[count];
+        types= new Object[count];
+
+        String[] ss= recFormat.split(",");
+        int ioff=0;
+        int ifield=0;
+        for ( int i=0; i<ss.length; i++ ) {
+
+            int repeat=1;
+            int n= ss[i].length();
+            Object type;
+            String code;
+            if ( n>1 && ss[i].charAt(n-2)=='u' ) {
+                code= ss[i].substring(n-2);
+            } else {
+                code= ss[i].substring(n-1);
+            }
+            if ( code.length()==n ) {
+                repeat= 1;
+                type= getTypeFromCode( code );
+            } else {
+                type= getTypeFromCode( code );
+                repeat= Integer.parseInt( ss[i].substring(0,n-code.length()) );
+            } 
+
+            offsets[ifield]= ioff;
+            for ( int j=0; j<repeat; j++ ) {
+                if ( type!=null ) {
+                    types[ifield]= type;
+                    offsets[ifield]= ioff;
+                    ifield++;
+                    ioff+= BufferDataSet.byteCount(type);
+                } else {
+                    ioff+= 1;
+                }
+
+            }
+        }
+        Object[] result= new Object[4];
+        result[0]= offsets;
+        result[1]= types;
+        result[2]= ifield;
+        result[3]= ioff;
+
+        return result;
+    }
+
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         File f = getFile(mon);
@@ -56,6 +139,15 @@ public class BinaryDataSource extends AbstractDataSource {
                 
         ByteBuffer buf = fc.map(MapMode.READ_ONLY, offset, length);
 
+        String recFormat= getParameter( "recFormat", null );
+
+        Object[] recFormatParse= null;
+        if ( recFormat!=null ) {
+            recFormatParse= parseRecFormat(recFormat);
+            fieldCount= (Integer)recFormatParse[2];
+        }
+
+
         int dep0 = getIntParameter("depend0", -1);
         int dep0Offset= getIntParameter( "depend0Offset", -1 );
         
@@ -70,16 +162,34 @@ public class BinaryDataSource extends AbstractDataSource {
             }
         }
 
-        String columnType = getParameter("type", (String)BufferDataSet.UBYTE );
+        int col = getIntParameter("column", defltcol);
+
+        String columnType;
+        String colType= String.valueOf(BufferDataSet.UBYTE);
+        if ( recFormatParse!=null ) {
+            String o = params.get("rank2");
+            Object[] types= ((Object[])recFormatParse[1]);
+            if (o != null) {
+                throw new IllegalArgumentException("rank2 and columnFormat are not supported");
+            } else {
+                colType= String.valueOf( types[col] );
+            }
+        }
+
+        columnType= getParameter("type", colType );
 
         int recSizeBytes= getIntParameter("recLength", -1 );
+        if ( recFormatParse!=null ) {
+            recSizeBytes= (Integer)recFormatParse[3];
+        }
         if ( recSizeBytes==-1 ) recSizeBytes= BufferDataSet.byteCount(columnType) * fieldCount;
 
-        fieldCount= recSizeBytes / BufferDataSet.byteCount(columnType);
+        if ( recFormatParse==null ) {
+            fieldCount= recSizeBytes / BufferDataSet.byteCount(columnType);
+        }
 
         final int frecCount= Math.min( length / recSizeBytes, recCount );
 
-        int col = getIntParameter("column", defltcol);
         int[] rank2= null;
 
         String o = params.get("rank2");
@@ -104,10 +214,15 @@ public class BinaryDataSource extends AbstractDataSource {
             if ( last>fieldCount ) throw new IndexOutOfBoundsException("rank 2 index is greater than field count");
         }
 
-
         int recOffset= getIntParameter( "recOffset", -1 );
-        if ( recOffset==-1 ) recOffset= col * BufferDataSet.byteCount(columnType);
-
+        if ( recOffset==-1 ) {
+            if ( recFormatParse!=null ) {
+                recOffset= ((int[])recFormatParse[0])[col];
+            } else {
+                recOffset= col * BufferDataSet.byteCount(columnType);
+            }
+        }
+        
         String encoding = getParameter("byteOrder", "little");
         if (encoding.equals("big")) {
             buf.order(ByteOrder.BIG_ENDIAN);
@@ -133,7 +248,16 @@ public class BinaryDataSource extends AbstractDataSource {
 
         if (dep0 > -1 || dep0Offset > -1 ) {
             String dep0Type = getParameter("depend0Type", columnType);
-            if ( dep0Offset==-1 ) dep0Offset= BufferDataSet.byteCount(dep0Type) * dep0;
+            if ( recFormatParse!=null ) {
+                dep0Type= getParameter("dep0Type", String.valueOf(((Object[])recFormatParse[1])[dep0]) );
+            }
+            if ( dep0Offset==-1 ) {
+                if ( recFormatParse==null ) {
+                    dep0Offset= BufferDataSet.byteCount(dep0Type) * dep0;
+                } else {
+                    dep0Offset= ((int[])recFormatParse[0])[dep0];
+                }
+            }
             QDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, buf, dep0Type );
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         } else {
