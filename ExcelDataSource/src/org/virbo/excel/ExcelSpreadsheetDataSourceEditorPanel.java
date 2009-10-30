@@ -50,7 +50,6 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
     URISplit split;
 
     private enum Tool {
-
         NONE, FIRSTROW, COLUMN, DEPEND_0, TIMEFORMAT,
     }
     Tool currentTool = Tool.NONE;
@@ -67,48 +66,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                     return;
                 }
 
-                if (jTable1.getColumnModel().getSelectedColumnCount() == 0) {
-                } else if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
-                    int col = jTable1.getColumnModel().getSelectedColumns()[0];
-                    String name = columns.get(col);
-                    if (name == null) {
-                        name = String.valueOf((char)('A' + col));
-                    }
-                    if (currentTool == Tool.DEPEND_0) {
-                        params.put(PROP_DEP0, name);
-                        dep0Columns.setSelectedItem(name);
-
-                    } else if (currentTool == Tool.COLUMN) {
-                        params.put(PROP_COLUMN, name);
-                        columnsComboBox.setSelectedItem(name);
-
-                    }
-
-                } else {
-                    int[] cols = jTable1.getColumnModel().getSelectedColumns();
-                    int first = cols[0];
-                    int last = cols[cols.length - 1];
-                    String sfirst = columns.get(first);
-                    if (sfirst == null) {
-                        sfirst = "" + first;
-                    }
-                    boolean haveColumnNames = true;
-                    String slast = columns.get(last);
-                    if (slast == null) {
-                        slast = "" + last;
-                        haveColumnNames = false;
-                    }
-
-                    if (currentTool == Tool.DEPEND_0) {
-                    } else if (currentTool == Tool.COLUMN) {
-                        if (haveColumnNames) {
-                            params.put(PROP_COLUMN, sfirst + "-" + slast);
-                        } else {
-                            params.put(PROP_COLUMN, "" + first + ":" + (last + 1));
-                        }
-                    }
-                }
-                clearTool();
+                doSelect(currentTool);
             }
         });
 
@@ -118,33 +76,92 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                 if (e.getValueIsAdjusting()) {
                     return;
                 }
-                if (currentTool == Tool.FIRSTROW) {
-                    if (jTable1.getSelectedRow() > 0) {
-                        params.put(PROP_FIRST_ROW, String.valueOf(jTable1.getSelectedRow() + 1));
-                    } else {
-                        params.remove(PROP_FIRST_ROW);
-                    }
-                    firstRowTextField.setValue(jTable1.getSelectedRow() + 1);
-
-                    resetFirstRow();
-                    clearTool();
-                }
+                doSelect( currentTool );
             }
         });
 
         jScrollPane1.setRowHeaderView(new TableRowHeader(jTable1));
     }
 
+    private void doSelect( Tool tool ) {
+        if (tool == Tool.FIRSTROW) {
+            if (jTable1.getSelectedRow() > 0) {
+                params.put(PROP_FIRST_ROW, String.valueOf(jTable1.getSelectedRow() + 1));
+            } else {
+                params.remove(PROP_FIRST_ROW);
+            }
+            firstRowTextField.setValue(jTable1.getSelectedRow() + 1);
+
+            resetFirstRow();
+            clearTool();
+        }
+        if (jTable1.getColumnModel().getSelectedColumnCount() == 0) {
+        } else if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
+            int col = jTable1.getColumnModel().getSelectedColumns()[0];
+            String name = columns.get(col);
+            if (name == null) {
+                name = String.valueOf((char)('A' + col));
+            }
+            if (currentTool == Tool.DEPEND_0) {
+                params.put(PROP_DEP0, name);
+                dep0Columns.setSelectedItem(name);
+
+            } else if (currentTool == Tool.COLUMN) {
+                params.put(PROP_COLUMN, name);
+                columnsComboBox.setSelectedItem(name);
+
+            }
+
+        } else {
+            int[] cols = jTable1.getColumnModel().getSelectedColumns();
+            int first = cols[0];
+            int last = cols[cols.length - 1];
+            String sfirst = columns.get(first);
+            if (sfirst == null) {
+                sfirst = "" + first;
+            }
+            boolean haveColumnNames = true;
+            String slast = columns.get(last);
+            if (slast == null) {
+                slast = "" + last;
+                haveColumnNames = false;
+            }
+
+            if (currentTool == Tool.DEPEND_0) {
+            } else if (currentTool == Tool.COLUMN) {
+                if (haveColumnNames) {
+                    params.put(PROP_COLUMN, sfirst + "-" + slast);
+                } else {
+                    params.put(PROP_COLUMN, "" + first + ":" + (last + 1));
+                }
+            }
+        }
+        clearTool();
+        if ( tool!=Tool.NONE ) {
+            jTable1.getSelectionModel().clearSelection();
+            jTable1.getColumnModel().getSelectionModel().clearSelection();
+        }
+    }
+
     Action createToolAction(final String label, final Tool t) {
         return new AbstractAction(label) {
 
             public void actionPerformed(ActionEvent e) {
-                if (e.getSource() instanceof JToggleButton) {
-                    jTable1.getSelectionModel().clearSelection();
-                    jTable1.getColumnModel().getSelectionModel().clearSelection();
-                    currentToolButton = (JToggleButton) e.getSource();
-                    currentTool = t;
+                if ( e.getSource() instanceof JToggleButton ) {
+                    if ( jTable1.getSelectionModel().isSelectionEmpty() ) {
+                        jTable1.getSelectionModel().clearSelection();
+                        jTable1.getColumnModel().getSelectionModel().clearSelection();
+                        currentToolButton= ( JToggleButton ) e.getSource();
+                        currentTool = t;
+                    } else {
+                        currentToolButton= ( JToggleButton ) e.getSource();
+                        currentTool = t;
+                        doSelect( t );
+                        jTable1.getSelectionModel().clearSelection();
+                        jTable1.getColumnModel().getSelectionModel().clearSelection();
+                    }
                 }
+
 
             }
         };
