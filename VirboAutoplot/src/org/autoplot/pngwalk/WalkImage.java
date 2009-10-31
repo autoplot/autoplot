@@ -84,6 +84,11 @@ public class WalkImage implements Comparable<WalkImage> {
         return getThumbnail(true);
     }
 
+    /**
+     *
+     * @param loadIfNeeded if false, then be reluctant to load the thumbnail.
+     * @return
+     */
     public BufferedImage getThumbnail(boolean loadIfNeeded) {
         switch (status) {
             case THUMB_LOADING:
@@ -157,9 +162,18 @@ public class WalkImage implements Comparable<WalkImage> {
     }
 
     public BufferedImage getSquishedThumbnail() {
+        return getSquishedThumbnail(true);
+    }
+
+    /**
+     *
+     * @param loadIfNeeded if false, then be reluctant to load the thumbnail.
+     * @return
+     */
+    public BufferedImage getSquishedThumbnail( boolean loadIfNeeded ) {
         if (squishedThumb == null) {
             if (thumb == null) {
-                if (getThumbnail() == null) {
+                if (getThumbnail(loadIfNeeded) == null) {
                     return null;
                 }
             }
