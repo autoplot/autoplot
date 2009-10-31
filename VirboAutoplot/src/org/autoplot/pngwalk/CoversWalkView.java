@@ -58,13 +58,15 @@ public class CoversWalkView extends PngWalkView  {
         });
 
         scrollPane.getVerticalScrollBar().getModel().addChangeListener(new ChangeListener() {
-            Timer repaintTimer = new Timer("GridViewRepaintDelay", true);
+            Timer repaintTimer = new Timer("CoversViewRepaintDelay", true);
             TimerTask task;
 
             public void stateChanged(ChangeEvent e) {
                 // Cancel any pending timer events
                 if (task != null) task.cancel();
                 if (seq == null) return;
+                if ( !canvas.isShowing() ) return;
+                
                 // Schedule a new one
                 task = new TimerTask() {
 

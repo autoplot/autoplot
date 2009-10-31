@@ -74,6 +74,8 @@ public class RowPngWalkView extends PngWalkView {
                 // Cancel any pending timer events
                 if (task != null) task.cancel();
                 if (seq == null) return;
+                if ( !canvas.isShowing() ) return;
+                
                 // Schedule a new one
                 task = new TimerTask() {
 
