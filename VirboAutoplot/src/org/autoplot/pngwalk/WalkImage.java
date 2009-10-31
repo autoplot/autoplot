@@ -157,7 +157,7 @@ public class WalkImage implements Comparable<WalkImage> {
                 return null;
             default:
                 //should never get here, but keeps Java from warning about missing return
-                throw(new IllegalArgumentException("Encountered invalid status in walk image."));
+                throw new IllegalArgumentException("Encountered invalid status in walk image.");
         } //end switch
     }
 
