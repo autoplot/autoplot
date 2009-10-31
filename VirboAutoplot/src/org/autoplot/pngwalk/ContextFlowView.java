@@ -216,7 +216,8 @@ public class ContextFlowView extends PngWalkView {
 
                     image = seq.imageAt(index).getImage();
                     if ( image==null ) {
-                        image= loadingImage;
+                        image= seq.imageAt(index).getThumbnail();
+                        
                         height = image.getHeight();
                         width = image.getWidth();
 
