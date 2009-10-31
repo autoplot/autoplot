@@ -215,11 +215,20 @@ public class ContextFlowView extends PngWalkView {
                     int x = xm;
 
                     image = seq.imageAt(index).getImage();
+                    if ( image==null ) {
+                        image= loadingImage;
+                        height = image.getHeight();
+                        width = image.getWidth();
 
-                    height = image.getHeight();
-                    width = image.getWidth();
+                        bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
 
-                    bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
+                    } else {
+
+                        height = image.getHeight();
+                        width = image.getWidth();
+
+                        bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
+                    }
                     //if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
                     //    lastImage = image;
                     //}
