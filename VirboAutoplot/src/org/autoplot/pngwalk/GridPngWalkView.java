@@ -6,7 +6,10 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -167,17 +170,39 @@ public class GridPngWalkView extends PngWalkView {
             int y = (i / nCols) * thumbSize;
             int x = (i % nCols) * thumbSize;
             canvas.repaint(new Rectangle(x, y, thumbSize, thumbSize));
+            canvas.repaintSoon();
         }
     }
 
 
     private class GridViewCanvas extends JPanel implements Scrollable {
 
+
+        GridViewCanvas() {
+            repaintTimer = new javax.swing.Timer( 300, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    repaint();
+                }
+            });
+            repaintTimer.setRepeats(false);
+        }
+
+        // kludge to work around repainting problem
+        javax.swing.Timer repaintTimer;
+
+        //int psn= 0; // paint sequence number
+
+        private void repaintSoon(  ) {
+            repaintTimer.restart();
+        }
+
+
         @Override
         public void paintComponent(Graphics g1) {
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
 
+            g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
             if (seq == null) {
                 return;
             }

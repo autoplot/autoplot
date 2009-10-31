@@ -6,7 +6,10 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -146,6 +149,7 @@ public class RowPngWalkView extends PngWalkView {
             int i = (Integer) e.getNewValue();
             int x = i * cellSize;
             canvas.repaint(new Rectangle(x, 0, cellSize, cellSize));
+            canvas.repaintSoon();
         }
     }
 
@@ -154,15 +158,31 @@ public class RowPngWalkView extends PngWalkView {
 
         public RowViewCanvas() {
             this.setBorder(javax.swing.BorderFactory.createEmptyBorder());
+
+            repaintTimer = new javax.swing.Timer( 300, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    repaint();
+                }
+            });
+            repaintTimer.setRepeats(false);
         }
 
+        // kludge to work around repainting problem
+        javax.swing.Timer repaintTimer;
+
         //int psn= 0; // paint sequence number
+
+        private void repaintSoon(  ) {
+            repaintTimer.restart();
+        }
 
         @Override
         public synchronized void paintComponent(Graphics g1) {
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
 
+            g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
+            
             Rectangle bounds = g2.getClipBounds();
             FontMetrics fm= g2.getFontMetrics();
 

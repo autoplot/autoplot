@@ -8,6 +8,8 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -113,6 +115,7 @@ public class CoversWalkView extends PngWalkView  {
             int i = (Integer) e.getNewValue();
             int x = (i % seq.size()) * (cellWidth);
             canvas.repaint(new Rectangle(x, 0, cellWidth, cellSize));
+            canvas.repaintSoon();
         }
 
 
@@ -120,6 +123,22 @@ public class CoversWalkView extends PngWalkView  {
 
     private class Canvas extends JPanel implements Scrollable {
 
+        Canvas() {
+            repaintTimer = new javax.swing.Timer( 300, new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    repaint();
+                }
+            });
+            repaintTimer.setRepeats(false);
+        }
+
+        // kludge to work around repainting problem
+        javax.swing.Timer repaintTimer;
+
+        private void repaintSoon(  ) {
+            repaintTimer.restart();
+        }
+        
         @Override
         public void paintComponent(Graphics g1) {
             boolean useSquished= true;
