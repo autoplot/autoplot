@@ -110,6 +110,12 @@ public class CoversWalkView extends PngWalkView  {
     }
 
     @Override
+    protected void sequenceChanged() {
+        updateLayout();
+        if (scrollPane!=null) scrollPane.getVerticalScrollBar().setValue(0);
+    }
+
+    @Override
     protected void thumbnailSizeChanged() {
         cellSize= getThumbnailSize();
         cellWidth= cellSize / HEIGHT_WIDTH_RATIO;
