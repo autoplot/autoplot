@@ -15,10 +15,14 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.Scrollable;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  *
@@ -50,6 +54,30 @@ public class CoversWalkView extends PngWalkView  {
                 int clickCell = (int) Math.floor((double) e.getX() / (double) cellWidth);
                 //System.err.printf("Click at %d, %d (cell %d)%n", e.getX(), e.getY(), clickCell);
                 CoversWalkView.this.seq.setIndex(clickCell);
+            }
+        });
+
+        scrollPane.getVerticalScrollBar().getModel().addChangeListener(new ChangeListener() {
+            Timer repaintTimer = new Timer("GridViewRepaintDelay", true);
+            TimerTask task;
+
+            public void stateChanged(ChangeEvent e) {
+                // Cancel any pending timer events
+                if (task != null) task.cancel();
+                if (seq == null) return;
+                // Schedule a new one
+                task = new TimerTask() {
+
+                    public void run() {
+                        Rectangle bounds = scrollPane.getViewport().getViewRect();
+                        int first = (int) Math.floor(bounds.x / cellWidth);
+                        int last = Math.min(seq.size(), (int) Math.ceil((bounds.x + bounds.width) / cellWidth + 1));
+                        for(int i=first; i<last; i++) {
+                            seq.imageAt(i).getThumbnail(true);
+                        }
+                    }
+                };
+                repaintTimer.schedule(task, 200L);
             }
         });
 
@@ -111,7 +139,7 @@ public class CoversWalkView extends PngWalkView  {
             if (scrollMin > i * cellWidth || scrollMax < (i + 1) * cellWidth) {
                 scrollPane.getHorizontalScrollBar().setValue(pos);
             }
-        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_THUMB_LOADED)) {
             int i = (Integer) e.getNewValue();
             int x = (i % seq.size()) * (cellWidth);
             canvas.repaint(new Rectangle(x, 0, cellWidth, cellSize));
@@ -168,7 +196,7 @@ public class CoversWalkView extends PngWalkView  {
                     g2.fillRect(i * cellWidth, 0, cellWidth, cellSize);
                 }
                 //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
-                BufferedImage thumb = useSquished ? seq.imageAt(i).getSquishedThumbnail() :  seq.imageAt(i).getThumbnail();
+                BufferedImage thumb = useSquished ? seq.imageAt(i).getSquishedThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting()) :  seq.imageAt(i).getThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting());
                 if (thumb != null) {
                     double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4) / thumb.getHeight());
                     if (s < 1.0) {
