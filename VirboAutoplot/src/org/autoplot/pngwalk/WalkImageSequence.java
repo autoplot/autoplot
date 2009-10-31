@@ -258,14 +258,18 @@ public class WalkImageSequence implements PropertyChangeListener  {
         
         int loadingCount=0;
         int loadedCount=0;
+        int thumbLoadingCount=0;
+        int thumbLoadedCount=0;
         for ( WalkImage i : images ) {
             if ( i.getStatus()==WalkImage.Status.IMAGE_LOADING ) loadingCount++;
             if ( i.getStatus()==WalkImage.Status.IMAGE_LOADED ) loadedCount++;
+            if ( i.getStatus()==WalkImage.Status.THUMB_LOADING ) thumbLoadingCount++;
+            if ( i.getStatus()==WalkImage.Status.THUMB_LOADED ) thumbLoadedCount++;
         }
-        if ( loadingCount==0 ) {
-            setStatus(""+loadedCount+" images loaded");
+        if ( loadingCount==0 && thumbLoadingCount==0) {
+            setStatus(""+loadedCount+" images loaded.");
         } else {
-            setStatus("busy: "+loadedCount+" images loaded, " + loadingCount + " are loading");
+            setStatus("busy: "+loadedCount+" images loaded, " + loadingCount + " are loading and "+ thumbLoadingCount + " thumbs are loading.  ");
         }
     }
 
