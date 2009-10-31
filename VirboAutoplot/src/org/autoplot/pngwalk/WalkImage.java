@@ -151,7 +151,7 @@ public class WalkImage implements Comparable<WalkImage> {
                 RequestProcessor.invokeLater(r);
                 return null;
             default:
-                //should never get here, but keeps NB from warning about missing return
+                //should never get here, but keeps Java from warning about missing return
                 throw(new IllegalArgumentException("Encountered invalid status in walk image."));
         } //end switch
     }
@@ -187,6 +187,8 @@ public class WalkImage implements Comparable<WalkImage> {
                     FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
 
                     File localFile = fo.getFile();
+
+                    Thread.yield();
 
                     im = ImageIO.read(localFile);
 
