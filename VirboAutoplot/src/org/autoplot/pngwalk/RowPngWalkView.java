@@ -67,7 +67,6 @@ public class RowPngWalkView extends PngWalkView {
             Timer repaintTimer = new Timer("RowViewRepaintDelay", true);
             TimerTask task;
 
-            @Override
             public void stateChanged(ChangeEvent e) {
                 // Cancel any pending timer events
                 if (task != null) task.cancel();
