@@ -707,7 +707,7 @@ public class PanelController extends DomNodeController {
             p.getXaxis().setAutolabel(true);
             p.getYaxis().setAutolabel(true);
             p.getZaxis().setAutolabel(true);
-            p.setAutolabel(true);
+            p.setAutoLabel(true);
             p.setAutoBinding(true);
         }
     }
