@@ -136,7 +136,7 @@ public class PlotController extends DomNodeController {
     private PropertyChangeListener labelListener= new PropertyChangeListener() {
          public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals(Plot.PROP_TITLE) ) {
-                plot.setAutolabel(false);
+                plot.setAutoLabel(false);
             }
          }
     };
@@ -441,7 +441,7 @@ public class PlotController extends DomNodeController {
             }
             this.panel= p;
             this.panel.getController().addPropertyChangeListener( PanelController.PROP_DATASET, panelDataSetListener );
-            if ( plot.isAutolabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
+            if ( plot.isAutoLabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
             if ( plot.getXaxis().isAutolabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
             if ( plot.getYaxis().isAutolabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
             if ( plot.getZaxis().isAutolabel() ) plot.getZaxis().setLabel( p.getPlotDefaults().getZaxis().getLabel() );
@@ -630,6 +630,6 @@ public class PlotController extends DomNodeController {
      */
     public void setTitleAutomatically(String title) {
         plot.setTitle(title);
-        plot.setAutolabel(true);
+        plot.setAutoLabel(true);
     }
 }

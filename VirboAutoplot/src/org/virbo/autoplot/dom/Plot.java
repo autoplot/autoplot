@@ -71,16 +71,16 @@ public class Plot extends DomNode {
      * indicates that the label was set by a machine, not a human, and can be
      * updated automatically.
      */
-    protected boolean autolabel = false;
-    public static final String PROP_AUTOLABEL = "autolabel";
+    protected boolean autoLabel = false;
+    public static final String PROP_AUTOLABEL = "autoLabel";
 
-    public boolean isAutolabel() {
-        return autolabel;
+    public boolean isAutoLabel() {
+        return autoLabel;
     }
 
-    public void setAutolabel(boolean autolabel) {
-        boolean oldAutolabel = this.autolabel;
-        this.autolabel = autolabel;
+    public void setAutoLabel(boolean autolabel) {
+        boolean oldAutolabel = this.autoLabel;
+        this.autoLabel = autolabel;
         propertyChangeSupport.firePropertyChange(PROP_AUTOLABEL, oldAutolabel, autolabel);
     }
 
@@ -164,7 +164,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_ISOTROPIC)) this.setIsotropic(that.isIsotropic());
         if (!exclude.contains(PROP_ROWID)) this.setRowId(that.getRowId());
         if (!exclude.contains(PROP_COLUMNID)) this.setColumnId(that.getColumnId());
-        if (!exclude.contains(PROP_AUTOLABEL)) this.setAutolabel(that.isAutolabel());
+        if (!exclude.contains(PROP_AUTOLABEL)) this.setAutoLabel(that.isAutoLabel());
         if (!exclude.contains(PROP_XAXIS)) this.xaxis.syncTo(that.getXaxis(),exclude); // possibly exclude id's.
         if (!exclude.contains(PROP_YAXIS)) this.yaxis.syncTo(that.getYaxis(),exclude);
         if (!exclude.contains(PROP_ZAXIS)) this.zaxis.syncTo(that.getZaxis(),exclude);
@@ -191,8 +191,8 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff("title", that.title, this.title));
         b = that.isotropic == this.isotropic;
         if (!b) result.add(new PropertyChangeDiff("isotropic", that.isotropic, this.isotropic));
-        b = that.autolabel == this.autolabel;
-        if (!b) result.add(new PropertyChangeDiff("autolabel", that.autolabel, this.autolabel));
+        b = that.autoLabel == this.autoLabel;
+        if (!b) result.add(new PropertyChangeDiff("autolabel", that.autoLabel, this.autoLabel));
         b = that.rowId.equals(this.rowId);
         if (!b) result.add(new PropertyChangeDiff("rowId", that.rowId, this.rowId));
         b = that.columnId.equals(this.columnId);
