@@ -5,7 +5,9 @@
 
 package org.virbo.autoplot.dom;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Many operations are defined within the DOM object controllers that needn't
@@ -40,14 +42,12 @@ public class DomOps {
 
     }
 
-    public static Plot copyPlotAndPanels( Plot srcPlot, boolean copyPanels, boolean bindx, boolean bindy, Object direction ) {
+    public static Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy, Object direction ) {
         Application application= srcPlot.getController().getApplication();
         ApplicationController ac= application.getController();
 
         Plot that = ac.addPlot( direction );
         that.getController().setAutoBinding(false);
-
-        ac.addPanel(that, null);
 
         that.syncTo( srcPlot, Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
 
@@ -67,5 +67,45 @@ public class DomOps {
 
         return that;
 
+    }
+
+    public static List<Panel> copyPanels( Plot srcPlot, Plot dstPlot ) {
+
+        DataSourceFilter dsf= null;
+
+        ApplicationController ac=  srcPlot.getController().getApplication().getController();
+        List<Panel> srcPanels = ac.getPanelsFor(srcPlot);
+
+        List<Panel> newPanels = new ArrayList<Panel>();
+        for (Panel srcPanel : srcPanels) {
+            if (!srcPanel.getComponent().equals("")) {
+                if ( srcPanel.getController().getParentPanel()==null ) {
+                    Panel newp = ac.copyPanel(srcPanel, dstPlot, dsf);
+                    newPanels.add(newp);
+                }
+            } else {
+                Panel newp = ac.copyPanel(srcPanel, dstPlot, dsf);
+                newPanels.add(newp);
+                List<Panel> srcKids = srcPanel.controller.getChildPanels();
+                List<Panel> newKids = new ArrayList();
+                DataSourceFilter dsf1 = ac.getDataSourceFilterFor(newp);
+                for (Panel k : srcKids) {
+                    if (srcPanels.contains(k)) {
+                        Panel kidp = ac.copyPanel(k, dstPlot, dsf1);
+                        kidp.getController().setParentPanel(newp);
+                        newPanels.add(kidp);
+                        newKids.add(kidp);
+                    }
+                }
+            }
+        }
+        return newPanels;
+
+    }
+
+    public static Plot copyPlotAndPanels( Plot srcPlot, boolean copyPanels, boolean bindx, boolean bindy, Object direction ) {
+        Plot dstPlot= copyPlot( srcPlot, bindx, bindy, direction );
+        if ( copyPanels ) copyPanels( srcPlot, dstPlot );
+        return dstPlot;
     }
 }
