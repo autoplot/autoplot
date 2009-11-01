@@ -80,10 +80,6 @@ public class Row extends DomNode {
         return DomUtil.getDiffs( this, node );
     }
 
-    List<Diff> diffs(DomNode node, List<String> exclude) {
-        return DomUtil.getDiffs( this, node, exclude );
-    }
-
     @Override
     public void syncTo(DomNode n) {
         DomUtil.syncTo(this,n);
