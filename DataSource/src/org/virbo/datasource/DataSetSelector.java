@@ -141,6 +141,12 @@ public class DataSetSelector extends javax.swing.JPanel {
             return;
         }
 
+        String ext= DataSetURI.getExt(surl);
+        if ( ext.equals("vap" ) ) {
+            firePlotDataSetURL();
+            return;
+        }
+        
         try {
 
             if (surl.endsWith("/") || surl.contains("/?") || surl.endsWith(".zip") || surl.contains(".zip?")) {
@@ -185,9 +191,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                     showCompletions(surl, carotpos);
                 } catch (IllegalArgumentException ex) {
                     setMessage(ex.getMessage());
+                    ex.printStackTrace();
                     firePlotDataSetURL();
                 } catch (URISyntaxException ex) {
                     setMessage(ex.getMessage());
+                    ex.printStackTrace();
                     firePlotDataSetURL();
                 }
             }
@@ -696,9 +704,21 @@ public class DataSetSelector extends javax.swing.JPanel {
                         }
                     } else if (split.scheme.equals("file")) {
                         JFileChooser chooser = new JFileChooser( new File( new URI(split.path) ) );
+                        chooser.setMultiSelectionEnabled(true);
                         int result = chooser.showOpenDialog(this);
                         if (result == JFileChooser.APPROVE_OPTION) {
-                            String suri = DataSetURI.newUri(context, chooser.getSelectedFile().toString());
+                            File[] ff=  chooser.getSelectedFiles();
+                            File f= chooser.getSelectedFile();
+                            String suri;
+                            suri= DataSetURI.newUri(context, f.toString());
+                            if ( ff.length>1 ) {  // let's try to aggregate
+                                String[] suris= new String[ff.length];
+                                for ( int i=0; i<suris.length; i++ ) {
+                                    suris[i]= DataSetURI.newUri(context, ff[i].toString());
+                                }
+                                String asuri= org.virbo.datasource.DataSourceUtil.makeAggregation(suri,suris);
+                                suri= asuri;
+                            }
                             dataSetSelector.setSelectedItem(suri);
                         }
                     } else {
