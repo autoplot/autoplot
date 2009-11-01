@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
+import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasRow;
 import org.das2.graph.Painter;
@@ -143,6 +144,7 @@ public class CanvasController extends DomNodeController {
     }
 
     Row getRowFor(Plot domPlot) {
+        if ( domPlot.getRowId().equals( canvas.marginRow.getId() ) ) return canvas.marginRow;
         for (Row row : canvas.getRows()) {
             if (row.getId().equals(domPlot.getRowId())) {
                 return row;
@@ -158,6 +160,16 @@ public class CanvasController extends DomNodeController {
             }
         }
         throw new IllegalArgumentException("no dom row found for " + dasRow);
+    }
+
+    Column getColumnFor(Plot domPlot) {
+        if ( domPlot.getColumnId().equals( canvas.marginColumn.getId() ) ) return canvas.marginColumn;
+        for (Column column : canvas.getColumns()) {
+            if (column.getId().equals(domPlot.getColumnId())) {
+                return column;
+            }
+        }
+        throw new IllegalArgumentException("no column found for " + domPlot);
     }
 
     /**
@@ -201,6 +213,47 @@ public class CanvasController extends DomNodeController {
         }
     }
 
+    /**
+     * reset this stack of columns, trying to preserve weights.
+     * @param columns
+     */
+    static void removeGapsAndOverlapsInColumns(List<Column> columns) {
+
+        int[] weights = new int[columns.size()]; // in per milli.
+
+        int totalWeight = 0;
+        for (int i = 0; i < columns.size(); i++) {
+            try {
+                double nmin = DasDevicePosition.parseFormatStr(columns.get(i).getRight())[0];
+                double nmax = DasDevicePosition.parseFormatStr(columns.get(i).getLeft())[0];
+                weights[i] = (int) Math.round((nmax - nmin) * 1000);
+
+            } catch (ParseException ex) {
+                weights[i] = 200;
+            }
+            totalWeight += weights[i];
+        }
+
+        // normalize to per thousand.
+        for (int i = 0; i < columns.size(); i++) {
+            weights[i] = 1000 * weights[i] / totalWeight;
+        }
+        totalWeight = 1000;
+
+        int t = 0;
+        double emIn = columns.size() < 2 ? 0. : 2.;
+
+        for (int idx = 0; idx < weights.length; idx++) {
+            DasColumn dasColumn;
+            dasColumn = columns.get(idx).controller.getDasColumn();
+            dasColumn.setMinimum(1. * t / totalWeight);
+            dasColumn.setMaximum(1. * (t + weights[idx]) / totalWeight);
+            t += weights[idx];
+            dasColumn.setEmMinimum(emIn);
+            dasColumn.setEmMaximum(-emIn);
+        }
+    }
+
     void removeGaps() {
         removeGapsAndOverlaps(Arrays.asList(canvas.getRows()));
         repaintSoon();
@@ -235,11 +288,42 @@ public class CanvasController extends DomNodeController {
 
         rows.add(ipos, row);
         row.syncTo(trow, Arrays.asList("id"));
-        List<Diff> d = row.diffs(trow, Arrays.asList("id"));
+        List<Diff> d = DomUtil.getDiffs( row, trow, Arrays.asList("id") );
         if (d.size() > 0) {
             row.syncTo(trow, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
         }
         removeGapsAndOverlaps(rows);
+
+        lock.unlock();
+        repaintSoon();
+    }
+
+    /**
+     * make a gap in the columns to make way for the new column <tt>column</tt>.
+     * @param column the column to insert.  Its position will be the gap.
+     * @param tcolumn above or below this column
+     * @param position LayoutUtil.RIGHT or LayoutUtil.LEFT.
+     */
+    void insertGapFor(Column column, Column tcolumn, Object position) {
+        MutatorLock lock = changesSupport.mutatorLock();
+        lock.lock();
+
+        List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+
+        int ipos = 0;
+        if (position == LayoutConstants.BELOW) {
+            ipos = columns.indexOf(tcolumn) + 1;
+        } else {
+            ipos = columns.indexOf(tcolumn);
+        }
+
+        columns.add(ipos, column);
+        column.syncTo(tcolumn, Arrays.asList("id"));
+        List<Diff> d = DomUtil.getDiffs( column, tcolumn, Arrays.asList("id") );
+        if (d.size() > 0) {
+            column.syncTo(tcolumn, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
+        }
+        removeGapsAndOverlapsInColumns(columns);
 
         lock.unlock();
         repaintSoon();
@@ -282,6 +366,46 @@ public class CanvasController extends DomNodeController {
         lock.unlock();
 
         return row;
+
+    }
+
+    /**
+     * insert the column into the other columns by shrinking them to make room.
+     * @param tcolumn column to position above or below, or null if we don't care.
+     * @param position LayoutConstants.ABOVE, LayoutConstants.BELOW
+     */
+    protected Column addInsertColumn(Column tcolumn, Object position) {
+        MutatorLock lock = changesSupport.mutatorLock();
+        lock.lock();
+
+        final Column column = new Column();
+
+        column.setParent(canvas.getMarginColumn().getId());
+        new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
+
+        if (tcolumn != null) {
+            insertGapFor(column, tcolumn, position);
+        }
+
+        List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+
+        int ipos = columns.size();
+        if (tcolumn != null) {
+            if (position == LayoutConstants.BELOW) {
+                ipos = columns.indexOf(tcolumn) + 1;
+            } else {
+                ipos = columns.indexOf(tcolumn);
+            }
+        }
+        columns.add(ipos, column);
+
+        canvas.setColumns(columns.toArray(new Column[columns.size()]));
+
+        this.application.getController().assignId(column);
+
+        lock.unlock();
+
+        return column;
 
     }
 
