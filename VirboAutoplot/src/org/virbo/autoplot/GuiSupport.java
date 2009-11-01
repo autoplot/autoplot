@@ -59,6 +59,7 @@ import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
+import org.virbo.autoplot.dom.DomOps;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Panel;
 import org.virbo.autoplot.dom.Plot;
@@ -792,6 +793,17 @@ public class GuiSupport {
                 that.getController().resetZoom(true, true, true);
             }
         });
+        addPlotMenu.add(item);
+        
+        item = new JMenuItem(new AbstractAction("Copy Panels Right") {
+
+            public void actionPerformed(ActionEvent e) {
+                DomOps.copyPlotAndPanels(domPlot,true,false,false,LayoutConstants.RIGHT);
+            }
+        });
+        item.setToolTipText("make a new plot, and copy the panels into it.  New plot is bound by the x axis.");
+        addPlotMenu.add(item);
+
 
         item.setToolTipText("make a new plot, and copy the panels into it.  The plot is not bound,\n" +
                 "and a connector is drawn between the two.  The panel uris are bound as well.");
