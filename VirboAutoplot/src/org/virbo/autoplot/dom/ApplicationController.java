@@ -684,29 +684,60 @@ public class ApplicationController extends DomNodeController implements RunLater
      * focus plot, and currently only LayoutConstants.ABOVE and LayoutConstants.BELOW
      * are supported.
      * 
-     * @param direction LayoutConstants.ABOVE, LayoutConstants.BELOW, or null.  Null indicates the layout will be done elsewhere.
+     * @param direction LayoutConstants.ABOVE, LayoutConstants.BELOW, or null.  
+     * Null indicates the layout will be done elsewhere, and the new plot will
+     * be on top of the old.
      * @return
      */
     public synchronized Plot addPlot(Object direction) {
+        Plot focus = getPlot();
+        return addPlot( focus, direction );
+    }
+
+    public synchronized Plot addPlot( final Plot focus, Object direction ) {
         logger.fine("enter addPlot");
         final Plot domPlot = new Plot();
 
         CanvasController ccontroller=  ((CanvasController)canvas.controller);
         Row domRow;
 
-        Plot focus = getPlot();
-
-        if ( canvas.getRows().length == 0) {
+        if ( canvas.getRows().length == 0 && ( direction==LayoutConstants.BELOW || direction==LayoutConstants.ABOVE ) ) {
             domRow = ccontroller.addRow();
-        } else if ( direction==null ) {
+        } else if ( direction==null || direction==LayoutConstants.LEFT || direction==LayoutConstants.RIGHT ) {
             domRow= ccontroller.getRowFor(focus);
         } else {
             domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction);
         }
 
+        Column domColumn= canvas.getMarginColumn();
+
+        // the logic for columns is different because we optimize the application for a stack of time
+        // series.
+        if ( direction==null || direction==LayoutConstants.ABOVE || direction==LayoutConstants.BELOW ) {
+            domColumn= canvas.marginColumn;
+        } else {
+            if ( ccontroller.getColumnFor(focus)==canvas.marginColumn ) {
+                String srcColumn;
+                if ( canvas.getColumns().length>0 ) {
+                    srcColumn= canvas.getColumns(0).getId();
+                } else {
+                    ccontroller.addColumns(2);
+                    srcColumn= canvas.getColumns(0).getId();
+                }
+                if ( canvas.getColumns().length>1 ) {
+                    domColumn= canvas.getColumns(1);
+                } else {
+                    domColumn = ccontroller.addInsertColumn( ccontroller.getColumnFor(focus), direction );
+                }
+                focus.setColumnId(srcColumn);
+            } else {
+                domColumn = ccontroller.addInsertColumn( ccontroller.getColumnFor(focus), direction);
+            }
+        }
+
         assignId( domPlot );
 
-        new PlotController(application, domPlot).createDasPeer(canvas, domRow ,canvas.getMarginColumn() );
+        new PlotController(application, domPlot).createDasPeer(canvas, domRow ,domColumn );
 
         domPlot.getXaxis().setAutorange(true);
         domPlot.getYaxis().setAutorange(true);
@@ -714,11 +745,11 @@ public class ApplicationController extends DomNodeController implements RunLater
         domPlot.getXaxis().setAutolabel(true);
         domPlot.getYaxis().setAutolabel(true);
         domPlot.getZaxis().setAutolabel(true);
-        domPlot.setAutolabel(true);
+        domPlot.setAutoLabel(true);
         domPlot.setAutoBinding(true);
 
         domPlot.setRowId( domRow.getId() );
-        domPlot.setColumnId( canvas.getMarginColumn().getId() );
+        domPlot.setColumnId( domColumn.getId() );
 
         List<Plot> plots = new ArrayList<Plot>(Arrays.asList(application.getPlots()));
 
