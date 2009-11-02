@@ -142,7 +142,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         }
 
         String ext= DataSetURI.getExt(surl);
-        if ( ext.equals("vap" ) ) {
+        if ( ext!=null && ext.equals("vap" ) ) {
             firePlotDataSetURL();
             return;
         }
