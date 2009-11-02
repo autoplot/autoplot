@@ -148,10 +148,19 @@ public class DataSourceUtil {
         return i;
     }
 
+    /**
+     * attempt to make an aggregation from the URLs.  If one cannot be created
+     * (for example if the filenames are not consistent), then the original
+     * URI is returned.
+     *
+     * @param surl
+     * @param surls
+     * @return
+     */
     public static String makeAggregation( String surl, String[] surls ) {
         try {
             String sagg = makeAggregation(surl);
-            if (sagg.equals(surl))
+            if (sagg==null || sagg.equals(surl))
                 return surl;
             DatumRange dr = null;
             // remove parameter
@@ -159,16 +168,23 @@ public class DataSourceUtil {
             TimeParser tp = TimeParser.create(sagg);
             tp.parse(surl);
             dr = tp.getTimeRange();
-            
-            for (int i = 0; i < surls.length; i++) {
+
+            boolean okay= true;
+            for (int i = 0; okay && i < surls.length; i++) {
                 try {
                     tp.parse(surls[i]);
                     dr = DatumRangeUtil.union(dr, tp.getTimeRange());
                 } catch (ParseException ex) {
+                    okay= false;
                     Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            return URISplit.putParam(sagg, "timerange", dr.toString());
+            if ( okay==false ) {
+                return surl;
+            } else {
+                return URISplit.putParam(sagg, "timerange", dr.toString());
+            }
+            
         } catch (ParseException ex) {
             Logger.getLogger(DataSourceUtil.class.getName()).log(Level.SEVERE, null, ex);
             return surl;
@@ -177,6 +193,13 @@ public class DataSourceUtil {
 
     }
 
+    /**
+     * attempt to create an equivalent URL that uses an aggregation template
+     * instead of the explicit filename.
+     * For example, file:/tmp/20091102.dat -> file:/tmp/%Y%m%d.dat?timerange=20091102
+     * @param surl
+     * @return
+     */
     public static String makeAggregation( String surl ) {
         String yyyy= "/\\d{4}/";
         String yyyymmdd= "(?<!\\d)(\\d{8})(?!\\d)"; //"(\\d{8})";
