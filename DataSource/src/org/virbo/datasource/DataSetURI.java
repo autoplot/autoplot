@@ -721,6 +721,19 @@ public class DataSetURI {
         }
 
         List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
+
+        String[] s2= new String[s.length];
+        for ( int i=0; i<s.length; i++ ) {
+            s2[i]= surlDir + s[i];
+        }
+
+        String sagg= DataSourceUtil.makeAggregation( s2[0], s2 );
+        if ( !sagg.equals(s2[0]) ) {
+            sagg= URISplit.removeParam( sagg, "timerange" );
+            completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation" ) );
+        }
+
+
         for (int j = 0; j < s.length; j++) {
             String scomp = foldCase ? s[j].toLowerCase() : s[j];
             if (scomp.startsWith(prefix)) {
