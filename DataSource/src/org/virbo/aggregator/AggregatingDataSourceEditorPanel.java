@@ -15,12 +15,19 @@ import java.awt.BorderLayout;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -39,6 +46,9 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }
 
 
+    String uri;
+    DatumRange[] ranges;
+
     public void setDelegateEditorPanel(DataSourceEditorPanel edit) {
         delegateEditorPanel= edit;
     }
@@ -53,36 +63,62 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     private void initComponents() {
 
         delegatePanel = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         timeRangeTextField = new javax.swing.JTextField();
+        outerRangeTextField = new javax.swing.JLabel();
 
         delegatePanel.setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setText("timeRange:");
+        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        jLabel1.setText("Time Range:");
         jLabel1.setToolTipText("enter the time range to aggregate over.  Data from files within this range will be combined by concatenating over the first dimension.\n");
 
         timeRangeTextField.setText("jTextField1");
+
+        outerRangeTextField.setFont(new java.awt.Font("DejaVu Sans", 0, 10)); // NOI18N
+        outerRangeTextField.setText("listing to get available time range...");
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(304, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(outerRangeTextField)
+                .addContainerGap(50, Short.MAX_VALUE))
+        );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jLabel1)
-                .add(18, 18, 18)
-                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
-                .addContainerGap())
-            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 438, Short.MAX_VALUE)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 614, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1)))
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -90,6 +126,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel delegatePanel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JLabel outerRangeTextField;
     private javax.swing.JTextField timeRangeTextField;
     // End of variables declaration//GEN-END:variables
 
@@ -113,10 +151,46 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         delegatePanel.validate();
     }
 
+    private synchronized void updateTimeRanges() {
+        DatumRange dr= null;
+        try {
+            FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(uri);
+            String[] names= fsm.getNamesFor( null, new NullProgressMonitor() );
+            ranges= new DatumRange[names.length];
+            for ( int i=0; i<names.length; i++ ) {
+                ranges[i]= fsm.getRangeFor(names[i]);
+                if ( dr==null ) {
+                    dr= ranges[i];
+                } else {
+                    dr=  DatumRangeUtil.union(dr, ranges[i] );
+                }
+            }
+        } catch (IOException ex) {
+            outerRangeTextField.setText( ex.toString() );
+            return;
+        }
+        outerRangeTextField.setText( dr.toString() );
+    }
+
+    private void updateDropLists() {
+
+        // years
+        List pyears= DatumRangeUtil.generateList( DatumRangeUtil.parseTimeRangeValid("1900-2100"),
+                DatumRangeUtil.parseTimeRangeValid("1900" ));
+        List ryears= new ArrayList();
+
+        for ( int i=0; i<pyears.size(); i++ ) {
+            DatumRange yr= (DatumRange) pyears.get(i);
+
+        }
+
+
+    }
+
     public void setURI(String url) {
         split= URISplit.parse(url);
         params= URISplit.parseParams(split.params);
-
+        this.uri= url;
         try {
 
             timeRangeTextField.setText( params.get("timerange") );
@@ -143,6 +217,15 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(AggregatingDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        Runnable run= new Runnable() {
+            public void run() {
+                updateTimeRanges();
+                updateDropLists();
+            }
+        };
+
+        new Thread( run ).start();
 
     }
 
