@@ -727,10 +727,12 @@ public class DataSetURI {
             s2[i]= surlDir + s[i];
         }
 
-        String sagg= DataSourceUtil.makeAggregation( s2[0], s2 );
-        if ( !sagg.equals(s2[0]) ) {
-            sagg= URISplit.removeParam( sagg, "timerange" );
-            completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation" ) );
+        if ( s2.length>0 ) {
+            String sagg= DataSourceUtil.makeAggregation( s2[0], s2 );
+            if ( !sagg.equals(s2[0]) ) {
+                sagg= URISplit.removeParam( sagg, "timerange" );
+                completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation" ) );
+            }
         }
 
 
