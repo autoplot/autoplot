@@ -12,24 +12,27 @@
 package org.virbo.aggregator;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetSelector;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.datasource.URISplit;
@@ -47,7 +50,8 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
 
     String uri;
-    DatumRange[] ranges;
+    List<DatumRange> ranges;
+    boolean updatingDropLists= false;  // avoid re-entry in droplists.
 
     public void setDelegateEditorPanel(DataSourceEditorPanel edit) {
         delegateEditorPanel= edit;
@@ -67,34 +71,77 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         jLabel1 = new javax.swing.JLabel();
         timeRangeTextField = new javax.swing.JTextField();
         outerRangeTextField = new javax.swing.JLabel();
+        yearsComboBox = new javax.swing.JComboBox();
+        monthsComboBox = new javax.swing.JComboBox();
+        daysComboBox = new javax.swing.JComboBox();
+        jButton1 = new javax.swing.JButton();
 
         delegatePanel.setLayout(new java.awt.BorderLayout());
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel1.setText("Time Range:");
+        jLabel1.setText("Aggregation Time Range:");
         jLabel1.setToolTipText("enter the time range to aggregate over.  Data from files within this range will be combined by concatenating over the first dimension.\n");
 
         timeRangeTextField.setText("jTextField1");
 
-        outerRangeTextField.setFont(new java.awt.Font("DejaVu Sans", 0, 10)); // NOI18N
-        outerRangeTextField.setText("listing to get available time range...");
+        outerRangeTextField.setFont(new java.awt.Font("DejaVu Sans", 0, 10));
+        outerRangeTextField.setText("listing to get available time ranges...");
+
+        yearsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "..." }));
+        yearsComboBox.setToolTipText("Select from available years");
+        yearsComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                yearsComboBoxItemStateChanged(evt);
+            }
+        });
+
+        monthsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "...", " " }));
+        monthsComboBox.setToolTipText("Select from available months");
+        monthsComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                monthsComboBoxItemStateChanged(evt);
+            }
+        });
+
+        daysComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "...", " " }));
+        daysComboBox.setToolTipText("Select from available days");
+
+        jButton1.setText("Copy");
+        jButton1.setToolTipText("copy the date into the time range field.");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
-                        .add(jLabel1)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(304, Short.MAX_VALUE))
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(222, Short.MAX_VALUE))
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(yearsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(monthsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 61, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 61, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jButton1)
+                .addContainerGap(320, Short.MAX_VALUE))
+            .add(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                .add(383, 383, 383))
         );
+
+        jPanel1Layout.linkSize(new java.awt.Component[] {daysComboBox, monthsComboBox, yearsComboBox}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
@@ -103,7 +150,13 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                     .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(outerRangeTextField)
-                .addContainerGap(50, Short.MAX_VALUE))
+                .add(9, 9, 9)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(yearsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(monthsComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jButton1))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -116,19 +169,52 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+                .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String syr= String.valueOf( yearsComboBox.getSelectedItem() ).trim();
+        String smn= String.valueOf( monthsComboBox.getSelectedItem() ).trim();
+        String sday= String.valueOf( daysComboBox.getSelectedItem() ).trim();
+        String range = syr +  " " + smn + " " + sday;
+        range= range.trim();
+        if ( ( evt.getModifiers() & ActionEvent.SHIFT_MASK ) == ActionEvent.SHIFT_MASK ) {
+            DatumRange dr1= DatumRangeUtil.parseTimeRangeValid(range);
+            DatumRange dr2= null;
+            try {
+                dr2= DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
+                dr2= DatumRangeUtil.union( dr1, dr2 );
+                timeRangeTextField.setText( dr2.toString() );
+            } catch (ParseException ex) {
+                timeRangeTextField.setText(range);
+            }
+        } else {
+            timeRangeTextField.setText(range);
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void yearsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_yearsComboBoxItemStateChanged
+        if ( !updatingDropLists ) updateDropLists( false, true );
+    }//GEN-LAST:event_yearsComboBoxItemStateChanged
+
+    private void monthsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_monthsComboBoxItemStateChanged
+        if ( !updatingDropLists ) updateDropLists( false, false );
+    }//GEN-LAST:event_monthsComboBoxItemStateChanged
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox daysComboBox;
     private javax.swing.JPanel delegatePanel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JComboBox monthsComboBox;
     private javax.swing.JLabel outerRangeTextField;
     private javax.swing.JTextField timeRangeTextField;
+    private javax.swing.JComboBox yearsComboBox;
     // End of variables declaration//GEN-END:variables
 
     public JPanel getPanel() {
@@ -151,40 +237,101 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         delegatePanel.validate();
     }
 
-    private synchronized void updateTimeRanges() {
+    private void updateTimeRanges() {
         DatumRange dr= null;
         try {
             FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(uri);
             String[] names= fsm.getNamesFor( null, new NullProgressMonitor() );
-            ranges= new DatumRange[names.length];
+            ranges= new ArrayList(names.length);
             for ( int i=0; i<names.length; i++ ) {
-                ranges[i]= fsm.getRangeFor(names[i]);
+                ranges.add(i,fsm.getRangeFor(names[i]));
                 if ( dr==null ) {
-                    dr= ranges[i];
+                    dr= ranges.get(i);
                 } else {
-                    dr=  DatumRangeUtil.union(dr, ranges[i] );
+                    dr= DatumRangeUtil.union(dr, ranges.get(i) );
                 }
             }
         } catch (IOException ex) {
             outerRangeTextField.setText( ex.toString() );
             return;
         }
-        outerRangeTextField.setText( dr.toString() );
+        outerRangeTextField.setText( "found files for " +dr.toString() );
     }
 
-    private void updateDropLists() {
+    private void updateDropLists( boolean updateYear, boolean updateMonth ) {
 
-        // years
-        List pyears= DatumRangeUtil.generateList( DatumRangeUtil.parseTimeRangeValid("1900-2100"),
-                DatumRangeUtil.parseTimeRangeValid("1900" ));
-        List ryears= new ArrayList();
+        List possible;
+        List<DatumRange> result;
+        ComboBoxModel model;
 
-        for ( int i=0; i<pyears.size(); i++ ) {
-            DatumRange yr= (DatumRange) pyears.get(i);
-
+        updatingDropLists= true;
+        
+        DatumRange selectedRange= null;
+        try {
+            selectedRange = DatumRangeUtil.parseTimeRange(timeRangeTextField.getText());
+        } catch (ParseException ex) {
+            Logger.getLogger(AggregatingDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+        if ( updateYear ) {
+            // years
+            possible= DatumRangeUtil.generateList( DatumRangeUtil.parseTimeRangeValid("1800-2200"),
+                    DatumRangeUtil.parseTimeRangeValid("1800" ) );
+            result= DatumRangeUtil.intersection( possible, ranges, false );
 
+            String[] yrLabels= new String[result.size()+1];
+            yrLabels[0]="";
+            int isel= result.size()==1 ? 1 : 0;
+            for ( int i=0; i<result.size(); i++ ) {
+                yrLabels[i+1]= result.get(i).toString();
+                if ( selectedRange!=null && result.get(i).intersects(selectedRange) ) isel= i+1;
+            }
+            model = new DefaultComboBoxModel(yrLabels);
+            yearsComboBox.setModel(model);
+            yearsComboBox.setSelectedIndex(isel);
+        }
+
+        String syr=  String.valueOf( yearsComboBox.getSelectedItem() ).trim();
+        if ( updateMonth ) {
+            if ( syr.length()>0 ) {
+                possible= DatumRangeUtil.generateList( DatumRangeUtil.parseTimeRangeValid(syr),
+                    DatumRangeUtil.parseTimeRangeValid( syr + " jan" ) );
+                result= DatumRangeUtil.intersection( possible, ranges, false );
+                String[] mnLabels= new String[result.size()+1];
+                mnLabels[0]="";
+                int isel= result.size()==1 ? 1 : 0;
+                for ( int i=0; i<result.size(); i++ ) {
+                    mnLabels[i+1]= result.get(i).toString().replace( syr, "" ).trim();
+                    if ( selectedRange!=null && result.get(i).intersects(selectedRange)  && selectedRange.width().le( result.get(i).width() )) isel= i+1;
+                }
+                model = new DefaultComboBoxModel(mnLabels);
+                monthsComboBox.setModel(model);
+                monthsComboBox.setSelectedIndex(isel);
+            } else {
+                monthsComboBox.setModel( new DefaultComboBoxModel( new String[] { "" } ) );
+            }
+        }
+
+        String smon=  String.valueOf( monthsComboBox.getSelectedItem() ).trim();
+        if ( syr.length()>0 && smon.length()>0 ) {
+            possible= DatumRangeUtil.generateList( DatumRangeUtil.parseTimeRangeValid(syr+" "+smon),
+                DatumRangeUtil.parseTimeRangeValid( syr + " " + smon + " 1" ) );
+            result= DatumRangeUtil.intersection( possible, ranges, false );
+            String[] dayLabels= new String[result.size()+1];
+            dayLabels[0]= "";
+            int isel= result.size()==1 ? 1 : 0;
+            for ( int i=0; i<result.size(); i++ ) {
+                dayLabels[i+1]= String.valueOf( TimeUtil.toTimeStruct(result.get(i).min()).day );
+                if ( selectedRange!=null && result.get(i).intersects(selectedRange) && selectedRange.width().le( result.get(i).width() ) ) isel= i+1;
+            }
+            model = new DefaultComboBoxModel(dayLabels);
+            daysComboBox.setModel(model);
+            daysComboBox.setSelectedIndex(isel);
+        } else {
+            daysComboBox.setModel( new DefaultComboBoxModel( new String[] { "" } ) );
+        }
+
+        updatingDropLists= false;
     }
 
     public void setURI(String url) {
@@ -221,7 +368,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         Runnable run= new Runnable() {
             public void run() {
                 updateTimeRanges();
-                updateDropLists();
+                updateDropLists(true,true);
             }
         };
 
