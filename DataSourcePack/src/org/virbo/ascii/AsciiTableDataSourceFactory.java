@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -145,18 +147,32 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
     }
 
     public boolean reject(String surl, ProgressMonitor mon) {
-        return false;
+        try {
+            URISplit split = URISplit.parse(surl);
+
+            Map<String, String> params = URISplit.parseParams(split.params);
+            
+            if ( params.get("rank2")!=null ) return false;
+            
+            File file = DataSetURI.getFile(split.resourceUri, mon);
+            List<CompletionContext> cc= getFieldNames( file, params, mon );
+
+            if ( cc.size()<=2 ) {
+                return false;
+            } else {
+                if ( params.get("column")!=null ) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+        } catch (IOException ex) {
+            return false;
+        }
     }
 
-    public String urlForServer(String surl) {
-        return surl;
-    }
-
-    private List<CompletionContext> getFieldNames(CompletionContext cc, ProgressMonitor mon) throws IOException {
-
-        Map<String,String> params = URISplit.parseParams(cc.params);
-        Object o;
-        File file = DataSetURI.getFile(cc.resource, mon);
+    private List<CompletionContext> getFieldNames( File file, Map<String,String> params, ProgressMonitor mon ) throws IOException {
 
         AsciiParser parser = AsciiParser.newParser(5);
         if (params.containsKey("skip")) {
@@ -178,17 +194,28 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
 
         String[] columns = parser.getFieldNames();
         List<CompletionContext> result = new ArrayList<CompletionContext>();
-        
+
         for ( int i=0; i<columns.length; i++ ) {
             String s= columns[i];
             String label= s;
             if ( ! label.equals(fields[i]) && label.startsWith("field") ) label += " ("+fields[i]+")";
-            
+
             result.add(new CompletionContext(
-                    CompletionContext.CONTEXT_PARAMETER_VALUE, 
+                    CompletionContext.CONTEXT_PARAMETER_VALUE,
                     s,
                     label, null ) ) ;
         }
         return result;
+
+    }
+
+    private List<CompletionContext> getFieldNames(CompletionContext cc, ProgressMonitor mon) throws IOException {
+
+        Map<String,String> params = URISplit.parseParams(cc.params);
+        Object o;
+        File file = DataSetURI.getFile(cc.resource, mon);
+
+        return getFieldNames( file, params, mon );
+
     }
 }
