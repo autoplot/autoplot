@@ -63,11 +63,15 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     /** Respond to property changes on the {@list WalkImageSequence} this view
      * represents.  The default implementation just calls <code>repaint()</code>,
-     * but subclasses may override.
+     * (or <code>sequencChanged()</code> if appropriate) but subclasses may override.
      * @param e
      */
     public void propertyChange(PropertyChangeEvent e) {
-        repaint();
+        if (e.getPropertyName().equals(WalkImageSequence.PROP_SEQUENCE_CHANGED)) {
+            sequenceChanged();
+        } else {
+            repaint();
+        }
     }
 
     public boolean isShowCaptions() {

@@ -172,6 +172,8 @@ public class GridPngWalkView extends PngWalkView {
             int x = (i % nCols) * thumbSize;
             canvas.repaint(new Rectangle(x, y, thumbSize, thumbSize));
             canvas.repaintSoon();
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_SEQUENCE_CHANGED)) {
+            sequenceChanged();
         }
     }
 

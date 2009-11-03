@@ -152,6 +152,8 @@ public class RowPngWalkView extends PngWalkView {
             int x = i * cellSize;
             canvas.repaint(new Rectangle(x, 0, cellSize, cellSize));
             canvas.repaintSoon();
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_SEQUENCE_CHANGED)) {
+            sequenceChanged();
         }
     }
 

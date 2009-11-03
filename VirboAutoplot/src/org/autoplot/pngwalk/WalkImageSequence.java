@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
 
 /**
@@ -25,8 +26,11 @@ import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
 public class WalkImageSequence implements PropertyChangeListener  {
     private List<WalkImage> images;
     //private List<URI> locations;
-    //private boolean showMissing = false;
+    private boolean showMissing = false;
     private int index;
+
+    private DatumRange timeSpan = null;
+    private List<DatumRange> datumRanges = null;
 
     /**
      * template used to create list.  This may be null.
@@ -39,6 +43,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     public static final String PROP_INDEX = "index";
     public static final String PROP_IMAGE_LOADED = "imageLoaded";
     public static final String PROP_THUMB_LOADED = "thumbLoaded";
+    public static final String PROP_SEQUENCE_CHANGED = "sequenceChanged";
 
     /** Create an image sequence based on a URI template.
      *
@@ -55,7 +60,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * sequence is used.
      */
     public void initialLoad() { 
-        List<DatumRange> datumRanges = new ArrayList<DatumRange>();
+        datumRanges = new ArrayList<DatumRange>();
         List<URI> uris;
 
         if ( template==null ) {
@@ -89,6 +94,14 @@ public class WalkImageSequence implements PropertyChangeListener  {
             images.get(i).setCaption(captionString);
         }
 
+        //DatumRange span = null;
+        for (DatumRange dr : datumRanges) {
+            if (timeSpan == null)
+                timeSpan = dr;
+            else
+                timeSpan = DatumRangeUtil.union(timeSpan, dr);
+        }
+
         for (WalkImage i : images) {
             i.addPropertyChangeListener(this);
         }
@@ -118,15 +131,29 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
     }
 
-//    public boolean isShowMissing() {
-//        return showMissing;
-//    }
-//
-//    public void setShowMissing(boolean showMissing) {
-//        boolean oldShowMissing = this.showMissing;
-//        this.showMissing = showMissing;
-//        pcs.firePropertyChange(PROP_SHOWMISSING, oldShowMissing, this.showMissing);
-//    }
+    public boolean isShowMissing() {
+        return showMissing;
+    }
+
+    public void setShowMissing(boolean showMissing) {
+        if (showMissing != this.showMissing) {
+            this.showMissing = showMissing;
+
+            //Bogus property has no meaningful value
+            pcs.firePropertyChange(PROP_SEQUENCE_CHANGED, false, true);
+        }
+    }
+
+    /** Return the time range covered by this sequence.  This is the total range
+     * of available images, not any currently displayed subrange.  Will be null
+     * if no date template was used to create the sequence.
+     *
+     * @return
+     */
+    public DatumRange getTimeSpan() {
+        return timeSpan;
+    }
+
 
     /** Return the current value of the index.
      * 
