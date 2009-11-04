@@ -139,6 +139,9 @@ public class CdfFileDataSource extends AbstractDataSource {
                 nn= (Number)istpProps.get(QDataSet.VALID_MIN);
                 if ( nn!=null ) result.putProperty(QDataSet.VALID_MIN, uc.convert(nn) );
                 result.putProperty(QDataSet.FILL_VALUE, istpProps.get(QDataSet.FILL_VALUE));
+
+                result.putProperty(QDataSet.LABEL, istpProps.get("FIELDNAM") );
+                result.putProperty(QDataSet.TITLE, istpProps.get("CATDESC" ) );
             // apply properties.
             }
 
