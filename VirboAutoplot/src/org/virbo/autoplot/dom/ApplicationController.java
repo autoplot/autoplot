@@ -1155,7 +1155,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         if ( c.getRows().length>0 ) {
-            c.getRows(0).syncTo( new Row(), Arrays.asList(DomNode.PROP_ID, Row.PROP_TOP, Row.PROP_BOTTOM ) );
+            c.getRows(0).syncTo( new Row(), Arrays.asList(DomNode.PROP_ID, Row.PROP_TOP, Row.PROP_BOTTOM, Row.PROP_PARENT ) );
             c.getRows(0).setTop("0%");
             c.getRows(0).setBottom("100%");
         }
