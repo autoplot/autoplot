@@ -9,6 +9,9 @@
 
 package org.virbo.autoplot.state;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
@@ -20,10 +23,20 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import javax.xml.parsers.DocumentBuilderFactory;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Connector;
+import org.virbo.autoplot.dom.DomNode;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 
 /**
  *
@@ -55,7 +68,42 @@ public class StatePersistence {
             }
         } );
         e.writeObject(state);
-        e.close();                
+        e.close();
+
+        Document document=null;
+        try {
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        }
+        Element element = SerializeUtil.getDomElement(document, (DomNode)state);
+        document.appendChild(element);
+        OutputStream out = new FileOutputStream( new File( f.toString()+"x") );
+
+        DOMImplementation impl = document.getImplementation();
+        DOMImplementationLS ls = (DOMImplementationLS)impl.getFeature("LS", "3.0");
+        LSSerializer serializer = ls.createLSSerializer();
+        LSOutput output = ls.createLSOutput();
+        output.setEncoding("UTF-8");
+        output.setByteStream(out);
+
+        try {
+            if (serializer.getDomConfig().canSetParameter("format-pretty-print", Boolean.TRUE)) {
+                serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+            }
+        } catch (Error e2) {
+            // Ed's nice trick for finding the implementation
+            String name = serializer.getClass().getSimpleName();
+            java.net.URL u = serializer.getClass().getResource(name+".class");
+            //System.err.println(u);
+            e2.printStackTrace();
+        }
+
+
+        serializer.write(document, output);
+
+        out.close();
     }
     
     public static Object restoreState( File f )  throws IOException {
