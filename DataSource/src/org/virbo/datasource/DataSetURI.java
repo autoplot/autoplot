@@ -603,11 +603,11 @@ public class DataSetURI {
         }
 
         protected CompletionResult(String completion, String doc, boolean maybePlot) {
-            this(completion, doc, null, false);
+            this(completion, null, doc, null, maybePlot);
         }
 
         protected CompletionResult(String completion, String doc, String completable, boolean maybePlot) {
-            this(completion, null, doc, null, false);
+            this(completion, null, doc, completable, maybePlot );
         }
 
         /**
@@ -731,7 +731,7 @@ public class DataSetURI {
             String sagg= DataSourceUtil.makeAggregation( s2[0], s2 );
             if ( !sagg.equals(s2[0]) ) {
                 sagg= URISplit.removeParam( sagg, "timerange" );
-                completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation" ) );
+                completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation", true ) );
             }
         }
 
