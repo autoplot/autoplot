@@ -15,25 +15,20 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import ftpfs.FTPBeanFileSystemFactory;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -728,8 +723,10 @@ public class DataSetURI {
         }
 
         if ( s2.length>0 ) {
-            String sagg= DataSourceUtil.makeAggregation( s2[0], s2 );
-            if ( !sagg.equals(s2[0]) ) {
+            //String sagg= DataSourceUtil.makeAggregation( s2[0], s2 );
+            List<String> files= new LinkedList( Arrays.asList(s2) );
+            List<String> saggs= DataSourceUtil.findAggregations( files, true );
+            for ( String sagg: saggs ) {
                 sagg= URISplit.removeParam( sagg, "timerange" );
                 completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation", true ) );
             }
