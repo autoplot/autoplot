@@ -622,6 +622,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         jumpToLastButton = new javax.swing.JButton();
         dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
         statusLabel = new javax.swing.JLabel();
+        showMissingCheckBox = new javax.swing.JCheckBox();
 
         pngsPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         pngsPanel.setLayout(new java.awt.BorderLayout());
@@ -727,6 +728,13 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         statusLabel.setText("starting application...");
 
+        showMissingCheckBox.setText("Show Missing");
+        showMissingCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                showMissingCheckBoxItemStateChanged(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -742,7 +750,9 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(528, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(showMissingCheckBox)
+                .addContainerGap(407, Short.MAX_VALUE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE)
@@ -759,7 +769,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
-                    .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(showMissingCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -818,6 +829,10 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         setTemplate( dataSetSelector1.getValue() );
     }//GEN-LAST:event_dataSetSelector1ActionPerformed
 
+    private void showMissingCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_showMissingCheckBoxItemStateChanged
+        seq.setShowMissing(evt.getStateChange()==java.awt.event.ItemEvent.SELECTED);
+    }//GEN-LAST:event_showMissingCheckBoxItemStateChanged
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -832,6 +847,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private javax.swing.JPanel pngsPanel;
     private javax.swing.JButton prevButton;
     private javax.swing.JButton prevSetButton;
+    private javax.swing.JCheckBox showMissingCheckBox;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JTextField timeFilterTextField;
     // End of variables declaration//GEN-END:variables

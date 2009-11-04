@@ -1,11 +1,15 @@
 package org.autoplot.pngwalk;
 
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -33,8 +37,18 @@ public class WalkImage implements Comparable<WalkImage> {
     private Status status;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
 
+    private static BufferedImage missingImage = initMissingImage();
+
     public URI getUri() {
-        return imgURI;
+        if (imgURI != null) {
+            return imgURI;
+        } else {
+            try {
+                return new URI("");
+            } catch(URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public enum Status {
@@ -50,10 +64,16 @@ public class WalkImage implements Comparable<WalkImage> {
 
     public WalkImage(URI uri) {
         imgURI = uri;
+        if (imgURI != null) {
         uriString = uri.toString();
         status = Status.UNKNOWN;
+        } else {
+            uriString = null;
+            status = Status.MISSING;
+        }
     // image and thumbnail are initialized lazily
     }
+
 
     public Status getStatus() {
         return status;
@@ -74,6 +94,9 @@ public class WalkImage implements Comparable<WalkImage> {
     }
 
     public BufferedImage getImage() {
+        if (status == Status.MISSING) {
+            return missingImage;
+        }
         if (im == null && status != Status.IMAGE_LOADING) {
             loadImage();
         }
@@ -104,7 +127,7 @@ public class WalkImage implements Comparable<WalkImage> {
 
             case MISSING:
                 // TODO: should return a placeholder?
-                return null;
+                return missingImage;
 
             case UNKNOWN:
                 if(!loadIfNeeded) return null;
@@ -224,6 +247,16 @@ public class WalkImage implements Comparable<WalkImage> {
         RequestProcessor.invokeLater(r);
     }
 
+    private static BufferedImage initMissingImage() {
+        BufferedImage missing = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = missing.createGraphics();
+        g2.setColor(java.awt.Color.RED);
+        FontMetrics fm = g2.getFontMetrics(g2.getFont());
+        String msg = "Missing.";
+        g2.drawString(msg, (200 - fm.stringWidth(msg)) / 2, 100);
+
+        return missing;
+    }
     // Implementing the Comparable interface lets List sort
     //TODO: Compare on date information first
     public int compareTo(WalkImage o) {

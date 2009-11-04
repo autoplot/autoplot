@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,13 +25,15 @@ import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
  * @author Ed Jackson
  */
 public class WalkImageSequence implements PropertyChangeListener  {
-    private List<WalkImage> images;
+    private List<WalkImage> existingImages;
+    private List<WalkImage> displayImages = new ArrayList();
     //private List<URI> locations;
-    private boolean showMissing = false;
+    private boolean showMissing = true;
     private int index;
 
     private DatumRange timeSpan = null;
     private List<DatumRange> datumRanges = null;
+    private List<DatumRange> possibleRanges = null;
 
     /**
      * template used to create list.  This may be null.
@@ -78,9 +81,9 @@ public class WalkImageSequence implements PropertyChangeListener  {
 
         //if ( uris.size()>20 ) {uris= uris.subList(0,30); }
 
-        images = new ArrayList<WalkImage>();
+        existingImages = new ArrayList<WalkImage>();
         for (int i=0; i < uris.size(); i++) {
-            images.add(new WalkImage(uris.get(i)));
+            existingImages.add(new WalkImage(uris.get(i)));
             //System.err.println(i + ": " + datumRanges.get(i));
 
             String captionString;
@@ -91,10 +94,9 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 captionString = captionString.substring(captionString.lastIndexOf('/')+1);
             }
 
-            images.get(i).setCaption(captionString);
+            existingImages.get(i).setCaption(captionString);
         }
 
-        //DatumRange span = null;
         for (DatumRange dr : datumRanges) {
             if (timeSpan == null)
                 timeSpan = dr;
@@ -102,9 +104,44 @@ public class WalkImageSequence implements PropertyChangeListener  {
                 timeSpan = DatumRangeUtil.union(timeSpan, dr);
         }
 
-        for (WalkImage i : images) {
+        if (timeSpan != null) {
+            possibleRanges = DatumRangeUtil.generateList(timeSpan, datumRanges.get(0));
+        }
+
+        for (WalkImage i : existingImages) {
             i.addPropertyChangeListener(this);
         }
+
+        rebuildSequence();
+    }
+
+    /** Rebuilds the image sequence.  Should be called on initial load and if
+     * list content options (showMissing, subrange) are changed.
+     */
+    private void rebuildSequence() {
+        if (showMissing && timeSpan != null) {
+            displayImages.clear();
+            int i = 0;
+            for (DatumRange dr : possibleRanges) {
+                if (dr.equals(datumRanges.get(i))) {
+                    displayImages.add(existingImages.get(i));
+                    i++;
+                } else {
+                    // add missing image placeholder
+                    WalkImage ph = new WalkImage(null);
+                    ph.setCaption(dr.toString());
+                    displayImages.add(ph);
+                }
+            }
+        } else {
+            displayImages.clear();
+            //create one-to-one mapping to existing image files
+            for (WalkImage i : existingImages) {
+                displayImages.add(i);
+            }
+        }
+        //Bogus property has no meaningful value, only event is important
+        pcs.firePropertyChange(PROP_SEQUENCE_CHANGED, false, true);
     }
 
 //commented until questions are resolved.
@@ -124,10 +161,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
     }
 
     public WalkImage imageAt(int n) {
-        if (n<0 || n>images.size()-1) {
+        if (n<0 || n>displayImages.size()-1) {
             throw new IndexOutOfBoundsException();
         } else {
-            return images.get(n);
+            return displayImages.get(n);
         }
     }
 
@@ -138,9 +175,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     public void setShowMissing(boolean showMissing) {
         if (showMissing != this.showMissing) {
             this.showMissing = showMissing;
-
-            //Bogus property has no meaningful value
-            pcs.firePropertyChange(PROP_SEQUENCE_CHANGED, false, true);
+            rebuildSequence();  // fires property change
         }
     }
 
@@ -172,7 +207,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
             // do nothing and fire no event
             return;
         }
-        if (index < 0 || index >= images.size()) {
+        if (index < 0 || index >= displayImages.size()) {
             throw new IndexOutOfBoundsException();
         }
         int oldIndex = this.index;
@@ -184,7 +219,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * at the last image, do nothing.
      */
     public void next() {
-        if (index < images.size() -1) {
+        if (index < displayImages.size() -1) {
             setIndex(index + 1);
         }
     }
@@ -209,7 +244,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * 
      */
     public void last() {
-        setIndex(images.size()-1);
+        setIndex(displayImages.size()-1);
     }
 
     /** Skip forward or backward by the specified number of images.  Positive
@@ -220,8 +255,8 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * @param n The number of images to skip.
      */
     public void skipBy(int n) {
-        if (index + n > images.size() - 1) {
-            setIndex(images.size() - 1);
+        if (index + n > displayImages.size() - 1) {
+            setIndex(displayImages.size() - 1);
         } else if (index + n < 0) {
             setIndex(0);
         } else {
@@ -230,7 +265,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     }
 
     public int size() {
-        return images.size();
+        return displayImages.size();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener l) {
@@ -271,7 +306,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     public void propertyChange(PropertyChangeEvent e) {
         if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.IMAGE_LOADED ||
                 (WalkImage.Status)e.getNewValue() == WalkImage.Status.THUMB_LOADED)  {
-            int i = images.indexOf(e.getSource());
+            int i = existingImages.indexOf(e.getSource());
             if (i == -1) {
                 //panic because something is very very wrong
                 throw new RuntimeException("Status change from unknown image object");
@@ -287,7 +322,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
         int loadedCount=0;
         int thumbLoadingCount=0;
         int thumbLoadedCount=0;
-        for ( WalkImage i : images ) {
+        for ( WalkImage i : existingImages ) {
             if ( i.getStatus()==WalkImage.Status.IMAGE_LOADING ) loadingCount++;
             if ( i.getStatus()==WalkImage.Status.IMAGE_LOADED ) loadedCount++;
             if ( i.getStatus()==WalkImage.Status.THUMB_LOADING ) thumbLoadingCount++;
