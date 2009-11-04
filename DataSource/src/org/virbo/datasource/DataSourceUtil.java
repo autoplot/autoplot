@@ -21,8 +21,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -146,6 +148,76 @@ public class DataSourceUtil {
             i = surl.lastIndexOf('/');
         }
         return i;
+    }
+
+    /**
+     * return the aggregations we can find.  
+     * If remove is true, then the input list will have all items
+     * removed that are not part of an aggregation.
+     * 
+     * @param files
+     * @param remove
+     * @return
+     */
+    public static List<String> findAggregations( List<String> files, boolean remove ) {
+        List<String> accountedFor= new ArrayList<String>();
+        List<String> result= new ArrayList<String>();
+        List<String> nonAgg= new ArrayList<String>();
+
+        List<String> notAccountedFor;
+        notAccountedFor= new LinkedList(files);
+
+        while ( notAccountedFor.size()>0 ) {
+            String surl= notAccountedFor.remove(0);
+
+            String sagg = makeAggregation(surl);
+
+            if (sagg==null || sagg.equals(surl)) {
+                nonAgg.add(surl);
+                continue;
+            }
+
+            DatumRange dr = null;
+            // remove parameter
+            sagg = URISplit.removeParam(sagg, "timerange");
+            TimeParser tp = TimeParser.create(sagg);
+            try {
+                tp.parse(surl);
+            } catch (ParseException ex) {
+                continue;
+            }
+            dr = tp.getTimeRange();
+
+            boolean okay= true;
+
+            List<String> moveUs= new ArrayList();
+
+            Pattern p= Pattern.compile( tp.getRegex() );
+
+            for ( String s: notAccountedFor ) {
+                if ( p.matcher(s).matches() ) {
+                    try {
+                        tp.parse(s);
+                        dr = DatumRangeUtil.union(dr, tp.getTimeRange());
+                        moveUs.add( s );
+                    } catch (ParseException ex) {
+                        // it's not part of the agg.
+                    }
+                }
+            }
+
+            notAccountedFor.removeAll(moveUs);
+            accountedFor.addAll(moveUs);
+
+            result.add( URISplit.putParam(sagg, "timerange", dr.toString()) );
+
+        }
+
+        if ( remove ) {
+            files.removeAll(accountedFor);
+        }
+        
+        return result;
     }
 
     /**
