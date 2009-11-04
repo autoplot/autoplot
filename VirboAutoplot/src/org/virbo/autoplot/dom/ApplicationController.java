@@ -701,7 +701,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         CanvasController ccontroller=  ((CanvasController)canvas.controller);
         Row domRow;
         
-        if ( focus!=null && ccontroller.getRowFor(focus)==canvas.marginRow ) {
+        if ( focus!=null && ccontroller.getRowFor(focus)==canvas.marginRow ) { 
             String srcRow;
             if ( canvas.getRows().length>0 ) {
                 srcRow= canvas.getRows(0).getId();
