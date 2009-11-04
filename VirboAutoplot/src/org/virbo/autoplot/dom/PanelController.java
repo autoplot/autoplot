@@ -33,9 +33,7 @@ import org.virbo.autoplot.RenderTypeUtil;
 import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.metatree.MetadataUtil;
 
@@ -551,7 +549,19 @@ public class PanelController extends DomNodeController {
             }
         }
 
-        String result= "|slice"+sliceIndex+"(0)";
+        // pick a slice index near the middle, which is less likely to be all fill.
+        int n=0;
+        if ( sliceIndex==0 ) {
+            n= fillDs.length() / 2;
+        } else if ( sliceIndex==1 ) {
+            n= fillDs.length(0) / 2;
+        } else if ( sliceIndex==2 ) {
+            n= fillDs.length(0,0) / 2;
+        } else if ( sliceIndex==3 ) {
+            n= fillDs.length(0,0,0) / 2;
+        }
+
+        String result= "|slice"+sliceIndex+"("+n+")";
         if (lat > -1 && lon > -1 && lat < lon) {
             result+="|transpose()";
         }
