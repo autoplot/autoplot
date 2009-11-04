@@ -700,8 +700,22 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         CanvasController ccontroller=  ((CanvasController)canvas.controller);
         Row domRow;
-
-        if ( canvas.getRows().length == 0 && ( direction==LayoutConstants.BELOW || direction==LayoutConstants.ABOVE ) ) {
+        
+        if ( focus!=null && ccontroller.getRowFor(focus)==canvas.marginRow ) {
+            String srcRow;
+            if ( canvas.getRows().length>0 ) {
+                srcRow= canvas.getRows(0).getId();
+            } else {
+                ccontroller.addRows(2);
+                srcRow= canvas.getRows(0).getId();
+            }
+            if ( canvas.getRows().length>1 ) {
+                domRow= canvas.getRows(1);
+            } else {
+                domRow = ccontroller.addInsertRow( ccontroller.getRowFor(focus), direction );
+            }
+            focus.setRowId(srcRow);
+        } else if ( canvas.getRows().length == 0 && ( direction==LayoutConstants.BELOW || direction==LayoutConstants.ABOVE ) ) {
             domRow = ccontroller.addRow();
         } else if ( direction==null || direction==LayoutConstants.LEFT || direction==LayoutConstants.RIGHT ) {
             domRow= ccontroller.getRowFor(focus);
@@ -1133,10 +1147,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         application.getPlots(0).setColumnId("marginColumn_0");
-        application.getPlots(0).setRowId("marginRow_0");
+        application.getPlots(0).setRowId("row_0");
 
         Canvas c= application.getCanvases(0);
-        for ( int i=c.getRows().length-1; i>=0; i-- ) {
+        for ( int i=c.getRows().length-1; i>=1; i-- ) {
             c.getController().deleteRow(c.getRows(i));
         }
 
