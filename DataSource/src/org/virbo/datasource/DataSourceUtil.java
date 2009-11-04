@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.TimeParser;
 import org.das2.util.filesystem.FileSystem;
@@ -156,8 +157,8 @@ public class DataSourceUtil {
      * removed that are not part of an aggregation.
      * 
      * @param files
-     * @param remove
-     * @return
+     * @param remove remove the files that are accounted for by the aggregation.
+     * @return list of aggregations found.
      */
     public static List<String> findAggregations( List<String> files, boolean remove ) {
         List<String> accountedFor= new ArrayList<String>();
@@ -175,6 +176,8 @@ public class DataSourceUtil {
             if (sagg==null || sagg.equals(surl)) {
                 nonAgg.add(surl);
                 continue;
+            } else {
+                accountedFor.add(surl);
             }
 
             DatumRange dr = null;
@@ -187,6 +190,7 @@ public class DataSourceUtil {
                 continue;
             }
             dr = tp.getTimeRange();
+            DatumRange dr1= dr; // keep track of the first one to measure continuity.
 
             boolean okay= true;
 
@@ -198,7 +202,7 @@ public class DataSourceUtil {
                 if ( p.matcher(s).matches() ) {
                     try {
                         tp.parse(s);
-                        dr = DatumRangeUtil.union(dr, tp.getTimeRange());
+                        dr = DatumRangeUtil.union(dr, tp.getTimeRange() );
                         moveUs.add( s );
                     } catch (ParseException ex) {
                         // it's not part of the agg.
@@ -206,10 +210,16 @@ public class DataSourceUtil {
                 }
             }
 
-            notAccountedFor.removeAll(moveUs);
-            accountedFor.addAll(moveUs);
-
-            result.add( URISplit.putParam(sagg, "timerange", dr.toString()) );
+            double nc= dr.width().divide(dr1.width()).doubleValue(Units.dimensionless); // number of intervals estimate
+            
+            // more than one file, and then five files or fairly continuous.
+            if ( moveUs.size()>0 && ( moveUs.size()>4 || nc<((1+moveUs.size())*2)  ) ) { // reject small aggregations
+                notAccountedFor.removeAll(moveUs);
+                accountedFor.addAll(moveUs);
+                result.add( URISplit.putParam(sagg, "timerange", dr.toString()) );
+            } else {
+                notAccountedFor.removeAll(moveUs);
+            }
 
         }
 
