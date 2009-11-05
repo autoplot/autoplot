@@ -642,7 +642,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
             Logger.getLogger("ap").fine("plotUrl("+surl+")");
             URISplit split= URISplit.parse(surl);
             ProgressMonitor mon= getStatusBarProgressMonitor("Finished "+surl);
-            if ( !split.file.endsWith(".vap")) {
+            if ( !( split.file.endsWith(".vap")|| split.file.endsWith(".vapx") ) ) {
                 if ( ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false")) ) {
                     try {
                         DataSourceFactory sourcef = DataSetURI.getDataSourceFactory(DataSetURI.getURI(surl),mon);
