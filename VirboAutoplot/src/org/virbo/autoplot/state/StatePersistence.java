@@ -23,8 +23,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.StringWriter;
+import java.text.ParseException;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
@@ -37,6 +39,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -107,8 +111,33 @@ public class StatePersistence {
     }
     
     public static Object restoreState( File f )  throws IOException {
-        XMLDecoder decode= new XMLDecoder( new FileInputStream(f) );
-        Object state= decode.readObject();
-        return state;
+
+        InputStreamReader isr = new InputStreamReader( new FileInputStream( f ) );
+
+        try {
+            DocumentBuilder builder;
+            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            InputSource source = new InputSource(isr);
+            Document document = builder.parse(source);
+
+            if ( document.getDocumentElement().getNodeName().equals("java") ) { // legacy
+                isr.close();
+                XMLDecoder decode= new XMLDecoder( new FileInputStream(f) );
+                Object state= decode.readObject();
+                return state;
+
+            } else {
+                DomNode n= SerializeUtil.getDomNode( document, document.getDocumentElement() );
+                return n;
+            }
+
+        } catch (SAXException ex) {
+            throw new RuntimeException(ex);
+        } catch (ParserConfigurationException ex) {
+            throw new RuntimeException(ex);
+        } catch (ParseException ex ) {
+            throw new RuntimeException(ex);
+        }
+
     }
 }
