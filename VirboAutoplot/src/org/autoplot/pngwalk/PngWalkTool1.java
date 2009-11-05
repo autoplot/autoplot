@@ -12,6 +12,7 @@
 package org.autoplot.pngwalk;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -42,6 +43,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
 import org.das2.util.ArgumentList;
@@ -623,6 +625,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         dataSetSelector1 = new org.virbo.datasource.DataSetSelector();
         statusLabel = new javax.swing.JLabel();
         showMissingCheckBox = new javax.swing.JCheckBox();
+        useRangeCheckBox = new javax.swing.JCheckBox();
+        editRangeButton = new javax.swing.JButton();
 
         pngsPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         pngsPanel.setLayout(new java.awt.BorderLayout());
@@ -735,6 +739,20 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
+        useRangeCheckBox.setText("Use subrange");
+        useRangeCheckBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                useRangeCheckBoxItemStateChanged(evt);
+            }
+        });
+
+        editRangeButton.setText("Edit...");
+        editRangeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editRangeButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -752,7 +770,11 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(showMissingCheckBox)
-                .addContainerGap(407, Short.MAX_VALUE))
+                .add(18, 18, 18)
+                .add(useRangeCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(editRangeButton)
+                .addContainerGap(222, Short.MAX_VALUE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE)
@@ -763,14 +785,16 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 541, Short.MAX_VALUE)
+                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 539, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(showMissingCheckBox))
+                    .add(showMissingCheckBox)
+                    .add(useRangeCheckBox)
+                    .add(editRangeButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -833,11 +857,28 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         seq.setShowMissing(evt.getStateChange()==java.awt.event.ItemEvent.SELECTED);
     }//GEN-LAST:event_showMissingCheckBoxItemStateChanged
 
+    private void editRangeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRangeButtonActionPerformed
+        Frame myFrame = (java.awt.Frame)SwingUtilities.getWindowAncestor(this);
+        SubrangeEditorDialog d = new SubrangeEditorDialog(myFrame, true);
+        d.setTimeSpan(seq.getAllTimes());
+        d.setVisible(true);  //blocks until dialog closes
+
+        if (d.isOkClicked()) {
+            //System.err.printf("OK, start index is %d and end index is %d.%n", d.getStartIndex(), d.getEndIndex());
+            seq.setActiveSubrange(d.getStartIndex(), d.getEndIndex());
+        }
+    }//GEN-LAST:event_editRangeButtonActionPerformed
+
+    private void useRangeCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_useRangeCheckBoxItemStateChanged
+        seq.setUseSubRange(evt.getStateChange()==java.awt.event.ItemEvent.SELECTED);
+    }//GEN-LAST:event_useRangeCheckBoxItemStateChanged
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel actionButtonsPanel;
     private org.virbo.datasource.DataSetSelector dataSetSelector1;
+    private javax.swing.JButton editRangeButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton jumpToFirstButton;
@@ -850,6 +891,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private javax.swing.JCheckBox showMissingCheckBox;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JTextField timeFilterTextField;
+    private javax.swing.JCheckBox useRangeCheckBox;
     // End of variables declaration//GEN-END:variables
 
 }

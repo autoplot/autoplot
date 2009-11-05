@@ -5,7 +5,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,11 +28,13 @@ public class WalkImageSequence implements PropertyChangeListener  {
     private List<WalkImage> displayImages = new ArrayList();
     //private List<URI> locations;
     private boolean showMissing = true;
+    private boolean useSubRange = false;
     private int index;
 
     private DatumRange timeSpan = null;
     private List<DatumRange> datumRanges = null;
     private List<DatumRange> possibleRanges = null;
+    private List<DatumRange> subRange = null;
 
     /**
      * template used to create list.  This may be null.
@@ -46,6 +47,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     public static final String PROP_INDEX = "index";
     public static final String PROP_IMAGE_LOADED = "imageLoaded";
     public static final String PROP_THUMB_LOADED = "thumbLoaded";
+    public static final String PROP_USESUBRANGE = "useSubRange";
     public static final String PROP_SEQUENCE_CHANGED = "sequenceChanged";
 
     /** Create an image sequence based on a URI template.
@@ -64,6 +66,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      */
     public void initialLoad() { 
         datumRanges = new ArrayList<DatumRange>();
+        subRange = new ArrayList<DatumRange>();
         List<URI> uris;
 
         if ( template==null ) {
@@ -121,11 +124,16 @@ public class WalkImageSequence implements PropertyChangeListener  {
     private void rebuildSequence() {
         if (showMissing && timeSpan != null) {
             displayImages.clear();
-            int i = 0;
-            for (DatumRange dr : possibleRanges) {
-                if (dr.equals(datumRanges.get(i))) {
-                    displayImages.add(existingImages.get(i));
-                    i++;
+
+            List<DatumRange> displayRange;
+            if (isUseSubRange() && subRange.size() > 0 ) {
+                displayRange = subRange;
+            } else {
+                displayRange = possibleRanges;
+            }
+            for (DatumRange dr : displayRange) {
+                if (datumRanges.contains(dr)) {
+                    displayImages.add(existingImages.get(datumRanges.indexOf(dr)));
                 } else {
                     // add missing image placeholder
                     WalkImage ph = new WalkImage(null);
@@ -179,16 +187,45 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
     }
 
+    public boolean isUseSubRange() {
+        return useSubRange;
+    }
+
+    public void setUseSubRange(boolean useSubRange) {
+        boolean oldSubRange = this.useSubRange;
+        this.useSubRange = useSubRange;
+        pcs.firePropertyChange(PROP_USESUBRANGE, oldSubRange, useSubRange);
+        if(useSubRange != oldSubRange) rebuildSequence();
+    }
+
+    /** Set the sequence's active subrange to a range from first to last, inclusive.
+     * First and last are indices into the list obtained from <code>getAllTimes()</code>.
+     * @param first
+     * @param last
+     */
+    public void setActiveSubrange(int first, int last) {
+        subRange = possibleRanges.subList(first, last+1);
+        if (isUseSubRange()) rebuildSequence();
+    }
+
     /** Return the time range covered by this sequence.  This is the total range
      * of available images, not any currently displayed subrange.  Will be null
      * if no date template was used to create the sequence.
-     *
+     * TODO: Is this needed?
      * @return
      */
     public DatumRange getTimeSpan() {
         return timeSpan;
     }
 
+    /** Return a <code>java.awt.List</code> of the times associated with this sequence.
+     * This list will include times associated with missing images, and is not restricted
+     * to any currently active subrange.
+     * @return
+     */
+    public List<DatumRange> getAllTimes() {
+        return possibleRanges;
+    }
 
     /** Return the current value of the index.
      * 

@@ -30,7 +30,11 @@
               <Component id="timeFilterTextField" min="-2" pref="236" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="showMissingCheckBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="407" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="useRangeCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="editRangeButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="222" max="32767" attributes="0"/>
           </Group>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
@@ -44,7 +48,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="pngsPanel" pref="541" max="32767" attributes="0"/>
+              <Component id="pngsPanel" pref="539" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dataSetSelector1" min="-2" pref="27" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -52,6 +56,8 @@
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="timeFilterTextField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="showMissingCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="useRangeCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="editRangeButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -201,6 +207,22 @@
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="showMissingCheckBoxItemStateChanged"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="useRangeCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Use subrange"/>
+      </Properties>
+      <Events>
+        <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="useRangeCheckBoxItemStateChanged"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="editRangeButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Edit..."/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editRangeButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
