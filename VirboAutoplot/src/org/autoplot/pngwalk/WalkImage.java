@@ -2,7 +2,6 @@ package org.autoplot.pngwalk;
 
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeListener;
@@ -10,6 +9,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -28,6 +28,9 @@ public class WalkImage implements Comparable<WalkImage> {
 
     public static final String PROP_STATUS_CHANGE = "status"; // this should to be the same as the property name to be beany.
     public static final int THUMB_SIZE = 400;
+    private static final int SQUASH_FACTOR = 10; // amount to horizontally squash thumbs for covers and contextFlow
+    private static final int LOADED_IMAGE_COUNT_LIMIT = 50;
+    
     final String uriString;  // Used for sorting
     private URI imgURI;
     private BufferedImage im;
@@ -39,6 +42,10 @@ public class WalkImage implements Comparable<WalkImage> {
 
     private static BufferedImage missingImage = initMissingImage();
 
+    private static LinkedList<WalkImage> freshness= new LinkedList();
+
+    //private java.util.concurrent.ThreadPoolExecutor reqProc= new ThreadPoolExecutor( 2, 4, 1, TimeUnit.MINUTES, workQueue );
+    
     public URI getUri() {
         if (imgURI != null) {
             return imgURI;
@@ -52,12 +59,11 @@ public class WalkImage implements Comparable<WalkImage> {
     }
 
     public enum Status {
-
         UNKNOWN,
         THUMB_LOADING, // loading only thumbnail
         THUMB_LOADED, // thumbnail loaded but image is not
         IMAGE_LOADING, // loading thumbnail AND image
-        IMAGE_LOADED, // this also implies thumbnail is loaded
+        IMAGE_LOADED, // this also implies thumbnail is loaded.  Note images can be unloaded, so we might return to the THUMB_LOADED state.
         MISSING,
         ERROR;
     }
@@ -65,8 +71,8 @@ public class WalkImage implements Comparable<WalkImage> {
     public WalkImage(URI uri) {
         imgURI = uri;
         if (imgURI != null) {
-        uriString = uri.toString();
-        status = Status.UNKNOWN;
+            uriString = uri.toString();
+            status = Status.UNKNOWN;
         } else {
             uriString = null;
             status = Status.MISSING;
@@ -97,9 +103,22 @@ public class WalkImage implements Comparable<WalkImage> {
         if (status == Status.MISSING) {
             return missingImage;
         }
-        if (im == null && status != Status.IMAGE_LOADING) {
+        if ( im == null && status != Status.IMAGE_LOADING) {
             loadImage();
         }
+
+        synchronized (freshness ) {
+            freshness.remove(this); // move to freshest position
+            freshness.addFirst(this);
+        }
+        return im;
+    }
+
+    /**
+     * provide access to the image, but don't load it.
+     * @return null or the loaded image.
+     */
+    BufferedImage getImageIfLoaded() {
         return im;
     }
 
@@ -201,7 +220,7 @@ public class WalkImage implements Comparable<WalkImage> {
                 }
             }
 
-            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth() / 10, thumb.getHeight(), 0, 1, 1, 0, false);
+            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth() / SQUASH_FACTOR, thumb.getHeight(), 0, 1, 1, 0, false);
             squishedThumb = resizeOp.filter(thumb, null);
         }
         return squishedThumb;
@@ -229,6 +248,16 @@ public class WalkImage implements Comparable<WalkImage> {
 
                     im = ImageIO.read(localFile);
 
+                    synchronized ( freshness ) {
+                        while ( freshness.size() > LOADED_IMAGE_COUNT_LIMIT ) {
+                            WalkImage old= freshness.getLast();
+                            freshness.remove(old);
+                            Logger.getLogger("org.autoplot.pngwalk.WalkImage").fine( "unloading image for "+old );
+                            old.im= null;
+                            old.setStatus( Status.THUMB_LOADED );
+                        }
+                    }
+
                     if (thumb == null) {
                         getThumbnail(); //force thumbnail creation
                     }
@@ -250,7 +279,7 @@ public class WalkImage implements Comparable<WalkImage> {
     private static BufferedImage initMissingImage() {
         BufferedImage missing = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = missing.createGraphics();
-        g2.setColor(java.awt.Color.RED);
+        //g2.setColor(java.awt.Color.RED);
         FontMetrics fm = g2.getFontMetrics(g2.getFont());
         String msg = "Missing.";
         g2.drawString(msg, (200 - fm.stringWidth(msg)) / 2, 100);
@@ -269,5 +298,9 @@ public class WalkImage implements Comparable<WalkImage> {
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
+    }
+
+    public String toString() {
+        return this.getCaption()==null ? this.uriString : this.getCaption();
     }
 }
