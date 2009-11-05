@@ -68,7 +68,11 @@ public class RequestHandler {
                 } catch ( RuntimeException ex ) {
                     ex.printStackTrace( new PrintStream( out ) );
                 }
-                if ( echo ) out.write("autoplot> ".getBytes());
+                try {
+                    if ( echo ) out.write("autoplot> ".getBytes());
+                } catch ( IOException ex ) {
+                    // client didn't stick around to get response.
+                }
                 s = reader.readLine();
             }
                         
