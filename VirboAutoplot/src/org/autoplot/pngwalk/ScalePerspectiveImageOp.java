@@ -32,6 +32,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
     final double p;
     int nw;
     int nh;
+    final int maxidx;
     private int w1;
     private int h1;
     private int rh1; // reflection height
@@ -62,6 +63,7 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
         this.p = p;
         this.nw = (int) w1;
         this.nh = (int) h1 + rh1;
+        this.maxidx= nw*nh-1;
         if ( ssx==-1 ) {
             this.ssx= Math.max( 1, w / w1 / 2 );
         } else {
@@ -96,7 +98,10 @@ class ScalePerspectiveImageOp implements BufferedImageOp {
     }
 
     private final int index(int i, int j) {
-        return Math.max(0, Math.min(i + j * nw, nw * nh - 1));
+        int ii= i + j * nw;
+        ii= ( ii>this.maxidx ) ? maxidx : ii;
+        ii= ( ii<0 ) ? 0 : ii;
+        return ii;
     }
 
     public BufferedImage filter(BufferedImage src, BufferedImage dest) {
