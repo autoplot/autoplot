@@ -256,7 +256,7 @@ public class ApplicationModel {
         //surl = DataSetURI.maybeAddFile(surl);
 
         try {
-            if (split.file.endsWith(".vap")) {
+            if (split.file.endsWith(".vap") || split.file.endsWith(".vapx" )) {
                 try {
                     URL url = DataSetURI.getURL(surl);
                     mon.started();
