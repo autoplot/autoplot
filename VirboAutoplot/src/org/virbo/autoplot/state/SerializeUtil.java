@@ -278,6 +278,7 @@ public class SerializeUtil {
                             for ( int j=0; j<n; j++ ) { //DANGER
                                 while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
                                 DomNode c1= getDomNode( document, (Element)arraykids.item(ik) );
+                                ik++;
                                 Array.set( arr, j, c1 );
                             }
                             pd.getWriteMethod().invoke( node, arr );
@@ -288,6 +289,7 @@ public class SerializeUtil {
                                 Object c1=null;
                                 while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
                                 c1 = getLeafNode(document, (Element) arraykids.item(ik));
+                                ik++;
                                 Array.set( arr, j, c1 );
                             }
                             pd.getWriteMethod().invoke( node, arr );
