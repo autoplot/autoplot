@@ -134,7 +134,7 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void plot(String surl) throws InterruptedException {
         maybeInitModel();
-        if ( surl.endsWith(".vap") || surl.contains(".vap?") ) {
+        if ( surl.endsWith(".vap") || surl.contains(".vap?") || surl.endsWith(".vapx") || surl.contains(".vapx?")  ) {
             model.resetDataSetSourceURL(surl, new NullProgressMonitor());
         } else {
             DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
