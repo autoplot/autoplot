@@ -60,6 +60,7 @@ public class ContextFlowView extends PngWalkView {
             imageBounds= new ArrayList<Rectangle>(seq.size());
             for ( int i=0; i<seq.size(); i++ ) imageBounds.add(i,null);
         }
+        repaint();
     }
 
 

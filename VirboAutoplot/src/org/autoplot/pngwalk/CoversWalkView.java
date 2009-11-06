@@ -152,6 +152,8 @@ public class CoversWalkView extends PngWalkView  {
             int x = (i % seq.size()) * (cellWidth);
             canvas.repaint(new Rectangle(x, 0, cellWidth, cellSize));
             canvas.repaintSoon();
+        } else if (e.getPropertyName().equals(WalkImageSequence.PROP_SEQUENCE_CHANGED)) {
+            sequenceChanged();
         }
 
 
