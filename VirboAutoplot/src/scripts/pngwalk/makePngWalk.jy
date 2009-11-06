@@ -116,7 +116,7 @@ def showPngWalkInfoDialog():
     timeRangeTf= JTextField( '2009' )
     p.add( timeRangeTf )
 
-    createThumbsCb= JCheckBox( 'Create Thumbs' )
+    createThumbsCb= JCheckBox( 'Create Thumbs', selected=True )
     p.add( createThumbsCb )
 
     outputFolder=0
@@ -138,11 +138,22 @@ def showPngWalkInfoDialog():
 
 from org.virbo.autoplot import ApplicationModel
 
-params= showPngWalkInfoDialog()
+try:
+   params
+except NameError:
+   params=None
+
+if ( params==None ):
+   params= showPngWalkInfoDialog()
+
 if ( params!=None ):
 
    from org.das2.components import DasProgressPanel
-   mon= DasProgressPanel.createFramed( getViewWindow(),"running batch")
+
+   if ( getViewWindow()==None ):
+       mon= org.das2.util.monitor.NullProgressMonitor()
+   else:
+       mon= DasProgressPanel.createFramed( getViewWindow(),"running batch" )
 
    times= generateTimeRanges( params.timeFormat, params.timeRangeStr )
 
@@ -150,10 +161,11 @@ if ( params!=None ):
 
    if ( not mon.cancelled ):
 
-     from org.autoplot.pngwalk import DemoPngWalk
+     from org.autoplot.pngwalk import PngWalkTool1
      if ( params.outputFolder[1]==':' ):
        url= 'file:/'+params.outputFolder
      else:
        url= 'file:'+params.outputFolder
 
-     DemoPngWalk.start( url + params.product + '_' + params.timeFormat + '.png', getViewWindow() )
+   if ( getViewWindow()!=None ):
+      PngWalkTool1.start( url + params.product + '_' + params.timeFormat + '.png', getViewWindow() )
