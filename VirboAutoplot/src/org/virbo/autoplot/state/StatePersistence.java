@@ -9,6 +9,7 @@
 
 package org.virbo.autoplot.state;
 
+import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,13 +31,18 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DefaultPlotSymbol;
+import org.das2.util.AboutUtil;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Connector;
 import org.virbo.autoplot.dom.DomNode;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSException;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
@@ -81,17 +87,36 @@ public class StatePersistence {
             Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
-        Element element = SerializeUtil.getDomElement(document, (DomNode)state);
-        document.appendChild(element);
-        OutputStream out = new FileOutputStream( new File( f.toString()+"x") );
 
+        Element element = SerializeUtil.getDomElement( document, (DomNode)state, "org.virbo.autoplot.dom" );
+
+        Element vap= document.createElement("vap");
+        vap.appendChild(element);
+        vap.setAttribute( "domVersion", "1.0" );
+        vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
+
+        document.appendChild(vap);
+        writeDocument( new File( f.toString()+"x" ), document);
+
+    }
+
+    /**
+     * write the document out to the file, hiding the details of the serializer.
+     * @param f
+     * @param document
+     * @return
+     * @throws LSException
+     * @throws DOMException
+     * @throws FileNotFoundException
+     */
+    public static void writeDocument(File f, Document document) throws FileNotFoundException, IOException {
+        OutputStream out = new FileOutputStream( f );
         DOMImplementation impl = document.getImplementation();
-        DOMImplementationLS ls = (DOMImplementationLS)impl.getFeature("LS", "3.0");
+        DOMImplementationLS ls = (DOMImplementationLS) impl.getFeature("LS", "3.0");
         LSSerializer serializer = ls.createLSSerializer();
         LSOutput output = ls.createLSOutput();
         output.setEncoding("UTF-8");
         output.setByteStream(out);
-
         try {
             if (serializer.getDomConfig().canSetParameter("format-pretty-print", Boolean.TRUE)) {
                 serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
@@ -99,17 +124,34 @@ public class StatePersistence {
         } catch (Error e2) {
             // Ed's nice trick for finding the implementation
             String name = serializer.getClass().getSimpleName();
-            java.net.URL u = serializer.getClass().getResource(name+".class");
+            java.net.URL u = serializer.getClass().getResource(name + ".class");
             //System.err.println(u);
             e2.printStackTrace();
         }
-
-
         serializer.write(document, output);
 
         out.close();
+        
     }
-    
+
+
+    /**
+     * return the first child, if any, with the given tag name.
+     * @param parent
+     * @param tagName
+     * @return return the child or null if no such child exists.
+     */
+    public static Element getChildElement( Element parent, String tagName ) {
+        NodeList nl= parent.getChildNodes();
+        for ( int i=0; i<nl.getLength(); i++ ) {
+            Node item = nl.item(i);
+            if ( item instanceof Element && ((Element)item).getTagName().equals(tagName) ) {
+                return (Element)item;
+            }
+        }
+        return null;
+    }
+
     public static Object restoreState( File f )  throws IOException {
 
         InputStreamReader isr = new InputStreamReader( new FileInputStream( f ) );
@@ -120,14 +162,17 @@ public class StatePersistence {
             InputSource source = new InputSource(isr);
             Document document = builder.parse(source);
 
-            if ( document.getDocumentElement().getNodeName().equals("java") ) { // legacy
+            if ( document.getDocumentElement().getNodeName().equals("java") ) { // legacy support
                 isr.close();
                 XMLDecoder decode= new XMLDecoder( new FileInputStream(f) );
                 Object state= decode.readObject();
                 return state;
 
             } else {
-                DomNode n= SerializeUtil.getDomNode( document, document.getDocumentElement() );
+                String packg= "org.virbo.autoplot.dom";
+
+                Element dom= getChildElement( document.getDocumentElement(), "Application" );
+                DomNode n= SerializeUtil.getDomNode( dom, packg );
                 return n;
             }
 
