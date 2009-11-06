@@ -122,30 +122,22 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * list content options (showMissing, subrange) are changed.
      */
     private void rebuildSequence() {
-        if (showMissing && timeSpan != null) {
-            displayImages.clear();
-
-            List<DatumRange> displayRange;
-            if (isUseSubRange() && subRange.size() > 0 ) {
-                displayRange = subRange;
-            } else {
-                displayRange = possibleRanges;
-            }
-            for (DatumRange dr : displayRange) {
-                if (datumRanges.contains(dr)) {
-                    displayImages.add(existingImages.get(datumRanges.indexOf(dr)));
-                } else {
-                    // add missing image placeholder
-                    WalkImage ph = new WalkImage(null);
-                    ph.setCaption(dr.toString());
-                    displayImages.add(ph);
-                }
-            }
+        List<DatumRange> displayRange;
+        if (isUseSubRange() && subRange.size() > 0) {
+            displayRange = subRange;
         } else {
-            displayImages.clear();
-            //create one-to-one mapping to existing image files
-            for (WalkImage i : existingImages) {
-                displayImages.add(i);
+            displayRange = possibleRanges;
+        }
+        displayImages.clear();
+
+        for (DatumRange dr : displayRange) {
+            if (datumRanges.contains(dr)) {
+                displayImages.add(existingImages.get(datumRanges.indexOf(dr)));
+            } else if (showMissing && timeSpan != null) {
+                // add missing image placeholder
+                WalkImage ph = new WalkImage(null);
+                ph.setCaption(dr.toString());
+                displayImages.add(ph);
             }
         }
         //Bogus property has no meaningful value, only event is important
