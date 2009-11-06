@@ -23,25 +23,24 @@
               <Component id="actionButtonsPanel" min="-2" pref="463" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
+          <Component id="pngsPanel" alignment="1" pref="870" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="12" pref="12" max="12" attributes="0"/>
+                      <Component id="useRangeCheckBox" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="timeFilterTextField" min="-2" pref="236" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                      <Component id="editRangeButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Component id="showMissingCheckBox" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="dataSetSelector1" alignment="0" pref="846" max="32767" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="timeFilterTextField" min="-2" pref="236" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="showMissingCheckBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="useRangeCheckBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="editRangeButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="222" max="32767" attributes="0"/>
           </Group>
-          <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="dataSetSelector1" pref="846" max="32767" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-          </Group>
-          <Component id="pngsPanel" alignment="1" pref="870" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -53,11 +52,10 @@
               <Component id="dataSetSelector1" min="-2" pref="27" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="timeFilterTextField" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="showMissingCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="useRangeCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="editRangeButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="showMissingCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -84,19 +82,13 @@
     </Container>
     <Component class="javax.swing.JTextField" name="timeFilterTextField">
       <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Enter a time range, for example a year like &quot;2009&quot;, or month &quot;2009 may&quot;, or &quot;2009-01-01 to 2009-03-10&quot;&#xa;"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeFilterTextFieldActionPerformed"/>
         <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="timeFilterTextFieldFocusLost"/>
       </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="jLabel1">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Display Only:"/>
-        <Property name="toolTipText" type="java.lang.String" value="Enter a time range, such as &quot;2009&quot; or &quot;May 2009&quot; to limit the images displayed."/>
-        <Property name="enabled" type="boolean" value="false"/>
-      </Properties>
     </Component>
     <Container class="javax.swing.JPanel" name="actionButtonsPanel">
 
@@ -204,6 +196,7 @@
     <Component class="javax.swing.JCheckBox" name="showMissingCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" value="Show Missing"/>
+        <Property name="toolTipText" type="java.lang.String" value="Insert placeholder images where there are gaps detected in the sequence"/>
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="showMissingCheckBoxItemStateChanged"/>
@@ -211,7 +204,8 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="useRangeCheckBox">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Use subrange"/>
+        <Property name="text" type="java.lang.String" value="Show Only:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Limit the time range of the images in the sequence."/>
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="useRangeCheckBoxItemStateChanged"/>
@@ -219,7 +213,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="editRangeButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Edit..."/>
+        <Property name="text" type="java.lang.String" value="Select..."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editRangeButtonActionPerformed"/>

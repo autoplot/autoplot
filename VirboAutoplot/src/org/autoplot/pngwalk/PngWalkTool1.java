@@ -613,7 +613,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         pngsPanel = new javax.swing.JPanel();
         timeFilterTextField = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
         actionButtonsPanel = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         prevSetButton = new javax.swing.JButton();
@@ -631,6 +630,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         pngsPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         pngsPanel.setLayout(new java.awt.BorderLayout());
 
+        timeFilterTextField.setToolTipText("Enter a time range, for example a year like \"2009\", or month \"2009 may\", or \"2009-01-01 to 2009-03-10\"\n");
         timeFilterTextField.setEnabled(false);
         timeFilterTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -642,10 +642,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 timeFilterTextFieldFocusLost(evt);
             }
         });
-
-        jLabel1.setText("Display Only:");
-        jLabel1.setToolTipText("Enter a time range, such as \"2009\" or \"May 2009\" to limit the images displayed.");
-        jLabel1.setEnabled(false);
 
         actionButtonsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
@@ -733,20 +729,22 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         statusLabel.setText("starting application...");
 
         showMissingCheckBox.setText("Show Missing");
+        showMissingCheckBox.setToolTipText("Insert placeholder images where there are gaps detected in the sequence");
         showMissingCheckBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 showMissingCheckBoxItemStateChanged(evt);
             }
         });
 
-        useRangeCheckBox.setText("Use subrange");
+        useRangeCheckBox.setText("Show Only:");
+        useRangeCheckBox.setToolTipText("Limit the time range of the images in the sequence.");
         useRangeCheckBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 useRangeCheckBoxItemStateChanged(evt);
             }
         });
 
-        editRangeButton.setText("Edit...");
+        editRangeButton.setText("Select...");
         editRangeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editRangeButtonActionPerformed(evt);
@@ -763,23 +761,21 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(18, 18, 18)
                 .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(showMissingCheckBox)
-                .add(18, 18, 18)
-                .add(useRangeCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(editRangeButton)
-                .addContainerGap(222, Short.MAX_VALUE))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(useRangeCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 236, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(12, 12, 12)
+                        .add(editRangeButton)
+                        .add(18, 18, 18)
+                        .add(showMissingCheckBox))
+                    .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE))
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -790,11 +786,10 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
                     .add(timeFilterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(showMissingCheckBox)
                     .add(useRangeCheckBox)
-                    .add(editRangeButton))
+                    .add(editRangeButton)
+                    .add(showMissingCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -879,7 +874,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private javax.swing.JPanel actionButtonsPanel;
     private org.virbo.datasource.DataSetSelector dataSetSelector1;
     private javax.swing.JButton editRangeButton;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JButton jumpToFirstButton;
     private javax.swing.JButton jumpToLastButton;
