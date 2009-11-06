@@ -208,6 +208,24 @@ public class WalkImageSequence implements PropertyChangeListener  {
         if (isUseSubRange()) rebuildSequence();
     }
 
+    /**
+     * Convenience method for to set the subrange to the items intersecting the given range.
+     * @param range
+     */
+    public void setActiveSubrange(DatumRange range) {
+        int first=-1;
+        int last= -1;
+        for ( int i=0; i<possibleRanges.size(); i++ ) {
+            if ( possibleRanges.get(i).intersects(range) ) {
+                if ( first==-1 ) first=i;
+                last= i;
+            }
+        }
+        if ( first!=-1 ) {
+            setActiveSubrange( first, last );
+        }
+    }
+
     /** Return the time range covered by this sequence.  This is the total range
      * of available images, not any currently displayed subrange.  Will be null
      * if no date template was used to create the sequence.
