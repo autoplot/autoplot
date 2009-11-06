@@ -12,6 +12,7 @@ import org.virbo.autoplot.dom.*;
 import java.beans.BeanInfo;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.PropertyDescriptor;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
@@ -32,7 +33,9 @@ import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.system.DasLogger;
+import org.das2.util.AboutUtil;
 import org.virbo.autoplot.RenderType;
+import org.virbo.autoplot.ScriptContext;
 import org.virbo.qstream.SerializeDelegate;
 import org.virbo.qstream.SerializeRegistry;
 import org.virbo.qstream.XMLSerializeDelegate;
@@ -64,12 +67,15 @@ public class SerializeUtil {
         SerializeRegistry.register( PlotSymbol.class, new TypeSafeEnumSerializeDelegate() );
     }
     
-    public static Element getDomElement( Document document, DomNode node ) {
+    public static Element getDomElement( Document document, DomNode node, String packg ) {
         Logger log= DasLogger.getLogger( DasLogger.SYSTEM_LOG );
 
 
         try {
             String elementName = node.getClass().getName();
+            if ( elementName.startsWith(packg+".") ) {
+                elementName= elementName.substring(packg.length()+1);
+            }
 
             DomNode defl= node.getClass().newInstance();
 
@@ -137,7 +143,7 @@ public class SerializeUtil {
                     Element propertyElement= document.createElement( "property" );
                     propertyElement.setAttribute("name", propertyName );
                     propertyElement.setAttribute("type", "DomNode" );
-                    Element child= getDomElement( document, (DomNode)value );
+                    Element child= getDomElement( document, (DomNode)value, packg );
                     propertyElement.appendChild(child);
                     element.appendChild(propertyElement);
 
@@ -145,18 +151,22 @@ public class SerializeUtil {
                     // serialize each element of the array.  Assumes order doesn't change
                     Element propertyElement= document.createElement( "property" );
                     propertyElement.setAttribute( "name", propertyName );
-                    propertyElement.setAttribute( "class", ipd.getIndexedPropertyType().getName() );
+                    String clasName= ipd.getIndexedPropertyType().getName();
+                    if ( clasName.startsWith(packg+".") ) clasName= clasName.substring(packg.length()+1);
+                    propertyElement.setAttribute( "class", clasName );
                     propertyElement.setAttribute( "length", String.valueOf( Array.getLength(value) ) );
                     for ( int j=0; j<Array.getLength(value); j++ ) {
                         Object value1= Array.get( value, j );
-                        Element child= getDomElement( document, (DomNode)value1 );
+                        Element child= getDomElement( document, (DomNode)value1, packg  );
                         propertyElement.appendChild(child);
                     }
                     element.appendChild(propertyElement);
                 } else if ( ipd!=null ) {
                     Element propertyElement= document.createElement( "property" );
                     propertyElement.setAttribute( "name", propertyName );
-                    propertyElement.setAttribute( "class", ipd.getIndexedPropertyType().getName() );
+                    String clasName= ipd.getIndexedPropertyType().getName();
+                    if ( clasName.startsWith(packg+".") ) clasName= clasName.substring(packg.length()+1);
+                    propertyElement.setAttribute( "class", clasName );
                     propertyElement.setAttribute( "length", String.valueOf( Array.getLength(value) ) );
                     for ( int j=0; j<Array.getLength(value); j++ ) {
                         Object value1= Array.get( value, j );
@@ -223,7 +233,7 @@ public class SerializeUtil {
         }
     }
 
-    public static Object getLeafNode( Document document,Element element ) throws ParseException {
+    public static Object getLeafNode( Element element ) throws ParseException {
         String type= element.getAttribute("type");
         SerializeDelegate sd= SerializeRegistry.getByName(type);
         if ( sd==null ) {
@@ -237,10 +247,22 @@ public class SerializeUtil {
         }
     }
 
-    public static DomNode getDomNode( Document document, Element element ) throws ParseException {
+    /**
+     *
+     * @param document
+     * @param element
+     * @param packg  the java package containing the default package for nodes.
+     * @return
+     * @throws ParseException
+     */
+    public static DomNode getDomNode( Element element, String packg ) throws ParseException {
         try {
             DomNode node = null;
-            node = (DomNode) Class.forName( element.getNodeName() ).newInstance();
+
+            String clasName= element.getNodeName();
+            if ( !clasName.contains(".") )  clasName= packg + "." + clasName;
+            
+            node = (DomNode) Class.forName( clasName ).newInstance();
 
             BeanInfo info = BeansUtil.getBeanInfo(node.getClass());
 
@@ -261,15 +283,12 @@ public class SerializeUtil {
                 if ( k instanceof Element ) {
                     Element e= (Element)k;
 
-                    System.err.println( e.getNodeName() + "  " + e.getAttribute("name") );
-                    if ( e.getAttribute("name").equals("options") ) {
-                        System.err.println("here");
-                    }
-
                     PropertyDescriptor pd= pp.get( e.getAttribute("name") );
                     String slen= e.getAttribute("length");
                     if ( slen!=null && slen.length()>0 ) {
-                        Class c= Class.forName(e.getAttribute("class"));
+                        clasName= e.getAttribute("class");
+                        if ( !clasName.contains(".") )  clasName= packg + "." + clasName;
+                        Class c= Class.forName(clasName);
                         int n= Integer.parseInt(e.getAttribute("length"));
                         Object arr= Array.newInstance( c,n );
                         if ( DomNode.class.isAssignableFrom(c) ) {
@@ -277,7 +296,7 @@ public class SerializeUtil {
                             int ik=0;
                             for ( int j=0; j<n; j++ ) { //DANGER
                                 while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
-                                DomNode c1= getDomNode( document, (Element)arraykids.item(ik) );
+                                DomNode c1= getDomNode( (Element)arraykids.item(ik), packg );
                                 ik++;
                                 Array.set( arr, j, c1 );
                             }
@@ -288,7 +307,7 @@ public class SerializeUtil {
                             for ( int j=0; j<n; j++ ) { //DANGER
                                 Object c1=null;
                                 while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
-                                c1 = getLeafNode(document, (Element) arraykids.item(ik));
+                                c1 = getLeafNode( (Element) arraykids.item(ik));
                                 ik++;
                                 Array.set( arr, j, c1 );
                             }
@@ -297,12 +316,12 @@ public class SerializeUtil {
                     } else {
                         String stype= e.getAttribute("type");
                         if ( !stype.equals("DomNode") ) {
-                            Object child= getLeafNode( document, e );
+                            Object child= getLeafNode( e );
                             pd.getWriteMethod().invoke( node, child );
                         } else {
                             Node childElement= e.getFirstChild();
                             while ( !( childElement instanceof Element ) ) childElement= childElement.getNextSibling();
-                            DomNode child= getDomNode( document, (Element)childElement );
+                            DomNode child= getDomNode( (Element)childElement, packg );
                             pd.getWriteMethod().invoke( node, child );
                         }
                     }
@@ -318,15 +337,41 @@ public class SerializeUtil {
     }
 
     public static void main( String[] args ) throws FileNotFoundException, SAXException, IOException, ParseException {
+
+        Application dom= ScriptContext.getDocumentModel();
+
+        Document document=null;
+        try {
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        }
+        Element element = SerializeUtil.getDomElement( document, (DomNode)dom, "org.virbo.autoplot.dom" );
+
+        Element vap= document.createElement("vap");
+        vap.appendChild(element);
+        vap.setAttribute( "domVersion", "1.0" );
+        vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
+
+        document.appendChild(vap);
+        StatePersistence.writeDocument( new File("/home/jbf/tmp/foo2.vapx" ), document);
+
+
         InputStreamReader isr = new InputStreamReader( new FileInputStream( "/home/jbf/tmp/foo2.vapx" ) );
 
         try {
             DocumentBuilder builder;
             builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             InputSource source = new InputSource(isr);
-            Document document = builder.parse(source);
+            document = builder.parse(source);
 
-            DomNode n= getDomNode( document, document.getDocumentElement() );
+            vap=  document.getDocumentElement();
+            Element child= StatePersistence.getChildElement(vap,"Application");
+
+            DomNode n= getDomNode( child, "org.virbo.autoplot.dom" );
+
+            System.err.println( n.diffs(dom) ); // should be none!
 
         } catch (ParserConfigurationException ex) {
             throw new RuntimeException(ex);
