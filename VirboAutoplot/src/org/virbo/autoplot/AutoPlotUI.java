@@ -63,7 +63,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
-import org.autoplot.pngwalk.DemoPngWalk;
+import org.autoplot.pngwalk.PngWalkTool1;
 import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasPlot;
@@ -1586,7 +1586,7 @@ private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_jMenuItem7ActionPerformed
 
 private void pngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pngWalkMenuItemActionPerformed
-    new DemoPngWalk().start( null, this);
+    new PngWalkTool1().start( null, this);
 }//GEN-LAST:event_pngWalkMenuItemActionPerformed
 
 private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createPngWalkMenuItemActionPerformed
