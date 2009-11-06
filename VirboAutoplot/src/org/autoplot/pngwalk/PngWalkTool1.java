@@ -871,6 +871,11 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         SubrangeEditorDialog d = new SubrangeEditorDialog(myFrame, true);
         List<DatumRange> times= seq.getAllTimes();
         d.setTimeSpan(times);
+        if(seq.isUseSubRange()) {
+            List<DatumRange> sub = seq.getActiveSubrange();
+            d.setStartIndex(times.indexOf(sub.get(0)));
+            d.setEndIndex(times.indexOf(sub.get(sub.size()-1)));
+        }
         d.setVisible(true);  //blocks until dialog closes
 
         if (d.isOkClicked()) {

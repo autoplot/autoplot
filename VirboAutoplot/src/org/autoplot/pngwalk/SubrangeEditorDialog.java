@@ -58,8 +58,22 @@ public class SubrangeEditorDialog extends javax.swing.JDialog {
         return startSlider.getValue();
     }
 
+    public void setStartIndex(int in) {
+        if (in < 0) in = 0;
+        if (in > maxIndex) in = maxIndex;
+        if (in > endSlider.getValue()) in = endSlider.getValue();
+        startSlider.setValue(in);
+    }
+
     public int getEndIndex() {
         return endSlider.getValue();
+    }
+
+    public void setEndIndex(int in) {
+        if (in < 0) in = 0;
+        if (in > maxIndex) in = maxIndex;
+        if (in < startSlider.getValue()) in = startSlider.getValue();
+        endSlider.setValue(in);
     }
     
     /** This method is called from within the constructor to

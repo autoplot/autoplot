@@ -114,7 +114,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
         for (WalkImage i : existingImages) {
             i.addPropertyChangeListener(this);
         }
-
+        subRange = possibleRanges;
         rebuildSequence();
     }
 
@@ -216,6 +216,10 @@ public class WalkImageSequence implements PropertyChangeListener  {
         if ( first!=-1 ) {
             setActiveSubrange( first, last );
         }
+    }
+
+    public List<DatumRange> getActiveSubrange() {
+        return subRange;
     }
 
     /** Return the time range covered by this sequence.  This is the total range
