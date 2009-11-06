@@ -11,6 +11,7 @@
 
 package org.autoplot.pngwalk;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Window;
@@ -44,8 +45,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.util.ArgumentList;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.datasource.DataSetSelector;
@@ -503,7 +506,9 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         Runnable run= new Runnable() {
             public void run() {
                 seq.initialLoad();
-
+                useRangeCheckBox.setEnabled( seq.getTimeSpan()!=null );
+                editRangeButton.setEnabled( seq.getTimeSpan()!=null );
+                showMissingCheckBox.setEnabled( seq.getTimeSpan()!=null );
                 for ( PngWalkView v:views ) {
                     v.setSequence( seq );
                 }
@@ -728,6 +733,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         statusLabel.setText("starting application...");
 
+        showMissingCheckBox.setSelected(true);
         showMissingCheckBox.setText("Show Missing");
         showMissingCheckBox.setToolTipText("Insert placeholder images where there are gaps detected in the sequence");
         showMissingCheckBox.addItemListener(new java.awt.event.ItemListener() {
@@ -736,7 +742,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
-        useRangeCheckBox.setText("Show Only:");
+        useRangeCheckBox.setText("Limit range to:");
         useRangeCheckBox.setToolTipText("Limit the time range of the images in the sequence.");
         useRangeCheckBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -819,7 +825,15 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 }//GEN-LAST:event_prevSetButtonActionPerformed
 
     private void timeFilterTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeFilterTextFieldActionPerformed
-//        canvas.setTimeRange( timeFilterTextField.getText() );
+        try {
+            timeFilterTextField.setBackground( dataSetSelector1.getBackground() );
+            DatumRange range= DatumRangeUtil.parseTimeRange(timeFilterTextField.getText());
+            seq.setActiveSubrange( range );
+        } catch ( ParseException ex ) {
+            timeFilterTextField.setBackground( Color.PINK );
+        }
+
+        //        canvas.setTimeRange( timeFilterTextField.getText() );
 //        if ( !canvas.getTimeRange().equals(timeFilterTextField.getText() ) ) {
 //            timeFilterTextField.setBackground( Color.PINK );
 //        } else {
@@ -855,17 +869,28 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private void editRangeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editRangeButtonActionPerformed
         Frame myFrame = (java.awt.Frame)SwingUtilities.getWindowAncestor(this);
         SubrangeEditorDialog d = new SubrangeEditorDialog(myFrame, true);
-        d.setTimeSpan(seq.getAllTimes());
+        List<DatumRange> times= seq.getAllTimes();
+        d.setTimeSpan(times);
         d.setVisible(true);  //blocks until dialog closes
 
         if (d.isOkClicked()) {
             //System.err.printf("OK, start index is %d and end index is %d.%n", d.getStartIndex(), d.getEndIndex());
             seq.setActiveSubrange(d.getStartIndex(), d.getEndIndex());
+            DatumRange range= new DatumRange( times.get(d.getStartIndex()).min(), times.get(d.getEndIndex()).max() );
+            timeFilterTextField.setText( range.toString() );
         }
     }//GEN-LAST:event_editRangeButtonActionPerformed
 
     private void useRangeCheckBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_useRangeCheckBoxItemStateChanged
-        seq.setUseSubRange(evt.getStateChange()==java.awt.event.ItemEvent.SELECTED);
+        boolean enable= evt.getStateChange()==java.awt.event.ItemEvent.SELECTED;
+        seq.setUseSubRange(enable);
+        timeFilterTextField.setEnabled(enable);
+        DatumRange range= seq.getTimeSpan();
+        if ( range==null ) {
+            timeFilterTextField.setText("error"); // shouldn't get here
+        } else {
+            timeFilterTextField.setText( range.toString() );
+        }
     }//GEN-LAST:event_useRangeCheckBoxItemStateChanged
 
 
