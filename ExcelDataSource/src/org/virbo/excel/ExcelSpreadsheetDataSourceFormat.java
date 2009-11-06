@@ -10,7 +10,6 @@ import org.das2.datum.UnitsUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Calendar;
 import java.util.TimeZone;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -30,13 +29,6 @@ import org.virbo.datasource.datasource.DataSourceFormat;
  * @author jbf
  */
 public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
-
-    private void maybeOutputProperty(PrintWriter out, QDataSet data, String property) {
-        Object v = data.property(property);
-        if (v != null) {
-            out.println("# " + property + ": " + v);
-        }
-    }
 
     private void formatRank2( HSSFSheet sheet, QDataSet data, ProgressMonitor mon) throws IOException {
 
