@@ -279,9 +279,9 @@ public class WalkImage implements Comparable<WalkImage> {
     private static BufferedImage initMissingImage() {
         BufferedImage missing = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = missing.createGraphics();
-        //g2.setColor(java.awt.Color.RED);
+        g2.setColor(java.awt.Color.BLACK);
         FontMetrics fm = g2.getFontMetrics(g2.getFont());
-        String msg = "Missing.";
+        String msg = "(Missing)";
         g2.drawString(msg, (200 - fm.stringWidth(msg)) / 2, 100);
 
         return missing;
