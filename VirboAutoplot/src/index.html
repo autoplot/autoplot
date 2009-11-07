@@ -7,10 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Autoplot is used to plot data from IDL using the "applot" command.  Data in IDL is serialized
-                to a das2Stream (soon a QStream) and the server interface is used to command Autoplot to
-                plot the data.  This is useful for debugging in IDL when using IDL's plotting would interfere
-                with the process being debugged.
+        <p><small>Ideal case to test peak identification in AutoHistogram result.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -22,29 +19,43 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         </p>
         
         <p>Recent changes include:</p>
-<ul>
-    <li>bugfix in copy panels when the plot contains parent and child panels.</li>
-    <li>bugfix in QStreams, calculate resolution needed for time formatting.</li>
-    <li>bugfix OpenDAP subsetting works with ISTP CDFs.</li>
-    <li>bugfixes in hide/show colorbar, when overplots are used.</li>
-    <li>bugfix in stack order of panels, so that spectrograms are inserted under lineplots.</li>
-    <li>add das2 ripples dataset for demos and testing.</li>
-    <li>bugfixes in sync, style node changes didn't make it out to the view layer, which affects load and save.</li>
-    <li>bugfix: guess cadence is invoked when autorange is false, so that symbol connector is correct.</li>
-    <li>bugfix: das2 renderers use weights property so that original dataset fill values are not clobbered.</li>
-    <li>bugfix: introduce dsfReset property to panel controller to address perennial problems with syncing.</li>
-    <li>for das2server data source, introduce GUI for selecting data sets.</li>
-    <li>bugfix: spaces in filenames when exporting data is supported.</li>
-    <li>introduce Aggregate All to tools menu.</li>
-    <li>create pngwalk has option to create thumbnails as well</li>
-    <li>bugfix when no preferences exist for recent or bookmarks.</li>
-    <li>improvements to DomainDivider-based tick labelling, though it's not quite ready yet due to formatting</li>
-    <li>handle unit "days since 1-1-1T00:00:00"</li>
-    <li>bugfix in das2: toTimeStruct(Datum) rounded to nearest microsecond.</li>
-    <li>bugfix in das2: format to nanosecond resolution failed.</li>
-    <li>more tweaking of guess cadence code when there are <10 elements that are log spaced.</li>
-    <li>introduce experimental peakIds() and peaks() in AutoHistogram, to support statistical gcd.</li>
-</ul>
+        <ul><li>
+New PNG Walk Tool that is more flexible and improves the user interface.
+            </li><ul><li> scrollbars used to provide more usable control.
+</li><li> simple, serviceable views composed to make complex displays
+</li><li> tear off tabbed pane used to support wide displays, e.g. grid + single
+</li><li> missing sequence images indicated.
+</li><li> experimental problem/okay buttons allow images to be annotated.
+</li><li> pre-computed thumbnail support.
+
+</li><li> bookmarks and recent entries
+</li></ul>
+</li><li> QDataSet histogram peaks analysis, gcd.
+</li><li> QStream ascii format evaluates resolution needed for time tag output.
+</li><li> AsciiDataSource and Excel panel editors made more intuitive.
+</li><li> AsciiDataSource rejects URIs that don't specify column when there are more than two columns.
+<ul><li> reduce confusion when user points to ascii file, use the editor GUI instead of plotting first column (often just the year).
+</li></ul>
+</li><li> Aggregating
+<ul><li> editor panel (at the bottom) lists remote site to provide year, month, day droplists of available data.
+
+</li><li> file browsers allow multiple files to be selected, and aggregation URI is result.
+</li><li> file system completion presents aggregation options when aggregations are detected.
+</li></ul>
+</li><li> Introduce experimental vap format that uses new serializer
+<ul><li> improves serviceability of this serialization, Java Beans serialization is too opaque
+</li><li> decouples vap from DOM to support forward-compatibility of vap files.
+</li><li> more explicit yet hackable
+</li><li> save to vap will create ".vapx" which is the new format.
+</li><li> .vap and .vapx can contain either xml scheme.
+
+</li><li> leverage QStream serialization so that one serialization type is used.
+</li></ul>
+</li><li> miscellaneous bugfixes and gui improvements for example:
+<ul><li> automatic slice of rank 3 slices the middle of each dimension, where there is more likely to be valid data.
+</li><li> remove properties buttons from style tab that were left over from the old gui.
+</li></ul>
+
 <p>
 
 
@@ -52,7 +63,8 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 <ul>
 <li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
 </li><li> last URI is not added to DataSetSelector.
-</li>
+</li><li> PNGWalk tool doesn't repaint when subrange is changed</li>
+<li>AsciiTableDataSource sometimes identifies data as column headers</li>
 </ul>
 <p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
@@ -75,7 +87,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 	</p>
 	<p>This is not complete, and limitations include:</p>
 	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
-	<li>Quantities of rank 4 dimensionality cannot be plotted.</li>
+	<li>Quantities of rank 4 dimensionality (e.g. flux(Time,Energy,azimuth,sector) are plotted by slicing.</li>
          
          <p><a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
          more information than this launch page.</p>
