@@ -36,6 +36,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "limit the number of records to read in" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recLength=", "byte length of each record" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recOffset=", "byte offset into each record") );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recFormat=", "specify field types and rec size in one string") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "column=", "byte offset into each record based on field type" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "type=") );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "depend0=") );
@@ -99,6 +100,12 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 List<CompletionContext> result= new ArrayList<CompletionContext>();
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "little", "(default) first byte has little significance") );
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "big", "first byte has big significance") );
+                return result;
+            } else if ( paramName.equals("recFormat") ) {
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "d,13f", "double followed by 13 floats") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "i,s,ub", "int, short, unsigned byte") );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "x,ub,ui", "skip byte, unsigned byte, unsigned int") );
                 return result;
             } else {
                 return Collections.emptyList();
