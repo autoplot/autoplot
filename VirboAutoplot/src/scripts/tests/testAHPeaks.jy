@@ -1,0 +1,20 @@
+n= 10
+dist=  randomn(12345,20*n)*.35 + 4.34
+dist2= randomn(12345,30*n)*.45 + 6.23
+dist3= randomn(12345,10*n)*.15 + 8.9
+
+dist.append(dist2)
+dist.append(dist3)
+
+plot(0,dist)
+
+from org.virbo.dsutil import AutoHistogram
+ah= AutoHistogram()
+ah.doit(dist)
+
+hist= ah.getHistogram()
+plot(1,'Histogram', hist)
+
+plot(2,'Peak ID', ah.peakIds(hist) )
+
+plot(3,'Peaks', ah.peaks(hist) )
