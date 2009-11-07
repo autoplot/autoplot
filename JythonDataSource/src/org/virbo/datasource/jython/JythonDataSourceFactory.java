@@ -18,13 +18,18 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyList;
 import org.python.core.PyStringMap;
+import org.python.parser.PythonGrammar;
+import org.python.parser.ReaderCharStream;
 import org.python.util.PythonInterpreter;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
@@ -140,7 +145,55 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         }
 
     }
-    
+
+    protected static Map<String,String> getParameters( String surl, ProgressMonitor mon ) {
+        try {
+            File src = DataSetURI.getFile(DataSetURI.getURL(surl), new NullProgressMonitor());
+            BufferedReader reader = new BufferedReader(new FileReader(src));
+            String s = reader.readLine();
+
+            Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
+            Pattern defPattern= Pattern.compile("def .*");
+
+            boolean inDef= false;
+
+            Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
+
+            boolean haveResult = false;
+            while (s != null) {
+
+                if ( inDef==false ) {
+                    Matcher defm= defPattern.matcher(s);
+                    if ( defm.matches() ) {
+                        inDef= true;
+                    }
+                } else {
+                    if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+                        Matcher defm= defPattern.matcher(s);
+                        inDef=  defm.matches();
+                    }
+                }
+
+                if ( !inDef ) {
+                    Matcher m= assignPattern.matcher(s);
+                    if ( m.matches() ) {
+                        if ( m.group(3)!=null ) {
+                            result.put(m.group(1), m.group(3) );
+                        } else {
+                            result.put(m.group(1), s );
+                        }
+                    }
+                }
+
+                s = reader.readLine();
+            }
+            reader.close();
+            return result;
+        } catch (IOException ex) {
+            Logger.getLogger(JythonDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        }
+    }
     
     ExceptionListener listener;
     

@@ -12,17 +12,23 @@
 package org.virbo.datasource.jython;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.text.Element;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
+import org.virbo.datasource.URISplit;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
 /**
@@ -32,11 +38,15 @@ import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
 
     ScriptPanelSupport support;
+    String suri;
+    File file;
 
     /** Creates new form JythonEditorPanel */
     public JythonEditorPanel() {
         initComponents();
-        support= new ScriptPanelSupport(editorTextPane1);
+        support= new ScriptPanelSupport(textArea);
+        support.addCaretLabel(caretPositionLabel);
+        support.addFileLabel(fileNameLabel);
     }
 
     /** This method is called from within the constructor to
@@ -49,28 +59,61 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        editorTextPane1 = new org.virbo.jythonsupport.ui.EditorTextPane();
+        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
+        variableComboBox = new javax.swing.JComboBox();
+        jLabel1 = new javax.swing.JLabel();
+        caretPositionLabel = new javax.swing.JLabel();
+        fileNameLabel = new javax.swing.JLabel();
 
-        jScrollPane1.setViewportView(editorTextPane1);
+        jScrollPane1.setViewportView(textArea);
+
+        variableComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(running script)" }));
+
+        jLabel1.setText("dataset variable:");
+        jLabel1.setToolTipText("The dataset pointed to by the URI");
+
+        caretPositionLabel.setText("1,1");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(variableComboBox, 0, 270, Short.MAX_VALUE)
+                .addContainerGap())
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 87, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 288, Short.MAX_VALUE)
-                .addContainerGap())
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 264, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(caretPositionLabel)
+                    .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 12, Short.MAX_VALUE)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(variableComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public org.virbo.jythonsupport.ui.EditorTextPane editorTextPane1;
+    public javax.swing.JLabel caretPositionLabel;
+    protected javax.swing.JLabel fileNameLabel;
+    public javax.swing.JLabel jLabel1;
     public javax.swing.JScrollPane jScrollPane1;
+    public org.virbo.jythonsupport.ui.EditorTextPane textArea;
+    public javax.swing.JComboBox variableComboBox;
     // End of variables declaration//GEN-END:variables
 
     public JPanel getPanel() {
@@ -79,8 +122,26 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     public void setURI(String url) {
         try {
+            this.suri= url;
+            URISplit split= URISplit.parse(suri);
+
             File f = DataSetURI.getFile( DataSetURI.getWebURL( new URI(url) ), new NullProgressMonitor());
+            
             support.loadFile(f);
+            Map<String,String> params= JythonDataSourceFactory.getParameters(url, new NullProgressMonitor() );
+            String[] dropList= new String[params.size()];
+            int i=0;
+            int idx= -1;
+            for ( Entry<String,String> ent: params.entrySet()  ) {
+                dropList[i]= ent.getKey()+":  "+ent.getValue();
+                if ( split.params!=null && split.params.equals(ent.getKey()) ) {
+                    idx= i;
+                }
+                i++;
+            }
+            variableComboBox.setModel( new DefaultComboBoxModel( dropList ) );
+            if ( idx>=0 ) variableComboBox.setSelectedIndex(idx);
+            
         } catch (URISyntaxException ex) {
             Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -89,7 +150,24 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
 
     public String getURI() {
-        return support.getFile().toURI().toString();
+        URISplit split=  URISplit.parse(suri);
+        String param= (String)variableComboBox.getSelectedItem();
+        int i= param.indexOf(":");
+        if ( i==-1 ) {
+            split.params= param.trim();
+        } else {
+            split.params= param.substring(0,i).trim();
+        }
+        if ( support.isDirty() ) {
+            try {
+                FileWriter writer = new FileWriter(support.getFile());
+                writer.write( textArea.getText() );
+                writer.close();
+            } catch (IOException ex) {
+                Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return URISplit.format(split);
     }
 
 }
