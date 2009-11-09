@@ -64,7 +64,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
      * be done on the event thread, and should be done before the
      * sequence is used.
      */
-    public void initialLoad() { 
+    public void initialLoad() throws java.io.IOException {
         datumRanges = new ArrayList<DatumRange>();
         subRange = new ArrayList<DatumRange>();
         List<URI> uris;
@@ -73,12 +73,13 @@ public class WalkImageSequence implements PropertyChangeListener  {
             uris= new ArrayList<URI>();
         } else {
             try {
-                setStatus( "busy: listing "+template );
+                setStatus( "Busy: listing "+template );
                 uris = WalkUtil.getFilesFor(template, null, datumRanges, false, null);
-                setStatus( "done listing "+template );
+                setStatus( "Done listing "+template );
             } catch (Exception ex) {
                 Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
-                throw new RuntimeException(ex);
+                setStatus("Error listing " + template);
+                throw new java.io.IOException("Error listing " + template);
             }
         }
 

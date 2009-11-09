@@ -299,6 +299,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         fileMenu.add( new AbstractAction( f.getDefaultCloseOperation()==JFrame.EXIT_ON_CLOSE ? "Exit" : "Close" ) {
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
+                if (f.getDefaultCloseOperation()==JFrame.EXIT_ON_CLOSE) System.exit(0);
             }
         } );
         result.add(fileMenu);
@@ -505,12 +506,23 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         Runnable run= new Runnable() {
             public void run() {
-                seq.initialLoad();
-                useRangeCheckBox.setEnabled( seq.getTimeSpan()!=null );
-                editRangeButton.setEnabled( seq.getTimeSpan()!=null );
-                showMissingCheckBox.setEnabled( seq.getTimeSpan()!=null );
-                for ( PngWalkView v:views ) {
-                    v.setSequence( seq );
+                try {
+                    seq.initialLoad();
+                    useRangeCheckBox.setEnabled(seq.getTimeSpan() != null);
+
+                    // always clear subrange on new sequence
+                    useRangeCheckBox.setSelected(false);
+                    editRangeButton.setEnabled(false);
+                    timeFilterTextField.setEnabled(false);
+                    timeFilterTextField.setText("");
+                    
+                    showMissingCheckBox.setEnabled(seq.getTimeSpan() != null);
+                    for (PngWalkView v : views) {
+                        v.setSequence(seq);
+                    }
+                } catch (java.io.IOException e) {
+                    // This probably means the template was invalid. Don't set new sequence.
+                    setStatus(e.getMessage());
                 }
             }
         };
@@ -890,7 +902,10 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         boolean enable= evt.getStateChange()==java.awt.event.ItemEvent.SELECTED;
         seq.setUseSubRange(enable);
         timeFilterTextField.setEnabled(enable);
-        DatumRange range= seq.getTimeSpan();
+        editRangeButton.setEnabled(enable);
+        
+        List<DatumRange> current = seq.getActiveSubrange();
+        DatumRange range= DatumRangeUtil.union(current.get(0), current.get(current.size()-1));
         if ( range==null ) {
             timeFilterTextField.setText("error"); // shouldn't get here
         } else {
