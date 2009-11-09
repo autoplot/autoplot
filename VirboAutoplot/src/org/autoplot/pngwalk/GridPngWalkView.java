@@ -104,7 +104,7 @@ public class GridPngWalkView extends PngWalkView {
         if (canvas == null) return;
         if (seq != null) canvas.setPreferredSize(new Dimension(thumbSize*nCols, thumbSize*(seq.size()/nCols + 1)));
         else canvas.setPreferredSize(new Dimension(100,100));
-        canvas.revalidate();
+        canvas.repaint();
     }
 
     @Override

@@ -121,7 +121,7 @@ public class RowPngWalkView extends PngWalkView {
         } else {
             canvas.setPreferredSize(new Dimension(DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE));
         }
-        canvas.revalidate();
+        canvas.repaint();
     }
 
     private void selectCell(int n) {
