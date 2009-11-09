@@ -202,7 +202,12 @@ public class IstpMetadataModel extends MetadataModel {
 
         for (int i = 0; i < 4; i++) {
             String key = "DEPEND_" + i;
-            Map<String, Object> props = (Map<String, Object>) attrs.get(key);
+            Object o= attrs.get(key);
+            if ( !( o instanceof Map ) ) {
+                new RuntimeException("String where Map was expected").printStackTrace();
+                continue;
+            }
+            Map<String, Object> props = (Map<String, Object>) o;
             if (props!=null) {
                 properties.put(key, properties(props));
             }
