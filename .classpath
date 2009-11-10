@@ -37,10 +37,7 @@
 	<classpathentry kind="lib" path="APLibs/lib/batik-svggen.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/batik-util.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/beansbinding-1.2.1.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/beansbinding.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/cdfjava.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/itext-1.2.jar"/>
-	<classpathentry kind="lib" path="APLibs/lib/JDiskHog.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jfits-0.93.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/JFontChooser.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/jython.jar"/>
@@ -49,26 +46,8 @@
 	<classpathentry kind="lib" path="APLibs/lib/poi-contrib-3.1-FINAL-20080629.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/poi-scratchpad-3.1-FINAL-20080629.jar"/>
 	<classpathentry kind="lib" path="APLibs/lib/swing-layout-1.0.3.jar"/>
-	<classpathentry kind="lib" path="AudioSystemDataSource/dist/AudioSystemDataSource.jar"/>
-	<classpathentry kind="lib" path="BinaryDataSource/dist/BinaryDataSource.jar"/>
-	<classpathentry kind="lib" path="CdfDataSource/dist/CdfDataSource.jar"/>
-	<classpathentry kind="lib" path="CefDataSource/dist/CefDataSource.jar"/>
-	<classpathentry kind="lib" path="Das2ServerDataSource/dist/Das2ServerDataSource.jar"/>
-	<classpathentry kind="lib" path="dasCore/dist/dasCore.jar"/>
-	<classpathentry kind="lib" path="DataSource/dist/DataSource.jar"/>
-	<classpathentry kind="lib" path="DataSourcePack/dist/DataSourcePack.jar"/>
-	<classpathentry kind="lib" path="ExcelDataSource/dist/ExcelDataSource.jar"/>
-	<classpathentry kind="lib" path="FitsDataSource/dist/FitsDataSource.jar"/>
-	<classpathentry kind="lib" path="IdlMatlabSupport/dist/IdlMatlabSupport.jar"/>
-	<classpathentry kind="lib" path="ImageDataSource/dist/ImageDataSource.jar"/>
-	<classpathentry kind="lib" path="JythonDataSource/dist/JythonDataSource.jar"/>
-	<classpathentry kind="lib" path="JythonSupport/dist/JythonSupport.jar"/>
-	<classpathentry kind="lib" path="NetCdfDataSource/dist/NetCdfDataSource.jar"/>
-	<classpathentry kind="lib" path="OpenDapDataSource/dist/OpenDapDataSource.jar"/>
-	<classpathentry kind="lib" path="QDataSet/dist/QDataSet.jar"/>
-	<classpathentry kind="lib" path="QStream/dist/QStream.jar"/>
-	<classpathentry kind="lib" path="TsdsDataSource/dist/TsdsDataSource.jar"/>
-	<classpathentry kind="lib" path="VirboAutoplot/dist/VirboAutoplot.jar"/>
-	<classpathentry kind="lib" path="WavDataSource/dist/WavDataSource.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/cdfjava-hack.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/jh.jar"/>
+	<classpathentry kind="lib" path="APLibs/lib/commons/commons-vfs-1.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
