@@ -627,8 +627,11 @@ private void guessFillButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
                 for ( int i=0; i<model.getRowCount(); i++ ) {
                     mon.setTaskProgress(i);
                     for ( int j=cols[0]; j<=cols[1]; j++ ) {
-                        builder.putValue(-1,Double.parseDouble(String.valueOf(model.getValueAt(i,j))));
-                        builder.nextRecord();
+                        try {
+                            builder.putValue(-1, Double.parseDouble(String.valueOf(model.getValueAt(i, j))));
+                            builder.nextRecord();
+                        } catch (NumberFormatException numberFormatException) {
+                        }
                     }
                 }
                 mon.finished();
