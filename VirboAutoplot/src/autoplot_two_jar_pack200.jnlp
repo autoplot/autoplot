@@ -34,7 +34,7 @@
               href="http://java.sun.com/products/autodl/j2se" > 
         </j2se>
 
-        <!-- <property name="jnlp.packEnabled" value="true"/> --> 
+        <property name="jnlp.packEnabled" value="true"/> 
 
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
@@ -42,11 +42,11 @@
         <jar href="#{codebase}../../../../../../autoplot-jar-stable/lastStableBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
                 
         <!-- cdf -->
-        <jar href="http://www.autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
-        <package name="gsfc.nssdc" part="cdf"  recursive="true" />
+<!--        <jar href="http://www.autoplot.org/jnlp-lib/cdfjava-hack.jar" /> --><!-- rank 3 hack -->
+<!--        <package name="gsfc.nssdc" part="cdf"  recursive="true" /> -->
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.0.jnlp" > -->
-        <extension name="cdf" href="http://www.autoplot.org/cdf-jnlp/cdf-3.3.0-hack.jnlp" >
-        </extension>
+<!--        <extension name="cdf" href="http://www.autoplot.org/cdf-jnlp/cdf-3.3.0-hack.jnlp" > -->
+<!--        </extension>-->
         <!--<extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2.1a.jnlp" >  
         </extension>-->
         
