@@ -62,7 +62,7 @@ public class DataPanel extends javax.swing.JPanel {
         });
         doPanelBindings();
         doDataSourceFilterBindings();
-
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "dataPanel");
     }
 
     private void updateComponent() {
