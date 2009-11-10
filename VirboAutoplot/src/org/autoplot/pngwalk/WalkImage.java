@@ -42,7 +42,7 @@ public class WalkImage implements Comparable<WalkImage> {
 
     private static BufferedImage missingImage = initMissingImage();
 
-    private static LinkedList<WalkImage> freshness= new LinkedList();
+    private static final LinkedList<WalkImage> freshness= new LinkedList();
 
     //private java.util.concurrent.ThreadPoolExecutor reqProc= new ThreadPoolExecutor( 2, 4, 1, TimeUnit.MINUTES, workQueue );
     
@@ -129,7 +129,7 @@ public class WalkImage implements Comparable<WalkImage> {
     /**
      *
      * @param loadIfNeeded if false, then be reluctant to load the thumbnail.
-     * @return
+     * @return the thumbnail, or null if it is not loaded.
      */
     public BufferedImage getThumbnail(boolean loadIfNeeded) {
         switch (status) {
@@ -188,10 +188,12 @@ public class WalkImage implements Comparable<WalkImage> {
                         int height = (int) Math.round(Math.sqrt((THUMB_SIZE * THUMB_SIZE) / (aspect * aspect + 1)));
                         int width = (int) Math.round(height * aspect);
 
-                        BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
-                        thumb = resizeOp.filter(rawThumb, null);
-                        if (status == Status.THUMB_LOADING) {
-                            setStatus(Status.THUMB_LOADED);
+                        synchronized ( this ) {
+                            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
+                            thumb = resizeOp.filter(rawThumb, null);
+                            if (status == Status.THUMB_LOADING) {
+                                setStatus(Status.THUMB_LOADED);
+                            }
                         }
                     }
                 };
@@ -214,14 +216,16 @@ public class WalkImage implements Comparable<WalkImage> {
      */
     public BufferedImage getSquishedThumbnail( boolean loadIfNeeded ) {
         if (squishedThumb == null) {
-            if (thumb == null) {
-                if (getThumbnail(loadIfNeeded) == null) {
-                    return null;
+            synchronized ( this ) {
+                if (thumb == null) {
+                    if (getThumbnail(loadIfNeeded) == null) {
+                        return null;
+                    }
                 }
-            }
 
-            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth() / SQUASH_FACTOR, thumb.getHeight(), 0, 1, 1, 0, false);
-            squishedThumb = resizeOp.filter(thumb, null);
+                BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth() / SQUASH_FACTOR, thumb.getHeight(), 0, 1, 1, 0, false);
+                squishedThumb = resizeOp.filter(thumb, null);
+            }
         }
         return squishedThumb;
     }
