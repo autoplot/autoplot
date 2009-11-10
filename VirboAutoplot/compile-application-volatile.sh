@@ -213,6 +213,7 @@ cd temp-volatile-src
 $JAVA5_HOME/bin/javac -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
 $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar_pack200.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/pngwalk_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 #echo "proguard/pack200 stuff..."
