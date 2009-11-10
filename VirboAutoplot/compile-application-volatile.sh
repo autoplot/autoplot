@@ -199,8 +199,11 @@ cd ..
 
 echo "done make jumbo jar files..."
 
-echo "sign the jar files..."
+echo "normalize jar file before signing..."
+$JAVA5_HOME/bin/pack200 --repack dist/AutoplotVolatile.jar
+echo "sign and pack the jar file..."
 $JAVA5_HOME/bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
+$JAVA5_HOME/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 
 echo "create jnlp file for build..."
 cp src/autoplot_two_jar.jnlp dist
@@ -212,9 +215,9 @@ cd ..
 $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/pngwalk_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 
-echo "proguard/pack200 stuff..."
-$JAVA6_HOME/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
-echo "done proguard/pack200 stuff."
+#echo "proguard/pack200 stuff..."
+#$JAVA5_HOME/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
+#echo "done proguard/pack200 stuff."
 
 mv AutoplotStable.jar.pack.gz dist/
 
