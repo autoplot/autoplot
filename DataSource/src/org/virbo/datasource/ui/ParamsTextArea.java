@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextArea;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -85,11 +86,13 @@ public class ParamsTextArea extends JTextArea {
             List<CompletionContext> ccs = dsf.getCompletions(cc, new NullProgressMonitor());
             for ( int i=0; i<ccs.size(); i++ ) {
                 final CompletionContext acc= ccs.get(i);
-                popup.add( new AbstractAction( acc.label) {
+                JMenuItem mi= new JMenuItem( new AbstractAction( acc.label) {
                     public void actionPerformed(ActionEvent e) {
                         insert( acc.completable, pos );
                     }
                 } );
+                mi.setToolTipText(acc.doc);
+                popup.add( mi );
             }
             popup.show(this, e.getX(), e.getY() );
             
