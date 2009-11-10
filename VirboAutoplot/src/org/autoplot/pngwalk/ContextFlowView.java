@@ -152,129 +152,138 @@ public class ContextFlowView extends PngWalkView {
     @Override
     protected synchronized void paintComponent(Graphics g1) {
 
-        if ( seq==null ) return;
-        
-        Graphics2D g= (Graphics2D)g1;
+        if (seq == null)
+            return;
+
+        Graphics2D g = (Graphics2D) g1;
 
         Rectangle clip = g.getClipBounds();
-        g.clearRect( clip.x, clip.y, clip.width, clip.height );;
+        g.clearRect(clip.x, clip.y, clip.width, clip.height);
 
 
-            int shelfWidth= 40;    // width of the images to the right or left.
-            int currentWidth= 400; // width of the current image in the center.
+        int shelfWidth = 40;    // width of the images to the right or left.
+        int currentWidth = 400; // width of the current image in the center.
 
-            int xm = getWidth() / 2;
-            int y = Math.max( 200, getHeight() / 2 );
+        int xm = getWidth() / 2;
+        int y = Math.max(200, getHeight() / 2);
 
-            int columns = (xm - currentWidth/2 ) / shelfWidth;
+        int columns = (xm - currentWidth / 2) / shelfWidth;
 
-            int currentIndex= seq.getIndex();
+        int currentIndex = seq.getIndex();
 
-            firstIndexPainted= Math.max( 0, currentIndex - columns );
-            lastIndexPainted= Math.min( seq.size(), currentIndex + columns + 1 ); // exclusive
+        firstIndexPainted = Math.max(0, currentIndex - columns);
+        lastIndexPainted = Math.min(seq.size(), currentIndex + columns + 1); // exclusive
 
-            double sh= useSquashedThumbs ? 1. : 10.;
+        double sh = useSquashedThumbs ? 1. : 10.;
 
-            for (int i = 0; i < columns * 2 + 1; i++) {
+        for (int i = 0; i < columns * 2 + 1; i++) {
 
-                int index;
-                int d = columns - i / 2;
-                if (i % 2 == 0) {
-                    index = currentIndex - d;
-                } else {
-                    index = currentIndex + d;
+            int index;
+            int d = columns - i / 2;
+            if (i % 2 == 0) {
+                index = currentIndex - d;
+            } else {
+                index = currentIndex + d;
+            }
+            if (index < 0)
+                continue;
+            if (index >= seq.size())
+                continue;
+
+            boolean usedLastImage = false;
+            BufferedImage image = useSquashedThumbs ? seq.imageAt(index).getSquishedThumbnail() : seq.imageAt(index).getThumbnail();
+
+            if (image == null)
+                continue;
+
+            int height = image.getHeight();
+            int width = image.getWidth();
+
+            Rectangle bounds;
+
+            if (index < currentIndex) {
+                int x = xm - currentWidth / 2 + (index - currentIndex) * shelfWidth; // fudge
+
+                bounds = bounds(x, y, width, height, shelfWidth, Math.min(height, shelfWidth * 10), 1 / sh, false);
+                //bounds = bounds( x, y, width, height, shelfWidth, shelfWidth*10, 0.1, false);
+
+                BufferedImage cacheImage = getRightImage(image, width, height, bounds);
+
+                if (cacheImage == null) {
+                    continue;
                 }
-                if (index < 0) continue;
-                if (index >= seq.size() ) continue;
 
-                boolean usedLastImage = false;
-                BufferedImage image = useSquashedThumbs ? seq.imageAt(index).getSquishedThumbnail() : seq.imageAt(index).getThumbnail();
+                g.drawImage(cacheImage, bounds.x, bounds.y, this);
+                //g.draw(op.getOutline(bounds.x, bounds.y));
 
-                if ( image==null ) continue;
-                
-                int height = image.getHeight();
-                int width = image.getWidth();
+            } else if (index == currentIndex) {
+                int x = xm;
 
-                Rectangle bounds;
+                image = seq.imageAt(index).getImage();
+                if (image == null) {
+                    image = seq.imageAt(index).getThumbnail();
 
-                if (index < currentIndex) {
-                    int x = xm - currentWidth/2 + (index - currentIndex) * shelfWidth ; // fudge
+                    height = image.getHeight();
+                    width = image.getWidth();
 
-                        bounds = bounds( x, y, width, height, shelfWidth, Math.min( height, shelfWidth*10 ), 1/sh, false);
-                        //bounds = bounds( x, y, width, height, shelfWidth, shelfWidth*10, 0.1, false);
-
-                        BufferedImage cacheImage = getRightImage( image, width, height, bounds );
-
-                        if (cacheImage == null) {
-                            continue;
-                        }
-
-                        g.drawImage( cacheImage, bounds.x, bounds.y, this );
-                        //g.draw(op.getOutline(bounds.x, bounds.y));
-
-                } else if (index == currentIndex) {
-                    int x = xm;
-
-                    image = seq.imageAt(index).getImage();
-                    if ( image==null ) {
-                        image= seq.imageAt(index).getThumbnail();
-                        
-                        height = image.getHeight();
-                        width = image.getWidth();
-
-                        bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
-
+                    if (width > height) {
+                        //allowing such images to take full width reduces flicker
+                        bounds = bounds(x, y, width, height, currentWidth, 10000, 1.0, false);
                     } else {
-
-                        height = image.getHeight();
-                        width = image.getWidth();
-
                         bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
                     }
-                    //if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
-                    //    lastImage = image;
-                    //}
-                    //g.draw(bounds);
 
-                    BufferedImage im;
-                    if (image instanceof BufferedImage) {
-                                im = (BufferedImage) image;
-                            } else {
-                                im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                                if ( !im.getGraphics().drawImage(image, 0, 0, this) ) {
-                                    continue;
-                                }
-                            }
-                     //addBorder(im,1);
-                    ScalePerspectiveImageOp op = new ScalePerspectiveImageOp( width, height,
-                            0, 0, bounds.width, bounds.height, 100, -1, -1,
-                           0. , true);
-                    g.drawImage(im, op, bounds.x, bounds.y );
-                        //lastImage = image;
-                        
-                    maybeTimeStamp(g, bounds, seq.imageAt(index).getCaption() );
-
-                    //if (usedLastImage) drawMomentStr(g, bounds);
                 } else {
-                    int x = xm + currentWidth/2 + (index - currentIndex)  * shelfWidth;
 
-                    bounds = bounds(x, y, width, height, shelfWidth, Math.min( height, shelfWidth*10 ), 1/sh, false);
+                    height = image.getHeight();
+                    width = image.getWidth();
 
-                        Image cacheImage = getLeftImage( image, width, height, bounds );
+                    bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
+                }
+                //if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
+                //    lastImage = image;
+                //}
+                //g.fill(bounds);
 
-                        if (cacheImage == null) {
-                            continue;
-                        }
+                BufferedImage im;
+                if (image instanceof BufferedImage) {
+                    im = (BufferedImage) image;
+                } else {
+                    im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+                    if (!im.getGraphics().drawImage(image, 0, 0, this)) {
+                        continue;
+                    }
+                }
+                //addBorder(im,1);
+                ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(width, height,
+                        0, 0, bounds.width, bounds.height, 100, -1, -1,
+                        0., true);
+                g.drawImage(im, op, bounds.x, bounds.y);
+                //lastImage = image;
 
-                        g.drawImage( cacheImage, bounds.x, bounds.y, this );
-                        //g.draw(op.getOutline(bounds.x, bounds.y));
-                    //if (usedLastImage) drawMomentStr(g, bounds);
+                maybeTimeStamp(g, bounds, seq.imageAt(index).getCaption());
+
+                //if (usedLastImage) drawMomentStr(g, bounds);
+            } else {
+                int x = xm + currentWidth / 2 + (index - currentIndex) * shelfWidth;
+
+                bounds = bounds(x, y, width, height, shelfWidth, Math.min(height, shelfWidth * 10), 1 / sh, false);
+
+                Image cacheImage = getLeftImage(image, width, height, bounds);
+
+                if (cacheImage == null) {
+                    continue;
                 }
 
-                imageBounds.set( index, bounds );
+                g.drawImage(cacheImage, bounds.x, bounds.y, this);
+                //g.draw(op.getOutline(bounds.x, bounds.y));
+                //if (usedLastImage) drawMomentStr(g, bounds);
+                }
 
-            }
-        
+            imageBounds.set(index, bounds);
+
+        }
+
     }
 
 

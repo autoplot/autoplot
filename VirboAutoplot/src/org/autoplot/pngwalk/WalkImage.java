@@ -145,7 +145,6 @@ public class WalkImage implements Comparable<WalkImage> {
                 return thumb;   //TODO: May be null; use error placeholder?
 
             case MISSING:
-                // TODO: should return a placeholder?
                 return missingImage;
 
             case UNKNOWN:
@@ -215,6 +214,8 @@ public class WalkImage implements Comparable<WalkImage> {
      * @return
      */
     public BufferedImage getSquishedThumbnail( boolean loadIfNeeded ) {
+        if (status == Status.MISSING)
+            return missingImage;
         if (squishedThumb == null) {
             synchronized ( this ) {
                 if (thumb == null) {
@@ -222,9 +223,10 @@ public class WalkImage implements Comparable<WalkImage> {
                         return null;
                     }
                 }
-
-                BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth() / SQUASH_FACTOR, thumb.getHeight(), 0, 1, 1, 0, false);
-                squishedThumb = resizeOp.filter(thumb, null);
+                if (thumb != null) {  //might be loading on another thread
+                    BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, thumb.getWidth() / SQUASH_FACTOR, thumb.getHeight(), 0, 1, 1, 0, false);
+                    squishedThumb = resizeOp.filter(thumb, null);
+                }
             }
         }
         return squishedThumb;
