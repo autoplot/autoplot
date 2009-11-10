@@ -3,4 +3,5 @@
     <indexitem target="aphelp_main" text="Introduction to Autoplot"/>
     <indexitem target="axisPanel" text="Axis Panel"/>
     <indexitem target="layoutPanel" text="Layout Panel"/>
+    <indexitem target="dataPanel" text="Data Panel"/>
 </index>

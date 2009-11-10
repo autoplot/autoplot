@@ -3,4 +3,5 @@
     <mapID target="aphelp_main" url="html/autoplot.html"/>
     <mapID target="axisPanel" url="html/axisPanel.html"/>
     <mapID target="layoutPanel" url="html/layoutPanel.html"/>
+    <mapID target="dataPanel" url="html/dataPanel.html"/>
 </map>

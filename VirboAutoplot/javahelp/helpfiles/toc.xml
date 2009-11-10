@@ -5,5 +5,6 @@
     <tocitem text="Panels">
         <tocitem target="axisPanel" text="Axis Panel"/>
         <tocitem target="layoutPanel" text="Layout Panel"/>
+        <tocitem target="dataPanel" text="Data Panel"/>
     </tocitem>
 </toc>
