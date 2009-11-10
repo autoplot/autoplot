@@ -29,6 +29,9 @@ public class LayoutUtil {
         double excess = -1 * (c.getEmMaximum() - em);
         if (ALLOW_EXCESS_SPACE && c.getMaximum() == norm && excess >= 0 && excess < 4) return false;
         if (Math.abs(c.getEmMaximum() - em) < 0.1 && Math.abs(norm - c.getMaximum()) < 0.001) return false;
+        if ( Math.abs(em)>100 ) {
+            System.err.println("autolayout failure.");
+        }
         c.setMaximum(norm);
         c.setEmMaximum(em);
         c.setPtMaximum(pt);
@@ -36,11 +39,24 @@ public class LayoutUtil {
         return true;
     }
 
+    /**
+     *
+     * @param c
+     * @param need
+     * @param norm
+     * @param em
+     * @param pt
+     * @return return true if it was changed
+     */
     private static boolean maybeSetMinimum(final DasDevicePosition c, double need, double norm, double em, int pt) {
         em = Math.ceil(em);
         double excess = c.getEmMinimum() - em;
         if (ALLOW_EXCESS_SPACE && c.getMinimum() == norm && excess >= 0 && excess < 4) return false;
         if (Math.abs(c.getEmMinimum() - em) < 0.1 && Math.abs(norm - c.getMinimum()) < 0.001) return false;
+
+        if ( Math.abs(em)>100 ) {
+            System.err.println("autolayout failure.");
+        }
         c.setMinimum(norm);
         c.setEmMinimum(em);
         c.setPtMinimum(pt);
@@ -86,6 +102,11 @@ public class LayoutUtil {
             }
         }
 
+        if ( xmin==90000 || xmax==-90000 || ymin==90000 || ymax==-90000 ) {
+            //System.err.println("marching axis state?");
+           // return;
+        }
+
         bounds = getChildBounds(c);
         if (bounds != null) {
             xmin = Math.min(xmin, bounds.x);
@@ -106,6 +127,10 @@ public class LayoutUtil {
 
         boolean changed = false;
 
+        if ( Math.abs(ymin)>9999 || Math.abs(ymax)>9999 || Math.abs(ymin)>9999 || Math.abs(ymax)>9999  ) {
+            System.err.println("invalid bounds returned, returning.");
+            return;
+        }
         int old, need;
         old = c.getDMinimum();
         need = old - xmin;
