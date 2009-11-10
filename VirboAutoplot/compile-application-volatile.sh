@@ -207,7 +207,9 @@ $JAVA5_HOME/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.
 
 echo "create jnlp file for build..."
 cp src/autoplot_two_jar.jnlp dist
+cp src/autoplot_two_jar_pack200.jnlp dist
 cp src/pngwalk_two_jar.jnlp dist
+
 
 cd temp-volatile-src
 $JAVA5_HOME/bin/javac -d ../temp-volatile-classes external/FileSearchReplace.java
