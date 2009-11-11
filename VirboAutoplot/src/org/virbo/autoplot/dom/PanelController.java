@@ -149,7 +149,7 @@ public class PanelController extends DomNodeController {
 
         public void propertyChange(PropertyChangeEvent evt) {
             logger.fine("panelListener: " + evt.getPropertyName() + " " + evt.getOldValue() + "->" + evt.getNewValue());
-            if (evt.getPropertyName().equals(Panel.PROP_RENDERTYPE)) {
+            if ( evt.getPropertyName().equals(Panel.PROP_RENDERTYPE) && !PanelController.this.isValueAdjusting() ) {
                 RenderType newRenderType = (RenderType) evt.getNewValue();
                 RenderType oldRenderType = (RenderType) evt.getOldValue();
                 Panel parentPanel= getParentPanel();
@@ -1238,7 +1238,10 @@ public class PanelController extends DomNodeController {
             ch.renderType= renderType;  // we don't want to enter doResetRenderType.
             ch.getController().maybeCreateDasPeer();
         }
-
+        MutatorLock lock= this.mutatorLock();
+        lock.lock();
+        panel.propertyChangeSupport.firePropertyChange( panel.PROP_RENDERTYPE, null, renderType );
+        lock.unlock();
         maybeCreateDasPeer();
     }
 
