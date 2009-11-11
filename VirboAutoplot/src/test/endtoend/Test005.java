@@ -79,13 +79,15 @@ public class Test005 {
             plot("http://autoplot.org/data/autoplot.xml");
             writeToPng("test005_demo6.png");
             xxx("demo6");
-            plot("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_1963.dat");
+            //String omniSrc= "ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/";
+            String omniSrc= "file:/root/autoplot_data/ftp/nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/";
+            plot( omniSrc + "/omni2_1963.dat");
             writeToPng("test005_demo7.png");
             xxx("demo7");
-            plot("ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?timerange=1963-1965");
+            plot( omniSrc + "/omni2_$Y.dat?timerange=1963-1965");
             writeToPng("test005_demo8.png");
             xxx("demo8");
-            plot("vap:ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/omni2_$Y.dat?column=field17&timeFormat=$Y+$j+$H&time=field0&validMax=999&timerange=1972");
+            plot( omniSrc + "omni2_$Y.dat?column=field17&timeFormat=$Y+$j+$H&time=field0&validMax=999&timerange=1972");
             writeToPng("test005_demo9.png");
             xxx("demo9");
             plot("http://autoplot.org/data/autoplot.ncml");
