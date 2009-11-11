@@ -5,16 +5,11 @@
 package org.virbo.autoplot.state;
 
 import java.awt.Color;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.ParseException;
 import org.virbo.autoplot.dom.*;
 import java.beans.BeanInfo;
 import java.beans.IndexedPropertyDescriptor;
 import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,9 +17,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.das2.beans.BeansUtil;
 import org.das2.datum.Datum;
 import org.das2.graph.DasColorBar;
@@ -33,9 +25,7 @@ import org.das2.graph.PlotSymbol;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.system.DasLogger;
-import org.das2.util.AboutUtil;
 import org.virbo.autoplot.RenderType;
-import org.virbo.autoplot.ScriptContext;
 import org.virbo.qstream.SerializeDelegate;
 import org.virbo.qstream.SerializeRegistry;
 import org.virbo.qstream.XMLSerializeDelegate;
@@ -43,8 +33,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -336,45 +324,4 @@ public class SerializeUtil {
         }
     }
 
-    public static void main( String[] args ) throws FileNotFoundException, SAXException, IOException, ParseException {
-
-        Application dom= ScriptContext.getDocumentModel();
-
-        Document document=null;
-        try {
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        } catch (ParserConfigurationException ex) {
-            Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        }
-        Element element = SerializeUtil.getDomElement( document, (DomNode)dom, "org.virbo.autoplot.dom" );
-
-        Element vap= document.createElement("vap");
-        vap.appendChild(element);
-        vap.setAttribute( "domVersion", "1.0" );
-        vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
-
-        document.appendChild(vap);
-        StatePersistence.writeDocument( new File("/home/jbf/tmp/foo2.vapx" ), document);
-
-
-        InputStreamReader isr = new InputStreamReader( new FileInputStream( "/home/jbf/tmp/foo2.vapx" ) );
-
-        try {
-            DocumentBuilder builder;
-            builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            InputSource source = new InputSource(isr);
-            document = builder.parse(source);
-
-            vap=  document.getDocumentElement();
-            Element child= StatePersistence.getChildElement(vap,"Application");
-
-            DomNode n= getDomNode( child, "org.virbo.autoplot.dom" );
-
-            System.err.println( n.diffs(dom) ); // should be none!
-
-        } catch (ParserConfigurationException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
 }
