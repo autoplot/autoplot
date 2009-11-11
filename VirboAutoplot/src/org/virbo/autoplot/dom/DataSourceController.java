@@ -594,7 +594,7 @@ public class DataSourceController extends DomNodeController {
         if ( cadence!=null && "log".equals(cadence.property(QDataSet.SCALE_TYPE) ) ) {
             xds.putProperty( QDataSet.SCALE_TYPE, "log" );
         }
-        xds.putProperty(QDataSet.CADENCE, cadence);
+        if ( cadence!=null ) xds.putProperty(QDataSet.CADENCE, cadence);
     }
     /**
      * the fill parameters have changed, so update the auto range stats.
