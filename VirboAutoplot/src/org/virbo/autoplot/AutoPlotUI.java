@@ -25,6 +25,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.PersistentStateSupport;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -62,6 +63,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.autoplot.pngwalk.PngWalkTool1;
 import org.das2.DasApplication;
@@ -975,12 +977,13 @@ public class AutoPlotUI extends javax.swing.JFrame {
         editMenu.setToolTipText("Edit the DOM, which is the internal application state.\n");
 
         undoMenuItem.setAction(undoRedoSupport.getUndoAction());
-        undoMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Z, java.awt.event.InputEvent.CTRL_MASK));
+        undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
         undoMenuItem.setText("Undo");
         editMenu.add(undoMenuItem);
 
         redoMenuItem.setAction(undoRedoSupport.getRedoAction());
-        redoMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_Y, java.awt.event.InputEvent.CTRL_MASK));
+        redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         redoMenuItem.setText("Redo");
         editMenu.add(redoMenuItem);
 
@@ -1033,7 +1036,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         viewMenu.setText("View");
 
-        resetZoomMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+        resetZoomMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         resetZoomMenuItem.setText("Reset Zoom");
         resetZoomMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1172,7 +1175,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         jMenu2.setText("Text Size");
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_EQUALS, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         jMenuItem1.setText("Bigger");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1181,7 +1184,8 @@ public class AutoPlotUI extends javax.swing.JFrame {
         });
         jMenu2.add(jMenuItem1);
 
-        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_MINUS, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem2.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())
+        );
         jMenuItem2.setText("Smaller");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

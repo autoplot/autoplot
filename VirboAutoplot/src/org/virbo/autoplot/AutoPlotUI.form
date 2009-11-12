@@ -23,8 +23,8 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="undoRedoSupport.getUndoAction()" type="code"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+Z"/>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())&#xa;" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Undo"/>
               </Properties>
@@ -34,8 +34,8 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="undoRedoSupport.getRedoAction()" type="code"/>
                 </Property>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+Y"/>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyStroke.getKeyStroke(KeyEvent.VK_Y,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Redo"/>
               </Properties>
@@ -98,8 +98,8 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="resetZoomMenuItem">
               <Properties>
-                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                  <KeyStroke key="Ctrl+R"/>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                  <Connection code="KeyStroke.getKeyStroke(KeyEvent.VK_R,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Reset Zoom"/>
               </Properties>
@@ -263,8 +263,8 @@
               <SubComponents>
                 <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
                   <Properties>
-                    <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                      <KeyStroke key="Ctrl+EQUALS"/>
+                    <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())" type="code"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Bigger"/>
                   </Properties>
@@ -274,8 +274,8 @@
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
                   <Properties>
-                    <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
-                      <KeyStroke key="Ctrl+MINUS"/>
+                    <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                      <Connection code="KeyStroke.getKeyStroke(KeyEvent.VK_MINUS,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())&#xa;" type="code"/>
                     </Property>
                     <Property name="text" type="java.lang.String" value="Smaller"/>
                   </Properties>
