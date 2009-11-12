@@ -6,6 +6,7 @@
 package org.virbo.jythonsupport.ui;
 
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -29,14 +30,14 @@ public class EditorTextPane extends JTextPane {
 
         getActionMap().put( "undo", new AbstractAction( undo.getUndoPresentationName() ) {
             public void actionPerformed( ActionEvent e ) {
-                undo.undo();
+                if ( undo.canUndo() ) undo.undo();
             }
         });
 
         getActionMap().put( "redo", new AbstractAction( undo.getRedoPresentationName() ) {
             public void actionPerformed( ActionEvent e ) {
                try {
-                    undo.redo();
+                    if ( undo.canRedo() ) undo.redo();
                } catch ( javax.swing.undo.CannotRedoException ex ) {
                    
                }
@@ -61,10 +62,12 @@ public class EditorTextPane extends JTextPane {
             }
         } );
 
-        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK ), "undo" );
-        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK ), "redo" );
-        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, KeyEvent.CTRL_DOWN_MASK ), "biggerFont" );
-        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK ), "smallerFont" );
+        Toolkit tk= Toolkit.getDefaultToolkit();
+
+        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Z,tk.getMenuShortcutKeyMask() ), "undo" );
+        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_Y,tk.getMenuShortcutKeyMask() ), "redo" );
+        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
+        getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
     }
 
 
