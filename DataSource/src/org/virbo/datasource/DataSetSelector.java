@@ -669,9 +669,10 @@ public class DataSetSelector extends javax.swing.JPanel {
     }//GEN-LAST:event_plotItButtonActionPerformed
 
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
-        final String context = (String) dataSetSelector.getSelectedItem();
-
-        String ext = DataSetURI.getExt(context);
+        String context = (String) dataSetSelector.getSelectedItem();
+        if ( context==null ) context= "";
+        String ext = context==null ? "" : DataSetURI.getExt(context);
+        final String fcontext= context;
 
         if ( enableDataSource && ( context.trim().length()==0 || context.trim().equals("vap+") ) ) {
             showCompletions();
@@ -691,7 +692,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                                         SwingUtilities.getWindowAncestor(DataSetSelector.this),
                                         "downloading "+split.file.substring(split.path.length()) );
                                     try {
-                                        FileSystemUtil.doDownload(context, mon);
+                                        FileSystemUtil.doDownload(fcontext, mon);
                                     } catch (Exception ex) {
                                         FileSystem.getExceptionHandler().handle(ex);
                                     }
