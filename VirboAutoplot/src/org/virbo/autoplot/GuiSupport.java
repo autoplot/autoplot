@@ -468,13 +468,15 @@ public class GuiSupport {
         });
 
         InputMap map = new ComponentInputMap(thisPanel);
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_DOWN_MASK), "UNDO");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_DOWN_MASK), "REDO");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), "RESET_ZOOM");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, KeyEvent.CTRL_DOWN_MASK), "DECREASE_FONT_SIZE");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "INCREASE_FONT_SIZE");  // american keyboard
+
+        Toolkit tk= Toolkit.getDefaultToolkit();
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, tk.getMenuShortcutKeyMask() ), "UNDO");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, tk.getMenuShortcutKeyMask() ), "REDO");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, tk.getMenuShortcutKeyMask() ), "RESET_ZOOM");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask()), "DECREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, tk.getMenuShortcutKeyMask()), "INCREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask()), "INCREASE_FONT_SIZE");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK | tk.getMenuShortcutKeyMask()), "INCREASE_FONT_SIZE");  // american keyboard
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.CTRL_DOWN_MASK), "NEXT_PANEL");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "PREV_PANEL");
         thisPanel.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, map);
