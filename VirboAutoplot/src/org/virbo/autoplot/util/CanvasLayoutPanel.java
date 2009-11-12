@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -69,7 +70,7 @@ public class CanvasLayoutPanel extends JLabel {
                             bounds.width * mwidth / twidth,
                             bounds.height * mwidth / twidth);
                     if (mbounds.contains(e.getX(), e.getY())) {
-                        if ( e.getModifiersEx()==MouseEvent.CTRL_DOWN_MASK ) {
+                        if ( e.getModifiersEx()== Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ) {
                             if ( selectedComponents.contains(c) ) {
                                 selectedComponents.remove(c);
                                 component = null;
@@ -84,7 +85,7 @@ public class CanvasLayoutPanel extends JLabel {
                         }
                         repaint();
                         firePropertyChange(PROP_COMPONENT, null, c);
-                        if ( e.getModifiers()==MouseEvent.CTRL_DOWN_MASK ) {
+                        if ( e.getModifiers()==Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ) {
                             firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
                         }
                     }
