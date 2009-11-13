@@ -223,6 +223,7 @@ $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/p
 #echo "done proguard/pack200 stuff."
 
 mv AutoplotStable.jar.pack.gz dist/
+mv AutoplotStable.jar dist/
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
 cp src/htaccess.txt dist/
