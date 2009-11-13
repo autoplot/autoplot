@@ -9,6 +9,8 @@
 
 package org.virbo.netCDF;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +38,18 @@ public class NetCDFDataSource extends AbstractDataSource {
     Variable variable;
     String sMyUrl;
     String svariable;
-    
+
+    static {
+        try {
+            NetcdfFile.registerIOProvider("org.virbo.netCDF.APIOServiceProvider");
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(NetCDFDataSource.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(NetCDFDataSource.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(NetCDFDataSource.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     /** Creates a new instance of NetCDFDataSource */
     public NetCDFDataSource( URI uri ) throws IOException {
         super(uri);
