@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -66,6 +67,34 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         return jythonScript;
     }
 
+    private String nextExec( LineNumberReader reader, String[] nextLine ) throws IOException {
+        String s;
+        if ( nextLine[0]!=null ) {
+            s= nextLine[0];
+            nextLine[0]= null;
+        } else {
+            s = reader.readLine();
+        }
+        if ( s!=null && ( s.startsWith("def ") || s.startsWith("if") || s.startsWith("else") ) ) {
+            String s1= reader.readLine();
+            while ( s1!=null && ( s1.length()==0 || Character.isWhitespace(s1.charAt(0)) ) ) {
+                s= s+"\n"+s1;
+                s1= reader.readLine();
+            }
+            while ( s1.startsWith("else") ) {  // TODO: under implementation, use python parser for ideal solution
+                s= s+"\n"+s1;
+                s1= reader.readLine();
+                while ( s1!=null && ( s1.length()==0 || Character.isWhitespace(s1.charAt(0)) ) ) {
+                   s= s+"\n"+s1;
+                    s1= reader.readLine();
+                }
+            }
+            nextLine[0]= s1;
+        }
+
+        return s;
+    }
+
     @Override
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
@@ -112,38 +141,24 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 interp.set("resourceURI", resourceURI);
                 
                 mon.setProgressMessage( "executing script");
-                int iline = -1;
+                
+                LineNumberReader reader=null;
                 try {
-                    boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
+                    boolean debug = true;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
-                        iline=0;
-                        BufferedReader reader = new BufferedReader(new FileReader( jythonScript ) );
-                        String s = reader.readLine();
-                        iline++;
+                        reader = new LineNumberReader( new FileReader( jythonScript ) );
+                        String[] nextLine= new String[1];
+
+                        String s = nextExec( reader, nextLine );
                         long t0= System.currentTimeMillis();
-                        String s1= null;
                         while (s != null) {
-                            Logger.getLogger("virbo.jythondatasource").fine("" + iline + ": " + s);
+                            Logger.getLogger("virbo.jythondatasource").fine("" + reader.getLineNumber() + ": " + s);
                             interp.exec(s);
-                            System.err.printf("line=%d time=%dms  %s\n", iline, (System.currentTimeMillis()-t0), s );
-                            t0= System.currentTimeMillis();
-                            if ( s1!=null ) {
-                                s= s1;
-                                s1= null;
-                            } else {
-                                s = reader.readLine();
-                                iline++;
-                            }
-                            if ( s.startsWith("def ") ) {
-                                s1= reader.readLine();
-                                iline++;
-                                while ( s1!=null && ( s1.length()==0 || Character.isWhitespace(s1.charAt(0)) ) ) {
-                                    s= s+"\n"+s1;
-                                    s1= reader.readLine();
-                                    iline++;
-                                }
-                            }
+                            System.err.printf("line=%d time=%dms  %s\n", reader.getLineNumber(), (System.currentTimeMillis()-t0), s );
                             if ( mon.isCancelled() ) break;
+                            mon.setProgressMessage("exec line "+reader.getLineNumber() );
+                            s = nextExec( reader, nextLine );
+                            t0= System.currentTimeMillis();
                         }
 
                     } else {
@@ -151,9 +166,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     }
                     mon.setProgressMessage( "done executing script");
                 } catch (PyException ex) {
-                    if ( iline!=-1 ) {
+                    if ( reader!=null ) {
                         //ex.lineno= ex.lineno+iline;
-                        System.err.println("debugging line number="+iline);
+                        System.err.println("debugging line number="+reader.getLineNumber());
                     }
                     causedBy = ex;
                     ex.printStackTrace();
@@ -163,7 +178,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 } catch (Exception ex) {
                     throw ex;
                 }
-
+                reader=null;
+                
                 if (causedBy == null) {
                     cacheDate = resourceDate(this.uri);
                     cacheUrl = cacheUrl(this.uri);
