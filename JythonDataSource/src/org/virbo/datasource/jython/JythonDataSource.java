@@ -112,24 +112,49 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 interp.set("resourceURI", resourceURI);
                 
                 mon.setProgressMessage( "executing script");
+                int iline = -1;
                 try {
                     boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
-                        int i = 0;
+                        iline=0;
                         BufferedReader reader = new BufferedReader(new FileReader( jythonScript ) );
                         String s = reader.readLine();
-                        i++;
+                        iline++;
+                        long t0= System.currentTimeMillis();
+                        String s1= null;
                         while (s != null) {
-                            Logger.getLogger("virbo.jythondatasource").fine("" + i + ": " + s);
+                            Logger.getLogger("virbo.jythondatasource").fine("" + iline + ": " + s);
                             interp.exec(s);
-                            s = reader.readLine();
-                            i++;
+                            System.err.printf("line=%d time=%dms  %s\n", iline, (System.currentTimeMillis()-t0), s );
+                            t0= System.currentTimeMillis();
+                            if ( s1!=null ) {
+                                s= s1;
+                                s1= null;
+                            } else {
+                                s = reader.readLine();
+                                iline++;
+                            }
+                            if ( s.startsWith("def ") ) {
+                                s1= reader.readLine();
+                                iline++;
+                                while ( s1!=null && ( s1.length()==0 || Character.isWhitespace(s1.charAt(0)) ) ) {
+                                    s= s+"\n"+s1;
+                                    s1= reader.readLine();
+                                    iline++;
+                                }
+                            }
+                            if ( mon.isCancelled() ) break;
                         }
+
                     } else {
                         interp.execfile(new FileInputStream( jythonScript ));
                     }
                     mon.setProgressMessage( "done executing script");
                 } catch (PyException ex) {
+                    if ( iline!=-1 ) {
+                        //ex.lineno= ex.lineno+iline;
+                        System.err.println("debugging line number="+iline);
+                    }
                     causedBy = ex;
                     ex.printStackTrace();
                     if (listener != null) {
