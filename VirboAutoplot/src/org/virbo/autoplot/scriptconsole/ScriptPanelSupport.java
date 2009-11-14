@@ -102,7 +102,7 @@ public class ScriptPanelSupport {
             file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
             loadFile(file);
             panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
-            panel.setFilename(sfile);
+            panel.setFilename(file.toString());
         } catch (NullPointerException ex) {
             Logger.getLogger(JythonScriptPanel.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -153,6 +153,8 @@ public class ScriptPanelSupport {
 
     protected void loadFile(File file) throws IOException, FileNotFoundException {
         InputStream r= new FileInputStream(file);
+        this.file= file;
+        panel.setFilename( file.toString() );
         loadInputStream( r );
         if (file.toString().endsWith(".jyds")) {
             panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
