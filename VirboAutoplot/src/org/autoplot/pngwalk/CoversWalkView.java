@@ -72,8 +72,8 @@ public class CoversWalkView extends PngWalkView  {
 
                     public void run() {
                         Rectangle bounds = scrollPane.getViewport().getViewRect();
-                        int first = (int) Math.floor(bounds.x / cellWidth);
-                        int last = Math.min(seq.size(), (int) Math.ceil((bounds.x + bounds.width) / cellWidth + 1));
+                        int first = bounds.x / cellWidth;
+                        int last = Math.min(seq.size(), (bounds.x + bounds.width) / cellWidth + 1);
                         for(int i=first; i<last; i++) {
                             seq.imageAt(i).getThumbnail(true);
                         }
@@ -192,8 +192,8 @@ public class CoversWalkView extends PngWalkView  {
             }
 
             int cellWidth = (cellSize / HEIGHT_WIDTH_RATIO);
-            int i = (int) Math.floor(bounds.x / cellWidth);
-            int imax = Math.min(seq.size() - 1, (int) Math.ceil((bounds.x + bounds.width) / cellWidth));
+            int i = bounds.x / cellWidth;
+            int imax = Math.min(seq.size() - 1, (bounds.x + bounds.width) / cellWidth);
 
             //double pp= perspective ? 0.05 : 0.0;
             double pp= perspective ? ( useSquished ? 0.50 : 0.05 ) : 0.0;

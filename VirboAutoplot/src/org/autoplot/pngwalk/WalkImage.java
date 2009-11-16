@@ -7,6 +7,7 @@ import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
@@ -24,7 +25,8 @@ import org.virbo.datasource.URISplit;
  * 
  * @author Ed Jackson
  */
-public class WalkImage implements Comparable<WalkImage> {
+// TODO: implementation of Comparable wasn't being used and was incomplete.  Will we ever need it?
+public class WalkImage /*implements Comparable<WalkImage>*/ {
 
     public static final String PROP_STATUS_CHANGE = "status"; // this should to be the same as the property name to be beany.
     public static final int THUMB_SIZE = 400;
@@ -169,7 +171,7 @@ public class WalkImage implements Comparable<WalkImage> {
                             File localFile = fo.getFile();
                             rawThumb = ImageIO.read(localFile);
 
-                        } catch (Exception e) {
+                        } catch (IOException ex) {
                             // Assume the error is that the thumbs folder doesn't exist; other errors
                             // will occur again in loadImage()
                             //System.err.println("Thumb dir doesn't exist; using image.");
@@ -181,6 +183,10 @@ public class WalkImage implements Comparable<WalkImage> {
                             }
                             rawThumb = im;
 
+                        } catch (URISyntaxException ex) {
+                            //This should never happen; what would break if it it did?
+                            Logger.getLogger(WalkImage.class.getName()).log(Level.WARNING, null, ex);
+                            return;
                         }
                         double aspect = (double) rawThumb.getWidth() / (double) rawThumb.getHeight();
 
@@ -294,10 +300,9 @@ public class WalkImage implements Comparable<WalkImage> {
     }
     // Implementing the Comparable interface lets List sort
     //TODO: Compare on date information first
-    public int compareTo(WalkImage o) {
-        return imgURI.compareTo(o.imgURI);
-    }
-
+/*public int compareTo(WalkImage o) {
+    return imgURI.compareTo(o.imgURI);
+    }*/
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }

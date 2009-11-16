@@ -24,7 +24,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     protected boolean showCaptions = false;
     //protected boolean showMissing = false;  //Should view show placeholder for missing files?
 
-    protected static BufferedImage loadingImage = initLoadingImage();
+    protected static final BufferedImage loadingImage = initLoadingImage();
 
     protected PngWalkView(WalkImageSequence sequence) {
         setSequence(sequence);
@@ -131,7 +131,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
 
     protected void paintImageCentered(BufferedImage i, Graphics2D g2, String caption) {
         FontMetrics fm = this.getFontMetrics(this.getFont());
-        double captionHeight=  ( showCaptions & caption!=null ) ? ( fm.getHeight() + fm.getDescent() ) : 0 ;
+        double captionHeight=  ( showCaptions && caption!=null ) ? ( fm.getHeight() + fm.getDescent() ) : 0 ;
         double imageHeight= i.getHeight();
         double xfactor = (double) getWidth() / (double) i.getWidth(null);
         double yfactor = (double) ( getHeight()-captionHeight ) / (double) imageHeight;

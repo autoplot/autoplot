@@ -81,8 +81,8 @@ public class RowPngWalkView extends PngWalkView {
 
                     public void run() {
                         Rectangle bounds = scrollPane.getViewport().getViewRect();
-                        int first = (int) Math.floor(bounds.x / cellSize);
-                        int last = Math.min(seq.size(), (int) Math.ceil((bounds.x + bounds.width) / cellSize + 1));
+                        int first = bounds.x / cellSize;
+                        int last = Math.min(seq.size(), (bounds.x + bounds.width) / cellSize + 1);
                         for(int i=first; i<last; i++) {
                             seq.imageAt(i).getThumbnail(true);
                         }
@@ -204,8 +204,8 @@ public class RowPngWalkView extends PngWalkView {
                 return;
             }
 
-            int i = (int) Math.floor(bounds.x / cellSize);
-            int imax = Math.min(seq.size() - 1, (int) Math.ceil((bounds.x + bounds.width) / cellSize));
+            int i = bounds.x / cellSize;
+            int imax = Math.min(seq.size() - 1, (bounds.x + bounds.width) / cellSize);
 
             //System.out.printf("First: %d, Last: %d%n", i, imax);
             for (; i <= imax; i++) {
