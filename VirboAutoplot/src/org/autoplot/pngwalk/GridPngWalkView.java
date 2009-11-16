@@ -32,7 +32,7 @@ import javax.swing.event.ChangeListener;
  */
 public class GridPngWalkView extends PngWalkView {
 
-    private int thumbSize = 100;
+    private int thumbSize = 200;
     private int nCols = 1;
     private static final int MIN_THUMB_SIZE = 20;
     private static final int MAX_THUMB_SIZE = 300;
