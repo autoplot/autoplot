@@ -17,8 +17,12 @@ import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import org.das2.datum.EnumerationUnits;
+import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.Slice0DataSet;
+import org.virbo.dataset.TrimDataSet;
 import org.virbo.dataset.WritableDataSet;
 
 /**
@@ -132,6 +136,20 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         throw new IllegalArgumentException("rank limit");
     }
 
+
+    public <T> T capability(Class<T> clazz) {
+        return null;
+    }
+
+    public QDataSet slice(int i) {
+        return new Slice0DataSet(this, i);
+    }
+
+    public QDataSet trim(int start, int end) {
+        return new TrimDataSet(this, start, end);
+    }
+
+
     public static class Int32Array extends DodsVarDataSet {
 
         int[] back;
@@ -210,6 +228,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
         public void putValue(int i0, int i1, int i2, double d) {
             back[i0 * dimSizes[1] * dimSizes[2] + i1 * dimSizes[2] + i2]= putIntValue(d);
         }
+
     }
 
     public static class Int16Array extends DodsVarDataSet {
@@ -521,6 +540,7 @@ public abstract class DodsVarDataSet implements WritableDataSet {
     static DodsVarDataSet newDataSet(DArray z, HashMap properties) {
         Object o = z.getPrimitiveVector().getInternalStorage();
         if (o instanceof double[]) {
+            DDataSet.wrap((double[])o);
             return new DodsVarDataSet.DoubleArray(z, properties);
         } else if (o instanceof float[]) {
             return new DodsVarDataSet.FloatArray(z, properties);
