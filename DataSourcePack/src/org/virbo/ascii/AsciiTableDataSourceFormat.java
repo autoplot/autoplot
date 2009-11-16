@@ -143,7 +143,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         mon.started();
 
         if ( data.length()>0 ) {
-            dep0Format= dep0Units.createDatum(dep0.value(0)).getFormatter();
+            dep0Format= dep0!=null ? dep0Units.createDatum(dep0.value(0)).getFormatter() : null;
             format= units.createDatum(data.value(0)).getFormatter();
             planeFormats= new ArrayList<DatumFormatter>(planes.size());
             for ( int i=0; i<planes.size(); i++ ) {
