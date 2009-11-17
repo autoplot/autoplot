@@ -564,7 +564,7 @@ public class ScriptContext extends PyJavaInstance {
             throw new IllegalArgumentException("no format for extension: " + file);
         }
 
-        format.formatData( file, ds, new NullProgressMonitor());
+        format.formatData( uri.toString(), ds, new NullProgressMonitor());
 
     }
 
