@@ -753,12 +753,12 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         new PlotController(application, domPlot).createDasPeer(canvas, domRow ,domColumn );
 
-        domPlot.getXaxis().setAutorange(true);
-        domPlot.getYaxis().setAutorange(true);
-        domPlot.getZaxis().setAutorange(true);
-        domPlot.getXaxis().setAutolabel(true);
-        domPlot.getYaxis().setAutolabel(true);
-        domPlot.getZaxis().setAutolabel(true);
+        domPlot.getXaxis().setAutoRange(true);
+        domPlot.getYaxis().setAutoRange(true);
+        domPlot.getZaxis().setAutoRange(true);
+        domPlot.getXaxis().setAutoLabel(true);
+        domPlot.getYaxis().setAutoLabel(true);
+        domPlot.getZaxis().setAutoLabel(true);
         domPlot.setAutoLabel(true);
         domPlot.setAutoBinding(true);
 
@@ -927,7 +927,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected Panel copyPanel(Panel srcPanel, Plot domPlot, DataSourceFilter dsf) {
         logger.finer( "copyPanel("+srcPanel+","+domPlot+","+dsf+")");
         Panel newp = addPanel(domPlot, dsf);
-        newp.getController().setResetPanel(false);// don't add children, trigger autorange, etc.
+        newp.getController().setResetPanel(false);// don't add children, trigger autoRange, etc.
         newp.getController().setDsfReset(false); // dont' reset when the dataset changes
         newp.syncTo(srcPanel, Arrays.asList(DomNode.PROP_ID,Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID));
         if (dsf == null) { // new DataSource, but with the same URI.
@@ -1138,9 +1138,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.getPlots(0).getYaxis().setLog(false); // TODO kludge
         application.getPlots(0).getZaxis().setLog(false); // TODO kludge
         application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
-        application.getPlots(0).getXaxis().setAutorange(true);
-        application.getPlots(0).getYaxis().setAutorange(true);
-        application.getPlots(0).getZaxis().setAutorange(true);
+        application.getPlots(0).getXaxis().setAutoRange(true);
+        application.getPlots(0).getYaxis().setAutoRange(true);
+        application.getPlots(0).getZaxis().setAutoRange(true);
 
         for ( int i=application.getBindings().length-1; i>0; i-- ) {
             deleteBinding( application.getBindings(i) );
