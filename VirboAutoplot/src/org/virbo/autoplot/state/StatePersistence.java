@@ -59,7 +59,7 @@ public class StatePersistence {
     }
 
     public static void saveState( File f, Object state ) throws IOException {
-        XMLEncoder e = new XMLEncoder( new BufferedOutputStream( new FileOutputStream(f) ) );
+        /* XMLEncoder e = new XMLEncoder( new BufferedOutputStream( new FileOutputStream(f) ) );
         
         e.setPersistenceDelegate( DatumRange.class, new DatumRangePersistenceDelegate() );
         e.setPersistenceDelegate( Units.class, new UnitsPersistenceDelegate() );
@@ -79,7 +79,8 @@ public class StatePersistence {
         } );
         e.writeObject(state);
         e.close();
-
+        */
+        
         Document document=null;
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -92,11 +93,11 @@ public class StatePersistence {
 
         Element vap= document.createElement("vap");
         vap.appendChild(element);
-        vap.setAttribute( "domVersion", "1.0" );
+        vap.setAttribute( "domVersion", "1.01" );
         vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
 
         document.appendChild(vap);
-        writeDocument( new File( f.toString()+"x" ), document);
+        writeDocument( new File( f.toString() ), document);
 
     }
 
