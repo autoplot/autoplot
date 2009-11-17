@@ -34,7 +34,7 @@ public class AxisController extends DomNodeController {
     }
 
     /**
-     * checks to see that the axis is still valid and clears the autorange property.
+     * checks to see that the axis is still valid and clears the autoRange property.
      */
     private PropertyChangeListener rangeChangeListener = new PropertyChangeListener() {
 
@@ -70,9 +70,9 @@ public class AxisController extends DomNodeController {
             // ensure that log doesn't make axis invalid, or min trivially close to zero.
             if ( dom.controller.isValueAdjusting() || valueIsAdjusting() ) return;
             if ( evt.getPropertyName().equals( Axis.PROP_RANGE )
-                    || evt.getPropertyName().equals( Axis.PROP_LOG ) ) axis.setAutorange(false);
+                    || evt.getPropertyName().equals( Axis.PROP_LOG ) ) axis.setAutoRange(false);
             if ( evt.getPropertyName().equals( Axis.PROP_LABEL ) ) {
-                axis.setAutolabel(false);
+                axis.setAutoLabel(false);
             }
             if ( evt.getPropertyName().equals(Axis.PROP_LOG) || evt.getPropertyName().equals(Axis.PROP_RANGE) ) {
                 if ( isPendingChanges() ) return;
@@ -101,16 +101,16 @@ public class AxisController extends DomNodeController {
         axis.log= log;
         axis.setRange(range);
         axis.setLog(log);
-        axis.setAutorange(true);
+        axis.setAutoRange(true);
     }
 
     /**
-     * set the label, leaving its autolabel property true.
+     * set the label, leaving its autoLabel property true.
      * @param label
      */
     public void setLabelAutomatically( String label ) {
         axis.setLabel(label);
-        axis.setAutolabel(true);
+        axis.setAutoLabel(true);
     }
 
     public synchronized void bindTo(DasAxis p) {
@@ -136,8 +136,8 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_LOG ) ) axis.setLog(that.isLog());
         if ( !exclude.contains( Axis.PROP_RANGE ) ) axis.setRange(that.getRange());
         if ( !exclude.contains( Axis.PROP_LABEL ) ) axis.setLabel(that.getLabel());
-        if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutorange(that.isAutorange());
-        if ( !exclude.contains( Axis.PROP_AUTOLABEL ) ) axis.setAutolabel(that.isAutolabel());
+        if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutoRange(that.isAutoRange());
+        if ( !exclude.contains( Axis.PROP_AUTOLABEL ) ) axis.setAutoLabel(that.isAutoLabel());
         if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
         if ( lock!=null ) lock.unlock();
     }
