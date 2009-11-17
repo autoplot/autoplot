@@ -24,9 +24,7 @@ import org.python.core.PySlice;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
-import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.TrimStrideWrapper;
 import org.virbo.dataset.WritableDataSet;
 
@@ -316,6 +314,9 @@ public class PyQDataSet extends PyJavaInstance {
 
             } else if (arg0.isNumberType()) {
                 int idx = ((Number) arg0.__tojava__(Number.class)).intValue();
+                if ( idx<0 ) {
+                    idx= rods.length()+idx;
+                }
                 if ( rods.rank()>1 ) {
                     return new PyQDataSet( DataSetOps.slice0(rods, idx) );
                 } else {
@@ -547,6 +548,29 @@ public class PyQDataSet extends PyJavaInstance {
     public QDataSet gt( Object o ) {
         System.err.println(o);
         return null;
+    }
+
+    public PyQDataSet append( PyObject arg0 ) {
+        Object o = arg0.__tojava__(QDataSet.class);
+        DDataSet result;
+        if (o == null || o == Py.NoConversion) {
+            if (arg0.isNumberType()) {
+                double d = (Double) arg0.__tojava__(Double.class);
+                result= DDataSet.copy(rods);
+                result.append( DDataSet.wrap( new double[] { d } ) );
+            } else if (arg0.isSequenceType()) {
+                result= DDataSet.copy(rods);
+                result.append( DDataSet.copy( PyQDataSetAdapter.adaptList((PyList) arg0) ) );
+            } else {
+                throw Py.TypeError("unable to coerce: " + arg0);
+            }
+        } else {
+            QDataSet ds = (QDataSet) o;
+            result= DDataSet.copy(rods);
+            result.append( DDataSet.copy( ds ) );
+        }
+
+        return new PyQDataSet(result);
     }
 
 // coerce logic doesn't seem to kick in, so I do it!
