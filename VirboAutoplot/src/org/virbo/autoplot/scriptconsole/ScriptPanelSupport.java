@@ -29,6 +29,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.das2.components.DasProgressPanel;
+import org.das2.jythoncompletion.JythonCompletionTask;
+import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
@@ -204,15 +206,16 @@ public class ScriptPanelSupport {
      * @param offset line offset from beginning of file where execution began.
      * @throws javax.swing.text.BadLocationException
      */
-    private void annotateError(PyException ex, int offset) throws BadLocationException {
+    private void annotateError(PyException ex, int offset, final PythonInterpreter interp)
+            throws BadLocationException {
         if (ex instanceof PySyntaxError) {
             Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
             //int col = ((PyInteger) ex.value.__getitem__(1).__getitem__(2)).getValue();
-            annotationsSupport.annotateLine(lineno, "error", ex.toString());
+            annotationsSupport.annotateLine(lineno, "error", ex.toString(),interp);
         } else {
             Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-            annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString());
+            annotationsSupport.annotateLine(offset + ex.traceback.tb_lineno, "error", ex.toString(),interp);
         }
     }
 
@@ -238,7 +241,7 @@ public class ScriptPanelSupport {
                             public void exceptionThrown(Exception e) {
                                 if (e instanceof PyException) {
                                     try {
-                                        annotateError((PyException) e, 0);
+                                        annotateError((PyException) e, 0, null );
                                     } catch (BadLocationException ex) {
                                         Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
                                     }
@@ -293,8 +296,9 @@ public class ScriptPanelSupport {
                                 save();
                             }
                             ProgressMonitor mon= DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
+                            PythonInterpreter interp = null;
                             try {
-                                PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
+                                interp= JythonUtil.createInterpreter(true, false);
                                 interp.set("dom", model.getDocumentModel() );
                                 interp.set("monitor", mon );
                                 boolean dirty0 = panel.isDirty();
@@ -335,8 +339,7 @@ public class ScriptPanelSupport {
                                 applicationController.setStatus("error: I/O exception: " + ex.toString());
                             } catch (PyException ex) {
                                 mon.finished();
-                                annotateError(ex, offset);
-
+                                annotateError(ex, offset, interp );
                                 ex.printStackTrace();
                                 applicationController.setStatus("error: " + ex.toString());
                             }
