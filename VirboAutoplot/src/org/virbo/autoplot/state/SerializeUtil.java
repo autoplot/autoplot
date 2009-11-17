@@ -165,7 +165,6 @@ public class SerializeUtil {
 
                 } else {
                     Object defltValue= DomUtil.getPropertyValue( defl, pd.getName() );
-                    boolean isDef= defltValue==value || (defltValue!=null && defltValue.equals(value) );
 
                     Element prop= getElementForLeafNode( document, pd.getPropertyType(), value, defltValue );
                     if ( prop==null ) {
@@ -174,9 +173,6 @@ public class SerializeUtil {
                     }
                     prop.setAttribute("name", pd.getName() );
                     element.appendChild( prop );
-                    if ( !isDef ) {
-                        element.setAttribute( "default", "" );
-                    }
                 }
 
             }
