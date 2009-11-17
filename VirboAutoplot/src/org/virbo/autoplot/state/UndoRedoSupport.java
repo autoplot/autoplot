@@ -22,7 +22,6 @@ import javax.swing.JMenuItem;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.Diff;
-import org.virbo.autoplot.dom.PropertyChangeDiff;
 
 /**
  *
@@ -38,7 +37,7 @@ public class UndoRedoSupport {
         applicationModel.addPropertyChangeListener(new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent ev) {
-                if (ev.getPropertyName().equals(ApplicationModel.PROPERTY_FILE)) {
+                if (ev.getPropertyName().equals(ApplicationModel.PROP_VAPFILE)) {
                     resetHistory();
                 }
             }
@@ -84,15 +83,26 @@ public class UndoRedoSupport {
     int stateStackPos = 0;
     protected String redoLabel = null;
     public static final String PROP_REDOLABEL = "redoLabel";
+
+
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
 
     public Action getUndoAction() {
         return new AbstractAction("Undo") {
@@ -107,7 +117,8 @@ public class UndoRedoSupport {
     }
 
     public void undo(int level) {
-        String oldRedoLabel= getRedoLabel();        
+        String oldRedoLabel= getRedoLabel();
+        int oldDepth= stateStackPos;
         stateStackPos -= level;
         if (stateStackPos < 0) {
             stateStackPos = 0;
@@ -121,6 +132,7 @@ public class UndoRedoSupport {
             ignoringUpdates = false;
         }
         propertyChangeSupport.firePropertyChange(PROP_REDOLABEL, oldRedoLabel, redoLabel);
+        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
 
     }
 
@@ -134,6 +146,7 @@ public class UndoRedoSupport {
     }
 
     public void redo() {
+        int oldDepth= stateStackPos;
         if (stateStackPos >= stateStack.size()) {
             stateStackPos = stateStack.size() - 1;
         }
@@ -144,6 +157,7 @@ public class UndoRedoSupport {
             ignoringUpdates = false;
             stateStackPos++;
         }
+        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
     }
 
     public void pushState(PropertyChangeEvent ev) {
@@ -198,12 +212,17 @@ public class UndoRedoSupport {
             }
         }
 
+        int oldDepth= stateStackPos;
         stateStack.add(stateStackPos, new StateStackElement(state, labelStr,docString));
 
         while (stateStack.size() > (1 + stateStackPos)) {
             stateStack.removeLast();
         }
         stateStackPos++;
+
+        propertyChangeSupport.firePropertyChange(PROP_DEPTH, oldDepth, stateStackPos);
+        
+
     }
 
     public String getUndoDescription() {
@@ -247,9 +266,12 @@ public class UndoRedoSupport {
 
 
     public void resetHistory() {
+        int oldDepth= stateStackPos;
         stateStack = new LinkedList<StateStackElement>();
         stateStackPos = 0;
+        propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
     }
+    
     /**
      * Holds value of property ignoringUpdates.
      */
@@ -270,4 +292,11 @@ public class UndoRedoSupport {
     public void setIgnoringUpdates(boolean ignoringUpdates) {
         this.ignoringUpdates = ignoringUpdates;
     }
+
+    public static final String PROP_DEPTH = "depth";
+
+    public int getDepth() {
+        return stateStackPos;
+    }
+
 }
