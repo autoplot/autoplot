@@ -711,12 +711,12 @@ public class PanelController extends DomNodeController {
         if ( p==null ) return;
         List<Panel> panels= dom.controller.getPanelsFor(p);
         if ( DomUtil.oneFamily(panels) ) {
-            p.getXaxis().setAutorange(true);
-            p.getYaxis().setAutorange(true);
-            p.getZaxis().setAutorange(true);
-            p.getXaxis().setAutolabel(true);
-            p.getYaxis().setAutolabel(true);
-            p.getZaxis().setAutolabel(true);
+            p.getXaxis().setAutoRange(true);
+            p.getYaxis().setAutoRange(true);
+            p.getZaxis().setAutoRange(true);
+            p.getXaxis().setAutoLabel(true);
+            p.getYaxis().setAutoLabel(true);
+            p.getZaxis().setAutoLabel(true);
             p.setAutoLabel(true);
             p.setAutoBinding(true);
         }
@@ -910,9 +910,9 @@ public class PanelController extends DomNodeController {
 
         if ( panel.getComponent().equals("") && panel.isAutoLabel() ) panel.setLegendLabelAutomatically( panelCopy.getLegendLabel() );
 
-        panelCopy.getPlotDefaults().getXaxis().setAutorange(true); // this is how we distinguish it from the original, useless plot defaults.
-        panelCopy.getPlotDefaults().getYaxis().setAutorange(true);
-        panelCopy.getPlotDefaults().getZaxis().setAutorange(true);
+        panelCopy.getPlotDefaults().getXaxis().setAutoRange(true); // this is how we distinguish it from the original, useless plot defaults.
+        panelCopy.getPlotDefaults().getYaxis().setAutoRange(true);
+        panelCopy.getPlotDefaults().getZaxis().setAutoRange(true);
 
         if ( logger.isLoggable(Level.FINEST) ) {
             logger.finest( String.format( "done, autorange  x:%s, y:%s ",
@@ -1253,7 +1253,7 @@ public class PanelController extends DomNodeController {
         ac.bind(panel.style, "symbolConnector", seriesRenderer, "psymConnector");
         ac.bind(panel.style, "plotSymbol", seriesRenderer, "psym");
         ac.bind(panel.style, "fillColor", seriesRenderer, "fillColor");
-        ac.bind(panel.style, "fillToReference", seriesRenderer, "fillToReference");
+        ac.bind(panel.style, "fill", seriesRenderer, "fillToReference");
         ac.bind(panel.style, "reference", seriesRenderer, "reference");
         ac.bind(panel.style, "antiAliased", seriesRenderer, "antiAliased");
     }
