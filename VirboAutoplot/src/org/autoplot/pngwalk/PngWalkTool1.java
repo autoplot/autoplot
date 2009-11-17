@@ -593,7 +593,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         boolean isActionEnabled( String filename );
     }
 
-    public static ActionEnabler LOCAL_FILE_ENABLER = new ActionEnabler() {
+    public static final ActionEnabler LOCAL_FILE_ENABLER = new ActionEnabler() {
         public boolean isActionEnabled( String filename ) {
             return DataSetURI.getResourceURI(filename).toString().startsWith("file:" );
         }

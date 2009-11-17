@@ -51,8 +51,9 @@ public class AutoplotHelpSystem {
         while( hsurls!=null && hsurls.hasMoreElements()) {
             hsurl = hsurls.nextElement();
             log.fine("found /META-INF/helpsets.txt at " + hsurl);
+            BufferedReader read = null;
             try {
-                BufferedReader read= new BufferedReader( new InputStreamReader( hsurl.openStream() ) );
+                read= new BufferedReader( new InputStreamReader( hsurl.openStream() ) );
                 String spec= read.readLine();
                 while ( spec!=null ) {
                     int i= spec.indexOf("#");
@@ -78,6 +79,12 @@ public class AutoplotHelpSystem {
                 }
             } catch ( IOException ex ) {
                 log.warning(ex.toString());
+            } finally {  // make sure stream is closed
+                try {
+                    if (read != null) read.close();
+                } catch(IOException ex) {
+                    log.warning(ex.toString());
+                }
             }
 
         }

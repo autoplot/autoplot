@@ -1873,8 +1873,8 @@ private void updateFrameTitle() {
     }
     
     public void setMessage( Icon icon, String message ) {
-        String myMess= message;
         if ( message==null ) message= "<null>"; // TODO: fix this later
+        String myMess= message;
         if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
         this.statusLabel.setIcon( icon );
         this.statusLabel.setText(myMess);
