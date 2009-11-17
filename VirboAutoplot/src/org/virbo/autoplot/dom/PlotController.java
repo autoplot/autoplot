@@ -34,7 +34,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
 /**
- * Manages a Plot node, for example listening for autorange updates and layout
+ * Manages a Plot node, for example listening for autoRange updates and layout
  * changes.
  * @author jbf
  */
@@ -305,7 +305,7 @@ public class PlotController extends DomNodeController {
         Plot newSettings = null;
         for (Panel p : panels) {
             Plot plot1 = p.getPlotDefaults();
-            if ( p.isActive() && plot1.getXaxis().isAutorange() ) {  // we use autorange to indicate these are real settings, not just the defaults.
+            if ( p.isActive() && plot1.getXaxis().isAutoRange() ) {  // we use autoRange to indicate these are real settings, not just the defaults.
                 if (newSettings == null) {
                     newSettings = (Plot) plot1.copy();
                 } else {
@@ -324,26 +324,26 @@ public class PlotController extends DomNodeController {
         }
         
         if ( newSettings==null ) {
-            plot.getXaxis().setAutorange(true);
-            plot.getYaxis().setAutorange(true);
-            plot.getZaxis().setAutorange(true);
+            plot.getXaxis().setAutoRange(true);
+            plot.getYaxis().setAutoRange(true);
+            plot.getZaxis().setAutoRange(true);
             return;
         }
 
         if ( x ) {
             plot.getXaxis().setLog( newSettings.getXaxis().isLog() );
             plot.getXaxis().setRange(newSettings.getXaxis().getRange());
-            plot.getXaxis().setAutorange(true);
+            plot.getXaxis().setAutoRange(true);
         }
         if ( y ) {
             plot.getYaxis().setLog( newSettings.getYaxis().isLog() );
             plot.getYaxis().setRange(newSettings.getYaxis().getRange());
-            plot.getYaxis().setAutorange(true);
+            plot.getYaxis().setAutoRange(true);
         }
         if ( z ) {
             plot.getZaxis().setLog( newSettings.getZaxis().isLog() );
             plot.getZaxis().setRange(newSettings.getZaxis().getRange());
-            plot.getZaxis().setAutorange(true);
+            plot.getZaxis().setAutoRange(true);
         }
     }
 
@@ -418,7 +418,7 @@ public class PlotController extends DomNodeController {
     private void doPanelDefaultsChange( Panel panel ) {
 
         if ( panel!=null ) {
-            if ( panel.getPlotDefaults().getXaxis().isAutorange()==false ) {
+            if ( panel.getPlotDefaults().getXaxis().isAutoRange()==false ) {
                 return;
             }
         }
@@ -429,7 +429,7 @@ public class PlotController extends DomNodeController {
         BindingModel existingBinding= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.xaxis, Axis.PROP_RANGE );
         if ( bms.contains(existingBinding) ) {
             if ( bms.size()>1 ) {
-                plot.getXaxis().setAutorange(false);
+                plot.getXaxis().setAutoRange(false);
             }
         }
 
@@ -442,15 +442,15 @@ public class PlotController extends DomNodeController {
             this.panel= p;
             this.panel.getController().addPropertyChangeListener( PanelController.PROP_DATASET, panelDataSetListener );
             if ( plot.isAutoLabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
-            if ( plot.getXaxis().isAutolabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
-            if ( plot.getYaxis().isAutolabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
-            if ( plot.getZaxis().isAutolabel() ) plot.getZaxis().setLabel( p.getPlotDefaults().getZaxis().getLabel() );
-            if ( plot.getXaxis().isAutorange() && plot.getYaxis().isAutorange() ) {
+            if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
+            if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
+            if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().setLabel( p.getPlotDefaults().getZaxis().getLabel() );
+            if ( plot.getXaxis().isAutoRange() && plot.getYaxis().isAutoRange() ) {
                 plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
             }
         }
 
-        resetZoom( plot.getXaxis().isAutorange(), plot.getYaxis().isAutorange(), plot.getZaxis().isAutorange() );
+        resetZoom( plot.getXaxis().isAutoRange(), plot.getYaxis().isAutoRange(), plot.getZaxis().isAutoRange() );
 
     }
 
@@ -476,7 +476,7 @@ public class PlotController extends DomNodeController {
         }
 
         // if we aren't autoranging, then only change the bindings if there will be a conflict.
-        if ( plot.getXaxis().isAutorange()==false ) {
+        if ( plot.getXaxis().isAutoRange()==false ) {
             shouldBindX= bm!=null;
             if ( bm!=null && !newSettings.getXaxis().getRange().getUnits().isConvertableTo( plot.getXaxis().getRange().getUnits() ) ) {
                 shouldBindX= false;
@@ -484,7 +484,7 @@ public class PlotController extends DomNodeController {
             }
         }
 
-        if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutorange() ) {
+        if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutoRange() ) {
             if ( bms.size()==0 ) {
                 dom.setTimeRange( plot.getXaxis().getRange() );
                 shouldBindX= true;
