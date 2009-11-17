@@ -192,7 +192,9 @@ public class Plot extends DomNode {
         b = that.isotropic == this.isotropic;
         if (!b) result.add(new PropertyChangeDiff("isotropic", that.isotropic, this.isotropic));
         b = that.autoLabel == this.autoLabel;
-        if (!b) result.add(new PropertyChangeDiff("autolabel", that.autoLabel, this.autoLabel));
+        if (!b) result.add(new PropertyChangeDiff(PROP_AUTOLABEL, that.autoLabel, this.autoLabel));
+        b = that.autoBinding == this.autoBinding;
+        if (!b) result.add(new PropertyChangeDiff(PROP_AUTOBINDING, that.autoBinding, this.autoBinding));
         b = that.rowId.equals(this.rowId);
         if (!b) result.add(new PropertyChangeDiff("rowId", that.rowId, this.rowId));
         b = that.columnId.equals(this.columnId);
