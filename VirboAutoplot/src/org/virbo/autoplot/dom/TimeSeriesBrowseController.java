@@ -68,7 +68,7 @@ public class TimeSeriesBrowseController {
         if (setTsbInitialResolution) {
             try {
                 DatumRange tr = dataSourceController.getTsb().getTimeRange();
-                if ( this.domPlot.getXaxis().isAutorange() ) this.plot.getXAxis().resetRange(tr);
+                if ( this.domPlot.getXaxis().isAutoRange() ) this.plot.getXAxis().resetRange(tr);
                 updateTsb(true);
             } catch ( RuntimeException e ) {
                 throw e;
