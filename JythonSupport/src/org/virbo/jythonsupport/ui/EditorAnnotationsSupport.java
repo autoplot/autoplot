@@ -19,6 +19,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import org.python.util.PythonInterpreter;
 
 /**
  *
@@ -27,6 +28,7 @@ import javax.swing.text.StyledDocument;
 public class EditorAnnotationsSupport {
 
     private JTextPane editorPanel;
+    PythonInterpreter interp;
 
     EditorAnnotationsSupport(JTextPane editorPanel) {
         this.editorPanel = editorPanel;
@@ -110,13 +112,16 @@ public class EditorAnnotationsSupport {
         }
     }
 
+    public void annotateLine(int line, String name, String text) throws BadLocationException {
+        annotateLine( line, name, text, null );
+    }
     /**
      * highlite the line by setting the background to color.  null clears the highlite.
      * @param line, the line number to highlite.  1 is the first line.
      * @param name, the name of the style, including "error" and "programCounter"
      * @param text, annotation to display when hovering. Currently ignored.
      */
-    public void annotateLine(int line, String name, String text) throws BadLocationException {
+    public void annotateLine(int line, String name, String text, PythonInterpreter interp ) throws BadLocationException {
         StyledDocument doc = editorPanel.getStyledDocument();
         Element root = editorPanel.getDocument().getDefaultRootElement();
         
@@ -146,6 +151,7 @@ public class EditorAnnotationsSupport {
         ann.offset = i0;
         ann.text = text;
         annotations.put(ann.offset, ann);
+        this.interp= interp;
     }
     
     private String htmlify( String text ) {
@@ -166,12 +172,24 @@ public class EditorAnnotationsSupport {
      */
     public String getToolTipText(MouseEvent me) {
         int offset= editorPanel.viewToModel(me.getPoint());
+        if ( editorPanel.getSelectionStart()<offset && offset<editorPanel.getSelectionEnd() ) {
+            String eval= editorPanel.getSelectedText();
+            if ( interp!=null ) {
+                try {
+                    String peek= interp.eval(eval).toString();
+                    return peek;
+                } catch ( Exception ex ) {
+                    return ""+ex.toString();
+                }
+            }
+        }
+
         if ( offset>0 ) {
             Annotation ann= annotationAt(offset);
-            if ( ann==null ) {
-                return null;
-            }  else {
+            if ( ann!=null ) {
                 return htmlify(ann.text);
+            } else {
+                return null;
             }
         } else {
             return null;
@@ -184,7 +202,7 @@ public class EditorAnnotationsSupport {
      * @return
      */
     public Dimension getPreferredSize() {
-        return new Dimension(250,250);
+        return new Dimension(350,250);
     }    
     
     
