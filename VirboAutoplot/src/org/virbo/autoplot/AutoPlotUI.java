@@ -171,10 +171,22 @@ public class AutoPlotUI extends javax.swing.JFrame {
         undoRedoSupport = new UndoRedoSupport(applicationModel);
         undoRedoSupport.addPropertyChangeListener(new PropertyChangeListener() {
 
-            public void propertyChange(PropertyChangeEvent evt) {
+        public void propertyChange(PropertyChangeEvent evt) {
                 refreshUndoRedoLabel();
             }
         });
+
+        applicationModel.addPropertyChangeListener( ApplicationModel.PROP_VAPFILE, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateFrameTitle();
+            }
+        });
+
+        undoRedoSupport.addPropertyChangeListener( UndoRedoSupport.PROP_DEPTH, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateFrameTitle();
+            }
+        } );
         
         initComponents();
 
@@ -643,7 +655,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
         try {
             Logger.getLogger("ap").fine("plotUrl("+surl+")");
             URISplit split= URISplit.parse(surl);
-            ProgressMonitor mon= getStatusBarProgressMonitor("Finished "+surl);
+            ProgressMonitor mon= getStatusBarProgressMonitor("Finished loading "+surl);
             if ( !( split.file.endsWith(".vap")|| split.file.endsWith(".vapx") ) ) {
                 if ( ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false")) ) {
                     try {
@@ -1630,7 +1642,22 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
     }
 };
 
+private void updateFrameTitle() {
+    String suri= applicationModel.getVapFile();
+    String title0= "Autoplot";
 
+    if ( suri==null ) {
+        setTitle( title0 );
+    } else {
+
+        URISplit split= URISplit.parse(suri);
+
+        boolean dirty= undoRedoSupport.getDepth()>1;
+        String titleStr= split.file.substring( split.path.length() ) + ( dirty ? "*" : "" );
+        setTitle( titleStr + " - " + title0  );
+    }
+
+}
     /**
      * @param args the command line arguments
      */
@@ -1789,23 +1816,6 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
                     new Thread(run, "LoadBookmarksThread").start();
 
                 }
-
-                final String title0= app.getTitle();
-
-                app.applicationModel.addPropertyChangeListener( ApplicationModel.PROP_VAPFILE, new PropertyChangeListener() {
-
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        if ( evt.getNewValue()==null ) {
-                            app.setTitle( title0 );
-                        } else {
-                            String suri= (String) evt.getNewValue();
-                            URISplit split= URISplit.parse(suri);
-
-                            app.setTitle( split.file.substring(split.path.length() ) + " - " + title0  );
-                        }
-                    }
-
-                });
 
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
