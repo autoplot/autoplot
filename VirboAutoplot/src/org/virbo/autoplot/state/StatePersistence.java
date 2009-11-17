@@ -89,11 +89,12 @@ public class StatePersistence {
             throw new RuntimeException(ex);
         }
 
-        Element element = SerializeUtil.getDomElement( document, (DomNode)state, "org.virbo.autoplot.dom" );
+        VapScheme scheme= new Vap1_01Scheme();
+        Element element = SerializeUtil.getDomElement( document, (DomNode)state, scheme );
 
         Element vap= document.createElement("vap");
         vap.appendChild(element);
-        vap.setAttribute( "domVersion", "1.01" );
+        vap.setAttribute( "domVersion", scheme.getId() );
         vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
 
         document.appendChild(vap);
@@ -170,10 +171,20 @@ public class StatePersistence {
                 return state;
 
             } else {
-                String packg= "org.virbo.autoplot.dom";
-
+                VapScheme scheme;
+                String domVersion= document.getDocumentElement().getAttribute("domVersion");
+                if (domVersion.equals("1.0") ) {
+                    scheme= new Vap1_00Scheme();
+                } else {
+                    scheme= new Vap1_01Scheme();
+                }
                 Element dom= getChildElement( document.getDocumentElement(), "Application" );
-                DomNode n= SerializeUtil.getDomNode( dom, packg );
+                DomNode n= SerializeUtil.getDomNode( dom, scheme );
+                String errors=scheme.describeUnresolved();
+                if ( errors.length()>0 ) {
+                    System.err.println(errors);
+                }
+
                 return n;
             }
 

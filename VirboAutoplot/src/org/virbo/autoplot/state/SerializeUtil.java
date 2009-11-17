@@ -55,19 +55,15 @@ public class SerializeUtil {
         SerializeRegistry.register( PlotSymbol.class, new TypeSafeEnumSerializeDelegate() );
     }
     
-    public static Element getDomElement( Document document, DomNode node, String packg ) {
+    public static Element getDomElement( Document document, DomNode node, VapScheme scheme ) {
         Logger log= DasLogger.getLogger( DasLogger.SYSTEM_LOG );
 
 
         try {
-            String elementName = node.getClass().getName();
-            if ( elementName.startsWith(packg+".") ) {
-                elementName= elementName.substring(packg.length()+1);
-            }
+            String elementName = scheme.getName(node.getClass());
 
             DomNode defl= node.getClass().newInstance();
 
-            elementName = elementName.replaceAll("\\$", "\\_dollar_");
             Element element = null;
             try {
                 element = document.createElement(elementName);
@@ -131,7 +127,7 @@ public class SerializeUtil {
                     Element propertyElement= document.createElement( "property" );
                     propertyElement.setAttribute("name", propertyName );
                     propertyElement.setAttribute("type", "DomNode" );
-                    Element child= getDomElement( document, (DomNode)value, packg );
+                    Element child= getDomElement( document, (DomNode)value, scheme );
                     propertyElement.appendChild(child);
                     element.appendChild(propertyElement);
 
@@ -139,21 +135,19 @@ public class SerializeUtil {
                     // serialize each element of the array.  Assumes order doesn't change
                     Element propertyElement= document.createElement( "property" );
                     propertyElement.setAttribute( "name", propertyName );
-                    String clasName= ipd.getIndexedPropertyType().getName();
-                    if ( clasName.startsWith(packg+".") ) clasName= clasName.substring(packg.length()+1);
+                    String clasName= scheme.getName( ipd.getIndexedPropertyType() );
                     propertyElement.setAttribute( "class", clasName );
                     propertyElement.setAttribute( "length", String.valueOf( Array.getLength(value) ) );
                     for ( int j=0; j<Array.getLength(value); j++ ) {
                         Object value1= Array.get( value, j );
-                        Element child= getDomElement( document, (DomNode)value1, packg  );
+                        Element child= getDomElement( document, (DomNode)value1, scheme  );
                         propertyElement.appendChild(child);
                     }
                     element.appendChild(propertyElement);
                 } else if ( ipd!=null ) {
                     Element propertyElement= document.createElement( "property" );
                     propertyElement.setAttribute( "name", propertyName );
-                    String clasName= ipd.getIndexedPropertyType().getName();
-                    if ( clasName.startsWith(packg+".") ) clasName= clasName.substring(packg.length()+1);
+                    String clasName= scheme.getName( ipd.getIndexedPropertyType() );
                     propertyElement.setAttribute( "class", clasName );
                     propertyElement.setAttribute( "length", String.valueOf( Array.getLength(value) ) );
                     for ( int j=0; j<Array.getLength(value); j++ ) {
@@ -232,21 +226,20 @@ public class SerializeUtil {
     }
 
     /**
-     *
-     * @param document
+     * decode the DomNode from the document element.
      * @param element
      * @param packg  the java package containing the default package for nodes.
      * @return
      * @throws ParseException
      */
-    public static DomNode getDomNode( Element element, String packg ) throws ParseException {
+    public static DomNode getDomNode( Element element, VapScheme scheme ) throws ParseException {
         try {
             DomNode node = null;
 
             String clasName= element.getNodeName();
-            if ( !clasName.contains(".") )  clasName= packg + "." + clasName;
-            
-            node = (DomNode) Class.forName( clasName ).newInstance();
+
+            Class claz= scheme.getClass(clasName);
+            node = (DomNode) claz.newInstance();
 
             BeanInfo info = BeansUtil.getBeanInfo(node.getClass());
 
@@ -266,47 +259,53 @@ public class SerializeUtil {
                 Node k= kids.item(i);
                 if ( k instanceof Element ) {
                     Element e= (Element)k;
-
-                    PropertyDescriptor pd= pp.get( e.getAttribute("name") );
-                    String slen= e.getAttribute("length");
-                    if ( slen!=null && slen.length()>0 ) {
-                        clasName= e.getAttribute("class");
-                        if ( !clasName.contains(".") )  clasName= packg + "." + clasName;
-                        Class c= Class.forName(clasName);
-                        int n= Integer.parseInt(e.getAttribute("length"));
-                        Object arr= Array.newInstance( c,n );
-                        if ( DomNode.class.isAssignableFrom(c) ) {
-                            NodeList arraykids= e.getChildNodes();
-                            int ik=0;
-                            for ( int j=0; j<n; j++ ) { //DANGER
-                                while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
-                                DomNode c1= getDomNode( (Element)arraykids.item(ik), packg );
-                                ik++;
-                                Array.set( arr, j, c1 );
+                    try {
+                        PropertyDescriptor pd= pp.get( e.getAttribute("name") );
+                        String slen= e.getAttribute("length");
+                        if ( slen!=null && slen.length()>0 ) {
+                            clasName= e.getAttribute("class");
+                            Class c= scheme.getClass(clasName);
+                            int n= Integer.parseInt(e.getAttribute("length"));
+                            Object arr= Array.newInstance( c,n );
+                            if ( DomNode.class.isAssignableFrom(c) ) {
+                                NodeList arraykids= e.getChildNodes();
+                                int ik=0;
+                                for ( int j=0; j<n; j++ ) { //DANGER
+                                    while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
+                                    DomNode c1= getDomNode( (Element)arraykids.item(ik), scheme );
+                                    ik++;
+                                    Array.set( arr, j, c1 );
+                                }
+                                pd.getWriteMethod().invoke( node, arr );
+                            } else {
+                                NodeList arraykids= e.getChildNodes();
+                                int ik=0;
+                                for ( int j=0; j<n; j++ ) { //DANGER
+                                    Object c1=null;
+                                    while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
+                                    c1 = getLeafNode( (Element) arraykids.item(ik));
+                                    ik++;
+                                    Array.set( arr, j, c1 );
+                                }
+                                pd.getWriteMethod().invoke( node, arr );
                             }
-                            pd.getWriteMethod().invoke( node, arr );
                         } else {
-                            NodeList arraykids= e.getChildNodes();
-                            int ik=0;
-                            for ( int j=0; j<n; j++ ) { //DANGER
-                                Object c1=null;
-                                while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
-                                c1 = getLeafNode( (Element) arraykids.item(ik));
-                                ik++;
-                                Array.set( arr, j, c1 );
+                            String stype= e.getAttribute("type");
+                            if ( !stype.equals("DomNode") ) {
+                                Object child= getLeafNode( e );
+                                pd.getWriteMethod().invoke( node, child );
+                            } else {
+                                Node childElement= e.getFirstChild();
+                                while ( !( childElement instanceof Element ) ) childElement= childElement.getNextSibling();
+                                DomNode child= getDomNode( (Element)childElement, scheme );
+                                pd.getWriteMethod().invoke( node, child );
                             }
-                            pd.getWriteMethod().invoke( node, arr );
                         }
-                    } else {
-                        String stype= e.getAttribute("type");
-                        if ( !stype.equals("DomNode") ) {
-                            Object child= getLeafNode( e );
-                            pd.getWriteMethod().invoke( node, child );
+                    } catch ( Exception ex ) {
+                        if ( scheme.resolveProperty(e, node) ) {
+                            System.err.println("imported "+e.getAttribute("name") );
                         } else {
-                            Node childElement= e.getFirstChild();
-                            while ( !( childElement instanceof Element ) ) childElement= childElement.getNextSibling();
-                            DomNode child= getDomNode( (Element)childElement, packg );
-                            pd.getWriteMethod().invoke( node, child );
+                            scheme.addUnresolvedProperty(e,node);
                         }
                     }
                 }
