@@ -1790,6 +1790,23 @@ private PropertyChangeListener optionsListener= new PropertyChangeListener() {
 
                 }
 
+                final String title0= app.getTitle();
+
+                app.applicationModel.addPropertyChangeListener( ApplicationModel.PROP_VAPFILE, new PropertyChangeListener() {
+
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if ( evt.getNewValue()==null ) {
+                            app.setTitle( title0 );
+                        } else {
+                            String suri= (String) evt.getNewValue();
+                            URISplit split= URISplit.parse(suri);
+
+                            app.setTitle( split.file.substring(split.path.length() ) + " - " + title0  );
+                        }
+                    }
+
+                });
+
                 final String script= alm.getValue("script");
                 if ( !script.equals("") ) {
                     app.setStatus("running script "+script);

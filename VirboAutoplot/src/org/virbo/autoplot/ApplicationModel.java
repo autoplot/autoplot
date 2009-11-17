@@ -72,7 +72,6 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public class ApplicationModel {
-    public static final String PREF_RECENT = "recent";
 
     DasApplication application;
     DasCanvas canvas;
@@ -99,11 +98,8 @@ public class ApplicationModel {
     }
 
     static final Logger logger = Logger.getLogger("virbo.autoplot");
-    /**
-     * dataset with fill data has been recalculated
-     */
-    public static final String PROPERTY_FILL = "fill";
-    public static final String PROPERTY_FILE = "file";
+
+    public static final String PREF_RECENT = "recent";
     public static final String PROPERTY_RECENT = PREF_RECENT;
     public static final String PROPERTY_BOOKMARKS = "bookmarks";
     private static final int MAX_RECENT = 20;
@@ -111,13 +107,13 @@ public class ApplicationModel {
     public ApplicationModel() {
 
         DataSetURI.init();
-
         dom = new Application();
 
     }
 
     /**
-     * better if called from swing thread
+     * This needs to be called after the application model is initialized and
+     * preferrably from the event thread.
      */
     public void addDasPeersToApp() {
         if ( !applet ) {
@@ -223,13 +219,23 @@ public class ApplicationModel {
         return dom.getController().getDataSourceFilter().getController().getDataSource();
     }
 
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener listener) {
+    public synchronized void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public synchronized void addPropertyChangeListener(PropertyChangeListener listener) {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
+
 
     /**
      * Create a dataSource object and set autoplot to display this datasource.
@@ -528,6 +534,9 @@ public class ApplicationModel {
     void doSave(File f) throws IOException {
         StatePersistence.saveState(f, createState(true));
         setUseEmbeddedDataSet(false);
+
+        setVapFile( f.toString() );
+
     }
 
     /**
@@ -631,11 +640,25 @@ public class ApplicationModel {
         restoreState(state);
         setUseEmbeddedDataSet(false);
 
+        setVapFile( f.toString() );
         propertyChangeSupport.firePropertyChange("file", null, f);
     }
 
     void doOpen(File f) throws IOException {
         doOpen(f,null);
+    }
+
+    protected String vapFile = null;
+    public static final String PROP_VAPFILE = "vapFile";
+
+    public String getVapFile() {
+        return vapFile;
+    }
+
+    public void setVapFile(String vapFile) {
+        String oldVapFile = this.vapFile;
+        this.vapFile = vapFile;
+        propertyChangeSupport.firePropertyChange(PROP_VAPFILE, oldVapFile, vapFile);
     }
 
     /**
