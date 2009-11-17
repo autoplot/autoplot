@@ -87,32 +87,32 @@ public class Axis extends DomNode {
     /**
      * true indicates the axis hasn't been changed and may/should be autoranged.
      */
-    public static final String PROP_AUTORANGE = "autorange";
-    protected boolean autorange = false;
+    public static final String PROP_AUTORANGE = "autoRange";
+    protected boolean autoRange = false;
 
-    public boolean isAutorange() {
-        return autorange;
+    public boolean isAutoRange() {
+        return autoRange;
     }
 
-    public void setAutorange(boolean autorange) {
-        boolean oldAutorange = this.autorange;
-        this.autorange = autorange;
+    public void setAutoRange(boolean autorange) {
+        boolean oldAutorange = this.autoRange;
+        this.autoRange = autorange;
         propertyChangeSupport.firePropertyChange(PROP_AUTORANGE, oldAutorange, autorange);
     }
 
     /**
      * true indicates the axis label hasn't been changed by a human and may/should be autoranged.
      */
-    public static final String PROP_AUTOLABEL = "autolabel";
-    protected boolean autolabel = false;
+    public static final String PROP_AUTOLABEL = "autoLabel";
+    protected boolean autoLabel = false;
 
-    public boolean isAutolabel() {
-        return autolabel;
+    public boolean isAutoLabel() {
+        return autoLabel;
     }
 
-    public void setAutolabel(boolean autolabel) {
-        boolean oldAutolabel = this.autolabel;
-        this.autolabel = autolabel;
+    public void setAutoLabel(boolean autolabel) {
+        boolean oldAutolabel = this.autoLabel;
+        this.autoLabel = autolabel;
         propertyChangeSupport.firePropertyChange(PROP_AUTOLABEL, oldAutolabel, autolabel);
     }
 
@@ -141,8 +141,8 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_LOG ) ) this.setLog(that.isLog());
             if ( !exclude.contains( PROP_RANGE ) ) this.setRange(that.getRange());
             if ( !exclude.contains( PROP_LABEL ) ) this.setLabel(that.getLabel());
-            if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutorange(that.isAutorange());
-            if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutolabel(that.isAutolabel());
+            if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutoRange(that.isAutoRange());
+            if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
             if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
         }
     }
@@ -167,10 +167,10 @@ public class Axis extends DomNode {
         if ( !b ) result.add(new PropertyChangeDiff("range", that.range , this.range ) );
         b=  that.label.equals(this.label) ;
         if ( !b ) result.add(new PropertyChangeDiff("label", that.label , this.label ) );
-        b=  that.autorange==this.autorange;
-        if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTORANGE, that.autorange , this.autorange ) );
-        b=  that.autolabel==this.autolabel;
-        if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTOLABEL, that.autolabel , this.autolabel ) );
+        b=  that.autoRange==this.autoRange;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTORANGE, that.autoRange , this.autoRange ) );
+        b=  that.autoLabel==this.autoLabel;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTOLABEL, that.autoLabel , this.autoLabel ) );
         b=  that.drawTickLabels==this.drawTickLabels;
         if ( !b ) result.add(new PropertyChangeDiff("drawTickLabels", that.drawTickLabels, this.drawTickLabels ) );
 
