@@ -8,4 +8,12 @@ copy() method should be a deep copy.  It's clone() method needn't be a deep copy
 
 = pitfalls =
 A deep copy is needed to make state support and serialization work.  It's easy to fail to make a deep copy, because clone
-will create a shallow copy that seems to work. 
+will create a shallow copy that seems to work.
+
+= conventions =
+* id is a special property that identifies each node.  If non-empty, then this must be unique in the DOM tree.
+* properties like "plotId" should refer to an id of another node (of that type).
+* DOM Trees should not contain cycles.
+* properties like "autoLabel" indicates the if property "label" was set automatically or intentionally by the user.
+
+
