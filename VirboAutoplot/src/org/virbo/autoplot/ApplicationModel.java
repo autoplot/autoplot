@@ -656,9 +656,13 @@ public class ApplicationModel {
     }
 
     public void setVapFile(String vapFile) {
-        String oldVapFile = this.vapFile;
+        String old= this.vapFile;
         this.vapFile = vapFile;
-        propertyChangeSupport.firePropertyChange(PROP_VAPFILE, oldVapFile, vapFile);
+        if ( vapFile==null ) { // always fire off an event.
+            propertyChangeSupport.firePropertyChange(PROP_VAPFILE, old, null);
+        } else {
+            propertyChangeSupport.firePropertyChange(PROP_VAPFILE, null, vapFile);
+        }
     }
 
     /**
