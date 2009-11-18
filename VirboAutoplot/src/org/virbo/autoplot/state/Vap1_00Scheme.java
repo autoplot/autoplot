@@ -34,12 +34,7 @@ public class Vap1_00Scheme extends AbstractVapScheme {
         }
 
         boolean resolved= false;
-        if ( node instanceof PanelStyle ) {
-            if ( name.equals("fillToReference") ) {
-                ((PanelStyle)node).setFill( (Boolean)value );
-                resolved= true;
-            }
-        } else if ( node instanceof Axis ) {
+        if ( node instanceof Axis ) {
             Axis a= (Axis)node;
             if ( name.equals("autorange") ) {
                 a.setAutoRange( (Boolean)value );
