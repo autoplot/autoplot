@@ -154,18 +154,21 @@ public class GuiSupport {
         if ( m.matches() ) {
             int depCount= m.group(5)!=null ? 2 : ( m.group(3)!=null ? 1 : ( m.group(1)!=null ? 0 : -1 ) );
             dia.setDepCount(depCount);
-            if ( m.group(1)!=null ) {
-                DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(1) );
-                dia.getPrimaryDataSetSelector().setValue(dsf.getUri());
+            int[] groups;
+            DataSetSelector[] selectors;
+            selectors= new DataSetSelector[] { dia.getPrimaryDataSetSelector(), 
+                dia.getSecondaryDataSetSelector(), 
+                dia.getTertiaryDataSetSelector(), };
+            if ( depCount==2 ) {
+                groups= new int[] { 5,1,3 };
+            } else if (depCount==1 ) {
+                groups= new int[] { 3,1 };
+            } else {
+                groups= new int[] { 1 };
             }
-            if ( m.group(3)!=null ) {
-                DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(3) );
-                dia.getSecondaryDataSetSelector().setValue(dsf.getUri());
-                
-            }
-            if ( m.group(5)!=null ) {
-                DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(5) );
-                dia.getTertiaryDataSetSelector().setValue(dsf.getUri());
+            for ( int i=0; i<groups.length; i++ ) {
+                DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(groups[i]) );
+                selectors[i].setValue(dsf.getUri());
             }
         } else {
             dia.getPrimaryDataSetSelector().setValue( suri );
