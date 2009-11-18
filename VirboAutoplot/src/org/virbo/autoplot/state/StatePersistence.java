@@ -20,6 +20,8 @@ import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,6 +41,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -165,8 +168,19 @@ public class StatePersistence {
             Document document = builder.parse(source);
 
             if ( document.getDocumentElement().getNodeName().equals("java") ) { // legacy support
-                isr.close();
-                XMLDecoder decode= new XMLDecoder( new FileInputStream(f) );
+                importLegacyVap(document.getDocumentElement());
+                ByteArrayOutputStream baos= new ByteArrayOutputStream(10000);
+                
+                DOMImplementation impl = document.getImplementation();
+                DOMImplementationLS ls = (DOMImplementationLS) impl.getFeature("LS", "3.0");
+                LSSerializer serializer = ls.createLSSerializer();
+                LSOutput output = ls.createLSOutput();
+                output.setEncoding("UTF-8");
+                output.setByteStream(baos);
+                serializer.write(document, output);
+                baos.close();
+                
+                XMLDecoder decode= new XMLDecoder( new ByteArrayInputStream( baos.toByteArray() ) );
                 Object state= decode.readObject();
                 return state;
 
@@ -196,5 +210,27 @@ public class StatePersistence {
             throw new RuntimeException(ex);
         }
 
+    }
+
+    /**
+     * hack the dom to make it class-compatible.
+     * @param doc
+     */
+    private static void importLegacyVap( Element element ) {
+        NodeList nl= element.getChildNodes();
+        for ( int i=0; i<nl.getLength(); i++ ) {
+            Node n= nl.item(i);
+            if ( n.getNodeName().equals("void") ) {
+                NamedNodeMap nn= n.getAttributes();
+                Node prop= nn.getNamedItem("property");
+                if ( prop!=null ) {
+                    if ( prop.getNodeValue().equals("autorange") ) prop.setNodeValue("autoRange");
+                    if ( prop.getNodeValue().equals("autolabel") ) prop.setNodeValue("autoLabel");
+                }
+            }
+            if ( n.hasChildNodes() && n instanceof Element ) {
+                importLegacyVap( (Element) n );
+            }
+        }
     }
 }
