@@ -1253,7 +1253,7 @@ public class PanelController extends DomNodeController {
         ac.bind(panel.style, "symbolConnector", seriesRenderer, "psymConnector");
         ac.bind(panel.style, "plotSymbol", seriesRenderer, "psym");
         ac.bind(panel.style, "fillColor", seriesRenderer, "fillColor");
-        ac.bind(panel.style, "fill", seriesRenderer, "fillToReference");
+        ac.bind(panel.style, PanelStyle.PROP_FILL_TO_REFERENCE, seriesRenderer, "fillToReference");
         ac.bind(panel.style, "reference", seriesRenderer, "reference");
         ac.bind(panel.style, "antiAliased", seriesRenderer, "antiAliased");
     }

@@ -27,6 +27,7 @@ public class PanelStyle extends DomNode {
     }
     
     private double symbolSize= 1.0;
+    public final static String PROP_FILL_TO_REFERENCE= "fillToReference";
     public final static String PROP_SYMBOL_SIZE= "symbolSize";
     
     
@@ -41,7 +42,7 @@ public class PanelStyle extends DomNode {
     }
 
     public final static String PROP_LINE_WIDTH= "lineWidth";
-
+    
     private double lineWidth= 1.0;
 
     public double getLineWidth() {
@@ -138,19 +139,17 @@ public class PanelStyle extends DomNode {
         this.reference = reference;
         propertyChangeSupport.firePropertyChange(PROP_REFERENCE, oldVal, reference );
     }
-
-    public final static String PROP_FILL= "fill";
-
-    private boolean fill= false;
     
-    public boolean isFill() {
-        return this.fill;
+    private boolean fillToReference= false;
+    
+    public boolean isFillToReference() {
+        return this.fillToReference;
     }
     
-    public void setFill(boolean fillToReference) {
-        boolean oldVal= this.fill;
-        this.fill = fillToReference;
-        propertyChangeSupport.firePropertyChange( PROP_FILL, oldVal, fillToReference );
+    public void setFillToReference(boolean fillToReference) {
+        boolean oldVal= this.fillToReference;
+        this.fillToReference = fillToReference;
+        propertyChangeSupport.firePropertyChange( PROP_FILL_TO_REFERENCE, oldVal, fillToReference );
     }
 
     
@@ -191,7 +190,7 @@ public class PanelStyle extends DomNode {
         super.syncTo(node,exclude);
         PanelStyle that= ( PanelStyle )node;
         if ( !exclude.contains(PROP_COLORTABLE ) ) this.setColortable( that.colortable );
-        if ( !exclude.contains(PROP_FILL ) )this.setFill( that.fill );
+        if ( !exclude.contains(PROP_FILL_TO_REFERENCE ) )this.setFillToReference( that.fillToReference );
         if ( !exclude.contains(PROP_COLOR ) )this.setColor( that.getColor() );
         if ( !exclude.contains(PROP_FILLCOLOR ) ) this.setFillColor( that.getFillColor() );
         if ( !exclude.contains(PROP_REFERENCE ) )this.setReference( that.getReference() );
@@ -224,8 +223,8 @@ public class PanelStyle extends DomNode {
         b= that.symbolConnector.equals( this.symbolConnector ) ;
         if ( !b ) result.add( new PropertyChangeDiff( "symbolConnector", that.symbolConnector, this.symbolConnector ));
 
-        b= that.fill==this.fill;
-        if ( !b ) result.add( new PropertyChangeDiff( "fillToReference", that.fill, this.fill ));
+        b= that.fillToReference==this.fillToReference;
+        if ( !b ) result.add( new PropertyChangeDiff( "fillToReference", that.fillToReference, this.fillToReference ));
 
         b= that.reference.equals( this.reference );
         if ( !b ) result.add( new PropertyChangeDiff( "reference",  that.reference, this.reference ));
