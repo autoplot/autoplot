@@ -102,10 +102,12 @@ public class LayoutUtil {
             }
         }
 
-        if ( xmin==90000 || xmax==-90000 || ymin==90000 || ymax==-90000 ) {
+        //90000 or -90000 means no components are connected directly to the margin row
+        // or column.  this is normal.
+        //if ( xmin==90000 || xmax==-90000 || ymin==90000 || ymax==-90000 ) {
             //System.err.println("marching axis state?");
            // return;
-        }
+        //}
 
         bounds = getChildBounds(c);
         if (bounds != null) {
