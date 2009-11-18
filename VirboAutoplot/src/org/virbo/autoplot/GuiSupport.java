@@ -316,6 +316,8 @@ public class GuiSupport {
                     }
                 }
                 parent.dom.getController().reset();
+                parent.undoRedoSupport.resetHistory();
+                parent.applicationModel.setVapFile(null);
             }
         };
     }
