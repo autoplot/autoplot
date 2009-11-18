@@ -29,6 +29,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.das2.DasApplication;
+import org.das2.datum.DatumRange;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasCanvas;
@@ -1177,7 +1178,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE ) );
         application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
         application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID ) );
-
+        application.getPanels(0).controller.setDsfReset(true);
+        application.setTimeRange( application.getPlots(0).getXaxis().getRange() );
+        
         resetIdSequenceNumbers();
         
         lock.unlock();
