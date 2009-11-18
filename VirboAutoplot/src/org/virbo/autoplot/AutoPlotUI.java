@@ -1613,7 +1613,7 @@ private void aggregateAllMenuItemActionPerformed(java.awt.event.ActionEvent evt)
     JythonUtil.invokeScriptSoon( AutoPlotUI.class.getResource("/scripts/aggregateAll.jy"), applicationModel.dom, null );
 }//GEN-LAST:event_aggregateAllMenuItemActionPerformed
 
-private PropertyChangeListener optionsListener= new PropertyChangeListener() {
+private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
             if ( Boolean.TRUE==ev.getNewValue() ) {

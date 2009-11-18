@@ -115,7 +115,7 @@ public class DataPanel extends javax.swing.JPanel {
     }
 
     BindingGroup panelBindingGroup;
-    private PropertyChangeListener panelListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener panelListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals( Panel.PROP_COMPONENT ) ) {
                 componentTextField.setText((String) evt.getNewValue());
@@ -124,7 +124,7 @@ public class DataPanel extends javax.swing.JPanel {
         }
     };
 
-    PropertyChangeListener dsfListener= new PropertyChangeListener() {
+    transient PropertyChangeListener dsfListener= new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals(DataSourceController.PROP_DEPNAMES)) {
                     updateSliceTypeComboBox( applicationController.getDataSourceFilter(), false );

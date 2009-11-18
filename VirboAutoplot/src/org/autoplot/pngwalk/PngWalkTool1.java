@@ -459,7 +459,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     /**
      * respond to changes of the current index.
      */
-    private PropertyChangeListener indexListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener indexListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
             String item= seq.currentImage().getUri().toString();
 
@@ -476,7 +476,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     /**
      * listen for status updates from other agents, relay the status for the view.
      */
-    private PropertyChangeListener statusListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener statusListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
            setStatus((String)evt.getNewValue());
         }
