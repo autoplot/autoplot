@@ -181,6 +181,17 @@ public class StatePersistence {
                 baos.close();
                 
                 XMLDecoder decode= new XMLDecoder( new ByteArrayInputStream( baos.toByteArray() ) );
+
+                // add a direct reference to these guys for compile-all script.
+                new DatumRangePersistenceDelegate();
+                new UnitsPersistenceDelegate();
+                new DatumPersistenceDelegate() ;
+                new DatumPersistenceDelegate() ;
+                new TypeSafeEnumPersistenceDelegate() ;
+                new TypeSafeEnumPersistenceDelegate() ;
+                new BindingPersistenceDelegate() ;
+                new ConnectorPersistenceDelegate();
+
                 Object state= decode.readObject();
                 return state;
 
