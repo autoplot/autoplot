@@ -170,7 +170,7 @@ public class StatePersistence {
             if ( document.getDocumentElement().getNodeName().equals("java") ) { // legacy support
                 importLegacyVap(document.getDocumentElement());
                 ByteArrayOutputStream baos= new ByteArrayOutputStream(10000);
-                
+                System.err.println("importing legacy vap file v0.99");
                 DOMImplementation impl = document.getImplementation();
                 DOMImplementationLS ls = (DOMImplementationLS) impl.getFeature("LS", "3.0");
                 LSSerializer serializer = ls.createLSSerializer();
@@ -189,6 +189,7 @@ public class StatePersistence {
                 String domVersion= document.getDocumentElement().getAttribute("domVersion");
                 if (domVersion.equals("1.0") ) {
                     scheme= new Vap1_00Scheme();
+                    System.err.println("importing legacy vap file v1.00");
                 } else {
                     scheme= new Vap1_01Scheme();
                 }
