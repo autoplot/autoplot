@@ -28,13 +28,13 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
 
     DasPlot topPlot;
     DasPlot bottomPlot;
-    DasPlot panPlot;  // the plot that is panning
-    DasPlot oppositePlot; // this plot we're dragging along
-    DasAxis topAxis;
-    DasAxis bottomAxis;
+   // DasPlot panPlot;  // the plot that is panning
+    //DasPlot oppositePlot; // this plot we're dragging along
+    //DasAxis topAxis;
+    //DasAxis bottomAxis;
     Point p0;  // initial mouse press
-    DatumRange topAxisRange0;
-    DatumRange bottomAxisRange0;
+    //DatumRange topAxisRange0;
+    //DatumRange bottomAxisRange0;
     DasAxis panAxis = null; // this is the axis we're panning
     DatumRange panAxisRange0;
     DasAxis oppositeAxis = null;  // this is the axis we're dragging along

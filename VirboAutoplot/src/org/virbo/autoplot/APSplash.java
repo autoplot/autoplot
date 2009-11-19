@@ -68,7 +68,6 @@ public class APSplash extends JFrame {
 
     private Handler createhandler() {
         Handler result= new Handler() {
-            Handler handler;
             public void publish( LogRecord logRecord ) {
                 messageLabel.setText(logRecord.getMessage() );
                 messageLabel.paint( messageLabel.getGraphics() );
