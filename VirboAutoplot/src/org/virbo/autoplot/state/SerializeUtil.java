@@ -62,12 +62,9 @@ public class SerializeUtil {
             String elementName = scheme.getName(node.getClass());
             DomNode defl = node.getClass().newInstance();
             Element element = null;
-            try {
-                element = document.createElement(elementName);
-            } catch (Exception e) {
-                System.err.println(e);
-                throw new RuntimeException(e);
-            }
+            
+            element = document.createElement(elementName);
+            
             BeanInfo info = BeansUtil.getBeanInfo(node.getClass());
             PropertyDescriptor[] properties = info.getPropertyDescriptors();
             for (int i = 0; i < properties.length; i++) {
