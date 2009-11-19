@@ -62,6 +62,7 @@ public class Test013 {
         QDataSetStreamHandler handler = new QDataSetStreamHandler();
         StreamTool.readStream(Channels.newChannel(new FileInputStream(file)), handler);
         QDataSet qds = handler.getDataSet();
+        System.err.println(qds);
     }
 
     private static QDataSet test1() throws ParseException, StreamException, IOException {
@@ -129,8 +130,6 @@ public class Test013 {
     private static QDataSet test4_rank3() throws ParseException, StreamException, IOException {
         DDataSet ds= (DDataSet) Ops.dindgen( 3, 4, 5 );
         ds.putValue( 1, 2, 3, 0.05 );
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-
         formatParse( ds, "test013_test4_rank3.qds" );
         return ds;
     }
