@@ -67,15 +67,15 @@ public class DemoPngWalk {
 
     }
 
-    public static PngWalkTool start( String template, Window parent ) {
+    public static PngWalkTool1 start( String template, Window parent ) {
 
-        final PngWalkTool tool = new PngWalkTool();
+        final PngWalkTool1 tool = new PngWalkTool1();
 
         if ( template!=null ) {
             tool.setTemplate(template);
         } else {
-            Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
-            String srecent = prefs.get( PngWalkTool.PREF_RECENT,"");
+            Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
+            String srecent = prefs.get( PngWalkTool1.PREF_RECENT,"");
             if ( srecent.equals("") ) {
                 tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");
             } else {
@@ -92,7 +92,7 @@ public class DemoPngWalk {
 
         }
 
-        PngWalkTool.ActionEnabler enabler= new PngWalkTool.ActionEnabler() {
+        PngWalkTool1.ActionEnabler enabler= new PngWalkTool1.ActionEnabler() {
             public boolean isActionEnabled(String filename) {
                 String s = filename;
                 String template = tool.getTemplate();
@@ -171,7 +171,7 @@ public class DemoPngWalk {
         return tool;
     }
 
-    private static JMenuBar createMenuBar( final PngWalkTool tool, final JFrame f ) {
+    private static JMenuBar createMenuBar( final PngWalkTool1 tool, final JFrame f ) {
         JMenuBar result= new JMenuBar();
         JMenu fileMenu= new JMenu("File");
         fileMenu.add( new AbstractAction( f.getDefaultCloseOperation()==JFrame.EXIT_ON_CLOSE ? "Exit" : "Close" ) {

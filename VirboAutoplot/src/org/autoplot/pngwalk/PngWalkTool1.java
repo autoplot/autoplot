@@ -130,8 +130,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         if ( template!=null ) {
             tool.setTemplate(template);
         } else {
-            Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
-            String srecent = prefs.get( PngWalkTool.PREF_RECENT,"");
+            Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
+            String srecent = prefs.get( PngWalkTool1.PREF_RECENT,"");
             if ( srecent.equals("") ) {
                 tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");
             } else {
@@ -350,7 +350,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         initComponents();
         dataSetSelector1.setEnableDataSource(false);
 
-        Preferences prefs = Preferences.userNodeForPackage(PngWalkTool.class);
+        Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
         String srecent = prefs.get(PREF_RECENT,"");
 
         if ( !srecent.equals("") ) {
