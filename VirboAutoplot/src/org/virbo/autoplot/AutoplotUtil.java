@@ -931,13 +931,19 @@ public class AutoplotUtil {
 
         QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
         QDataSet plane0 = (QDataSet) fillds.property(QDataSet.PLANE_0);
+        QDataSet bundle1= (QDataSet) fillds.property(QDataSet.BUNDLE_1);
 
         if (fillds.rank() >= 2) {
-            if (dep1 != null && isVectorOrBundleIndex(dep1)) {
+            if ( bundle1!=null || (dep1 != null && isVectorOrBundleIndex(dep1) ) ) {
                 if (fillds.length() > 80000) {
                     spec = RenderType.hugeScatter;
                 } else {
                     spec = RenderType.series;
+                }
+                if ( bundle1!=null ) {
+                    if ( bundle1.length()>2 ) {
+                        spec= RenderType.colorScatter;
+                    }
                 }
             } else {
                 spec = RenderType.spectrogram;
