@@ -311,11 +311,23 @@ public class PanelController extends DomNodeController {
                 return rendererAcceptsData( DataSetOps.slice0(fillDs,0) );
             } else {
                 return fillDs.rank()==2;
-            }
+            } 
         } else if ( getRenderer() instanceof SeriesRenderer) {
-            return fillDs.rank()==1;
+            if ( fillDs.rank()==1 ) {
+                return true;
+            } else if ( fillDs.rank()==2 ) {
+                return SemanticOps.isBundle(fillDs);
+            } else {
+                return false;
+            }
         } else if ( getRenderer() instanceof ImageVectorDataSetRenderer ) {
-            return fillDs.rank()==1;
+            if ( fillDs.rank()==1 ) {
+                return true;
+            } else if ( fillDs.rank()==2 ) {
+                return SemanticOps.isBundle(fillDs);
+            } else {
+                return false;
+            }
         } else {
             return true;
         }
@@ -599,6 +611,13 @@ public class PanelController extends DomNodeController {
                     && renderType != RenderType.nnSpectrogram
                     && renderType != RenderType.digital )
                     &&  fillDs.length(0) < 12;
+
+            if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) {
+                QDataSet bdesc= (QDataSet) fillDs.property(QDataSet.BUNDLE_1);
+                if ( null!=bdesc.property(QDataSet.CONTEXT_0,bdesc.length()-1) ) {
+                    shouldHaveChildren= false;
+                }
+            }
 
             String[] labels = null;
             if ( shouldHaveChildren ) labels= SemanticOps.getComponentLabels(fillDs);
@@ -1119,8 +1138,14 @@ public class PanelController extends DomNodeController {
             panelCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
 
             if (spec == RenderType.colorScatter) {
-                AutoplotUtil.AutoRangeDescriptor zdesc = AutoplotUtil.autoRange((QDataSet) fillDs.property(QDataSet.PLANE_0),
+                AutoplotUtil.AutoRangeDescriptor zdesc;
+                if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
+                    zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, 2 ),null);
+                } else {
+                    zdesc= AutoplotUtil.autoRange((QDataSet) fillDs.property(QDataSet.PLANE_0),
                         (Map) props.get(QDataSet.PLANE_0));
+                }
+                 
                 panelCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
                 panelCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
                 panelCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
