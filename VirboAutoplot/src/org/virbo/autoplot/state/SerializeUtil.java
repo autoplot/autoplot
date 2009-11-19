@@ -5,6 +5,7 @@
 package org.virbo.autoplot.state;
 
 import java.awt.Color;
+import java.beans.IntrospectionException;
 import java.text.ParseException;
 import org.virbo.autoplot.dom.*;
 import java.beans.BeanInfo;
@@ -56,14 +57,10 @@ public class SerializeUtil {
     }
     
     public static Element getDomElement( Document document, DomNode node, VapScheme scheme ) {
-        Logger log= DasLogger.getLogger( DasLogger.SYSTEM_LOG );
-
-
         try {
+            Logger log = DasLogger.getLogger(DasLogger.SYSTEM_LOG);
             String elementName = scheme.getName(node.getClass());
-
-            DomNode defl= node.getClass().newInstance();
-
+            DomNode defl = node.getClass().newInstance();
             Element element = null;
             try {
                 element = document.createElement(elementName);
@@ -72,28 +69,22 @@ public class SerializeUtil {
                 throw new RuntimeException(e);
             }
             BeanInfo info = BeansUtil.getBeanInfo(node.getClass());
-
             PropertyDescriptor[] properties = info.getPropertyDescriptors();
-
-            for ( int i=0; i<properties.length; i++ ) {
-                PropertyDescriptor pd= properties[i];
-                String propertyName= pd.getName();
-
-                if ( propertyName.equals("controller") ) { //special node should runtime data
+            for (int i = 0; i < properties.length; i++) {
+                PropertyDescriptor pd = properties[i];
+                String propertyName = pd.getName();
+                if (propertyName.equals("controller")) {
+                    //special node should runtime data
                     continue;
                 }
-
-                log.fine( "serializing property "+propertyName + " of " +elementName + " id=" + node.getId());
-
-                Method readMethod= pd.getReadMethod();
-                Method writeMethod= pd.getWriteMethod();
-
-                if ( writeMethod==null || readMethod==null ) {
-                     log.info( "skipping property "+propertyName +" of "+elementName+", failed to find read and write method." );
-                     continue;
+                log.fine("serializing property " + propertyName + " of " + elementName + " id=" + node.getId());
+                Method readMethod = pd.getReadMethod();
+                Method writeMethod = pd.getWriteMethod();
+                if (writeMethod == null || readMethod == null) {
+                    log.info("skipping property " + propertyName + " of " + elementName + ", failed to find read and write method.");
+                    continue;
                 }
-
-                Object value= null;
+                Object value = null;
                 try {
                     value = readMethod.invoke(node, new Object[0]);
                 } catch (IllegalAccessException ex) {
@@ -106,77 +97,80 @@ public class SerializeUtil {
                     log.log(Level.SEVERE, null, ex);
                     continue;
                 }
-
-                if ( value==null ) {
-                    log.info( "skipping property "+propertyName+" of "+elementName+", value is null." );
+                if (value == null) {
+                    log.info("skipping property " + propertyName + " of " + elementName + ", value is null.");
                     continue;
                 }
-
-                if ( propertyName.equals("id") && ((String)value).length()>0 ) {
-                    element.setAttribute( propertyName, (String)value );
+                if (propertyName.equals("id") && ((String) value).length() > 0) {
+                    element.setAttribute(propertyName, (String) value);
                     continue;
                 }
-
-                IndexedPropertyDescriptor ipd=null;
-                if ( pd instanceof IndexedPropertyDescriptor ) {
-                    ipd= (IndexedPropertyDescriptor)pd;
+                IndexedPropertyDescriptor ipd = null;
+                if (pd instanceof IndexedPropertyDescriptor) {
+                    ipd = (IndexedPropertyDescriptor) pd;
                 }
-
-                if ( value instanceof DomNode ) {
+                if (value instanceof DomNode) {
                     // special optimization, only serialize at the first reference to DCC, afterwards just use name
-                    Element propertyElement= document.createElement( "property" );
-                    propertyElement.setAttribute("name", propertyName );
-                    propertyElement.setAttribute("type", "DomNode" );
-                    Element child= getDomElement( document, (DomNode)value, scheme );
+                    Element propertyElement = document.createElement("property");
+                    propertyElement.setAttribute("name", propertyName);
+                    propertyElement.setAttribute("type", "DomNode");
+                    Element child = getDomElement(document, (DomNode) value, scheme);
                     propertyElement.appendChild(child);
                     element.appendChild(propertyElement);
-
-                } else if ( ipd!=null && ( DomNode.class.isAssignableFrom( ipd.getIndexedPropertyType() ) ) ) {
+                } else if (ipd != null && (DomNode.class.isAssignableFrom(ipd.getIndexedPropertyType()))) {
                     // serialize each element of the array.  Assumes order doesn't change
-                    Element propertyElement= document.createElement( "property" );
-                    propertyElement.setAttribute( "name", propertyName );
-                    String clasName= scheme.getName( ipd.getIndexedPropertyType() );
-                    propertyElement.setAttribute( "class", clasName );
-                    propertyElement.setAttribute( "length", String.valueOf( Array.getLength(value) ) );
-                    for ( int j=0; j<Array.getLength(value); j++ ) {
-                        Object value1= Array.get( value, j );
-                        Element child= getDomElement( document, (DomNode)value1, scheme  );
+                    Element propertyElement = document.createElement("property");
+                    propertyElement.setAttribute("name", propertyName);
+                    String clasName = scheme.getName(ipd.getIndexedPropertyType());
+                    propertyElement.setAttribute("class", clasName);
+                    propertyElement.setAttribute("length", String.valueOf(Array.getLength(value)));
+                    for (int j = 0; j < Array.getLength(value); j++) {
+                        Object value1 = Array.get(value, j);
+                        Element child = getDomElement(document, (DomNode) value1, scheme);
                         propertyElement.appendChild(child);
                     }
                     element.appendChild(propertyElement);
-                } else if ( ipd!=null ) {
-                    Element propertyElement= document.createElement( "property" );
-                    propertyElement.setAttribute( "name", propertyName );
-                    String clasName= scheme.getName( ipd.getIndexedPropertyType() );
-                    propertyElement.setAttribute( "class", clasName );
-                    propertyElement.setAttribute( "length", String.valueOf( Array.getLength(value) ) );
-                    for ( int j=0; j<Array.getLength(value); j++ ) {
-                        Object value1= Array.get( value, j );
-                        Element child= getElementForLeafNode( document, ipd.getIndexedPropertyType(), value1, null );
+                } else if (ipd != null) {
+                    Element propertyElement = document.createElement("property");
+                    propertyElement.setAttribute("name", propertyName);
+                    String clasName = scheme.getName(ipd.getIndexedPropertyType());
+                    propertyElement.setAttribute("class", clasName);
+                    propertyElement.setAttribute("length", String.valueOf(Array.getLength(value)));
+                    for (int j = 0; j < Array.getLength(value); j++) {
+                        Object value1 = Array.get(value, j);
+                        Element child = getElementForLeafNode(document, ipd.getIndexedPropertyType(), value1, null);
                         propertyElement.appendChild(child);
                     }
                     element.appendChild(propertyElement);
-
                 } else {
-                    Object defltValue= DomUtil.getPropertyValue( defl, pd.getName() );
-
-                    Element prop= getElementForLeafNode( document, pd.getPropertyType(), value, defltValue );
-                    if ( prop==null ) {
-                        log.warning( "unable to serialize "+ propertyName );
+                    Object defltValue = DomUtil.getPropertyValue(defl, pd.getName());
+                    Element prop = getElementForLeafNode(document, pd.getPropertyType(), value, defltValue);
+                    if (prop == null) {
+                        log.warning("unable to serialize " + propertyName);
                         continue;
                     }
-                    prop.setAttribute("name", pd.getName() );
-                    element.appendChild( prop );
+                    prop.setAttribute("name", pd.getName());
+                    element.appendChild(prop);
                 }
-
             }
-
             return element;
-            
-        } catch (Exception ex) {
+        } catch (IntrospectionException ex) {
+            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
             Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
+            
     }
 
     /**
@@ -313,7 +307,16 @@ public class SerializeUtil {
 
             return node;
 
-        } catch (Exception ex) {
+        } catch (IntrospectionException ex) {
+            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
             Logger.getLogger(SerializeUtil.class.getName()).log(Level.SEVERE, null, ex);
             throw new RuntimeException(ex);
         }
