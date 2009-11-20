@@ -149,6 +149,7 @@ if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 or
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
+
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
@@ -164,6 +165,10 @@ for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPane
    echo $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
    if ! $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
+
+# NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+
 cd ..
 echo "done compile sources."
 
