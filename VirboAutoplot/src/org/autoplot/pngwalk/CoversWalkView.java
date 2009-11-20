@@ -32,14 +32,13 @@ public class CoversWalkView extends PngWalkView  {
 
     private static final int HEIGHT_WIDTH_RATIO = 10;
     int cellSize = 200;
-    int cellWidth= 20 / HEIGHT_WIDTH_RATIO;
+    int cellWidth= cellSize / HEIGHT_WIDTH_RATIO;
     int MINIMUM_CELL_SIZE = 50;
     int DEFAULT_CELL_SIZE = 100;
     private JScrollPane scrollPane;
 
     Canvas canvas;
     
-    /** Creates new form RowPngWalkView */
     public CoversWalkView(final WalkImageSequence seq) {
         super(seq);
         setLayout(new java.awt.BorderLayout());
@@ -108,7 +107,7 @@ public class CoversWalkView extends PngWalkView  {
         } else {
             canvas.setPreferredSize(new Dimension(DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE));
         }
-        revalidate();
+        canvas.repaint();
     }
 
     @Override
