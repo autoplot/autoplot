@@ -176,8 +176,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 String s = tool.getSelectedFile();
                 String template = tool.getTemplate();
-                //int i0 = template.indexOf("_$Y");
-                //if ( i0==-1 ) i0= template.indexOf("_%Y");
+                int i0 = template.indexOf("_$Y");
+                if ( i0==-1 ) i0= template.indexOf("_%Y");
                 //int i1 = template.indexOf(".png");
                 //if ( i1==-1 ) return;
                 //TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
