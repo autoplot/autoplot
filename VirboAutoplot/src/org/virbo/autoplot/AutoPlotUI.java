@@ -24,6 +24,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.PersistentStateSupport;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -289,6 +290,7 @@ public class AutoPlotUI extends javax.swing.JFrame {
 
         applicationModel.getCanvas().setFitted(true);
         JScrollPane scrollPane = new JScrollPane(applicationModel.getCanvas());
+        scrollPane.getViewport().setBackground( new JLabel().getBackground() );
         tabs.insertTab("canvas", null, scrollPane, TABS_TOOLTIP, 0);
         tabs.validate();
         
