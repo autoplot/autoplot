@@ -58,8 +58,10 @@ public class Test013 {
      */
     private static void formatParse( QDataSet ds, String file) throws FileNotFoundException, IOException, StreamException {
         SimpleStreamFormatter format = new SimpleStreamFormatter();
+        System.err.println("attempt to format "+ds+" into "+file);
         format.format(ds, new FileOutputStream(file), true);
         QDataSetStreamHandler handler = new QDataSetStreamHandler();
+        System.err.println("attempt to parse "+file);
         StreamTool.readStream(Channels.newChannel(new FileInputStream(file)), handler);
         QDataSet qds = handler.getDataSet();
         System.err.println(qds);
