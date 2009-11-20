@@ -206,7 +206,6 @@ public class SerializeUtil {
         String type= element.getAttribute("type");
         SerializeDelegate sd= SerializeRegistry.getByName(type);
         if ( sd==null ) {
-            sd= SerializeRegistry.getByName(type);
             throw new IllegalArgumentException("unable to find serialize delegate for \""+type+"\"");
         }
         if ( element.hasChildNodes() ) {
@@ -292,6 +291,9 @@ public class SerializeUtil {
                                 pd.getWriteMethod().invoke( node, child );
                             }
                         }
+                    } catch ( RuntimeException ex) {
+                        // Probably better to be sure this gets thrown, and it keeps findbugs happy
+                        throw(ex);
                     } catch ( Exception ex ) {
                         if ( scheme.resolveProperty(e, node) ) {
                             System.err.println("imported "+e.getAttribute("name") );
