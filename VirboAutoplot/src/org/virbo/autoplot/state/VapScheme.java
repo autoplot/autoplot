@@ -13,7 +13,7 @@ import org.w3c.dom.Element;
  * @author jbf
  */
 public interface VapScheme {
-    void addUnresolvedProperty( Element element, DomNode node );
+    public void addUnresolvedProperty( Element element, DomNode node , Exception exception);
     boolean resolveProperty( Element element, DomNode node );
     Class getClass( String name );
     String getName( Class clas );

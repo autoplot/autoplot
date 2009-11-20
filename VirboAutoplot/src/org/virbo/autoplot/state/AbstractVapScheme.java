@@ -43,13 +43,13 @@ public abstract class AbstractVapScheme implements VapScheme {
         return elementName;
     }
 
-    public void addUnresolvedProperty( Element element, DomNode node) {
+    public void addUnresolvedProperty( Element element, DomNode node, Exception exception) {
         String name =element.getAttribute("name");
         if ( name.length()==0 ) {
             name= element.getNodeName();
         }
         String value= element.getAttribute("value");
-        unresolved.add( node.getId() + "  " + name + "=" +value );
+        unresolved.add( node.getId() + "  " + name + "=" +value + "  "+exception );
         
     }
 

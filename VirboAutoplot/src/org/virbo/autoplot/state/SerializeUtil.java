@@ -298,7 +298,7 @@ public class SerializeUtil {
                         if ( scheme.resolveProperty(e, node) ) {
                             System.err.println("imported "+e.getAttribute("name") );
                         } else {
-                            scheme.addUnresolvedProperty(e,node);
+                            scheme.addUnresolvedProperty(e,node, ex);
                         }
                     }
                 }

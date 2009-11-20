@@ -186,8 +186,6 @@ public class StatePersistence {
                 new DatumRangePersistenceDelegate();
                 new UnitsPersistenceDelegate();
                 new DatumPersistenceDelegate() ;
-                new DatumPersistenceDelegate() ;
-                new TypeSafeEnumPersistenceDelegate() ;
                 new TypeSafeEnumPersistenceDelegate() ;
                 new BindingPersistenceDelegate() ;
                 new ConnectorPersistenceDelegate();
