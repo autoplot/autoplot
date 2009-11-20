@@ -183,6 +183,10 @@ for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceE
    echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
    if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
+
+# NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+
 cd ..
 echo "done compile sources."
 
