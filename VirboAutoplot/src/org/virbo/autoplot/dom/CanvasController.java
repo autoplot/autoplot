@@ -6,6 +6,7 @@ package org.virbo.autoplot.dom;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,8 +24,10 @@ import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasDevicePosition;
+import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.Painter;
+import org.das2.graph.Renderer;
 import org.das2.graph.SelectionUtil;
 import org.das2.system.MutatorLock;
 import org.virbo.autoplot.layout.LayoutConstants;
@@ -535,12 +538,20 @@ public class CanvasController extends DomNodeController {
 
         if ( !dasCanvas.isShowing() ) return;
         final List<Shape> sel= new ArrayList<Shape>();
+        final List<Rectangle> clip= new ArrayList<Rectangle>();
+
         for ( Object o: selectedItems ) {
             Area sel1=null;
             if ( o instanceof Plot ) {
-                sel.add( SelectionUtil.getSelectionArea( ((Plot)o).getController().getDasPlot() ) );
+                DasPlot p= ((Plot)o).getController().getDasPlot();
+                sel.add( SelectionUtil.getSelectionArea( p ) );
+                clip.add( p.getBounds() );
             } else if ( o instanceof Panel ) {
-                sel.add( SelectionUtil.getSelectionArea( ((Panel)o).getController().getRenderer() ) );
+                Renderer rend= ((Panel)o).getController().getRenderer();
+                DasPlot p= rend.getParent();
+                Rectangle r= p.getBounds();
+                sel.add( SelectionUtil.getSelectionArea( rend ) );
+                clip.add( r );
             }
 
             if (sel1!=null) sel.add(sel1);
@@ -549,8 +560,15 @@ public class CanvasController extends DomNodeController {
         final Painter p= new Painter() {
             public void paint(Graphics2D g) {
                 g.setColor( new Color( 255, 255, 0, 100 ) );
-                for ( Shape s: sel ) {
-                    if ( s!=null ) g.fill(s);
+                Shape clip0= g.getClip();
+                for ( int i=0; i<sel.size(); i++ ) {
+                    Shape s= sel.get(i);
+                    Rectangle c= clip.get(i);
+                    if ( s!=null ) {
+                        g.clip(c);
+                        g.fill(s);
+                        g.clip(clip0);
+                    }
                 }
             }
         };
