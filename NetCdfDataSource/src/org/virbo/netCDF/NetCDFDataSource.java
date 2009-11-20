@@ -38,6 +38,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     Variable variable;
     String sMyUrl;
     String svariable;
+    NetcdfDataset ncfile;
 
     static {
         try {
@@ -89,7 +90,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         mon.started();
         readData(mon);
-        NetCdfVarDataSet result= new NetCdfVarDataSet( variable );
+        NetCdfVarDataSet result= new NetCdfVarDataSet( variable , ncfile);
         QDataSet qresult= checkLatLon(result);
         mon.finished();
         return qresult;
@@ -144,6 +145,8 @@ public class NetCDFDataSource extends AbstractDataSource {
             NetcdfFile f= NetcdfFile.open( location );
             dataset= new NetcdfDataset( f );
         }
+
+        ncfile= dataset;
         
         List<Variable> variables= (List<Variable>)dataset.getVariables();
         

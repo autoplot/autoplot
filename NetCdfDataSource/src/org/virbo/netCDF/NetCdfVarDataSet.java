@@ -23,6 +23,7 @@ import org.virbo.metatree.MetadataUtil;
 import ucar.ma2.DataType;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
+import ucar.nc2.dataset.NetcdfDataset;
 
 /**
  * wraps a rank 1 netCDF variable to present it as a QDataSet.
@@ -39,7 +40,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     int[] shape;
     
     @SuppressWarnings("unchecked")
-    public NetCdfVarDataSet( Variable variable ) throws IOException {
+    public NetCdfVarDataSet( Variable variable , NetcdfDataset ncfile ) throws IOException {
         this.v= variable;
                 
         ucar.ma2.Array a = v.read();
@@ -54,12 +55,12 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
         for ( int ir=0; ir<a.getRank(); ir++ ) {
             ucar.nc2.Dimension d= v.getDimension(ir);
-            List l= d.getCoordinateVariables();
-            if ( l.size()>1 ) throw new IllegalArgumentException("Huh?");
-            for ( int i=0; i<l.size(); i++ ) {
-                Variable dv= (Variable) l.get(0);
+
+            Variable cv = ncfile.findVariable(d.getName());
+            if ((cv != null) && cv.isCoordinateVariable()) {
+                Variable dv= cv;
                 if ( dv!=variable ) {
-                    QDataSet depend0= new NetCdfVarDataSet( dv );
+                    QDataSet depend0= new NetCdfVarDataSet( dv , ncfile);
                     properties.put( "DEPEND_"+ir, depend0 );
                 } else {
                     isCoordinateVariable= true;
