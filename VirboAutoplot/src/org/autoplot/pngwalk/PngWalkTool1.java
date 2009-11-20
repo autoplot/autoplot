@@ -400,6 +400,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         views[1].setMinimumSize( new Dimension(100,100) );
         views[4].setMinimumSize( new Dimension(100,100) );
+        views[3].setPreferredSize( new Dimension(640,480) );
         final JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
         p.setDividerLocation(getThumbnailSize()+ SCROLLBAR_HEIGHT);
         views[1].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
