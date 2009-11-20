@@ -176,12 +176,14 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 String s = tool.getSelectedFile();
                 String template = tool.getTemplate();
-                int i0 = template.indexOf("_$Y");
-                if ( i0==-1 ) i0= template.indexOf("_%Y");
-                int i1 = s.indexOf(".png");
-                if ( i1==-1 ) return;
-                TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
-                String timeRange = s.substring(i0 + 1, i1);
+                //int i0 = template.indexOf("_$Y");
+                //if ( i0==-1 ) i0= template.indexOf("_%Y");
+                //int i1 = template.indexOf(".png");
+                //if ( i1==-1 ) return;
+                //TimeParser tp= TimeParser.create( template.substring(i0 + 1, i1) );
+                //String timeRange = s.substring(i0 + 1, i1);
+                TimeParser tp= TimeParser.create( template );
+                String timeRange = s;
                 try {
                     DatumRange dr= tp.parse(timeRange).getTimeRange();
                     timeRange= dr.toString().replaceAll(" ", "+");
