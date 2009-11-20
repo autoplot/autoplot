@@ -1117,17 +1117,26 @@ public class PanelController extends DomNodeController {
             panelCopy.getStyle().setLineWidth(1.0f);
 
             QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
-            AutoplotUtil.AutoRangeDescriptor desc;
+            AutoplotUtil.AutoRangeDescriptor ydesc;
             if ( false && hist!=null ) {
-                desc= AutoplotUtil.autoRange( hist, fillDs, props );
+                ydesc= AutoplotUtil.autoRange( hist, fillDs, props );
             } else {
-                desc = AutoplotUtil.autoRange( fillDs, props );
+                if ( SemanticOps.isBundle(fillDs) ) {
+                    ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props );
+                } else {
+                    ydesc = AutoplotUtil.autoRange( fillDs, props );
+                }
             }
 
-            panelCopy.getPlotDefaults().getYaxis().setLog(desc.log);
-            panelCopy.getPlotDefaults().getYaxis().setRange(desc.range);
+            panelCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
+            panelCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
 
-            QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            QDataSet xds;
+            if ( SemanticOps.isBundle(fillDs) ) {
+                xds= DataSetOps.unbundle(fillDs,0);
+            } else {
+                xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            }
             if (xds == null) {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
             }
