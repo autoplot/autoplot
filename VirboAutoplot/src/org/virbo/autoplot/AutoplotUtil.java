@@ -407,7 +407,12 @@ public class AutoplotUtil {
 
         double[] dd;
 
-        boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC)) || null != ds.property(QDataSet.CADENCE);
+        boolean mono = Boolean.TRUE.equals(ds.property(QDataSet.MONOTONIC));
+        if ( null != ds.property(QDataSet.CADENCE) ) {
+            if ( DataSetUtil.isMonotonic(ds) ) {
+                mono= true;
+            }
+        }
         
         // the autoranging will be in log space only if the data are not time locations.
         boolean isLog= "log".equals(ds.property(QDataSet.SCALE_TYPE)) && !UnitsUtil.isTimeLocation(u);
