@@ -874,8 +874,6 @@ public class PanelController extends DomNodeController {
      * postconditions:
      *   panel's plotDefaults are set based on metadata and autoranging.
      *   listening plot may invoke its resetZoom method.
-     *
-     * @param autorange
      */
     private synchronized void doResetRanges() {
         logger.finest("doResetRanges...");
@@ -1011,28 +1009,44 @@ public class PanelController extends DomNodeController {
 
             }
         } else { // hugeScatter okay
-            if ( (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
+
+            Map<String,Object> yprop=null, xprop=null, prop=null;
+
+            QDataSet bundle1= (QDataSet) properties.get(QDataSet.BUNDLE_1);
+            if ( bundle1!=null ) {
+                prop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, bundle1.length()-1 ) );
+                xprop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 0 ) );
+                yprop=  DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 1 ) ); // may be the same as prop.
+            } else {
+                prop= properties;
+                xprop= (Map<String, Object>) properties.get( QDataSet.DEPEND_0 );
+                yprop= properties;
+                v = properties.get(QDataSet.PLANE_0);
+                if ( v!=null ) {
+                    yprop= prop;
+                    prop= (Map<String, Object>) v;
+                }
+            }
+
+            if ( (v = yprop.get(QDataSet.SCALE_TYPE)) != null) {
                 plotDefaults.getYaxis().setLog(v.equals("log"));
             }
 
-            if ( (v = properties.get(QDataSet.LABEL)) != null) {
+            if ( (v = yprop.get(QDataSet.LABEL)) != null) {
                 plotDefaults.getYaxis().setLabel((String) v);
             }
 
-            if (spec == RenderType.colorScatter) {
-                v = properties.get(QDataSet.PLANE_0);
-                if (v != null) {
-                    Map m = (Map) v;
-                    Object v2 = m.get(QDataSet.LABEL);
-                    if (v2 != null) {
-                        plotDefaults.getZaxis().setLabel((String) v2);
-                    }
-                } else {
-                    plotDefaults.getZaxis().setLabel("");
-                }
-            } else {
-                plotDefaults.getZaxis().setLabel("");
+            if ( (v = xprop.get(QDataSet.LABEL)) != null) {
+                plotDefaults.getXaxis().setLabel((String) v);
             }
+
+            if (spec == RenderType.colorScatter) {
+                v = prop.get(QDataSet.LABEL);
+                if (v != null) {
+                    plotDefaults.getZaxis().setLabel((String) v);
+                }
+            }
+
 
         }
 
@@ -1053,7 +1067,7 @@ public class PanelController extends DomNodeController {
      * The dom Plot containing this panel should be listening for changes in panel.plotDefaults,
      * and can then decide if it wants to use the autorange settings.
      *
-     * This also sets the style node of the panel copy, so its values sould be sync'ed as well.
+     * This also sets the style node of the panel copy, so its values should be sync'ed as well.
      * 
      * @param cpanel
      * @param props
