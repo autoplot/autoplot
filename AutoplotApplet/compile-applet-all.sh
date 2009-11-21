@@ -51,7 +51,7 @@ if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes 
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
 
 # NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+#NetCDF isn't enabled for applets yet:   if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
 
 echo "done compile sources."
 
