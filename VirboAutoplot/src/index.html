@@ -6,9 +6,9 @@
     <H3>Autoplot Application (#{tag}) (update 1)</H3>
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
-	<img src="screen2.png">
-        <p><small>New PNGWalk Tool uses Tearoff Tabbed Pane to provide flexible views
-                of PNG walks.
+	<img src="screen.png">
+        <p><small>Bugfix in huge scatter improves appearance.  Add Plot->Copy Panels Right makes it
+                easier to add side-by-side plots.  The vap filename is indicated in the title.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -21,14 +21,26 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Recent changes include:</p>
         <ul>
-            <li>Updates:
-                <ul>
-                    <li>command key used on mac (e.g. command-Z), instead of control.</li>
-                    <li>various bugfixes.</li>
-                    <li>QDataSet interface gets experimental native (implementation-specific) slice and trim operations.</li>
-                    <li>help document for data tab.</li>
-                </ul>
-            </li>
+            <li>bug 2896789: command key used on mac (e.g. command-Z), instead of control.</li>
+            <li>QDataSet interface gets experimental native (implementation-specific) slice and trim operations.</li>
+            <li>help document for data tab.</li>
+            <li>start findbugs analysis, final code cleanup before production branch.</li>
+            <li>python editor panel allows inspection of variables when an error is hit.</li>
+            <li>new vap scheme introduced, old vaps are parsed but not formatted.</li>
+            <li>"native" slice and trim dataset operators will improve performance</li>
+            <li>vap filename indicated in the title</li>
+            <li>support bundle_1 dataset schema to better support Z(X,Y) where X and Y are rank 1.</li>
+            <li>python "link(x,y,z)" command returns data equivalent to "plot(x,y,z)"
+            <li>bugfixes:
+            <ul>
+                <li>2899475: edit data source ds order wrong</li>
+                <li>2900384: huge scatter renderer didn't saturate.</li>
+                <li>2899734: copy panels right would fail to repaint left plot.</li>
+                <li>minor errors in reset application</li>
+                <li>loading new vap resets undo/redo</li>
+                <li>bug in axis bounds calculation could lead to autolayout marching axes</li>
+                <li>when editing multiple nodes at once, avoid "child is not instanceof leader class</li>
+            </ul>
 <li>New PNG Walk Tool that is more flexible and improves the user interface.</li>
 <ul><li> scrollbars used to provide more usable control.
 </li><li> simple, serviceable views composed to make complex displays
@@ -70,10 +82,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
 <p>Known issues:</p>
 <ul>
-<li> HugeScatter renderer needs to have the envelope (column min to max) painted to avoid Moire patterns.
-</li><li> last URI is not added to DataSetSelector.
-</li><li> PNGWalk tool doesn't repaint when subrange is changed</li>
-<li>AsciiTableDataSource sometimes identifies data as column headers</li>
+<li> <a href="https://sourceforge.net/tracker/?func=browse&group_id=199733&atid=970682">see Source Forge</a>
 </ul>
 <p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
