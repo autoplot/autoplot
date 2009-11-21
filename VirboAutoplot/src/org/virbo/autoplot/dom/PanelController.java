@@ -1119,8 +1119,25 @@ public class PanelController extends DomNodeController {
 
         } else {
 
+            QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
+            AutoplotUtil.AutoRangeDescriptor ydesc;
+            
+            QDataSet depend0;
+
+            if ( false && hist!=null ) {
+                ydesc= AutoplotUtil.autoRange( hist, fillDs, props );
+                depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            } else {
+                if ( SemanticOps.isBundle(fillDs) ) {
+                    ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props );
+                    depend0= DataSetOps.unbundle(fillDs,0);
+                } else {
+                    ydesc = AutoplotUtil.autoRange( fillDs, props );
+                    depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                }
+            }
+
             boolean isSeries;
-            QDataSet depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             isSeries = (depend0 == null || DataSetUtil.isMonotonic(depend0));
             if (isSeries) {
                 panelCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);
@@ -1129,28 +1146,10 @@ public class PanelController extends DomNodeController {
             }
 
             panelCopy.getStyle().setLineWidth(1.0f);
-
-            QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
-            AutoplotUtil.AutoRangeDescriptor ydesc;
-            if ( false && hist!=null ) {
-                ydesc= AutoplotUtil.autoRange( hist, fillDs, props );
-            } else {
-                if ( SemanticOps.isBundle(fillDs) ) {
-                    ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props );
-                } else {
-                    ydesc = AutoplotUtil.autoRange( fillDs, props );
-                }
-            }
-
             panelCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
             panelCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
 
-            QDataSet xds;
-            if ( SemanticOps.isBundle(fillDs) ) {
-                xds= DataSetOps.unbundle(fillDs,0);
-            } else {
-                xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-            }
+            QDataSet xds= depend0;
             if (xds == null) {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
             }
