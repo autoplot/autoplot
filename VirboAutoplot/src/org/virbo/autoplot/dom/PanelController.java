@@ -1036,7 +1036,7 @@ public class PanelController extends DomNodeController {
                 plotDefaults.getYaxis().setLabel((String) v);
             }
 
-            if ( (v = xprop.get(QDataSet.LABEL)) != null) {
+            if ( xprop!=null && (v = xprop.get(QDataSet.LABEL)) != null) {
                 plotDefaults.getXaxis().setLabel((String) v);
             }
 
