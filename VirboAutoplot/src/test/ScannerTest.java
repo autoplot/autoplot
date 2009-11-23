@@ -21,9 +21,11 @@ import org.virbo.dsutil.DataSetBuilder;
  * @author jbf
  */
 public class ScannerTest {
-    private static final String TEST_FILE = "/home/jbf/project/cassini/BobsFiles/data_look_asc";
+    private static String TEST_FILE;
 
     public static void main(String[] args) throws FileNotFoundException, Exception {
+
+        TEST_FILE = "/home/jbf/project/cassini/BobsFiles/data_look_asc"; // findbugs
         File file= new File( TEST_FILE);
 
         int nds= 16;
