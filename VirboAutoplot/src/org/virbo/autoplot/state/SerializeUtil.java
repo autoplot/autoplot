@@ -292,8 +292,11 @@ public class SerializeUtil {
                             }
                         }
                     } catch ( RuntimeException ex) {
-                        // Probably better to be sure this gets thrown, and it keeps findbugs happy
-                        throw(ex);
+                        if ( scheme.resolveProperty(e, node) ) {
+                            System.err.println("imported "+e.getAttribute("name") );
+                        } else {
+                            scheme.addUnresolvedProperty(e,node, ex);
+                        }
                     } catch ( Exception ex ) {
                         if ( scheme.resolveProperty(e, node) ) {
                             System.err.println("imported "+e.getAttribute("name") );
