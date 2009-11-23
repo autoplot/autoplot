@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
@@ -573,14 +574,18 @@ public class CanvasController extends DomNodeController {
             }
         };
 
-        dasCanvas.addTopDecorator( p );
-        Timer clearSelectionTimer= new Timer( 400, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                dasCanvas.removeTopDecorator( p );
+        SwingUtilities.invokeLater(  new Runnable() {
+            public void run() {
+                dasCanvas.addTopDecorator( p );
+                Timer clearSelectionTimer= new Timer( 300, new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        dasCanvas.removeTopDecorator( p );
+                    }
+                });
+                clearSelectionTimer.setRepeats(false);
+                clearSelectionTimer.restart();
             }
-        });
-        clearSelectionTimer.setRepeats(false);
-        clearSelectionTimer.restart();
+        } );
 
     }
 
