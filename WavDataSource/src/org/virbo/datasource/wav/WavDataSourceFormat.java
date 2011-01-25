@@ -20,12 +20,10 @@ import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
-import org.virbo.metatree.MetadataUtil;
 
 /**
  * Format data to binary file.
@@ -70,6 +68,40 @@ public class WavDataSourceFormat implements DataSourceFormat {
                 it.next();
                 it.putValue(ddep0, it.getValue(dep0));
             }
+        }
+
+        return result;
+    }
+
+    /**
+     * @param data
+     * @param mon
+     * @param params
+     * @return
+     */
+    private ByteBuffer formatRank2(QDataSet data, ProgressMonitor mon, Map<String, String> params) {
+
+        String type = params.get("type");
+
+        int dep0Len = 0;
+        int typeSize = BufferDataSet.byteCount(type);
+        int recSize = typeSize * (dep0Len + 1);
+        int channels= data.length(0);
+        int size = data.length() * recSize * channels;
+
+        ByteBuffer result = ByteBuffer.allocate(size);
+        result.order("big".equals(params.get("byteOrder")) ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
+
+        BufferDataSet ddata = BufferDataSet.makeDataSet( 2,
+                recSize, dep0Len * typeSize,
+                data.length(), data.length(0), 1,
+                result, type);
+
+        QubeDataSetIterator it = new QubeDataSetIterator(data);
+
+        while (it.hasNext()) {
+            it.next();
+            it.putValue(ddata, it.getValue(data));
         }
 
         return result;
@@ -123,13 +155,27 @@ public class WavDataSourceFormat implements DataSourceFormat {
             samplesPerSecond= (float) Math.round( 1 / periodSeconds );
         }
 
-        AudioFormat outDataFormat = new AudioFormat((float) samplesPerSecond, (int) 16, (int) 1, true, false);
+        AudioFormat outDataFormat;
+        if ( data.rank()==1 ) {
+            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) 16, (int) 1, true, false);
+        } else if ( data.rank()==2 ) {
+            outDataFormat= new AudioFormat((float) samplesPerSecond, (int) 16, (int) data.length(0), true, false);
+        } else {
+            throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+        }
 
         Map<String, String> params2 = new HashMap<String, String>();
         params2.put("type", "short");
         params2.put("byteOrder","little");
 
-        ByteBuffer buf = formatRank1(data, new NullProgressMonitor(), params2);
+        ByteBuffer buf;
+        if ( data.rank()==1 ) {
+            buf= formatRank1(data, new NullProgressMonitor(), params2);
+        } else if ( data.rank()==2 ) {
+            buf= formatRank2(data, new NullProgressMonitor(), params2);
+        } else {
+            throw new IllegalArgumentException("only rank 1 and rank 2 datasets supported");
+        }
 
         AudioInputStream inFileAIS = new AudioInputStream( newInputStream(buf), outDataFormat, buf.capacity() );
 

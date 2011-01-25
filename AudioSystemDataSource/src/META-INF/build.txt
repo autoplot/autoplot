@@ -1,4 +1,4 @@
 build.timestamp: 
 build.user.name: 
-build.svnurl: $URL: https://vxoware.svn.sourceforge.net/svnroot/vxoware/autoplot/trunk/BinaryDataSource/src/META-INF/build.txt $
-build.svnrevision: $Revision: 595 $
+build.svnurl: $URL$
+build.svnrevision: $Revision$

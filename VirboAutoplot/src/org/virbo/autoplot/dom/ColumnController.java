@@ -55,7 +55,7 @@ public class ColumnController extends DomNodeController {
                     } else if ( evt.getPropertyName().equals(Column.PROP_RIGHT) ) {
                         dasColumn.setMax( dd[0], dd[1], (int) dd[2] );
                     }
-                    DasDevicePosition.parseLayoutStr( dasColumn, column.getLeft() + "," + column.getRight() );
+                    //DasDevicePosition.parseLayoutStr( dasColumn, column.getLeft() + "," + column.getRight() );
                 } catch (ParseException ex) {
                     Logger.getLogger(ColumnController.class.getName()).warning("parse exception: "+ex);
                     column.setLeft( DasDevicePosition.formatLayoutStr(dasColumn, true) );

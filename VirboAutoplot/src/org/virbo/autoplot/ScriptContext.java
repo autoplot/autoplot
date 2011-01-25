@@ -12,7 +12,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
-import org.das2.util.TimeParser;
+import org.das2.datum.TimeParser;
 import java.awt.Image;
 import java.awt.Window;
 import java.awt.image.BufferedImage;
@@ -30,6 +30,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import org.das2.DasApplication;
 import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.awt.PdfGraphicsOutput;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -40,10 +41,11 @@ import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
-import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetAdapter;
+import org.virbo.dataset.ArrayDataSet;
+import org.das2.dataset.DataSetAdapter;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -69,17 +71,20 @@ public class ScriptContext extends PyJavaInstance {
         dom= m.getDocumentModel();
     }
     
-    private static AutoPlotUI view = null;
+    private static AutoplotUI view = null;
 
     private static synchronized void maybeInitView() {
         maybeInitModel();
         if (view == null) {
-            view = new AutoPlotUI(model);
+            view = new AutoplotUI(model);
             view.setVisible(true);
         }
     }
 
-    protected static void setView(AutoPlotUI v) {
+    /**
+     * Used by AutoplotUI to set the view.
+     */
+    protected static void setView(AutoplotUI v) {
         view = v;
     }
 
@@ -109,9 +114,12 @@ public class ScriptContext extends PyJavaInstance {
      * @param width
      * @param height
      */
-    public static void setCanvasSize(int width, int height) {
+    public static void setCanvasSize(int width, int height) throws InterruptedException {
         maybeInitModel();
         model.canvas.setSize(width, height);
+        model.getDocumentModel().getCanvases(0).setWidth(width);
+        model.getDocumentModel().getCanvases(0).setHeight(height);
+        model.waitUntilIdle(false);
     }
 
     /**
@@ -133,6 +141,9 @@ public class ScriptContext extends PyJavaInstance {
     public static void plot(String surl) throws InterruptedException {
         maybeInitModel();
         if ( surl.endsWith(".vap") || surl.contains(".vap?") || surl.endsWith(".vapx") || surl.contains(".vapx?")  ) {
+            if ( view!=null ) {
+                view.dataSetSelector.setValue(surl);
+            }
             model.resetDataSetSourceURL(surl, new NullProgressMonitor());
         } else {
             DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
@@ -232,7 +243,7 @@ public class ScriptContext extends PyJavaInstance {
 
     public static void plot( int chNum, String label, QDataSet x, QDataSet y ) throws InterruptedException {
         maybeInitModel();
-        DDataSet yds= DDataSet.copy(y);
+        ArrayDataSet yds= ArrayDataSet.copy(y);
         if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, x );
         model.setDataSet( chNum, label, yds);
         model.waitUntilIdle(false);
@@ -241,12 +252,12 @@ public class ScriptContext extends PyJavaInstance {
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
         maybeInitModel();
         if ( z.rank()==1 ) {
-            DDataSet yds= DDataSet.copy(y);
+            ArrayDataSet yds= ArrayDataSet.copy(y);
             yds.putProperty( QDataSet.DEPEND_0, x );
             yds.putProperty( QDataSet.PLANE_0, z );
             model.setDataSet(chNum, label, yds);
         } else {
-            DDataSet zds= DDataSet.copy(z);
+            ArrayDataSet zds= ArrayDataSet.copy(z);
             if ( x!=null ) zds.putProperty( QDataSet.DEPEND_0, x );
             if ( y!=null ) zds.putProperty( QDataSet.DEPEND_1, y );
             model.setDataSet(chNum, label, zds);
@@ -254,6 +265,87 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
     }
 
+
+//    /**
+//     * plot the dataset in the first dataSource node.
+//     * @param ds
+//     * @throws java.lang.InterruptedException
+//     */
+//    public static void plot(double[] ds) throws InterruptedException {
+//        plot( 0, (String)null, DDataSet.wrap(ds) );
+//    }
+//
+//    /**
+//     * plot the dataset in the first dataSource node.
+//     * @param ds
+//     * @throws java.lang.InterruptedException
+//     */
+//    public static void plot( double[] x, double[] y ) throws InterruptedException {
+//        plot( 0, (String)null, DDataSet.wrap(x), DDataSet.wrap(y) );
+//    }
+//
+//    /**
+//     * plot the dataset in the first dataSource node.
+//     * @param ds
+//     * @throws java.lang.InterruptedException
+//     */
+//    public static void plot( double[] x, double[] y, double[] z ) throws InterruptedException {
+//        plot( 0, (String)null, DDataSet.wrap(x), DDataSet.wrap(y), DDataSet.wrap(z) );
+//    }
+//
+//    /**
+//     * plot the dataset in the specified dataSource node.
+//     * @param ds
+//     * @throws java.lang.InterruptedException
+//     */
+//    public static void plot( int chNum, double[] ds) throws InterruptedException {
+//        plot( chNum, (String)null, DDataSet.wrap(ds) );
+//    }
+//
+//    /**
+//     * plot the dataset in the specified  dataSource node.
+//     * @param ds
+//     * @throws java.lang.InterruptedException
+//     */
+//    public static void plot( int chNum, double[] x, double[] y ) throws InterruptedException {
+//        plot( chNum, (String)null, x, y );
+//    }
+//
+//    /**
+//     * plot the dataset in the specified  dataSource node.
+//     * @param ds
+//     * @throws java.lang.InterruptedException
+//     */
+//    public static void plot( int chNum, double[] x, double[] y, double[] z ) throws InterruptedException {
+//        plot( chNum, (String)null, x, y, z );
+//    }
+//    /**
+//     * plot the dataset in the chNum dataSource node.
+//     * @param ds
+//     * @throws java.lang.InterruptedException
+//     */
+//    public static void plot( int chNum, String label, double[] ds) throws InterruptedException {
+//        maybeInitModel();
+//        model.setDataSet( chNum, label, DDataSet.wrap(ds) );
+//        model.waitUntilIdle(false);
+//    }
+//
+//    public static void plot( int chNum, String label, double[] x, double[] y ) throws InterruptedException {
+//        maybeInitModel();
+//        DDataSet yds= DDataSet.copy(DDataSet.wrap(y));
+//        if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, DDataSet.wrap(x) );
+//        model.setDataSet( chNum, label, yds);
+//        model.waitUntilIdle(false);
+//    }
+//
+//    public static void plot( int chNum, String label, double[] x, double[] y, double[] z ) throws InterruptedException {
+//        maybeInitModel();
+//        DDataSet yds= DDataSet.wrap(y);
+//        yds.putProperty( QDataSet.DEPEND_0, DDataSet.wrap(x) );
+//        yds.putProperty( QDataSet.PLANE_0, DDataSet.wrap(z) );
+//        model.setDataSet(chNum, label, yds);
+//        model.waitUntilIdle(false);
+//    }
 
     /**
      * set the autoplot status bar string.  Use the prefixes "busy:", "warning:"
@@ -282,21 +374,36 @@ public class ScriptContext extends PyJavaInstance {
      * @param name string name of the plot style.
      */
     public static void setRenderStyle( String name ) {
-        dom.getController().getPanel().setRenderType( RenderType.valueOf(name) );
+        dom.getController().getPlotElement().setRenderType( RenderType.valueOf(name) );
     }
     /**
      * write out the current canvas to a png file.
+     * TODO: bug 3113441: this has issues with the size.  It's coded to get the size from
+     *  the DOM, but if it is fitted and has a container it must get size from
+     *  the container.  User writeToPng( filename, width, height ) instead for now.
+     *  See writeToPdf(String filename), which appears to have a fix for this that
+     *  would affect how this is resolved.
      * @param filename
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
     public static void writeToPng(String filename) throws InterruptedException, IOException {
+        if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
+            filename= filename + ".png";
+        }
+
         model.waitUntilIdle(false);
-        model.getCanvas().writeToPng(filename);
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        writeToPng( filename, width, height );
         setStatus("wrote to "+filename);
     }
 
     public static void writeToPng( String filename, int width, int height ) throws InterruptedException, IOException {
+        if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
+            filename= filename + ".png";
+        }
+        
         final FileOutputStream out = new FileOutputStream(filename);
 
         Image image = model.canvas.getImage( width, height );
@@ -330,6 +437,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * write out the current canvas to stdout.  This is introduced to support servers.
+     * TODO: this has issues with the size.  See writeToPng(filename).
      * @param OutputStream out 
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
@@ -338,8 +446,10 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
 
         DasCanvas c = model.getCanvas();
-
-        Image image = c.getImage(c.getWidth(), c.getHeight());
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        
+        Image image = c.getImage(width,height);
 
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
@@ -350,20 +460,50 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * write out the current canvas to a pdf file.
+     * TODO: this has issues with the size.  See writeToPng(filename).  It looks
+     *   like this might be handled here
      * @param filename
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
     public static void writeToPdf(String filename) throws InterruptedException, IOException {
+        if ( !( filename.endsWith(".pdf") || filename.endsWith(".PDF") ) ) {
+            filename= filename + ".pdf";
+        }
+        model.waitUntilIdle(false);
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        model.getCanvas().setSize( width, height );
+        model.getCanvas().validate();
         model.waitUntilIdle(false);
         model.getCanvas().writeToPDF(filename);
         setStatus("wrote to "+filename);
     }
 
     /**
+     * write out the current canvas to a pdf file.
+     * TODO: this has issues with the size.  See writeToPng(filename).  It looks
+     *   like this might be handled here
+     * @param filename
+     * @throws java.lang.InterruptedException
+     * @throws java.io.IOException
+     */
+    public static void writeToPdf( OutputStream out ) throws InterruptedException, IOException, IllegalAccessException {
+        model.waitUntilIdle(false);
+        int width= model.getDocumentModel().getCanvases(0).getWidth();
+        int height= model.getDocumentModel().getCanvases(0).getHeight();
+        model.getCanvas().setSize( width, height );
+        model.getCanvas().validate();
+        model.waitUntilIdle(false);
+        model.getCanvas().writeToGraphicsOutput( out, new PdfGraphicsOutput() );
+        
+    }
+
+    /**
      * creates an image from the provided DOM.  This blocks until the image is
      * ready.
-     * TODO: verify
+     * TODO: this has issues with the size.  See writeToPng(filename).  It looks
+     *   like this might be handled here
      * @param applicationIn
      * @return
      */
@@ -564,7 +704,7 @@ public class ScriptContext extends PyJavaInstance {
             throw new IllegalArgumentException("no format for extension: " + file);
         }
 
-        format.formatData( uri.toString(), ds, new NullProgressMonitor());
+        format.formatData( DataSetURI.fromUri(uri), ds, new NullProgressMonitor());
 
     }
 
@@ -579,8 +719,17 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void save( String filename ) throws IOException {
         maybeInitModel();
-        if ( ! filename.endsWith(".vap") ) throw new IllegalArgumentException("filename must end in vap");
-        model.doSave( new File( filename ) );
+        if ( ! filename.endsWith(".vap") )
+            throw new IllegalArgumentException("filename must end in vap");
+        if ( !( filename.startsWith("file:") ) ) {
+            filename= "file://" + new File(filename).getAbsolutePath().replaceAll("\\\\", "/" );
+        }
+        URISplit split= URISplit.parse(filename);
+        String uri= DataSetURI.fromUri(split.resourceUri);
+        if ( !uri.startsWith("file:/") )
+            throw new IllegalArgumentException("save only supported to files, got "+split.resourceUri);
+        String f= uri.startsWith("file:///") ?  split.file.substring(7) : split.file.substring(5);
+        model.doSave( new File( f ) );
     }
 
     /**
@@ -602,5 +751,15 @@ public class ScriptContext extends PyJavaInstance {
     public static void reset() {
         maybeInitModel();
         dom.getController().reset();
+    }
+
+    /**
+     * called when the application closes so if we reopen it will be in a
+     * good state.
+     */
+    protected static void close() {
+        model= null;
+        view= null;
+        out= null;
     }
 }

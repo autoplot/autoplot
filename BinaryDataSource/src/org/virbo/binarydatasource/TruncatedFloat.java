@@ -9,7 +9,8 @@ import java.nio.ByteBuffer;
 import org.virbo.dataset.WritableDataSet;
 
 /**
- *
+ * Truncated floats are two-byte floats with low precision used by the plasma wave group.  They
+ * have an exponent the same size as a 4-byte float, but the mantissa has just 7(?) bits.
  * @author jbf
  */
 public class TruncatedFloat extends BufferDataSet implements WritableDataSet {

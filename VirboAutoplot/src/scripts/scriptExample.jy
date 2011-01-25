@@ -1,0 +1,20 @@
+# example script for autoplot.  This should be called with APScript.
+# for this example:
+
+# $JAVA_HOME/bin/java -Djava.awt.headless=true -Djava.library.path=/home/jbf/ct/hudson/x86_32/:.  -cp  $JAR  test.endtoend.Test012
+#   java -Djava.awt.headless=true -Djava.library.path=/home/jbf/ct/hudson/x86_32/:. -cp AutoplotAll.jar
+
+vap= getParam( 0, 'http://autoplot.org/vap/hydra_two_panel.vap', 'product file to load' )
+range= getParam( 1, '2000-01-08', 'range to load' )
+frmt= getParam( 2, 'png', 'png or pdf' )
+loc= getParam( 3, '/tmp/autoplot', 'filename to record' )
+
+load( vap )
+dom.timeRange= range
+
+if ( frmt.index('png')>-1):
+   writeToPng( file )
+elif ( frmt.index('pdf')>-1 ):
+   writeToPdf( file )
+else:
+   print 'bad format, only png and pdf supported: '+frmt

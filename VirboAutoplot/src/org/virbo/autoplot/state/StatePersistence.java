@@ -13,30 +13,26 @@ import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
-import org.das2.datum.Datum;
-import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
-import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.text.ParseException;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.das2.graph.DasColorBar;
-import org.das2.graph.DefaultPlotSymbol;
 import org.das2.util.AboutUtil;
-import org.virbo.autoplot.dom.BindingModel;
-import org.virbo.autoplot.dom.Connector;
+import org.virbo.autoplot.RenderType;
+import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DomNode;
+import org.virbo.autoplot.dom.PlotElement;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -50,6 +46,15 @@ import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.TransformerException;
+import org.virbo.autoplot.dom.DomUtil;
+import org.virbo.autoplot.dom.Plot;
 
 /**
  *
@@ -92,7 +97,7 @@ public class StatePersistence {
             throw new RuntimeException(ex);
         }
 
-        VapScheme scheme= new Vap1_01Scheme();
+        VapScheme scheme= new Vap1_06Scheme();
         Element element = SerializeUtil.getDomElement( document, (DomNode)state, scheme );
 
         Element vap= document.createElement("vap");
@@ -128,8 +133,8 @@ public class StatePersistence {
             }
         } catch (Error e2) {
             // Ed's nice trick for finding the implementation
-            String name = serializer.getClass().getSimpleName();
-            java.net.URL u = serializer.getClass().getResource(name + ".class");
+            //String name = serializer.getClass().getSimpleName();
+            //java.net.URL u = serializer.getClass().getResource(name + ".class");
             //System.err.println(u);
             e2.printStackTrace();
         }
@@ -157,9 +162,43 @@ public class StatePersistence {
         return null;
     }
 
+    /**
+     * restore the XML file, possibly promoting it.
+     * @param f
+     * @return
+     * @throws IOException
+     */
     public static Object restoreState( File f )  throws IOException {
+        InputStream in =new FileInputStream( f );
+        Object result= restoreState( in );
+        in.close();
+        return result;
+    }
 
-        InputStreamReader isr = new InputStreamReader( new FileInputStream( f ) );
+    /**
+     * restore the XML on the inputStream, possibly promoting it.
+     * @param in, an input stream that starts with the xml.  This will be left open.
+     * @return
+     * @throws IOException
+     */
+    public static Object restoreState( InputStream in )  throws IOException {
+        PushbackInputStream pbin= new PushbackInputStream(in,10);
+
+        if ( pbin.available()<5 ) {
+            System.err.println("less than 5 chars available, can't check");
+        } else {
+            byte[] five= new byte[5];
+            pbin.read(five);
+            String magic= new String( five );
+            if ( !( magic.equals("<?xml") || magic.equals("<vap ") || magic.equals("<java") ) ) {
+                throw new IllegalArgumentException("expected to find document that started with \"<?xml\" , this starts with \""+magic+"\"." );
+            }
+            pbin.unread(five);
+        }
+        
+        InputStreamReader isr= new InputStreamReader( pbin );
+        Application state;
+        String domVersion;
 
         try {
             DocumentBuilder builder;
@@ -168,9 +207,18 @@ public class StatePersistence {
             Document document = builder.parse(source);
 
             if ( document.getDocumentElement().getNodeName().equals("java") ) { // legacy support
+
+                domVersion= "0.99";
                 importLegacyVap(document.getDocumentElement());
+
                 ByteArrayOutputStream baos= new ByteArrayOutputStream(10000);
-                System.err.println("importing legacy vap file v0.99");
+                
+                //throw new RuntimeException("It is no longer possible to convert old " +
+                //        "files at runtime.  Contact Autoplot group at Google groups " +
+                //        "for conversion help." );
+                System.err.println("importing legacy vap file v0.99. ");
+                System.err.println("These must be rewritten to new vap format, support will be dropped.");
+
                 DOMImplementation impl = document.getImplementation();
                 DOMImplementationLS ls = (DOMImplementationLS) impl.getFeature("LS", "3.0");
                 LSSerializer serializer = ls.createLSSerializer();
@@ -190,33 +238,87 @@ public class StatePersistence {
                 new BindingPersistenceDelegate() ;
                 new ConnectorPersistenceDelegate();
 
-                Object state= decode.readObject();
-                return state;
+                state= (Application) decode.readObject();
 
+                Application app= (Application)state;
+                for ( PlotElement p: app.getPlotElements() ) {
+                    if ( p.getRenderType()==null ) {
+                        p.setRenderTypeAutomatically( RenderType.series );
+                    }
+                }
+
+                for ( Plot p: app.getPlots() ) {
+                    p.getZaxis().setVisible(false);
+                    List<PlotElement> pes= DomUtil.getPlotElementsFor(app, p);
+                    for ( PlotElement pe: pes ) {
+                        RenderType rt= pe.getRenderType();
+                        if ( rt==RenderType.spectrogram || rt==RenderType.nnSpectrogram || rt==RenderType.colorScatter ) {
+                            p.getZaxis().setVisible(true);
+                        }
+                    }
+                }
             } else {
-                VapScheme scheme;
-                String domVersion= document.getDocumentElement().getAttribute("domVersion");
-                if (domVersion.equals("1.0") ) {
-                    scheme= new Vap1_00Scheme();
-                    System.err.println("importing legacy vap file v1.00");
-                } else {
-                    scheme= new Vap1_01Scheme();
-                }
-                Element dom= getChildElement( document.getDocumentElement(), "Application" );
-                DomNode n= SerializeUtil.getDomNode( dom, scheme );
-                String errors=scheme.describeUnresolved();
-                if ( errors.length()>0 ) {
-                    System.err.println(errors);
+
+                domVersion= document.getDocumentElement().getAttribute("domVersion");
+                String currentVersion= "1.06";
+
+                if ( ! domVersion.equals(currentVersion) ) {
+
+                    double srcVersion= Double.parseDouble(domVersion);
+                    double dstVersion= Double.parseDouble(currentVersion);
+
+                    if (srcVersion > dstVersion) {
+                        throw new IOException("Cannot read .vap file version > " + currentVersion);
+                    }
+
+                    for ( double s=srcVersion; s<dstVersion; s=s+0.01 ) {
+                        Source src = new DOMSource( document );
+
+                        DOMResult res = new DOMResult( );
+
+                        String fname= String.format( "Vap_%4.2f_to_%4.2f",
+                                s, s+0.01 );
+                        fname= fname.replaceAll("\\.","_") + ".xsl";
+
+                        InputStream xsl = StatePersistence.class.getResourceAsStream(fname);
+                        if ( xsl==null ) {
+                            throw new RuntimeException("Unable to find "+fname+".");
+                        }
+                        TransformerFactory factory = TransformerFactory.newInstance();
+                        Transformer tr = factory.newTransformer(new StreamSource(xsl));
+
+                        tr.transform(src, res);
+                        document= ((Document)res.getNode());
+
+                    }
+
                 }
 
-                return n;
+                Element dom= getChildElement( document.getDocumentElement(), "Application" );
+                state= (Application) SerializeUtil.getDomNode( dom, new Vap1_04Scheme() );
+
             }
 
+            if ( domVersion.compareTo("1.00")<0 ) { // make all ranging automatic
+                Plot[] pp= state.getPlots();        // file:///home/jbf/ct/hudson/vap/Cluster1_HEEA_slices.vap motivated
+                for ( int i=0; i<pp.length; i++ ) {
+                    pp[i].getXaxis().setAutoRange(true);
+                    pp[i].getYaxis().setAutoRange(true);
+                    pp[i].getZaxis().setAutoRange(true);
+                }
+            }
+
+            return state;
+
+        } catch (ParseException ex) {
+            Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        } catch (TransformerException ex) {
+            Logger.getLogger(StatePersistence.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         } catch (SAXException ex) {
             throw new RuntimeException(ex);
         } catch (ParserConfigurationException ex) {
-            throw new RuntimeException(ex);
-        } catch (ParseException ex ) {
             throw new RuntimeException(ex);
         }
 
@@ -236,8 +338,35 @@ public class StatePersistence {
                 if ( prop!=null ) {
                     if ( prop.getNodeValue().equals("autorange") ) prop.setNodeValue("autoRange");
                     if ( prop.getNodeValue().equals("autolabel") ) prop.setNodeValue("autoLabel");
+                    if ( prop.getNodeValue().equals("panels") ) prop.setNodeValue("plotElements");
+                    if ( prop.getNodeValue().equals("parentPanel") ) prop.setNodeValue("parent");
+                }
+            } else if ( n.getNodeName().equals("object") ) {
+                NamedNodeMap nn= n.getAttributes();
+
+                Node prop= nn.getNamedItem("class");
+                if ( prop==null ) {
+                    continue;
+                }
+                if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.Panel") ) {
+                    prop.setNodeValue("org.virbo.autoplot.dom.PlotElement");
+                } else if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.PanelStyle") ) {
+                    prop.setNodeValue("org.virbo.autoplot.dom.PlotElementStyle");
+                }
+            } else if ( n.getNodeName().equals("array") ) {
+                NamedNodeMap nn= n.getAttributes();
+
+                Node prop= nn.getNamedItem("class");
+                if ( prop==null ) {
+                    continue;
+                }
+                if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.Panel") ) {
+                    prop.setNodeValue("org.virbo.autoplot.dom.PlotElement");
+                } else if ( prop.getNodeValue().equals("org.virbo.autoplot.dom.PanelStyle") ) {
+                    prop.setNodeValue("org.virbo.autoplot.dom.PlotElementStyle");
                 }
             }
+
             if ( n.hasChildNodes() && n instanceof Element ) {
                 importLegacyVap( (Element) n );
             }

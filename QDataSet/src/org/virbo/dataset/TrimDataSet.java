@@ -69,11 +69,6 @@ public class TrimDataSet extends AbstractDataSet {
     }
 
     @Override
-    public Object property(String name, int i0, int i1) {
-        return super.property(name, i0, i1);
-    }
-
-    @Override
     public double value(int i) {
         return ds.value(offset + i);
     }
@@ -98,7 +93,25 @@ public class TrimDataSet extends AbstractDataSet {
 
     public Object property(String name, int i) {
         Object p = properties.get(name);
-        return (p != null) ? p : ds.property(name, i);
+        return (p != null) ? p : ds.property(name, i + offset);
+    }
+
+    @Override
+    public Object property(String name, int i0, int i1) {
+        Object p = properties.get(name);
+        return (p != null) ? p : ds.property(name, i0 + offset,i1);
+    }
+
+    @Override
+    public Object property(String name, int i0, int i1, int i2) {
+        Object p = properties.get(name);
+        return (p != null) ? p : ds.property(name, i0 + offset,i1,i2);
+    }
+
+    @Override
+    public Object property(String name, int i0, int i1, int i2, int i3 ) {
+        Object p = properties.get(name);
+        return (p != null) ? p : ds.property( name, i0 + offset,i1,i2,i3 );
     }
 
     public int length() {

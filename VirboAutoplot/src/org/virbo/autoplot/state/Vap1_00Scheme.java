@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.DomNode;
-import org.virbo.autoplot.dom.PanelStyle;
+import org.virbo.autoplot.dom.PlotElementStyle;
 import org.w3c.dom.Element;
 
 /**
@@ -47,6 +47,16 @@ public class Vap1_00Scheme extends AbstractVapScheme {
 
         }
         return resolved;
+    }
+
+    @Override
+    public Class getClass(String clasName) {
+        Class claz= super.getClass(clasName);
+        if ( claz!=null ) return claz;
+        if ( clasName.equals("PanelStyle") ) {
+            return PlotElementStyle.class;
+        } 
+        throw new IllegalArgumentException("unrecognized class: "+clasName);
     }
 
 }

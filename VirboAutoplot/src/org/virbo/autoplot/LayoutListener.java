@@ -51,14 +51,20 @@ public class LayoutListener implements PropertyChangeListener {
                     logger.fine("create timer ");
                     t = new Timer(100, new ActionListener() {
                         public synchronized void actionPerformed(ActionEvent e) {
-                            logger.fine("do autolayout");
-                            ApplicationController applicationController= model.getDocumentModel().getController();
-                            model.dom.getController().getCanvas().getController().performingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
-                            model.canvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
-                            LayoutUtil.autolayout( applicationController.getDasCanvas(),
-                                    applicationController.getRow(), applicationController.getColumn() );
-                            model.canvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
-                            model.dom.getController().getCanvas().getController().changePerformed(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                            if ( model.dom.getOptions().isAutolayout() ) { //bug 3034795
+                                logger.fine("do autolayout");
+                                ApplicationController applicationController= model.getDocumentModel().getController();
+                                model.dom.getController().getCanvas().getController().performingChange(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                                model.canvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                LayoutUtil.autolayout( applicationController.getDasCanvas(),
+                                        applicationController.getRow(), applicationController.getColumn() );
+                                model.canvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                model.dom.getController().getCanvas().getController().changePerformed(LayoutListener.this,PENDING_CHANGE_AUTOLAYOUT);
+                            } else {
+                                //TODO: maybe we want a changeCancelled.
+                                model.canvas.performingChange(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                                model.canvas.changePerformed(LayoutListener.this, PENDING_CHANGE_AUTOLAYOUT);
+                            }
                         }
                     });
                     t.setRepeats(false);

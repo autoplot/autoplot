@@ -1,0 +1,11 @@
+# bring in new version of data source.  Note it is registered under qqq,
+# so it's URIs are vap+qqq:/tmp/foo.wav and the old version is still
+# vap+wav:/tmp/foo.wav.  (This uses class loading that is probably not
+# useful in webstart.)
+
+from org.virbo.datasource import DataSourceRegistry
+
+reg= DataSourceRegistry.getInstance()
+
+myurl= URL( 'file:/media/mini/nbprojects/virbo/autoplot/WavDataSource/dist/WavDataSource.jar' )
+reg.registerDataSourceJar('qqq', myurl)

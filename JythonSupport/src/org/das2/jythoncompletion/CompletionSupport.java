@@ -8,7 +8,6 @@ package org.das2.jythoncompletion;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 import org.python.parser.*;
@@ -74,14 +73,56 @@ public class CompletionSupport {
                 return line.substring(0,i+1);
             }
         } else {
-            return line.substring(0,pos);
+            squote= '\"';
+            i=line.indexOf(squote);
+            ss= line.substring(0,pos).split("\"",-2);
+            inQuote= ss.length % 2 == 0;
+            if ( inQuote ) {
+                i= line.indexOf(squote,pos);
+                if ( i==-1 ) {
+                    return line.substring(0,pos) + squote;
+                } else {
+                    return line.substring(0,i+1);
+                }
+            } else {
+                return line.substring(0,pos);
+            }
         }
     }
 
     private static String exprBeforeDot( List<Token> tokens, int pos ) {
             String contextString= tokens.get(pos-1).image;
+
             int i= pos-1;
-            while ( i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT ) {
+
+            if ( i>1 && tokens.get(pos-1).kind==PythonGrammarConstants.RPAREN ) {
+                int rparCount=1;
+                int lpar= i-1;
+                while ( lpar>0 && rparCount>0 ) {
+                    contextString= tokens.get(lpar).image + contextString;
+                    if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.LPAREN ) {
+                        rparCount--;
+                    } else if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.RPAREN ) {
+                        rparCount++;
+                    }
+                    if ( rparCount==0 ) {
+                        if ( lpar>0 && tokens.get(lpar-1).kind==PythonGrammarConstants.NAME ) {
+                            contextString= tokens.get(lpar-1).image + contextString;
+                            if ( lpar>1 && tokens.get(lpar-2).kind==PythonGrammarConstants.DOT ) { // recurse to find the expr before that
+                                String before= exprBeforeDot( tokens, lpar-2 );
+                                return before + "." + contextString;
+                            } else {
+                                return contextString;
+                            }
+                        }
+                    }
+                    lpar--;
+                }
+            }
+
+            boolean notdone= true;
+            notdone= i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT;
+            while ( notdone ) {
                 if ( tokens.get(i-2).kind==PythonGrammarConstants.RBRACKET
                         && i>5
                         && tokens.get(i-4).kind==PythonGrammarConstants.LBRACKET
@@ -92,6 +133,7 @@ public class CompletionSupport {
                     contextString = tokens.get(i-2).image + tokens.get(i-1).image + contextString;
                     i=i-2;
                 }
+                notdone= i>1 && tokens.get(i-1).kind==PythonGrammarConstants.DOT;
             }
             return contextString;
     }
@@ -110,7 +152,12 @@ public class CompletionSupport {
         PythonGrammar g= new PythonGrammar( new ReaderCharStream( new StringReader( line ) ) );
         
         do  {
-            t= g.getNextToken();       
+            try {
+                t= g.getNextToken();
+            } catch ( TokenMgrError ex ) {
+                return new CompletionContext( CompletionContext.DEFAULT_NAME, null, "" );
+            }
+
             thisTokenIndex++;
             
             tokens.add(t);
@@ -159,10 +206,16 @@ public class CompletionSupport {
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.NAME ) {
                 String contextString= exprBeforeDot(tokens, myTokenIndex);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, "" );
+            } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.RPAREN ) {
+                // ds= PlasmaModelDataSet().<COMP>
+                // DasLogger.getLogger(DasLogger.GRAPHICS_LOG).<COMP
+                String contextString= exprBeforeDot(tokens, myTokenIndex);
+                return new CompletionContext( CompletionContext.METHOD_NAME, contextString, "" );
             } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
                 String contextString= exprBeforeDot(tokens, myTokenIndex-1);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, completable );
-            } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING ) {
+            } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING
+                    ||  tokens.get(myTokenIndex).kind==PythonGrammarConstants.SINGLE_STRING2 ) {
                 if ( myTokenIndex>1 && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
                     return new CompletionContext( CompletionContext.STRING_LITERAL_ARGUMENT, tokens.get(myTokenIndex-2).image, tokens.get(myTokenIndex).image );
                 } else {

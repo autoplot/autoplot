@@ -5,10 +5,12 @@
 
 package org.autoplot.pngwalk;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -64,6 +66,18 @@ public class ContextFlowView extends PngWalkView {
     }
 
 
+    /**
+     * return the bounds that will contain the image, preserving its aspect ratio.
+     * @param xpos
+     * @param ypos
+     * @param width
+     * @param height
+     * @param targetWidth
+     * @param targetHeight
+     * @param aspectFactor
+     * @param debug
+     * @return
+     */
     private static Rectangle bounds(int xpos, int ypos, int width, int height, int targetWidth, int targetHeight, double aspectFactor, boolean debug) {
         double aspect = 1. * width / height;
         // target is the limiting dimension.
@@ -93,7 +107,7 @@ public class ContextFlowView extends PngWalkView {
         //Image cacheImage = rightThumbsCache.get(image);
         Image cacheImage = null;
 
-        if (cacheImage == null) {
+//        if (cacheImage == null) {
             BufferedImage im;
             if (image instanceof BufferedImage) {
                 im = (BufferedImage) image;
@@ -110,9 +124,9 @@ public class ContextFlowView extends PngWalkView {
             cacheImage= op.filter( im, null );
             //rightThumbsCache.put( image, cacheImage );
             return (BufferedImage)cacheImage;
-        } else {
-            return (BufferedImage)cacheImage;
-        }
+//        } else {
+//            return (BufferedImage)cacheImage;
+//        }
     }
 
     synchronized BufferedImage getLeftImage( Image image, int width, int height, Rectangle bounds ) {
@@ -120,7 +134,7 @@ public class ContextFlowView extends PngWalkView {
         //Image cacheImage = leftThumbsCache.get(image);
         Image cacheImage = null;
         
-        if (cacheImage == null) {
+//        if (cacheImage == null) {
             BufferedImage im;
             if (image instanceof BufferedImage) {
                 im = (BufferedImage) image;
@@ -137,9 +151,9 @@ public class ContextFlowView extends PngWalkView {
             cacheImage= op.filter( im, null );
             //leftThumbsCache.put( image, cacheImage );
             return (BufferedImage)cacheImage;
-        } else {
-            return (BufferedImage)cacheImage;
-        }
+//        } else {
+//            return (BufferedImage)cacheImage;
+//        }
     }
 
     private synchronized void maybeTimeStamp(Graphics2D g, Rectangle bounds, String s ) {
@@ -156,11 +170,17 @@ public class ContextFlowView extends PngWalkView {
             return;
 
         Graphics2D g = (Graphics2D) g1;
+        g.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
 
         Rectangle clip = g.getClipBounds();
-        g.clearRect(clip.x, clip.y, clip.width, clip.height);
+        //g.clearRect(clip.x, clip.y, clip.width, clip.height);
 
+        Color color0= g.getColor();
+        g.setColor( getBackground() );
+        g.fillRect( clip.x, clip.y, clip.width, clip.height );
 
+        g.setColor( color0 );
+        
         int shelfWidth = 40;    // width of the images to the right or left.
         int currentWidth = 400; // width of the current image in the center.
 
@@ -196,6 +216,10 @@ public class ContextFlowView extends PngWalkView {
             if (image == null)
                 continue;
 
+            if ( index!=currentIndex && seq.imageAt(index).getStatus()==WalkImage.Status.MISSING ) {
+                continue;
+            }
+
             int height = image.getHeight();
             int width = image.getWidth();
 
@@ -207,6 +231,7 @@ public class ContextFlowView extends PngWalkView {
                 bounds = bounds(x, y, width, height, shelfWidth, Math.min(height, shelfWidth * 10), 1 / sh, false);
                 //bounds = bounds( x, y, width, height, shelfWidth, shelfWidth*10, 0.1, false);
 
+
                 BufferedImage cacheImage = getRightImage(image, width, height, bounds);
 
                 if (cacheImage == null) {
@@ -215,6 +240,10 @@ public class ContextFlowView extends PngWalkView {
 
                 g.drawImage(cacheImage, bounds.x, bounds.y, this);
                 //g.draw(op.getOutline(bounds.x, bounds.y));
+                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                    //System.err.println(bounds);
+                    paintQualityControlIcon( index, g, bounds.x + bounds.width/2 - 4, bounds.y-10, false );
+                }
 
             } else if (index == currentIndex) {
                 int x = xm;
@@ -222,7 +251,7 @@ public class ContextFlowView extends PngWalkView {
                 image = seq.imageAt(index).getImage();
                 if (image == null) {
                     image = seq.imageAt(index).getThumbnail();
-
+                    
                     height = image.getHeight();
                     width = image.getWidth();
 
@@ -233,6 +262,13 @@ public class ContextFlowView extends PngWalkView {
                         bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
                     }
 
+                    BufferedImage im = new BufferedImage(bounds.width, bounds.height, BufferedImage.TYPE_INT_ARGB);
+                    im.getGraphics().drawImage( image, 0, 0, bounds.width+1, bounds.height+1, this );
+
+                    image= im;
+                    height = image.getHeight();
+                    width = image.getWidth();
+
                 } else {
 
                     height = image.getHeight();
@@ -240,27 +276,15 @@ public class ContextFlowView extends PngWalkView {
 
                     bounds = bounds(x, y, width, height, currentWidth, height, 1.0, false);
                 }
-                //if (g.drawImage(image, bounds.x, bounds.y, bounds.width, bounds.height, this)) {
-                //    lastImage = image;
-                //}
-                //g.fill(bounds);
 
-                BufferedImage im;
-                if (image instanceof BufferedImage) {
-                    im = (BufferedImage) image;
-                } else {
-                    im = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                    if (!im.getGraphics().drawImage(image, 0, 0, this)) {
-                        continue;
-                    }
-                }
-                //addBorder(im,1);
                 ScalePerspectiveImageOp op = new ScalePerspectiveImageOp(width, height,
                         0, 0, bounds.width, bounds.height, 100, -1, -1,
                         0., true);
-                g.drawImage(im, op, bounds.x, bounds.y);
+                g.drawImage(image, op, bounds.x, bounds.y);
                 //lastImage = image;
-
+                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                    paintQualityControlIcon( index, g, bounds.x, bounds.y, true );
+                }
                 maybeTimeStamp(g, bounds, seq.imageAt(index).getCaption());
 
                 //if (usedLastImage) drawMomentStr(g, bounds);
@@ -278,7 +302,11 @@ public class ContextFlowView extends PngWalkView {
                 g.drawImage(cacheImage, bounds.x, bounds.y, this);
                 //g.draw(op.getOutline(bounds.x, bounds.y));
                 //if (usedLastImage) drawMomentStr(g, bounds);
+
+                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                    paintQualityControlIcon( index, g, bounds.x + bounds.width/2 - 4, bounds.y - 10, false );
                 }
+            }
 
             imageBounds.set(index, bounds);
 

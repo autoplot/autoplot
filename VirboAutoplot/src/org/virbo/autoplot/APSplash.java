@@ -107,7 +107,7 @@ public class APSplash extends JFrame {
         super();
 
         setUndecorated(true);
-        setIconImage(new ImageIcon(this.getClass().getResource("logoA16x16.png")).getImage());
+        setIconImage( AutoplotUtil.getAutoplotIcon() );
         setTitle("Starting Autoplot");
         
         JPanel panel= new JPanel(new BorderLayout());
@@ -124,7 +124,6 @@ public class APSplash extends JFrame {
         panel.add( bottomPanel, BorderLayout.SOUTH );
         this.setContentPane(panel);
         this.pack();
-        //this.setLocation(300,300);
         this.setLocationRelativeTo(null);
     }
 

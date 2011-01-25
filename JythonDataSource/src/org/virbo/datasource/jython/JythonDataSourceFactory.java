@@ -15,7 +15,6 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,8 +27,6 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
 import org.python.core.PyList;
 import org.python.core.PyStringMap;
-import org.python.parser.PythonGrammar;
-import org.python.parser.ReaderCharStream;
 import org.python.util.PythonInterpreter;
 import org.virbo.datasource.AbstractDataSourceFactory;
 import org.virbo.datasource.CompletionContext;
@@ -50,16 +47,16 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
         return result;
     }
 
-    private Map<String, Object> getNames(URL url, ProgressMonitor mon) throws Exception {
+    private Map<String, Object> getNames(URI uri, ProgressMonitor mon) throws Exception {
         PythonInterpreter interp = new PythonInterpreter();
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
 
         interp.set("monitor", mon);
         interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py");
 
-        File src = DataSetURI.getFile(url, new NullProgressMonitor());
+        File src = DataSetURI.getFile(uri, new NullProgressMonitor());
 
-        URISplit split = URISplit.parse(url.toString());
+        URISplit split = URISplit.parse(uri);
         Map<String, String> params = URISplit.parseParams(split.params);
         try {
             interp.exec("params=dict()");
@@ -95,11 +92,11 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         List<CompletionContext> result = new ArrayList<CompletionContext>();
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
-            String ext= cc.resource.toString();
+            String ext= DataSetURI.fromUri(cc.resourceURI);
             int i= ext.lastIndexOf(".");
             if ( i!=-1 ) ext= ext.substring(i+1);
             if ( ext.equals(".jyds" ) || ext.equals("jy") || ext.equals("py") ) {
-                Map<String, Object> po = getNames( cc.resource, mon);
+                Map<String, Object> po = getNames( cc.resourceURI, mon);
                 for (String n : po.keySet()) {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
                 }
@@ -121,6 +118,10 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             return false;
         } else {
             try {
+                URISplit split= URISplit.parse(surl);
+                if ( split.scheme.equals("inline") ) {
+                    return false;
+                }
                 File src = DataSetURI.getFile(DataSetURI.getURL(surl), new NullProgressMonitor());
                 BufferedReader reader = new BufferedReader(new FileReader(src));
                 String s = reader.readLine();

@@ -122,7 +122,7 @@ public class BindingSupport {
      * @param c bean converter for converting the property.
      * @throws IllegalArgumentException if a property contains a dot.
      */
-    public void bind(DomNode src, String srcProp, Object dst, String dstProp, Converter c) {
+        public void bind(DomNode src, String srcProp, Object dst, String dstProp, Converter c) {
         if (srcProp.contains(".")) {
             throw new IllegalArgumentException("src property name cannot contain periods: " + srcProp);
         }
@@ -134,6 +134,8 @@ public class BindingSupport {
         BindingImpl bi = new BindingImpl();
         bi.dst = dst;
         bi.src = src;
+        bi.srcProp= srcProp;
+        bi.dstProp= dstProp;
 
         lookupGetterSetter(src, srcProp, bi);
         lookupGetterSetter(dst, dstProp, bi);
@@ -214,6 +216,41 @@ public class BindingSupport {
             }
             list.clear();
             implBindingContexts.remove(master);
+        }
+    }
+
+    public void unbind( DomNode master, String property, Object dst, String dstProp ) {
+        synchronized (implBindingContexts) {
+            List<BindingImpl> list = implBindingContexts.get(master);
+            if (list == null) {
+                return;
+            }
+            List<BindingImpl> list2= new ArrayList(list);
+            for (BindingImpl bi : list) {
+                if ( bi.srcProp.equals(property) && bi.dst==dst && bi.dstProp.equals(dstProp) ) {
+                    try {
+                        Method apcl = bi.dst.getClass().getMethod("removePropertyChangeListener", String.class, PropertyChangeListener.class);
+                        apcl.invoke(bi.dst, bi.dstProp, bi.dstListener);
+                    } catch (IllegalAccessException ex) {
+                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IllegalArgumentException ex) {
+                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (NoSuchMethodException ex) {
+                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SecurityException ex) {
+                        Logger.getLogger(BindingSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    bi.src.removePropertyChangeListener(bi.srcProp, bi.srcListener);
+                    list2.remove(bi);
+                }
+            }
+            if ( list2.isEmpty() ) {
+                implBindingContexts.remove(master);
+            } else {
+                implBindingContexts.put( master, list2 );
+            }
         }
     }
 }

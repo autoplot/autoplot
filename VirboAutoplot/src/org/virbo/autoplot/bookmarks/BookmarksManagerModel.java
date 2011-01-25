@@ -41,6 +41,7 @@ public class BookmarksManagerModel {
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
             public boolean accept(File f) {
+                if ( f.toString()==null ) return false;
                 return f.isDirectory() || f.getName().endsWith(".xml");
             }
 
@@ -78,6 +79,7 @@ public class BookmarksManagerModel {
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
             public boolean accept(File f) {
+                if ( f.toString()==null ) return false;
                 return f.isDirectory() || f.getName().endsWith(".xml");
             }
 
@@ -150,6 +152,28 @@ public class BookmarksManagerModel {
         return model;
     }
 
+    /**
+     * return the equal bookmark from the list, traverse tree
+     * @param newList
+     * @param context
+     * @return
+     */
+    Bookmark.Folder getFolder( List<Bookmark>newList, Bookmark context ) {
+        for ( int i=0; i<newList.size(); i++ ) {
+            Bookmark item= newList.get(i);
+            if ( item.equals( context ) ) {
+                return (Bookmark.Folder) item; // old logic.
+            } else if ( item instanceof Bookmark.Folder ) {
+                Bookmark.Folder sub= getFolder( ((Bookmark.Folder)item).getBookmarks(), context );
+                if ( sub!=null ) return sub;
+            } else {
+                // do nothing.
+            }
+        }
+        return null;
+        
+    }
+
     void addBookmarks(List<Bookmark> bookmarks, Bookmark context, boolean insert) {
         ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
         for (Bookmark b : this.list) {
@@ -159,14 +183,14 @@ public class BookmarksManagerModel {
         for (Bookmark b : bookmarks) {
             containsFolder = containsFolder || b instanceof Bookmark.Folder;
         }
-        if (context == null || (containsFolder && context instanceof Bookmark.Folder)) { // only allow folders in the root node
+        if (context == null ) { 
             if (newList.contains(context)) {
                 newList.addAll(newList.indexOf(context) + ( insert ? 0 : 1 ), bookmarks);
             } else {
                 newList.addAll(bookmarks);
             }
         } else if (context instanceof Bookmark.Folder) {
-            Bookmark.Folder newFolder = (Bookmark.Folder) newList.get(newList.indexOf(context));
+            Bookmark.Folder newFolder = getFolder( newList, context );
             newFolder.getBookmarks().addAll(bookmarks);
         } else {
             if (newList.contains(context)) {
@@ -220,7 +244,7 @@ public class BookmarksManagerModel {
      * folders with the same name are merged.
      * @param list
      */
-     void mergeList( List<Bookmark> src, List<Bookmark> dest ) {
+     public void mergeList( List<Bookmark> src, List<Bookmark> dest ) {
         if ( src.size()==0 ) return;
 
         for ( int i=0; i<src.size(); i++ ) {
@@ -254,6 +278,7 @@ public class BookmarksManagerModel {
     }
 
     TreePath getPathFor(Bookmark b, TreeModel model, TreePath root ) {
+        if ( root==null ) return null;
         final Object parent = root.getLastPathComponent();
         final int childCount = model.getChildCount(parent);
         for ( int ii=0; ii<childCount; ii++ ) {
@@ -322,6 +347,7 @@ public class BookmarksManagerModel {
 
     protected List<Bookmark> getSelectedBookmarks(TreeModel model, TreePath[] paths) {
         List<Bookmark> result= new ArrayList<Bookmark>();
+        if ( paths==null ) return result;
         for ( TreePath path: paths ) {
             if (path == null ) return null;
             if (path.getPathCount() == 1) return list;
@@ -363,12 +389,7 @@ public class BookmarksManagerModel {
         try {
             Document doc = AutoplotUtil.readDoc(url.openStream());
             List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
-            List<Bookmark> newList= new ArrayList(this.list.size());
-            for ( int i=0; i<this.list.size(); i++ ) {
-                newList.add(i,this.list.get(i).copy());
-            }
-            mergeList(importBook,newList);
-            setList(newList);
+            importList(importBook);
         } catch (SAXException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -376,5 +397,54 @@ public class BookmarksManagerModel {
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void importList(List<Bookmark> books) {
+        List<Bookmark> newList= new ArrayList(this.list.size());
+        for ( int i=0; i<this.list.size(); i++ ) {
+            newList.add(i,this.list.get(i).copy());
+        }
+        mergeList(books,newList);
+        setList(newList);
+    }
+
+    public void addRemoteBookmarks(String surl ) throws MalformedURLException {
+        addRemoteBookmarks(surl,null);
+    }
+
+    /**
+     * add the remote bookmarks.
+     * @param surl
+     * @param selectedBookmark location to add the bookmark, can be null.
+     * @throws MalformedURLException
+     */
+    public void addRemoteBookmarks(String surl, Bookmark selectedBookmark) throws MalformedURLException {
+        try {
+            URL url = new URL(surl);
+            Document doc = AutoplotUtil.readDoc(url.openStream());
+            List<Bookmark> newList= new ArrayList(this.list.size());
+            for ( int i=0; i<this.list.size(); i++ ) {
+                newList.add(i,this.list.get(i).copy());
+            }
+            List<Bookmark> importBook = Bookmark.parseBookmarks(doc.getDocumentElement());
+            List<Bookmark> copy= new ArrayList();
+            for ( int i=0;i<importBook.size(); i++ ) {
+                Bookmark m=  importBook.get(i);
+                if ( m instanceof Bookmark.Folder ) {
+                    ((Bookmark.Folder)m).setRemoteUrl( surl );
+                    ((Bookmark.Folder)m).setTitle( m.getTitle() + " (remote)");
+                    copy.add( m );
+                }
+            }
+            mergeList(copy,newList);
+            setList(newList);
+        } catch (SAXException ex) {
+            Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(BookmarksManagerModel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 }

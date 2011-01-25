@@ -106,7 +106,13 @@ public class ValuesTreeModel extends DefaultTreeModel {
 
     public static MutableTreeNode valuesTreeNode( String prefix, MutableTreeNode aroot, QDataSet ds, int sizeLimit ) {
         QDataSet wds= DataSetUtil.weightsDataSet(ds);
+
+        QDataSet bundle= (QDataSet)ds.property( QDataSet.BUNDLE_1 );
+
         QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+        QDataSet wdsDep0= null;
+        if ( dep0!=null ) wdsDep0= DataSetUtil.weightsDataSet(dep0);
+
         Units depu= dep0==null ? Units.dimensionless : (Units) dep0.property(QDataSet.UNITS);
         if ( depu==null ) depu= Units.dimensionless;
 
@@ -117,10 +123,22 @@ public class ValuesTreeModel extends DefaultTreeModel {
             Units units= (Units) ds.property(QDataSet.UNITS);
             if ( units==null ) units= Units.dimensionless;
             for ( int i=0; i<Math.min( ds.length(), sizeLimit ); i++ ) {
+                Units u= units;
+                if ( bundle!=null ) {
+                    u= (Units)bundle.property( QDataSet.UNITS, i );
+                    if ( u==null ) u= Units.dimensionless;
+                }
                 //TODO: future datum class may allow for toString to return nominal data for invalid data.
-                String sval= wds.value(i) > 0. ? String.valueOf(units.createDatum(ds.value(i))) : "fill";
-                if ( dep0!=null ) sval += " @ " +String.valueOf(depu.createDatum(dep0.value(i)));
-                aroot.insert(  new DefaultMutableTreeNode( prefix+""+i+")="+sval), aroot.getChildCount() );
+                String sval= wds.value(i) > 0. ? String.valueOf(u.createDatum(ds.value(i))) : "fill";
+                if ( dep0!=null ) {
+                    sval += " @ " +( String.valueOf(wdsDep0.value(i) > 0 ? depu.createDatum(dep0.value(i) ) : "fill" ) );
+                }
+                if ( bundle!=null ) {
+                    sval = bundle.property(QDataSet.NAME,i)+" = " + ( wds.value(i) > 0. ? String.valueOf(u.createDatum(ds.value(i))) : "fill" );
+                    aroot.insert(  new DefaultMutableTreeNode( sval), aroot.getChildCount() );
+                } else {
+                    aroot.insert(  new DefaultMutableTreeNode( prefix+""+i+")="+sval), aroot.getChildCount() );
+                }
             }
             if ( ds.length()>=sizeLimit ) {
                 aroot.insert( new DefaultMutableTreeNode( "..." ), aroot.getChildCount() );
@@ -130,9 +148,11 @@ public class ValuesTreeModel extends DefaultTreeModel {
             if ( depu==null ) depu= Units.dimensionless;
         
             for ( int i=0; i<Math.min( ds.length(), sizeLimit ); i++ ) {
-                MutableTreeNode sliceNode= new DefaultMutableTreeNode( "values @ "+depu.createDatum(dep0.value(i)) ); 
-                MutableTreeNode atree= valuesTreeNode( prefix + i+",", sliceNode, DataSetOps.slice0(ds, i) , sizeLimit );
-                aroot.insert( sliceNode, aroot.getChildCount() );
+                if ( dep0.rank()==1 ) { //TODO: waht should this do for rank>1?
+                    MutableTreeNode sliceNode= new DefaultMutableTreeNode( "values @ "+depu.createDatum(dep0.value(i)) );
+                    MutableTreeNode atree= valuesTreeNode( prefix + i+",", sliceNode, DataSetOps.slice0(ds, i) , sizeLimit );
+                    aroot.insert( sliceNode, aroot.getChildCount() );
+                }
             }
             if ( ds.length()>=sizeLimit ) {
                 aroot.insert( new DefaultMutableTreeNode( "..." ), aroot.getChildCount() );

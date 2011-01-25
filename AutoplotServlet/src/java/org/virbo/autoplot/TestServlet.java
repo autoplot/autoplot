@@ -163,6 +163,6 @@ public class TestServlet {
 
         ScriptContext.formatDataSet(result, dataFile.toString());
 
-        AutoPlotUI.main(new String[]{dataFile.toString()});
+        AutoplotUI.main(new String[]{dataFile.toString()});
     }
 }

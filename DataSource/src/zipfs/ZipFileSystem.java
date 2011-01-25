@@ -48,7 +48,7 @@ public class ZipFileSystem extends FileSystem {
         while(contents.hasMoreElements()) {
             ZipEntry entry = contents.nextElement();
             String entryName = "/" + entry.getName();
-            addZipEntry(entryName, entry);
+            addZipEntry(entryName, entry); //TODO: do the other FS implementations start entries with /?
         }
     }
 
@@ -77,6 +77,7 @@ public class ZipFileSystem extends FileSystem {
     @Override
     public FileObject getFileObject(String filename) {
         String f = FileSystem.toCanonicalFilename(filename);
+        if ( !f.startsWith("/") ) f= "/"+f;
         if (filemap.containsKey(f)) {
             return filemap.get(f);
         } else if (filemap.containsKey(f+"/")) {  //maybe it's a folder with out trailing /

@@ -99,9 +99,17 @@ public interface QDataSet {
     public final static String BINS_0="BINS_0";
 
     /**
+     * type String.  This non-null string identifies that elements in this dimension are
+     * instances of data with the same dimensions.  ds[2,20] where JOIN_0="DEPEND_1" should
+     * be equivalent to ds[40].  It's not clear if the text should indicate anything, but
+     * for now let's just indicate the next dimension.
+     */
+    public final static String JOIN_0="JOIN_0";
+
+    /**
      * type QDataSet. Correllated plane of data.  An additional dependent DataSet that is correllated by the first index.  
      * Note "0" is just a count, and does not refer to the 0th index.  All correllated datasets must be 
-     * correllated by the first index.  TODO: what about two rank 2 datasets?
+     * correllated by the first index.  TODO: what about two rank 2 datasets?  
      */
     public final static String PLANE_0= "PLANE_0";
 
@@ -118,6 +126,13 @@ public interface QDataSet {
      * this is the maximum number of allowed planes.  This should be used to enumerates all the planes.
      */
     public final static int MAX_PLANE_COUNT=50;
+
+    /**
+     * maximum number of same-unit bundled dimensions (e.g. B_GSM[time,Bundle]).  This was introduced when cdf dataset
+     * fa_k0_tms_20040224_v01.cdf?O+_en had 48 energy channels, was marked as time_series but wouldn't render because
+     * view code limited to 12.
+     */
+    public final static int MAX_UNIT_BUNDLE_COUNT=12;
 
     /**
      * this is the highest rank supported by the library.  Rank 0 is supported though Rank0DataSet.  High rank datasets are supported through
@@ -189,9 +204,8 @@ public interface QDataSet {
     public final static String TITLE="TITLE";
     
     /**
-     * Boolean, Boolean.TRUE if dataset is monotonically increasing.  Also, the data must not contain 
-     * invalid values.  Generally this will be used with tags datasets.  Negative CADENCE implies
-     * monotonic decreasing.
+     * Boolean, Boolean.TRUE if dataset is monotonically increasing.  Data may only contain
+     * invalid values at the beginning or end.  Generally this will be used with tags datasets.
      */
     public final static String MONOTONIC="MONOTONIC";
             
@@ -255,6 +269,7 @@ public interface QDataSet {
      * of a dataset should be EnumerationUnits which convert the data in this 
      * dimension to dimension labels that are understood in the coordinate frame
      * label context.  (E.g. X,Y,Z in GSM.)
+     * (Note this is before BUNDLE dimensions were formalized.)
      */
     public final static String COORDINATE_FRAME="COORDINATE_FRAME";
     

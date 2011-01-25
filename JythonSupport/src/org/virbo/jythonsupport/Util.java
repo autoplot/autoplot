@@ -30,7 +30,7 @@ import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
- * Utilities for jython scripts in both the datasource and application contexts.
+ * Utilities for Jython scripts in both the datasource and application contexts.
  * @author jbf
  */
 public class Util {
@@ -152,7 +152,7 @@ public class Util {
      */
     public static String[] list(String surl) throws IOException, URISyntaxException {
         String[] ss = FileSystem.splitUrl(surl);
-        FileSystem fs = FileSystem.create(new URI(ss[2]));
+        FileSystem fs = FileSystem.create( DataSetURI.toUri(ss[2]));
         String glob = ss[3].substring(ss[2].length());
         String[] result;
         if (glob.length() == 0) {

@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.das2.datum.format.DatumFormatter;
+import org.das2.datum.format.EnumerationDatumFormatter;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -30,6 +32,91 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         }
     }
 
+    /**
+     * format the rank 2 bundle of data.
+     * @param out
+     * @param data
+     * @param mon
+     */
+    private void formatBundle(PrintWriter out, QDataSet data, ProgressMonitor mon) {
+        maybeOutputProperty(out, data, QDataSet.TITLE);
+
+        QDataSet bundleDesc= (QDataSet) data.property(QDataSet.BUNDLE_1);
+        QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+
+        DatumFormatter[] formats= new DatumFormatter[data.length(0)];
+        Units[] uu= new Units[data.length(0)];
+
+        for ( int i=0; i<bundleDesc.length(); i++ ) {
+            uu[i] = (Units) bundleDesc.property(QDataSet.UNITS,i);
+            if (uu[i] == null) uu[i] = Units.dimensionless;
+            formats[i]= uu[i].createDatum(data.value(0,i)).getFormatter();
+            if ( formats[i] instanceof EnumerationDatumFormatter ) {
+                //((EnumerationDatumFormatter)formats[i]).setAddQuotes(true);
+            }
+        }
+
+        if ( bundleDesc==null ) {
+            throw new IllegalArgumentException("expected to find bundleDesc in dataset!");
+        }
+        
+        if (bundleDesc != null) {
+            if (dep0 != null) {
+                String l = (String) dep0.property(QDataSet.LABEL);
+                if ( l==null ) {
+                    if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
+                        l= "time(UTC)";
+                    } else {
+                        l= "dep0";
+                    }
+                }
+                out.print(" " + l + ", ");
+            }
+
+            int i;
+            for (  i = 0; i < bundleDesc.length()-1; i++) {
+                String l1= (String) bundleDesc.property(QDataSet.LABEL,i);
+                if ( l1.trim().length()==0 ) {
+                    Units u1=  (Units) bundleDesc.property(QDataSet.UNITS,i);
+                    if ( u1!=null && Units.t2000.isConvertableTo( u1 ) ) {
+                        l1= "time(UTC)";
+                    } else {
+                        l1= "field"+i;
+                    }
+                }
+                out.print( l1 + ", " );
+            }
+            String l1= (String) bundleDesc.property(QDataSet.LABEL,i);
+            out.println( l1 == null ? ("field"+i) : l1 );
+        }
+
+        Units u0 = null;
+        if (dep0 != null) {
+            u0 = (Units) dep0.property(QDataSet.UNITS);
+            if (u0 == null) u0 = Units.dimensionless;
+
+        }
+
+        mon.setTaskSize(data.length());
+        mon.started();
+
+        for (int i = 0; i < data.length(); i++) {
+            mon.setTaskProgress(i);
+            if ( mon.isCancelled() ) break;
+            if (dep0 != null) {
+                out.print("" + u0.createDatum(dep0.value(i)) + ", ");
+            }
+
+            int j;
+            for ( j = 0; j < data.length(i) - 1; j++) {
+                out.print( formats[j].format( uu[j].createDatum(data.value(i,j)), uu[j] ) + ", ");
+            }
+            out.println( formats[j].format( uu[j].createDatum(data.value(i,j)), uu[j] )  );
+        }
+        mon.finished();
+
+    }
+
     private void formatRank2(PrintWriter out, QDataSet data, ProgressMonitor mon) {
         maybeOutputProperty(out, data, QDataSet.TITLE);
         QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
@@ -40,7 +127,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
 
         Units u = (Units) data.property(QDataSet.UNITS);
         if (u == null) u = Units.dimensionless;
-        format= u.createDatum(data.value(0)).getFormatter();
+        format= u.createDatum(data.value(0,0)).getFormatter();
 
         if ( u!=Units.dimensionless ) maybeOutputProperty( out, data, QDataSet.UNITS );
         
@@ -48,7 +135,14 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
             out.print("#");
             if (dep0 != null) {
                 String l = (String) dep0.property(QDataSet.LABEL);
-                out.print(" " + (l == null ? "dep0" : l) + ", ");
+                if ( l==null ) {
+                    if ( Units.t2000.isConvertableTo( SemanticOps.getUnits(dep0) ) ) {
+                        l= "time(UTC)";
+                    } else {
+                        l= "dep0";
+                    }
+                }
+                out.print( l + ", ");
             }
             Units dep1units = (Units) dep1.property(QDataSet.UNITS);
             if (dep1units == null) dep1units = Units.dimensionless;
@@ -173,7 +267,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
     }
 
     /**
-     * format the ascii table to the file.  No controls are provided presently, but this
+     * format the data to an ASCII table file.  No controls are provided presently, but this
      * may change.
      * @param uri
      * @param data
@@ -189,7 +283,11 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         out.println("# Generated by Autoplot on " + new Date());
 
         if (data.rank() == 2) {
-            formatRank2(out, data, mon);
+            if ( SemanticOps.isBundle(data) ) {
+                formatBundle( out, data, mon );
+            } else {
+                formatRank2(out, data, mon);
+            }
         } else if (data.rank() == 1) {
             formatRank1(out, data, mon);
         }

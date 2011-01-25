@@ -5,12 +5,15 @@
 
 package org.virbo.autoplot.dom;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.system.MutatorLock;
@@ -68,7 +71,6 @@ public class DomNodeController {
      * @return
      */
     public boolean isPendingChanges() {
-        boolean result = false;
         if (changesSupport.isPendingChanges()) {
             return true;
         } else {
@@ -79,7 +81,25 @@ public class DomNodeController {
         }
         return false;
     }
-    
+
+    /**
+     * return a list of all the pending changes.  These are returned in a
+     * Map that goes from pending change to change manager.  Note this will
+     * recurse through all the children, so to see pending changes
+     * for the application, just call this on it's controller.
+     *
+     * @param changes a Map to which the changes will be added.
+     */
+    public void pendingChanges( Map<Object,Object> changes ) {
+        if (changesSupport.isPendingChanges()) {
+            changes.putAll( changesSupport.changesPending );
+        }
+        List<DomNodeController> kids= getChildControllers();
+        for ( DomNodeController k: kids ) {
+            k.pendingChanges(changes);
+        }
+    }
+
     /**
      * the application state is rapidly changing.
      * @return
@@ -88,7 +108,7 @@ public class DomNodeController {
         return changesSupport.isValueAdjusting();
     }
 
-    protected MutatorLock mutatorLock() {
+    protected Lock mutatorLock() {
         return changesSupport.mutatorLock();
     }
 

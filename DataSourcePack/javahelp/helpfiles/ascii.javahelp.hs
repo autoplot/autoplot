@@ -4,15 +4,15 @@
         <type>javax.help.TOCView</type>
         <name>TOC</name>
         <label>Table Of Contents</label>
-        <data>toc.xml</data>
+        <data>ascii.toc.xml</data>
     </view>
     <view>
         <type>javax.help.IndexView</type>
         <name>Index</name>
         <label>Index</label>
-        <data>index.xml</data>
+        <data>ascii.index.xml</data>
     </view>
     <maps>
-        <mapref location="map.jhm"/>
+        <mapref location="ascii.map.jhm"/>
     </maps>
 </helpset>

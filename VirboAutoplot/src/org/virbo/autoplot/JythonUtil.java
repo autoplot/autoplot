@@ -5,6 +5,7 @@
 
 package org.virbo.autoplot;
 
+import external.PlotCommand;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -14,9 +15,11 @@ import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.PySystemState;
+import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  *
@@ -33,23 +36,54 @@ public class JythonUtil {
      * @return PythonInterpreter ready for commands.
      * @throws java.io.IOException
      */
-    public static PythonInterpreter createInterpreter( boolean appContext, boolean sandbox ) throws IOException {
-        PythonInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(sandbox);
+    public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox ) throws IOException {
+        InteractiveInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(sandbox);
         if ( appContext ) interp.execfile( JythonUtil.class.getResource("appContextImports.py").openStream(), "appContextImports.py" );
+        interp.set( "plotx", new PlotCommand() );
         return interp;
     }
 
-    public static PythonInterpreter createInterpreter( boolean appContext, boolean sandbox, Application dom, ProgressMonitor mon ) throws IOException {
-        PythonInterpreter interp= createInterpreter(appContext, sandbox);
+    public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox, Application dom, ProgressMonitor mon ) throws IOException {
+        InteractiveInterpreter interp= createInterpreter(appContext, sandbox);
         if ( dom!=null ) interp.set("dom", dom );
         if ( mon!=null ) interp.set("monitor", mon );
+        interp.set( "plotx", new PlotCommand() );
         return interp;
     }
 
     protected static void runScript( ApplicationModel model, String script, String[] argv ) throws IOException {
         if ( argv==null ) argv= new String[] {""};
-        PySystemState.initialize( PySystemState.getBaseProperties(), null, argv );
+        PySystemState.initialize( PySystemState.getBaseProperties(), null, argv ); // legacy support sys.argv. now we use getParam
         PythonInterpreter interp = JythonUtil.createInterpreter(true, false, model.getDocumentModel(), new NullProgressMonitor() );
+
+        System.err.println();
+        
+        interp.exec("params=dict()"); // untested.
+        int iargv=-1;  // skip the zeroth one, it is the name of the script
+        for (String s : argv ) {
+            int ieq= s.indexOf("=");
+            if ( ieq>0 ) {
+                String snam= s.substring(0,ieq).trim();
+                if ( DataSourceUtil.isJavaIdentifier(snam) ) {
+                    String sval= s.substring(ieq+1).trim();
+                    interp.exec("params['" + snam + "']='" + sval+"'");
+                } else {
+                    if ( snam.startsWith("-") ) {
+                        System.err.println("script arguments should not start with -, they should be name=value");
+                    }
+                    System.err.println("bad parameter: "+ snam);
+                }
+            } else {
+                if ( iargv>=0 ) {
+                    interp.exec("params['arg_" + iargv + "']='" + s +"'" );
+                    iargv++;
+                } else {
+                    //System.err.println("skipping parameter" + s );
+                    iargv++;
+                }
+            }
+        }
+        
         URL url= DataSetURI.getURL(script);
         InputStream in= url.openStream();
         interp.execfile(in);
@@ -81,10 +115,11 @@ public class JythonUtil {
             public void run() {
                 try {
                     PythonInterpreter interp = JythonUtil.createInterpreter(true, false, dom, mon );
+                    System.err.println("invokeScriptSoon("+url+")");
                     interp.execfile(url.openStream(), url.toString());
                     mon.finished();
                 } catch (IOException ex) {
-                    Logger.getLogger(AutoPlotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         };

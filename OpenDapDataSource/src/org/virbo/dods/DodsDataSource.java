@@ -26,7 +26,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import dods.dap.Attribute;
 import java.net.URI;
-import org.das2.CancelledOperationException;
+import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.Units;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
 
@@ -79,7 +80,9 @@ public class DodsDataSource extends AbstractDataSource {
         i = surl.indexOf('?');
         String variableConstraint= null;
         if ( i!=-1 ) {
-            variableConstraint = URISplit.uriDecode(surl.substring(i + 1));
+            String s= surl.substring(i + 1);
+            s= DataSetURI.maybePlusToSpace(s);
+            variableConstraint = URISplit.uriDecode(s);
             StringTokenizer tok= new StringTokenizer(variableConstraint,"[<>",true);
             String name= tok.nextToken();
             
@@ -215,7 +218,7 @@ public class DodsDataSource extends AbstractDataSource {
         AttributeTable at = das.getAttributeTable(variable);
         ds.putProperty(QDataSet.METADATA,at);
 
-        if ( uri.toString().contains(".cdf.dds") ) {
+        if ( DataSetURI.fromUri(uri).contains(".cdf.dds") ) {
             ds.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
         }
 
@@ -227,7 +230,7 @@ public class DodsDataSource extends AbstractDataSource {
 
     @Override
     public MetadataModel getMetadataModel() {
-        if (uri.toString().contains(".cdf.dds")) {
+        if ( DataSetURI.fromUri(uri).contains(".cdf.dds")) {
             return new IstpMetadataModel();
         } else {
             return super.getMetadataModel();

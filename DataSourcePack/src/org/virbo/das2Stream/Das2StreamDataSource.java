@@ -11,7 +11,7 @@ package org.virbo.das2Stream;
 import org.das2.client.DataSetStreamHandler;
 import org.das2.stream.StreamException;
 import org.das2.util.monitor.ProgressMonitor;
-import org.das2.util.StreamTool;
+import org.das2.stream.StreamTool;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.DataSetAdapter;
+import org.das2.dataset.DataSetAdapter;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -50,7 +50,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
 
         ReadableByteChannel channel = Channels.newChannel(in);
 
-        URISplit split = URISplit.parse(uri.toString());
+        URISplit split = URISplit.parse( uri );
         
         if (split.ext.equals(".qds")) {
             QDataSetStreamHandler h= new QDataSetStreamHandler();
@@ -65,7 +65,7 @@ public class Das2StreamDataSource extends AbstractDataSource {
         } else {
 
             HashMap<String,String> props = new HashMap<String,String>();
-            props.put("file", uri.toString());
+            props.put("file", DataSetURI.fromUri(uri) );
 
             DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
 
@@ -76,10 +76,6 @@ public class Das2StreamDataSource extends AbstractDataSource {
             return DataSetAdapter.create(handler.getDataSet());
         }
 
-    }
-
-    public boolean asynchronousLoad() {
-        return true;
     }
 
     public static DataSourceFactory getFactory() {

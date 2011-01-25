@@ -22,7 +22,6 @@ import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -30,6 +29,7 @@ import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -57,6 +57,82 @@ public class SimpleStreamFormatter {
         return packet;
     }
     Map<QDataSet, String> names = new HashMap<QDataSet, String>();
+    Map<QDataSet, String> joinDataSets= new HashMap<QDataSet, String>();
+
+    private void doValuesElement(QDataSet ds, PacketDescriptor pd, PlaneDescriptor planeDescriptor, Document document, Element qdatasetElement) throws DOMException {
+        Units u = (Units) ds.property(QDataSet.UNITS);
+        if (!pd.isValuesInDescriptor()) {
+            if (asciiTypes) {
+                double min = Double.POSITIVE_INFINITY;
+                double max = Double.NEGATIVE_INFINITY;
+                double absMin = Double.MAX_VALUE; // smallest non-zero number.
+                double maxFp = 0.; // biggest fractional part.
+                double minFp = 1.; // smallest non-zero fractional part.
+                QubeDataSetIterator it = new QubeDataSetIterator(ds);
+                while (it.hasNext()) {
+                    it.next();
+                    double d = it.getValue(ds);
+                    if (d < min) {
+                        min = d;
+                    }
+                    final double dd = Math.abs(d);
+                    final double fp = dd - (long) dd;
+                    if (fp > maxFp) {
+                        maxFp = fp; // check for all ints, for now. //TODO: check for highest precision.
+                    }
+                    if (fp > 0 && fp < minFp) {
+                        minFp = fp;
+                    }
+                    if (dd > 0 && dd < absMin) {
+                        absMin = dd;
+                    }
+                    if (d > max) {
+                        max = d;
+                    }
+                }
+                if (u instanceof EnumerationUnits) {
+                    planeDescriptor.setType(new AsciiIntegerTransferType(10));
+                } else if (u instanceof TimeLocationUnits) {
+                    AsciiTimeTransferType att = getTT(ds);
+                    planeDescriptor.setType(att);
+                } else {
+                    //QDataSet diffs= Ops.subtract( ds, DataSetOps.slice0(ds,0) );
+                    //QDataSet gcd= DataSetUtil.gcd( diffs, DataSetUtil.asDataSet(absMin/100) );
+                    if (maxFp == 0 && min > -1e8 && max < 1e8) {
+                        planeDescriptor.setType(new AsciiIntegerTransferType(10));
+                    } else if (min > -10000 && max < 10000 && absMin > 0.0001) {
+                        planeDescriptor.setType(new AsciiTransferType(10, false));
+                    } else if (min > -100000 && max < 100000 && minFp == 0.5 && maxFp == 0.5) {
+                        planeDescriptor.setType(new AsciiTransferType(10, false));
+                    } else {
+                        if (absMin > 1e-100 && max < 1e100) {
+                            planeDescriptor.setType(new AsciiTransferType(10, true));
+                        } else {
+                            planeDescriptor.setType(new AsciiTransferType(12, true));
+                        }
+                    }
+                }
+            } else {
+                if (u instanceof EnumerationUnits) {
+                    planeDescriptor.setType(new IntegerTransferType());
+                } else if (u instanceof TimeLocationUnits) {
+                    planeDescriptor.setType(new DoubleTransferType());
+                } else {
+                    planeDescriptor.setType(new FloatTransferType());
+                }
+            }
+        }
+        if (pd.isValuesInDescriptor() && ds.rank() == 2) {
+            for (int i = 0; i < ds.length(); i++) {
+                Element values = doValues(document, pd, planeDescriptor, DataSetOps.slice0(ds, i));
+                values.setAttribute("index", String.valueOf(i));
+                qdatasetElement.appendChild(values);
+            }
+        } else {
+            Element values = doValues(document, pd, planeDescriptor, ds);
+            qdatasetElement.appendChild(values);
+        }
+    }
 
     /**
      * 
@@ -87,7 +163,7 @@ public class SimpleStreamFormatter {
     }
 
     /**
-     * pick a time formatter so that resolution is not reduced noticably 
+     * pick a time formatter so that resolution is not reduced noticeably
      * in formatting.
      * @param ds
      * @return
@@ -129,7 +205,11 @@ public class SimpleStreamFormatter {
         Element qdatasetElement = document.createElement("qdataset");
         qdatasetElement.setAttribute("id", nameFor(ds));
 
-        qdatasetElement.setAttribute("rank", "" + (ds.rank() + (streamRank - 1)));
+        if ( isJoin(ds) ){
+            qdatasetElement.setAttribute("rank", "" + ds.rank() );
+        } else {
+            qdatasetElement.setAttribute("rank", "" + (ds.rank() + (streamRank - 1)));
+        }
 
         if ( isBundle(ds) ) {
             QDataSet bds;
@@ -147,98 +227,42 @@ public class SimpleStreamFormatter {
                     qdatasetElement.appendChild(props);
                 }
             }
-        } 
+        } else if ( isJoin(ds) ) {
+            Element values=  document.createElement("values");
+            String sliceName= nameFor( ds.slice(0) );  // the slices ought to have a different name
+            for ( int i=0; i<ds.length(); i++ ) {
+                setNameFor(ds.slice(i),sliceName);
+            }
+            values.setAttribute("join", sliceName ); //TODO: multiple property names
+            qdatasetElement.appendChild( values );
+        }
+
         Element props = doProperties(document, ds);
         qdatasetElement.appendChild(props);
 
         PlaneDescriptor planeDescriptor = new PlaneDescriptor();
 
         planeDescriptor.setRank(ds.rank());
-        int[] qube = DataSetUtil.qubeDims(ds);
-        if ( !pd.valuesInDescriptor ) {
-            if (pd.isStream()) {
-                planeDescriptor.setQube(Util.subArray(qube, 1, qube.length - 1));
+
+        if ( !isJoin(ds) ) {
+            int[] qube = DataSetUtil.qubeDims(ds);
+            if ( !pd.valuesInDescriptor ) {
+                if (pd.isStream()) {
+                    planeDescriptor.setQube(Util.subArray(qube, 1, qube.length - 1));
+                } else {
+                    planeDescriptor.setQube(qube);
+                }
             } else {
-                planeDescriptor.setQube(qube);
-            }
-        } else {
-            if ( ds.length()==0 ) {
-                System.err.println("here");
+                if ( ds.length()==0 ) {
+                    System.err.println("here");
+                }
             }
         }
         planeDescriptor.setDs(ds);
         planeDescriptor.setName(nameFor(ds));
 
-        Units u = (Units) ds.property(QDataSet.UNITS);
-
-        if ( !pd.isValuesInDescriptor() ) {
-            if (asciiTypes) {
-                double min = Double.POSITIVE_INFINITY;
-                double max = Double.NEGATIVE_INFINITY;
-                double absMin = Double.MAX_VALUE; // smallest non-zero number.
-                double maxFp= 0.;                 // biggest fractional part.
-                double minFp= 1.;                 // smallest non-zero fractional part.
-                QubeDataSetIterator it = new QubeDataSetIterator(ds);
-                while (it.hasNext()) {
-                    it.next();
-                    double d = it.getValue(ds);
-                    if (d < min) {
-                        min = d;
-                    }
-                    final double dd = Math.abs(d);
-                    final double fp = dd-(long)dd;
-                    if ( fp>maxFp ) maxFp= fp; // check for all ints, for now. //TODO: check for highest precision.
-                    if ( fp>0 && fp<minFp ) minFp= fp;
-                    if (dd > 0 && dd < absMin) {
-                        absMin = dd;
-                    }
-                    if (d > max) {
-                        max = d;
-                    }
-                }
-
-                if (u instanceof EnumerationUnits) {
-                    planeDescriptor.setType(new AsciiIntegerTransferType(10));
-                } else if (u instanceof TimeLocationUnits) {
-                    AsciiTimeTransferType att= getTT(ds);
-                    planeDescriptor.setType(att);
-                } else {
-                    //QDataSet diffs= Ops.subtract( ds, DataSetOps.slice0(ds,0) );
-                    //QDataSet gcd= DataSetUtil.gcd( diffs, DataSetUtil.asDataSet(absMin/100) );
-
-                    if ( maxFp==0 && min>-1e8 && max<1e8 ) {
-                        planeDescriptor.setType(new AsciiIntegerTransferType(10));
-                    } else if (min > -10000 && max < 10000 && absMin > 0.0001) {
-                        planeDescriptor.setType(new AsciiTransferType(10, false));
-                    } else if ( min > -100000 && max < 100000 && minFp==0.5 && maxFp==0.5 ) {
-                        planeDescriptor.setType(new AsciiTransferType(10, false));
-                    } else {
-                        if (absMin > 1e-100 && max < 1e100) {
-                            planeDescriptor.setType(new AsciiTransferType(10, true));
-                        } else {
-                            planeDescriptor.setType(new AsciiTransferType(12, true));
-                        }
-                    }
-                }
-            } else {
-                if (u instanceof EnumerationUnits) {
-                    planeDescriptor.setType(new IntegerTransferType());
-                } else if (u instanceof TimeLocationUnits) {
-                    planeDescriptor.setType(new DoubleTransferType());
-                } else {
-                    planeDescriptor.setType(new FloatTransferType());
-                }
-            }
-        }
-        if ( pd.isValuesInDescriptor() && ds.rank()==2 ) {
-            for ( int i=0; i<ds.length(); i++ ) {
-                Element values = doValues(document, pd, planeDescriptor, DataSetOps.slice0(ds, i) );
-                values.setAttribute( "index", String.valueOf(i) );
-                qdatasetElement.appendChild(values);
-            }
-        } else {
-            Element values = doValues(document, pd, planeDescriptor, ds);
-            qdatasetElement.appendChild(values);
+        if ( !isJoin(ds) ) {
+            doValuesElement(ds, pd, planeDescriptor, document, qdatasetElement);
         }
 
         planeDescriptor.setDomElement(qdatasetElement);
@@ -249,11 +273,17 @@ public class SimpleStreamFormatter {
     private boolean isBundle( QDataSet ds ) {
         if ( ds.property(QDataSet.BUNDLE_0) !=null ) return true;
         if ( ds.property(QDataSet.BUNDLE_1) !=null ) return true;
-        if ( ds.property(QDataSet.NAME,0)!=ds.property(QDataSet.NAME) ) {
+        if ( ds.property(QDataSet.NAME,0)!=null &&
+                ds.property(QDataSet.NAME,0)!=ds.property(QDataSet.NAME) ) {
+            //TODO: this is a little bit of a kludge.  See demo 5, export the Z component.
             return true;
         } else {
             return false;
         }
+    }
+
+    private boolean isJoin( QDataSet ds ) {
+        return ds.property(QDataSet.JOIN_0) !=null;
     }
 
     private Element doProperties(Document document, QDataSet ds) {
@@ -270,7 +300,14 @@ public class SimpleStreamFormatter {
                 if (qds.rank() == 0) {
                     SerializeDelegate r0d= (SerializeDelegate) SerializeRegistry.getByName("rank0dataset");
                     prop.setAttribute("type", "rank0dataset");
-                    prop.setAttribute("value", r0d.format(value) );
+                    Units u= (Units) qds.property( QDataSet.UNITS );
+                    if ( u!=null && u instanceof EnumerationUnits ) {
+                        //prop.setAttribute("value", r0d.format(value) );
+                        //prop.setAttribute("value", String.valueOf(value) );
+                        continue; // TODO: this should do something!
+                    } else {
+                        prop.setAttribute("value", r0d.format(value) );
+                    }
                 } else {
                     prop.setAttribute("type", "qdataset");
                     prop.setAttribute("value", nameFor((QDataSet) value));
@@ -278,16 +315,16 @@ public class SimpleStreamFormatter {
 
             } else {
                 SerializeDelegate sd = SerializeRegistry.getDelegate(value.getClass());
-                if (sd == null) {
-                    throw new IllegalArgumentException("Unsupported data type: " + value.getClass());
-                // TODO: just skip the property, or insert it as a string.
-                }
                 prop.setAttribute("name", name);
-                if ( sd instanceof XMLSerializeDelegate ) {
-                    prop.appendChild( ((XMLSerializeDelegate)sd).xmlFormat(document,value) );
+                if (sd == null) {
+                    System.err.println("dropping "+name+" because unsupported type: "+value.getClass());
                 } else {
-                    prop.setAttribute("type", sd.typeId(value.getClass()));
-                    prop.setAttribute("value", sd.format(value));
+                    if ( sd instanceof XMLSerializeDelegate ) {
+                        prop.appendChild( ((XMLSerializeDelegate)sd).xmlFormat(document,value) );
+                    } else {
+                        prop.setAttribute("type", sd.typeId(value.getClass()));
+                        prop.setAttribute("value", sd.format(value));
+                    }
                 }
             }
             properties.appendChild(prop);
@@ -309,6 +346,7 @@ public class SimpleStreamFormatter {
         }
 
         sd.setDomElement(streamElement);
+        sd.addDescriptor(sd); // allocate [00] for itself.
 
         return sd;
 
@@ -333,9 +371,9 @@ public class SimpleStreamFormatter {
                 values.setAttribute("length", Util.encodeArray(qubeDims, 0, qubeDims.length));
             }
             if (packetDescriptor.isValuesInDescriptor()) {
-                String s = "";
+                StringBuilder s = new StringBuilder("");
                 for (int i = 0; i < ds.length(); i++) {
-                    s += "," + ds.value(i);
+                    s.append( "," ).append( ds.value(i) );
                 }
                 values.setAttribute("values", ds.length() == 0 ? "" : s.substring(1));
                 if ( ds.length()==0 ) {
@@ -431,6 +469,22 @@ public class SimpleStreamFormatter {
 
     }
 
+    /**
+     * set the names for all the joined datasets.
+     * @param slice
+     * @param name
+     */
+    private synchronized void setNameFor( QDataSet slice, String name ) {
+        names.put(slice, name);
+    }
+
+    /**
+     * return a name for the thing that describes dep0.  This will be used in
+     * the descriptor, so if the descriptor doesn't contain the values, then
+     * the name can be reused.  Note no names are reused at this point.
+     * @param dep0
+     * @return
+     */
     private synchronized String nameFor(QDataSet dep0) {
         String name = names.get(dep0);
 
@@ -490,7 +544,47 @@ public class SimpleStreamFormatter {
 
     }
 
-    PacketDescriptor doPacketDescriptor(StreamDescriptor sd, QDataSet ds, boolean stream, boolean valuesInDescriptor, int streamRank) throws ParserConfigurationException {
+    PacketDescriptor doPacketDescriptorJoin( StreamDescriptor sd, QDataSet ds,
+            boolean stream, boolean valuesInDescriptor, int streamRank )
+            throws ParserConfigurationException {
+
+        PacketDescriptor packetDescriptor = new PacketDescriptor();
+        packetDescriptor.setStream(stream);
+        packetDescriptor.setStreamRank(streamRank);
+        if (valuesInDescriptor) {
+            packetDescriptor.setValuesInDescriptor(true);
+        }
+
+        Document document = sd.newDocument(packetDescriptor);
+
+        Element packetElement = getPacketElement(document);
+
+        Object join = ds.property(QDataSet.JOIN_0);
+        if (join == null) {
+            throw new IllegalArgumentException("expected join");
+        }
+            
+        PlaneDescriptor planeDescriptor = doPlaneDescriptor(document, packetDescriptor, ds, streamRank);
+        packetDescriptor.addPlane(planeDescriptor);
+        packetElement.appendChild(planeDescriptor.getDomElement());
+
+        packetDescriptor.setDomElement(packetElement);
+
+        return packetDescriptor;
+
+    }
+    /**
+     * create the packetDescriptor object.  
+     * @param sd the handle for the stream
+     * @param ds the dataset that will be serialized to this packet descriptor.
+     * @param stream the data will be streamed in packets.
+     * @param valuesInDescriptor the data will be contained in the packet.
+     * @param streamRank the rank of the stream.  
+     * @return
+     * @throws ParserConfigurationException
+     */
+    PacketDescriptor doPacketDescriptor(StreamDescriptor sd, QDataSet ds, boolean stream, boolean valuesInDescriptor,
+            int streamRank, String joinId) throws ParserConfigurationException {
 
         if ( !valuesInDescriptor && DataSetUtil.isQube(ds) == false ) {
             throw new IllegalArgumentException("must be qube!");
@@ -528,7 +622,10 @@ public class SimpleStreamFormatter {
         PlaneDescriptor planeDescriptor = doPlaneDescriptor(document, packetDescriptor, ds, streamRank);
         packetDescriptor.addPlane(planeDescriptor);
 
-        packetElement.appendChild(planeDescriptor.getDomElement());
+        Element dselement= planeDescriptor.getDomElement();
+        if (joinId!=null ) dselement.setAttribute("joinId", joinId );
+
+        packetElement.appendChild(dselement);
 
         packetDescriptor.setDomElement(packetElement);
 
@@ -553,7 +650,7 @@ public class SimpleStreamFormatter {
      * @throws StreamException
      * @throws IOException
      */
-    public void format(QDataSet ds, OutputStream osout, boolean asciiTypes) throws StreamException, IOException {
+    public void format( QDataSet ds, OutputStream osout, boolean asciiTypes ) throws StreamException, IOException {
 
         try {
 
@@ -562,6 +659,11 @@ public class SimpleStreamFormatter {
             WritableByteChannel out = Channels.newChannel(osout);
 
             StreamDescriptor sd = doStreamDescriptor(ds);
+
+            List<String> probs= new ArrayList();
+            if ( !DataSetUtil.validate(ds, probs ) ) {
+                throw new IllegalArgumentException("DataSet is not valid: "+probs.get(0)); 
+            }
 
             List<PacketDescriptor> depPackets = new ArrayList<PacketDescriptor>();
 
@@ -574,6 +676,9 @@ public class SimpleStreamFormatter {
             if (DataSetUtil.isQube(ds)) {
                 packetDescriptorCount = 1;
                 streamRank = 1;
+            } else if ( isJoin(ds) ) {
+                packetDescriptorCount = ds.length();
+                streamRank = 1;
             } else {
                 packetDescriptorCount = ds.length();
                 streamRank = 2;
@@ -583,14 +688,26 @@ public class SimpleStreamFormatter {
             if (dep0 != null) {
                 dep0Name = nameFor(dep0);
             }
+
+            String joinDataSet=null;
+            boolean isjoin= ds.property(QDataSet.JOIN_0) != null;
+            if ( isjoin ) {
+                PacketDescriptor join= doPacketDescriptorJoin(sd, ds, false, false, streamRank);
+                sd.addDescriptor(join);
+                sd.send(join, out);
+                joinDataSet= nameFor(ds);
+            }
+
             for (int ipacket = 0; ipacket < packetDescriptorCount; ipacket++) {
                 PacketDescriptor mainPd;
                 QDataSet packetDs;
 
-                if (streamRank == 1) {
+                List<PacketDescriptor> retire= new ArrayList();
+                
+                if (streamRank == 1 && !isjoin ) {
                     packetDs = ds;
                 } else {
-                    packetDs = DataSetOps.slice0(ds, ipacket);
+                    packetDs = ds.slice(ipacket);
                     names.put(packetDs, nameFor(packetDs));
                     if (dep0Name != null) {
                         names.put((QDataSet) packetDs.property(QDataSet.DEPEND_0), dep0Name);
@@ -598,7 +715,10 @@ public class SimpleStreamFormatter {
                     }
                 }
 
-                mainPd = doPacketDescriptor(sd, packetDs, true, false, streamRank);
+                if ( isJoin(packetDs) ) {
+                    throw new IllegalArgumentException("join of join not supported");
+                }
+                mainPd = doPacketDescriptor(sd, packetDs, true, false, streamRank, joinDataSet );
 
                 sd.addDescriptor(mainPd);
 
@@ -607,18 +727,25 @@ public class SimpleStreamFormatter {
                     QDataSet depi = (QDataSet) packetDs.property("DEPEND_" + i);
                     if (depi != null) {
                         if ( depi==dep0 ) { // kludge: if DEPEND_0==DEPEND_1, an invalid stream was created
-                            System.err.println("DEPEND_0==DEPEND_1, copy kludge");
-                            depi= DDataSet.copy(depi);
+                            throw new RuntimeException("bug in QStream prevents DEPEND_0==DEPEND_1");
+                            /*(System.err.println("DEPEND_0==DEPEND_1, copy kludge");
+                            depi= DDataSet.copy(dep0);
+                            String name= (String) dep0.property(QDataSet.NAME);
+                            if ( name!=null ) {
+                                ((MutablePropertyDataSet)depi).putProperty( QDataSet.NAME, name + "_1" );
+                            }*/
                         }
                         PacketDescriptor pd;
 
                         boolean valuesInDescriptor = true; // because it's a non-qube
-                        pd = doPacketDescriptor(sd, depi, false, valuesInDescriptor, 1);
+                        pd = doPacketDescriptor(sd, depi, false, valuesInDescriptor, 1, null);
 
                         sd.addDescriptor(pd);
 
                         depPackets.add(pd);
                         sd.send(pd, out);
+
+                        retire.add(pd);
                     }
                 }
 
@@ -631,7 +758,7 @@ public class SimpleStreamFormatter {
                         for ( int j=0; j<depi.length(); j++ ) {
                             QDataSet dep1= (QDataSet) depi.property(QDataSet.DEPEND_1, j );
                             if ( dep1!=null ) {
-                                pd = doPacketDescriptor(sd, dep1, false, true, 1);
+                                pd = doPacketDescriptor(sd, dep1, false, true, 1, null);
                                 sd.addDescriptor(pd);
                                 depPackets.add(pd);
                                 sd.send(pd, out);
@@ -639,12 +766,14 @@ public class SimpleStreamFormatter {
                         }
                         
                         boolean valuesInDescriptor = true;
-                        pd = doPacketDescriptor(sd, depi, false, valuesInDescriptor, 1);
+                        pd = doPacketDescriptor(sd, depi, false, valuesInDescriptor, 1, null );
 
                         sd.addDescriptor(pd);
 
                         depPackets.add(pd);
                         sd.send(pd, out);
+
+                        retire.add(pd);
                     }
                 }
 
@@ -657,6 +786,11 @@ public class SimpleStreamFormatter {
                 }
 
                 formatPackets(out, sd, mainPd);
+
+                for ( PacketDescriptor r: retire ) {
+                    sd.retireDescriptor(r);
+                }
+                sd.retireDescriptor(mainPd);
             }
 
         } catch (ParserConfigurationException ex) {

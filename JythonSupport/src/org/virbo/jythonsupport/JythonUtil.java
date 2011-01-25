@@ -4,11 +4,11 @@
  */
 package org.virbo.jythonsupport;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
+import java.net.URL;
 import org.python.core.Py;
 import org.python.core.PySystemState;
+import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 
 /**
@@ -26,14 +26,17 @@ public class JythonUtil {
      * @return PythonInterpreter ready for commands.
      * @throws java.io.IOException
      */
-    public static PythonInterpreter createInterpreter(boolean sandbox) throws IOException {
+    public static InteractiveInterpreter createInterpreter(boolean sandbox) throws IOException {
         if ( PySystemState.cachedir==null ) {
             System.setProperty( "python.cachedir", System.getProperty("user.home")+"/autoplot_data/pycache" );
         }
-        PythonInterpreter interp = new PythonInterpreter();
+        InteractiveInterpreter interp = new InteractiveInterpreter();
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
-
-        interp.execfile(JythonOps.class.getResource("imports.py").openStream(), "imports.py");
+        URL imports= JythonOps.class.getResource("imports.py");
+        if ( imports==null ) {
+            throw new RuntimeException("unable to locate imports.py on classpath");
+        }
+        interp.execfile(imports.openStream(), "imports.py");
         return interp;
 
     }

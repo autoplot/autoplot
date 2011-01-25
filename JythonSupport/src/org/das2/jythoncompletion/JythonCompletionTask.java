@@ -218,7 +218,7 @@ public class JythonCompletionTask implements CompletionTask {
                     }
                 }
                 String link = null;
-                if (signature != null) {
+                if ( false && signature != null) {
                     if ( signature.startsWith("javax") || signature.startsWith("java") ) {
                         link= "http://java.sun.com/j2se/1.5.0/docs/api/" + signature;
                     } else if ( signature.startsWith("org/das2/")) {

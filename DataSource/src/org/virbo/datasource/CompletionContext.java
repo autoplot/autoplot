@@ -9,6 +9,7 @@
 
 package org.virbo.datasource;
 
+import java.net.URI;
 import java.net.URL;
 
 /**
@@ -95,9 +96,9 @@ public class CompletionContext {
     public int surlpos;
     
     /**
-     * resource file, no params (and no "vap:" schema);
+     * resource file URI, no params (and no "vap:" schema), starting with http, sftp, etc.
      */
-    public URL resource;
+    public URI resourceURI;
     
     /**
      * params parsed
@@ -144,12 +145,16 @@ public class CompletionContext {
     
     /**
      * returns the value for the context
+     * <pre>
+     * {@code
      * cc= new CompletionContext();
      * cc.surl= vap:http://www.autoplot.org/data/myfile.dat?param1=aaa&param2=bbb
      * cc.completable= b
      * cc.surlpos= 63
      * get( CONTEXT_PARAMETER_NAME, cc ) ->  param2
      * get( CONTEXT_FILE, cc ) ->  http://www.autoplot.org/data/myfile.dat
+     * }
+     * </pre>
      */
     public static String get( Object context, CompletionContext cc ) {
         if ( context==CONTEXT_FILESYSTEM || context==CONTEXT_FILE ) {
@@ -211,10 +216,20 @@ public class CompletionContext {
             if ( i2>i1 ) i2=-1; // equals is from the next name=value pair.
             String delima= "";
             if ( context==CONTEXT_PARAMETER_NAME ) {
+                String completable= ccnew.completable;
+                String after;
                 if ( i2==-1 ) {
-                    return cc.surl.substring(0,i0+1) + ccnew.completable + delima + cc.surl.substring( i1 );
+                    after= cc.surl.substring( i1 );
                 } else {
-                    return cc.surl.substring(0,i0+1) + ccnew.completable + delima + cc.surl.substring( i2 );
+                    after= cc.surl.substring( i2 );
+                }
+                if ( completable.endsWith("=") && delima.length()==0 && after.startsWith("=") ) {
+                    completable= completable.substring(0,completable.length()-1);
+                }
+                if ( i2==-1 ) {
+                    return cc.surl.substring(0,i0+1) + completable + delima + cc.surl.substring( i1 );
+                } else {
+                    return cc.surl.substring(0,i0+1) + completable + delima + cc.surl.substring( i2 );
                 }
             } else {
                 if ( i2==-1 ) {

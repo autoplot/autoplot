@@ -7,6 +7,12 @@ package test.endtoend;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -31,8 +37,9 @@ public class Test017 {
         t0 = System.currentTimeMillis();
     }
 
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
 
+        try {
         QDataSet ds;
 
         int count;
@@ -42,6 +49,8 @@ public class Test017 {
         getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
         xxx("start");
+
+        ThreadPoolExecutor exec= new ThreadPoolExecutor(12,12,3600,TimeUnit.SECONDS, new SynchronousQueue<Runnable>() );
 
         for (String s : uris) {
 
@@ -63,7 +72,7 @@ public class Test017 {
                     // we'll just skip these odd local file references for now.
                     System.err.println("skipping local " + s);
                 } else {
-                    doTest( s, label);
+                    doTest( s, label,exec );
 
                 }
             } catch (Exception ex) {
@@ -81,9 +90,13 @@ public class Test017 {
             xxx( label + ": "+ s );
 
         }
-
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
         System.exit(0);  // TODO: something is firing up the event thread
     }
+    
     static String[] uris = new String[]{
         //[edit] 1 Tsds
         "033 http://cdaweb.gsfc.nasa.gov/istp_public/data/omni/hro_5min/%Y/omni_hro_5min_%Y%m%d_v...cdf?HR[::100]&timerange=1995+to+2000",
@@ -106,7 +119,7 @@ public class Test017 {
 
         "008 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/mari_mag/1994/cn_k0_mari_19940122_v01.cdf?Epoch",
         "009 http://cdaweb.gsfc.nasa.gov/istp_public/data/canopus/bars/%Y/cn_k0_bars_%Y%m%d_v...cdf?E_vel&timerange=1993-01-02+through+1993-01-14",
-        "010 ftp://cdaweb.gsfc.nasa.gov/pub/istp/imp8/mag_15sec/1973/i8_15sec_mag_19731030_v02.cdf",
+        "010 CC ftp://cdaweb.gsfc.nasa.gov/pub/istp/imp8/mag_15sec/1973/i8_15sec_mag_19731030_v02.cdf",
         //No data is drawn:
         "011 vap:ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/l2/fgm/2007/tha_l2_fgm_20070224_v01.cdf?tha_fgh_gse",
         //IndexOutOfBoundsException:
@@ -155,10 +168,10 @@ public class Test017 {
         "024 vap+dat:http://goes.ngdc.noaa.gov/data/avg/$Y/A105$y$m.TXT?skip=23&timeFormat=$y$m$d+$H$M&column=E1&time=YYMMDD&fill=32700&timerange=Dec+2004",
         //I'd expect this to read in the column as a rank 1 dataset:
 
-        "025 http://www-pw.physics.uiowa.edu/~jbf/L1times.2.dat?fixedColumns=29-35",
+//        "025 http://www-pw.physics.uiowa.edu/~jbf/L1times.2.dat?fixedColumns=29-35",
         //And this gets a null pointer exception in AsciiParser.getFieldIndex line 1024:
 
-        "026 http://www-pw.physics.uiowa.edu/~jbf/L1times.2.dat?fixedColumns=0-24,29-35&column=field1",
+//        "026 http://www-pw.physics.uiowa.edu/~jbf/L1times.2.dat?fixedColumns=0-24,29-35&column=field1",
         //Very large with $b and ${skip}:
 
         "027 http://vho.nasa.gov/mission/soho/celias_pm_30sec/2003.txt",
@@ -233,10 +246,15 @@ public class Test017 {
 
         //From VMO, the data here contains the search date, but the time axis is not properly located:
 
-        "046 http://vmo.nasa.gov/vxotmp/vap/VMO/Granule/OMNI/PT1H/omni2_1994.vap",
+        //"046 http://vmo.nasa.gov/vxotmp/vap/VMO/Granule/OMNI/PT1H/omni2_1994.vap",
+
+        //vaps with modifiers and recent ISO8601 parsing.
+        "050 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20+12:00+to+18:00",
+        "051 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/2010-10-20T18:00",
+        "052 vap:file:/home/jbf/ct/autoplot/vap/cdaweb_ace.vap?timerange=2010-10-20T12:00/PT6H",
     };
 
-    private static void doTest( final String s, final String label) throws IOException, InterruptedException, Exception {
+    private static void doTest( final String s, final String label, ThreadPoolExecutor exec ) throws IOException, InterruptedException, Exception {
 
         Runnable run= new Runnable() {
             public void run()  {
@@ -268,11 +286,22 @@ public class Test017 {
             }
         };
 
-        int timeoutSeconds= 60;
+        int timeoutSeconds= 30;
 
-        ThreadPoolExecutor exec= new ThreadPoolExecutor(1,1,3600,TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1) );
-        exec.execute( run );
-        if ( exec.awaitTermination(  timeoutSeconds, TimeUnit.SECONDS ) ) {
+        Future f=null;
+        while (true) {
+            try {
+                f = exec.submit(run, "Success!");
+                break;
+            }
+            catch (RejectedExecutionException ex) {
+                if (exec.isShutdown()) break;
+                System.err.println("Thread pool is full. Retrying...");
+                Thread.sleep(100);
+            }
+        }
+
+        if ( "Success!".equals(f.get(  timeoutSeconds, TimeUnit.SECONDS ) ) ) {
             System.err.println("okay!");
         } else {
             PrintWriter pw = new PrintWriter(label + ".error");

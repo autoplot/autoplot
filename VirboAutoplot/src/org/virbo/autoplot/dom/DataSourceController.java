@@ -6,8 +6,8 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.io.InterruptedIOException;
-import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +24,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.util.RunLaterListener;
-import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -215,25 +215,25 @@ public class DataSourceController extends DomNodeController {
 
     /**
      * We isolate the flakiness by introducing a method that encapsulates the 
-     * impossible logic of know if a panel will support timeSeriesBrowse.  If
+     * impossible logic of know if a plot element will support timeSeriesBrowse.  If
      * it doesn't, we would just want to load the data set and be done with it.
      * If it can then we want a tsb.
      *
-     * The problem is that until the panel does
+     * The problem is that until the plot element does
      * its slicing, we don't really know if it will or not.  For now we kludge up
-     * logic based on the component string or panels where the component string
+     * logic based on the component string or plotElements where the component string
      * won't be set automatically.
      *
      * @param p
      * @return
      */
-    private boolean doesPanelSupportTsb( Panel p ) {
+    private boolean doesPlotElementSupportTsb( PlotElement p ) {
         return p.isAutoComponent() || (
                 !( p.getComponent().contains("|slice0") || p.getComponent().contains("|collapse0") ) );
 
     }
 
-    public synchronized void setDataSource(boolean valueWasAdjusting,DataSource dataSource) {
+    public synchronized void resetDataSource(boolean valueWasAdjusting,DataSource dataSource) {
 
         if ( dataSource==null ) {
             setDataSetNeedsLoading(false);
@@ -251,13 +251,15 @@ public class DataSourceController extends DomNodeController {
             setCaching(null);
             setTsb(null);
             setTsbSuri(null);
-            if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal" ) ) dsf.setUri("vap+internal:");
+            if ( dsf.getUri()!=null && !dsf.getUri().startsWith("vap+internal" ) ) {
+                dsf.setUri("vap+internal:");
+            }
 
         } else {
             changesSupport.performingChange( this, PENDING_SET_DATA_SOURCE );
             setCaching(dataSource.getCapability(Caching.class));
-            List<Panel> ps = dom.controller.getPanelsFor(dsf);
-            if ( ps.size()>0 && this.doesPanelSupportTsb( ps.get(0) ) ) {  //TODO: flakey
+            List<PlotElement> ps = dom.controller.getPlotElementsFor(dsf);
+            if ( ps.size()>0 && this.doesPlotElementSupportTsb( ps.get(0) ) ) {  //TODO: flakey
                 setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
             } else {
                 setTsb(null);
@@ -282,7 +284,7 @@ public class DataSourceController extends DomNodeController {
         if (oldSource == null || !oldSource.equals(dataSource)) {
             if (getTsb() != null) {
                 setDataSet(null);
-                List<Panel> ps = dom.controller.getPanelsFor(dsf);
+                List<PlotElement> ps = dom.controller.getPlotElementsFor(dsf);
                 if (ps.size() > 0) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(this,ps.get(0));
                     timeSeriesBrowseController.setup(valueWasAdjusting);
@@ -323,7 +325,7 @@ public class DataSourceController extends DomNodeController {
 
         if (ds != null && !DataSetUtil.validate(ds, problems)) {
             StringBuffer message = new StringBuffer("data set is invalid:\n");
-            new Exception().printStackTrace();
+            new Exception("data set is invalid").printStackTrace();
             for (String s : problems) {
                 message.append(s + "\n");
             }
@@ -368,22 +370,30 @@ public class DataSourceController extends DomNodeController {
                 return;
             }
 
-            setStatus("busy: apply fill");
-
             extractProperties();
 
             doDimensionNames();
 
-            setHistogram(new AutoHistogram().doit(ds, null));
-            //doFillValidRange();  the QDataSet returned 
+            if ( DataSetUtil.totalLength(ds) < 200000 ) {
+                setStatus("busy: do statistics on the data...");
+                setHistogram(new AutoHistogram().doit(ds, null));
+            } else {
+                setHistogram( null );
+            }
+
+            setStatus("busy: apply fill");
+
+            //doFillValidRange();  the QDataSet returned
             updateFill();
 
             setStatus("done, apply fill");
 
-            List<Panel> panels= dom.controller.getPanelsFor(dsf);
-            if ( panels.size()==0 ) {
-                setStatus("warning: done loading data but no panels are listening");
+            List<PlotElement> pele= dom.controller.getPlotElementsFor(dsf);
+            if ( pele.size()==0 ) {
+                setStatus("warning: done loading data but no plot elements are listening");
             }
+
+
         }
     }
     
@@ -402,6 +412,9 @@ public class DataSourceController extends DomNodeController {
     private synchronized void resolveParents() {
         if ( dsf.getUri()==null ) return; //TODO: remove
         URISplit split= URISplit.parse(dsf.getUri());
+        if ( !dsf.getUri().startsWith("vap+internal:") ) {
+            throw new IllegalArgumentException("expected uri to start with vap+internal:");
+        }
         String[] ss = split.surl.split(",", -2);
         for (int i = 0; i < ss.length; i++) {
             DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
@@ -409,33 +422,40 @@ public class DataSourceController extends DomNodeController {
                 dsf.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
                 parentSources[i] = dsf;
             }else {
+                logger.warning("unable to find parent "+ss[i]);
                 parentSources[i] = null;
             }
         }
-        System.err.println( Arrays.asList(parentSources));
+        //System.err.println( Arrays.asList(parentSources));
     }
     
     /**
      * check to see if all the parent sources have updated and have
      * datasets that are compatible, so a new dataset can be created.
+     * @return null if everything is okay, error message otherwise
      */
-    private synchronized boolean checkParents() {
+    private synchronized String checkParents() {
 
         QDataSet x;
         QDataSet y = null;
         QDataSet z = null;
+        if ( parentSources==null ) return "no parent sources";
+        if ( parentSources[0]==null ) return "first parent is null";
         x = parentSources[0].controller.getFillDataSet();
         if (parentSources.length > 1) {
+            if ( parentSources[1]==null ) return "second parent is null";
             y = parentSources[1].controller.getFillDataSet();
         }
         if (parentSources.length > 2) {
+            if ( parentSources[2]==null ) return "third parent is null";
             z = parentSources[2].controller.getFillDataSet();
         }
         if (parentSources.length == 2) {
+            System.err.println("creating dataset by making Y depend on X");
             if (x == null || y == null) {
-                return false;
+                return "first or second dataset is null";
             }
-            DDataSet yds = DDataSet.copy(y);
+            ArrayDataSet yds = ArrayDataSet.copy(y);
             if (x != null) {
                 yds.putProperty(QDataSet.DEPEND_0, x);
             }
@@ -444,17 +464,17 @@ public class DataSourceController extends DomNodeController {
             }
         } else if (parentSources.length == 3) {
             if (x == null || y == null || z == null) {
-                return false;
+                return "at least one of the three datasets is null";
             }
             if (z.rank() == 1) {
-                DDataSet yds = DDataSet.copy(y);
+                ArrayDataSet yds = ArrayDataSet.copy(y);
                 yds.putProperty(QDataSet.DEPEND_0, x);
                 yds.putProperty(QDataSet.PLANE_0, z);
                 if ( DataSetUtil.validate(yds, null ) ) {
                     setDataSetInternal(yds);
                 }
             } else {
-                DDataSet zds = DDataSet.copy(z);
+                ArrayDataSet zds = ArrayDataSet.copy(z);
                 if (x != null) {
                     zds.putProperty(QDataSet.DEPEND_0, x);
                 }
@@ -466,12 +486,15 @@ public class DataSourceController extends DomNodeController {
                 }
             }
         }
-        return true;
+        return null;
     }
     
     PropertyChangeListener parentListener = new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            checkParents();
+            String prob= checkParents();
+            if ( prob!=null ) {
+               setStatus("warning: "+prob );
+            }
         }
     };
 
@@ -485,19 +508,25 @@ public class DataSourceController extends DomNodeController {
     /**
      * resolve a URI like vap+internal:data_0,data_1.
      * @param path
+     * @return true if the resolution was successful.
      */
-    private synchronized void doInternal(String path) {
+    private synchronized boolean doInternal(String path) {
         if ( parentSources!=null ) {
             for ( int i=0; i<parentSources.length; i++ ) {
                 if ( parentSources[i]!=null ) parentSources[i].controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
             }
         }
-        if ( path.trim().length()==0 ) return;
+        if ( path.trim().length()==0 ) return true;
         String[] ss = path.split(",", -2);
         parentSources = new DataSourceFilter[ss.length];
         resolveParents();
-        checkParents();
+        String prob= checkParents();
+        if ( prob!=null ) {
+            setStatus("warning: "+prob);
+            return false;
+        }
         dom.addPropertyChangeListener( Application.PROP_DATASOURCEFILTERS, dsfListener );
+        return true;
     }
 
     protected void unbind() {
@@ -608,7 +637,7 @@ public class DataSourceController extends DomNodeController {
      *   the fillDataSet is set.  the fillProperties are set.
      *   reduceRankString is set to document the reduction
      *   all parties interested in the fill dataset will be notified of the new version.
-     * 
+     *     (which triggers plotting via PlotElement)
      */
     @SuppressWarnings("unchecked")
     private void updateFill() {
@@ -629,7 +658,7 @@ public class DataSourceController extends DomNodeController {
 
         boolean doSlice= ( sliceIndex>=0 && sliceDimension>=0  ); // kludge to support legacy datasets
 
-        if ( doSlice && getDataSet().rank() == 3) { // panel now does slicing
+        if ( doSlice && getDataSet().rank() == 3) { // plot element now does slicing
 
             QDataSet ds;
             QDataSet dep;
@@ -655,7 +684,7 @@ public class DataSourceController extends DomNodeController {
             if (dep == null) {
                 reduceRankString = names.get(sliceDimension) + "=" + sliceIndex;
             } else {
-                reduceRankString = PanelUtil.describe(names.get(sliceDimension), dep, sliceIndex);
+                reduceRankString = PlotElementUtil.describe(names.get(sliceDimension), dep, sliceIndex);
             }
             setReduceDataSetString(reduceRankString);
 
@@ -674,7 +703,7 @@ public class DataSourceController extends DomNodeController {
         }
 
         // add the cadence property to each dimension of the dataset, so that
-        // the panel doesn't have to worry about it.
+        // the plot element doesn't have to worry about it.
         for ( int i=0; i<fillDs.rank(); i++ ) {
             QDataSet dep= (QDataSet) fillDs.property("DEPEND_"+i);
             if ( dep!=null ) {
@@ -682,7 +711,11 @@ public class DataSourceController extends DomNodeController {
                 if ( i==0 ) {
                     guessCadence( (MutablePropertyDataSet) dep,fillDs);
                 } else {
-                    guessCadence( (MutablePropertyDataSet) dep,null);
+                    if ( dep.rank()==1 ) {
+                        guessCadence( (MutablePropertyDataSet) dep,null);
+                    } else if ( dep.rank()==2 && dep.length(0)>2 ) {
+                        //guessCadence( (MutablePropertyDataSet) dep.slice(0),null);
+                    }
                 }
                 fillDs.putProperty( "DEPEND_"+i, dep );
             }
@@ -697,7 +730,7 @@ public class DataSourceController extends DomNodeController {
         double vmin = Double.NEGATIVE_INFINITY, vmax = Double.POSITIVE_INFINITY, fill = Double.NaN;
 
         try {
-            double[] vminMaxFill = PanelUtil.parseFillValidRangeInternal(dsf.getValidRange(), dsf.getFill());
+            double[] vminMaxFill = PlotElementUtil.parseFillValidRangeInternal(dsf.getValidRange(), dsf.getFill());
             vmin = vminMaxFill[0];
             vmax = vminMaxFill[1];
             fill = vminMaxFill[2];
@@ -731,11 +764,21 @@ public class DataSourceController extends DomNodeController {
                     logger.fine("   tsb= "+ tsb.getURI() );
                 }
                 loadDataSet();
-                setStatus("done loading dataset");
+                if ( dataSet!=null ) {
+                    setStatus("done loading dataset");
+                    if ( dsf.getUri()==null ) {
+                        System.err.println("dsf.getUri was null");
+                        return;
+                    }
+                } else {
+                    setStatus("no data returned");
+                }
             } else {
-                setDataSetInternal(null);
+                if ( !(this.parentSources!=null) ) {
+                    setDataSetInternal(null);
+                }
             }
-            setStatus("ready");
+            if ( dataSet!=null ) setStatus("ready");
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             setStatus("error: " + ex);
@@ -751,8 +794,8 @@ public class DataSourceController extends DomNodeController {
             if (ds != null) {
                 setDataSetInternal(ds);
             } else {
-                List<Panel> panels = dom.controller.getPanelsFor(dsf);
-                for ( Panel p: panels )  {
+                List<PlotElement> pelements = dom.controller.getPlotElementsFor(dsf);
+                for ( PlotElement p: pelements )  {
                     p.getController().setResetRanges(true);
                 }
                 update(true, true);
@@ -760,6 +803,16 @@ public class DataSourceController extends DomNodeController {
         }
     };
 
+    public void cancel() {
+        if (getDataSource() != null && getDataSource().asynchronousLoad() && !dom.controller.isHeadless()) {
+            ProgressMonitor monitor= mon;
+            if (monitor != null) {
+                logger.info("cancel running request");
+                monitor.cancel();
+            }
+        }
+    }
+    
     /**
      * update the model and view using the new DataSource to create a new dataset,
      * then inspecting the dataset to decide on axis settings.
@@ -791,7 +844,8 @@ public class DataSourceController extends DomNodeController {
         };
 
         if (getDataSource() != null && getDataSource().asynchronousLoad() && !dom.controller.isHeadless()) {
-            logger.info("invoke later do load");
+            // this code will never be invoked because this is synchronous.  See cancel().
+            logger.fine("invoke later do load");
             if (mon != null) {
                 System.err.println("double load!");
                 if (mon != null) {
@@ -994,15 +1048,41 @@ public class DataSourceController extends DomNodeController {
         this.mon = mymon;
         try {
             result = getDataSource().getDataSet(mymon);
+            if ( dsf.getUri()!=null ) this.model.addRecent(dsf.getUri());
             Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
             setDataSetInternal(result,props,dom.controller.isValueAdjusting());
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
             setException(ex);
             setDataSet(null);
+            setStatus("interrupted");
         } catch (CancelledOperationException ex) {
             setException(ex);
             setDataSet(null);
+            setStatus("operation cancelled");
+        } catch (IOException e ) {
+            if ( e.getMessage().contains("No such file") || e.getMessage().contains("timed out") ) {
+                String message= e.getMessage();
+                if ( message.startsWith("550 ") ) {
+                    message= message.substring(4);
+                }
+                setException(e);
+                setDataSet(null);
+                setStatus("warning: " + message);
+                String title= e.getMessage().contains("No such file") ? "File not found" : e.getMessage();
+                model.showMessage( message, title, JOptionPane.WARNING_MESSAGE );
+            } else if ( e.getMessage().contains("root does not exist") ) {  // bugfix 3053225
+                setException(e);
+                setDataSet(null);
+                setStatus("warning: " + e.getMessage() );
+                String title= e.getMessage().contains("No such file") ? "Root does not exist" : e.getMessage();
+                model.showMessage( e.getMessage(), title, JOptionPane.WARNING_MESSAGE );
+            } else {
+                setException(e);
+                setDataSet(null);
+                setStatus("error: " + e.getMessage());
+                handleException(e);
+            }
         } catch (Exception e) {
             setException(e);
             setDataSet(null);
@@ -1060,7 +1140,7 @@ public class DataSourceController extends DomNodeController {
 
         String surl = dsf.getUri();
         if (surl == null) {
-            setDataSource(valueWasAdjusting,null);
+            resetDataSource(valueWasAdjusting,null);
             setUriNeedsResolution(false);
             setDataSetNeedsLoading(false);
         } else {
@@ -1080,12 +1160,15 @@ public class DataSourceController extends DomNodeController {
                 }
 
                 if (split.vapScheme.equals("vap+internal")) {
-                    URI uri;
-                    doInternal(split.path);
-                    setDataSource(valueWasAdjusting,null);
+                    boolean ok= doInternal(split.path);
+                    String msg=null;
+                    if ( !ok )  msg= dom.controller.getStatus();
+                    resetDataSource(valueWasAdjusting,null);
+                    if ( !ok )  dom.controller.setStatus(msg);
                 } else {
                     DataSource source = DataSetURI.getDataSource(surl);
-                    setDataSource(valueWasAdjusting,source);
+                    this.parentSources= null; //TODO: are there listeners to dispose of?
+                    resetDataSource(valueWasAdjusting,source);
                 }
                 setUriNeedsResolution(false);
                 
@@ -1215,30 +1298,32 @@ public class DataSourceController extends DomNodeController {
     private void handleException(Exception e) {
         if ( model.getExceptionHandler()==null ) {
             e.printStackTrace();
+        } else if ( e.getMessage()!=null && e.getMessage().contains("nsupported protocol") ) { //unsupport protocol
+            model.showMessage( e.getMessage(), "Unsupported Protocol", JOptionPane.ERROR_MESSAGE );
         } else {
             model.getExceptionHandler().handle(e);
         }
     }
 
     /**
-     * return the first panel that is using this data source.
-     * @return null or a panel.
+     * return the first plot element that is using this data source.
+     * @return null or a plot element.
      */
-    private Panel getPanel() {
-        List<Panel> panels = dom.controller.getPanelsFor(dsf);
-        if (panels.size() == 0) {
+    private PlotElement getPlotElement() {
+        List<PlotElement> pele = dom.controller.getPlotElementsFor(dsf);
+        if (pele.size() == 0) {
             return null;
         } else {
-            return panels.get(0);
+            return pele.get(0);
         }
 
     }
 
     private ProgressMonitor getMonitor(String label, String description) {
-        Panel panel = getPanel();
+        PlotElement pele = getPlotElement();
         DasPlot p = null;
-        if (panel != null) {
-            Plot plot = dom.controller.getPlotFor(panel);
+        if (pele != null) {
+            Plot plot = dom.controller.getPlotFor(pele);
             if (plot != null) {
                 p = plot.controller.getDasPlot();
             }

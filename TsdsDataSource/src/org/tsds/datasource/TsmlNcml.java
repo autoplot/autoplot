@@ -319,10 +319,10 @@ public class TsmlNcml {
             int points = dimensionLength(dims.get(shapes[0])) / 3;
             BufferDataSet data3 = (BufferDataSet) tsds(new URL(codebase, surl), size, len1, type, new NullProgressMonitor());
 
-            MutablePropertyDataSet data = data3.trim(0, points);
-            BufferDataSet dataMin = data3.trim(RANK_LIMIT * points, 3 * points);
+            MutablePropertyDataSet data = (BufferDataSet)data3.trim(0, points);  // we know that BufferDataSet.trim returns another BufferDataSet.
+            BufferDataSet dataMin = (BufferDataSet)data3.trim(RANK_LIMIT * points, 3 * points);
             dataMin.putProperty(QDataSet.NAME, "binmin");
-            BufferDataSet dataMax = data3.trim(1 * points, RANK_LIMIT * points);
+            BufferDataSet dataMax = (BufferDataSet)data3.trim(1 * points, RANK_LIMIT * points);
             dataMax.putProperty(QDataSet.NAME, "binmax");
             data.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(dataMax, data));
             data.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(data, dataMin));

@@ -1,5 +1,6 @@
 package org.autoplot.pngwalk;
 
+import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -8,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
@@ -25,6 +28,29 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     //protected boolean showMissing = false;  //Should view show placeholder for missing files?
 
     protected static final BufferedImage loadingImage = initLoadingImage();
+    protected static final ImageIcon okBadge;
+    protected static final ImageIcon problemBadge;
+    protected static final ImageIcon ignoreBadge;
+
+    static {
+        URL u = PngWalkView.class.getResource("/resources/badge_problem.png");
+        if (u != null)
+            problemBadge = new ImageIcon(u);
+        else
+            problemBadge = null;
+
+        u = PngWalkView.class.getResource("/resources/badge_ok.png");
+        if (u != null)
+            okBadge = new ImageIcon(u);
+        else
+            okBadge = null;
+
+        u = PngWalkView.class.getResource("/resources/badge_ignore.png");
+        if (u != null)
+            ignoreBadge = new ImageIcon(u);
+        else
+            ignoreBadge = null;
+    }
 
     protected PngWalkView(WalkImageSequence sequence) {
         setSequence(sequence);
@@ -148,20 +174,71 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
             int cy = ypos + ys + fm.getHeight();
             g2.drawString(caption, cx, cy);
         }
+        if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+            paintQualityControlIcon( seq.getIndex(), g2, xpos, ypos, true );
+        }
     }
 
     private static BufferedImage initLoadingImage() {
-        BufferedImage li = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage li;
+        //e.printStackTrace(System.err);
+        // Construct a backup image to use
+        li = new BufferedImage(48, 48, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = li.createGraphics();
         g2.addRenderingHints(new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON));
         g2.setColor(new java.awt.Color(0.0F, 0.0F, 0.0F, 0.5F));
-        g2.fillRoundRect(0, 0, 80, 80, 10, 10);
+        g2.fillRoundRect(0, 0, 48, 48, 6, 6);
         //TODO: Add text or hourglass or something?
         g2.setColor(java.awt.Color.WHITE);
-        g2.fillOval(16, 54, 8, 8);
-        g2.fillOval(36, 54, 8, 8);
-        g2.fillOval(56, 54, 8, 8);
+        g2.fillOval(12, 32, 4, 4);
+        g2.fillOval(24, 32, 4, 4);
+        g2.fillOval(36, 32, 4, 4);
         return li;
     }
-  
+
+    protected void paintQualityControlIcon(int i, Graphics2D g2, int imgX, int imgY, boolean icon) {
+        QualityControlRecord rec = seq.getQualityControlSequence().getQualityControlRecord(i);
+        if ( okBadge==null ) {
+            throw new RuntimeException("unable to locate all badges for quality control");
+        }
+        if (rec != null) {
+            // "missing" images
+            if ( icon ) {
+                switch (rec.getStatus()) {
+                    case OK:
+                        okBadge.paintIcon(this, g2, imgX + 5, imgY + 5);
+                        break;
+                    case PROBLEM:
+                        problemBadge.paintIcon(this, g2, imgX + 5, imgY + 5);
+                        break;
+                    case IGNORE:
+                        ignoreBadge.paintIcon(this, g2, imgX + 5, imgY + 5);
+                    default:
+                        // Don't do anything.
+                        return;
+                }
+            } else {
+                Color color0= g2.getColor();
+                switch (rec.getStatus()) {
+                    case OK:
+                        System.err.println("imgX="+imgX);
+                        g2.setColor( Color.GREEN );
+                        break;
+                    case PROBLEM:
+                        g2.setColor( Color.RED );
+                        break;
+                    case IGNORE:
+                        g2.setColor( Color.GRAY );
+                    default:
+                        // Don't do anything.
+                        return;
+                }
+                g2.fillOval( imgX, imgY, 6, 6 );
+                g2.setColor( Color.GRAY );
+                g2.drawOval( imgX, imgY, 6, 6 );
+                g2.setColor(color0);
+            }
+        }
+    }
+
 }

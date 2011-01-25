@@ -5,8 +5,13 @@
 package org.virbo.autoplot;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -15,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import org.virbo.datasource.DataSourceUtil;
 
 /**
  *
@@ -76,6 +82,12 @@ public class Util {
     public static List<String> getBuildInfos() throws IOException {
         Enumeration<URL> urls = Util.class.getClassLoader().getResources("META-INF/build.txt");
 
+        Enumeration<URL> urls2 = Util.class.getClassLoader().getResources("META-INF/build.txt");
+        List<URL> urls3= new ArrayList();
+        while ( urls2.hasMoreElements() ) {
+            urls3.add(urls2.nextElement());
+        }
+
         List<String> result = new ArrayList<String>();
 
         LinkedHashMap<String, String> abbrevs = new LinkedHashMap<String, String>();
@@ -101,18 +113,18 @@ public class Util {
             Properties props = new Properties();
             props.load(url.openStream());
 
-            String cvsTagName = props.getProperty("build.tag");
+//            String cvsTagName = props.getProperty("build.tag");
             String svnTag = svnTag( props.getProperty("build.svnurl"), 
                     props.getProperty("build.svnrevision"),
                     jarname );
-            
+
             String tagName = tagName(svnTag, abbrevs);
-            String version;
-            if (cvsTagName == null || cvsTagName.length() <= 9) {
-                version = "untagged_version";
-            } else {
-                version = cvsTagName.substring(6, cvsTagName.length() - 2);
-            }
+//            String version;
+//            if (cvsTagName == null || cvsTagName.length() <= 9) {
+//                version = "untagged_version";
+//            } else {
+//                version = cvsTagName.substring(6, cvsTagName.length() - 2);
+//            }
 
             result.add(name + ": " + tagName + " (" + props.getProperty("build.timestamp") + " " + props.getProperty("build.user.name") + ")");
 
@@ -155,6 +167,57 @@ public class Util {
         return success;
     }
 
+    public static boolean copyFile( File srcf, File dstf ) throws IOException {
+        WritableByteChannel dest = Channels.newChannel(new FileOutputStream(dstf));
+        ReadableByteChannel src = Channels.newChannel(new FileInputStream(srcf));
+        DataSourceUtil.transfer(src, dest);
+        return true;
+    }
+    
+    public static boolean copyFileTree( File root, File dst ) {
+        try {
+            String roots= root.getCanonicalPath()+"/";
+            String dsts= dst.getCanonicalPath()+"/";
+            if ( dsts.startsWith(roots ) ) {
+                throw new IllegalArgumentException("can't move files into child of original");
+            }
+            if ( roots.startsWith(dsts ) ) {
+                throw new IllegalArgumentException("can't move files to parent of original");
+            }
+        } catch (IOException ex ) {
+            throw new RuntimeException(ex);
+        }
+
+        if (!root.exists()) {
+            return false; // doesn't exist
+        }
+        File[] children = root.listFiles();
+        boolean success = true;
+
+        dst.mkdirs();
+        for (int i = 0; i < children.length; i++) {
+            if (children[i].isDirectory()) {
+                success = success && copyFileTree( children[i],new File(dst,children[i].getName()) );
+                if (!success) {
+                    copyFileTree( children[i],new File(dst,children[i].getName()) );
+                    throw new IllegalArgumentException("unable to move file " + children[i]);
+                }
+            } else {
+                try {
+                    success = success && Util.copyFile( children[i], new File( dst, children[i].getName() ) );
+                    if (!success) {
+                        throw new IllegalArgumentException("unable to move file " + children[i]);
+                    }
+                } catch ( IOException ex ) {
+                    IllegalArgumentException ex2= new IllegalArgumentException("unable to move file " + children[i],ex);
+                    throw ex2;
+                }
+            }
+        }
+        return success;
+    }
+    
+
     public static String strjoin(Collection<String> c, String delim) {
         StringBuffer result = new StringBuffer();
         for (String s : c) {
@@ -167,6 +230,7 @@ public class Util {
     }
 
     public static void main(String[] args) throws IOException {
+        copyFileTree( new File("/home/jbf/temp/foo"), new File("/home/jbf/temp/foo2/" ));
         getBuildInfos();
     }
 }

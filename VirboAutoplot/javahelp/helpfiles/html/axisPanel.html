@@ -6,19 +6,19 @@
 <p>The Axis Panel contains basic controls for the two axes of the focus plot, and the colorbar which may not be visible.
 Controls for labels are based on focus as well.</p>
 <p>Autoplot's canvas consists of a number of "plots" which create the two-dimensional spaces on which data is rendered.
-    "Panels" connect data to the plots, by identifying the data source, plot, and method for rendering data.  So a plot
-    can contain a number of panels, as is the case when two datasets are drawn on the same axes, an "overplot."  A color bar
+    "Plot elements" connect data to the plots, by identifying the data source, plot, and method for rendering data.  So a plot
+    can contain a number of plot elements, as is the case when two datasets are drawn on the same axes, an "overplot."  A color bar
     is connected to the plot so that multiple spectrograms can be rendered using the same color transform.  The color bar
     is hidden when it is not needed.
 </p>
-<p>Each axis control has field for setting the label, range and log setting.  <p>
+<p>Each axis control has field for setting the label, range and log setting.<p>
 <p>Ranges are strings that are parsed using the
 current axis units (such as time or dimensionless).  Here are example strings for time axes: "2000 through 2010" "Sept 16 2009"  "2009-009 10:00 to 11:00"
 and "2009-009T00:00 to 2009-009T10:00".  For physical ranges, use the keyword "to" to delimit two real numbers.  When the axis has a
 physical unit, such as "m/s" the range can be qualified with a unit, as in "0 to 100 cm/s."</p>
 <p>Titles can contain "granny" strings defined by Grandle and Nystrom.  Escape sequences like "!C" for new line control position
     and size of the letters.  Unicode is supported as well, so greek and math symbols can be inserted.</p>
-<p>"isotropic" constrains the x and y axis to have the same data-to-pixel scaling.  This is ignored when the axes do not have
+<p>"Isotropic" constrains the x and y axis to have the same data-to-pixel scaling.  This is ignored when the axes do not have
 compatible units.</p>
 <p>When "Legend Label" is checked, a legend is added to the plot, and an icon for this panel is added.</p>
 

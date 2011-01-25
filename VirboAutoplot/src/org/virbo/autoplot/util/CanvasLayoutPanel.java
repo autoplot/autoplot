@@ -40,6 +40,8 @@ public class CanvasLayoutPanel extends JLabel {
     ClassMap<Color> types;
     Timer timer;
 
+    private boolean adjusting=false;
+
     public CanvasLayoutPanel() {
         types = new ClassMap<Color>();
         timer= new Timer(100,new ActionListener(){
@@ -51,6 +53,14 @@ public class CanvasLayoutPanel extends JLabel {
         addMouseListener(mouseListener);
     }
 
+    private boolean rectEdgeClicked( Rectangle r, int x, int y ) {
+        boolean e0= Math.abs( r.getX() - x ) < 10 ;
+        boolean e1= Math.abs( r.getY() - y ) < 10 ;
+        boolean e2= Math.abs( r.getX() + r.getWidth() - x ) < 10;
+        boolean e3= Math.abs( r.getY() + r.getHeight() - y ) < 10;
+        return ( e0 || e1 || e2 || e3 ) && r.intersects( x-10, y-10, x+20, y+20);
+    }
+
     transient MouseListener mouseListener = new MouseAdapter() {
 
         @Override
@@ -59,38 +69,50 @@ public class CanvasLayoutPanel extends JLabel {
                 return;
             }
             int twidth = target.getWidth();
+            int theight= target.getHeight();
             int mwidth = getWidth();
+            double scale= (double) mwidth / twidth;
+            if ( theight * scale > getHeight() ) {
+               scale= (double)getHeight() / theight;
+            }
+            adjusting= true;
             for (int i = target.getComponentCount() - 1; i >= 0; i--) {
                 Component c = target.getComponent(i);
                 Color color = types.get(c.getClass());
-                if (color != null) {
+                if (color != null ) {
                     java.awt.Rectangle bounds = ((JComponent) c).getBounds();
-                    Rectangle mbounds = new Rectangle(bounds.x * mwidth / twidth,
-                            bounds.y * mwidth / twidth,
-                            bounds.width * mwidth / twidth,
-                            bounds.height * mwidth / twidth);
-                    if (mbounds.contains(e.getX(), e.getY())) {
-                        if ( e.getModifiersEx()== Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ) {
-                            if ( selectedComponents.contains(c) ) {
-                                selectedComponents.remove(c);
-                                component = null;
+                    Rectangle mbounds = new Rectangle( (int)( bounds.x * scale ),
+                            (int)( bounds.y * scale ),
+                            (int)( bounds.width * scale ),
+                            (int)( bounds.height * scale) );
+                    final int km = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+                    // if the click is on an edge of an invisible component, select it.
+                    boolean invisibleEdgeClick= !c.isVisible() && rectEdgeClicked( mbounds, e.getX(), e.getY() );
+                    if ( c.isVisible() || invisibleEdgeClick ) {
+                        if ( mbounds.contains(e.getX(), e.getY()) || invisibleEdgeClick ) {
+                            if ( ( e.getModifiers() & km ) ==km ) {
+                                if ( selectedComponents.contains(c) ) {
+                                    selectedComponents.remove(c);
+                                    component = null;
+                                } else {
+                                    selectedComponents.add(c);
+                                    component = c;
+                                }
                             } else {
+                                component= c;
+                                selectedComponents.clear();
                                 selectedComponents.add(c);
-                                component = c;
                             }
-                        } else {
-                            component= c;
-                            selectedComponents.clear();
-                            selectedComponents.add(c);
-                        }
-                        repaint();
-                        firePropertyChange(PROP_COMPONENT, null, c);
-                        if ( e.getModifiers()==Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ) {
-                            firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
+                            repaint();
+                            firePropertyChange(PROP_COMPONENT, null, c);
+                            if ( ( e.getModifiers() & km ) == km ) {
+                                firePropertyChange( PROP_SELECTEDCOMPONENTS, null, selectedComponents );
+                            }
                         }
                     }
                 }
             }
+            adjusting= false;
         }
     };
     protected Object component = null;
@@ -115,8 +137,9 @@ public class CanvasLayoutPanel extends JLabel {
     }
 
     public void setSelectedComponents(List<Object> selectedComponents) {
+        if ( adjusting ) return;
         List<Object> oldSelectedComponents = this.selectedComponents;
-        this.selectedComponents = selectedComponents;
+        this.selectedComponents = new ArrayList( selectedComponents );
         propertyChangeSupport.firePropertyChange(PROP_SELECTEDCOMPONENTS, oldSelectedComponents, selectedComponents);
     }
     private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
@@ -142,7 +165,11 @@ public class CanvasLayoutPanel extends JLabel {
         int theight = target.getHeight();
         int twidth = target.getWidth();
         int mwidth = getWidth();
-        g.fillRect(0, 0, mwidth, theight * mwidth / twidth);
+        double scale= (double) mwidth / twidth;
+        if ( theight * scale > getHeight() ) {
+            scale= (double) getHeight() / theight;
+        }
+        g.fillRect(0, 0, mwidth, (int)( theight * scale ) );
         Stroke selectedStroke= new BasicStroke( 3.f );
         Stroke normalStroke= new BasicStroke( 1.f );
 
@@ -151,27 +178,40 @@ public class CanvasLayoutPanel extends JLabel {
             Color color = types.get(c.getClass());
             if (color != null) {
                 java.awt.Rectangle bounds = ((JComponent) c).getBounds();
-                Rectangle mbounds = new Rectangle(bounds.x * mwidth / twidth,
-                        bounds.y * mwidth / twidth,
-                        bounds.width * mwidth / twidth,
-                        bounds.height * mwidth / twidth);
-                if (c == component) {
+                Rectangle mbounds = new Rectangle( (int)( bounds.x * scale ),
+                        (int)( bounds.y * scale ),
+                        (int)( bounds.width * scale ),
+                        (int)( bounds.height * scale) );
+                if ( !c.isVisible() ) {
                     g.setColor(getTranslucentColor(color, 160));
-                    g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
-                    g.setColor(getTranslucentColor(color, 220));
-                    g.setStroke(selectedStroke);
-                    g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
-                    g.setStroke(normalStroke);
-                } else if ( selectedComponents.contains(c)) {
-                    g.setColor(getTranslucentColor(color, 130));
-                    g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
-                    g.setColor(getTranslucentColor(color, 220));
-                    g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                    Graphics2D g2= g;
+                    if ( selectedComponents.contains(c) ) {
+                        g2.setStroke( selectedStroke );
+                    } else {
+                        g2.setStroke( normalStroke );
+                    }
+                    mbounds= new Rectangle( mbounds.x+5, mbounds.y+5, mbounds.width-10, mbounds.height-10 );
+                    g2.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                    g2.setStroke(normalStroke);
                 } else {
-                    g.setColor(getTranslucentColor(color, 60));
-                    g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
-                    g.setColor(getTranslucentColor(color, 160));
-                    g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                    if (c == component) {
+                        g.setColor(getTranslucentColor(color, 160));
+                        g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                        g.setColor(getTranslucentColor(color, 220));
+                        g.setStroke(selectedStroke);
+                        g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                        g.setStroke(normalStroke);
+                    } else if ( selectedComponents.contains(c)) {
+                        g.setColor(getTranslucentColor(color, 130));
+                        g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                        g.setColor(getTranslucentColor(color, 220));
+                        g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                    } else {
+                        g.setColor(getTranslucentColor(color, 60));
+                        g.fillRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                        g.setColor(getTranslucentColor(color, 160));
+                        g.drawRoundRect(mbounds.x, mbounds.y, mbounds.width, mbounds.height, 10, 10);
+                    }
                 }
             }
         }

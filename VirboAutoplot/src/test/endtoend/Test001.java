@@ -17,7 +17,7 @@ import org.virbo.jythonsupport.Util;
  * @author jbf
  */
 public class Test001 {
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
         try {
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
@@ -49,7 +49,7 @@ public class Test001 {
             writeToPng( "test001_003.png" );
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch ( RuntimeException ex ) {
+        } catch ( Exception ex ) {
             ex.printStackTrace();
             System.exit(1);
         }

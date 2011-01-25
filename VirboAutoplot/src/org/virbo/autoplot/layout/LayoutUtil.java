@@ -32,10 +32,8 @@ public class LayoutUtil {
         if ( Math.abs(em)>100 ) {
             System.err.println("autolayout failure.");
         }
-        c.setMaximum(norm);
-        c.setEmMaximum(em);
-        c.setPtMaximum(pt);
-        logger.fine("reset maximum: " + c);
+        c.setMax(norm,em,pt);
+        logger.log(Level.FINE, "reset maximum: {0}", c);
         return true;
     }
 
@@ -57,17 +55,15 @@ public class LayoutUtil {
         if ( Math.abs(em)>100 ) {
             System.err.println("autolayout failure.");
         }
-        c.setMinimum(norm);
-        c.setEmMinimum(em);
-        c.setPtMinimum(pt);
-        logger.fine("reset minimum: " + c);
+        c.setMin(norm,em,pt);
+        logger.log(Level.FINE, "reset minimum: {0}", c);
         return true;
     }
 
     /**
      * resets the layout on the canvas so that labels are not clipped (somewhat).
      * Child row and columns are inspected as well, and it's assumed that adjusting
-     * this row and column, that everyone will be correctly adjuected.
+     * this row and column, that everyone will be correctly adjusted.
      * 
      * We calculate bounds on each component dependent on the row and column, then
      * the region outside the canvas determines how much the row and column should
@@ -129,26 +125,37 @@ public class LayoutUtil {
 
         boolean changed = false;
 
-        if ( Math.abs(ymin)>9999 || Math.abs(ymax)>9999 || Math.abs(ymin)>9999 || Math.abs(ymax)>9999  ) {
+        if ( Math.abs(xmin)>9999 || Math.abs(xmax)>9999 || Math.abs(ymin)>9999 || Math.abs(ymax)>9999  ) {
             System.err.println("invalid bounds returned, returning.");
             return;
         }
-        int old, need;
+        int old;
+
+        int needXmin, needXmax, needYmin, needYmax;
+
         old = c.getDMinimum();
-        need = old - xmin;
-        changed = changed | maybeSetMinimum(c, need, 0, need / em + MARGIN_LEFT_RIGHT_EM, 0);
+        needXmin = old - xmin;
 
         old = c.getDMaximum();
-        need = xmax - old;
-        changed = changed | maybeSetMaximum(c, need, 1.0, -need / em - MARGIN_LEFT_RIGHT_EM, 0);
+        needXmax = xmax - old;
 
         old = r.getDMinimum();
-        need = old - ymin;
-        changed = changed | maybeSetMinimum(r, need, 0, need / em, 0);
+        needYmin = old - ymin;
 
         old = r.getDMaximum();
-        need = ymax - old;
-        changed = changed | maybeSetMaximum(r, need, 1.0, -need / em, 0);
+        needYmax = ymax - old;
+
+        if ( needXmax<-120 ) {
+            System.err.println("needXmax: "+needXmax);
+            c.getParent().resizeAllComponents();
+            return;
+        }
+
+
+        changed = changed | maybeSetMinimum(c, needXmin, 0, needXmin / em + MARGIN_LEFT_RIGHT_EM, 0);
+        changed = changed | maybeSetMaximum(c, needXmax, 1.0, -needXmax / em - MARGIN_LEFT_RIGHT_EM, 0);
+        changed = changed | maybeSetMinimum(r, needYmin, 0, needYmin / em, 0);
+        changed = changed | maybeSetMaximum(r, needYmax, 1.0, -needYmax / em, 0);
 
         if (changed) {
             c.getParent().resizeAllComponents();

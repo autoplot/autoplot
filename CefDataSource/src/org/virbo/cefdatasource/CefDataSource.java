@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.das2.datum.EnumerationUnits;
 import org.virbo.cefdatasource.CefReaderHeader.ParamStruct;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -45,7 +46,7 @@ public class CefDataSource extends AbstractDataSource {
 
     public CefDataSource(URI uri) {
         super(uri);
-        URISplit split= URISplit.parse(uri.toString());
+        URISplit split= URISplit.parse( DataSetURI.fromUri(uri) );
         String file= split.file.substring(split.path.length());
         int i= file.indexOf("__");
         if ( i!=-1 ) {
@@ -182,7 +183,7 @@ public class CefDataSource extends AbstractDataSource {
                     ds = org.virbo.dataset.DataSetOps.leafTrim(tds, param.cefFieldPos[0], param.cefFieldPos[1] + 1);
                 }
 
-                DDataSet dds = DDataSet.copy(ds);
+                ArrayDataSet dds = ArrayDataSet.copy(ds);
                 dds.putProperty(QDataSet.UNITS, u);
                 for (int i = 0; i < dds.length(); i++) {
                     for (int j = 0; j < dds.length(i); j++) {
@@ -223,7 +224,7 @@ public class CefDataSource extends AbstractDataSource {
 
                 rank0 = ds.rank();
 
-                DDataSet dds = DDataSet.copy(ds);
+                ArrayDataSet dds = ArrayDataSet.copy(ds);
                 dds.putProperty(QDataSet.UNITS, u);
                 for (int i = 0; i < dds.length(); i++) {
                     for (int j = 0; j < dds.length(i); j++) {

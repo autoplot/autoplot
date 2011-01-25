@@ -20,12 +20,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +32,7 @@ import java.util.prefs.Preferences;
 import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -43,9 +43,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -53,15 +51,18 @@ import org.das2.util.ArgumentList;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
-import org.das2.util.TimeParser;
+import org.das2.datum.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
-import org.virbo.autoplot.AutoPlotUI;
+import org.virbo.autoplot.AppManager;
+import org.virbo.autoplot.AutoplotUI;
+import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ScriptContext;
+import org.virbo.autoplot.bookmarks.Util;
 import org.virbo.autoplot.bookmarks.BookmarksManager;
 import org.virbo.autoplot.bookmarks.BookmarksManagerModel;
 import org.virbo.datasource.DataSetURI;
@@ -71,6 +72,9 @@ import org.virbo.datasource.DataSetURI;
  * @author jbf
  */
 public class PngWalkTool1 extends javax.swing.JPanel {
+    private static boolean ENABLE_QUALITY_CONTROL;
+    private QualityControlPanel qcPanel=null;
+
     public static final String PREF_RECENT = "pngWalkRecent";
 
     public PngWalkView[] views;
@@ -83,23 +87,32 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
     static Logger logger= Logger.getLogger("org.autoplot.pngwalk");
     private static String RESOURCES= "/org/virbo/autoplot/resources/";
-    public static final Icon WARNING_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"warning-icon.png") );
-    public static final Icon ERROR_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"error-icon.png") );
-    public static final Icon BUSY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"spinner.gif") );
-    public static final Icon READY_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"indProgress0.png") );
-    public static final Icon IDLE_ICON= new ImageIcon( AutoPlotUI.class.getResource(RESOURCES+"idle-icon.png") );
+    public static final Icon WARNING_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"warning-icon.png") );
+    public static final Icon ERROR_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"error-icon.png") );
+    public static final Icon BUSY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner.gif") );
+    public static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
+    public static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
         
     int returnTabIndex=0; // index of the tab we left to look at the single panel view.  TODO: account for tear off.
 
+    DatumRange pendingGoto= null;  // after password is entered, then go to this range.
 
     public static void main(String[] args) {
 
-        DataSetURI.init();  // FtpFileSystem implementation
+        DataSetURI.init();  // for FtpFileSystem implementation
 
-        System.err.println("this is pngwalk 20091007");
-        final ArgumentList alm = new ArgumentList("AutoPlotUI");
+        System.err.println("this is pngwalk 20110114");
+        final ArgumentList alm = new ArgumentList("PngWalkTool1");
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
-        alm.addOptionalPositionArgument(0, "template",  "file:/tmp/pngwalk/product_$Y$m$d.png", "initial template to use.");
+        alm.addOptionalSwitchArgument( "mode", "m", "mode", "filmStrip", "initial display mode: grid, filmStrip, covers, contextFlow, etc");
+        alm.addOptionalSwitchArgument( "goto", "g", "goto", "", "start display at the beginning of this range, e.g. 2010-01-01" );
+        alm.addBooleanSwitchArgument("qualityControl", "q", "qualityControl", "enable quality control review mode");
+        String home= java.lang.System.getProperty( "user.home" ) + java.lang.System.getProperty( "file.separator" );
+        String output= "file:" + home + "pngwalk" + java.lang.System.getProperty( "file.separator" )
+                + "product_$Y$m$d.png";
+
+        alm.addOptionalPositionArgument(0, "template",  output, "initial template to use.");
+        alm.addOptionalSwitchArgument( "template", "t", "template", output, "initial template to use." );
 
         alm.process(args);
 
@@ -111,6 +124,10 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         }
 
+        if (alm.getBooleanValue("qualityControl"))
+            ENABLE_QUALITY_CONTROL = true;
+        else
+            ENABLE_QUALITY_CONTROL = false;
 
         String template = alm.getValue("template"); // One Slash!!
         //final String template=  "file:/home/jbf/temp/product_$Y$m$d.png" ; // One Slash!!
@@ -119,34 +136,40 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         //final String template= "file:///net/spot3/home/jbf/fun/pics/20080315_tenerife_masca_hike/IMG_.*.JPG";
         //final String template= "http://www.swpc.noaa.gov/ftpdir/lists/hpi/plots/pmap_$Y_$m_$d_...._S_.*_.*_.*_.*.gif";
 
-        start( template, null );
+        PngWalkTool1 pngWalkTool= start( template, null );
+
+        pngWalkTool.processArguments(alm);
 
     }
 
-    public static PngWalkTool1 start( String template, Window parent ) {
+    public static PngWalkTool1 start( String template, final Window parent ) {
 
         final PngWalkTool1 tool = new PngWalkTool1();
 
         if ( template!=null ) {
             tool.setTemplate(template);
-        } else {
-            Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
-            String srecent = prefs.get( PngWalkTool1.PREF_RECENT,"");
-            if ( srecent.equals("") ) {
-                tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");
-            } else {
-                try {
-                    List<Bookmark> books = Bookmark.parseBookmarks(srecent);
-                    tool.setTemplate( ((Bookmark.Item)books.get(0)).getUrl() );
-                } catch (SAXException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                tool.setTemplate("file:/tmp/pngwalk/product_$Y$m$d.png");
-            }
+        } 
 
+        String home= java.lang.System.getProperty( "user.home" ) + java.lang.System.getProperty( "file.separator" );
+
+        String output= "file:" + home + "pngwalk" + java.lang.System.getProperty( "file.separator" )
+                + "product_$Y$m$d.png";
+
+        String sdeft= "<bookmark-list>  <bookmark>     <title>User Bookdefault</title>"
+                + "     <url>"+output+"</url>  </bookmark></bookmark-list>";
+
+        List<Bookmark> deft=null;
+        try {
+            deft = Bookmark.parseBookmarks(sdeft);
+
+        } catch (SAXException ex) {
+            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        Util.loadRecent( "pngwalkRecent", tool.dataSetSelector1, deft );
+
 
         PngWalkTool1.ActionEnabler enabler= new PngWalkTool1.ActionEnabler() {
             public boolean isActionEnabled(String filename) {
@@ -170,12 +193,15 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         };
 
-        final int op= parent==null ? JFrame.EXIT_ON_CLOSE : JFrame.DISPOSE_ON_CLOSE;
+        final String lap= parent==null ? "View in Autoplot" : "View in Autoplot";
 
-        tool.addFileAction( enabler, "autoplot", new AbstractAction("Launch Autoplot") {
+        tool.addFileAction( enabler, "autoplot", new AbstractAction(lap) {
             public void actionPerformed(ActionEvent e) {
                 String s = tool.getSelectedFile();
                 String template = tool.getTemplate();
+                if ( s.startsWith("file:/") && !s.startsWith("file:///") && template.startsWith("file:///") ) {
+                    s= "file:///"+s.substring(6);
+                }
                 int i0 = template.indexOf("_$Y");
                 if ( i0==-1 ) i0= template.indexOf("_%Y");
                 //int i1 = template.indexOf(".png");
@@ -199,7 +225,9 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                         try {
                             ScriptContext.createGui();
                             ScriptContext.plot(suri);
-                            ((JFrame)ScriptContext.getViewWindow()).setDefaultCloseOperation(op);
+                            if ( parent==null ) {
+                                ((JFrame)ScriptContext.getViewWindow()).setVisible(true);
+                            }
                         } catch (InterruptedException ex) {
                             Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -209,84 +237,16 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         });
 
-        tool.addFileAction( PngWalkTool1.LOCAL_FILE_ENABLER, "problem", new AbstractAction("Problem...") {
-            public void actionPerformed( ActionEvent e ) {
-                String s = tool.getSelectedFile();
-                String problemFile= s + ".problem";
-                File pf;
-                try {
-                    pf = new File(new URI(problemFile));
-                } catch (URISyntaxException ex) {
-                    Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
-                    return;
-                }
-                JTextArea ta= new JTextArea(10,50);
-                if ( pf.exists() ) {
-                    try {
-                        String ss = WalkUtil.readFile(pf);
-                        ta.setText(ss);
-                    } catch (IOException ex) {
-                        Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
-                        throw new RuntimeException(ex);
-                    }
-                }
-
-                if ( JOptionPane.showConfirmDialog( tool, new JScrollPane(ta), "Edit Problem File", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                    try {
-                        WalkUtil.writeFile(pf, ta.getText());
-                    } catch (IOException ex) {
-                        Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-        });
-
-        tool.addFileAction( PngWalkTool1.LOCAL_FILE_ENABLER, "okay", new AbstractAction("Okay...") {
-            public void actionPerformed( ActionEvent e ) {
-                String s = tool.getSelectedFile();
-                String problemFile= s + ".okay";
-                File pf;
-                try {
-                    pf = new File(new URI(problemFile));
-                } catch (URISyntaxException ex) {
-                    Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
-                    return;
-                }
-                JTextArea ta= new JTextArea(10,50);
-                if ( pf.exists() ) {
-                    try {
-                        String ss = WalkUtil.readFile(pf);
-                        ta.setText(ss);
-                    } catch (IOException ex) {
-                        Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
-                        throw new RuntimeException(ex);
-                    }
-                }
-
-                if ( JOptionPane.showConfirmDialog( tool, new JScrollPane(ta), "Edit Okay File", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
-                    try {
-                        WalkUtil.writeFile(pf, ta.getText());
-                    } catch (IOException ex) {
-                        Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-        });
-
-        JFrame frame = new JFrame("PNG Walk Tool");
-
-        if ( parent==null ) {
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        } else {
-            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        }
+        JFrame frame = new JFrame("PNG Walk Viewer");
+        frame.setIconImage( AutoplotUtil.getAutoplotIcon() );
 
         frame.setJMenuBar( createMenuBar(tool,frame) );
 
+        AppManager.getInstance().addApplication(tool);
+        
         frame.getContentPane().add(tool);
 
+        frame.addWindowListener( AppManager.getInstance().getWindowListener(tool) );
 
         frame.pack();
 
@@ -298,10 +258,36 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private static JMenuBar createMenuBar( final PngWalkTool1 tool, final JFrame f ) {
         JMenuBar result= new JMenuBar();
         JMenu fileMenu= new JMenu("File");
-        fileMenu.add( new AbstractAction( f.getDefaultCloseOperation()==JFrame.EXIT_ON_CLOSE ? "Exit" : "Close" ) {
+        fileMenu.add( new AbstractAction( "Go To Date..." ) {
+            public void actionPerformed(ActionEvent e) {
+                String str= JOptionPane.showInputDialog(tool,"Select date to display");
+                if ( str!=null ) {
+                    try {
+                        DatumRange ds = DatumRangeUtil.parseTimeRange(str);
+                        tool.seq.gotoSubrange(ds);
+                    } catch (ParseException ex) {
+                        JOptionPane.showMessageDialog( tool, "parse error: "+ex );
+                        return;
+                    } catch (RuntimeException ex ) {
+                        tool.setStatus( "warning: "+ex.toString() );
+                    }
+                }
+
+            }
+        } );
+
+        fileMenu.add( new javax.swing.JSeparator() );
+
+        fileMenu.add( new AbstractAction( "Close" ) {
             public void actionPerformed(ActionEvent e) {
                 f.dispose();
-                if (f.getDefaultCloseOperation()==JFrame.EXIT_ON_CLOSE) System.exit(0);
+                AppManager.getInstance().closeApplication(tool);
+            }
+        } );
+        fileMenu.add( new AbstractAction( "Quit" ) {
+            public void actionPerformed(ActionEvent e) {
+                f.dispose();
+                AppManager.getInstance().quit();
             }
         } );
         result.add(fileMenu);
@@ -314,15 +300,25 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         bg.bind();
         optionsMenu.add(persMi);
 
+        ButtonGroup buttonGroup1 = new javax.swing.ButtonGroup();
+
         final JMenu thumbsizeMenu= new JMenu("Thumbnail Size" );
         final int[] sizes= new int[] { 50, 100, 200, 400 };
         for ( int i=0; i<sizes.length; i++ ) {
             final int fsize= sizes[i];
-            thumbsizeMenu.add( new AbstractAction(""+fsize+" px" ) {
-               public void actionPerformed( ActionEvent e ) {
-                  tool.setThumbnailSize(fsize);
+            final JCheckBoxMenuItem mi;
+            mi= new JCheckBoxMenuItem(
+               new AbstractAction(""+fsize+" px" ) {
+                  public void actionPerformed( ActionEvent e ) {
+                      tool.setThumbnailSize(fsize);
+                  }
                }
-            });
+            );
+            buttonGroup1.add(mi);
+            if ( tool.getThumbnailSize()==sizes[i] ) {
+                buttonGroup1.setSelected( mi.getModel(), true );
+            }
+            thumbsizeMenu.add( mi );
         }
         optionsMenu.add( thumbsizeMenu );
         
@@ -351,40 +347,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     public PngWalkTool1() {
         initComponents();
         dataSetSelector1.setEnableDataSource(false);
-
-        Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
-        String srecent = prefs.get(PREF_RECENT,"");
-
-        if ( !srecent.equals("") ) {
-            try {
-                List<String> urls = new ArrayList<String>();
-                List<Bookmark> recent = Bookmark.parseBookmarks(srecent);
-                for (Bookmark b : recent) {
-                    urls.add(((Bookmark.Item) b).getUrl());
-                }
-                dataSetSelector1.setRecent(urls);
-                if (urls.size() > 1) {
-                    dataSetSelector1.setValue(urls.get(urls.size() - 1));
-                }
-                dataSetSelector1.setRecent(urls);
-            } catch (SAXException ex) {
-                Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(PngWalkTool1.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-        dataSetSelector1.addPropertyChangeListener( DataSetSelector.PROP_RECENT, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                Preferences prefs = Preferences.userNodeForPackage(PngWalkTool1.class);
-                List<String> srecent= dataSetSelector1.getRecent();
-                List<Bookmark> recent = new ArrayList<Bookmark>();
-                for ( String s : srecent ) {
-                    recent.add( new Bookmark.Item( s ) );
-                }
-                prefs.put( PREF_RECENT, Bookmark.formatBooks( recent ) );
-            }
-        } );
+        dataSetSelector1.setAcceptPattern("(?i).*(\\.gif|\\.png|\\.jpg)");
+        dataSetSelector1.setSuggestFiles(false); // only aggs.
 
         views= new PngWalkView[7];
 
@@ -402,6 +366,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         views[4].setMinimumSize( new Dimension(100,100) );
         views[3].setPreferredSize( new Dimension(640,480) );
         final JSplitPane p = new JSplitPane(JSplitPane.VERTICAL_SPLIT, views[1], views[2] );
+        //p.setEnabled(false);  //prevents user manipulation
         p.setDividerLocation(getThumbnailSize()+ SCROLLBAR_HEIGHT);
         views[1].addPropertyChangeListener( PngWalkView.PROP_THUMBNAILSIZE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -446,7 +411,15 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             });
         }
 
-        pngsPanel.add( tabs );
+        if (isQualityControlEnabled()) {
+            qcPanel = new QualityControlPanel();
+            JSplitPane qcPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabs, qcPanel);
+            qcPane.setResizeWeight(1.0);
+            pngsPanel.add(qcPane);
+            qcPanel.setWalkImageSequece(seq);
+        } else {
+            pngsPanel.add( tabs );
+        }
         pngsPanel.revalidate();
 
         BindingGroup bc= new BindingGroup();
@@ -457,6 +430,36 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         }
         bc.bind();
 
+    }
+
+    private void processArguments( ArgumentList alm ) {
+        String tab= alm.getValue("mode");
+        if ( tab.equalsIgnoreCase("filmStrip" ) ) {
+            tabs.setSelectedIndex(3);
+        } else if ( tab.equalsIgnoreCase("single" ) ) {
+            tabs.setSelectedIndex(0);
+        } else if ( tab.equalsIgnoreCase("contextFlow") ) {
+            tabs.setSelectedIndex(1);
+        } else if ( tab.equalsIgnoreCase("grid" ) ) {
+            tabs.setSelectedIndex(2);
+        } else if ( tab.equalsIgnoreCase("film strip" ) ) {
+            tabs.setSelectedIndex(3);
+        } else if ( tab.equalsIgnoreCase("covers" ) ) {
+            tabs.setSelectedIndex(4);
+        }
+
+        String show= alm.getValue("goto");
+        if ( !show.equals("") ) {
+            try {      
+                if ( seq.getTimeSpan()!=null ) {
+                    seq.gotoSubrange(DatumRangeUtil.parseTimeRange(show));
+                } else {
+                    this.pendingGoto= DatumRangeUtil.parseTimeRange(show);
+                }
+            } catch ( ParseException ex ) {
+                throw new RuntimeException(ex);
+            }
+        }
     }
 
     /**
@@ -473,6 +476,9 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                    actionButtons.get(i).setActionCommand(actionCommand+" "+item);
                 }
             }
+            if (qcPanel != null && seq.getQualityControlSequence()!=null ) {
+                qcPanel.displayRecord( seq.getQualityControlSequence().getQualityControlRecord( seq.getIndex() ));
+            }
         }
     };
 
@@ -482,6 +488,18 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private transient PropertyChangeListener statusListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
            setStatus((String)evt.getNewValue());
+        }
+    };
+
+    /**
+     *
+     */
+    private transient PropertyChangeListener qcStatusListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( seq.getQualityControlSequence()!=null ) {
+                int n[] = seq.getQualityControlSequence().getQCTotals();
+                qcPanel.setStatus(n[0], n[1], n[2], n[3]);
+            }
         }
     };
 
@@ -501,16 +519,33 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         if ( oldseq!=null ) {
             oldseq.removePropertyChangeListener(WalkImageSequence.PROP_INDEX, indexListener );
             oldseq.removePropertyChangeListener(WalkImageSequence.PROP_STATUS, statusListener);
+            if (ENABLE_QUALITY_CONTROL) oldseq.removePropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
         }
         if ( seq!=null ) {
             seq.addPropertyChangeListener( WalkImageSequence.PROP_INDEX, indexListener );
             seq.addPropertyChangeListener( WalkImageSequence.PROP_STATUS, statusListener );
+            if (ENABLE_QUALITY_CONTROL) seq.addPropertyChangeListener(WalkImageSequence.PROP_BADGE_CHANGE, qcStatusListener);
         }
 
         Runnable run= new Runnable() {
             public void run() {
                 try {
                     seq.initialLoad();
+
+                    if ( pendingGoto!=null )  {
+                        seq.gotoSubrange(pendingGoto);
+                        pendingGoto= null;
+                    }
+                    
+                    List<String> urls = new ArrayList<String>();
+                    List<String> recent = dataSetSelector1.getRecent();
+                    recent.removeAll( Collections.singleton( seq.getTemplate() ) );
+                    for (String b : recent) {
+                        urls.add( b );
+                    }
+                    urls.add( seq.getTemplate() );
+                    dataSetSelector1.setRecent(urls);
+
                     useRangeCheckBox.setEnabled(seq.getTimeSpan() != null);
 
                     // always clear subrange on new sequence
@@ -520,12 +555,33 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                     timeFilterTextField.setText("");
                     
                     showMissingCheckBox.setEnabled(seq.getTimeSpan() != null);
+                    if (seq.getTimeSpan() == null) {
+                        //Can't identify missing images if there's no date info in template
+                        showMissingCheckBox.setEnabled(false);
+                        showMissingCheckBox.setSelected(false);
+                    } else {
+                        seq.setShowMissing(showMissingCheckBox.isSelected());
+                    }
                     for (PngWalkView v : views) {
                         v.setSequence(seq);
                     }
+                    indexListener.propertyChange( null );
+                    if (qcPanel != null ) {
+                        qcPanel.setWalkImageSequece(seq);
+                        if ( seq.getIndex()<seq.size() ) {
+                            if ( seq.getQualityControlSequence()!=null ) {
+                                QualityControlRecord rec= seq.getQualityControlSequence().getQualityControlRecord(seq.getIndex());
+                                qcPanel.displayRecord(rec);
+                                int n[] = seq.getQualityControlSequence().getQCTotals();
+                                qcPanel.setStatus(n[0], n[1], n[2], n[3]);
+                            }
+                        } else {
+                            qcPanel.setStatus(0,0,0,0);
+                        }
+                    }
                 } catch (java.io.IOException e) {
                     // This probably means the template was invalid. Don't set new sequence.
-                    setStatus(e.getMessage());
+                    if ( !getStatus().startsWith("error") ) setStatus("error:"+e.getMessage());
                 }
             }
         };
@@ -615,11 +671,15 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     }
 
     String getSelectedFile() {
-        return seq.currentImage().getUri().toString();
+        return DataSetURI.fromUri( seq.currentImage().getUri() );
     }
 
     DataSetSelector getSelector() {
         return this.dataSetSelector1;
+    }
+
+    public static boolean isQualityControlEnabled() {
+        return ENABLE_QUALITY_CONTROL;
     }
 
     /** This method is called from within the constructor to
@@ -666,6 +726,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         actionButtonsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         prevSetButton.setText("<<<");
+        prevSetButton.setToolTipText("Skip 7");
         prevSetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 prevSetButtonActionPerformed(evt);
@@ -673,6 +734,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         });
 
         prevButton.setText("<");
+        prevButton.setToolTipText("previous");
         prevButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 prevButtonActionPerformed(evt);
@@ -680,6 +742,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         });
 
         nextButton.setText(">");
+        nextButton.setToolTipText("next");
         nextButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nextButtonActionPerformed(evt);
@@ -687,6 +750,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         });
 
         nextSetButton.setText(">>>");
+        nextSetButton.setToolTipText("Skip 7");
         nextSetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nextSetButtonActionPerformed(evt);
@@ -751,14 +815,21 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         showMissingCheckBox.setSelected(true);
         showMissingCheckBox.setText("Show Missing");
         showMissingCheckBox.setToolTipText("Insert placeholder images where there are gaps detected in the sequence");
+        showMissingCheckBox.setEnabled(false);
         showMissingCheckBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 showMissingCheckBoxItemStateChanged(evt);
             }
         });
+        showMissingCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showMissingCheckBoxActionPerformed(evt);
+            }
+        });
 
         useRangeCheckBox.setText("Limit range to:");
         useRangeCheckBox.setToolTipText("Limit the time range of the images in the sequence.");
+        useRangeCheckBox.setEnabled(false);
         useRangeCheckBox.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 useRangeCheckBoxItemStateChanged(evt);
@@ -766,6 +837,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         });
 
         editRangeButton.setText("Select...");
+        editRangeButton.setEnabled(false);
         editRangeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 editRangeButtonActionPerformed(evt);
@@ -776,13 +848,11 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(18, 18, 18)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 30, Short.MAX_VALUE)
                 .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 463, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -797,12 +867,15 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                         .add(showMissingCheckBox))
                     .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE))
                 .addContainerGap())
+            .add(layout.createSequentialGroup()
+                .add(statusLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 858, Short.MAX_VALUE)
+                .addContainerGap())
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 870, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 539, Short.MAX_VALUE)
+                .add(pngsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 636, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(dataSetSelector1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -812,15 +885,12 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                     .add(editRangeButton)
                     .add(showMissingCheckBox))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(actionButtonsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusLabel))
         );
-
-        layout.linkSize(new java.awt.Component[] {actionButtonsPanel, jPanel1}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
     }// </editor-fold>//GEN-END:initComponents
 
     private void nextButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nextButtonActionPerformed
@@ -907,6 +977,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         timeFilterTextField.setEnabled(enable);
         editRangeButton.setEnabled(enable);
         
+        if (!enable) return;
+
         List<DatumRange> current = seq.getActiveSubrange();
         DatumRange range= DatumRangeUtil.union(current.get(0), current.get(current.size()-1));
         if ( range==null ) {
@@ -915,6 +987,10 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             timeFilterTextField.setText( range.toString() );
         }
     }//GEN-LAST:event_useRangeCheckBoxItemStateChanged
+
+    private void showMissingCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showMissingCheckBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_showMissingCheckBoxActionPerformed
 
 
 

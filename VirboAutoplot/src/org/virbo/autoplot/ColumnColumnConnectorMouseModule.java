@@ -18,6 +18,8 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.SwingUtilities;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 
 /**
  * provides zoom/pan on the connector object itself.  
@@ -102,6 +104,7 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
         super.mouseDragged(e);
         Point p2 = e.getPoint();
         if (panAxis != null) {
+            if ( !panAxis.getUnits().isConvertableTo(oppositeAxis.getUnits()) ) return;
             DatumRange dr;
             if (panAxis.isLog()) {
                 Datum delta = oppositeAxis.invTransform(p0.getX()).divide(oppositeAxis.invTransform(p2.getX()));
@@ -113,8 +116,13 @@ public class ColumnColumnConnectorMouseModule extends MouseModule {
             panAxis.setDatumRange(dr);
         }
         if (panAxisV != null) {
+            if ( !panAxisV.getUnits().isConvertableTo(oppositeAxisV.getUnits()) ) return;
             DatumRange dr;
             if (panAxisV.isLog()) {
+                if ( UnitsUtil.isTimeLocation( panAxisV.getUnits()) ) {
+                    System.err.println("log of time axis--shouldn't happen");
+                    return;
+                }
                 Datum delta = oppositeAxisV.invTransform(p0.getY()).divide(oppositeAxisV.invTransform(p2.getY()));
                 dr = new DatumRange(panAxisRange0V.min().divide(delta), panAxisRange0V.max().divide(delta));
             } else {

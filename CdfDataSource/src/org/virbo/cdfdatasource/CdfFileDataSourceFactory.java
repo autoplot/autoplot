@@ -10,13 +10,16 @@
 package org.virbo.cdfdatasource;
 
 import gsfc.nssdc.cdf.CDF;
+import gsfc.nssdc.cdf.CDFException;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
@@ -80,7 +83,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     
     
     public DataSource getDataSource(URI uri) throws Exception {
-        URISplit split= URISplit.parse( uri.toString() );
+        URISplit split= URISplit.parse( uri );
         return new CdfFileDataSource( uri );
     }
     
@@ -92,7 +95,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc, org.das2.util.monitor.ProgressMonitor mon) throws Exception {
         if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME) ) {
             
-            File cdfFile= DataSetURI.getFile( cc.resource, mon );
+            File cdfFile= DataSetURI.getFile( cc.resourceURI, mon );
             String fileName= cdfFile.toString();
             //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
@@ -100,7 +103,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             CDF cdf= CDF.open( fileName, CDF.READONLYoff );
             
             logger.finest("inspect cdf for plottable parameters");
-            Map<String,String> result= CdfUtil.getPlottable( cdf, true , 3);
+            Map<String,String> result= CdfUtil.getPlottable( cdf, true , 4);
             
             logger.finest("close cdf");
             cdf.close();
@@ -111,6 +114,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                         key, this, "arg_0", result.get(key), null, true );
                 ccresult.add(cc1);
             }
+
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "interpMeta=", "suppress interpretation of metadata"));
+            
             return ccresult;
             
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
@@ -123,7 +129,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
                 CDF cdf= CDF.open( fileName, CDF.READONLYoff );
-                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 3);
+                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4);
                 cdf.close();
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
@@ -147,7 +153,35 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
     }
     
     public boolean reject( String surl, ProgressMonitor mon ) {
-        return ! surl.contains("?") || surl.indexOf("?")==surl.length()-1;
+        try {
+            if (!surl.contains("?") || surl.indexOf("?") == surl.length() - 1) {
+                return true;
+            }
+            URISplit split = URISplit.parse(surl.toString());
+            Map<String,String> args= URISplit.parseParams( split.params );
+            String param= args.get("arg_0");
+            if ( param==null ) {
+                return true;
+            }
+            File file = DataSetURI.getFile(split.resourceUri, mon);
+            if (!file.isFile()) {
+                return true;
+            } else {
+                CDF cdf= CDF.open( file.getPath(), CDF.READONLYoff );
+                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4);
+                cdf.close();
+                int i= param.indexOf("[");
+                if ( i>-1 ) {
+                    param= param.substring(0,i);
+                }
+                return ! result.containsKey(param);
+            }
+        } catch (CDFException ex) {
+            Logger.getLogger(CdfFileDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        } catch (IOException ex) {
+            return false;
+        }
     }
     
     

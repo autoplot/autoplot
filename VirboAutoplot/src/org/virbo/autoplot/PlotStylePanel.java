@@ -5,20 +5,14 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import org.das2.components.DatumEditor;
 import org.das2.components.propertyeditor.ColorEditor;
 import org.das2.components.propertyeditor.EnumerationEditor;
-import org.das2.components.propertyeditor.PropertyEditor;
-import java.awt.BorderLayout;
-import java.awt.Color;
 import java.beans.PropertyChangeListener;
-import javax.swing.SpinnerNumberModel;
-import org.das2.graph.DasColorBar;
-import org.das2.graph.DefaultPlotSymbol;
-import org.das2.graph.PsymConnector;
-import org.das2.graph.SpectrogramRenderer;
-import org.das2.system.RequestProcessor;
+import javax.swing.JPanel;
+import org.autoplot.help.AutoplotHelpSystem;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -27,8 +21,7 @@ import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Options;
-import org.virbo.autoplot.dom.Panel;
-import org.virbo.autoplot.dom.PanelStyle;
+import org.virbo.autoplot.dom.PlotElement;
 
 /**
  *
@@ -45,68 +38,40 @@ public class PlotStylePanel extends javax.swing.JPanel {
     ColorEditor colorEditor;
     ColorEditor fillColorEditor;
     DatumEditor referenceEditor;
-    BindingGroup panelBindingContext;
+    BindingGroup elementBindingContext;
 
     Application dom;
+
+    interface StylePanel {
+        public abstract void doElementBindings(PlotElement element);
+    }
     
     /** Creates new form PlotStylePanel */
     public PlotStylePanel(final ApplicationModel applicationModel) {
         this.applicationModel = applicationModel;
         this.dom= applicationModel.getDocumentModel();
         
-        this.dom.getController().addPropertyChangeListener( ApplicationController.PROP_PANEL, new PropertyChangeListener() {
+        this.dom.getController().addPropertyChangeListener( ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                doPanelBindings();
+                doElementBindings();
             }
         });
         
         initComponents();
-
-        symSizeSpinner.setModel(new SpinnerNumberModel(2.0f, 0.09f, 10.f, 0.2f));
-
-        psymEditor = new EnumerationEditor();
-        psymEditor.setValue( DefaultPlotSymbol.BOX );
-        psymPanel.add(psymEditor.getCustomEditor(), BorderLayout.CENTER);
-
-        lineEditor = new EnumerationEditor();
-        lineEditor.setValue( PsymConnector.SOLID );
-        lineStylePanel.add(lineEditor.getCustomEditor(), BorderLayout.CENTER);
-
-        lineThickSpinner.setModel(new SpinnerNumberModel(1.0f, 0.09f, 10.f, 0.2f));
-
-        edit = new EnumerationEditor();
-        edit.setValue( DasColorBar.Type.GRAYSCALE );
-        colortableTypePanel.add(edit.getCustomEditor(), BorderLayout.CENTER);
-
-        rebin = new EnumerationEditor();
-        rebin.setValue( SpectrogramRenderer.RebinnerEnum.binAverage );
-        rebinPanel.add(rebin.getCustomEditor(), BorderLayout.CENTER);
-
-        colorEditor = new ColorEditor();
-        colorEditor.setValue( Color.BLACK );
-        colorPanel.add(colorEditor.getSmallEditor(), BorderLayout.CENTER);
-
-        fillColorEditor = new ColorEditor();
-
-        fillColorEditor.setValue( Color.DARK_GRAY );
-        fillColorPanel.add(fillColorEditor.getSmallEditor(), BorderLayout.CENTER);
-
-        referenceEditor = new DatumEditor();
-        referenceValuePanel.add(referenceEditor.getCustomEditor());
 
         validate();
 
         Runnable run= new Runnable() {
             public void run() {
                 doOptionsBindings();
-                doPanelBindings();
+                doElementBindings();
             }
         };
         run.run();
         //RequestProcessor.invokeLater(run);
     }
 
-    public synchronized void doOptionsBindings( ) {
+    private synchronized void doOptionsBindings( ) {
         BindingGroup bc = new BindingGroup();
         Binding b;
 
@@ -117,36 +82,45 @@ public class PlotStylePanel extends javax.swing.JPanel {
 
         bc.bind();
     }
-    
 
-    public synchronized void doPanelBindings() {
+    private PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
+        public void propertyChange( PropertyChangeEvent ev ) {
+            doElementBindings();
+        }
+    };
+
+    private synchronized void doElementBindings() {
         //TODO: why null?
-        Panel panel= dom.getController().getPanel();
-        if ( panel==null ) return;
-        PanelStyle style= panel.getStyle();
-        BindingGroup bc = new BindingGroup();
-        Binding b;
+        PlotElement element= dom.getController().getPlotElement();
+        if ( element==null ) return;
 
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style,BeanProperty.create(  "symbolSize" ), symSizeSpinner, BeanProperty.create("value")) );
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "plotSymbol" ), psymEditor,BeanProperty.create( "value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "lineWidth" ), lineThickSpinner, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "symbolConnector" ), lineEditor, BeanProperty.create("value")));
-
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "color" ), colorEditor, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillToReference" ), fillToReferenceCheckBox, BeanProperty.create("selected")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "fillColor" ), fillColorEditor, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "reference" ), referenceEditor, BeanProperty.create("value")));
-
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "colortable" ), edit, BeanProperty.create("value")));
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, style, BeanProperty.create( "rebinMethod" ), rebin, BeanProperty.create("value")));
+        if ( stylePanel.getComponentCount()==1 ) {
+            stylePanel.remove( stylePanel.getComponent(0) );
+        }
         
-        if ( panelBindingContext!=null ) panelBindingContext.unbind();
-        bc.bind();
-        
+        StylePanel editorPanel=null;
+        if ( element.getRenderType()==RenderType.spectrogram || element.getRenderType()==RenderType.nnSpectrogram ) {
+            editorPanel= new SpectrogramStylePanel(applicationModel);
+        } else if ( element.getRenderType()==RenderType.hugeScatter ) {
+            editorPanel= new HugeScatterStylePanel(applicationModel);
+        } else if ( element.getRenderType()==RenderType.colorScatter ) {
+            editorPanel= new ColorScatterStylePanel(applicationModel);
+        } else {
+            editorPanel= new SeriesStylePanel(applicationModel);
+        }
+
+        editorPanel.doElementBindings(element);
+
+        stylePanel.add((JPanel)editorPanel,BorderLayout.CENTER);
+
+        element.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener ); // remove it if it's there already
+        element.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
+
         repaint();
+        validate(); // paint the new GUI
         
-        panelBindingContext= bc;
-        
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "stylePanel");
+
     }
 
     /** This method is called from within the constructor to
@@ -157,299 +131,74 @@ public class PlotStylePanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jPanel4 = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        colortableTypePanel = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        rebinPanel = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        lineThickSpinner = new javax.swing.JSpinner();
-        symSizeSpinner = new javax.swing.JSpinner();
-        colorPanel = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        fillColorPanel = new javax.swing.JPanel();
-        fillToReferenceCheckBox = new javax.swing.JCheckBox();
-        jLabel8 = new javax.swing.JLabel();
-        referenceValuePanel = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
-        psymPanel = new javax.swing.JPanel();
-        jLabel10 = new javax.swing.JLabel();
-        lineStylePanel = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
+        jSplitPane2 = new javax.swing.JSplitPane();
+        stylePanel = new javax.swing.JPanel();
+        plotPanel = new javax.swing.JPanel();
         majorTicksCheckBox = new javax.swing.JCheckBox();
-        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
         minorGridCheckBox = new javax.swing.JCheckBox();
-        gridOverCheckBox = new javax.swing.JCheckBox();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Spectrogram"));
+        setPreferredSize(new java.awt.Dimension(688, 300));
 
-        colortableTypePanel.setLayout(new java.awt.BorderLayout());
+        jSplitPane2.setLastDividerLocation(300);
 
-        jLabel4.setText("colortable:");
+        stylePanel.setMinimumSize(new java.awt.Dimension(300, 300));
+        stylePanel.setLayout(new java.awt.BorderLayout());
+        jSplitPane2.setLeftComponent(stylePanel);
 
-        jLabel5.setText("rebin:");
-
-        rebinPanel.setLayout(new java.awt.BorderLayout());
-
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel4)
-                    .add(jLabel5))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(rebinPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 142, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(colortableTypePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 141, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(55, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(7, 7, 7)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.CENTER)
-                    .add(jLabel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(colortableTypePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.CENTER)
-                    .add(jLabel5)
-                    .add(rebinPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(59, 59, 59))
-        );
-
-        jPanel1Layout.linkSize(new java.awt.Component[] {colortableTypePanel, rebinPanel}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Symbol Line"));
-
-        jLabel3.setText("line thickness:");
-
-        jLabel2.setText("symbol size:");
-
-        colorPanel.setLayout(new java.awt.BorderLayout());
-
-        jLabel6.setText("color:");
-
-        jLabel7.setText("fill color:");
-
-        fillColorPanel.setLayout(new java.awt.BorderLayout());
-
-        fillToReferenceCheckBox.setText("fill to reference");
-        fillToReferenceCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
-        jLabel8.setText("reference value:");
-
-        referenceValuePanel.setLayout(new java.awt.BorderLayout());
-
-        jLabel9.setText("plot symbol:");
-
-        psymPanel.setLayout(new java.awt.BorderLayout());
-
-        jLabel10.setText("line style:");
-
-        lineStylePanel.setLayout(new java.awt.BorderLayout());
-
-        org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jPanel2Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jPanel2Layout.createSequentialGroup()
-                                .add(12, 12, 12)
-                                .add(jLabel7)
-                                .add(63, 63, 63)
-                                .add(fillColorPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE))
-                            .add(jPanel2Layout.createSequentialGroup()
-                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jLabel9)
-                                    .add(jLabel6)
-                                    .add(jLabel2)
-                                    .add(jLabel3)
-                                    .add(jLabel10))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                                    .add(lineStylePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
-                                    .add(psymPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 104, Short.MAX_VALUE)
-                                    .add(colorPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
-                                    .add(symSizeSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 60, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(lineThickSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 61, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                            .add(jPanel2Layout.createSequentialGroup()
-                                .add(fillToReferenceCheckBox)
-                                .add(94, 94, 94))))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .add(24, 24, 24)
-                        .add(jLabel8)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(referenceValuePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)))
-                .add(12, 12, 12))
-        );
-
-        jPanel2Layout.linkSize(new java.awt.Component[] {lineThickSpinner, symSizeSpinner}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
-        jPanel2Layout.linkSize(new java.awt.Component[] {colorPanel, lineStylePanel, psymPanel}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jLabel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, colorPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 29, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.CENTER)
-                    .add(psymPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 28, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel9))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel2)
-                    .add(symSizeSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel10)
-                    .add(lineStylePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
-                    .add(lineThickSpinner, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(fillToReferenceCheckBox)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(fillColorPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
-                    .add(jLabel7))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(referenceValuePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 25, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel8))
-                .add(112, 112, 112))
-        );
-
-        jPanel2Layout.linkSize(new java.awt.Component[] {fillColorPanel, jLabel7}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
-        jPanel2Layout.linkSize(new java.awt.Component[] {jLabel10, jLabel3, lineStylePanel}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
-        jPanel2Layout.linkSize(new java.awt.Component[] {colorPanel, jLabel2, jLabel6, jLabel9, psymPanel}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot"));
+        plotPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot"));
 
         majorTicksCheckBox.setText("major ticks");
         majorTicksCheckBox.setToolTipText("draw grid lines at major ticks\n");
 
-        jLabel11.setText("grid:");
+        jLabel12.setText("grid:");
 
         minorGridCheckBox.setText("minor ticks");
         minorGridCheckBox.setToolTipText("draw grid lines at minor ticks\n");
 
-        gridOverCheckBox.setText("overlay");
-        gridOverCheckBox.setToolTipText("draw grid lines on top of data");
-
-        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout plotPanelLayout = new org.jdesktop.layout.GroupLayout(plotPanel);
+        plotPanel.setLayout(plotPanelLayout);
+        plotPanelLayout.setHorizontalGroup(
+            plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(plotPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel11)
+                .add(jLabel12)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(gridOverCheckBox)
-                    .add(jPanel3Layout.createSequentialGroup()
-                        .add(majorTicksCheckBox)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(minorGridCheckBox)))
-                .addContainerGap(42, Short.MAX_VALUE))
+                .add(majorTicksCheckBox)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(minorGridCheckBox)
+                .addContainerGap(31, Short.MAX_VALUE))
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel3Layout.createSequentialGroup()
-                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+        plotPanelLayout.setVerticalGroup(
+            plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(plotPanelLayout.createSequentialGroup()
+                .add(plotPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(majorTicksCheckBox)
-                    .add(jLabel11)
+                    .add(jLabel12)
                     .add(minorGridCheckBox))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(gridOverCheckBox)
-                .addContainerGap(169, Short.MAX_VALUE))
+                .addContainerGap(251, Short.MAX_VALUE))
         );
 
-        org.jdesktop.layout.GroupLayout jPanel4Layout = new org.jdesktop.layout.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel4Layout.createSequentialGroup()
-                .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        jPanel4Layout.linkSize(new java.awt.Component[] {jPanel1, jPanel3}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
-
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel4Layout.createSequentialGroup()
-                .add(jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel4Layout.createSequentialGroup()
-                        .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 155, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .add(jPanel2, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-
-        jScrollPane1.setViewportView(jPanel4);
+        jSplitPane2.setRightComponent(plotPanel);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 423, Short.MAX_VALUE)
+            .add(jSplitPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel colorPanel;
-    private javax.swing.JPanel colortableTypePanel;
-    private javax.swing.JPanel fillColorPanel;
-    private javax.swing.JCheckBox fillToReferenceCheckBox;
-    private javax.swing.JCheckBox gridOverCheckBox;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JPanel lineStylePanel;
-    private javax.swing.JSpinner lineThickSpinner;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JCheckBox majorTicksCheckBox;
     private javax.swing.JCheckBox minorGridCheckBox;
-    private javax.swing.JPanel psymPanel;
-    private javax.swing.JPanel rebinPanel;
-    private javax.swing.JPanel referenceValuePanel;
-    private javax.swing.JSpinner symSizeSpinner;
+    private javax.swing.JPanel plotPanel;
+    private javax.swing.JPanel stylePanel;
     // End of variables declaration//GEN-END:variables
 }

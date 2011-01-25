@@ -1,3 +1,4 @@
 org.virbo.ascii.AsciiTableDataSourceFactory dat txt csv
 org.virbo.das2Stream.Das2StreamDataSourceFactory d2s das2Stream das2stream qds
 org.virbo.spase.SpaseRecordDataSourceFactory xml
+org.autoplot.html.HtmlTableParserFactory htm

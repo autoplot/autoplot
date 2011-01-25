@@ -4,7 +4,10 @@
     <tocitem target="aphelp_main" text="Welcome to Autoplot"/>
     <tocitem text="Panels">
         <tocitem target="axisPanel" text="Axis Panel"/>
+        <tocitem target="stylePanel" text="Style Panel"/>
         <tocitem target="layoutPanel" text="Layout Panel"/>
-        <tocitem target="dataPanel" text="Data Panel"/>
+        <tocitem target="dataPanel_1" text="Data Source"/>
+        <tocitem target="dataPanel_2" text="Data Post Processing"/>
+        <tocitem target="metadataPanel" text="Metadata Panel"/>
     </tocitem>
 </toc>

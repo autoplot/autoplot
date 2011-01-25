@@ -9,6 +9,9 @@ import java.text.ParseException;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.WritableDataSet;
@@ -51,4 +54,21 @@ public class TestSupport {
         return rank1Rand;
     }
 
+    public static MutablePropertyDataSet sampleQube1( double off1, double off2, int len1, int len2 ) {
+        DDataSet result= (DDataSet) Ops.randn(len1,len2);
+        result.putProperty( QDataSet.DEPEND_0, Ops.add( DataSetUtil.asDataSet(off1), Ops.dindgen(len1) ) );
+        result.putProperty( QDataSet.DEPEND_1, Ops.add( DataSetUtil.asDataSet(off2), Ops.dindgen(len2) ) );
+        return result;
+    }
+
+    public static MutablePropertyDataSet sampleRank3Join( ) {
+        JoinDataSet jds= new JoinDataSet(3);
+
+        MutablePropertyDataSet qds= sampleQube1( 0, 2.2, 6, 5 );
+        jds.join( qds );
+        qds= sampleQube1( qds.length(), 3.3, 5, 4 );
+        jds.join( qds );
+        
+        return jds;
+    }
 }

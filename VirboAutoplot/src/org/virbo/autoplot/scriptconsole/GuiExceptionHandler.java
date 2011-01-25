@@ -26,15 +26,21 @@ package org.virbo.autoplot.scriptconsole;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.DasApplication;
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -43,6 +49,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.LogRecord;
 import java.util.logging.XMLFormatter;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
@@ -50,7 +65,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
-import org.das2.system.ExceptionHandler;
+import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
 
 /**
@@ -84,11 +99,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         "";
 
     private JButton submitButton;
+    private static final String USER_ID= "USER_ID";
+    private static final String EMAIL="EMAIL";
+    private static final String FOCUS_URI="FOCUS_URI";
     
-    /* this is public so that the AWT thread can create it */
     public GuiExceptionHandler() {
     }
-    
+
     public void handle(Throwable t) {
         if ( DasApplication.getDefaultApplication().isHeadless() ) {
             t.printStackTrace();
@@ -109,7 +126,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     private Map<Integer,DiaDescriptor> dialogs= new HashMap<Integer, DiaDescriptor>();
 
-    private synchronized DiaDescriptor createDialog( final Throwable t, final boolean uncaught ) {
+    private synchronized DiaDescriptor createDialog( final Throwable throwable, final boolean uncaught ) {
         final DiaDescriptor diaDescriptor= new DiaDescriptor();
         diaDescriptor.hits=1;
 
@@ -136,8 +153,14 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton ok = new JButton("Ok");
         final JToggleButton details = new JToggleButton("Show Details");
-        buttonPanel.add(ok);
+
+        JButton submit= new JButton("Submit Error Report...");
+        submit.setToolTipText("<html>Submit exception, platform information, source tags, and possibly log records to RTE server</html>");
+
+        buttonPanel.add(submit);
         buttonPanel.add(details);
+        buttonPanel.add(ok);
+
         mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         dialog.getContentPane().add(mainPanel, BorderLayout.CENTER);
@@ -150,7 +173,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         diaDescriptor.textArea= messageArea;
         
         StringWriter writer = new StringWriter();
-        t.printStackTrace(new PrintWriter(writer));
+        throwable.printStackTrace(new PrintWriter(writer));
         traceArea.setText(writer.toString());
 
         final JPanel stackPane = new JPanel(new BorderLayout());
@@ -159,13 +182,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         JPanel buttonPanel2 = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel2.setBorder(new javax.swing.border.EmptyBorder(10, 0, 0, 0));
         JButton dump = new JButton("Dump to Console");
-        JButton save = new JButton("Save to File");
-        JButton submit= new JButton("Submit Error Report...");
-        submit.setToolTipText("<html>Submit exception, platform information, source tags, and possibly log records to RTE server</html>");
 
         buttonPanel2.add(dump);
-        buttonPanel2.add(save);
-        buttonPanel2.add(submit);
 
         submitButton= submit;
 
@@ -199,35 +217,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         dump.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String text = traceArea.getText();
-                System.err.print(text);
-            }
-        });
-
-        save.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    JFileChooser chooser = new JFileChooser();
-                    int result = chooser.showSaveDialog(dialog);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        File selected = chooser.getSelectedFile();
-                        PrintWriter out = new PrintWriter(new FileOutputStream(selected));
-                        t.printStackTrace(out);
-                        out.close();
-                    }
-                }
-                catch (IOException ioe) {
-                    handle(ioe);
-                }
+                System.err.print(text); // Note this is useful when debugging in an IDE.
             }
         });
 
         submit.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    submitRuntimeException(t,uncaught);
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog( stackPane, "Unable to send the data! "+ex );
-                }
+                submitRuntimeException(throwable,uncaught);
             }
         });
 
@@ -235,7 +231,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         return diaDescriptor;
     }
 
-    class DiaDescriptor {
+    static class DiaDescriptor {
         JDialog dialog;
         int hits;
         JTextArea textArea;
@@ -280,16 +276,15 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         int rteHash= 0;
 
         StackTraceElement[] ee= t.getStackTrace();
-        for ( int i=ee.length-1; i>=0 && i>ee.length-5; i-- ) {
+        for ( int i=0; i<ee.length && i<5; i++ ) {
             rteHash= 31*rteHash + hashCode(ee[i]);
         }
-        rteHash= Math.abs(rteHash);
+        rteHash= Math.abs(rteHash) + ee[0].getLineNumber();
         return rteHash;
     }
 
     private static int hashCode( StackTraceElement e ) {
         int result = 31*e.getClassName().hashCode() + e.getMethodName().hashCode();
-        result = 31*result + e.getLineNumber();
         return result;
     }
 
@@ -299,50 +294,58 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         this.lc= lc;
     }
 
+    private String focusURI;
+    public void setFocusURI( String uri ) {
+        this.focusURI= uri;
+    }
+
     // Append to the given StringBuffer an escaped version of the
     // given text string where XML special characters have been escaped.
     // For a null string we append "<null>"
     // from java.util.logging.XMLFormatter
     private void escape(StringBuffer sb, String text) {
-	if (text == null) {
-	    text = "<null>";
-	}
-	for (int i = 0; i < text.length(); i++) {
-	    char ch = text.charAt(i);
-	    if (ch == '<') {
-		sb.append("&lt;");
-	    } else if (ch == '>') {
-		sb.append("&gt;");
-	    } else if (ch == '&') {
-		sb.append("&amp;");
-	    } else {
-		sb.append(ch);
-	    }
-	}
+        if (text == null) {
+            text = "<null>";
+        }
+        for (int i = 0; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (ch == '<') {
+                sb.append("&lt;");
+            } else if (ch == '>') {
+                sb.append("&gt;");
+            } else if (ch == '&') {
+                sb.append("&amp;");
+            } else {
+                sb.append(ch);
+            }
+        }
     }
 
     private void formatException( StringBuffer sb, Throwable th ) {
-	    sb.append("  <exception>\n");
-        sb.append("    <type>" );
-        escape( sb, th.getClass().getName() );
-        sb.append("</type>\n" );
-	    sb.append("    <message>");
-	    escape(sb, th.toString() );
-	    sb.append("</message>\n");
-        StackTraceElement ste= th.getStackTrace()[0];
+        sb.append("  <exception>\n");
+        sb.append("    <type>");
+        escape(sb, th.getClass().getName());
+        sb.append("</type>\n");
+        sb.append("    <message>");
+        escape(sb, th.toString());
+        sb.append("</message>\n");
+        int hash = hashCode(th);
+        sb.append("    <hash>").append(hash).append("</hash>\n");
+
+        StackTraceElement ste = th.getStackTrace()[0];
         sb.append("    <location>\n");
-        sb.append("       <class>"+ste.getClassName()+"</class>\n");
-        sb.append("       <method>"+ste.getMethodName()+"</method>\n");
-        sb.append("       <file>"+ste.getFileName()+"</file>\n");
-        sb.append("       <lineNumber>"+ste.getLineNumber()+"</lineNumber>\n");
+        sb.append("       <class>").append(ste.getClassName()).append("</class>\n");
+        sb.append("       <method>").append(ste.getMethodName()).append("</method>\n");
+        sb.append("       <file>").append(safe(ste.getFileName())).append("</file>\n");
+        sb.append("       <lineNumber>").append(ste.getLineNumber()).append("</lineNumber>\n");
         sb.append("    </location>\n");
         sb.append("    <toString><![CDATA[\n");
-        StringWriter sw= new StringWriter();
-        th.printStackTrace( new PrintWriter( sw ) );
-        sb.append( sw.toString() );
+        StringWriter sw = new StringWriter();
+        th.printStackTrace(new PrintWriter(sw));
+        sb.append(sw.toString());
         sb.append("]]>\n");
         sb.append("    </toString>\n");
-	    sb.append("  </exception>\n");
+        sb.append("  </exception>\n");
 
     }
 
@@ -358,7 +361,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     }
 
     private void formatSysProp( StringBuffer buf, String prop ) {
-        buf.append("     <property name=\""+prop+"\" value=\"" + System.getProperty(prop) + "\" />\n" );
+        buf.append("     <property name=\"").append(prop).append("\" value=\"").append(System.getProperty(prop)).append("\" />\n");
     }
     private void formatPlatform( StringBuffer buf ) {
         buf.append("  <platform>\n");
@@ -370,13 +373,13 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         buf.append("  </platform>\n");
     }
     
-    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs ,boolean uncaught, String userComments ) {
+    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs , Map<String,String> data, boolean uncaught, String userComments ) {
         StringBuffer buf= new StringBuffer();
         buf.append("<?xml version=\"1.0\"");
 
 
         buf.append(" encoding=\"");
-        buf.append("US-ASCII");
+        buf.append("UTF-8");
         buf.append("\"");
         buf.append(" ?>\n");
 
@@ -386,10 +389,20 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         
         formatException( buf, t );
 
-        buf.append("  <uncaught>"+uncaught+"</uncaught>\n" );
+        buf.append("  <uncaught>").append(uncaught).append("</uncaught>\n");
         
-        buf.append("  <userComments><![CDATA[\n" + userComments + "]]>\n</userComments>\n");
+        buf.append("  <userComments><![CDATA[\n").append(userComments).append("]]>\n</userComments>\n");
+
+        String id= data.get(USER_ID);
         
+        buf.append("  <userName>").append(safe(id)).append("</userName>\n");
+
+        String email= data.get(EMAIL);
+        buf.append("  <email>").append(safe(email)).append("</email>\n");
+
+        String focusUri= data.get(FOCUS_URI);
+        buf.append("  <focusUri>").append(safe(focusUri)).append("</focusUri>\n");
+
         formatBuildInfos( buf, bis );
 
         formatPlatform( buf );
@@ -406,7 +419,29 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         return buf.toString();
     }
 
-    private void submitRuntimeException( Throwable t, boolean uncaught ) throws IOException {
+    javax.swing.filechooser.FileFilter getFileNameExtensionFilter( final String desc, final String[] exts ) {
+        return new javax.swing.filechooser.FileFilter() {
+            public boolean accept(File pathname) {
+                if ( pathname.isFile() ) return true;
+                for ( int i=0; i<exts.length; i++ ) {
+                    if ( exts[i].length()>1 && exts[i].charAt(0)=='.' ) {
+                        return ( pathname.toString().endsWith( exts[i] ) );
+                    } else {
+                        return ( pathname.toString().endsWith( "." + exts[i] ) );
+                    }
+                    
+                }
+                return false;
+            }
+
+            @Override
+            public String getDescription() {
+                return desc;
+            }
+        };
+    }
+
+    public synchronized void submitRuntimeException( Throwable t, boolean uncaught ) {
         int rteHash;
         rteHash= hashCode( t );
         
@@ -425,43 +460,133 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         if ( lc!=null ) recs= lc.records;
 
-        String report= formatReport( t, bis, recs, uncaught, "USER COMMENTS" );
+        Map<String,String> map= new HashMap();
+
+        String id= "anon";
+        id= System.getProperty("user.name");
+
+        map.put( USER_ID, id );
+        map.put( EMAIL, "" );
+        map.put( FOCUS_URI, focusURI );
+
+        String report= formatReport( t, bis, recs, map, uncaught, "USER COMMENTS" );
 
         String url =
          "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
 
         GuiExceptionHandlerSubmitForm form= new GuiExceptionHandlerSubmitForm();
-        form.getDataTextArea().setText( report );
 
-        if ( JOptionPane.showConfirmDialog( null, form, "Submit Exception Report",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null ) == JOptionPane.CANCEL_OPTION ) {
-            return;
+        boolean notsent= true;
+
+        while ( notsent ) {
+
+            form.getDataTextArea().setText( report );
+
+            form.getUsernameTextField().setText( map.get(USER_ID) );
+            form.getEmailTextField().setText( map.get(EMAIL) );
+
+            String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "OK" };
+            int option= JOptionPane.showOptionDialog( null, form, "Submit Exception Report", 
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[3] )  ;
+            if ( option==2 ) {
+                return;
+            } else if ( option==1 ) {
+                id= form.getUsernameTextField().getText();
+                if ( id.trim().equals("") ) id= "anon";
+                map.put( USER_ID, form.getUsernameTextField().getText() );
+
+                String email= form.getEmailTextField().getText();
+                map.put( EMAIL, email );
+
+                report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+
+                JFileChooser chooser= new JFileChooser();
+                chooser.setFileFilter( this.getFileNameExtensionFilter("xml files", new String[] { ".xml" } ) );
+                String fname= "rte_"+rteHash+"_" + eventId + "_" + id + ".xml";
+                chooser.setSelectedFile( new File(fname) );
+                if ( chooser.showSaveDialog(form) == JFileChooser.APPROVE_OPTION ) {
+                    try {
+                        File f= chooser.getSelectedFile();
+                        PrintWriter out= new PrintWriter(f);
+                        out.write(report);
+                        out.close();
+                        notsent= false;
+                    } catch ( IOException ex ) {
+                        JOptionPane.showMessageDialog( null, ex.toString() );
+                    }
+                }
+
+            } else if ( option==3 ) {
+
+            //TODO soon: this needs to be done off the event thread.  It causes the app to hang when there is no internet.
+                id= form.getUsernameTextField().getText();
+                if ( id.trim().equals("") ) id= "anon";
+                map.put( USER_ID, form.getUsernameTextField().getText() );
+
+                String email= form.getEmailTextField().getText();
+                map.put( EMAIL, email );
+
+                report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+                String fname= "rte_"+rteHash+"_" + eventId + "_" + id + ".xml";
+
+                HttpClient client = new HttpClient();
+                PostMethod postMethod = new PostMethod(url);
+
+                Part[] parts= {
+                    new StringPart( "secret", "secret" ),
+                    new StringPart( "todo", "upload" ),
+                    new FilePart( "uploadfile", new ByteArrayPartSource( fname, report.getBytes() ) ),
+                };
+
+                postMethod.setRequestEntity(
+                        new MultipartRequestEntity( parts, postMethod.getParams() ));
+
+                try {
+                    int statusCode1 = client.executeMethod(postMethod);
+                    if ( statusCode1==200 ) {
+                        if ( this.submitButton!=null ) this.submitButton.setEnabled(false);
+                        notsent= false;
+                        postMethod.releaseConnection();
+                    } else {
+                        postMethod.releaseConnection();
+                        JOptionPane.showMessageDialog( null, postMethod.getStatusLine() );
+                    }
+
+                } catch ( IOException ex ) {
+                    JOptionPane.showMessageDialog( null, ex.toString() );
+                }
+            } else if ( option==0 ) {
+                id= form.getUsernameTextField().getText();
+                if ( id.trim().equals("") ) id= "anon";
+                map.put( USER_ID, form.getUsernameTextField().getText() );
+
+                String email= form.getEmailTextField().getText();
+                map.put( EMAIL, email );
+
+                report= formatReport( t, bis, recs, map, uncaught, form.getUserTextArea().getText() );
+
+                StringSelection stringSelection = new StringSelection(report);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, new ClipboardOwner() {
+                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                    }
+                } );
+                // make them hit cancel...
+            }
+        } // while notsent
+    }
+
+
+    public static String safe(String s) {
+        try {
+            if ( s==null ) {
+                return "null";
+            } else {
+                return URLEncoder.encode(s, "UTF-8");
+            }
+        } catch (UnsupportedEncodingException ex) {
+            throw new RuntimeException(s); // shouldn't happen UTF-8 should always be available.
         }
-
-        report= formatReport( t, bis, recs, uncaught, form.getUserTextArea().getText() );
-
-        HttpClient client = new HttpClient();
-        PostMethod postMethod = new PostMethod(url);
-
-        Part[] parts= {
-            new StringPart( "secret", "secret" ),
-            new StringPart( "todo", "upload" ),
-            new FilePart( "uploadfile", new ByteArrayPartSource("rte_"+rteHash+"_" + eventId + ".xml", report.getBytes() ) ),
-        };
-
-        postMethod.setRequestEntity(
-                new MultipartRequestEntity( parts, postMethod.getParams() ));
-
-        int statusCode1 = client.executeMethod(postMethod);
-        if ( statusCode1==200 ) {
-            this.submitButton.setEnabled(false);
-        } else {
-            System.err.println( postMethod.getStatusLine() );
-        }
-
-        postMethod.releaseConnection();
-
-
     }
 
     public static void main( String[] args ) {

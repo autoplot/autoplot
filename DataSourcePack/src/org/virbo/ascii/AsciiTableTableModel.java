@@ -74,10 +74,14 @@ public class AsciiTableTableModel extends AbstractTableModel implements ColSpanT
         if (lineNumber != row) {
             fields= new String[recParser.fieldCount()];
             //if ( parser.isHeader( row, lines[Math.max(0,row-lineStart-1)], lines[row-lineStart], 1 ) ) {
-            if ( recParser.splitRecord(lines[row-lineStart], fields) ) {
-                this.isRecord[row - lineStart] = true;
-            } else {
+            if ( parser.isHeader( row, lines[Math.max(0,row-lineStart-1)], lines[row-lineStart], 1 ) ) {
                 this.isRecord[row - lineStart] = false;
+            } else {
+                if ( recParser.splitRecord(lines[row-lineStart], fields) ) {
+                    this.isRecord[row - lineStart] = true;
+                } else {
+                    this.isRecord[row - lineStart] = false;
+                }
             }
         }
         if (this.isRecord[row - lineStart]) {

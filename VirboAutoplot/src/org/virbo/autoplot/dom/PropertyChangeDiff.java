@@ -57,7 +57,11 @@ public class PropertyChangeDiff implements Diff {
     public String toString() {
         String s = this.propertyName + " " + oldVal + " to " + newVal;
         if (s.length() > 30) {
-            s = this.propertyName;
+            if ( newVal instanceof Boolean ) {
+                s = this.propertyName + "=" + newVal;
+            } else {
+                s = this.propertyName;
+            }
         }
         return s;
     }

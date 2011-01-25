@@ -1,0 +1,3 @@
+eh= getApplicationModel().getExceptionHandler()
+
+eh.handle( java.lang.RuntimeException("Wow an Error") )

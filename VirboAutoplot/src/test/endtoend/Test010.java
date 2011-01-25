@@ -5,7 +5,6 @@
 package test.endtoend;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -18,8 +17,8 @@ import org.virbo.datasource.DataSetURI;
  */
 public class Test010 {
 
-    public static void doTest( String uri ) throws Exception {
-        URL url= DataSetURI.getWebURL( new URI( uri ) );
+    public static void doTest( String suri ) throws Exception {
+        URL url= DataSetURI.getWebURL( DataSetURI.toUri( suri ) );
 
         URLConnection connect= url.openConnection();
         connect.setConnectTimeout(500);
@@ -28,7 +27,7 @@ public class Test010 {
         
     }
     
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
         List<String> tests= new ArrayList();
         tests.add("http://autoplot.org/data/foo.dat");
         tests.add("http://timeseries.org/get.cgi?StartDate=19980101&EndDate=20090101&ppd=1&ext=bin&out=tsml&param1=NGDC_NOAA15_SEM2-33-v0" );

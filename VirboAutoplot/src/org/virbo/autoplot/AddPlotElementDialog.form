@@ -1,0 +1,147 @@
+<?xml version="1.1" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="2"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="cancelButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="overplotButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="plotBelowButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="plotButton" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Component id="primaryDataSetSelector" alignment="0" pref="678" max="32767" attributes="0"/>
+                  <Component id="primaryCheckBox" alignment="0" pref="678" max="32767" attributes="0"/>
+                  <Component id="secondaryCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="secondaryDataSetSelector" alignment="0" pref="0" max="32767" attributes="0"/>
+                  <Component id="tertiaryCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="tertiaryDataSetSelector" alignment="0" pref="0" max="32767" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="primaryCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="primaryDataSetSelector" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="secondaryCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="secondaryDataSetSelector" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="tertiaryCheckBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Component id="tertiaryDataSetSelector" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="65" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="plotButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="plotBelowButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="overplotButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cancelButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="org.virbo.datasource.DataSetSelector" name="primaryDataSetSelector">
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="secondaryCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Plot Against (X):"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="secondaryCheckBoxActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="org.virbo.datasource.DataSetSelector" name="secondaryDataSetSelector">
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="tertiaryCheckBox">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="And Against (Y):"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tertiaryCheckBoxActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="org.virbo.datasource.DataSetSelector" name="tertiaryDataSetSelector">
+    </Component>
+    <Component class="javax.swing.JButton" name="overplotButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Overplot"/>
+        <Property name="toolTipText" type="java.lang.String" value="Add this to the current plot as an overplot"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="overplotButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="plotBelowButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Plot Below"/>
+        <Property name="toolTipText" type="java.lang.String" value="Plot below the current plot, possibly inserting a plot."/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotBelowButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="plotButton">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/org/virbo/datasource/go.png"/>
+        </Property>
+        <Property name="text" type="java.lang.String" value="Plot"/>
+        <Property name="toolTipText" type="java.lang.String" value="Replace the current plot with this"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="plotButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="cancelButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Cancel"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cancelButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="primaryCheckBox">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" value="Plot the Data Set URI:"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Enter the data set URI, such as the name of an ascii text file and parameters for parsing.  &#xa;Possible completions are displayed when CTRL-Space is pressed, and the folder icon &#xa;may invoke an editor depending on the data source type.&#xa;&#xa;Uncheck this to add an empty panel.&#xa;&lt;/html&gt;"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="primaryCheckBoxActionPerformed"/>
+      </Events>
+    </Component>
+  </SubComponents>
+</Form>

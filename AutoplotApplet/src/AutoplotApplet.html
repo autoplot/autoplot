@@ -4,7 +4,8 @@
   <head>
     <title>Autoplot Applet</title>
   </head>
-  <script>
+  <body>
+      <script type="text/javascript" >
       function f( evt ) {
           alert( evt );
       }
@@ -16,16 +17,16 @@
           consoleOut.value=""+id+" "+xdata+","+ydata+" x="+x+ " y="+y+" type="+type;
       }
     </script>
-  <body>
-    This demonstrates the parameters that control the initial settings of the applet.
+      <p>This demonstrates the parameters that control the initial settings of the applet.
     The parameter dataSetURL specifies the initial dataset URI.  AutoplotApplet.jar
     should contain a manifest that loads the jar files the application needs.  This
-    is still a new use mode for Autoplot and funky behavior should be expected.
+      is still a new use mode for Autoplot and funky behavior should be expected.</p>
+      <p>This unsigned applet will only run properly from sarahandjeremy.net.
     <br>
     <applet  width="600" height="200" id="applet1"
           code="org.virbo.autoplot.AutoplotApplet" archive="AutoplotAppletAll.jar"
           onpropertychange="f">
-                <param name="dataSetURL" value="http://www.sarahandjeremy.net/jeremy/data/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14">
+                <param name="dataSetURL" value="http://www.sarahandjeremy.net/jeremy/1wire/data/$Y/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14">
                 <param name="column" value="5em,100%-10em">
                 <param name="font" value="sans-italic-10">
                 <param name="row" value="3em,100%-3em">

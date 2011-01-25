@@ -16,6 +16,7 @@ import org.python.core.PyObject;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
+import org.das2.DebuggerVars;
 
 /**
  * Contains operations that are only available to Jython code, and is dependent
@@ -70,7 +71,7 @@ public class JythonOps {
      */
     public static QDataSet coerce( PyObject arg0 ) {
         if ( arg0 instanceof PyQDataSet ) {
-            return ((PyQDataSet)arg0).ds;
+            return ((PyQDataSet)arg0).rods;
         } else if ( arg0 instanceof PyList ) {
             return PyQDataSetAdapter.adaptList( (PyList)arg0 ) ;
         } else if ( arg0 instanceof PyArray ) {
@@ -111,5 +112,5 @@ public class JythonOps {
         };
         new Thread(run).start();
     }
-        
+
 }

@@ -14,12 +14,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 
 /**
  * allows dataset of unknown length to be built. Presently, this only builds QUBES, but should allow for geometry changes.
  * TODO: consider using WritableDataSet interface.
+ * The guessRecCount parameter is the initial number of allocated records, and is also the extension when this number of
+ * records is passed.  The final physical dataset size is not affected by this, because the data is copied.
  * @author jbf
  */
 public class DataSetBuilder { 
@@ -38,30 +41,30 @@ public class DataSetBuilder {
     
     /**
      * recCount is the guess of dim0 size.  Bad guesses will result in an extra copy.
-     * @param recCount initial allocation for the first dimension.
+     * @param guessRecCount initial allocation for the first dimension.
      */
-    public DataSetBuilder( int rank, int recCount ) {
-        this( rank, recCount, 1, 1 );
+    public DataSetBuilder( int rank, int guessRecCount ) {
+        this( rank, guessRecCount, 1, 1 );
     }
     
     /**
      * recCount is the guess of dim0 size.  Bad guesses will result in an extra copy.
-     * @param recCount initial allocation for the first dimension.
+     * @param guessRecCount initial allocation for the first dimension.
      * @param dim1 when rank 2 or greater is used.
      */
-    public DataSetBuilder( int rank, int recCount, int dim1 ) {
-        this( rank, recCount, dim1, 1 );
+    public DataSetBuilder( int rank, int guessRecCount, int dim1 ) {
+        this( rank, guessRecCount, dim1, 1 );
     }
     
     /**
      * recCount is the guess of dim0 size.  Bad guesses may result in an extra copy.
-     * @param recCount initial allocation for the first dimension.
+     * @param guessRecCount initial allocation for the first dimension.
      * @param dim1 when rank 2 or greater is used.
      * @param dim2 when rank 3 or greater is used.
      */
-    public DataSetBuilder( int rank, int recCount, int dim1, int dim2 ) {
+    public DataSetBuilder( int rank, int guessRecCount, int dim1, int dim2 ) {
         this.rank= rank;
-        this.recCount= recCount;
+        this.recCount= guessRecCount;
         this.dim1= dim1;
         this.dim2= dim2;
         this.recElements= dim1 * dim2;
@@ -179,10 +182,6 @@ public class DataSetBuilder {
         return this.recElements;
     }
     
-    private final boolean isFill( double d ) {
-        return fillValue==d || validMin>d || validMax<d;
-    }
-    
     /**
      * returns the result dataset, concatenating all the datasets it's built
      * thus far.
@@ -207,38 +206,9 @@ public class DataSetBuilder {
             }
             DDataSet.copyElements( current, 0, result, dsindex, length-dsindex );
         } else {
-            result= DDataSet.copy(current);
+            result= (DDataSet) ArrayDataSet.copy(double.class,current);
         }
         result.putLength( length );
-
-        // install canonical fill value
-        if ( fillValue!=-1e31 || validMax<Double.POSITIVE_INFINITY || validMin>Double.NEGATIVE_INFINITY ) {
-            switch ( rank ) {
-                case 1: {
-                    for ( int i=0; i<result.length(); i++ ) {
-                        if ( isFill( result.value(i) ) ) result.putValue(i,-1e31);
-                    }
-                } break;
-                case 2: {
-                    for ( int i=0; i<result.length(); i++ ) {
-                        for ( int j=0; j<result.length(i); j++ ) {
-                            if ( isFill( result.value(i,j) ) ) result.putValue(i,j,-1e31);
-                        }
-                    }
-                } break;
-                case 3: {
-                    for ( int i=0; i<result.length(); i++ ) {
-                        for ( int j=0; j<result.length(i); j++ ) {
-                            for ( int k=0; k<result.length(i,j); k++ ) {
-                                if ( isFill( result.value(i,j,k) ) ) result.putValue(i,j,k,-1e31);
-                            }
-                        }
-                    }
-                }
-                default: throw new RuntimeException("bad rank");
-            }
-            if ( fillValue!=-1e31 ) properties.put( QDataSet.FILL_VALUE, -1e31 );
-        }
         
         for ( Iterator<String> i= properties.keySet().iterator(); i.hasNext();  ) {
             String key= i.next();

@@ -1,9 +1,7 @@
 package org.virbo.datasource;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,6 +11,21 @@ import java.util.regex.Pattern;
 /**
  * Class for containing the elemental parts of a URI, and utility
  * routines for working with URIs.
+ *
+ * We need a working definition of well-formed and colloquial URIs:
+ * = well-formed URIs =
+ *   <vapScheme>:<fileResource>?<params>
+ *   <vapScheme>:[<identifier>?]<params>
+ *   * they are valid URIs: they contain no spaces, etc.
+ * = colloquial URIs =
+ *   * these are Strings that can be converted into URIs.
+ *   * spaces in file names are converted into %20. 
+ *   * spaces in parameter lists are converted into pluses.
+ *   * pluses in parameter lists are converted into %2B.
+ *   * note that if there are pluses but the URI is valid, then pluses may be left alone. 
+ * This routine knows nothing about the data source that will interpret the
+ * URI, so this needs to be established.
+ * 
  * @author jbf
  */
 public class URISplit {
@@ -60,21 +73,23 @@ public class URISplit {
     public int resourceUriCarotPos;
     /**
      * position of the carot after modifications to the surl are made.  This
-     * is with respect to formatted uri, which probably includes the explcit "vap:" scheme.
+     * is with respect to formatted URI, which probably includes the explicit "vap:" scheme.
      */
     public int formatCarotPos;
 
     /**
-     * add "file:/" to a resource string that appears to reference the local filesystem.
-     * 
-     * @param surl
-     * @return surl, maybe with "file:/" prepended.
+     * if true, then "vap:" for the vapScheme was implicitly added.  We always
+     * format with the "vap:" added.
      */
-    public static String maybeAddFile(String surl) {
-        URISplit result = maybeAddFile(surl, 0);
-        return result.surl;
-    }
+    public boolean implicitVap= false;
 
+    /**
+     * add "file:/" to a resource string that appears to reference the local filesystem.
+     * return the parsed string, or null if the string doesn't appear to be from a file.
+     * @param surl
+     * @param carotPos
+     * @return
+     */
     public static URISplit maybeAddFile(String surl, int carotPos) {
         URISplit result = new URISplit();
 
@@ -83,11 +98,12 @@ public class URISplit {
             carotPos = surl.length();
             result.surl = surl;
             result.vapScheme = "vap";
+            result.implicitVap= true;
             result.resourceUriCarotPos = carotPos;
             result.formatCarotPos = carotPos + 4;
         }
 
-        String scheme;  // identify the scheme, if any.
+        String scheme;  // identify a scheme, if any.  This might be vap+foo:, or http:
         int i0 = surl.indexOf(":");
         if (i0 == -1) {
             scheme = "";
@@ -103,10 +119,15 @@ public class URISplit {
             if (scheme.equals("vap+internal")) { // leave the resourcePart alone. TODO: jdbc and other non-file URIs.
                 result.surl= resourcePart;
             } else {
-                URISplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));
-                result.surl = resourceSplit.surl;
-                result.formatCarotPos = (carotPos > i0) ? resourceSplit.resourceUriCarotPos + (i0 + 1) : carotPos;
-                result.resourceUriCarotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
+                URISplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));  //TODO: jdbc and vap+inline
+                if ( resourceSplit==null ) {
+                    result.surl= resourcePart;
+                    result.file= "";
+                } else {
+                    result.surl = resourceSplit.surl;
+                    result.formatCarotPos = (carotPos > i0) ? resourceSplit.resourceUriCarotPos + (i0 + 1) : carotPos;
+                    result.resourceUriCarotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
+                }
             }
 
         } else {
@@ -115,19 +136,77 @@ public class URISplit {
         }
 
         if (scheme.equals("")) {
-            result.surl = "file://";
-            result.resourceUriCarotPos += 7;
-            if ((surl.charAt(0) == '/')) {
-                result.surl += surl;
-            } else {
-                result.surl += ('/' + surl); // Windows c:
-                result.resourceUriCarotPos += 1;
+            boolean isFile= true;
+            int iquery= surl.indexOf("?");
+            if ( iquery==-1 ) {
+                int ieq= surl.indexOf("=");
+                if ( ieq>-1 && !(surl.charAt(0)=='/') ) {
+                    isFile= false;
+                }
             }
-            result.surl = result.surl.replaceAll("\\\\", "/");
-            result.surl = result.surl.replaceAll(" ", "+");
+
+            if ( !isFile ) {
+                return null;
+
+            } else {
+                result.surl = "file://";
+                result.scheme= "file";
+                result.resourceUriCarotPos += 7;
+                if ((surl.charAt(0) == '/')) {
+                    result.surl += surl;
+                } else {
+                    result.surl += ('/' + surl); // Windows c:
+                    result.resourceUriCarotPos += 1;
+                }
+                int iq= result.surl.indexOf("?");
+                if ( iq==-1 ) iq= result.surl.length();
+
+                result.surl = result.surl.replaceAll("\\\\", "/"); //TODO: what if \ in query part?
+
+                int spaceCount= charCount( result.surl, ' ', 0, result.surl.length() );
+                result.surl = replaceAll( result.surl, " ", "%20", 0, iq );
+
+                result.formatCarotPos+= spaceCount*2; //account for inserted characters.
+                result.resourceUriCarotPos+= spaceCount*2;
+            }
+            
         }
 
         return result;
+    }
+
+    private static int charCount( String src, char find, int start, int end ) {
+        int count=0;
+        for ( int i=start; i<end; i++ ) {
+            if ( src.charAt(i)==find ) count++;
+        }
+        return count;
+    }
+
+    /**
+     * replace all characters in the given range.
+     * @param src
+     * @param regex
+     * @param replacement
+     * @param start
+     * @param end
+     * @return
+     */
+    private static String replaceAll( String src, String regex, String replacement, int start, int end ) {
+        String prefix= src.substring(0,start);
+        String middle= src.substring(start,end);
+        String suffix= src.substring(end);
+        return prefix + middle.replaceAll(regex, replacement) + suffix;
+    }
+
+    /**
+     * added to avoid widespread use of parse(uri.toString).  This way its all being done with same code,
+     * and keep the URI abstraction.
+     * @param uri
+     * @return
+     */
+    public static URISplit parse( URI uri ) {
+        return parse( DataSetURI.fromUri(uri) );
     }
 
     /**
@@ -256,6 +335,7 @@ public class URISplit {
             } else {
                 if (result.vapScheme == null && normalize ) {
                     result.vapScheme = "vap";
+                    result.implicitVap= true;
                     result.formatCarotPos = result.resourceUriCarotPos + 4;
                 }
                 result.surl = surl;
@@ -291,10 +371,17 @@ public class URISplit {
      * @param normalize normalize the surl by adding implicit "vap", etc.
      */
     public static URISplit parse( String surl, int carotPos , boolean normalize) {
+
+        if ( surl.startsWith("file:/") && surl.endsWith(":") && surl.length()<11 && surl.charAt(surl.length()-3)=='/' ) { // kludge for file:///c:<CAROT> on Windows.
+            if ( carotPos==surl.length() ) carotPos++;
+            surl= surl+"/";
+        }
+
         URISplit result = maybeAddFile(surl, carotPos);
 
+        if ( "vap+internal".equals(result.vapScheme) ) result.file=""; // non-files will get "" for the file, and this should too.
         try {
-            if ( result.vapScheme==null || !result.vapScheme.equals("vap+internal") ) {
+            if ( result.vapScheme==null || result.file==null ) {
                 parseScheme(result, normalize);
             }
         } catch (URISyntaxException ex) {
@@ -313,13 +400,18 @@ public class URISplit {
         int iquery;
         // check for just one ?
         iquery = rsurl.indexOf("?");
+        int ieq= rsurl.indexOf("=");
 
         String file;
 
         file = result.resourceUri == null ? null : result.resourceUri.getPath();
         if (file == null) {
             if (iquery == -1) {
-                file = rsurl;
+                if ( ieq==-1 ) {
+                    file= rsurl;
+                } else {
+                    file= null;
+                }
             } else {
                 file = rsurl.substring(0, iquery);
             }
@@ -332,14 +424,19 @@ public class URISplit {
         }
 
         String params = null;
-        int fileEnd;
+        int fileEnd=-1;
 
         if (file != null && iquery != -1) {
             fileEnd = iquery;
             params = rsurl.substring(iquery + 1);
         } else {
-            iquery = rsurl.length();
-            fileEnd = rsurl.length();
+            if ( ieq>-1 ) {
+                iquery = 0;
+                params= rsurl;
+            } else {
+                iquery = rsurl.length();
+                fileEnd = rsurl.length();
+            }
         }
 
         if (result.scheme != null) {
@@ -368,6 +465,7 @@ public class URISplit {
         }
         result.params = params;
 
+        if ( "".equals(result.file) ) result.file=null;
         return result;
 
 
@@ -400,6 +498,15 @@ public class URISplit {
         }
 
         params = URISplit.uriDecode(params);
+//        if ( params.contains("+") && params.contains(" ") ) {  // this may be a problem.  We know spaces are not encoded as pluses.
+//            System.err.println("params appear to be decoded already");
+//        } else {
+//            if ( params.contains("+") && !params.contains("%20") ) { // legacy
+//               params = params.replaceAll("+", " " );
+//            }
+//            params = URISplit.uriDecode(params);
+//            //params = params.replaceAll("\\+", " "); // in the parameters, plus (+) is the same as space ( ).
+//        }
 
         String[] ss = params.split("&");
 
@@ -411,6 +518,7 @@ public class URISplit {
             if (j == -1) {
                 name = ss[i];
                 value = "";
+                name = name.replaceAll("%3D", "=" ); // https://sourceforge.net/tracker/?func=detail&aid=3049295&group_id=199733&atid=970682
                 result.put("arg_" + (argc++), name);
             } else {
                 name = ss[i].substring(0, j);
@@ -437,7 +545,7 @@ public class URISplit {
             } else {
                 String value = (String) parms.get(key);
                 if (value != null) {
-                    result.append("&" + key + "=" + uriEncode(value));
+                    result.append("&" + key + "=" + uriEncode(value)); //result.append("&" + key + "=" + uriEncode(value).replaceAll("%20", "+" ));
                 } else {
                     result.append("&" + key);
                 }
@@ -447,46 +555,92 @@ public class URISplit {
     }
 
     public static String format(URISplit split) {
-        String surl;
         String result = "";
         if ( split.vapScheme!=null ) result= result + split.vapScheme + ":";
-        result= result + split.file;
-        if (split.params != null) {
-            result += "?" + split.params;
+        if ( split.file==null && split.params!=null ) {
+            result= result + split.params;
+        } else if ( split.file!=null ) {
+            result= result + split.file;
+            if (split.params != null) {
+                result += "?" + split.params;
+            }
         }
         return result;
     }
 
     /**
-     * convert " " to "+", etc, by looking for and encoding illegal characters.  
+     * We need a standard way to detect if a string has already been URL encoded.
+     * The problem is we want valid URIs that are also readable, so just using
+     * simple encode/decode logic is not practical.
+     *
+     * This means:
+     * - no spaces
+     * - contains %[0-9][0-9]
+     * @param surl
+     * @return
+     */
+    public static boolean isUriEncoded( String surl ) {
+        boolean result= false;
+        // check for illegal characters.
+        if ( surl.contains(" ") ) result= false;
+        // check for encoded characters.
+        if ( Pattern.compile("%[0-9][0-9]").matcher(surl).find() ) result= true;
+        return result;
+    }
+
+    /**
+     * convert " " to "%20", etc, by looking for and encoding illegal characters.
+     * We can't just aggressively convert...
      * @param s
      * @return
      */
     public static String uriEncode(String surl) {
-        surl = surl.replaceAll("%([^0-9])", "%25$1");
+        if ( isUriEncoded(surl) ) return surl;
+        surl = surl.replaceAll("%([^0-9])", "%25$1");  //%Y, %j, etc
+        surl = surl.replaceAll("\\%24", "\\$"); // What's this--seems backward.  We like $'s in URIs...
+
+        surl = surl.replaceAll(" ", "%20" );
+        //surl = surl.replaceAll("#", "%23" );
+        //surl = surl.replaceAll("%", "%25" ); // see above
+        //surl = surl.replaceAll("&", "%26" );
+        //surl = surl.replaceAll("\\+", "%2B" );
+        //surl = surl.replaceAll("/", "%2F" );
+        //surl = surl.replaceAll(":", "%3A" );
+        //surl = surl.replaceAll(";", "%3B" );
         surl = surl.replaceAll("<", "%3C");
         surl = surl.replaceAll(">", "%3E");
-        surl = surl.replaceAll(" ", "+");
-        surl = surl.replaceAll("\\%24", "\\$");
+        //surl = surl.replaceAll("\\?", "%3F" );
+
         return surl;
     }
 
     /**
      * convert "+" to " ", etc, by using URLDecoder and catching the UnsupportedEncodingException that will never occur.
-     * Kludge to check for and
-     * decode pluses (+) in an otherwise unencoded string, also we have to be careful for elements like %Y than are
+     * We have to be careful for elements like %Y than are
      * not to be decoded.
+     * TODO: we need to use standard escape/unescape code, possibly changing %Y to $Y beforehand.
      * @param s
      * @return
      */
     public static String uriDecode(String s) {
-        try {
-            return URLDecoder.decode(s, "UTF-8");
-        } catch (IllegalArgumentException ex) {
-            return s.replaceAll("\\+", " ");
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
-        }
+        if ( !isUriEncoded(s) ) return s;
+        String surl= s;
+//        if ( surl.contains("+") && !surl.contains("%20") ) { // legacy
+//            surl = surl.replaceAll("+", " " );
+//        }
+        surl = surl.replaceAll("%20", " " );
+        //surl = surl.replaceAll("%23", "#" );
+        surl = surl.replaceAll("%25", "%" );
+        //surl = surl.replaceAll("%26", "&" );
+        surl = surl.replaceAll("%2B", "+" );
+        //surl = surl.replaceAll("%2F", "/" );
+        //surl = surl.replaceAll("%3A", ":" );
+        //surl = surl.replaceAll("%3B", ";" );
+        surl = surl.replaceAll("%3C", "<" );
+        surl = surl.replaceAll("%3E", ">" );
+        //surl = surl.replaceAll("%3F", "?" );
+
+        return surl;
     }
 
     public String toString() {

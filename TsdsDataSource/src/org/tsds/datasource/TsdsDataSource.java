@@ -35,13 +35,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import org.das2.util.TimeParser;
+import org.das2.datum.TimeParser;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
@@ -307,7 +309,7 @@ class TsdsDataSource extends AbstractDataSource {
                     "&out=" + params.get("out") +
                     "&param1=" + params.get("param1");
 
-                return "vap+tsds:" + TsdsDataSource.this.resourceURI.toString() + "?" + sparams;
+                return "vap+tsds:" + DataSetURI.fromUri( TsdsDataSource.this.resourceURI ) + "?" + sparams;
             }
 
             public DatumRange getTimeRange() {
@@ -366,7 +368,12 @@ class TsdsDataSource extends AbstractDataSource {
         bbuf.flip();
         bbuf.order(ByteOrder.LITTLE_ENDIAN);
 
+        int expectedPoints= points; 
         points = bbuf.limit() / SIZE_DOUBLE;
+
+        if ( points==0 && points<expectedPoints ) {
+            throw new IOException( "No data returned from "+ connection.getURL() );
+        }
 
         if ( len1==-1 ) {
             return new org.virbo.binarydatasource.Double( 1, SIZE_DOUBLE, 0, points, 1, 1, bbuf );
@@ -385,7 +392,7 @@ class TsdsDataSource extends AbstractDataSource {
         }
 
         try {
-            DDataSet result = DDataSet.copy(Ops.timegen(String.valueOf(t0), String.valueOf(cadence), points));
+            DDataSet result = (DDataSet) ArrayDataSet.copy( double.class, Ops.timegen(String.valueOf(t0), String.valueOf(cadence), points));
             DatumRange timeRange = new DatumRange(startTime, endTime);
             result.putProperty(QDataSet.CACHE_TAG, new CacheTag(timeRange, cadence));
             return result;
@@ -542,10 +549,10 @@ class TsdsDataSource extends AbstractDataSource {
                 org.virbo.binarydatasource.Double data3 = (org.virbo.binarydatasource.Double)dataUrl(connect, 3*size, 3*points, -1, mon);
                 logit("done loading mean", t0);
 
-                data= data3.trim( 0, points );
-                BufferDataSet dataMin= data3.trim( 2*points, 3*points );
+                data= (BufferDataSet)data3.trim( 0, points );
+                BufferDataSet dataMin= (BufferDataSet)data3.trim( 2*points, 3*points );
                 dataMin.putProperty( QDataSet.NAME, "binmin" );
-                BufferDataSet dataMax= data3.trim( 1*points, 2*points );
+                BufferDataSet dataMax= (BufferDataSet)data3.trim( 1*points, 2*points );
                 dataMax.putProperty( QDataSet.NAME, "binmax" );
                 data.putProperty(QDataSet.DELTA_PLUS, Ops.subtract(dataMax, data));
                 data.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(data, dataMin));

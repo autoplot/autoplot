@@ -45,27 +45,27 @@ public class Application extends DomNode {
     }
 
     
-    public static final String PROP_PANELS = "panels";
-    protected List<Panel> panels = new LinkedList<Panel>();
+    public static final String PROP_PLOT_ELEMENTS = "plotElements";
+    protected List<PlotElement> plotElements = new LinkedList<PlotElement>();
 
-    public Panel[] getPanels() {
-        return panels.toArray(new Panel[panels.size()]);
+    public PlotElement[] getPlotElements() {
+        return plotElements.toArray(new PlotElement[plotElements.size()]);
     }
 
-    public void setPanels(Panel[] panels) {
-        Panel[] oldPanels = this.panels.toArray(new Panel[this.panels.size()]);
-        this.panels = Arrays.asList(panels);
-        propertyChangeSupport.firePropertyChange(PROP_PANELS, oldPanels, panels);
+    public void setPlotElements(PlotElement[] pele) {
+        PlotElement[] old = this.plotElements.toArray(new PlotElement[this.plotElements.size()]);
+        this.plotElements = Arrays.asList(pele);
+        propertyChangeSupport.firePropertyChange(PROP_PLOT_ELEMENTS, old, pele);
     }
 
-    public Panel getPanels(int index) {
-        return this.panels.get(index);
+    public PlotElement getPlotElements(int index) {
+        return this.plotElements.get(index);
     }
 
-    public void setPanels(int index, Panel newPanels) {
-        Panel oldPanels = this.panels.get(index);
-        this.panels.set(index, newPanels);
-        propertyChangeSupport.fireIndexedPropertyChange(PROP_PANELS, index, oldPanels, newPanels);
+    public void setPlotElements(int index, PlotElement pele) {
+        PlotElement old = this.plotElements.get(index);
+        this.plotElements.set(index, pele);
+        propertyChangeSupport.fireIndexedPropertyChange(PROP_PLOT_ELEMENTS, index, old, pele);
     }
     public static final String PROP_PLOTS = "plots";
     protected List<Plot> plots = new LinkedList<Plot>();
@@ -216,11 +216,11 @@ public class Application extends DomNode {
         }
         result.setPlots( plotsCopy );
 
-        Panel[] panelsCopy= this.getPanels();
-        for ( int i=0; i<panelsCopy.length; i++ ) {
-            panelsCopy[i]= (Panel) panelsCopy[i].copy();
+        PlotElement[] peleCopy= this.getPlotElements();
+        for ( int i=0; i<peleCopy.length; i++ ) {
+            peleCopy[i]= (PlotElement) peleCopy[i].copy();
         }
-        result.setPanels( panelsCopy );
+        result.setPlotElements( peleCopy );
 
         Connector[] connectorsCopy= this.getConnectors();
         for ( int i=0; i<connectorsCopy.length; i++ ) {
@@ -241,7 +241,7 @@ public class Application extends DomNode {
     public List<DomNode> childNodes() {
         ArrayList<DomNode> result = new ArrayList<DomNode>();
         result.addAll(plots);
-        result.addAll(panels);
+        result.addAll(plotElements);
         result.addAll(dataSourceFilters);
         result.addAll(canvases);
         result.add(options);
@@ -286,7 +286,7 @@ public class Application extends DomNode {
 
         addArrayDiffs( "dataSourceFilters", that.getDataSourceFilters(), this.getDataSourceFilters(), result );
 
-        addArrayDiffs( "panels", that.getPanels(), this.getPanels(), result );
+        addArrayDiffs( "plotElements", that.getPlotElements(), this.getPlotElements(), result );
 
         addArrayDiffs( "plots", that.getPlots(), this.getPlots(), result );
 
@@ -314,14 +314,14 @@ public class Application extends DomNode {
             result.addAll( DomUtil.childDiffs( "plots["+i+"]", thatPlot.diffs( thisPlot ) ) );
         }
 
-        for ( int i=0; i<Math.min(this.panels.size(),that.panels.size()); i++ ) {
-            result.addAll( DomUtil.childDiffs( "panels["+i+"]", that.getPanels(i).diffs( this.panels.get(i) ) ) );
+        for ( int i=0; i<Math.min(this.plotElements.size(),that.plotElements.size()); i++ ) {
+            result.addAll( DomUtil.childDiffs( "plotElements["+i+"]", that.getPlotElements(i).diffs( this.plotElements.get(i) ) ) );
         }
         
         result.addAll( DomUtil.childDiffs( "options", this.getOptions().diffs(  that.getOptions()) ));
 
         if ( !that.timeRange.equals( this.timeRange ) ) {
-            result.add( new PropertyChangeDiff( "timeRange", that.timeRange, this.timeRange ) );
+            result.add( new PropertyChangeDiff( "timeRange", this.timeRange, that.timeRange ) );  //TODO: why is this backwards but it works?
         }
 
         return result;

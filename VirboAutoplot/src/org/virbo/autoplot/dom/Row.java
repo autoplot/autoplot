@@ -54,7 +54,7 @@ public class Row extends DomNode {
     }
 
 
-    protected String bottom = "+100%-3em";
+    protected String bottom = "+100%-2em";
     public static final String PROP_BOTTOM = "bottom";
 
     public String getBottom() {

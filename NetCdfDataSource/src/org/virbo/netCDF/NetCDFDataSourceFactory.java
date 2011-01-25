@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
@@ -45,15 +46,18 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         
         if ( cc.context==CompletionContext.CONTEXT_PARAMETER_NAME ) {
-            String file= cc.resource.toString();
+            String file= DataSetURI.fromUri( cc.resourceURI );
             
             NetcdfDataset dataset= getDataSet( file );
             List<Variable> vars= (List<Variable>)dataset.getVariables();
             
             for ( int j=0; j<vars.size();j++ ) {
-                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME,
-                        vars.get(j).getName(), this, "arg_0" ,
-                        vars.get(j).getNameAndDimensions(), vars.get(j).getDescription(), true ) );
+                Variable v= vars.get(j);
+                if ( v.getDimensions().size()==0 ) continue;
+                result.add( new CompletionContext(
+                        CompletionContext.CONTEXT_PARAMETER_NAME,
+                        v.getName(), this, "arg_0",
+                        v.getNameAndDimensions(), v.getDescription(), true ) );
             }
         }
         
@@ -84,15 +88,18 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             Map params= URISplit.parseParams( split.params );
             
             NetcdfDataset dataset= getDataSet( split.file );
-            
+
             int depCount=0; // number of dependent variables--If there's just one, then we needn't identify it
             List<Variable> vars= (List<Variable>)dataset.getVariables();
             
             String lookfor= (String)params.get("arg_0");
+
+            if ( lookfor!=null ) lookfor= lookfor.replaceAll(" ", "+");  // change space back to plus
             boolean haveIt= false;
             
             for ( int j=0; j<vars.size();j++ ) {
                 Variable v= vars.get(j);
+                if ( v.getDimensions().isEmpty() ) continue;
                 List l= v.getDimension(0).getCoordinateVariables();
                 if ( l.size()>1 ) throw new IllegalArgumentException("Huh?");
                 for ( int i=0; i<l.size(); i++ ) {
@@ -101,7 +108,7 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
                         depCount++;
                     }
                 }
-                if ( v.getName().equals(lookfor) ) haveIt= true;
+                if ( v.getName().replaceAll(" ", "+").equals(lookfor) ) haveIt= true;
             }
             
             if ( depCount==1 ) {

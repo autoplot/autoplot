@@ -20,13 +20,20 @@ import org.virbo.dataset.QDataSet;
 public interface DataSource {
     
     /**
-     * retrieve the dataset.  This allowed to be sub-interactive or batch time scale, and will block until the dataset is produced.  
+     * retrieve the dataset.  This allowed to be sub-interactive or batch time scale, and will block
+     * until the dataset is produced.
+     *
+     * If the user cancelled the operation, then java.io.InterrupedIOExcaption or
+     * better yet org.das2.CancelledOperationException should be called.  These will
+     * simply display "cancelled" (or similar) on the status bar.
+     *
      */
     QDataSet getDataSet( ProgressMonitor mon ) throws Exception;
     
     /**
      *loading the data is slow, so load the data asynchronously (on a separate thread).  This
      *should return true if getDataSet will take more than 100 milliseconds (interactive time).
+     * Note this is currently ignored, and may be indefinately ignored.
      */
     boolean asynchronousLoad();
     

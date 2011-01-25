@@ -23,7 +23,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.virbo.autoplot.AutoPlotUI;
+import org.virbo.autoplot.AutoplotUI;
 
 /**
  *
@@ -31,10 +31,10 @@ import org.virbo.autoplot.AutoPlotUI;
  */
 public class JDiskHogPanel extends javax.swing.JPanel {
 
-    AutoPlotUI app;
+    AutoplotUI app;
 
     /** Creates new form JDiskHogPanel */
-    public JDiskHogPanel(AutoPlotUI model) {
+    public JDiskHogPanel(AutoplotUI model) {
         this.app = model;
         initComponents();
         jTree1.addMouseListener(createMouseListener(jTree1));

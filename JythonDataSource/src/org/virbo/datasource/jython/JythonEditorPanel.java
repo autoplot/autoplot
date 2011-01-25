@@ -11,21 +11,32 @@
 
 package org.virbo.datasource.jython;
 
+import java.awt.Dimension;
+import java.awt.Window;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
-import javax.swing.text.Element;
+import javax.swing.JTextField;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
@@ -40,13 +51,21 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     ScriptPanelSupport support;
     String suri;
     File file;
-
+    boolean hasVariables= false;
+    List<JTextField> tflist;
+    List<String> paramsList;
+    List<String> deftsList;
+    List<Character> typesList;  // only 'A' and 'F' right now
+    
     /** Creates new form JythonEditorPanel */
     public JythonEditorPanel() {
         initComponents();
+
         support= new ScriptPanelSupport(textArea);
         support.addCaretLabel(caretPositionLabel);
         support.addFileLabel(fileNameLabel);
+
+        
     }
 
     /** This method is called from within the constructor to
@@ -58,14 +77,15 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
         variableComboBox = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
+        tearoffTabbedPane1 = new org.das2.components.TearoffTabbedPane();
+        scriptPanel = new javax.swing.JPanel();
         caretPositionLabel = new javax.swing.JLabel();
         fileNameLabel = new javax.swing.JLabel();
-
-        jScrollPane1.setViewportView(textArea);
+        jScrollPane1 = new javax.swing.JScrollPane();
+        textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
+        paramsPanel = new javax.swing.JPanel();
 
         variableComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(running script)" }));
 
@@ -73,6 +93,33 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         jLabel1.setToolTipText("The dataset pointed to by the URI");
 
         caretPositionLabel.setText("1,1");
+
+        jScrollPane1.setViewportView(textArea);
+
+        org.jdesktop.layout.GroupLayout scriptPanelLayout = new org.jdesktop.layout.GroupLayout(scriptPanel);
+        scriptPanel.setLayout(scriptPanelLayout);
+        scriptPanelLayout.setHorizontalGroup(
+            scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+        );
+        scriptPanelLayout.setVerticalGroup(
+            scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(caretPositionLabel)))
+        );
+
+        tearoffTabbedPane1.addTab("script", scriptPanel);
+
+        paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
+        tearoffTabbedPane1.addTab("params", paramsPanel);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -82,24 +129,15 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(variableComboBox, 0, 270, Short.MAX_VALUE)
+                .add(variableComboBox, 0, 294, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 87, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+                .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(caretPositionLabel)
-                    .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(12, 12, 12)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(variableComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
@@ -112,6 +150,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     protected javax.swing.JLabel fileNameLabel;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JPanel paramsPanel;
+    public javax.swing.JPanel scriptPanel;
+    public org.das2.components.TearoffTabbedPane tearoffTabbedPane1;
     public org.virbo.jythonsupport.ui.EditorTextPane textArea;
     public javax.swing.JComboBox variableComboBox;
     // End of variables declaration//GEN-END:variables
@@ -120,30 +161,130 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         return this;
     }
 
+    private boolean doVariables( File f, Map<String,String> params ) {
+        BufferedReader reader= null;
+        boolean hasVars= false;
+        tflist= new ArrayList();
+        paramsList= new ArrayList();
+        deftsList= new ArrayList();
+        typesList= new ArrayList();
+
+        try {
+            reader = new LineNumberReader(new BufferedReader(new FileReader(f)));
+
+            String vnarg= "\\s*([a-z_][a-z0-9_]*)\\s*"; // any variable name  VERIFIED
+            String sarg= "\\s*\\'([a-z_][a-z0-9_]*)\\'\\s*"; // any variable name  VERIFIED
+            String aarg= "\\s*(\\'[^\\']+\\')\\s*"; // any argument
+            String farg= "\\s*([0-9\\.\\+-eE]+)\\s*"; // any float variable name
+            
+            Pattern p= Pattern.compile( vnarg+"=\\s*getParam\\("+sarg+"\\,"+aarg+"(\\,"+aarg + ")?\\).*" );
+            Pattern fp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+farg+"(\\,"+aarg + ")?\\).*" );
+
+            String line= reader.readLine();
+            while ( line!=null ) {
+                Matcher m= p.matcher(line);
+                if ( !m.matches() ) {
+                    m= fp.matcher(line);
+                }
+                if ( m.matches() ) {
+                    String vname= m.group(2);
+
+                    String label= m.group(1);
+                    if ( m.group(5)==null ) {
+                        label= m.group(1)+ ":";
+                    } else {
+                        String doc= m.group(5);
+                        doc= doc.substring(1,doc.length()-1);// pop off the quotes
+                        label= "<html>" + m.group(1) + ", <em>" + doc + "</em>:</html>";
+                    }
+                    JLabel l= new JLabel( label );
+                    l.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                    paramsPanel.add( l );
+                    JTextField tf= new JTextField(50);
+                    Dimension x= tf.getPreferredSize();
+                    x.width= Integer.MAX_VALUE;
+                    tf.setMaximumSize(x);
+                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+
+                    String val;
+                    if ( params.get(vname)!=null ) {
+                        val= params.get(vname);
+                        if ( val.startsWith("'") ) val= val.substring(1);
+                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                    } else {
+                        val= m.group(3);
+                    }
+
+                    tf.setText( val );
+                    paramsPanel.add( tf );
+                    tflist.add(tf);
+                    paramsList.add( m.group(2) );
+                    String pval= m.group(3);
+                    deftsList.add( pval );
+                    typesList.add( pval.startsWith("'") ? 'A' : 'F' );
+
+                    hasVars= true;
+                }
+                line= reader.readLine();
+            }
+
+            if ( !hasVars ) {
+                paramsPanel.add( new JLabel("<html><em>no parameters</em></html>") );
+            }
+
+            paramsPanel.add( Box.createVerticalGlue() );
+
+        } catch (IOException ex) {
+            Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return hasVars;
+
+    }
+
     public void setURI(String url) {
         try {
             this.suri= url;
             URISplit split= URISplit.parse(suri);
 
-            File f = DataSetURI.getFile( DataSetURI.getWebURL( new URI(url) ), new NullProgressMonitor());
+            File f = DataSetURI.getFile( DataSetURI.getResourceURI( DataSetURI.toUri(url) ), new NullProgressMonitor());
             
             support.loadFile(f);
-            Map<String,String> params= JythonDataSourceFactory.getParameters(url, new NullProgressMonitor() );
-            String[] dropList= new String[params.size()];
+            Map<String,String> results= JythonDataSourceFactory.getParameters(url, new NullProgressMonitor() );
+            String[] dropList= new String[results.size()+1];
             int i=0;
             int idx= -1;
-            for ( Entry<String,String> ent: params.entrySet()  ) {
-                dropList[i]= ent.getKey()+":  "+ent.getValue();
-                if ( split.params!=null && split.params.equals(ent.getKey()) ) {
-                    idx= i;
+
+            Map<String,String> params= URISplit.parseParams(split.params);
+
+            String param= params.remove("arg_0");
+
+            dropList[0]= "";
+            for ( Entry<String,String> ent: results.entrySet()  ) {
+                dropList[i+1]= ent.getKey()+":  "+ent.getValue();
+                if ( param!=null && param.equals(ent.getKey()) ) {
+                    idx= i+1;
                 }
                 i++;
             }
             variableComboBox.setModel( new DefaultComboBoxModel( dropList ) );
-            if ( idx>=0 ) variableComboBox.setSelectedIndex(idx);
+            if ( idx>=0 ) {
+                variableComboBox.setSelectedIndex(idx);
+            } else {
+                variableComboBox.setSelectedIndex(0);
+            }
+
+            hasVariables= doVariables(f,params);
+
+            if ( hasVariables ) {
+                tearoffTabbedPane1.setSelectedIndex(1);
+            }
             
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -151,13 +292,34 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     public String getURI() {
         URISplit split=  URISplit.parse(suri);
+
+        Map<String,String> params= URISplit.parseParams(split.params);
+
         String param= (String)variableComboBox.getSelectedItem();
         int i= param.indexOf(":");
         if ( i==-1 ) {
-            split.params= param.trim();
+            params.put( "arg_0", param.trim() );
         } else {
-            split.params= param.substring(0,i).trim();
+            params.put( "arg_0", param.substring(0,i).trim() );
         }
+
+        for ( int j=0; j<paramsList.size(); j++ ) {
+            String name= paramsList.get(j);
+            String value= tflist.get(j).getText();
+            String deft= deftsList.get(j);
+            char type= typesList.get(j);
+
+            if ( !value.equals(deft) || params.containsKey(name) ) {
+                if ( type=='A' ) {
+                    params.put( name, "'" + value + "'" );
+                } else {
+                    params.put( name, value );
+                }
+            }
+        }
+
+        split.params= URISplit.formatParams(params);
+        
         if ( support.isDirty() ) {
             try {
                 FileWriter writer = new FileWriter(support.getFile());
@@ -168,6 +330,21 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             }
         }
         return URISplit.format(split);
+    }
+
+    public boolean reject(String uri) throws Exception {
+        URISplit split= URISplit.parse(suri);
+        if ( split.file==null || split.file.length()==0 ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
+        File f = DataSetURI.getFile( DataSetURI.getResourceURI( DataSetURI.toUri(uri) ), mon );
+        return true;
     }
 
 }

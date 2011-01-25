@@ -1,4 +1,4 @@
-#label: Aggregate URIs
+#label: Aggregate All    # Note Autoplot gives it the same name when created.
 
 from java.util.regex import Pattern
 from java.lang import String
@@ -7,15 +7,23 @@ from java.util import Collections
 yyyy= "/\d{4}/"
 yyyymmdd= "(?<!\d)(\d{8})(?!\d)"  #"(\d{8})"
 yyyy_mm_dd= "\d{4}([\-_])\d{2}\1\d{2}"
+timerangePattern= 'timerange='
 
 version= "([Vv])\\d{2}" 
 
 count=0
 
+setStatus('busy: aggregating all...')
+
 oldDom= dom.copy()
 
 for dsf in dom.dataSourceFilters:
+   if ( dsf.uri==None ): continue
    result= String( dsf.uri )
+
+   if ( Pattern.compile( timerangePattern ).matcher(result).find() ):
+      print 'already found timerange: ', result
+      continue
 
    timeRange= ''
       
@@ -27,6 +35,7 @@ for dsf in dom.dataSourceFilters:
        if ( m.find() ):
             timeRange= m.group(0);
 
+   print timeRange
    if ( timeRange !='' ):
        result= String( result.replaceFirst(yyyy, '/\\$Y/') )   # force to java strings so Jeremy doesn't have to learn python
        result= String( result.replaceFirst(yyyymmdd, '\\$Y\\$m\\$d') )
@@ -43,9 +52,9 @@ for dsf in dom.dataSourceFilters:
        count= count + 1
        dsf.uri= result
 
-   for p in dom.controller.getPanelsFor(dsf):  # kludge to avoid reset range see ApplicationController.syncTo
+   for p in dom.controller.getPlotElementsFor(dsf):  # kludge to avoid reset range see ApplicationController.syncTo
        p.controller.setResetComponent(False)
-       p.controller.setResetPanel(False)
+       p.controller.setResetPlotElement(False)
        p.controller.doResetRenderType( p.getRenderType() )
        p.controller.setResetRenderType(False)
        p.setAutoLabel( False )

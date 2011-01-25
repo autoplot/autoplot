@@ -1,16 +1,20 @@
 #Sample script to make a set of summary plots
 
 import math
+from javax.imageio import ImageIO
+from java.awt import RenderingHints
+from org.autoplot.pngwalk import ImageResize
+from org.das2.util import DasPNGEncoder, DasPNGConstants
 
 def myWriteToPng( filename, appmodel, ldom, width, height ):
   appmodel.waitUntilIdle(False);
-  from org.das2.util import DasPNGEncoder, DasPNGConstants
   out= java.io.FileOutputStream( filename )
   image = ldom.canvases[0].controller.dasCanvas.getImage(width, height);
   encoder = DasPNGEncoder();
   encoder.addText( DasPNGConstants.KEYWORD_CREATION_TIME, java.util.Date().toString() );
   encoder.write(image, out)
   out.close();
+  return image
 
 def doBatch( times, dom, params, mon ):
 
@@ -28,25 +32,14 @@ def doBatch( times, dom, params, mon ):
 
    dom2= appmodel.getDocumentModel()
 
-   if ( params.createThumbs ):
-      appmodel3= ApplicationModel()
-      appmodel3.addDasPeersToApp()
-      dom3= appmodel3.getDocumentModel()
-   else:
-      dom3= dom2
-
    mon.setProgressMessage('synchronize to this application')
 
    dom2.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
-   dom2.options.autolayout= False
-   if ( params.createThumbs ):
-      dom3.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
-      dom3.options.autolayout= False
+   for p in dom2.getPlotElements():     # kludge for bug 2985891 since bug after cleanup.
+      p.controller.doResetRenderType( p.getRenderType() )
+   dom2.syncTo( dom, java.util.Arrays.asList( [ 'id' ]) )
 
    mon.setProgressMessage('write ' + params.product + '.vap' )
-
-   dom2.canvases[0].fitted=False
-   if ( params.createThumbs ): dom3.canvases[0].fitted=False
 
    thumbSize= 400
    w0= dom2.canvases[0].width
@@ -57,16 +50,10 @@ def doBatch( times, dom, params, mon ):
       thumbH= (int)( math.sqrt( thumbSize**2 / (aspect * aspect + 1. ) ) )
       thumbW= (int) ( thumbH * aspect )
 
-      dom3.canvases[0].width= thumbW
-      dom3.canvases[0].height= thumbH
-      dom3.options.canvasFont= 'Dialog-6'
-
    from org.virbo.autoplot.state import StatePersistence
    StatePersistence.saveState( java.io.File( params.outputFolder + params.product + '.vap' ), dom2 );
-   if ( params.createThumbs ): StatePersistence.saveState( java.io.File( params.outputFolder + 'thumbs400/' + params.product + '.vap' ), dom3 );
 
    dom2.getController().waitUntilIdle();
-   if ( params.createThumbs ): dom3.getController().waitUntilIdle();
 
    mon.setProgressMessage('making images')
 
@@ -80,10 +67,11 @@ def doBatch( times, dom, params, mon ):
       if ( mon.cancelled ): break
       mon.setTaskProgress(count)
       dom2.timeRange= tp.parse(i).getTimeRange()
-      if ( params.createThumbs ): dom3.timeRange= tp.parse(i).getTimeRange()
       mon.setProgressMessage('write '+ params.product + '_%s.png' %  i )
-      myWriteToPng( '%s%s_%s.png' % ( params.outputFolder, params.product, i ), appmodel, dom2, w0, h0 )
-      if ( params.createThumbs ): myWriteToPng( '%sthumbs400/%s_%s.png' % ( params.outputFolder, params.product, i ), appmodel3, dom3, thumbW, thumbH )
+      image= myWriteToPng( '%s%s_%s.png' % ( params.outputFolder, params.product, i ), appmodel, dom2, w0, h0 )
+      if ( params.createThumbs ):
+         thumb400= ImageResize.getScaledInstance( image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, True )
+         ImageIO.write( thumb400, 'png', java.io.File( '%sthumbs400/%s_%s.png' % ( params.outputFolder, params.product, i ) ) )
       imagesPerSec= count * 1000. / ( java.lang.System.currentTimeMillis()-t0 )
       #etaSec= (n-count) / imagesPerSec
       #etaStr= org.das2.datum.DatumUtil.asOrderOneUnits( Units.seconds.createDatum(etaSec) )
@@ -105,7 +93,10 @@ def showPngWalkInfoDialog():
     p.add( fln_rootTf )
 
     p.add( JLabel( 'Output Folder:' ) )
-    outputFolderTf= JTextField( '/tmp/pngwalk/' )
+
+    home= java.lang.System.getProperty( 'user.home' ) + java.lang.System.getProperty( 'file.separator' )
+    home= home.replace('\\','/')
+    outputFolderTf= JTextField( home + 'pngwalk/' )
     p.add( outputFolderTf )
 
     p.add( JLabel( 'Time Format:' ) )
@@ -161,11 +152,11 @@ if ( params!=None ):
 
    if ( not mon.cancelled ):
 
-     from org.autoplot.pngwalk import PngWalkTool1
      if ( params.outputFolder[1]==':' ):
        url= 'file:/'+params.outputFolder
      else:
        url= 'file:'+params.outputFolder
 
-   if ( getViewWindow()!=None ):
-      PngWalkTool1.start( url + params.product + '_' + params.timeFormat + '.png', getViewWindow() )
+     from org.autoplot.pngwalk import PngWalkTool1
+     if ( getViewWindow()!=None ):
+       PngWalkTool1.start( url + params.product + '_' + params.timeFormat + '.png', getViewWindow() )

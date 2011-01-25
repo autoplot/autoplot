@@ -16,8 +16,8 @@ import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.TableDataSetAdapter;
-import org.virbo.dataset.VectorDataSetAdapter;
+import org.das2.dataset.TableDataSetAdapter;
+import org.das2.dataset.VectorDataSetAdapter;
 
 /**
  * wrap aggregating DataSource into das2 DataSetDescriptor.

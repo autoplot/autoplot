@@ -6,7 +6,9 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import org.das2.datum.Datum;
@@ -44,6 +46,11 @@ public class PlotController extends DomNodeController {
     Plot plot;
     private DasPlot dasPlot;
     private DasColorBar dasColorBar;
+
+    /**
+     * the plot elements we listen to for autoranging.
+     */
+    public List<PlotElement> pdListen= new LinkedList();
 
     private static Logger logger= Logger.getLogger( PlotController.class.getName() );
 
@@ -89,6 +96,9 @@ public class PlotController extends DomNodeController {
                 dasPlot.setColumn(dasColumn);
                 plot.getXaxis().getController().getDasAxis().setColumn(dasColumn);
                 plot.getYaxis().getController().getDasAxis().setColumn(dasColumn);
+                // need to remove old column if no one is listening to it
+                DasColumn c= DasColorBar.getColorBarColumn(dasColumn);
+                dasColorBar.setColumn(c);
             }
         }
 
@@ -156,7 +166,7 @@ public class PlotController extends DomNodeController {
         //yaxis.setUseDomainDivider(true);
 
         if (UnitsUtil.isTimeLocation(xaxis.getUnits())) {
-            xaxis.setUserDatumFormatter(new DateTimeDatumFormatter());
+            xaxis.setUserDatumFormatter(new DateTimeDatumFormatter()); //See kludge in TimeSeriesBrowseController
         } else {
             xaxis.setUserDatumFormatter(null);
         }
@@ -199,7 +209,7 @@ public class PlotController extends DomNodeController {
         //plotId.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(plotId) ) ;
 
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
-        colorbar.setVisible(false);
+        if ( !dom.getController().isValueAdjusting() ) colorbar.setVisible(false);
 
         MouseModule zoomPan = new ZoomPanMouseModule(dasPlot1, dasPlot1.getXAxis(), dasPlot1.getYAxis());
         dasPlot1.getDasMouseInputAdapter().setSecondaryModule(zoomPan);
@@ -221,9 +231,9 @@ public class PlotController extends DomNodeController {
         ac.layoutListener.listenTo(colorbar);
 
         //TODO: clean up in an addDasPeer way
-        new AxisController(application, this.plot.getXaxis(), xaxis);
-        new AxisController(application, this.plot.getYaxis(), yaxis);
-        new AxisController(application, this.plot.getZaxis(), colorbar);
+        new AxisController(application, this.plot, this.plot.getXaxis(), xaxis);
+        new AxisController(application, this.plot, this.plot.getYaxis(), yaxis);
+        new AxisController(application, this.plot, this.plot.getZaxis(), colorbar);
 
         bindTo(dasPlot1);
         
@@ -237,6 +247,9 @@ public class PlotController extends DomNodeController {
         ac.bind(application.getOptions(), Options.PROP_DRAWMINORGRID, dasPlot1, "drawMinorGrid");
         ac.bind(application.getOptions(), Options.PROP_OVERRENDERING, dasPlot1, "overSize");
 
+        ac.bind(this.plot, Plot.PROP_VISIBLE, dasPlot1, "visible" );
+        ac.bind(this.plot, Plot.PROP_COLORTABLE, colorbar, "type" );
+        
         dasPlot1.addPropertyChangeListener(listener);
         dasPlot1.getXAxis().addPropertyChangeListener(listener);
         dasPlot1.getYAxis().addPropertyChangeListener(listener);
@@ -265,7 +278,9 @@ public class PlotController extends DomNodeController {
             if (e.getSource() instanceof DasAxis) {
                 DasAxis axis = (DasAxis) e.getSource();
 
-                if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) || e.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
+                if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) 
+                        || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE )
+                        || e.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
                     if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
                         axis.setUserDatumFormatter(new DateTimeDatumFormatter());
                     } else {
@@ -281,6 +296,17 @@ public class PlotController extends DomNodeController {
                     checkIsotropic(axis);
                 }
 
+            } else if ( e.getPropertyName().equals( DasPlot.PROP_FOCUSRENDERER ) ) {
+
+                List<PlotElement> eles= PlotController.this.dom.controller.getPlotElementsFor(plot);
+                PlotElement fe= null;
+                for ( PlotElement ele: eles ) {
+                    if ( ele.getController().getRenderer()== e.getNewValue() ) {
+                        fe= ele;
+                    }
+                }
+                if ( fe!=null ) PlotController.this.dom.controller.setPlotElement( fe );
+
             }
 
         }
@@ -295,15 +321,15 @@ public class PlotController extends DomNodeController {
     }
 
     /**
-     * set the zoom so that all of the panels' data is visible.  Thie means finding
-     * the "union" of each panels' plotDefault ranges.  If any panel's default log
+     * set the zoom so that all of the plotElements' data is visible.  Thie means finding
+     * the "union" of each plotElements' plotDefault ranges.  If any plotElement's default log
      * is false, then the new setting will be false.
      */
     public void resetZoom(boolean x, boolean y, boolean z) {
-        List<Panel> panels = dom.controller.getPanelsFor(plot);
-        if ( panels.size()==0 ) return;
+        List<PlotElement> elements = dom.controller.getPlotElementsFor(plot);
+        if ( elements.size()==0 ) return;
         Plot newSettings = null;
-        for (Panel p : panels) {
+        for (PlotElement p : elements) {
             Plot plot1 = p.getPlotDefaults();
             if ( p.isActive() && plot1.getXaxis().isAutoRange() ) {  // we use autoRange to indicate these are real settings, not just the defaults.
                 if (newSettings == null) {
@@ -317,7 +343,7 @@ public class PlotController extends DomNodeController {
                         newSettings.zaxis.range = DatumRangeUtil.union(newSettings.zaxis.range, plot1.getZaxis().getRange());
                         newSettings.zaxis.log = newSettings.zaxis.log & plot1.zaxis.log;
                     } catch ( InconvertibleUnitsException ex ) {
-                        logger.info("panels on the same plot have inconsistent units");
+                        logger.info("plot elements on the same plot have inconsistent units");
                     }
                 }
             }
@@ -346,10 +372,22 @@ public class PlotController extends DomNodeController {
             plot.getZaxis().setAutoRange(true);
         }
     }
-
+    
     PropertyChangeListener plotDefaultsListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            doPanelDefaultsChange((Panel)evt.getSource());
+            PlotElement pele= (PlotElement)evt.getSource();
+            List<PlotElement> pp= PlotController.this.dom.getController().getPlotElementsFor(plot);
+            if ( pp.contains(pele) ) {
+                pp.remove(pele);
+            } else {
+                System.err.println("Plot "+plot+"doesn't contain the source plotElement "+plotElement +" see bug 2992903" ); //bug 2992903
+                return;
+            }
+            
+            if ( pele.isAutoRenderType() && pp.size()==0 ) {
+                PlotController.this.setAutoBinding(true);
+            }
+            doPlotElementDefaultsChange(pele);
         }
     };
 
@@ -359,33 +397,65 @@ public class PlotController extends DomNodeController {
         }
     };
 
-    Panel panel;
+    PlotElement plotElement;
 
-    PropertyChangeListener panelDataSetListener= new PropertyChangeListener() {
+    private PropertyChangeListener plotElementDataSetListener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
-            if ( plot.getTitle().contains("%{CONTEXT}" ) ) {
-                QDataSet pds= panel.getController().getDataSet();
-                String title= plot.getTitle();
-                if ( pds!=null ) {
-                    String contextStr= DataSetUtil.contextAsString(pds);
-                    title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+            String contextStr;
+            String shortContextStr;
+            QDataSet pds= plotElement.getController().getDataSet();
+            if ( pds!=null ) {
+                contextStr= DataSetUtil.contextAsString(pds);
+                shortContextStr= contextStr;
+                if ( !contextStr.equals("") ) {
+                    String[] ss= contextStr.split("=");
+                    if ( ss.length==2 ) {
+                        shortContextStr= ss[1];
+                    }
                 }
+            } else {
+                contextStr= "";
+                shortContextStr= "";
+            }
+            if ( plot.getTitle().contains("%{CONTEXT}" ) ) {
+                String title= plot.getTitle();
+                title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
                 dasPlot.setTitle(title);
+            }
+            if ( plot.getYaxis().getLabel().contains("%{CONTEXT}") ) {
+                String title= plot.getYaxis().getLabel();
+                title= title.replaceAll("%\\{CONTEXT\\}", shortContextStr );
+                dasPlot.getYAxis().setLabel(title);
+            }
+            if ( plot.getXaxis().getLabel().contains("%{CONTEXT}") ) {
+                String title= plot.getXaxis().getLabel();
+                title= title.replaceAll("%\\{CONTEXT\\}", shortContextStr );
+                dasPlot.getXAxis().setLabel(title);
             }
         }
     };
 
+    /**
+     * check to see if the render type needs a colorbar by default.  If the
+     * changes are happening automatically, then return without doing anything.
+     */
     private void checkRenderType() {
+        if ( dom.getController().isValueAdjusting() ) return;
         boolean needsColorbar = false;
-        for (Panel p : dom.getController().getPanelsFor(plot)) {
+        for (PlotElement p : dom.getController().getPlotElementsFor(plot)) {
             if (RenderTypeUtil.needsColorbar(p.getRenderType())) {
                 needsColorbar = true;
             }
         }
         dasColorBar.setVisible(needsColorbar);
+        plot.getZaxis().setVisible(needsColorbar);
     }
 
-    void addPanel(Panel p) {
+    void addPlotElement(PlotElement p) {
+        addPlotElement(p,true);
+    }
+
+    synchronized void addPlotElement(PlotElement p,boolean reset) {
         Renderer rr= p.controller.getRenderer();
         if ( rr!=null ) {
             if ( rr instanceof SpectrogramRenderer ) {
@@ -395,35 +465,36 @@ public class PlotController extends DomNodeController {
             }
         }
         RenderType rt = p.getRenderType();
-        p.controller.doResetRenderType(rt);
-        doPanelDefaultsChange(p);
-        p.addPropertyChangeListener( Panel.PROP_PLOT_DEFAULTS, plotDefaultsListener );
-        p.addPropertyChangeListener( Panel.PROP_RENDERTYPE, renderTypeListener );
+        p.setPlotId(plot.getId());
+        if ( reset ) p.controller.doResetRenderType(rt);
+        doPlotElementDefaultsChange(p);
+        if ( !pdListen.contains(p) ) {
+            p.addPropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
+            p.addPropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
+            pdListen.add(p);
+        }
+        p.setPlotId(plot.getId());
         checkRenderType();
     }
 
-    void removePanel(Panel p) {
+    synchronized void removePlotElement(PlotElement p) {
         Renderer rr= p.controller.getRenderer();
         if ( rr!=null ) dasPlot.removeRenderer(rr);
-        doPanelDefaultsChange(null);
-        p.removePropertyChangeListener( Panel.PROP_PLOT_DEFAULTS, plotDefaultsListener );
-        p.removePropertyChangeListener( Panel.PROP_RENDERTYPE, renderTypeListener );
+        doPlotElementDefaultsChange(null);
+        p.removePropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
+        p.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
+        pdListen.remove(p);
+        p.setPlotId("");
         checkRenderType();
     }
 
     /**
-     * check all the panels' plot defaults, so that properties marked as automatic can be reset.
-     * @param panel
+     * check all the plotElements' plot defaults, so that properties marked as automatic can be reset.
+     * @param plotElement
      */
-    private void doPanelDefaultsChange( Panel panel ) {
+    private void doPlotElementDefaultsChange( PlotElement pele ) {
 
-        if ( panel!=null ) {
-            if ( panel.getPlotDefaults().getXaxis().isAutoRange()==false ) {
-                return;
-            }
-        }
-        
-        if ( panel!=null && isAutoBinding() ) doCheckBindings( plot, panel.getPlotDefaults() );
+        if ( pele!=null && isAutoBinding() ) doCheckBindings( plot, pele.getPlotDefaults() );
 
         List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
         BindingModel existingBinding= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.xaxis, Axis.PROP_RANGE );
@@ -433,29 +504,70 @@ public class PlotController extends DomNodeController {
             }
         }
 
-        if ( DomUtil.oneFamily( dom.getController().getPanelsFor(plot) ) ) {
-            Panel p= dom.getController().getPanelsFor(plot).get(0);
-            if ( !p.getParentPanel().equals("") ) p = p.getController().getParentPanel();
-            if ( this.panel!=null ) {
-                this.panel.getController().removePropertyChangeListener( PanelController.PROP_DATASET, panelDataSetListener );
+        if ( DomUtil.oneFamily( dom.getController().getPlotElementsFor(plot) ) ) {
+            PlotElement p= dom.getController().getPlotElementsFor(plot).get(0);
+            if ( !p.getParent().equals("") && p.getController().getParentPlotElement()!=null ) {
+                p = p.getController().getParentPlotElement();
             }
-            this.panel= p;
-            this.panel.getController().addPropertyChangeListener( PanelController.PROP_DATASET, panelDataSetListener );
-            if ( plot.isAutoLabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
-            if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
-            if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
-            if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().setLabel( p.getPlotDefaults().getZaxis().getLabel() );
-            if ( plot.getXaxis().isAutoRange() && plot.getYaxis().isAutoRange() ) {
-                plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
+            if ( !p.getParent().equals("") && p.getController().getParentPlotElement()==null ) {
+                logger.warning("reference to non-existent parent in "+p);
+            }
+            if ( this.plotElement!=null ) {
+                this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+            }
+            this.plotElement= p;
+            this.plotElement.getController().addPropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
+            if ( pele==null || pele.getPlotDefaults().getXaxis().isAutoRange()!=false ) { //TODO: why is this?  /home/jbf/ct/hudson/vap/geo_1.vap wants it
+                if ( plot.isAutoLabel() ) plot.setTitle( p.getPlotDefaults().getTitle() );
+                if ( plot.getXaxis().isAutoLabel() ) plot.getXaxis().setLabel( p.getPlotDefaults().getXaxis().getLabel() );
+                if ( plot.getYaxis().isAutoLabel() ) plot.getYaxis().setLabel( p.getPlotDefaults().getYaxis().getLabel() );
+                if ( plot.getZaxis().isAutoLabel() ) plot.getZaxis().setLabel( p.getPlotDefaults().getZaxis().getLabel() );
+                if ( plot.getXaxis().isAutoRange() && plot.getYaxis().isAutoRange() ) {
+                    plot.setIsotropic( p.getPlotDefaults().isIsotropic() );
+                }
             }
         }
 
-        resetZoom( plot.getXaxis().isAutoRange(), plot.getYaxis().isAutoRange(), plot.getZaxis().isAutoRange() );
+        if ( dom.getController().getPlotElementsFor(plot).size()==0 ) {
+            //System.err.println("should this happen?  see bug 2992903");
+        }
+
+        if ( pele==null || pele.getPlotDefaults().getXaxis().isAutoRange()!=false ) {
+            resetZoom( plot.getXaxis().isAutoRange(), plot.getYaxis().isAutoRange(), plot.getZaxis().isAutoRange() );
+        }
+    }
+
+    /** 
+     * see https://sourceforge.net/tracker/?func=detail&aid=3104572&group_id=199733&atid=970682  We've loaded an old
+     * vap file and we need to convert units.dimensionless to a correct unit.
+     * @param e
+     */
+    protected void doPlotElementDefaultsUnitsChange( PlotElement e ) {
+        DatumRange elerange;
+        DatumRange range;
+        elerange= e.getPlotDefaults().getXaxis().getRange();
+        range=  plot.getXaxis().getRange();
+        if ( elerange.getUnits() != range.getUnits() && range.getUnits()==Units.dimensionless ) {
+            DatumRange dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+            plot.getXaxis().setRange( dr );
+        }
+        elerange= e.getPlotDefaults().getYaxis().getRange();
+        range=  plot.getYaxis().getRange();
+        if ( elerange.getUnits() != range.getUnits() && range.getUnits()==Units.dimensionless ) {
+            DatumRange dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+            plot.getYaxis().setRange( dr );
+        }
+        elerange= e.getPlotDefaults().getZaxis().getRange();
+        range=  plot.getZaxis().getRange();
+        if ( elerange.getUnits() != range.getUnits() && range.getUnits()==Units.dimensionless  ) {
+            DatumRange dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+            plot.getZaxis().setRange( dr );
+        }
 
     }
 
     /**
-     * after autoranging, we need to check to see if a panel's plot looks like
+     * after autoranging, we need to check to see if a plotElement's plot looks like
      * it should be automatically bound or unbound.
      *
      * We unbind if changing this plot's axis settings will make another plot
@@ -467,9 +579,10 @@ public class PlotController extends DomNodeController {
      */
     private void doCheckBindings( Plot plot, Plot newSettings ) {
         boolean shouldBindX= false;
+        boolean shouldSetAxisRange= false; // true indicates that the dom.timeRange already contains the range
         List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, null, Axis.PROP_RANGE );
         BindingModel bm= dom.getController().findBinding( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
-        bms.remove(bm);
+        if ( bm!=null ) bms.remove(bm);
 
         if ( ! plot.isAutoBinding() ) {
             return;
@@ -485,24 +598,51 @@ public class PlotController extends DomNodeController {
         }
 
         if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutoRange() ) {
-            if ( bms.size()==0 ) {
-                dom.setTimeRange( plot.getXaxis().getRange() );
+            if ( bms.size()==0 && UnitsUtil.isTimeLocation( newSettings.getXaxis().getRange().getUnits() ) ) {
+                dom.setTimeRange( newSettings.getXaxis().getRange() );
                 shouldBindX= true;
+                shouldSetAxisRange= true;
             }
             DatumRange xrange= newSettings.getXaxis().getRange();
-            if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) ) {
-                if ( dom.timeRange.intersects( xrange ) ) {
-                    double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.2 : 0.8;
-                    double overlap= DatumRangeUtil.normalize( dom.timeRange, xrange.max() ) - DatumRangeUtil.normalize( dom.timeRange, xrange.min() );
-                    if ( overlap > 1.0 ) overlap= 1/overlap;
-                    if ( overlap > reqOverlap ) {
-                        shouldBindX= true;
+            if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) &&
+                    UnitsUtil.isTimeLocation(xrange.getUnits()) ) {
+                if ( dom.controller.isConnected( plot ) ) {
+                    logger.log(Level.FINER, "not binding because plot is connected: {0}", plot);
+                    // don't bind a connected plot.
+                } else if ( dom.timeRange.intersects( xrange ) ) {
+                    // we want to support the case where we've zoomed in on a range and want to
+                    // add another parameter.  We need to be more aggressive about binding in this
+                    // case.
+                    double reqOverlap= UnitsUtil.isTimeLocation( dom.timeRange.getUnits() ) ? 0.01 : 0.8;
+                    DatumRange droverlap= DatumRangeUtil.sloppyIntersection( xrange, dom.timeRange );
+                    try {
+                        double overlap= droverlap.width().divide(dom.timeRange.width()).doubleValue(Units.dimensionless);
+                        if ( overlap > 1.0 ) overlap= 1/overlap;
+                        if ( overlap > reqOverlap ) {
+                            shouldBindX= true;
+                            logger.finer("binding axis because there is significant overlap");
+                            dom.getController().setStatus("binding axis because there is significant overlap");
+                        }
+                    } catch ( InconvertibleUnitsException ex ) {
+                        shouldBindX= false;
+                    } catch ( IllegalArgumentException ex ) {
+                        shouldBindX= false;  //logERatio
                     }
                 }
             }
         }
+
+        if ( shouldBindX && !plot.getColumnId().equals( dom.getCanvases(0).getMarginColumn().getId() ) ) {
+            logger.finer("not binding because plot is not attached to marginRow: "+ plot.getXaxis() );
+            //TODO: Reiner has a two-column canvas that has each plot bound.  It might be
+            //  nice to support this.
+            shouldBindX= false;
+            dom.getController().setStatus("not binding axis because plot is not attached to marginRow");
+        }
+        
         if ( bm==null && shouldBindX ) {
             logger.finer("add binding because ranges overlap: "+ plot.getXaxis());
+            plot.getXaxis().setLog(false);
             dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
             //if ( !CanvasUtil.getMostBottomPlot(dom.getController().getCanvasFor(plot))==plot ) {
             //    plot.getXaxis().setDrawTickLabels(false);
@@ -560,19 +700,56 @@ public class PlotController extends DomNodeController {
         }
     }
 
-    private synchronized void bindTo(DasPlot p) {
-        ApplicationController ac= dom.controller;
-        ac.bind( this.plot, "title", p, "title", new Converter() {
+    Converter contextConverter= new Converter() {
+        @Override
+        public Object convertForward(Object value) {
+            String title= (String)value;
+            if ( title.contains("%{CONTEXT}" ) ) {
+                QDataSet context;
+                String contextStr="";
+                if ( plotElement!=null && plotElement.getController()!=null ) {
+                    QDataSet ds= plotElement.getController().getDataSet();
+                    if ( ds!=null ) {
+                        contextStr= DataSetUtil.contextAsString(ds);
+                    }
+                }
+                title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+            }
+            return title;
+        }
+
+        @Override
+        public Object convertReverse(Object value) {
+            String title= (String)value;
+            String ptitle=  plot.getTitle();
+            if (ptitle.contains("%{CONTEXT}") ) {
+                String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
+                if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
+                    return ptitle;
+                }
+            }
+            return title;
+        }
+    };
+
+    Converter labelContextConverter( final Axis axis ) {
+        return new Converter() {
             @Override
             public Object convertForward(Object value) {
                 String title= (String)value;
                 if ( title.contains("%{CONTEXT}" ) ) {
                     QDataSet context;
                     String contextStr="";
-                    if ( panel!=null && panel.getController()!=null ) {
-                        QDataSet ds= panel.getController().getDataSet();
+                    if ( plotElement!=null && plotElement.getController()!=null ) {
+                        QDataSet ds= plotElement.getController().getDataSet();
                         if ( ds!=null ) {
                             contextStr= DataSetUtil.contextAsString(ds);
+                            if ( !contextStr.equals("") ) {
+                                String[] ss= contextStr.split("=");
+                                if ( ss.length==2 ) {
+                                    contextStr= ss[1]; // shorten if it is of the form A=B to just B
+                                }
+                            }
                         }
                     }
                     title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
@@ -583,7 +760,7 @@ public class PlotController extends DomNodeController {
             @Override
             public Object convertReverse(Object value) {
                 String title= (String)value;
-                String ptitle=  plot.getTitle();
+                String ptitle=  axis.getLabel();
                 if (ptitle.contains("%{CONTEXT}") ) {
                     String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
                     if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
@@ -592,7 +769,12 @@ public class PlotController extends DomNodeController {
                 }
                 return title;
             }
-        } );
+        };
+    }
+
+    private synchronized void bindTo(DasPlot p) {
+        ApplicationController ac= dom.controller;
+        ac.bind( this.plot, "title", p, "title", contextConverter );
     }
 
     public BindingModel[] getBindings() {
@@ -604,17 +786,17 @@ public class PlotController extends DomNodeController {
     }
 
 
-    protected JMenuItem panelPropsMenuItem = null;
-    public static final String PROP_PANELPROPSMENUITEM = "panelPropsMenuItem";
+    protected JMenuItem plotElementPropsMenuItem = null;
+    public static final String PROP_PLOTELEMENTPROPSMENUITEM = "plotElementPropsMenuItem";
 
-    public JMenuItem getPanelPropsMenuItem() {
-        return panelPropsMenuItem;
+    public JMenuItem getPlotElementPropsMenuItem() {
+        return plotElementPropsMenuItem;
     }
 
-    public void setPanelPropsMenuItem(JMenuItem panelPropsMenuItem) {
-        JMenuItem oldPanelPropsMenuItem = this.panelPropsMenuItem;
-        this.panelPropsMenuItem = panelPropsMenuItem;
-        propertyChangeSupport.firePropertyChange(PROP_PANELPROPSMENUITEM, oldPanelPropsMenuItem, panelPropsMenuItem);
+    public void setPlotElementPropsMenuItem(JMenuItem pelePropsMenuItem) {
+        JMenuItem old = this.plotElementPropsMenuItem;
+        this.plotElementPropsMenuItem = pelePropsMenuItem;
+        propertyChangeSupport.firePropertyChange(PROP_PLOTELEMENTPROPSMENUITEM, old, pelePropsMenuItem);
     }
 
     public Application getApplication() {

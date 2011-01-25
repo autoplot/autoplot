@@ -15,7 +15,7 @@ import org.das2.datum.Units;
 import org.das2.graph.DasColorBar.Type;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.PlotSymbol;
-import org.virbo.autoplot.dom.PanelStyle;
+import org.virbo.autoplot.dom.PlotElementStyle;
 import org.virbo.autoplot.dom.Plot;
 
 /**
@@ -72,15 +72,15 @@ public class PersistenceTests {
         propertyChangeSupport.firePropertyChange(PROP_PLOT, oldPlot, plot);
     }
 
-    protected PanelStyle style = new PanelStyle();
+    protected PlotElementStyle style = new PlotElementStyle();
     public static final String PROP_STYLE = "style";
 
-    public PanelStyle getStyle() {
+    public PlotElementStyle getStyle() {
         return style;
     }
 
-    public void setStyle(PanelStyle style) {
-        PanelStyle oldStyle = this.style;
+    public void setStyle(PlotElementStyle style) {
+        PlotElementStyle oldStyle = this.style;
         this.style = style;
         propertyChangeSupport.firePropertyChange(PROP_STYLE, oldStyle, style);
     }

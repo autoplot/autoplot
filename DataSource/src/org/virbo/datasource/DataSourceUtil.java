@@ -12,11 +12,8 @@ package org.virbo.datasource;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -24,6 +21,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +31,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.das2.fsm.FileStorageModelNew;
-import org.das2.util.TimeParser;
-import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
+import org.das2.datum.TimeParser;
 
 /**
  *
@@ -183,11 +179,15 @@ public class DataSourceUtil {
             DatumRange dr = null;
             // remove parameter
             sagg = URISplit.removeParam(sagg, "timerange");
-            TimeParser tp = TimeParser.create(sagg);
+            TimeParser tp;
             try {
+                tp= TimeParser.create(sagg);
                 tp.parse(surl);
             } catch (ParseException ex) {
                 continue;
+            } catch ( IllegalArgumentException ex ) {
+                ex.printStackTrace(); 
+                continue; // bad format code "N" from "file:///c:/WINDOWS/$NtUninstallKB2079403$/"
             }
             dr = tp.getTimeRange();
             DatumRange dr1= dr; // keep track of the first one to measure continuity.
@@ -276,42 +276,113 @@ public class DataSourceUtil {
     }
 
     /**
-     * attempt to create an equivalent URL that uses an aggregation template
-     * instead of the explicit filename.
-     * For example, file:/tmp/20091102.dat -> file:/tmp/%Y%m%d.dat?timerange=20091102
-     * @param surl
+     * return the replacement or null.  remove the used items.
+     * @param s
+     * @param search
      * @return
      */
+    private static String replaceLast( String s, List<String> search, List<String> replaceWith, List<Integer> resolution ) {
+        Map<String,Integer> found= new HashMap();
+        int last= -1;
+        String flast= null;
+        String frepl= null;
+        int best= -1;
+        int n= search.size();
+
+        while (true ) {
+            for ( int i=0; i<n; i++ ) {
+                if ( search.get(i)==null ) continue; // search.get(i)==null means that search is no longer elagable.
+                Matcher m= Pattern.compile(search.get(i)).matcher(s);
+                int idx= -1;
+                while ( m.find() ) idx= m.start();
+                if ( idx>-1 ) {
+                    found.put( search.get(i), idx );
+                    if ( idx>last ) {
+                        last= idx;
+                        flast= search.get(i);
+                        frepl= replaceWith.get(i);
+                        best= i;
+                    }
+                }
+            }
+            if ( best>-1 ) {
+                s= s.substring(0,last) + s.substring(last).replaceAll(flast, frepl);
+                int res= resolution.get(best);
+                int count=0;
+                for ( int i=0; i<n; i++ ) {
+                    if ( resolution.get(i)>res ) {
+                        count++;
+                        search.set(i,null);
+                    }
+                }
+                if ( count==search.size() ) {
+                    return s;
+                } else {
+                    best= -1;
+                    last= -1; //search for courser resolutions
+                }
+            } else {
+                return s;
+            }
+        }
+    }
+    /**
+     * attempt to create an equivalent URL that uses an aggregation template
+     * instead of the explicit filename.
+     * For example, file:/tmp/20091102.dat -> file:/tmp/$Y$m$d.dat?timerange=20091102
+     * @param surl
+     * @return the string with aggregations ($Y.dat) instead of filename (1999.dat)
+     */
     public static String makeAggregation( String surl ) {
-        String yyyy= "/\\d{4}/";
-        String yyyymmdd= "(?<!\\d)(\\d{8})(?!\\d)"; //"(\\d{8})";
-        String yyyy_mm_dd= "\\d{4}([\\-_])\\d{2}\\1\\d{2}";
-        String yyyy_jjj= "\\d{4}([\\-_])\\d{3}";
+        String yyyy= "/(19|20)\\d{2}/";
+
+        String yyyymmdd= "(?<!\\d)(19|20)(\\d{6})(?!\\d)"; //"(\\d{8})";
+        String yyyyjjj= "(?<!\\d)(19|20)\\d{2}\\d{3}(?!\\d)";
+        String yyyymm= "(?<!\\d)(19|20)\\d{2}\\d{2}(?!\\d)";
+        String yyyy_mm_dd= "(?<!\\d)(19|20)\\d{2}([\\-_])\\d{2}\\1\\d{2}(?!\\d)";
+        String yyyy_jjj= "(?<!\\d)(19|20)\\d{2}([\\-_])\\d{3}(?!\\d)";
+
         String version= "([Vv])\\d{2}";
+
         String result= surl;
 
-        String[] abs= new String[] { yyyymmdd, yyyy_mm_dd, yyyy_jjj };
+        String[] abs= new String[] { yyyymmdd, yyyy_mm_dd, yyyy_jjj, yyyyjjj, yyyymm };
 
         String timeRange=null;
         for ( int i= 0; i<abs.length; i++ ) {
             Matcher m= Pattern.compile(abs[i]).matcher(surl);
             if ( m.find() ) {
                 timeRange= m.group(0);
+                break; // we found something
             }
         }
 
         if ( timeRange==null ) return null;
 
-        result= result.replaceFirst(yyyy_jjj, "\\$Y$1\\$j");
-        result= result.replaceFirst(yyyymmdd, "\\$Y\\$m\\$d");
-        result= result.replaceFirst(yyyy_mm_dd, "\\$Y$1\\$m$1\\$d" );
-        result= result.replaceFirst(yyyy, "/\\$Y/");
+        int day= TimeUtil.DAY;
+        int year= TimeUtil.YEAR;
+        int month= TimeUtil.MONTH;
 
-        result= result.replaceFirst(version, "$1..");
-        
-        return result 
-                + ( result.contains("?") ? "&" : "?" )
-                + "timerange="+timeRange;
+        List<String> search= new ArrayList( Arrays.asList( yyyy_jjj, yyyymmdd, yyyyjjj, yyyymm, yyyy_mm_dd, yyyy ) );
+        List<String> replac= new ArrayList( Arrays.asList( "\\$Y$2\\$j", "\\$Y\\$m\\$d","\\$Y\\$j","\\$Y\\$m", "\\$Y$2\\$m$2\\$d","/\\$Y/" ) );
+        List<Integer> resol= new ArrayList( Arrays.asList( day, day, day, month, day, year ) );
+        String s= replaceLast( result, 
+                search,
+                replac,
+                resol );
+
+        try {
+            TimeParser tp= TimeParser.create(s);
+            timeRange= tp.parse(surl).getTimeRange().toString();
+            //s= s.replaceFirst(version, "$1\\$2v"); //TODO: version causes problems elsewhere, see line 189.
+            result= s;
+            
+            return result
+                    + ( result.contains("?") ? "&" : "?" )
+                    + "timerange="+timeRange;
+        } catch ( ParseException ex ) {
+            return null;
+        }
     }
     
     /** 
@@ -333,6 +404,19 @@ public class DataSourceUtil {
 	    }
 	}
 	return buf.toString();
+    }
+
+    /**
+     * return true if the string is a java identifier.
+     * @param label
+     * @return
+     */
+    public static boolean isJavaIdentifier( String label ) {
+        if ( label.length()==0 || !Character.isJavaIdentifierStart(label.charAt(0)) ) return false;
+        for ( int i=1; i<label.length(); i++ ) {
+            if ( !Character.isJavaIdentifierPart(label.charAt(i) ) ) return false;
+        }
+        return true;
     }
 
     public static String strjoin(Collection<String> c, String delim) {

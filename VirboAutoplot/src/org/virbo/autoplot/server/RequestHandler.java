@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
-import org.virbo.autoplot.AutoPlotUI;
+import org.virbo.autoplot.AutoplotUI;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.ScriptContext;
 
@@ -51,7 +51,7 @@ public class RequestHandler {
         try {
             PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
 
-            interp.execfile(AutoPlotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
+            interp.execfile(AutoplotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
             interp.setOut( out );
             
             ScriptContext._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems

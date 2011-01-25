@@ -27,6 +27,10 @@ if [ "" = "$CODEBASE" ]; then
     CODEBASE=NEED_CODEBASE_TO_BE_DEFINED_IN_COMPILE_SCRIPT
 fi
 
+if [ "" = "$HUDSON_URL" ]; then
+    HUDSON_URL="http://papco.org:8080/hudson"
+fi
+
 rm -r -f temp-stable-src/
 mkdir temp-stable-src/
 rm -r -f temp-volatile-src/
@@ -56,15 +60,18 @@ echo "done copy jar file classes."
 
 echo "copy sources..."
 for i in \
-  QDataSet QStream dasCore DataSource \
+  dasCore dasCoreUtil dasCoreDatum \
+  QDataSet QStream DataSource \
   JythonSupport \
+  AutoplotHelp \
   IdlMatlabSupport \
   AudioSystemDataSource \
   BinaryDataSource DataSourcePack JythonDataSource \
   Das2ServerDataSource TsdsDataSource  \
-  NetCdfDataSource CdfDataSource CefDataSource \
+  NetCdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
+  CdfDataSource CdfJavaDataSource CDAWebDataSource \
   VirboAutoplot; do
     echo rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
     rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
@@ -101,7 +108,7 @@ for i in `ls ../*/src/META-INF/$file` ; do
    cat $i >> temp-volatile-classes/META-INF/$file
 done
 
-echo "Main-Class: org.virbo.autoplot.AutoPlotUI" > temp-volatile-src/MANIFEST.MF
+echo "Main-Class: org.virbo.autoplot.AutoplotUI" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm temp-volatile-classes/META-INF/*.RSA
@@ -125,22 +132,10 @@ cd temp-volatile-src
 #mkdir -p ../temp-volatile-classes/org/virbo/datasource/
 #mkdir -p ../temp-volatile-classes/org/netbeans/modules/editor/completion/resources/
 
-for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' ); do
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.xsl' -o -name '*.xsd' ); do
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
-#for i in `find * -name '*.gif'`; do
-#   cp $i ../temp-volatile-classes/$i
-#done
-#for i in `find * -name '*.html'`; do
-#   cp $i ../temp-volatile-classes/$i
-#done
-#for i in `find * -name '*.py'`; do
-#   cp $i ../temp-volatile-classes/$i
-#done
-#for i in `find * -name '*.jy'`; do
-#   cp $i ../temp-volatile-classes/$i
-#done
 cd ..
 echo "done copy resources."
 
@@ -149,12 +144,20 @@ hasErrors=0
 # compile key java classes.
 echo "compile sources..."
 cd temp-volatile-src
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoPlotUI.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk1.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
+
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
@@ -165,6 +168,12 @@ for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceF
    echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
    if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
+cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
+for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
+   echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
+   if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../temp-stable-classes:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+done
+
 cd ..
 echo "done compile sources."
 
@@ -192,10 +201,11 @@ echo "create jnlp file for build..."
 cp src/autoplot_two_jar.jnlp dist
 
 cd temp-volatile-src
-$JAVA5_HOME/bin/javac -d ../temp-volatile-classes external/FileSearchReplace.java
+$JAVA5_HOME/bin/javac -target 1.5 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
-echo $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+echo "replace codebase, etc"
+$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url} $HUDSON_URL
+$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar_pack200.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url} $HUDSON_URL
 
 echo "proguard/pack200 stuff..."
 #proguard is compiled for Java 6.  This needs to be fixed.
@@ -204,6 +214,9 @@ echo "proguard/pack200 stuff..."
 $JAVA6_HOME/bin/pack200 dist/AutoplotAllVolatile.jar.pack.gz dist/AutoplotAllVolatile.jar
 $JAVA6_HOME/bin/pack200 dist/AutoplotAllStable.jar.pack.gz dist/AutoplotAllStable.jar
 echo "done proguard/pack200 stuff."
+
+echo "copy branding for release, such as png icon images"
+cp src/*.png dist
 
 echo "copy htaccess.  htaccess must be moved to .htaccess to provide support for .pack.gz."
 cp src/htaccess.txt dist/

@@ -17,6 +17,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,8 +27,11 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import org.das2.components.DasProgressPanel;
 import org.das2.util.DasExceptionHandler;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
@@ -46,12 +50,6 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         parameterList.addListSelectionListener( new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if ( e.getValueIsAdjusting() ) return;
-                parameterComboBox.setSelectedItem(parameterList.getSelectedValue());
-            }
-        } );
-        parameterComboBox.addItemListener( new ItemListener() {
-            public void itemStateChanged(ItemEvent e) {
-                parameterList.setSelectedValue( parameterComboBox.getSelectedItem(), true );
             }
         } );
     }
@@ -67,25 +65,23 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        parameterComboBox = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         parameterList = new javax.swing.JList();
         jLabel3 = new javax.swing.JLabel();
-        subsetTextField = new javax.swing.JTextField();
+        subsetComboBox = new javax.swing.JComboBox();
         jPanel2 = new javax.swing.JPanel();
         paramInfo = new javax.swing.JLabel();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        jLabel1.setText("Select CDF Parameter:");
-
-        parameterComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jLabel1.setText("Select CDF Variable:");
 
         parameterList.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
         });
+        parameterList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         parameterList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 parameterListValueChanged(evt);
@@ -93,9 +89,12 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         });
         jScrollPane1.setViewportView(parameterList);
 
-        jLabel3.setText("subset:");
+        jLabel3.setText("Load subset of the data:");
+        jLabel3.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
 
-        subsetTextField.setToolTipText("<html>[0:100]  first 100 elements<br>\n[-100:] last 100 elements<br>\n[::10] every tenth element<br>\n</html>");
+        subsetComboBox.setEditable(true);
+        subsetComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "::10", "0:100", "-100:", "0:10000:5" }));
+        subsetComboBox.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -105,45 +104,43 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 193, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(12, 12, 12)
-                        .add(parameterComboBox, 0, 211, Short.MAX_VALUE))
-                    .add(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(jLabel3)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(subsetTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 107, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(6, 6, 6)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 263, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel3)
+                    .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(44, 44, 44))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(parameterComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel3)
-                    .add(subsetTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(79, Short.MAX_VALUE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 162, Short.MAX_VALUE)
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jLabel3)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        paramInfo.setText("Parameter");
+        paramInfo.setText("Variable");
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(paramInfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+            .add(paramInfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
                 .add(paramInfo)
-                .addContainerGap(96, Short.MAX_VALUE))
+                .addContainerGap(142, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -156,7 +153,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -179,9 +176,8 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel paramInfo;
-    private javax.swing.JComboBox parameterComboBox;
     private javax.swing.JList parameterList;
-    private javax.swing.JTextField subsetTextField;
+    private javax.swing.JComboBox subsetComboBox;
     // End of variables declaration//GEN-END:variables
 
     public JPanel getPanel() {
@@ -217,13 +213,30 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
     File cdfFile;
 
+    public boolean reject( String url ) throws IOException, URISyntaxException {
+        split = URISplit.parse(url);
+        FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
+        if ( fs.isDirectory( split.file.substring(split.path.length()) ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean prepare( String url,  java.awt.Window parent, ProgressMonitor mon) throws Exception {
+        split= URISplit.parse(url);
+
+        cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), mon );
+
+        return true;
+    }
+
     public void setURI(String url) {
         split= URISplit.parse(url);
         params= URISplit.parseParams(split.params);
 
         try {
 
-            cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), DasProgressPanel.createFramed("downloading file") );
+            cdfFile= DataSetURI.getFile( split.resourceUri.toURL(), new NullProgressMonitor() );
             
             String fileName= cdfFile.toString();
 
@@ -231,9 +244,9 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             CDF cdf= CDF.open( fileName, CDF.READONLYoff );
 
             logger.finest("inspect cdf for plottable parameters");
-            parameterDescriptions= CdfUtil.getPlottable( cdf, true, 4, false );
-            parameterInfo= CdfUtil.getPlottable( cdf, true, 4, true );
-            if ( parameterDescriptions.size()==0 ) {
+            parameterDescriptions= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, false );
+            parameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true );
+            if ( parameterDescriptions.isEmpty() ) {
                 throw new IllegalArgumentException("no plottable parameters in cdf file!");
             }
 
@@ -247,25 +260,24 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 cbmodel.addElement(p);
             }
             parameterList.setModel( model );
-            parameterComboBox.setModel(cbmodel);
 
             String param= params.get("arg_0");
             if ( param!=null ) {
                 int i= param.indexOf("[");
                 if ( i!=-1 ) {
-                    subsetTextField.setText( param.substring(i) );
+                    subsetComboBox.setSelectedItem( param.substring(i) );
                     param= param.substring(0,i);
                 } else {
-                    subsetTextField.setText("");
+                    subsetComboBox.setSelectedItem("");
                 }
                 parameterList.setSelectedValue(param, true);
             } else {
                 parameter= parameterDescriptions.entrySet().iterator().next().getKey();
                 parameterList.setSelectedValue( parameter, true );
-                subsetTextField.setText("");
+                subsetComboBox.setSelectedItem("");
                 param= parameter;
             }
-            parameter= param;
+            parameter= param.replaceAll("%3D", "=");
 
         } catch (CDFException ex) {
             DasExceptionHandler.handle( ex );
@@ -280,8 +292,13 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     }
 
     public String getURI() {
-        String slice= subsetTextField.getText();
-        params.put( "arg_0", parameter + ( slice==null ? "" : slice ) );
+        String slice= subsetComboBox.getSelectedItem().toString().trim();
+        if ( slice.length()>0 && slice.charAt(0)!='[' ) {
+            slice= "["+slice+"]";
+        }
+        String p = parameter;
+        p= p.replaceAll("=", "%3D");
+        params.put( "arg_0", p + ( slice==null ? "" : slice ) );
         split.params= URISplit.formatParams(params);
         return URISplit.format(split);
     }

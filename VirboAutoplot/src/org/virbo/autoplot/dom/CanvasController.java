@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
@@ -30,7 +31,6 @@ import org.das2.graph.DasRow;
 import org.das2.graph.Painter;
 import org.das2.graph.Renderer;
 import org.das2.graph.SelectionUtil;
-import org.das2.system.MutatorLock;
 import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
@@ -147,7 +147,7 @@ public class CanvasController extends DomNodeController {
         }
     }
 
-    Row getRowFor(Plot domPlot) {
+    public Row getRowFor(Plot domPlot) {
         if ( domPlot.getRowId().equals( canvas.marginRow.getId() ) ) return canvas.marginRow;
         for (Row row : canvas.getRows()) {
             if (row.getId().equals(domPlot.getRowId())) {
@@ -180,7 +180,7 @@ public class CanvasController extends DomNodeController {
      * reset this stack of rows, trying to preserve weights.
      * @param rows
      */
-    static void removeGapsAndOverlaps(List<Row> rows) {
+    static void removeGapsAndOverlaps( Application dom, List<Row> rows, Row newRow) {
 
         int[] weights = new int[rows.size()]; // in per milli.
 
@@ -190,7 +190,6 @@ public class CanvasController extends DomNodeController {
                 double nmin = DasDevicePosition.parseFormatStr(rows.get(i).getTop())[0];
                 double nmax = DasDevicePosition.parseFormatStr(rows.get(i).getBottom())[0];
                 weights[i] = (int) Math.round((nmax - nmin) * 1000);
-
             } catch (ParseException ex) {
                 weights[i] = 200;
             }
@@ -204,7 +203,6 @@ public class CanvasController extends DomNodeController {
         totalWeight = 1000;
 
         int t = 0;
-        double emIn = rows.size() < 2 ? 0. : 2.;
 
         for (int idx = 0; idx < weights.length; idx++) {
             DasRow dasRow;
@@ -212,8 +210,6 @@ public class CanvasController extends DomNodeController {
             dasRow.setMinimum(1. * t / totalWeight);
             dasRow.setMaximum(1. * (t + weights[idx]) / totalWeight);
             t += weights[idx];
-            dasRow.setEmMinimum(emIn);
-            dasRow.setEmMaximum(-emIn);
         }
     }
 
@@ -259,7 +255,7 @@ public class CanvasController extends DomNodeController {
     }
 
     void removeGaps() {
-        removeGapsAndOverlaps(Arrays.asList(canvas.getRows()));
+        removeGapsAndOverlaps( this.application, Arrays.asList(canvas.getRows()) , null);
         repaintSoon();
     }
 
@@ -278,27 +274,28 @@ public class CanvasController extends DomNodeController {
      * @param position LayoutUtil.BELOW or LayoutUtil.ABOVE.
      */
     void insertGapFor(Row row, Row trow, Object position) {
-        MutatorLock lock = changesSupport.mutatorLock();
+        Lock lock = changesSupport.mutatorLock();
         lock.lock();
+        try {
+            List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
 
-        List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
+            int ipos = 0;
+            if (position == LayoutConstants.BELOW) {
+                ipos = rows.indexOf(trow) + 1;
+            } else {
+                ipos = rows.indexOf(trow);
+            }
 
-        int ipos = 0;
-        if (position == LayoutConstants.BELOW) {
-            ipos = rows.indexOf(trow) + 1;
-        } else {
-            ipos = rows.indexOf(trow);
+            rows.add(ipos, row);
+            row.syncTo(trow, Arrays.asList("id"));
+            List<Diff> d = DomUtil.getDiffs( row, trow, Arrays.asList("id") );
+            if (d.size() > 0) {
+                row.syncTo(trow, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
+            }
+            removeGapsAndOverlaps( this.application, rows, row );
+        } finally {
+            lock.unlock();
         }
-
-        rows.add(ipos, row);
-        row.syncTo(trow, Arrays.asList("id"));
-        List<Diff> d = DomUtil.getDiffs( row, trow, Arrays.asList("id") );
-        if (d.size() > 0) {
-            row.syncTo(trow, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
-        }
-        removeGapsAndOverlaps(rows);
-
-        lock.unlock();
         repaintSoon();
     }
 
@@ -309,27 +306,28 @@ public class CanvasController extends DomNodeController {
      * @param position LayoutUtil.RIGHT or LayoutUtil.LEFT.
      */
     void insertGapFor(Column column, Column tcolumn, Object position) {
-        MutatorLock lock = changesSupport.mutatorLock();
+        Lock lock = changesSupport.mutatorLock();
         lock.lock();
+        try {
+            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
 
-        List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+            int ipos = 0;
+            if (position == LayoutConstants.BELOW) {
+                ipos = columns.indexOf(tcolumn) + 1;
+            } else {
+                ipos = columns.indexOf(tcolumn);
+            }
 
-        int ipos = 0;
-        if (position == LayoutConstants.BELOW) {
-            ipos = columns.indexOf(tcolumn) + 1;
-        } else {
-            ipos = columns.indexOf(tcolumn);
+            columns.add(ipos, column);
+            column.syncTo(tcolumn, Arrays.asList("id"));
+            List<Diff> d = DomUtil.getDiffs( column, tcolumn, Arrays.asList("id") );
+            if (d.size() > 0) {
+                column.syncTo(tcolumn, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
+            }
+            removeGapsAndOverlapsInColumns(columns);
+        } finally {
+            lock.unlock();
         }
-
-        columns.add(ipos, column);
-        column.syncTo(tcolumn, Arrays.asList("id"));
-        List<Diff> d = DomUtil.getDiffs( column, tcolumn, Arrays.asList("id") );
-        if (d.size() > 0) {
-            column.syncTo(tcolumn, Arrays.asList("id")); // kludge to get around bug where das2 essentially vetos the top
-        }
-        removeGapsAndOverlapsInColumns(columns);
-
-        lock.unlock();
         repaintSoon();
     }
 
@@ -339,35 +337,37 @@ public class CanvasController extends DomNodeController {
      * @param position LayoutConstants.ABOVE, LayoutConstants.BELOW
      */
     protected Row addInsertRow(Row trow, Object position) {
-        MutatorLock lock = changesSupport.mutatorLock();
-        lock.lock();
-
         final Row row = new Row();
 
-        row.setParent(canvas.getMarginRow().getId());
-        new RowController(row).createDasPeer(this.canvas, canvas.getMarginRow().getController().getDasRow());
+        Lock lock = changesSupport.mutatorLock();
+        lock.lock();
+        try {
+            row.setParent(canvas.getMarginRow().getId());
+            new RowController(row).createDasPeer(this.canvas, canvas.getMarginRow().getController().getDasRow());
 
-        if (trow != null) {
-            insertGapFor(row, trow, position);
-        }
-
-        List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
-
-        int ipos = rows.size();
-        if (trow != null) {
-            if (position == LayoutConstants.BELOW) {
-                ipos = rows.indexOf(trow) + 1;
-            } else {
-                ipos = rows.indexOf(trow);
+            this.application.getController().assignId(row);
+            if (trow != null) {
+                insertGapFor(row, trow, position);
             }
+
+            List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
+
+            int ipos = rows.size();
+            if (trow != null) {
+                if (position == LayoutConstants.BELOW) {
+                    ipos = rows.indexOf(trow) + 1;
+                } else {
+                    ipos = rows.indexOf(trow);
+                }
+            }
+            rows.add(ipos, row);
+
+            canvas.setRows(rows.toArray(new Row[rows.size()]));
+
+            this.application.getController().assignId(row);
+        } finally {
+            lock.unlock();
         }
-        rows.add(ipos, row);
-
-        canvas.setRows(rows.toArray(new Row[rows.size()]));
-
-        this.application.getController().assignId(row);
-
-        lock.unlock();
 
         return row;
 
@@ -379,35 +379,37 @@ public class CanvasController extends DomNodeController {
      * @param position LayoutConstants.ABOVE, LayoutConstants.BELOW
      */
     protected Column addInsertColumn(Column tcolumn, Object position) {
-        MutatorLock lock = changesSupport.mutatorLock();
-        lock.lock();
-
         final Column column = new Column();
 
-        column.setParent(canvas.getMarginColumn().getId());
-        new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
+        Lock lock = changesSupport.mutatorLock();
+        lock.lock();
+        try {
 
-        if (tcolumn != null) {
-            insertGapFor(column, tcolumn, position);
-        }
+            column.setParent(canvas.getMarginColumn().getId());
+            new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
 
-        List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
-
-        int ipos = columns.size();
-        if (tcolumn != null) {
-            if (position == LayoutConstants.BELOW) {
-                ipos = columns.indexOf(tcolumn) + 1;
-            } else {
-                ipos = columns.indexOf(tcolumn);
+            if (tcolumn != null) {
+                insertGapFor(column, tcolumn, position);
             }
+
+            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+
+            int ipos = columns.size();
+            if (tcolumn != null) {
+                if (position == LayoutConstants.BELOW) {
+                    ipos = columns.indexOf(tcolumn) + 1;
+                } else {
+                    ipos = columns.indexOf(tcolumn);
+                }
+            }
+            columns.add(ipos, column);
+
+            canvas.setColumns(columns.toArray(new Column[columns.size()]));
+
+            this.application.getController().assignId(column);
+        } finally {
+            lock.unlock();
         }
-        columns.add(ipos, column);
-
-        canvas.setColumns(columns.toArray(new Column[columns.size()]));
-
-        this.application.getController().assignId(column);
-
-        lock.unlock();
 
         return column;
 
@@ -428,7 +430,9 @@ public class CanvasController extends DomNodeController {
 
         List<Row> rows = new ArrayList();
         for (int i = 0; i < count; i++) {
-            rows.add(addInsertRow(trow,  LayoutConstants.BELOW ));
+            Row newRow= addInsertRow(trow,  LayoutConstants.BELOW );
+            rows.add(newRow);
+            trow= newRow;
         }
         return rows;
     }
@@ -439,38 +443,46 @@ public class CanvasController extends DomNodeController {
      * @param position LayoutConstants.RIGHT, LayoutConstants.LEFT
      */
     public List<Column> addColumns(int count) {
-        MutatorLock lock = changesSupport.mutatorLock();
-        lock.lock();
-
         List<Column> result = new ArrayList();
-        List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
 
-        for (int i = 0; i < count; i++) {
-            final Column column = new Column();
+        Lock lock = changesSupport.mutatorLock();
+        lock.lock();
+        try {
 
-            column.setParent(canvas.getMarginRow().getId());
+            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
 
-            new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
-            this.application.getController().assignId(column);
-            result.add(column);
+            for (int i = 0; i < count; i++) {
+                final Column column = new Column();
 
-            int lpm = 1000 * i / count;
-            int rpm = 1000 * (i + 1) / count;
-            int lem= i*50/(count-1);
-            int rem= 50*(count-1-i)/(count-1);
-            column.setLeft("" + lpm / 10. + "%+"+lem/10.+"em");
-            column.setRight("" + rpm / 10. + "%-"+rem/10.+"em");
+                column.setParent(canvas.getMarginRow().getId());
 
+                new ColumnController(column).createDasPeer(this.canvas, canvas.getMarginColumn().getController().getDasColumn());
+                this.application.getController().assignId(column);
+                result.add(column);
+
+                int lpm = 1000 * i / count;
+                int rpm = 1000 * (i + 1) / count;
+                int lem= i*50/(count-1);
+                int rem= 50*(count-1-i)/(count-1);
+                column.setLeft("" + lpm / 10. + "%+"+lem/10.+"em");
+                column.setRight("" + rpm / 10. + "%-"+rem/10.+"em");
+
+            }
+
+            columns.addAll(result);
+
+            canvas.setColumns(columns.toArray(new Column[columns.size()]));
+        } finally {
+            lock.unlock();
         }
-
-        columns.addAll(result);
-
-        canvas.setColumns(columns.toArray(new Column[columns.size()]));
-
-        lock.unlock();
 
         return result;
 
+    }
+
+
+   public Column addColumn() {
+        return addInsertColumn( null,null );
     }
 
     /**
@@ -482,27 +494,31 @@ public class CanvasController extends DomNodeController {
     }
 
     protected void deleteRow(Row row) {
-        MutatorLock lock = changesSupport.mutatorLock();
+        Lock lock = changesSupport.mutatorLock();
         lock.lock();
+        try {
+            List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
 
-        List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
+            rows.remove(row);
 
-        rows.remove(row);
-
-        canvas.setRows(rows.toArray(new Row[rows.size()]));
-        lock.unlock();
+            canvas.setRows(rows.toArray(new Row[rows.size()]));
+        } finally {
+            lock.unlock();
+        }
     }
 
     protected void deleteColumn(Column column) {
-        MutatorLock lock = changesSupport.mutatorLock();
+        Lock lock = changesSupport.mutatorLock();
         lock.lock();
+        try {
+            List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
 
-        List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
+            columns.remove(column);
 
-        columns.remove(column);
-
-        canvas.setColumns(columns.toArray(new Column[columns.size()]));
-        lock.unlock();
+            canvas.setColumns(columns.toArray(new Column[columns.size()]));
+        } finally {
+            lock.unlock();
+        }
     }
 
     protected void syncTo(Canvas canvas, List<String> exclude, Map<String, String> layoutIds) {
@@ -535,11 +551,19 @@ public class CanvasController extends DomNodeController {
         }
     }
 
+    private List<DomNode> currentSelectionItems;
+
     public void indicateSelection( List<DomNode> selectedItems ) {
 
         if ( !dasCanvas.isShowing() ) return;
+
         final List<Shape> sel= new ArrayList<Shape>();
         final List<Rectangle> clip= new ArrayList<Rectangle>();
+
+        synchronized (this) {
+            if ( currentSelectionItems!=null ) return; //TODO: we really should clear it if it's different
+            currentSelectionItems= selectedItems;
+        }
 
         for ( Object o: selectedItems ) {
             Area sel1=null;
@@ -547,9 +571,11 @@ public class CanvasController extends DomNodeController {
                 DasPlot p= ((Plot)o).getController().getDasPlot();
                 sel.add( SelectionUtil.getSelectionArea( p ) );
                 clip.add( p.getBounds() );
-            } else if ( o instanceof Panel ) {
-                Renderer rend= ((Panel)o).getController().getRenderer();
+            } else if ( o instanceof PlotElement ) {
+                Renderer rend= ((PlotElement)o).getController().getRenderer();
+                if ( rend==null ) return;// transitional case
                 DasPlot p= rend.getParent();
+                if ( p==null ) return; // transitional case
                 Rectangle r= p.getBounds();
                 sel.add( SelectionUtil.getSelectionArea( rend ) );
                 clip.add( r );
@@ -560,6 +586,11 @@ public class CanvasController extends DomNodeController {
 
         final Painter p= new Painter() {
             public void paint(Graphics2D g) {
+                // note it's non-trivial to apply transforms as the plot moves.
+                if ( dasCanvas.lisPaintingForPrint() ) {
+                    System.err.println("not painting select");
+                    return;
+                }
                 g.setColor( new Color( 255, 255, 0, 100 ) );
                 Shape clip0= g.getClip();
                 for ( int i=0; i<sel.size(); i++ ) {
@@ -568,7 +599,7 @@ public class CanvasController extends DomNodeController {
                     if ( s!=null ) {
                         g.clip(c);
                         g.fill(s);
-                        g.clip(clip0);
+                        g.setClip(clip0);
                     }
                 }
             }
@@ -580,6 +611,7 @@ public class CanvasController extends DomNodeController {
                 Timer clearSelectionTimer= new Timer( 300, new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
                         dasCanvas.removeTopDecorator( p );
+                        currentSelectionItems= null;
                     }
                 });
                 clearSelectionTimer.setRepeats(false);
@@ -596,4 +628,5 @@ public class CanvasController extends DomNodeController {
     public String toString() {
         return "" + canvas + " controller";
     }
+
 }

@@ -1,0 +1,3 @@
+d= Units.degrees.createDatum(180)
+
+print d.convertTo(Units.radians)

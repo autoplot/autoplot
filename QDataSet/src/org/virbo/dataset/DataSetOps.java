@@ -8,13 +8,17 @@
  */
 package org.virbo.dataset;
 
+import java.util.ArrayList;
+import org.das2.datum.Datum;
 import org.das2.datum.Units;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import org.virbo.dataset.BundleDataSet.BundleDescriptor;
+import org.das2.datum.DatumRange;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.DataSetBuilder;
 
@@ -104,7 +108,34 @@ public class DataSetOps {
         return new TrimDataSet( ds, offset, offset+len );
     }
 
-
+    public static MutablePropertyDataSet trim( final QDataSet dep, final int start, final int stop, final int stride  ) {
+        if ( dep.rank()!=1 ) throw new IllegalArgumentException("only rank 1 supported");
+        QubeDataSetIterator itIn= new QubeDataSetIterator(dep);
+        itIn.setIndexIteratorFactory( 0, new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, stride ) );
+        DDataSet depSlice= itIn.createEmptyDs();
+        QubeDataSetIterator itOut= new QubeDataSetIterator(depSlice);
+        while ( itIn.hasNext() ) {
+            itIn.next();
+            itOut.next();
+            itOut.putValue( depSlice, itIn.getValue(dep) );
+        }
+        String[] names = DataSetUtil.dimensionProperties();
+        for (int i = 0; i < names.length; i++) {
+            if ( dep.property(names[i]) != null) {
+                depSlice.putProperty(names[i], dep.property(names[i]));
+            }
+        }
+        return depSlice;
+    }
+    
+    /**
+     * flatten a rank 2 dataset.  The result is a n,3 dataset
+     * of [x,y,z], or if there are no tags, just [z].
+     * history:
+     *    modified for use in PW group.
+     * @param ds
+     * @return
+     */
     public static QDataSet flattenRank2( final QDataSet ds ) {
         QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
         QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1);
@@ -113,18 +144,45 @@ public class DataSetOps {
         DataSetBuilder ybuilder= new DataSetBuilder( 1, 100 );
         for ( int i=0; i<ds.length(); i++ ) {
             for ( int j=0; j<ds.length(i); j++ ) {
-                xbuilder.putValue(-1, dep0.value(i) );
-                ybuilder.putValue(-1, dep1.value(j) );
+                if (dep0!=null) {
+                    xbuilder.putValue(-1, dep0.value(i) );
+                    xbuilder.nextRecord();
+                }
+                if (dep1!=null) {
+                    ybuilder.putValue(-1, dep1.value(j) );
+                    ybuilder.nextRecord();
+                }
                 builder.putValue(-1, ds.value(i,j) );
-                xbuilder.nextRecord();
-                ybuilder.nextRecord();
                 builder.nextRecord();
             }
         }
 
-        return Ops.link( xbuilder.getDataSet(), ybuilder.getDataSet(), builder.getDataSet() );
+        DDataSet zds= builder.getDataSet();
+        DataSetUtil.putProperties( DataSetUtil.getProperties(ds), zds );
+
+        if ( dep1!=null && dep0!=null ) {
+            DDataSet xds= xbuilder.getDataSet();
+            DataSetUtil.putProperties( DataSetUtil.getProperties(dep0), xds );
+            DDataSet yds= ybuilder.getDataSet();
+            DataSetUtil.putProperties( DataSetUtil.getProperties(dep1), yds );
+            return Ops.link( xds, yds, zds );
+        } else  {
+            return zds;
+        }
         
     }
+
+    /**
+     * takes rank 2 link (x,y,z) and makes a table from it z(x,y)
+     * @param ds
+     * @return
+     */
+    public static QDataSet grid( final QDataSet ds ) {
+        GridDataSet result= new GridDataSet();
+        result.add( ds );
+        return result;
+    }
+
     /**
      * removes the index-th element from the array.
      * @param array
@@ -146,79 +204,14 @@ public class DataSetOps {
      * pull out a subset of the dataset by reducing the number of columns in the
      * last dimension.  This does not reduce rank.  This assumes the dataset has no
      * row with length>end.
+     * This is extended to support rank 4 datasets.
+     * TODO: This probably doesn't handle bundles property.
+     * TODO: slice and trim should probably be implemented here for efficiently.
      * @param start first index to include.
      * @param end last index, exclusive
      */
     public static MutablePropertyDataSet leafTrim(final QDataSet ds, final int start, final int end) {
-
-        if (ds.rank() > 3) {
-            throw new IllegalArgumentException("rank limit > 3");
-        }
-
-        MutablePropertyDataSet result = new AbstractDataSet() {
-
-            public int rank() {
-                return ds.rank();
-            }
-
-            public double value(int i) {
-                return ds.value(i + start);
-            }
-
-            public double value(int i0, int i1) {
-                return ds.value(i0, i1 + start);
-            }
-
-            public double value(int i0, int i1, int i2) {
-                return ds.value(i0, i1, i2 + start);
-            }
-
-            public Object property(String name) {
-                if (properties.containsKey(name)) {
-                    return properties.get(name);
-                } else {
-                    return ds.property(name);
-                }
-            }
-
-            public Object property(String name, int i) {
-                if (properties.containsKey(name)) {
-                    return properties.get(name);
-                } else {
-                    return ds.property(name);
-                }
-            }
-
-            public Object property(String name, int i0, int i1) {
-                if (properties.containsKey(name)) {
-                    return properties.get(name);
-                } else {
-                    return ds.property(name);
-                }
-            }
-
-            public int length() {
-                return ds.rank() == 1 ? end - start : ds.length();
-            }
-
-            public int length(int i) {
-                return ds.rank() == 2 ? end - start : ds.length(i);
-            }
-
-            public int length(int i, int j) {
-                return ds.rank() == 3 ? end - start : ds.length(i, j);
-            }
-        };
-
-        String depNName = "DEPEND_" + (ds.rank() - 1);
-        QDataSet depN = (QDataSet) ds.property(depNName);
-        if (depN != null) {
-            depN = leafTrim(depN, start, end);
-        }
-        result.putProperty(depNName, depN);
-
-        return result;
-
+        return new LeafTrimDataSet( ds, start, end );
     }
 
     /**
@@ -261,6 +254,9 @@ public class DataSetOps {
     /**
      * Applies the sort index to the idim-th dimension of the qube dataset ds.
      * TODO: consider sorting multiple dimensions at once, to reduce excessive copying.
+     * TODO: this should probably (and would easily) be redone by using dataset implementation that applies the sort on the ith index when read.
+     *   See SubsetDataSet which would do this nicely.
+     * TODO: note the Jython stuff does this to, using a different implementation.  Reconcile these...
      * @param ds rank 1,2, or 3 qube dataset
      * @param idim the dimension being sorted.
      * @param sort rank 1 dataset of new indeces, needn't be same size as index.
@@ -278,7 +274,7 @@ public class DataSetOps {
         }
 
         if ( idim==0 ) {
-            return DDataSet.copy( new SortDataSet( ds, sort ) );
+            return DDataSet.copy( new SortDataSet( ds, sort ) ); // this was presumably for efficiency
         }
         
         int[] qube = DataSetUtil.qubeDims( ds );
@@ -347,7 +343,10 @@ public class DataSetOps {
     }
 
     /**
-     * returns a rank 1 dataset that is a histogram of the data.
+     * returns a rank 1 dataset that is a histogram of the data.  Note there
+     * will also be in the properties:
+     *   count, the total number of valid values.
+     *   nonZeroMin, the smallest non-zero, positive number
      * @param ds rank N dataset
      * @param min the min of the first bin.
      * @param max the max of the last bin.
@@ -365,10 +364,11 @@ public class DataSetOps {
         tags.putProperty( QDataSet.TYPICAL_MIN, ds.property(QDataSet.TYPICAL_MIN) );
         
         final int[] hits = new int[n];
-        int maxFreq= 0;
         
         QubeDataSetIterator iter = new QubeDataSetIterator(ds);
         QDataSet wds= DataSetUtil.weightsDataSet(ds);
+
+        double positiveMin= Double.MAX_VALUE;
 
         int count=0;
         for (; count<DS_LENGTH_LIMIT && iter.hasNext();) {
@@ -379,8 +379,8 @@ public class DataSetOps {
                 int ibin = (int) ((d - min) / binsize);
                 if (ibin >= 0 && ibin < n) {
                     hits[ibin]++;
-                    if ( hits[ibin]>maxFreq ) maxFreq= hits[ibin];
                 }
+                if ( d>0 && d<positiveMin ) positiveMin=d;
                 count++;
             }
         }
@@ -388,8 +388,8 @@ public class DataSetOps {
         IDataSet result = IDataSet.wrap(hits);
         result.putProperty( QDataSet.DEPEND_0, tags );
         result.putProperty( "count", count );
-        result.putProperty( "max", maxFreq );
-
+        result.putProperty( "positiveMin", positiveMin );
+        
         return result;
     }
     
@@ -487,6 +487,8 @@ public class DataSetOps {
 
     /**
      * method to help dataset implementations implement slice.
+     * 2010-09-23: support rank 2 DEPEND_2 and DEPEND_3
+     * 2010-09-23: add BINS_1 and BUNDLE_1, Slice0DataSet calls this.
      * @param sliceIndex
      * @param props
      */
@@ -495,21 +497,24 @@ public class DataSetOps {
 
         QDataSet dep0= (QDataSet) props.get( QDataSet.DEPEND_0 );
         QDataSet dep1= (QDataSet) props.get( QDataSet.DEPEND_1 );
+        QDataSet dep2= (QDataSet) props.get( QDataSet.DEPEND_2 );
+        QDataSet dep3= (QDataSet) props.get( QDataSet.DEPEND_3 );
+        String bins1= (String) props.get( QDataSet.BINS_1 );
+        QDataSet bundle1= (QDataSet) props.get( QDataSet.BUNDLE_1 );
+
         if ( dep0!=null && dep1!=null && dep0.rank()>1 && dep1.rank()>1 ) {
             throw new IllegalArgumentException("both DEPEND_0 and DEPEND_1 have rank>1");
         }
-        if ( props.get(QDataSet.DEPEND_1)!=null ) { //DEPEND_1 rank 1 implies qube
+
+        if ( dep1!=null ) { //DEPEND_1 rank 1 implies qube
             if ( dep0!=null ) DataSetUtil.addContext( result, dep0.slice( index ) );
             if ( dep1!=null && dep1.rank()==2 ) {
                 result.put( QDataSet.DEPEND_0, dep1.slice( index ) );
             } else {
                 result.put( QDataSet.DEPEND_0, dep1 );
             }
-            result.put( QDataSet.DEPEND_1, props.get( QDataSet.DEPEND_2 ) );
-            result.put( QDataSet.DEPEND_2, props.get( QDataSet.DEPEND_3 ) );
-
         } else {
-            if ( dep0!=null && dep0.rank()==1 ) {
+            if ( dep0!=null && dep0.rank()==1 ) { //TODO: find documentation for rank 2 depend_0...
                 if ( dep0!=null ) DataSetUtil.addContext( result, dep0.slice( index ) );
             } else {
                 if ( props.get( "DEPEND_0["+index+"]" )==null ) { // bundle dataset  //TODO: this needs more review
@@ -518,14 +523,40 @@ public class DataSetOps {
             }
         }
 
+        if ( dep2!=null ) {
+            if ( dep2.rank()==2 ) {
+                result.put( QDataSet.DEPEND_1, dep2.slice( index ) );
+            } else {
+                result.put( QDataSet.DEPEND_1, dep2 );
+            }
+        }
+
+        if ( dep3!=null ) { 
+            if ( dep3.rank()==2 ) {
+                result.put( QDataSet.DEPEND_2, dep3.slice( index ) );
+            } else {
+                result.put( QDataSet.DEPEND_2, dep3 );
+            }
+        }
+
+        if ( bins1!=null ) {
+            result.put( QDataSet.BINS_0, bins1 );
+        }
+
+        if ( bundle1!=null ) {
+            result.put( QDataSet.BUNDLE_0, bundle1 );
+        }
+
+        //TODO: verify that we needn't put null in for JOIN_0.
+
         for ( int i=0; i<QDataSet.MAX_PLANE_COUNT; i++ ) {
             String prop= "PLANE_"+i;
-            QDataSet plane0= (QDataSet) props.get( prop );
-            if ( plane0!=null ) {
-                if ( plane0.rank()<1 ) {
-                    result.put( prop, plane0 );
+            QDataSet plane= (QDataSet) props.get( prop );
+            if ( plane!=null ) {
+                if ( plane.rank()<1 ) {
+                    result.put( prop, plane );
                 } else {
-                    result.put( prop, plane0.slice(index) );
+                    result.put( prop, plane.slice(index) );
                 }
             } else {
                 break;
@@ -540,11 +571,94 @@ public class DataSetOps {
                 result.put( p[i], delta.slice(index) );
             }
         }
+
+        String[] ss= DataSetUtil.dimensionProperties();
+        for ( int i=0; i<ss.length; i++ ) {
+            Object o= props.get( ss[i] );
+            if ( o!=null ) {
+                result.put( ss[i], o );
+            }
+        }
         return result;
     }
 
     /**
-     * Extract the named bundled dataset.
+     * returns a bundle descriptor roughly equivalent to the BundleDescriptor
+     * passed in, but will describe each dataset as if it were rank 1.  This
+     * is useful for when the client can't work with mixed rank bundles anyway
+     * (like display data).
+     * @param bundle1
+     * @return
+     */
+    public static QDataSet flattenBundleDescriptor( QDataSet bundle1 ) {
+
+        int nr1= 0;
+        final List<String> names= new ArrayList();
+        final List<Units> units= new ArrayList();
+
+        for ( int j=0; j<bundle1.length(); j++ ) {
+
+            int rank= bundle1.length(j);
+            int n=1;
+
+            for (int k = 0; k < rank; k++) {
+                 n *= bundle1.value(j, k);
+            }
+            nr1+= n;
+
+            String name= (String) bundle1.property(QDataSet.NAME,j);
+            Units unit= (Units) bundle1.property(QDataSet.UNITS,j);
+            String bins= (String) bundle1.property(QDataSet.BINS_1,j);
+
+            for ( int i=0; i<n; i++ ) {
+                String binName= null;
+                if ( bins!=null ) {
+                    String[] ss= bins.split(",",-2);
+                    binName= ss[i];
+                }
+                String theName= name;
+                if ( theName!=null && binName!=null ) {
+                    theName= theName + "_"+ binName;
+                }
+                if ( theName!=null ) names.add( theName ); else names.add("");
+                if ( unit!=null ) units.add( unit ); else units.add(Units.dimensionless);
+
+            }
+        }
+        final int fnr1= nr1;
+
+        QDataSet bundleDescriptor= new AbstractDataSet() {
+            @Override
+            public int rank() {
+                return 2;
+            }
+
+            @Override
+            public int length() {
+                return fnr1;
+            }
+            @Override
+            public int length(int i) {
+                return 0;
+            }
+            @Override
+            public Object property(String name, int i) {
+                if ( i>names.size() ) throw new IllegalArgumentException("index too large:"+i );
+                if ( name.equals( QDataSet.NAME ) ) {
+                    return names.get(i);
+                } else if ( name.equals( QDataSet.UNITS ) ) {
+                    return units.get(i);
+                } else {
+                    return null;
+                }
+            }
+        };
+
+        return bundleDescriptor;
+    }
+
+    /**
+     * Extract the named bundled dataset.  For example, extract B_x from bundle of components.
      * @param bundleDs
      * @param name
      * @see unbundle( QDataSet bundleDs, int ib )
@@ -552,11 +666,28 @@ public class DataSetOps {
      */
     public static QDataSet unbundle( QDataSet bundleDs, String name ) {
         QDataSet bundle1= (QDataSet) bundleDs.property(QDataSet.BUNDLE_1);
+
         int ib= -1;
         int i= name.indexOf("["); // allow name to be "Flux[Time=1440,en=10]"
         if ( i>0 ) {
             name= name.substring(i);
         }
+
+        if ( bundle1==null ) {
+            bundle1= (QDataSet) bundleDs.property(QDataSet.DEPEND_1); //simple legacy bundle was once DEPEND_1.
+            if ( bundle1!=null && bundle1.rank()>1 ) {
+                throw new IllegalArgumentException("high rank DEPEND_1 found where rank 1 was expected");
+            } else if ( bundle1!=null ) {
+                Units u= (Units) bundle1.property(QDataSet.UNITS);
+                for ( int i2=0; i2<bundle1.length(); i2++ ) {
+                    if ( name.equals( u.createDatum( bundle1.value(i2) ).toString() ) ) {
+                        return unbundle( bundleDs, i2 );
+                    }
+                }
+                throw new IllegalArgumentException("unable to find dataset with name \""+name+"\" in bundle "+bundleDs );
+            }
+        }
+
         for ( int j=0; j<bundle1.length(); j++ ) {
             String n1= (String) bundle1.property( QDataSet.NAME, j );
             if ( n1!=null && n1.equals(name) ) {
@@ -564,27 +695,70 @@ public class DataSetOps {
             }
         }
         if ( ib==-1 ) {
-            throw new IllegalArgumentException("unable to find dataset with name \""+name+"\"");
+            throw new IllegalArgumentException("unable to find dataset with name \""+name+"\" in bundle "+bundleDs );
         } else {
             return unbundle(bundleDs,ib);
         }
     }
 
     /**
+     * extract the dataset that is dependent on others, or the last one.  
+     * For example, the dataset ds[:,"x,y"] -> y[:]
+     * @param bundleDs
+     * @return
+     */
+    public static QDataSet unbundleDefaultDataSet( QDataSet bundleDs ) {
+        QDataSet bundle1= (QDataSet) bundleDs.property(QDataSet.BUNDLE_1);
+
+        if ( bundle1==null ) {
+            bundle1= (QDataSet) bundleDs.property(QDataSet.DEPEND_1); //simple legacy bundle was once DEPEND_1.
+            if ( bundle1!=null && bundle1.rank()>1 ) {
+                throw new IllegalArgumentException("high rank DEPEND_1 found where rank 1 was expected");
+            }
+        }
+
+        int ids= -1;
+        for ( int i=0; i<bundle1.length(); i++ ) {
+            if ( bundle1.property(QDataSet.DEPEND_0,i)!=null ) ids=i;
+        }
+        if ( ids==-1 ) ids= bundle1.length()-1;
+        return unbundle(bundleDs,ids);
+    }
+
+    /**
      * Extract a bundled dataset from a bundle of datasets.  The input should
      * be a rank 2 dataset with the property BUNDLE_1 set to a bundle descriptor
-     * dataset.  See BundleDataSet for more semantics.
+     * dataset.  See BundleDataSet for more semantics.  Note we support the case
+     * where DEPEND_1 has EnumerationUnits, and this is the same as slice1.
+     *
      *
      * @param aThis
-     * @param ib index of the dataset to extract.
+     * @param ib index of the dataset to extract
      * @throws IndexOutOfBoundsException if the index is invalid.
      * @return
      */
     public static QDataSet unbundle(QDataSet bundleDs, int ib) {
         QDataSet bundle1= (QDataSet) bundleDs.property(QDataSet.BUNDLE_1);
 
+        if ( bundle1==null ) {
+            bundle1= (QDataSet) bundleDs.property(QDataSet.DEPEND_1); //simple legacy bundle was once DEPEND_1.
+            if ( bundle1!=null && bundle1.rank()>1 ) {
+                throw new IllegalArgumentException("high rank DEPEND_1 found where rank 1 was expected");
+            }
+        }
+
         if ( ib<0 || ib>=bundle1.length() ) {
             throw new IndexOutOfBoundsException("no such data set");
+        }
+
+        if ( bundle1.rank()==1 ) { //simple legacy bundle was once DEPEND_1.
+            MutablePropertyDataSet result= DataSetOps.slice1(bundleDs,ib);
+            Units enumunits= (Units) bundle1.property(QDataSet.UNITS);
+            if ( enumunits==null ) enumunits= Units.dimensionless;
+            String label=  String.valueOf(enumunits.createDatum(bundle1.value(ib)));
+            result.putProperty(QDataSet.NAME, label ); //TODO: make safe java-identifier eg: org.virbo.dsops.Ops.safeName(label)
+            result.putProperty(QDataSet.LABEL, label );
+            return result;
         }
 
         String[] names= new String[bundle1.length()];
@@ -607,8 +781,17 @@ public class DataSetOps {
         int n= lens[j];
 
         if ( bundle1.length(j)==0 ) {
-            MutablePropertyDataSet result= DataSetOps.slice1(bundleDs,offsets[j]);
-            return result;
+            if ( bundleDs instanceof BundleDataSet ) {
+                QDataSet r= ((BundleDataSet)bundleDs).unbundle(offsets[j]);
+                return r;
+            } else {
+                MutablePropertyDataSet result;
+                result= DataSetOps.slice1(bundleDs,offsets[j]); // this results in error message saying "we're not going to do this correctly, use unbundle instead", oops...
+                result.putProperty(QDataSet.UNITS, bundle1.property( QDataSet.UNITS, j ) ); //TODO: underimplementation
+                result.putProperty(QDataSet.NAME, bundle1.property( QDataSet.NAME, j ) );
+                result.putProperty(QDataSet.LABEL, bundle1.property( QDataSet.LABEL, j ) );
+                return result;
+            }
         } else if ( bundle1.length(j)==1 ) {
             TrimStrideWrapper result= new TrimStrideWrapper(bundleDs);
             result.setTrim( 1, offsets[j], offsets[j]+lens[j], 1 );
@@ -634,12 +817,26 @@ public class DataSetOps {
     }
 
     /**
+     * return true if the process described in c is probably a slow
+     * process that should be done asynchronously.  For example, do
+     * a long fft on a different thread and use a progress monitor.  Processes
+     * that take a trivial, constant amount of time should return false, and
+     * may be completed on the event thread,etc.
+     * 
+     * @param c, process string, as in sprocess.
+     * @return
+     */
+    public static boolean isProcessAsync(String c) {
+        return c.contains("fft");
+    }
+
+    /**
      * see http://www.papco.org/wiki/index.php/DataReductionSpecs
      * @param c
      * @param fillDs
      * @return
      */
-    public static QDataSet sprocess(String c, QDataSet fillDs) {
+    public static QDataSet sprocess( String c, QDataSet fillDs , ProgressMonitor mon ) {
         int i=1;
         Scanner s= new Scanner( c );
         s.useDelimiter("[\\(\\),]");
@@ -647,12 +844,15 @@ public class DataSetOps {
         while ( s.hasNext() ) {
             String cmd= s.next();
             if ( cmd.startsWith("|slice") ) {
+                if  ( cmd.length()<=6 ) {
+                    throw new IllegalArgumentException("need DIM on sliceDIM(INDEX)");
+                }
                 int dim= cmd.charAt(6)-'0';
                 int idx= s.nextInt();
                 if ( dim==0 ) {
                     if ( idx>=fillDs.length() ) idx=fillDs.length()-1;
                     if ( idx<0 ) idx=0;
-                    fillDs= slice0(fillDs, idx);
+                    fillDs= slice0(fillDs, idx); //TODO: use fillDs.slice
                 } else if ( dim==1 ) {
                     if ( idx>=fillDs.length(0) ) idx=fillDs.length(0)-1;
                     if ( idx<0 ) idx=0;
@@ -670,6 +870,8 @@ public class DataSetOps {
                 //fillDs= fillDs;
             } else if ( cmd.equals("|diff") ) {
                 fillDs= Ops.diff(fillDs);
+            } else if ( cmd.equals("|accum") ) {
+                fillDs= Ops.accum(fillDs);
             } else if ( cmd.equals("|log10") ) {
                 fillDs= Ops.log10(fillDs);
             } else if ( cmd.equals("|exp10") ) {
@@ -697,6 +899,41 @@ public class DataSetOps {
             } else if ( cmd.equals("|flatten" ) ) {
                 if ( fillDs.rank()!=2 ) throw new IllegalArgumentException("only rank2 supported");
                 fillDs= flattenRank2(fillDs);
+            } else if ( cmd.equals("|grid" ) ) {
+                if ( fillDs.rank()!=2 ) throw new IllegalArgumentException("only rank2 supported");
+                fillDs= grid(fillDs);
+            } else if ( cmd.equals("|magnitude") ) {
+                fillDs= Ops.magnitude(fillDs);
+            } else if ( cmd.equals("|pow")) {
+                int idx= s.nextInt();
+                fillDs= Ops.pow(fillDs,idx);
+            } else if ( cmd.equals("|total")) {
+                int idx= s.nextInt();
+                fillDs= Ops.total(fillDs, idx);
+            } else if ( cmd.equals("|sqrt")) {
+                fillDs= Ops.sqrt(fillDs);
+            } else if ( cmd.equals("|fftPower" ) ) {
+                if ( fillDs.length()>0 ) {
+                    if ( s.hasNextInt() ) {
+                        int len= s.nextInt();
+                        fillDs= Ops.fftPower(fillDs,len, mon);
+                    } else {
+                        fillDs= Ops.fftPower(fillDs);
+                    }
+                } else {
+                    fillDs= Ops.fftPower(fillDs);
+                }
+            } else if ( cmd.equals("|unbundle" ) ) {
+                String comp= s.next();
+                if ( comp.startsWith("'") && comp.endsWith("'") ) {
+                    comp= comp.substring(1,comp.length()-1);
+                }
+                try {
+                    int icomp= Integer.parseInt(comp);
+                    fillDs= DataSetOps.unbundle( fillDs, icomp );
+                } catch ( NumberFormatException ex ) {
+                    fillDs= DataSetOps.unbundle( fillDs, comp );
+                }
             }
         }
         return fillDs;
@@ -725,4 +962,48 @@ public class DataSetOps {
         }
         return s.hasNext() || s2.hasNext();
     }
+
+    /**
+     * return a bounding qube of the independent dimensions containing
+     * the dataset.
+     * Only for tables right now.
+     * @param ds
+     * @return
+     */
+    public static QDataSet dependBounds( QDataSet ds ) {
+        QDataSet xrange;
+        QDataSet yrange;
+
+        if( ds.rank() == 2) {
+            xrange= Ops.extent( SemanticOps.xtagsDataSet(ds) );
+            yrange= Ops.extent( SemanticOps.ytagsDataSet(ds) );
+        } else if ( ds.rank()==3 ) {
+            QDataSet ds1= ds.slice(0);
+            xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1) );
+            yrange= Ops.extent( SemanticOps.ytagsDataSet(ds1) );
+            for ( int i=1; i<ds.length(); i++ ) {
+                ds1= ds.slice(i);
+                xrange= Ops.extent( SemanticOps.xtagsDataSet(ds1), xrange );
+                yrange= Ops.extent( SemanticOps.ytagsDataSet(ds1), yrange );
+            }
+        } else {
+            throw new IllegalArgumentException("bad rank");
+        }
+
+        QDataSet result= Ops.join( xrange, yrange );
+
+        return result;
+    }
+
+    public static boolean boundsContains(QDataSet bounds, Datum xValue, Datum yValue) {
+        if ( bounds.property(QDataSet.BINS_1)==null ) {
+            if ( bounds.property(QDataSet.BINS_0,0)==null ) {
+                throw new IllegalArgumentException("expected BINS_1");
+            }
+        }
+        DatumRange xrange= DataSetUtil.asDatumRange( bounds.slice(0), true );
+        DatumRange yrange= DataSetUtil.asDatumRange( bounds.slice(1), true );
+        return xrange.contains(xValue) && yrange.contains(yValue);
+    }
+    
 }

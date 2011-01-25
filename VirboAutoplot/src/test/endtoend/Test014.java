@@ -134,7 +134,7 @@ public class Test014 {
             doTest( 3, "file:/home/jbf/ct/hudson/data.backup/dat/cl_ttag_study.dat?column=field0", null );
             doTest( 5, "file:///home/jbf/ct/hudson/data.backup/dat/power.dat.txt", null );
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
+        } catch ( Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }

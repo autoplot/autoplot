@@ -8,8 +8,6 @@
  */
 package org.virbo.datasource;
 
-import java.io.UnsupportedEncodingException;
-import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
@@ -23,19 +21,21 @@ import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
-import org.das2.DasApplication;
+import java.util.regex.Pattern;
+import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.LocalFileSystem;
+import org.das2.util.filesystem.URIException;
 import org.das2.util.filesystem.VFSFileSystemFactory;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.datasource.DataSourceFormat;
@@ -67,8 +67,8 @@ public class DataSetURI {
         FileSystem.registerFileSystemFactory("sftp", new VFSFileSystemFactory());
         FileSystem.settings().setPersistence(FileSystemSettings.Persistence.EXPIRES);
 
-        if (DasApplication.hasAllPermission()) {
-            File apDataHome = new File(System.getProperty("user.home"), "autoplot_data");
+        if (FileSystemSettings.hasAllPermission()) {
+            File apDataHome = new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE ) );
             FileSystem.settings().setLocalCacheDir(apDataHome);
         }
     }
@@ -81,6 +81,7 @@ public class DataSetURI {
      * @return the extension found, or null if no period is found in the filename.
      */
     public static String getExt(String surl) {
+        if ( surl==null ) throw new NullPointerException();
         String explicitExt = getExplicitExt(surl);
         if (explicitExt != null) {
             return explicitExt;
@@ -142,6 +143,9 @@ public class DataSetURI {
      */
     public static DataSource getDataSource(URI uri) throws Exception {
         DataSourceFactory factory = getDataSourceFactory(uri, new NullProgressMonitor());
+        if ( factory==null ) {
+            throw new IllegalArgumentException("unable to resolve URI: "+uri);
+        }
         DataSource result = factory.getDataSource(uri);
         dsToFactory.put(result, factory);
         return result;
@@ -215,7 +219,7 @@ public class DataSetURI {
      * @return the URI for the datasource resource, or null if it is not valid.
      */
     public static URI getResourceURI(URI uri) {
-        URISplit split = URISplit.parse(uri.toString());
+        URISplit split = URISplit.parse(uri);
         return split.resourceUri;
     }
 
@@ -230,6 +234,12 @@ public class DataSetURI {
      * @return the URI for the datasource resource, or null if it is not valid.
      */
     public static URI getResourceURI(String surl) {
+        if ( surl.matches( "file\\:[A-Z]\\:\\\\.*") ) {
+            surl= "file://" + surl.substring(5).replace('\\','/');
+        }
+        if ( surl.matches( "file\\:/[A-Z]\\:\\\\.*") ) {
+            surl= "file://" + surl.substring(5).replace('\\','/');
+        }
         URISplit split = URISplit.parse(surl);
         return split.resourceUri;
     }
@@ -246,11 +256,6 @@ public class DataSetURI {
         try {
             URL rurl = getResourceURI(url).toURL();
             String surl = rurl.toString();
-            if (rurl.getProtocol().equals("file")) {
-                // do nothing
-            } else {
-                surl = surl.replaceAll("%20", "+");
-            }
             return new URL(surl);
 
         } catch (MalformedURLException ex) {
@@ -321,8 +326,9 @@ public class DataSetURI {
     public static DataSourceFactory getDataSourceFactory(
             URI uri, ProgressMonitor mon) throws IOException, IllegalArgumentException {
 
-        if (isAggregating(uri.toString())) {
-            String eext = DataSetURI.getExplicitExt(uri.toString());
+        String suri= DataSetURI.fromUri(uri);
+        if ( isAggregating( suri ) ) {
+            String eext = DataSetURI.getExplicitExt( suri );
             if (eext != null) {
                 DataSourceFactory delegateFactory = DataSourceRegistry.getInstance().getSource(eext);
                 AggregatingDataSourceFactory factory = new AggregatingDataSourceFactory();
@@ -333,7 +339,7 @@ public class DataSetURI {
             }
         }
 
-        String ext = DataSetURI.getExplicitExt(uri.toString());
+        String ext = DataSetURI.getExplicitExt( suri );
         if (ext != null) {
             return DataSourceRegistry.getInstance().getSource(ext);
         }
@@ -342,7 +348,7 @@ public class DataSetURI {
         try {
             String resourceSuri = uri.getRawSchemeSpecificPart();
             //resourceSuri= resourceSuri.replaceAll("%", "%25");
-            resourceUri = new URI(resourceSuri);
+            resourceUri = new URI(resourceSuri); //bug3055130 okay
         } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
@@ -417,7 +423,7 @@ public class DataSetURI {
         URISplit split = URISplit.parse(url.toString());
 
         try {
-            URI spath = getWebURL(new URI(split.path)).toURI();
+            URI spath = getWebURL( DataSetURI.toUri(split.path)).toURI();
             FileSystem fs = FileSystem.create(spath);
             String filename = split.file.substring(split.path.length());
             if (fs instanceof LocalFileSystem)
@@ -434,22 +440,18 @@ public class DataSetURI {
     }
 
     public static InputStream getInputStream(URI uri, ProgressMonitor mon) throws IOException {
-        URISplit split = URISplit.parse(uri.toString());
+        URISplit split = URISplit.parse( uri );
         FileSystem fs;
-        try {
-            fs = FileSystem.create(new URI(split.path));
-            String filename = split.file.substring(split.path.length());
-            if (fs instanceof LocalFileSystem)
-                filename = DataSourceUtil.unescape(filename);
-            FileObject fo = fs.getFileObject(filename);
-            if (!fo.isLocal()) {
-                Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
-            }
-            return fo.getInputStream(mon);
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);  // shouldn't happen
+        fs = FileSystem.create( DataSetURI.toUri(split.path) );
+        String filename = split.file.substring(split.path.length());
+        if (fs instanceof LocalFileSystem)
+            filename = DataSourceUtil.unescape(filename);
+        FileObject fo = fs.getFileObject(filename);
+        if (!fo.isLocal()) {
+            Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
         }
+        return fo.getInputStream(mon);
+
     }
 
     /**
@@ -467,40 +469,75 @@ public class DataSetURI {
 
     /**
      * canonical method for converting string from the wild into a URI-safe string.
+     * This contains the code that converts a colloquial string URI into a
+     * properly formed URI.
      * For example:
      *    space is converted to "%20"
      *    %Y is converted to $Y
-     * This does not add file: or vap:.
+     * This does not add file: or vap:.  Pluses are only changed in the params part.
      * @param suri
-     * @throws IllegalArgumentException if the uri cannot be made safe.
+     * @throws IllegalArgumentException if the URI cannot be made safe.
      * @return
      */
     public static URI toUri( String suri ) {
         try {
-            suri = suri.replaceAll("%([^0-9])", "%25$1");
-            suri = suri.replaceAll("<", "%3C");
-            suri = suri.replaceAll(">", "%3E");
-            suri = suri.replaceAll(" ", "%20");
-            return new URI(suri);
+            if ( !URISplit.isUriEncoded(suri) ) {
+                suri = suri.replaceAll("%([^0-9])", "%25$1");
+                //suri = suri.replaceAll("#", "%23" );
+                //surl = surl.replaceAll("%", "%25" ); // see above
+                //suri = suri.replaceAll("&", "%26" );
+                //surl = surl.replaceAll("/", "%2F" );
+                //surl = surl.replaceAll(":", "%3A" );
+                //suri = suri.replaceAll(";", "%3B" );
+                suri = suri.replaceAll("<", "%3C");
+                suri = suri.replaceAll(">", "%3E");
+                //suri = suri.replaceAll("\\?", "%3F" );
+                suri = suri.replaceAll(" ", "%20");
+            }
+            return new URI(suri); //bug 3055130 okay
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
     /**
-     * canonical mathos for converting URI to human-readable string, containing
-     * spaces and other illegal characters.
+     * canonical method for converting URI to human-readable string, containing
+     * spaces and other illegal characters.  Note pluses in the query part
+     * are interpreted as spaces.
+     * See also URISplit.uriDecode,etc.
      * @param uri
      * @return
      */
     public static String fromUri( URI uri ) {
-        try {
-            String r = URLDecoder.decode(uri.toASCIIString(), "US-ASCII");
-            return r;
-        } catch (UnsupportedEncodingException ex) {
-            throw new RuntimeException(ex);
+        String surl= uri.toASCIIString();
+        int i= surl.indexOf("?");
+        String query= i==-1 ? "" : surl.substring(i);
+        if ( i!=-1 ) {
+            //if ( query.contains("+") && !query.contains("%20") ) {
+            //    query = query.replaceAll("\\+", " " );
+            //}
+            return URISplit.uriDecode(surl.substring(0,i)) + query;
+        } else {
+            return URISplit.uriDecode(surl);
         }
+        
     }
+
+    /**
+     * Legacy behavior was to convert pluses into spaces in URIs.  This caused problems
+     * distinguishing spaces from pluses, so we dropped this as the default behavior.
+     * If data sources are to support legacy URIs, then they should use this routine
+     * to mimic the behavior.
+     * This checks if the URI already contains spaces, and will not convert if there
+     * are already spaces.
+     * @param ssheet
+     * @return
+     */
+    public static String maybePlusToSpace(String ssheet) {
+        if ( ssheet.contains(" ") ) return ssheet;
+        return ssheet.replaceAll("\\+"," ");
+    }
+
 
     /**
      * return a file reference for the url.  This is initially to fix the problem
@@ -540,23 +577,33 @@ public class DataSetURI {
      */
     public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse( fromUri( uri ) );
-        FileSystem fs = FileSystem.create(toUri(split.path));
-        String filename = split.file.substring(split.path.length());
-        FileObject fo = fs.getFileObject(filename);
-        File tfile = fo.getFile(mon);
-        return tfile;
+        try {
+            FileSystem fs = FileSystem.create(toUri(split.path));
+            String filename = split.file.substring(split.path.length());
+            FileObject fo = fs.getFileObject(filename);
+            File tfile = fo.getFile(mon);
+            return tfile;
+        } catch ( URIException ex ) {
+            throw new IOException(ex.getMessage()); //Java1.6 will change this
+        } catch ( IllegalArgumentException ex ) {
+            ex.printStackTrace();
+            if ( ex.getMessage().startsWith("root does not exist") ) { // kludgy bugfix 3053225:  why can't FS throw IOException
+                throw new IOException(ex.getMessage());
+            } else {
+                throw new IOException("Unsupported protocol: "+uri);
+            }
+        }
     }
 
     /**
      * canonical method for getting the Autoplot URI.  If no protocol is specified, then file:// is
      * used.  Note URIs may contain prefix like bin.http://www.cdf.org/data.cdf.  The
-     * result will start with an Autoplot sceme like "vap:" or "vap+cdf:"
+     * result will start with an Autoplot scheme like "vap:" or "vap+cdf:"
      * 
      */
     public static URI getURI(String surl) throws URISyntaxException {
         URISplit split = URISplit.maybeAddFile(surl, 0);
         surl = split.surl;
-        if (split.vapScheme != null) surl = split.vapScheme + ":" + surl;
         if (surl.endsWith("://")) {
             surl += "/";  // what strange case is this?
         }
@@ -567,8 +614,14 @@ public class DataSetURI {
         surl = surl.replaceAll(">", "%3E");
         surl = surl.replaceAll(" ", "%20"); // drop the spaces are pluses in filenames.
         //}
+        if (split.vapScheme != null) {
+            if ( split.vapScheme.contains(" ") ) {
+                split.vapScheme= split.vapScheme.replace(" ","+");
+            }
+            surl = split.vapScheme + ":" + surl;
+        }
         surl = URISplit.format(URISplit.parse(surl)); // add "vap:" if it's not there
-        URI result = new URI(surl);
+        URI result = new URI(surl); //bug 3055130 okay
         return result;
     }
 
@@ -630,7 +683,7 @@ public class DataSetURI {
             if (split.resourceUriCarotPos <= firstSlashAfterHost) {
                 return getHostCompletions(URISplit.format(split), split.formatCarotPos, mon);
             } else {
-                return getFileSystemCompletions(URISplit.format(split), split.formatCarotPos, mon);
+                return getFileSystemCompletions(URISplit.format(split), split.formatCarotPos, true, true, null, mon);
             }
 
         }
@@ -686,7 +739,7 @@ public class DataSetURI {
         return completions;
     }
 
-    public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException, URISyntaxException {
+    public static List<CompletionResult> getFileSystemAggCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws IOException, URISyntaxException {
         URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
         String prefix = URISplit.uriDecode(split.file.substring(split.path.length()));
         String surlDir = URISplit.uriDecode(split.path);
@@ -704,7 +757,7 @@ public class DataSetURI {
         FileSystem fs = null;
         String[] s;
 
-        fs = FileSystem.create( new URI(surlDir.replaceAll(" ", "%20")) );
+        fs = FileSystem.create( DataSetURI.toUri(surlDir) );
 
         s = fs.listDirectory("/");
 
@@ -715,7 +768,7 @@ public class DataSetURI {
             prefix = prefix.toLowerCase();
         }
 
-        List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
+        List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(5);
 
         String[] s2= new String[s.length];
         for ( int i=0; i<s.length; i++ ) {
@@ -731,33 +784,173 @@ public class DataSetURI {
                 completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation", true ) );
             }
         }
+        return completions;
+    }
+
+    /**
+     *
+     * @param surl
+     * @param carotpos
+     * @param inclAgg
+     * @param inclFiles
+     * @param acceptPattern  if non-null, files and aggregations much match this.
+     * @param mon
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException
+     */
+    public static List<CompletionResult> getFileSystemCompletions(final String surl, final int carotpos, boolean inclAgg, boolean inclFiles, String acceptPattern, ProgressMonitor mon) throws IOException, URISyntaxException {
+        URISplit split = URISplit.parse(surl.substring(0, carotpos),carotpos,false);
+        String prefix = URISplit.uriDecode(split.file.substring(split.path.length()));
+        String surlDir = URISplit.uriDecode(split.path);
+        String params = null; // possibly the params, not with question mark.
+        int iq = surl.indexOf("?");
+        if (iq > -1) {
+            int islash = surl.lastIndexOf("/");
+            if (islash <= carotpos) {
+                params = surl.substring(iq + 1);
+            }
+        }
+
+        mon.setLabel("getting remote listing");
+
+        FileSystem fs = null;
+        String[] s;
+
+        boolean hasVap= surl.startsWith("vap");
+
+        if ( surlDir.equals("file:" ) || surlDir.equals("file://" ) ) {  //TODO: could go ahead and list
+            surlDir="file:///";
+            CompletionResult t0;
+            if ( hasVap ) {
+                t0= new CompletionResult( split.vapScheme + ":" + "file:///","need three slashes");
+            } else {
+                t0= new CompletionResult("file:///","need three slashes");
+            }
+            List<DataSetURI.CompletionResult> completions= Collections.singletonList(t0);
+            return completions;
+        }
+
+        boolean onlyAgg= false;
+
+        if ( surlDir.endsWith("/$Y/") ) { // this will be generalized after verified
+            String s1= surlDir.substring(0,surlDir.length()-3);
+            String s2= surlDir.substring(surlDir.length()-3,surlDir.length()-1);  //$Y
+            FileSystem fsp= FileSystem.create( DataSetURI.toUri(s1), mon );
+            FileStorageModelNew fsm= FileStorageModelNew.create( fsp, s2 );
+
+            fs= fsp; // careful, we only use this for case insensitive check
+            List<String> ss= new ArrayList();
+            String [] ss2= fsm.getNamesFor(null);
+
+            int nn= Math.min( 1, ss2.length );
+            
+            for ( int i=0; i<nn; i++ ) {
+                FileSystem fsm2= FileSystem.create( DataSetURI.toUri( s1+ss2[i]) );
+                String[] ss3= fsm2.listDirectory("/");
+                for ( int ii=0; ii<ss3.length; ii++ ) {
+                    ss3[ii]= ss2[i] + '/' + ss3[ii];
+                }
+                ss.addAll( Arrays.asList(ss3) );
+            }
+
+            s= ss.toArray( new String[ss.size()] );
+            surlDir= s1;
+            onlyAgg= true;
+            
+        } else {
+            fs = FileSystem.create( DataSetURI.toUri(surlDir), mon );
+            s = fs.listDirectory("/");
+        }
+
+        //TODO: handle folder-not-found more gracefully.
 
 
-        for (int j = 0; j < s.length; j++) {
-            String scomp = foldCase ? s[j].toLowerCase() : s[j];
-            if (scomp.startsWith(prefix)) {
-                if (s[j].endsWith("contents.html")) {
-                    s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
-                } // kludge for dods
-                // Hack for .zip archives:
-                if (s[j].endsWith(".zip")) s[j] = s[j] + "/";
-                String uriSafe = s[j].replaceAll(" ", "%20");
+        if ( acceptPattern!=null ) {
+            Pattern p= Pattern.compile(acceptPattern);
+            List<String> res= new ArrayList<String>(s.length);
+            for ( int i=0; i<s.length; i++ ) {
+                if ( s[i].endsWith("/") ) {
+                    res.add(s[i]);
+                } else if ( p.matcher(s[i]).matches() ) {
+                    res.add(s[i]);
+                }
+            }
+            s= res.toArray( new String[res.size()] );
+        }
 
-                String completion = surlDir + uriSafe;
-                completion = DataSetURI.newUri(surl, completion);
+        Arrays.sort(s,new Comparator<String>() {
+            public int compare(String o1, String o2) {  // put ones starting with '.' at the end
+                boolean d1= o1.startsWith(".");
+                boolean d2= o2.startsWith(".");
+                if ( d1 == d2 ) {
+                    return o1.compareTo(o2);
+                } else if ( d1 ) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
 
-                String label = s[j];
-                String completable = surl.substring(0, carotpos);
+        boolean foldCase = Boolean.TRUE.equals(fs.getProperty(fs.PROP_CASE_INSENSITIVE));
+        if (foldCase) {
+            prefix = prefix.toLowerCase();
+        }
 
-                boolean maybePlot = true;
-                //if ( completion.contains("/?") ) maybePlot= false;
-                completions.add(new DataSetURI.CompletionResult(completion, label, null, completable, maybePlot));
+        List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>(s.length);
+
+        String[] s2= new String[s.length];
+        for ( int i=0; i<s.length; i++ ) {
+            s2[i]= surlDir + s[i];
+        }
+
+        if ( s2.length>0 && inclAgg ) {
+            //String sagg= DataSourceUtil.makeAggregation( s2[0], s2 );
+            List<String> files= new LinkedList( Arrays.asList(s2) );
+            List<String> saggs= DataSourceUtil.findAggregations( files, true );
+            if ( onlyAgg ) {
+                completions.removeAll(completions);
+            }
+
+            for ( String sagg: saggs ) {
+                sagg= URISplit.removeParam( sagg, "timerange" );
+                String scomp = foldCase ? sagg.toLowerCase() : sagg;
+                scomp= scomp.substring(surlDir.length());
+                if ( scomp.startsWith(prefix) ) {
+                    completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation", true ) );
+                }
+            }
+        }
+
+        if ( !onlyAgg ) {
+            for (int j = 0; j < s.length; j++) {
+                String scomp = foldCase ? s[j].toLowerCase() : s[j];
+                if (scomp.startsWith(prefix)) {
+                    if (s[j].endsWith("contents.html")) {
+                        s[j] = s[j].substring(0, s[j].length() - "contents.html".length());
+                    } // kludge for dods
+                    // Hack for .zip archives:
+                    if (s[j].endsWith(".zip")) s[j] = s[j] + "/";
+
+                    if ( ! ( inclFiles || s[j].endsWith("/") ) ) continue;
+
+                    String completion = surlDir + s[j];
+                    completion = DataSetURI.newUri(surl, completion);
+
+                    String label = s[j];
+                    String completable = surl.substring(0, carotpos);
+
+                    boolean maybePlot = true;
+                    //if ( completion.contains("/?") ) maybePlot= false;
+                    completions.add(new DataSetURI.CompletionResult(completion, label, null, completable, maybePlot));
+                }
             }
         }
 
         // check for single completion that is just a folder name with /.
         if (completions.size() == 1) {
-            if ((completions.get(0)).equals(surlDir + prefix + "/")) {
+            if ((completions.get(0)).completion.equals(surlDir + prefix + "/")) {
                 // maybe we should do something special.
             }
         }
@@ -768,10 +961,12 @@ public class DataSetURI {
     public static List<CompletionResult> getFactoryCompletions(String surl1, int carotPos, ProgressMonitor mon) throws Exception {
         CompletionContext cc = new CompletionContext();
         int qpos = surl1.lastIndexOf('?', carotPos);
+        if ( qpos==-1 && surl1.contains(":") && ( surl1.endsWith(":") || surl1.contains("&") ) ) {
+            qpos= surl1.indexOf(":");
+        }
 
         cc.surl = surl1;
         cc.surlpos = carotPos; //resourceUriCarotPos
-
 
         List<CompletionResult> result = new ArrayList<CompletionResult>();
 
@@ -822,15 +1017,15 @@ public class DataSetURI {
 
             URI uri = DataSetURI.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
 
-            cc.resource = DataSetURI.getWebURL(uri);
+            cc.resourceURI= DataSetURI.getResourceURI(uri);
             cc.params = split.params;
 
             List<CompletionContext> completions = factory.getCompletions(cc, mon);
 
-            // identify the implicit parameter names
+            // identify the implicit parameter names--THIS IS GOING AWAY!
             Map params = URISplit.parseParams(split.params);
             boolean hasImplicit = false;
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++) { // NOTE THERE ARE ONLY THREE ALLOWED arg_<i> PARAMETERS!
                 String arg = (String) params.get("arg_" + i);
                 if (arg != null) {
                     for (CompletionContext cc1 : completions) {
@@ -866,7 +1061,7 @@ public class DataSetURI {
                         paramsCopy.put(cc1.completable, null);
                     }
 
-                    String ss = split.vapScheme + ":" + split.file + "?" + URISplit.formatParams(paramsCopy);
+                    String ss= ( split.implicitVap ? "" : (split.vapScheme + ":" ) ) + split.file + "?" + URISplit.formatParams(paramsCopy);
 
                     if (dontYetHave == false) {
                         continue;  // skip it
@@ -879,10 +1074,13 @@ public class DataSetURI {
             return result;
 
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
-            URI uri = DataSetURI.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+            String file= CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
             DataSourceFactory factory = getDataSourceFactory(getURI(surl1), mon);
 
-            cc.resource = DataSetURI.getWebURL(uri);
+            if ( file!=null ) {
+                URI uri = DataSetURI.getURI(file);
+                cc.resourceURI= DataSetURI.getResourceURI(uri);
+            }
             cc.params = split.params;
 
             if (factory == null) {
@@ -893,8 +1091,9 @@ public class DataSetURI {
 
             int i = 0;
             for (CompletionContext cc1 : completions) {
-                if (cc1.completable.startsWith(cc.completable)) {
-                    String ss = split.vapScheme + ":" + CompletionContext.insert(cc, cc1);
+                if ( cc1.completable.startsWith(cc.completable)) {
+                    String ss= CompletionContext.insert(cc, cc1);
+                    if ( !ss.startsWith( split.vapScheme ) ) ss = split.vapScheme + ":" + ss;
                     result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
                     i = i + 1;
                 }
@@ -908,8 +1107,10 @@ public class DataSetURI {
                 mon.setProgressMessage("listing directory");
                 mon.started();
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
-
-                int i = surl.lastIndexOf("/", carotPos - 1);
+                int surlPos= cc.surl.indexOf(surl);
+                if ( surlPos==-1 ) surlPos= 0;
+                int newCarotPos= carotPos - surlPos;
+                int i = surl.lastIndexOf("/", newCarotPos - 1);
                 String surlDir;  // name of surl, including only folders, ending with /.
 
                 if (i <= 0) {
@@ -921,7 +1122,7 @@ public class DataSetURI {
                 }
 
                 URI url = getURI(surlDir);
-                String prefix = surl.substring(i + 1, carotPos);
+                String prefix = surl.substring(i + 1, newCarotPos);
                 FileSystem fs = FileSystem.create(getWebURL(url),new NullProgressMonitor());
                 String[] s = fs.listDirectory("/");
                 mon.finished();
@@ -950,9 +1151,13 @@ public class DataSetURI {
     }
 
     public static void main(String[] args) {
-        File f = new File("c:\\documents and settings\\");
-        System.err.println(f.exists());
-        System.err.println(f.toURI().toString());
+//        File f = new File("c:\\documents and settings\\");
+//        System.err.println(f.exists());
+//        System.err.println(f.toURI().toString());
+        
+        System.err.println(  getResourceURI("file:C:\\documents and settings\\jbf\\pngwalk") );
+
+
 
     }
 }

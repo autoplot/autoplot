@@ -1,17 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package org.virbo.netCDF;
 
 import java.io.IOException;
 import java.nio.channels.WritableByteChannel;
-import java.util.List;
 import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
-import org.jdom.Attribute;
-import org.jdom.Element;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
@@ -28,6 +20,10 @@ import ucar.nc2.util.CancelTask;
 import ucar.unidata.io.RandomAccessFile;
 
 /**
+ * APIOServiceProvider adapts Autoplot's data model to NetCDF to allow Autoplot
+ * URIs to be read into NetCDF.  The property vapuri in the NCML file contains
+ * an Autoplot URI.  It's been a while since we've played with this (to prove
+ * the idea), and I'm not sure where example NCML files are found.
  *
  * @author jbf
  */

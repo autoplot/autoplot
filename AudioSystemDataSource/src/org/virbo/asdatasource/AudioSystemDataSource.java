@@ -86,7 +86,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         dataBuffer.order( ByteOrder.LITTLE_ENDIAN );
 
-        startUpdateTimer();
+        //startUpdateTimer();
         
         QDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, dataBuffer, BufferDataSet.SHORT );
         if ( spec>-1 ) {
@@ -114,31 +114,33 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
         }
     }
 
-    private void shiftBuffer() throws IOException {
-        System.err.println("shiftBuffer"+dataBuffer);
-        dataBuffer.position( dataBuffer.capacity()/2 ); 
-        dataBuffer.compact();
-        fillBuffer( new NullProgressMonitor() );
-    }
-
-    private void startUpdateTimer() {
-        Runnable run= new Runnable() {
-            public void run() {
-                while ( true ) {
-                    try {
-                        shiftBuffer();
-                        QDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, dataBuffer, BufferDataSet.SHORT );
-                        if ( spec>-1 ) {
-                           ds= Ops.fftWindow(ds, spec);
-                        }
-                        pcs.firePropertyChange(Updating.PROP_DATASET, null, ds );
-                    } catch ( IOException ex ) {
-                        Logger.getLogger(AudioSystemDataSource.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        };
-        new Thread( run, "updater for " + getURI() ).start();
-    }
+    //TODO: add updating capability to replace function of code below.
+//
+//    private void shiftBuffer() throws IOException {
+//        System.err.println("shiftBuffer"+dataBuffer);
+//        dataBuffer.position( dataBuffer.capacity()/2 );
+//        dataBuffer.compact();
+//        fillBuffer( new NullProgressMonitor() );
+//    }
+//
+//    private void startUpdateTimer() {
+//        Runnable run= new Runnable() {
+//            public void run() {
+//                while ( true ) {
+//                    try {
+//                        shiftBuffer();
+//                        QDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, dataBuffer, BufferDataSet.SHORT );
+//                        if ( spec>-1 ) {
+//                           ds= Ops.fftWindow(ds, spec);
+//                        }
+//                        pcs.firePropertyChange(Updating.PROP_DATASET, null, ds );
+//                    } catch ( IOException ex ) {
+//                        Logger.getLogger(AudioSystemDataSource.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                }
+//            }
+//        };
+//        new Thread( run, "updater for " + getURI() ).start();
+//    }
 
 }

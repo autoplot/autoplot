@@ -12,10 +12,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModelNew;
@@ -56,7 +59,13 @@ public class WalkUtil {
 
     public static boolean fileExists(String surl) throws FileSystemOfflineException, URISyntaxException {
         int i= splitIndex( surl );
-        FileSystem fs = FileSystem.create( new URI(surl.substring(0,i+1) ) );
+        FileSystem fs;
+        try {
+            fs = FileSystem.create( DataSetURI.getResourceURI( surl.substring(0, i + 1) ) );
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(WalkUtil.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
         return fs.getFileObject(surl.substring(i+1)).exists();
     }
 
@@ -79,7 +88,7 @@ public class WalkUtil {
         String sansArgs = i == -1 ? surl : surl.substring(0, i);
 
         i = splitIndex(sansArgs);
-        FileSystem fs = FileSystem.create( new URI(sansArgs.substring(0, i+1)) );
+        FileSystem fs = FileSystem.create( DataSetURI.getResourceURI(sansArgs.substring(0, i+1)) );
         String spec= sansArgs.substring(i+1).replaceAll("\\$", "%");
 
         spec= spec.replaceAll("\\*", ".*");
@@ -109,7 +118,7 @@ public class WalkUtil {
             if ( dr==null || dr2==null || dr.contains(dr2) ) {
                 if ( fs.getFileObject(ss[i]).isLocal() ) {
                     //File f= fs.getFileObject(ss[i]).getFile();
-                    result.add( new URI( dirsuri + ss[i] ) ); // make file:/// match template.
+                    result.add( new URI( DataSetURI.getResourceURI( dirsuri ).toString() + ss[i] ) ); // make file:/// match template. // bug 3055130 suspect
                 } else {
                     result.add( fs.getRootURI().resolve(ss[i]) );
                 }
@@ -138,4 +147,5 @@ public class WalkUtil {
         write.write(s);
         write.close();
     }
+
 }

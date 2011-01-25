@@ -2,6 +2,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -32,23 +33,25 @@ import javax.swing.event.ChangeListener;
  */
 public class RowPngWalkView extends PngWalkView {
 
-    public static final int DEFAULT_CELL_SIZE = 100;
+    public static final int DEFAULT_CELL_SIZE = 200;
     public static final int MINIMUM_CELL_SIZE = 20;
     private int cellSize = DEFAULT_CELL_SIZE;
     protected JScrollPane scrollPane;
-    private RowViewCanvas canvas;
+    private Canvas canvas;
+    private double restoreScrollPct = -1;
 
     public RowPngWalkView(final WalkImageSequence sequence) {
         super(sequence);
         setShowCaptions(true);
         setLayout(new java.awt.BorderLayout());
-        canvas = new RowViewCanvas();
+        canvas = new Canvas();
         scrollPane = new JScrollPane(canvas, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         canvas.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (seq == null) return;
                 int clickCell = (int) Math.floor((double) e.getX() / (double) cellSize);
                 //System.err.printf("Click at %d, %d (cell %d)%n", e.getX(), e.getY(), clickCell);
                 selectCell(clickCell);
@@ -59,10 +62,15 @@ public class RowPngWalkView extends PngWalkView {
 
             @Override
             public void componentResized(ComponentEvent e) {
-                //cellSize = getHeight();
-                cellSize = getThumbnailSize();
-                //System.err.printf("Set cell size to %d.%n", cellSize);
-                updateLayout();
+                // Thumbnail set restoreScroll, indicating we need to adjust scroll
+                if (restoreScrollPct >= 0) {
+                    //int newScroll = restoreScrollPct * cellSize - (scrollPane.getWidth()-cellSize)/2;
+                    javax.swing.JScrollBar sb = scrollPane.getHorizontalScrollBar();
+                    int newScroll = (int)(restoreScrollPct * (sb.getMaximum()-sb.getVisibleAmount()));
+                    if (newScroll < 0) newScroll = 0;
+                    sb.setValue(newScroll);
+                    restoreScrollPct = -1;
+                }
             }
         });
 
@@ -81,8 +89,8 @@ public class RowPngWalkView extends PngWalkView {
 
                     public void run() {
                         Rectangle bounds = scrollPane.getViewport().getViewRect();
-                        int first = bounds.x / cellSize;
-                        int last = Math.min(seq.size(), (bounds.x + bounds.width) / cellSize + 1);
+                        int first = Math.max( 0, ( bounds.x - bounds.width ) / cellSize );
+                        int last = Math.min(seq.size(), (bounds.x +  2 * bounds.width) / cellSize + 1);
                         for(int i=first; i<last; i++) {
                             seq.imageAt(i).getThumbnail(true);
                         }
@@ -103,6 +111,12 @@ public class RowPngWalkView extends PngWalkView {
 
     @Override
     protected void thumbnailSizeChanged() {
+        // Store scroll bar position as percentage
+        // This will be restored by component event handler
+        javax.swing.JScrollBar sb = scrollPane.getHorizontalScrollBar();
+        restoreScrollPct = ((double)sb.getValue() / (sb.getMaximum()-sb.getVisibleAmount()));
+        //System.err.printf("Will restore scroll at %.2f%%%n", 100*restoreScrollPct);
+        //Update thumbnail size
         cellSize= getThumbnailSize();
         updateLayout();
         super.thumbnailSizeChanged();
@@ -119,8 +133,9 @@ public class RowPngWalkView extends PngWalkView {
         if (seq != null) {
             canvas.setPreferredSize(new Dimension(cellSize * seq.size(), cellSize));
         } else {
-            canvas.setPreferredSize(new Dimension(DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE));
+            canvas.setPreferredSize(new Dimension(0, 0));
         }
+        canvas.revalidate(); //force scrollpane to re-do layout
         canvas.repaint();
     }
 
@@ -147,20 +162,24 @@ public class RowPngWalkView extends PngWalkView {
                 scrollPane.getHorizontalScrollBar().setValue(pos);
             }
         } else if (e.getPropertyName().equals(WalkImageSequence.PROP_THUMB_LOADED) ||
-                e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED)) {
+                e.getPropertyName().equals(WalkImageSequence.PROP_IMAGE_LOADED) ||
+                e.getPropertyName().equals(WalkImageSequence.PROP_BADGE_CHANGE)) {
             int i = (Integer) e.getNewValue();
             int x = i * cellSize;
             canvas.repaint(new Rectangle(x, 0, cellSize, cellSize));
-            canvas.repaintSoon();
+            //canvas.repaintSoon();
+            //System.err.println("repaint soon...");
         } else if (e.getPropertyName().equals(WalkImageSequence.PROP_SEQUENCE_CHANGED)) {
             sequenceChanged();
         }
     }
 
 
-    private class RowViewCanvas extends JPanel implements Scrollable {
+    private class Canvas extends JPanel implements Scrollable {
+        private Font smallFont = new Font("Dialog", Font.PLAIN, 6);  //for use with small thumbnails
+        private Font normalFont = new Font("Dialog", Font.PLAIN, 12); // this is the Java default
 
-        public RowViewCanvas() {
+        public Canvas() {
             this.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 
             repaintTimer = new javax.swing.Timer( 300, new ActionListener() {
@@ -186,6 +205,11 @@ public class RowPngWalkView extends PngWalkView {
             Graphics2D g2 = (Graphics2D) g1;
 
             g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
+
+            if (cellSize < 100)
+                g2.setFont(smallFont);
+            else
+                g2.setFont(normalFont);
             
             Rectangle bounds = g2.getClipBounds();
             FontMetrics fm= g2.getFontMetrics();
@@ -214,9 +238,10 @@ public class RowPngWalkView extends PngWalkView {
                     g2.fillRect(i * cellSize, 0, cellSize, cellSize);
                 }
                 //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
-                BufferedImage thumb = seq.imageAt(i).getThumbnail(!scrollPane.getHorizontalScrollBar().getValueIsAdjusting());
+                WalkImage wimage= seq.imageAt(i);
+                BufferedImage thumb = wimage.getThumbnail(!scrollPane.getHorizontalScrollBar().getValueIsAdjusting());
                 if (thumb != null) {
-                    double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4) / thumb.getHeight());
+                    double s = Math.min((double) (cellSize - 4) / thumb.getWidth(), (double) (cellSize - 4 - fm.getHeight()) / thumb.getHeight());
                     if (s < 1.0) {
                         int w = (int) (s * thumb.getWidth());
                         int h = (int) (s * thumb.getHeight());
@@ -226,14 +251,23 @@ public class RowPngWalkView extends PngWalkView {
                 } else {
                     thumb = loadingImage;
                 }
-                g2.drawImage(thumb, i * cellSize + (cellSize - thumb.getWidth()) / 2, (cellSize - thumb.getHeight()) / 2, null);
-                if (showCaptions && seq.imageAt(i).getCaption()!=null) {
-                    int cx = i*cellSize + 5;
-                    int cy = getHeight() - fm.getHeight();
+                int imgX = i * cellSize + (cellSize - thumb.getWidth()) / 2;
+                int imgY = (cellSize - thumb.getHeight() - fm.getHeight()) / 2;
+                g2.drawImage(thumb, imgX , imgY, null);
+                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                    paintQualityControlIcon( i, g2, imgX, imgY, true );
+                }
+                if (showCaptions && wimage.getCaption()!=null) {
+                    //The following two lines center the caption under the image
+                    //int cx = i*cellSize + (cellSize - fm.stringWidth(wimage.getCaption())) / 2;
+                    //cx = Math.max(cx, i*cellSize + 2);
+                    //Instead, align with the left edge of the image.
+                    int cx = i * cellSize + ((cellSize - thumb.getWidth()) / 2);
+                    int cy = (cellSize + thumb.getHeight() + fm.getHeight())/2;
                     g2.setColor(Color.BLACK);
                     Shape oldClip = g2.getClip();
-                    g2.clip(new Rectangle(i*cellSize, 0, cellSize-10, getHeight()));
-                    g2.drawString(seq.imageAt(i).getCaption(), cx, cy);
+                    g2.clip(new Rectangle(cx, 0, (cellSize+thumb.getWidth())/2, getHeight()));
+                    g2.drawString(wimage.getCaption(), cx, cy);
                     g2.setClip(oldClip);
                 }
             }
@@ -250,7 +284,8 @@ public class RowPngWalkView extends PngWalkView {
 
         public int getScrollableBlockIncrement(Rectangle arg0, int arg1, int arg2) {
             // There is integer division here, so not as redundant as it looks
-            return (this.getWidth() / cellSize) * cellSize;
+            int x= (scrollPane.getHorizontalScrollBar().getVisibleAmount() / cellSize ) * cellSize;
+            return x;
         }
 
         public boolean getScrollableTracksViewportWidth() {

@@ -20,13 +20,15 @@ public class AxisController extends DomNodeController {
 
     DasAxis dasAxis;
     private Application dom;
+    Plot plot;
     Axis axis;
     private final static Object PENDING_RANGE_TWEAK="pendingRangeTweak";
 
-    public AxisController(Application dom, Axis axis, DasAxis dasAxis) {
+    public AxisController(Application dom, Plot plot, Axis axis, DasAxis dasAxis) {
         super( axis );
         this.dom = dom;
         this.dasAxis = dasAxis;
+        this.plot= plot;
         this.axis = axis;
         axis.controller = this;
         bindTo(dasAxis);
@@ -117,8 +119,9 @@ public class AxisController extends DomNodeController {
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", p, "datumRange");
         ac.bind(axis, "log", p, "log");
-        ac.bind(axis, "label", p, "label");
+        ac.bind(axis, "label", p, "label", plot.getController().labelContextConverter(axis) );
         ac.bind(axis, "drawTickLabels", p, "tickLabelsVisible");
+        ac.bind(axis, "visible", p, "visible" );
     }
 
     public DasAxis getDasAxis() {
@@ -139,6 +142,7 @@ public class AxisController extends DomNodeController {
         if ( !exclude.contains( Axis.PROP_AUTORANGE ) ) axis.setAutoRange(that.isAutoRange());
         if ( !exclude.contains( Axis.PROP_AUTOLABEL ) ) axis.setAutoLabel(that.isAutoLabel());
         if ( !exclude.contains( Axis.PROP_DRAWTICKLABELS ) ) axis.setDrawTickLabels( that.isDrawTickLabels() );
+        if ( !exclude.contains( Axis.PROP_VISIBLE ) ) axis.setVisible( that.isVisible() );
         if ( lock!=null ) lock.unlock();
     }
 }

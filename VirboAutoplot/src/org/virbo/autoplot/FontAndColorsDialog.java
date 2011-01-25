@@ -9,6 +9,7 @@ import ZoeloeSoft.projects.JFontChooser.JFontChooser;
 import org.das2.graph.DasCanvas;
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.DefaultComboBoxModel;
@@ -16,7 +17,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import org.das2.graph.GraphUtil;
 import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Options;
 
 /**
@@ -214,8 +215,8 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
     private void foregroundColorButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foregroundColorButtonActionPerformed
         Color c = JColorChooser.showDialog(this, "foreground color", foregroundColorButton.getBackground());
         jComboBox1.setSelectedIndex(fores.length);
-        List<Panel> panels= Collections.singletonList(app.dom.getController().getPanel());
-        for ( Panel p: panels ) {
+        List<PlotElement> pe= Arrays.asList( app.dom.getPlotElements() );
+        for ( PlotElement p: pe ) {
             if ( p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
                 p.getStyle().setColor(c);
             }
@@ -231,8 +232,8 @@ public class FontAndColorsDialog extends javax.swing.JDialog {
         if (i < fores.length) {
             foregroundColorButton.setIcon( GraphUtil.colorIcon( fores[i], ICON_SIZE, ICON_SIZE ) );
             backgroundColorButton.setIcon( GraphUtil.colorIcon( backs[i], ICON_SIZE, ICON_SIZE ) );
-            List<Panel> panels= Collections.singletonList(app.dom.getController().getPanel());
-            for ( Panel p: panels ) {
+            List<PlotElement> pe= Arrays.asList( app.dom.getPlotElements() );
+            for ( PlotElement p: pe ) {
                 if (p.getStyle().getColor().equals(app.getCanvas().getForeground())) {
                     p.getStyle().setColor(fores[i]);
                 }

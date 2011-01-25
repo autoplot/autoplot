@@ -1,4 +1,11 @@
-ds= getDataSet('vap:file:/media/mini/eg/content/avi/out.wav')
+# a waveform should be in the first plot.  Run this script, then
+# draw a box to hear the waveform at the selected time.
+
+import org.das2.graph
+
+ds= getDataSet('vap:file:/media/mini/eg/content/wav/20090818 204141.wav')
+#ds= dom.dataSourceFilters[0].controller.dataSet
+
 plot( 0, ds )
 plot( 1, fftWindow( ds, 256 ) )
 dom.plots[1].zaxis.log=True

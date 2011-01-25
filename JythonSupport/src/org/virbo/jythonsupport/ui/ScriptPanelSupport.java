@@ -167,6 +167,7 @@ public class ScriptPanelSupport {
 
             @Override
             public boolean accept(File f) {
+                if ( f.toString()==null ) return false;
                 return (f.isDirectory() || f.toString().endsWith(".jy") || f.toString().endsWith(".py") || f.toString().endsWith(".jyds"));
             }
 

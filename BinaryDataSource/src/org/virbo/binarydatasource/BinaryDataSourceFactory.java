@@ -32,7 +32,7 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteOffset=", "byte offset of the first record" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "byteLength=", "total number of bytes to read" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "fieldCount=", "specify record length based on field type" ) );
-            //result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rank2" ) );
+            result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "start and stop indeces for rank 2 data set" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recCount=", "limit the number of records to read in" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recLength=", "byte length of each record" ) );
             result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "recOffset=", "byte offset into each record") );
@@ -68,6 +68,11 @@ public class BinaryDataSourceFactory extends AbstractDataSourceFactory {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<double>" ) );
             } else if ( paramName.equals("column") ) {
                 return Collections.singletonList( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>" ) );
+            } else if ( paramName.equals("rank2") ) {
+                List<CompletionContext> result= new ArrayList<CompletionContext>();
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>:<int>", "first,last (exclusive) fields" ) );
+                result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "0:", "return rank two to last field" ) );
+                return result;
             } else if ( paramName.equals("type") ) {
                 List<CompletionContext> result= new ArrayList<CompletionContext>();
                 result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "double") ); 

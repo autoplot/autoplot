@@ -1,0 +1,261 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.autoplot.cdaweb;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
+import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.SubTaskMonitor;
+import org.virbo.cdfdatasource.CdfVirtualVars;
+import org.virbo.dataset.ArrayDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSource;
+import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
+import org.virbo.metatree.IstpMetadataModel;
+
+/**
+ *
+ * @author jbf
+ */
+public class CDAWebDataSource extends AbstractDataSource {
+
+    public static final String PARAM_ID= "id";
+    public static final String PARAM_DS= "ds";
+    public static final String PARAM_TIMERANGE= "timerange";
+
+    /**
+     * return the named parameter, or the default.
+     * Note arg_0, arg_1, etc are for unnamed positional parameters.  It's recommended
+     * that there be only one positional parameter.
+     *
+     * TODO: why is Netbeans making me override this?
+     */
+    protected String getParam( String name, String dflt ) {
+        String result= params.get(name);
+        if (result!=null ) {
+            return result;
+        } else {
+            return dflt;
+        }
+    }
+
+
+    public CDAWebDataSource( URI uri ) {
+        super(uri);
+        String timerange= getParam( "timerange", "2010-01-17" ).replaceAll("\\+", " ");
+        try {
+            tr = DatumRangeUtil.parseTimeRange(timerange);
+        } catch (ParseException ex) {
+            Logger.getLogger(CDAWebDataSource.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IllegalArgumentException(ex);
+        }
+        ds= getParam( "ds","ac_k0_epm" );
+        param= getParam( "arg_0", null );
+        if ( param==null ) param= getParam("id","H_lo");
+
+        if ( param==null ) throw new IllegalArgumentException("param not specified");
+
+    }
+
+    Map<String,Object> metadata;
+
+    DatumRange tr;
+    String ds;
+    String param;
+
+    private DataSourceFactory getDelegateFactory() {
+        //DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
+        DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdf");
+        //cdfFileDataSourceFactory=null;  //experiment with using java-based version instead
+        //if ( cdfFileDataSourceFactory==null ) {
+        //    cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
+        //}
+
+        return cdfFileDataSourceFactory;
+    }
+
+    @Override
+    public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
+
+        CDAWebDB db= CDAWebDB.getInstance();
+        db.maybeRefresh(mon);
+
+        String tmpl= db.getNaming(ds.toUpperCase());
+        String base= db.getBaseUrl(ds.toUpperCase());
+
+        FileSystem fs= FileSystem.create( new URI( base ) );
+        FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
+
+        String[] files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
+
+        DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
+
+        ArrayDataSet result = null;
+
+        mon.setTaskSize(files.length*10);
+        mon.started();
+
+        //we need to look in the file to see if it is virtual
+        getMetadata(mon);
+        String virtual= (String) metadata.get( "VIRTUAL" );
+
+        DatumRange range=null;
+
+        for ( int i=0; i<files.length; i++ ) {
+            if ( mon.isCancelled() ) break;
+            mon.setTaskProgress(i*10);
+            mon.setProgressMessage( "reading "+files[i] );
+
+            ProgressMonitor t1= SubTaskMonitor.create( mon, i*10, (i+1)*10 );
+
+            QDataSet ds1;
+            if ( virtual!=null && !virtual.equals("") ) {
+                int nc=0;
+                List<QDataSet> comps= new ArrayList();
+                String function= (String)metadata.get( "FUNCTION" );
+                String comp= (String)metadata.get( "COMPONENT_"  + nc );
+                while ( comp!=null ) {
+                    DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
+                    ds1= dataSource.getDataSet( t1 );
+                    comps.add( ds1 );
+                    nc++;
+                    comp= (String) metadata.get( "COMPONENT_"  + nc );
+                }
+                try {
+                    ds1= CdfVirtualVars.execute( function, comps );
+                } catch (IllegalArgumentException ex ){
+                    throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                }
+            } else {
+                DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + param ) );
+                ds1= dataSource.getDataSet( t1 );
+            }
+
+            if (result == null) {
+                range= fsm.getRangeFor(files[i]);
+                if ( files.length==1 ) {
+                    result= ArrayDataSet.maybeCopy(ds1);
+                } else {
+                    result = ArrayDataSet.maybeCopy(ds1);
+                    result.grow(result.length()*files.length*11/10);  //110%
+                }
+            } else {
+                ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
+                if ( result.canAppend(ads1) ) {
+                    result.append( ads1 );
+                } else {
+                    result.grow( result.length() + ads1.length() * ( files.length-i) );
+                    result.append( ads1 );
+                }
+                range= DatumRangeUtil.union( range,fsm.getRangeFor(files[i]) );
+            }
+
+        }
+
+        // we know the ranges for timeseriesbrowse, klduge around autorange 10% bug.
+        if ( result!=null ) {
+            MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
+            if ( dep0!=null && range!=null ) {
+                Units dep0units= (Units) dep0.property(QDataSet.UNITS);
+                dep0.putProperty( QDataSet.TYPICAL_MIN, range.min().doubleValue(dep0units) );
+                dep0.putProperty( QDataSet.TYPICAL_MAX, range.max().doubleValue(dep0units) );
+            }
+
+            Map<String,String> user= new HashMap<String, String>();
+            user.put( "delegate", base + "/" + tmpl );
+
+            result.putProperty( QDataSet.USER_PROPERTIES, user );
+        }
+        
+        return result;
+
+    }
+
+    @Override
+    public Map<String, Object> getMetadata(ProgressMonitor mon) throws Exception {
+        if ( metadata==null ) {
+
+            CDAWebDB db= CDAWebDB.getInstance();
+
+            String master= db.getMasterFile( ds.toLowerCase() );
+
+            DataSource cdf= getDelegateFactory().getDataSource( new URI(master+"?"+param) );
+
+            try {
+                cdf.getDataSet( new NullProgressMonitor() );  // this should be quick, because there is no data.
+            } catch ( Exception ex ) {
+                //do nothing, because the exception should be caused by no records.  TODO: it should throw NoDataInIntervalException, I think.
+            }
+            metadata= cdf.getMetadata(mon); // note this is a strange branch, because usually we have read data first.
+        }
+        return metadata;
+    }
+
+    @Override
+    public MetadataModel getMetadataModel() {
+        return new IstpMetadataModel();
+    }
+
+
+
+    @Override
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz==TimeSeriesBrowse.class ) {
+            return (T) new TimeSeriesBrowse() {
+
+                public void setTimeRange(DatumRange dr) {
+                    tr= dr;
+                }
+
+                public DatumRange getTimeRange() {
+                    return tr;
+                }
+
+                public void setTimeResolution(Datum d) {
+                    
+                }
+
+                public Datum getTimeResolution() {
+                    return null;
+                }
+
+                public String getURI() {
+                    return "ds="+ds+"&"+param+"&timerange="+tr.toString().replace(" ", "+");
+                }
+
+            };
+        } else {
+            return null;
+        }
+    }
+
+
+    public static void main( String[] args ) throws URISyntaxException, Exception {
+        CDAWebDataSource dss= new CDAWebDataSource( new URI( "vap+cdaweb:file:///foo.xml?ds=cl_sp_fgm&id=B_mag&timerange=2001-10-10") );
+        QDataSet ds= dss.getDataSet( new NullProgressMonitor() );
+        System.err.println(ds);
+    }
+}

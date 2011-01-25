@@ -5,6 +5,7 @@
 package org.virbo.autoplot.dom;
 
 import java.awt.AWTEventMulticaster;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,6 +15,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -29,7 +32,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.das2.DasApplication;
-import org.das2.datum.DatumRange;
 import org.das2.event.MouseModule;
 import org.das2.graph.ColumnColumnConnector;
 import org.das2.graph.DasCanvas;
@@ -40,7 +42,6 @@ import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
 import org.das2.system.MonitorFactory;
-import org.das2.system.MutatorLock;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
@@ -49,7 +50,6 @@ import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
-import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
 import org.virbo.autoplot.layout.LayoutConstants;
@@ -77,7 +77,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     private static AtomicInteger canvasIdNum = new AtomicInteger(0);
     private static AtomicInteger plotIdNum = new AtomicInteger(0);
-    private static AtomicInteger panelIdNum = new AtomicInteger(0);
+    private static AtomicInteger plotElementIdNum = new AtomicInteger(0);
     private static AtomicInteger dsfIdNum = new AtomicInteger(0);
     private static AtomicInteger rowIdNum = new AtomicInteger(0);
     private static AtomicInteger columnIdNum = new AtomicInteger(0);
@@ -85,12 +85,21 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     ApplicationControllerSyncSupport syncSupport;
     ApplicationControllerSupport support;
-    /** When non-null, we have the lock */
-    MutatorLock canvasLock;
+    
     ActionListener eventListener;
 
     public ApplicationController(ApplicationModel model, Application application) {
         super( application );
+
+        // kludge to trigger undo/redo support.
+        changesSupport.addPropertyChangeListener( new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getPropertyName().equals("status")
+                        && "ready".equals(evt.getNewValue() ) ) {
+                    fireActionEvent( new ActionEvent(this,0,"ready") );
+                }
+            }
+        });
 
         this.application = application;
         this.syncSupport = new ApplicationControllerSyncSupport(this);
@@ -247,11 +256,11 @@ public class ApplicationController extends DomNodeController implements RunLater
     };
 
     /**
-     * returns the URI for the panel, or "".
+     * returns the URI for the plotElement, or "".
      * @param p
      * @return
      */
-    private static String getFocusUriFor( Panel p ) {
+    private static String getFocusUriFor( PlotElement p ) {
         DataSourceFilter dsf= p.controller.getDataSourceFilter();
         if ( dsf!=null ) {
                      return dsf.getUri();
@@ -266,6 +275,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         public void focusGained(FocusEvent e) {
             super.focusGained(e);
 
+            if ( e.getComponent() instanceof ColumnColumnConnector ) {
+                System.err.println( "focus on column column connector");
+
+            }
             Plot domPlot = getPlotFor(e.getComponent());
             if (domPlot == null) {
                 return;
@@ -273,19 +286,17 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             DasPlot dasPlot = domPlot.controller.getDasPlot();
 
-            Panel p = null;
+            PlotElement p = null;
 
             Renderer r = dasPlot.getFocusRenderer();
 
             if (r != null) {
-                p = findPanel(r);
-                if (getPanel() != p) {
-                    setPanel(p);
-                }
+                p = findPlotElement(r);
+                setPlotElement(p);
             }
             
-            // if there's just one panel in the plot, then go ahead and set the focus uri.
-            List<Panel> ps = ApplicationController.this.getPanelsFor(domPlot);
+            // if there's just one plotElement in the plot, then go ahead and set the focus uri.
+            List<PlotElement> ps = ApplicationController.this.getPlotElementsFor(domPlot);
             if ( p==null && ps.size() == 1) {
                 setFocusUri( getFocusUriFor( ps.get(0) ) );
             }
@@ -295,11 +306,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             if (p != null) {
                 logger.fine("focus due to plot getting focus: " + p);
                 setFocusUri( getFocusUriFor( p ) );
-                if (getPanel() != p) {
-                    setPanel(p);
-                    setStatus("" + domPlot + ", " + p + " selected");
-                    canvas.controller.indicateSelection( Arrays.asList(domPlot,p) );
-                }
+                setPlotElement(p);
+                setStatus("" + domPlot + ", " + p + " selected");
+                canvas.controller.indicateSelection( Arrays.asList(domPlot,p) );
             }
 
         }
@@ -312,10 +321,10 @@ public class ApplicationController extends DomNodeController implements RunLater
             public void actionPerformed(ActionEvent e) {
                 List<BindingModel> bms= new ArrayList<BindingModel>();
 
-                List<Panel> panels = getPanelsFor(domPlot);
-                for (Panel pan : panels) {
-                    bms.addAll( Arrays.asList( getBindingsFor(pan) ) );
-                    unbind(pan);
+                List<PlotElement> peles = getPlotElementsFor(domPlot);
+                for (PlotElement pele : peles) {
+                    bms.addAll( Arrays.asList( getBindingsFor(pele) ) );
+                    unbind(pele);
                 }
                 bms.addAll( Arrays.asList( getBindingsFor(domPlot) ) );
                 unbind(domPlot);
@@ -328,23 +337,28 @@ public class ApplicationController extends DomNodeController implements RunLater
                 setStatus("removed "+bms.size()+" bindings");
             }
         });
-        item.setToolTipText("remove any plot and panel property bindings");
+        item.setToolTipText("remove any plot and plot element property bindings");
         editPlotMenu.add(item);
         item = new JMenuItem(new AbstractAction("Delete Plot") {
 
             public void actionPerformed(ActionEvent e) {
                 if (application.getPlots().length > 1) {
-                    List<Panel> panels = getPanelsFor(domPlot);
-                    for (Panel pan : panels) {
-                        if (application.getPanels().length > 1) {
-                            deletePanel(pan);
+                    List<PlotElement> plotElements = getPlotElementsFor(domPlot);
+                    for (PlotElement pele : plotElements) {
+                        if (application.getPlotElements().length > 1) {
+                            deletePlotElement(pele);
                         } else {
-                            setStatus("warning: the last panel may not be deleted");
+                            setStatus("warning: the last plot element may not be deleted");
                         }
                     }
                     deletePlot(domPlot);
                 } else {
-                    setStatus("warning: last plot may not be deleted");
+                    ArrayList<PlotElement> pes= new ArrayList( getPlotElementsFor(domPlot) );
+                    Collections.reverse(pes);
+                    for ( PlotElement pe: pes ) {
+                        deletePlotElement(pe);
+                    }
+                    domPlot.syncTo( new Plot(), Arrays.asList( "id", "rowId", "columnId" ) );
                 }
             }
         });
@@ -367,16 +381,16 @@ public class ApplicationController extends DomNodeController implements RunLater
         return plot;
     }
 
-    public void doplot(Plot plot, Panel panel, String secondaryUri, String teriaryUri, String primaryUri) {
-        support.plot(plot, panel, secondaryUri, teriaryUri, primaryUri);
+    public void doplot(Plot plot, PlotElement pele, String secondaryUri, String teriaryUri, String primaryUri) {
+        support.plot(plot, pele, secondaryUri, teriaryUri, primaryUri);
     }
 
-    public void doplot(Plot plot, Panel panel, String secondaryUri, String primaryUri) {
-        support.plot(plot, panel, secondaryUri, primaryUri);
+    public void doplot(Plot plot, PlotElement pele, String secondaryUri, String primaryUri) {
+        support.plot(plot, pele, secondaryUri, primaryUri);
     }
 
-    public void doplot(Plot plot, Panel panel, String primaryUri) {
-        support.plot(plot, panel, primaryUri);
+    public void doplot(Plot plot, PlotElement pele, String primaryUri) {
+        support.plot(plot, pele, primaryUri);
     }
 
     /**
@@ -406,7 +420,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     private void addListeners() {
-        this.addPropertyChangeListener(ApplicationController.PROP_PANEL, new PropertyChangeListener() {
+        this.addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
 
             public String toString() {
                 return "" + ApplicationController.this;
@@ -414,7 +428,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             public void propertyChange(PropertyChangeEvent evt) {
                 if (!isValueAdjusting()) {
-                    Panel p = getPanel();
+                    PlotElement p = getPlotElement();
                     if (p != null) {
                         setDataSourceFilter(getDataSourceFilterFor(p));
                         setPlot(getPlotFor(p));
@@ -425,10 +439,10 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         });
         
-        // automatically enable layout panel when there are multiple panels.
-        this.application.addPropertyChangeListener( Application.PROP_PANELS, new PropertyChangeListener() {
+        // automatically enable layout plotElement when there are multiple plotElements.
+        this.application.addPropertyChangeListener( Application.PROP_PLOT_ELEMENTS, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if ( application.getPanels().length>1 ) {
+                if ( application.getPlotElements().length>1 ) {
                     application.options.setLayoutVisible(true);
                 }
             }
@@ -474,46 +488,76 @@ public class ApplicationController extends DomNodeController implements RunLater
         return dasCanvas;
     }
 
-    public void deletePanel(Panel panel) {
-        logger.fine("deletePanel("+panel+")");
-        int currentIdx = application.panels.indexOf(panel);
+    /**
+     * @deprecated use deletePlotElement
+     * @param panel
+     */
+    public void deletePanel( PlotElement pele ) {
+        deletePlotElement( pele );
+    }
+
+    /**
+     * delete the plot element completely, or if it is the last, then empty the
+     * data source.
+     * Earlier versions of this would throw an exception if the last panel were
+     * deleted.
+     * @param pelement
+     */
+    public void deletePlotElement(PlotElement pelement) {
+        logger.fine("deletePlotElement("+pelement+")");
+        int currentIdx = application.plotElements.indexOf(pelement);
         if (currentIdx == -1) {
-            throw new IllegalArgumentException("deletePanel but panel isn't part of application");
+            throw new IllegalArgumentException("deletePlotElement but plot element isn't part of application");
         }
-        if (application.panels.size() < 2) {
-            throw new IllegalArgumentException("last panel may not be deleted");
-        }
-        DasPlot p = panel.controller.getDasPlot();
-        if (p != null) {
-            Renderer r = panel.controller.getRenderer();
-            if (r != null) {
-                p.removeRenderer(r);
+        String id= pelement.getId();
+        if (application.plotElements.size() > 1 ) {
+
+            DasPlot p = pelement.controller.getDasPlot();
+            if (p != null) {
+                Renderer r = pelement.controller.getRenderer();
+                if (r != null) {
+                    p.removeRenderer(r);
+                }
             }
+
+            //plotElement.removePropertyChangeListener(application.childListener);
+            pelement.removePropertyChangeListener(domListener);
+            pelement.getStyle().removePropertyChangeListener(domListener);
+            unbind(pelement);
+            pelement.controller.unbindDsf();
+            pelement.removePropertyChangeListener(plotIdListener);
+
         }
 
-        //panel.removePropertyChangeListener(application.childListener);
-        panel.removePropertyChangeListener(domListener);
-        unbind(panel);
-        panel.controller.unbindDsf();
-        panel.removePropertyChangeListener(plotIdListener);
+        DataSourceFilter dsf = getDataSourceFilterFor(pelement);
 
-        DataSourceFilter dsf = getDataSourceFilterFor(panel);
-
-        ArrayList<Panel> panels = new ArrayList<Panel>(Arrays.asList(application.getPanels()));
-        panels.remove(panel);
-        if (!panels.contains(getPanel())) {  // reset the focus panelId
-            if (panels.size() == 0) {
-                setPanel(null);
-            } else {
-                setPanel(panels.get(0)); // maybe use currentIdx
+        ArrayList<PlotElement> elements =
+                new ArrayList<PlotElement>(Arrays.asList(application.getPlotElements()));
+        elements.remove(pelement);
+        if ( elements.size()>0 ) {
+            if (!elements.contains(getPlotElement())) {  // reset the focus element Id
+                if (elements.size() == 0) {
+                    setPlotElement(null);
+                } else {
+                    setPlotElement(elements.get(0)); // maybe use currentIdx
+                }
             }
+            application.setPlotElements(elements.toArray(new PlotElement[elements.size()]));
+        } else {
+            dsf.setUri(null);  // this panel and the dsf should go together
+            pelement.setLegendLabelAutomatically("");
+            pelement.setActive(true);
         }
-        application.setPanels(panels.toArray(new Panel[panels.size()]));
 
         if (dsf != null) {
-            List<Panel> dsfPanels = getPanelsFor(dsf);
-            if (dsfPanels.size() == 0) {
+            List<PlotElement> dsfElements = getPlotElementsFor(dsf);
+            if ( dsfElements.size() == 0 && application.getDataSourceFilters().length>1 ) {
                 deleteDataSourceFilter(dsf);
+            }
+        }
+        for ( PlotElement p: application.plotElements ) {
+            if ( p.getParent().equals(id) ) {
+                p.setParent("");
             }
         }
 
@@ -568,11 +612,12 @@ public class ApplicationController extends DomNodeController implements RunLater
         application.setConnectors(connectors.toArray(new Connector[connectors.size()]));
     }
 
-    private void movePanel(Panel p, Plot src, Plot dst) {
+    private void movePlotElement(PlotElement p, Plot src, Plot dst) {
         assert (p.getPlotId().equals(src.getId()) || p.getPlotId().equals(dst.getId()));
 
-        src.getController().removePanel( p );
-        dst.getController().addPanel( p );
+        if ( src==dst ) return;
+        src.getController().removePlotElement( p );
+        dst.getController().addPlotElement( p,false );
 
         p.setPlotId(dst.getId());
 
@@ -585,23 +630,30 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         public void propertyChange(PropertyChangeEvent evt) {
-            Panel p = (Panel) evt.getSource();
+            PlotElement p = (PlotElement) evt.getSource();
             String srcid = (String) evt.getOldValue();
             String dstid = (String) evt.getNewValue();
-            if (srcid == null || srcid.equals("")) {
-                return; // initialization state
+            if ( srcid==null ) srcid="";
+            if ( dstid==null ) dstid="";
+            Plot src = srcid.length()==0 ? null : ( Plot) DomUtil.getElementById(application, srcid);
+            Plot dst = dstid.length()==0 ? null : (Plot) DomUtil.getElementById(application, dstid);
+            if ( src==null ) {
+                if ( dst!=null ) {
+                    dst.getController().addPlotElement( p,false );
+                } else {
+                    return; // initialization state
+                }
             }
-            if (dstid == null || dstid.equals("")) {
+            if ( dst==null ) {
+                src.getController().removePlotElement(p);
                 return;
             }
-            Plot src = (Plot) DomUtil.getElementById(application, srcid);
-            Plot dst = (Plot) DomUtil.getElementById(application, dstid);
-            if (src != null && dst != null) {
-                movePanel(p, src, dst);
-                if (getPanelsFor(src).size() == 0) {
-                    deletePlot(src);
-                }
-                if (getPanelsFor(dst).size() == 1) {
+            if ( src != null && dst != null ) {
+                movePlotElement(p, src, dst);
+                //if (getPlotElementsFor(src).size() == 0) {
+                //    deletePlot(src);
+                //}
+                if (getPlotElementsFor(dst).size() == 1) {
                     dst.syncTo(p.plotDefaults, Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
                 }
             }
@@ -609,55 +661,66 @@ public class ApplicationController extends DomNodeController implements RunLater
     };
 
     /**
-     * add a panel to the application, attaching it to the given Plot and DataSourceFilter.
-     * @param domPlot if null, create a Plot, if non-null, add the panel to this plot.
-     * @param dsf if null, create a DataSourceFilter.  If non-null, connect the panel to this data source.
+     * @deprecated use addPlotElement instead.
+     * @param domPlot
+     * @param dsf
      * @return
      */
-    public Panel addPanel(Plot domPlot, DataSourceFilter dsf) {
-        logger.fine("enter addPanel("+domPlot+","+dsf+")");
+    public PlotElement addPanel( Plot domPlot, DataSourceFilter dsf) {
+        return addPlotElement( domPlot,dsf );
+    }
 
-        final Panel panel1 = new Panel();
+    /**
+     * add a plotElement to the application, attaching it to the given Plot and DataSourceFilter.
+     * @param domPlot if null, create a Plot, if non-null, add the plotElement to this plot.
+     * @param dsf if null, create a DataSourceFilter.  If non-null, connect the plotElement to this data source.
+     * @return
+     */
+    public PlotElement addPlotElement(Plot domPlot, DataSourceFilter dsf) {
+        logger.fine("enter addPlotElement("+domPlot+","+dsf+")");
+
+        final PlotElement pele1 = new PlotElement();
 
         if (dsf == null) {
             dsf = addDataSourceFilter();
         }
 
-        new PanelController(this.model, application, panel1);
+        new PlotElementController(this.model, application, pele1);
         
         if (domPlot == null) {
             domPlot = addPlot(LayoutConstants.BELOW);
         }
 
-        assignId(panel1);
+        assignId(pele1);
 
-        panel1.getStyle().setColor(application.getOptions().getColor());
-        panel1.getStyle().setFillColor(application.getOptions().getFillColor());
-        panel1.getStyle().setAntiAliased(application.getOptions().isDrawAntiAlias());
+        pele1.getStyle().setColor(application.getOptions().getColor());
+        pele1.getStyle().setFillColor(application.getOptions().getFillColor());
+        pele1.getStyle().setAntiAliased(application.getOptions().isDrawAntiAlias());
 
-        panel1.addPropertyChangeListener(Panel.PROP_PLOTID, plotIdListener);
+        pele1.addPropertyChangeListener(PlotElement.PROP_PLOTID, plotIdListener);
 
-        panel1.setPlotId(domPlot.getId());
-        panel1.setDataSourceFilterId(dsf.getId());
+        pele1.setPlotId(domPlot.getId());
+        pele1.setDataSourceFilterId(dsf.getId());
 
-        panel1.setAutoLabel(true);
+        pele1.setAutoLabel(true);
 
         synchronized (this) {
-            Panel[] p = application.getPanels();
-            Panel[] temp = new Panel[p.length + 1];
+            PlotElement[] p = application.getPlotElements();
+            PlotElement[] temp = new PlotElement[p.length + 1];
             System.arraycopy(p, 0, temp, 0, p.length);
-            temp[p.length] = panel1;
-            this.application.setPanels(temp);
-            //panel1.addPropertyChangeListener(application.childListener);
-            panel1.addPropertyChangeListener(domListener);
-            if ( panel==null ) setPanel(panel1);
+            temp[p.length] = pele1;
+            this.application.setPlotElements(temp);
+            //pele1.addPropertyChangeListener(application.childListener);
+            pele1.addPropertyChangeListener(domListener);
+            pele1.getStyle().addPropertyChangeListener(domListener);
+            if ( plotElement==null ) setPlotElement(pele1);
         }
 
         if ( domPlot.getController()!=null ) {
-            domPlot.controller.addPanel(panel1);
+            domPlot.controller.addPlotElement(pele1);
         }
         
-        return panel1;
+        return pele1;
     }
 
     PropertyChangeListener rendererFocusListener = new PropertyChangeListener() {
@@ -672,9 +735,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             if (r == null) {
                 return;
             }
-            Panel p = findPanel(r);
-            if (getPanel() != p) {
-                setPanel(p);
+            PlotElement p = findPlotElement(r);
+            if (getPlotElement() != p) {
+                setPlotElement(p);
             }
 
         }
@@ -799,7 +862,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * adds a block of plots to the canvas below the focus plot.  A panel
+     * adds a block of plots to the canvas below the focus plot.  A plotElement
      * is added for each plot as well.
      * @param nrow
      * @param ncol
@@ -817,40 +880,32 @@ public class ApplicationController extends DomNodeController implements RunLater
         List<Row> rows;
         rows = ccontroller.addRows(nrow);
         for (int i = 0; i < nrow; i++) {
-            Plot masterp = null;
             for (int j = 0; j < ncol; j++) {
                 Plot p = addPlot(rows.get(i), cols.get(j));
                 result.add(p);
-                if (j == 0) {
-                    masterp = p;
-                } else {
-                    bind(masterp.getZaxis(), Axis.PROP_RANGE, p.getZaxis(), Axis.PROP_RANGE);
-                    bind(masterp.getZaxis(), Axis.PROP_LOG, p.getZaxis(), Axis.PROP_LOG);
-                    bind(masterp.getZaxis(), Axis.PROP_LABEL, p.getZaxis(), Axis.PROP_LABEL);
-                }
-                Panel panel = addPanel(p, null);
+                addPlotElement(p, null);
             }
         }
         return result;
     }
 
     /**
-     * find the panelId using this renderer.
+     * find the plotElement using this renderer.
      * @param rend
      * @return 
      */
-    private Panel findPanel(Renderer rend) {
-        for (Panel p : application.getPanels()) {
-            PanelController pc = p.controller;
+    private PlotElement findPlotElement(Renderer rend) {
+        for (PlotElement p : application.getPlotElements()) {
+            PlotElementController pc = p.controller;
             if (pc.getRenderer() == rend) {
                 return p;
             }
         }
-        throw new IllegalArgumentException("unable to find panel for das renderer");
+        throw new IllegalArgumentException("unable to find plot element for das renderer");
     }
 
     /**
-     * find the panelId using this renderer.
+     * find the plot using this renderer.
      * @param rend
      * @return
      */
@@ -865,53 +920,65 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * copy doplot and panels into a new doplot.
+     * @deprecated use copyPlotAndPlotElements instead
+     */
+    public Plot copyPlotAndPanels( Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
+        return copyPlotAndPlotElements( domPlot, dsf, bindx, bindy );
+    }
+
+    /**
+     * copy doplot and plotElements into a new doplot.
      * @param domPlot
      * @param dsf
      * @return
      */
-    public Plot copyPlotAndPanels(Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
-        List<Panel> srcPanels = getPanelsFor(domPlot);
-
-        MutatorLock lock = mutatorLock();
+    public Plot copyPlotAndPlotElements(Plot domPlot, DataSourceFilter dsf, boolean bindx, boolean bindy) {
+        List<PlotElement> srcElements = getPlotElementsFor(domPlot);
+        List<PlotElement> newElements;
+        Plot newPlot;
+        Lock lock = mutatorLock();
         lock.lock();
+        try {
 
-        Plot newPlot = copyPlot(domPlot, bindx, bindy, false);
-        if (srcPanels.size() == 0) {
-            return newPlot;
-        }
+            newPlot= copyPlot(domPlot, bindx, bindy, false);
+            if (srcElements.size() == 0) {
+                return newPlot;
+            }
 
-        List<Panel> newPanels = new ArrayList<Panel>();
-        for (Panel srcPanel : srcPanels) {
-            if (!srcPanel.getComponent().equals("")) {
-                if ( srcPanel.getController().getParentPanel()==null ) {
-                    Panel newp = copyPanel(srcPanel, newPlot, dsf);
-                    newPanels.add(newp);
-                }
-            } else {
-                Panel newp = copyPanel(srcPanel, newPlot, dsf);
-                newPanels.add(newp);
-                List<Panel> srcKids = srcPanel.controller.getChildPanels();
-                List<Panel> newKids = new ArrayList();
-                DataSourceFilter dsf1 = getDataSourceFilterFor(newp);
-                for (Panel k : srcKids) {
-                    if (srcPanels.contains(k)) {
-                        Panel kidp = copyPanel(k, newPlot, dsf1);
-                        kidp.getController().setParentPanel(newp);
-                        newPanels.add(kidp);
-                        newKids.add(kidp);
+            newElements = new ArrayList<PlotElement>();
+            for (PlotElement srcElement : srcElements) {
+                if (!srcElement.getComponent().equals("")) {
+                    if ( srcElement.getController().getParentPlotElement()==null ) {
+                        PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
+                        newElements.add(newp);
+                    }
+                } else {
+                    PlotElement newp = copyPlotElement(srcElement, newPlot, dsf);
+                    newElements.add(newp);
+                    List<PlotElement> srcKids = srcElement.controller.getChildPlotElements();
+                    List<PlotElement> newKids = new ArrayList();
+                    DataSourceFilter dsf1 = getDataSourceFilterFor(newp);
+                    for (PlotElement k : srcKids) {
+                        if (srcElements.contains(k)) {
+                            PlotElement kidp = copyPlotElement(k, newPlot, dsf1);
+                            kidp.getController().setParentPlotElement(newp);
+                            newElements.add(kidp);
+                            newKids.add(kidp);
+                        }
                     }
                 }
             }
+
+        } finally {
+            lock.unlock();
         }
 
-        lock.unlock();
-
-        for (Panel newp : newPanels) {
+        for (PlotElement newp : newElements) {
             newp.getController().setResetRanges(false);
             newp.getController().setResetComponent(false);
-            newp.getController().setResetPanel(false);
+            newp.getController().setResetPlotElement(false);
             newp.getController().setResetRenderType(false);
+            newp.getController().setDsfReset(true);
         }
 
         return newPlot;
@@ -919,21 +986,34 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * copy the panel and put it in domPlot.
-     * @param srcPanel the panel to copy.
-     * @param domPlot  plot to contain the new panel, which may be the same plot.
+     * @deprecated use copyPlotElement
+     * @param srcElement
+     * @param domPlot
+     * @param dsf
+     * @return
+     */
+    protected PlotElement copyPanel(PlotElement srcElement, Plot domPlot, DataSourceFilter dsf) {
+        return copyPlotElement( srcElement, domPlot, dsf );
+    }
+
+
+    /**
+     * copy the plotElement and put it in domPlot.
+     * @param srcElement the plotElement to copy.
+     * @param domPlot  plot to contain the new plotElement, which may be the same plot.
      * @param dsf     if non-null, then use this dataSourceFilter
      * @return
      */
-    protected Panel copyPanel(Panel srcPanel, Plot domPlot, DataSourceFilter dsf) {
-        logger.finer( "copyPanel("+srcPanel+","+domPlot+","+dsf+")");
-        Panel newp = addPanel(domPlot, dsf);
-        newp.getController().setResetPanel(false);// don't add children, trigger autoRange, etc.
+    protected PlotElement copyPlotElement(PlotElement srcElement, Plot domPlot, DataSourceFilter dsf) {
+        logger.finer( "copyPlotElement("+srcElement+","+domPlot+","+dsf+")");
+        PlotElement newp = addPlotElement(domPlot, dsf);
+        newp.getController().setResetPlotElement(false);// don't add children, trigger autoRange, etc.
         newp.getController().setDsfReset(false); // dont' reset when the dataset changes
-        newp.syncTo(srcPanel, Arrays.asList(DomNode.PROP_ID,Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID));
+        newp.syncTo(srcElement, Arrays.asList(DomNode.PROP_ID,PlotElement.PROP_PLOTID,
+                PlotElement.PROP_DATASOURCEFILTERID));
         if (dsf == null) { // new DataSource, but with the same URI.
             DataSourceFilter dsfnew = newp.controller.getDataSourceFilter();
-            DataSourceFilter dsfsrc = srcPanel.controller.getDataSourceFilter();
+            DataSourceFilter dsfsrc = srcElement.controller.getDataSourceFilter();
             copyDataSourceFilter(dsfsrc, dsfnew);
         }
         return newp;
@@ -948,14 +1028,14 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param bindx If true, X axes are bound.  If the srcPlot x axis is bound to the
      *    application timerange, then bind to that instead (kludge--handle higher)
      * @param bindy If true, Y axes are bound
-     * @param addPanel add a panel attached to the new plot as well.
+     * @param addPlotElement add a plotElement attached to the new plot as well.
      * @return The duplicate plot
      */
-    public Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy, boolean addPanel) {
+    public Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy, boolean addPlotElement) {
         Plot that = addPlot(LayoutConstants.BELOW);
         that.getController().setAutoBinding(false);
-        if (addPanel) {
-            addPanel(that, null);
+        if (addPlotElement) {
+            addPlotElement(that, null);
         }
         that.syncTo( srcPlot,Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
 
@@ -981,28 +1061,29 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param dsf
      */
     protected void copyDataSourceFilter(DataSourceFilter dsfsrc, DataSourceFilter dsfnew) {
-        MutatorLock lock= dsfnew.getController().mutatorLock();
+        Lock lock= dsfnew.getController().mutatorLock();
         lock.lock();
+        try {
+            final boolean dataSetNeedsLoading = dsfsrc.controller.isDataSetNeedsLoading();
 
-        final boolean dataSetNeedsLoading = dsfsrc.controller.isDataSetNeedsLoading();
-
-        dsfnew.controller.setResetDimensions(false);
-        if (dsfsrc.getUri() != null) {
-            dsfnew.setUri(dsfsrc.getUri());
-        }
-
-        if ( !dataSetNeedsLoading ) {
-            dsfnew.controller.setUriNeedsResolution( false );
-            dsfnew.controller.setDataSource(false,dsfsrc.controller.getDataSource());
-            dsfnew.controller.setDataSetNeedsLoading( false );
             dsfnew.controller.setResetDimensions(false);
-            dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),dsfsrc.controller.getRawProperties(),isValueAdjusting()); // fire off data event.
-            dsfnew.controller.setProperties(dsfsrc.controller.getProperties());
-            dsfnew.setSliceDimension( dsfsrc.getSliceDimension() );
-            dsfnew.setSliceIndex( dsfsrc.getSliceIndex() );
-        }
+            if (dsfsrc.getUri() != null) {
+                dsfnew.setUri(dsfsrc.getUri());
+            }
 
-        lock.unlock();
+            if ( !dataSetNeedsLoading ) {
+                dsfnew.controller.setUriNeedsResolution( false );
+                dsfnew.controller.resetDataSource(false,dsfsrc.controller.getDataSource());
+                dsfnew.controller.setDataSetNeedsLoading( false );
+                dsfnew.controller.setResetDimensions(false);
+                dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),dsfsrc.controller.getRawProperties(),isValueAdjusting()); // fire off data event.
+                dsfnew.controller.setProperties(dsfsrc.controller.getProperties());
+                dsfnew.setSliceDimension( dsfsrc.getSliceDimension() );
+                dsfnew.setSliceIndex( dsfsrc.getSliceIndex() );
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -1017,10 +1098,10 @@ public class ApplicationController extends DomNodeController implements RunLater
         if (application.plots.size() < 2) {
             throw new IllegalArgumentException("last plot cannot be deleted");
         }
-        List<Panel> panels = this.getPanelsFor(domPlot);
-        if (panels.size() > 0) { // transitional state
-            for ( Panel p: panels ) {
-                if ( application.panels.size()>1 ) deletePanel(p);
+        List<PlotElement> elements = this.getPlotElementsFor(domPlot);
+        if (elements.size() > 0) { // transitional state
+            for ( PlotElement p: elements ) {
+                if ( application.plotElements.size()>1 ) deletePlotElement(p);
             }
         }
         for (Connector c : DomUtil.asArrayList(application.getConnectors())) {
@@ -1079,9 +1160,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         if (application.dataSourceFilters.size() < 2) {
             throw new IllegalArgumentException("last plot cannot be deleted");
         }
-        List<Panel> panels = this.getPanelsFor(dsf);
-        if (panels.size() > 0) {
-            throw new IllegalArgumentException("dsf must not have panels before deleting");
+        List<PlotElement> plotElements = this.getPlotElementsFor(dsf);
+        if (plotElements.size() > 0) {
+            throw new IllegalArgumentException("dsf must not have plot elements before deleting");
         }
 
         //dsf.removePropertyChangeListener(application.childListener);
@@ -1117,73 +1198,117 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * resets the dom to the initial state by deleting added panels, plots and data sources.
+     * resets the dom to the initial state by deleting added plotElements, plots and data sources.
      */
-    public void reset() {
-        MutatorLock lock= mutatorLock();
+    public synchronized void reset() {
+        Lock lock= mutatorLock();
         lock.lock();
+        Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
+        canvasLock.lock();
+        try {
 
-        for ( int i=application.getPlots().length-1; i>0; i-- ) {
-            deletePlot( application.getPlots(i) );
+            Plot p0= getPlotFor(application.getPlotElements(0) );
+
+            for ( int i=application.getPlots().length-1; i>0; i-- ) {
+                deletePlot( application.getPlots(i) );
+            }
+
+            for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
+                deletePlotElement( application.getPlotElements(i) ); //may delete dsf and plots as well.
+            }
+
+            String dsfId= application.getDataSourceFilters(0).getId();
+            application.getPlotElements(0).setDataSourceFilterId(dsfId);
+            if ( p0!=application.getPlots(0) ) {
+                movePlotElement(application.getPlotElements(0),p0,application.getPlots(0));
+            }
+
+            for ( int i=application.getDataSourceFilters().length-1; i>0; i-- ) {
+                deleteDataSourceFilter( application.getDataSourceFilters(i) );
+            }
+
+            application.getPlots(0).getXaxis().setLog(false); // TODO kludge
+            application.getPlots(0).getYaxis().setLog(false); // TODO kludge
+            application.getPlots(0).getZaxis().setLog(false); // TODO kludge
+            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
+            application.getPlots(0).getXaxis().setAutoRange(true);
+            application.getPlots(0).getYaxis().setAutoRange(true);
+            application.getPlots(0).getZaxis().setAutoRange(true);
+
+            for ( int i=application.getBindings().length-1; i>0; i-- ) {
+                deleteBinding( application.getBindings(i) );
+            }
+
+            // return canvas to ground state.  This is margin row, margin column, and
+            // one row within.
+            Canvas c= application.getCanvases(0);
+
+            application.getPlots(0).setColumnId( c.getMarginColumn().getId() );
+            application.getPlots(0).setRowId( c.getRows(0).getId() );
+
+            for ( int i=c.getRows().length-1; i>=1; i-- ) {
+                c.getController().deleteRow(c.getRows(i));
+            }
+
+            if ( c.getRows().length>0 ) {
+                c.getRows(0).syncTo( new Row(), Arrays.asList(DomNode.PROP_ID, Row.PROP_TOP, Row.PROP_BOTTOM, Row.PROP_PARENT ) );
+                c.getRows(0).setTop("+2em");
+                c.getRows(0).setBottom("+100%-2em");
+            }
+
+            c.getMarginRow().setTop("2em");
+            c.getMarginRow().setBottom("100%-3em");
+            c.getMarginColumn().setLeft("+7.0em");
+            c.getMarginColumn().setRight("100%-7.0em");
+
+            for ( int i=c.getColumns().length-1; i>=0; i-- ) {
+                c.getController().deleteColumn(c.getColumns(i));
+            }
+
+            c.setFitted(true);
+
+            application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
+            application.getDataSourceFilters(0).getController().setDataSetInternal(null,null,true);
+            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+            application.getPlotElements(0).syncTo( new PlotElement(), Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID,PlotElement.PROP_DATASOURCEFILTERID, PlotElement.PROP_RENDERTYPE ) );
+            application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
+            application.getPlots(0).setAutoLabel(true);
+            application.getPlotElements(0).syncTo( new PlotElement(), Arrays.asList( DomNode.PROP_ID, PlotElement.PROP_PLOTID, PlotElement.PROP_DATASOURCEFILTERID ) );
+            application.getPlotElements(0).setAutoLabel(true);
+            application.getPlotElements(0).getPlotDefaults().setId("plot_defaults_0");
+            application.getPlotElements(0).getStyle().setId("style_0");
+            application.getPlotElements(0).getStyle().setFillColor( Color.decode("#404040") );
+            application.getPlots(0).getXaxis().setAutoLabel(true);
+            application.getPlots(0).getYaxis().setAutoLabel(true);
+            application.getPlots(0).getZaxis().setAutoLabel(true);
+            application.getPlots(0).getXaxis().setAutoRange(true);
+            application.getPlots(0).getYaxis().setAutoRange(true);
+            application.getPlots(0).getZaxis().setAutoRange(true);
+            application.getPlotElements(0).controller.setDsfReset(true);
+            application.getPlots(0).getZaxis().setVisible(false);
+            
+            application.setTimeRange( application.getPlots(0).getXaxis().getRange() );
+
+            resetIdSequenceNumbers();
+
+            //clean up controllers after seeing the junk left behind in the profiler.
+            for ( PlotElement pe :application.getPlotElements() ) {
+                pe.getController().dataSet=null;
+            }
+            for ( DataSourceFilter dsf :application.getDataSourceFilters() ) {
+                dsf.getController().dataSet=null;
+                dsf.getController().fillDataSet=null;
+                dsf.getController().histogram=null;
+            }
+        } finally {
+            canvasLock.unlock();
+            lock.unlock();
         }
 
-        for ( int i=application.getPanels().length-1; i>0; i-- ) {
-            deletePanel( application.getPanels(i) ); //may delete dsf and plots as well.
+        ArrayList problems= new ArrayList();
+        if ( !DomUtil.validateDom(application, problems ) ) {
+            System.err.println(problems);
         }
-
-        for ( int i=application.getDataSourceFilters().length-1; i>0; i-- ) {
-            deleteDataSourceFilter( application.getDataSourceFilters(i) );
-        }
-
-        application.getPlots(0).getXaxis().setLog(false); // TODO kludge
-        application.getPlots(0).getYaxis().setLog(false); // TODO kludge
-        application.getPlots(0).getZaxis().setLog(false); // TODO kludge
-        application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID ) );
-        application.getPlots(0).getXaxis().setAutoRange(true);
-        application.getPlots(0).getYaxis().setAutoRange(true);
-        application.getPlots(0).getZaxis().setAutoRange(true);
-
-        for ( int i=application.getBindings().length-1; i>0; i-- ) {
-            deleteBinding( application.getBindings(i) );
-        }
-
-        application.getPlots(0).setColumnId("marginColumn_0");
-        application.getPlots(0).setRowId("row_0");
-
-        Canvas c= application.getCanvases(0);
-        for ( int i=c.getRows().length-1; i>=1; i-- ) {
-            c.getController().deleteRow(c.getRows(i));
-        }
-
-        if ( c.getRows().length>0 ) {
-            c.getRows(0).syncTo( new Row(), Arrays.asList(DomNode.PROP_ID, Row.PROP_TOP, Row.PROP_BOTTOM, Row.PROP_PARENT ) );
-            c.getRows(0).setTop("0%");
-            c.getRows(0).setBottom("100%");
-        }
-
-        for ( int i=c.getColumns().length-1; i>=0; i-- ) {
-            c.getController().deleteColumn(c.getColumns(i));
-        }
-
-        if ( c.getColumns().length>0 ) {
-            c.getColumns(0).syncTo( new Column(), Arrays.asList(DomNode.PROP_ID, Column.PROP_LEFT, Column.PROP_RIGHT ) );
-            c.getColumns(0).setLeft("0%");
-            c.getColumns(0).setRight("100%");
-        }
-        c.setFitted(true);
-        
-        application.getDataSourceFilters(0).syncTo( new DataSourceFilter(), Collections.singletonList(DomNode.PROP_ID) );
-        application.getDataSourceFilters(0).getController().setDataSetInternal(null,null,true);
-        application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
-        application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID,Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE ) );
-        application.getPlots(0).syncTo( new Plot(), Arrays.asList( DomNode.PROP_ID, Plot.PROP_COLUMNID, Plot.PROP_ROWID ) );
-        application.getPanels(0).syncTo( new Panel(), Arrays.asList( DomNode.PROP_ID, Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID ) );
-        application.getPanels(0).controller.setDsfReset(true);
-        application.setTimeRange( application.getPlots(0).getXaxis().getRange() );
-        
-        resetIdSequenceNumbers();
-        
-        lock.unlock();
     }
 
 
@@ -1226,6 +1351,18 @@ public class ApplicationController extends DomNodeController implements RunLater
             return;
         }
 
+        try {
+            // verify properties exist.
+            DomUtil.getPropertyType(src, srcProp);
+            if ( dst instanceof DomNode ) {
+                 DomUtil.getPropertyType((DomNode)dst, dstProp);
+            }
+        } catch (IllegalAccessException ex) {
+            throw new IllegalArgumentException(ex);
+        } catch (InvocationTargetException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+
         // now do the implementation
         BindingGroup bc;
         synchronized (bindingContexts) {
@@ -1263,6 +1400,9 @@ public class ApplicationController extends DomNodeController implements RunLater
         bind(src, srcProp, dst, dstProp, null );
     }
 
+    protected void unbind( DomNode src, String srcProp, Object dst, String dstProp ) {
+        bindingSupport.unbind( src, srcProp, dst, dstProp );
+    }
     /**
      * unbindDsf the object.  For example, when the object is about to be deleted.
      * @param src
@@ -1468,16 +1608,13 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     /**
-     * return the plotId containing this panelId.
-     * @param panelId
+     * return the plotId containing this plotElement.
+     * @param element
      * @return the Plot or null if no plotId is found.
-     * @throws IllegalArgumentException if the panelId is not a child of the application
+     * @throws IllegalArgumentException if the element is not a child of the application
      */
-    public Plot getPlotFor(Panel panel) {
-     //   if ( !isValueAdjusting() && !application.panels.contains(panel) ) {
-     //       throw new IllegalArgumentException("the panel is not a child of the application");
-     //   }
-        String id = panel.getPlotId();
+    public Plot getPlotFor(PlotElement element) {
+        String id = element.getPlotId();
         Plot result = null;
         for (Plot p : application.getPlots()) {
             if (p.getId().equals(id)) {
@@ -1487,24 +1624,26 @@ public class ApplicationController extends DomNodeController implements RunLater
         return result;
     }
 
-    public List<Panel> getPanelsFor(Plot plot) {
-        String id = plot.getId();
-        List<Panel> result = new ArrayList<Panel>();
-        for (Panel p : application.getPanels()) {
-            if (p.getPlotId().equals(id)) {
-                result.add(p);
-            }
-        }
-        return result;
+    /**
+     * @deprecated use getPlotElementsFor instead
+     * @param plot
+     * @return
+     */
+    public List<PlotElement> getPanelsFor(Plot plot) {
+        return getPlotElementsFor(plot);
+    }
+
+    public List<PlotElement> getPlotElementsFor(Plot plot) {
+        return DomUtil.getPlotElementsFor( application, plot );
     }
 
     /**
-     * return the DataSourceFilter for the panel, or null if none exists.
-     * @param panel
+     * return the DataSourceFilter for the plotElement, or null if none exists.
+     * @param plotElement
      * @return
      */
-    public DataSourceFilter getDataSourceFilterFor(Panel panel) {
-        String id = panel.getDataSourceFilterId();
+    public DataSourceFilter getDataSourceFilterFor(PlotElement element) {
+        String id = element.getDataSourceFilterId();
         DataSourceFilter result = null;
         for (DataSourceFilter dsf : application.getDataSourceFilters()) {
             if (dsf.getId().equals(id)) {
@@ -1514,10 +1653,19 @@ public class ApplicationController extends DomNodeController implements RunLater
         return result;
     }
 
-    public List<Panel> getPanelsFor(DataSourceFilter plot) {
+    /**
+     * @deprecated use getPlotElementsFor instead
+     * @param plot
+     * @return
+     */
+    public List<PlotElement> getPanelsFor(DataSourceFilter plot) {
+        return getPlotElementsFor(plot);
+    }
+
+    public List<PlotElement> getPlotElementsFor(DataSourceFilter plot) {
         String id = plot.getId();
-        List<Panel> result = new ArrayList<Panel>();
-        for (Panel p : application.getPanels()) {
+        List<PlotElement> result = new ArrayList<PlotElement>();
+        for (PlotElement p : application.getPlotElements()) {
             if (p.getDataSourceFilterId().equals(id)) {
                 result.add(p);
             }
@@ -1546,11 +1694,11 @@ public class ApplicationController extends DomNodeController implements RunLater
             ca.getMarginColumn().setId("marginColumn_"+i);
             ca.getMarginRow().setId("marginRow_"+i);
 
-        } else if ( node instanceof Panel ) {
-            int i= panelIdNum.getAndIncrement();
-            node.setId("panel_"+i );
-            ((Panel)node).getStyle().setId("style_"+i);
-            ((Panel)node).getPlotDefaults().setId("plot_defaults_" + i);
+        } else if ( node instanceof PlotElement ) {
+            int i= plotElementIdNum.getAndIncrement();
+            node.setId("plotElement_"+i );
+            ((PlotElement)node).getStyle().setId("style_"+i);
+            ((PlotElement)node).getPlotDefaults().setId("plot_defaults_" + i);
         } else if ( node instanceof Plot ) {
             int num = plotIdNum.getAndIncrement();
             Plot domPlot= (Plot)node;
@@ -1594,39 +1742,39 @@ public class ApplicationController extends DomNodeController implements RunLater
         columnIdNum.set( maxIdNum( nodes, "column_(\\d+)" )+1 );
         dsfIdNum.set( maxIdNum( nodes, "data_(\\d+)") + 1 );
         canvasIdNum.set( maxIdNum( nodes, "canvas_(\\d+)" ) + 1 );
-        panelIdNum.set( maxIdNum( nodes, "panel_(\\d+)" ) + 1 );
+        plotElementIdNum.set( maxIdNum( nodes, "plotElement_(\\d+)" ) + 1 );
         plotIdNum.set( maxIdNum( nodes, "plot_(\\d+)" ) + 1 );
     }
 
     /** focus **/
     /**
-     * focus panel
+     * focus plot element
      */
-    protected Panel panel;
-    public static final String PROP_PANEL = "panel";
+    protected PlotElement plotElement;
+    public static final String PROP_PLOT_ELEMENT = "plotElement";
 
-    public Panel getPanel() {
-        return panel;
+    public PlotElement getPlotElement() {
+        return plotElement;
     }
 
-    public void setPanel(Panel panel) {
-        Panel oldPanel = this.panel;
-        if ( panel==null ) {
-            setStatus("no panel selected");
+    public void setPlotElement(PlotElement plotElement) {
+        PlotElement oldPlotElement = this.plotElement;
+        if ( plotElement==null ) {
+            setStatus("no plot element selected");
         } else {
-            if ( panel!=oldPanel ) {
-                setStatus(panel + " selected");
-                canvas.controller.indicateSelection( Collections.singletonList((DomNode)panel) );
-                Plot plot= getPlotFor(panel);
-                if ( plot!=null && plot.getController()!=null ) {
-                    JMenuItem mi= plot.getController().getPanelPropsMenuItem();
-                    if ( mi!=null && panel.getController()!=null && panel.getController().getRenderer()!=null )
-                        mi.setIcon( panel.getController().getRenderer().getListIcon() );
+            setStatus(plotElement + " selected");
+            canvas.controller.indicateSelection( Collections.singletonList((DomNode)plotElement) );
+            if ( plotElement!=oldPlotElement ) {
+                Plot lplot= getPlotFor(plotElement);
+                if ( lplot!=null && lplot.getController()!=null ) {
+                    JMenuItem mi= lplot.getController().getPlotElementPropsMenuItem();
+                    if ( mi!=null && plotElement.getController()!=null && plotElement.getController().getRenderer()!=null )
+                        mi.setIcon( plotElement.getController().getRenderer().getListIcon() );
                 }
             }
         }
-        this.panel = panel;
-        propertyChangeSupport.firePropertyChange(PROP_PANEL, oldPanel, panel);
+        this.plotElement = plotElement;
+        propertyChangeSupport.firePropertyChange(PROP_PLOT_ELEMENT, oldPlotElement, plotElement);
     }
     /**
      * focus plot.
@@ -1649,7 +1797,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected Canvas canvas;
     public static final String PROP_CANVAS = "canvas";
 
-    public Canvas getCanvas() {
+    public synchronized Canvas getCanvas() {
         return canvas;
     }
 
@@ -1682,53 +1830,54 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     protected synchronized void syncTo( Application that, List<String> exclude ) {
-        MutatorLock lock = changesSupport.mutatorLock();
+        Lock lock = changesSupport.mutatorLock();
         lock.lock();
-
-        canvasLock = canvas.controller.getDasCanvas().mutatorLock();
+        Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
 
-        if ( !exclude.contains("options") ) application.getOptions().syncTo(that.getOptions(),
-                Arrays.asList(Options.PROP_OVERRENDERING,
-                Options.PROP_LOGCONSOLEVISIBLE,
-                Options.PROP_SCRIPTVISIBLE,
-                Options.PROP_SERVERENABLED));
+        try {
+
+            if ( !exclude.contains("options") ) application.getOptions().syncTo(that.getOptions(),
+                    Arrays.asList(Options.PROP_OVERRENDERING,
+                    Options.PROP_LOGCONSOLEVISIBLE,
+                    Options.PROP_SCRIPTVISIBLE,
+                    Options.PROP_SERVERENABLED));
 
 
-        Map<String,String> nameMap= new HashMap<String,String>() {
-            @Override
-            public String get(Object key) {
-                String result= super.get(key);
-                return (result==null) ? (String)key : result;
-            }
-        };
+            Map<String,String> nameMap= new HashMap<String,String>() {
+                @Override
+                public String get(Object key) {
+                    String result= super.get(key);
+                    return (result==null) ? (String)key : result;
+                }
+            };
 
-        if ( !this.application.id.equals( that.id ) ) nameMap.put( that.id, this.application.id );
+            if ( !this.application.id.equals( that.id ) ) nameMap.put( that.id, this.application.id );
 
-        if ( !exclude.contains("canvases") ) syncSupport.syncToCanvases(that.getCanvases(),nameMap);
+            if ( !exclude.contains("canvases") ) syncSupport.syncToCanvases(that.getCanvases(),nameMap);
 
-        if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
+            if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
 
-        if ( !exclude.contains("plots") ) syncSupport.syncToPlots( that.getPlots(),nameMap );
+            if ( !exclude.contains("plots") ) syncSupport.syncToPlots( that.getPlots(),nameMap );
 
-        if ( !exclude.contains("panels") )  syncSupport.syncToPanels(that.getPanels(), nameMap);
+            if ( !exclude.contains("plotElements") )  syncSupport.syncToPlotElements(that.getPlotElements(), nameMap);
 
-        application.setTimeRange(that.getTimeRange());
+            application.setTimeRange(that.getTimeRange());
 
-        syncSupport.syncBindingsNew( that.getBindings(), nameMap );
-        syncSupport.syncConnectors(that.getConnectors());
+            syncSupport.syncBindingsNew( that.getBindings(), nameMap );
+            syncSupport.syncConnectors(that.getConnectors());
 
-        canvasLock.unlock();
+            resetIdSequenceNumbers();
+        } finally {
+            canvasLock.unlock();
+            lock.unlock();
+        }
 
-        resetIdSequenceNumbers();
-
-        lock.unlock();
-
-        for (Panel p : application.getPanels()) {  // kludge to avoid reset range
-            p.controller.setResetPanel(false);
+        for (PlotElement p : application.getPlotElements()) {  // kludge to avoid reset range
+            p.controller.setResetPlotElement(false);  // see https://sourceforge.net/tracker/index.php?func=detail&aid=2985891&group_id=199733&atid=970682
             p.controller.setResetComponent(false);
             p.controller.setResetRanges(false);
-            p.controller.doResetRenderType( p.getRenderType() );
+            //p.controller.doResetRenderType( p.getRenderType() );
             p.controller.setResetRenderType(false);
             p.controller.setDsfReset(true); // dataSourcesShould be resolved.
         }
@@ -1771,6 +1920,23 @@ public class ApplicationController extends DomNodeController implements RunLater
                 return DasApplication.getDefaultApplication().getMonitorFactory().getMonitor(getDasCanvas(), label, description);
             }
         };
+    }
+
+    /**
+     * return true if the plot is part of a connector, the top or the bottom.
+     * @param plot
+     * @return
+     */
+    boolean isConnected( Plot plot ) {
+        Connector[] connectors= this.application.getConnectors();
+        for ( int i=0; i<connectors.length; i++ ) {
+            if ( connectors[i].getPlotB().equals(plot.getId()) ) {
+                return true;
+            } else if ( connectors[i].getPlotA().equals(plot.getId()) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

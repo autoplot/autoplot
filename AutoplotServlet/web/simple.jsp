@@ -37,17 +37,10 @@ on Libraries node in Projects view can be used to add the JSTL 1.1 library.
     </form>
 <br><br>
     <form action="SimpleServlet">
-       <input name="url" value="tsds.http://timeseries.org/cgi-bin/get.cgi?StartDate=20010101&EndDate=20010101&ext=bin&ppd=24&param1=SourceAcronym_Subset-1-v0" size="80" type="text">
+       <input name="url" value="vap+tsds:http://timeseries.org/get.cgi?StartDate=20030301&EndDate=20030401&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="80" type="text">
         <input value="Plot" type="submit">
     </form>
 <br><br>
-    <form action="SimpleServlet">
-    <input name="url" value="http://timeseries.org/cgi-bin/get.cgi?StartDate=20010101&EndDate=20010101&ext=bin&ppd=24&param1=SourceAcronym_Subset-1-v0" size="80" type="text">      
-        <input value="Plot" type="submit">
-
-    </form>
-    
-    <br><br>
     <h1>This shows all the new controls:</h1>
     <form action="SimpleServlet">
         <input name="url" value="tsds.http://timeseries.org/get.cgi?StartDate=20030101&EndDate=20080831&ext=bin&out=tsml&ppd=1440&param1=OMNI_OMNIHR-26-v0" size="100" type="text"><br>

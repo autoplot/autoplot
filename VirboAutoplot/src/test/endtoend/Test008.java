@@ -18,6 +18,7 @@ import org.virbo.jythonsupport.Util;
  */
 public class Test008 {
 
+    public static boolean debug= false;
 
     public static void doTest( int id, String uri ) throws Exception {
         QDataSet ds;
@@ -49,22 +50,22 @@ public class Test008 {
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
     
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args) {
         try {
 
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
-            
+
             doTest( 0, "file:///home/jbf/ct/hudson/data.backup/dat/ACE_sis_level2_data_1hr_1283.txt?time=year&timeFormat=%Y+%j+%H+%M+%S&depend1Labels=5:13&rank2=5:13&skip=2&validMin=2e-09" );
             
-            load( "/home/jbf/ct/hudson/vap/ace_sis_level2_data_server.vap" );
+            load( "/home/jbf/ct/hudson/vap/ace_sis_level2_data_server_v1.03.vap" );
             setCanvasSize( 750, 300 );
             writeToPng( "test008_001.png" );
 
             doTest( 2, "file:///home/jbf/ct/hudson/data.backup/dat/ACE_sis_level2_data_1hr_1283.txt?time=year&timeFormat=%Y+%j+%H+%M+%S&intervalTag=start&depend1Labels=5:13&rank2=5:13&skip=2&validMin=2e-09" );
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }

@@ -3,14 +3,21 @@ package org.autoplot.pngwalk;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.filesystem.FileObject;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.DebugPropertyChangeSupport;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.URISplit;
 
 /**
  * <p>This class maintains a list of <code>WalkImage</code>s and provides functionality
@@ -49,6 +56,13 @@ public class WalkImageSequence implements PropertyChangeListener  {
     public static final String PROP_THUMB_LOADED = "thumbLoaded";
     public static final String PROP_USESUBRANGE = "useSubRange";
     public static final String PROP_SEQUENCE_CHANGED = "sequenceChanged";
+    public static final String PROP_BADGE_CHANGE = "badgeChange";  // For quality control icon badge
+
+    private URI qcFolder = null;                 //Location for quality control files, if used
+    private QualityControlSequence qualitySeq;
+
+    private boolean haveThumbs400=true;
+    private Object fs;
 
     /** Create an image sequence based on a URI template.
      *
@@ -73,21 +87,41 @@ public class WalkImageSequence implements PropertyChangeListener  {
             uris= new ArrayList<URI>();
         } else {
             try {
-                setStatus( "Busy: listing "+template );
+                setStatus( "busy: listing "+template );
                 uris = WalkUtil.getFilesFor(template, null, datumRanges, false, null);
-                setStatus( "Done listing "+template );
+                if ( uris.size()>0 ) {
+                    setStatus( "Done listing "+template );
+                } else {
+                    setStatus( "warning: Done listing "+template+", and no files were found" );
+                }
             } catch (Exception ex) {
                 Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
-                setStatus("Error listing " + template);
-                throw new java.io.IOException("Error listing " + template);
+                setStatus("error: Error listing " + template+", "+ex.getMessage() );
+                throw new java.io.IOException("Error listing "  + template+", "+ex.getMessage() );
             }
+        }
+
+        URI fsRoot;
+        fsRoot = DataSetURI.getResourceURI( URISplit.parse(template).path );
+        try {
+            FileSystem fs= FileSystem.create( fsRoot );
+            if ( fs.getFileObject("/thumbs400/").exists() ) {
+                String[] result= fs.listDirectory("/thumbs400/");
+                if ( result.length<2 ) {
+                    haveThumbs400= false; //TODO: kludge, I expected IOException when dir doesn't exist.
+                }
+            } else {
+                haveThumbs400= false;
+            }
+        } catch ( IOException ex ) {
+            haveThumbs400= false;
         }
 
         //if ( uris.size()>20 ) {uris= uris.subList(0,30); }
 
         existingImages = new ArrayList<WalkImage>();
         for (int i=0; i < uris.size(); i++) {
-            existingImages.add(new WalkImage(uris.get(i)));
+            existingImages.add(new WalkImage(uris.get(i),haveThumbs400));
             //System.err.println(i + ": " + datumRanges.get(i));
 
             String captionString;
@@ -116,33 +150,92 @@ public class WalkImageSequence implements PropertyChangeListener  {
             i.addPropertyChangeListener(this);
         }
         subRange = possibleRanges;
+
         rebuildSequence();
+    }
+
+    /**
+     * show the datumRange requested by selecting it.  If the datum range is
+     * within a gap, then select the range immediately following.
+     * 
+     * @param ds
+     */
+    void gotoSubrange(DatumRange ds) {
+        int idx= -1;
+        for ( int i=datumRanges.size()-1; i>=0; i-- ) {
+            if ( ds.contains( datumRanges.get(i).min() ) ) {
+                idx= i;
+                break;
+            }
+            if ( datumRanges.get(i).min().ge( ds.min() ) ) {
+                idx=i;
+            }
+        }
+        if ( idx==-1 ) {
+            setIndex( datumRanges.size()-1);
+        } else {
+            setIndex(idx);
+        }
     }
 
     /** Rebuilds the image sequence.  Should be called on initial load and if
      * list content options (showMissing, subrange) are changed.
      */
-    private void rebuildSequence() {
-        List<DatumRange> displayRange;
-        if (isUseSubRange() && subRange.size() > 0) {
-            displayRange = subRange;
-        } else {
-            displayRange = possibleRanges;
-        }
-        displayImages.clear();
-
-        for (DatumRange dr : displayRange) {
-            if (datumRanges.contains(dr)) {
-                displayImages.add(existingImages.get(datumRanges.indexOf(dr)));
-            } else if (showMissing && timeSpan != null) {
-                // add missing image placeholder
-                WalkImage ph = new WalkImage(null);
-                ph.setCaption(dr.toString());
-                displayImages.add(ph);
+    private synchronized void rebuildSequence( ) {
+        // remember current image so we can update the index appropriately
+        WalkImage currentImage = null;
+        if(displayImages.size() >  0) currentImage = currentImage();
+        if (timeSpan != null) {
+            List<DatumRange> displayRange;
+            if (isUseSubRange() && subRange.size() > 0) {
+                displayRange = subRange;
+            } else {
+                displayRange = possibleRanges;
             }
+            displayImages.clear();
+
+            for (DatumRange dr : displayRange) {
+                if (datumRanges.contains(dr)) {
+                    displayImages.add(existingImages.get(datumRanges.indexOf(dr)));
+                } else if (showMissing && timeSpan != null) {
+                    // add missing image placeholder
+                    WalkImage ph = new WalkImage(null,haveThumbs400);
+                    ph.setCaption(dr.toString());
+                    displayImages.add(ph);
+                }
+            }
+        } else {
+            displayImages.clear();
+            displayImages = new ArrayList<WalkImage>( existingImages );
         }
+        if (displayImages.contains(currentImage)) {
+            index = displayImages.indexOf(currentImage);
+        } else {
+            index = 0;
+        }
+        
         //Bogus property has no meaningful value, only event is important
         pcs.firePropertyChange(PROP_SEQUENCE_CHANGED, false, true);
+    }
+
+    /**
+     * initialize the quality control sequence.
+     * @param qcFolder URI with the password resolved.
+     */
+    protected void initQualitySequence( URI qcFolder ) {
+        try {
+            this.qcFolder= qcFolder;
+            qualitySeq = new QualityControlSequence(WalkImageSequence.this, qcFolder);
+            for (int i = 0; i < displayImages.size(); i++) {
+                qualitySeq.getQualityControlRecord(i).addPropertyChangeListener(WalkImageSequence.this); // DANGER
+                pcs.firePropertyChange(PROP_BADGE_CHANGE, -1, i);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(WalkImageSequence.class.getName()).log(Level.SEVERE, null, ex);
+            setStatus("warning: "+ ex.toString());
+            throw new RuntimeException(ex);
+        }
+
     }
 
 //commented until questions are resolved.
@@ -161,6 +254,16 @@ public class WalkImageSequence implements PropertyChangeListener  {
         return imageAt(index);
     }
 
+    /**
+     * return the WalkImage object for the given URI.
+     */
+    public WalkImage getImage( URI image ) {
+        for ( WalkImage i: displayImages ) {
+            if ( i.getUri().equals(image) ) return i;
+        }
+        throw new IllegalStateException("didn't find image for "+image);
+    }
+
     public WalkImage imageAt(int n) {
         if (n<0 || n>displayImages.size()-1) {
             throw new IndexOutOfBoundsException();
@@ -169,6 +272,23 @@ public class WalkImageSequence implements PropertyChangeListener  {
         }
     }
 
+    public URI getQCFolder() {
+        return qcFolder;
+    }
+
+    public void setQCFolder( URI folder ) {
+        this.qcFolder= folder;
+    }
+
+    /**
+     * this may be null if even though we are using QualityControl, if the user
+     * hasn't logged in yet.
+     * @return
+     */
+    public QualityControlSequence getQualityControlSequence() {
+        return this.qualitySeq;
+    }
+    
     public boolean isShowMissing() {
         return showMissing;
     }
@@ -253,6 +373,7 @@ public class WalkImageSequence implements PropertyChangeListener  {
     /** Set the index explicitly.
      *
      * @param index
+     * @throws IndexOutOfBoundsException when...
      */
     public void setIndex(int index) {
         if (index == this.index) {
@@ -320,6 +441,20 @@ public class WalkImageSequence implements PropertyChangeListener  {
         return displayImages.size();
     }
 
+    /**
+     * returns null, True or False.
+     * @return
+     */
+    private Boolean doHaveThumbs400() {
+        return this.haveThumbs400;
+    }
+
+    /**
+     * things we fire events for:
+     *   PROP_BADGE_CHANGE
+     *   and others
+     * @param l
+     */
     public void addPropertyChangeListener(PropertyChangeListener l) {
         pcs.addPropertyChangeListener(l);
     }
@@ -354,21 +489,37 @@ public class WalkImageSequence implements PropertyChangeListener  {
         pcs.firePropertyChange(PROP_STATUS, oldStatus, status);
     }
 
+
     // Get status changes from the images in the list
     public void propertyChange(PropertyChangeEvent e) {
-        if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.IMAGE_LOADED ||
-                (WalkImage.Status)e.getNewValue() == WalkImage.Status.THUMB_LOADED)  {
-            int i = existingImages.indexOf(e.getSource());
-            if (i == -1) {
-                //panic because something is very very wrong
-                throw new RuntimeException("Status change from unknown image object");
+        if (e.getNewValue() instanceof WalkImage.Status) {
+            if ((WalkImage.Status) e.getNewValue() == WalkImage.Status.IMAGE_LOADED ||
+                    (WalkImage.Status) e.getNewValue() == WalkImage.Status.THUMB_LOADED) {
+                int i = displayImages.indexOf(e.getSource());
+                if (i == -1) {
+                    if (existingImages.indexOf(e.getSource()) == -1) {
+                        //panic because something is very very wrong
+                        throw new RuntimeException("Status change from unknown image object");
+                    }
+                    /* If we get here, this is just a notification from an image that's no
+                     * longer displayed because of date filter or "show missing" filter, so do nothing
+                     */
+                    return;
+                }
+                // imageLoaded is a bogus property so there's no old value
+                // passing an illegal negative value in its place assures event is always fired
+                pcs.firePropertyChange(PROP_THUMB_LOADED, -1, i);
+                if ((WalkImage.Status) e.getNewValue() == WalkImage.Status.IMAGE_LOADED) {
+                    pcs.firePropertyChange(PROP_IMAGE_LOADED, -1, i);
+                }
             }
-            // imageLoaded is a bogus property so there's no old value
-            // passing an illegal negative value in its place assures event is always fired
-            pcs.firePropertyChange(PROP_THUMB_LOADED, -1, i);
-            if ((WalkImage.Status)e.getNewValue() == WalkImage.Status.IMAGE_LOADED)
-                pcs.firePropertyChange(PROP_IMAGE_LOADED, -1, i);
-        }
+        } else if ( e.getPropertyName().equals( QualityControlRecord.PROP_STATUS ) ) {
+            URI imageURI= ((QualityControlRecord)e.getSource()).getImageURI();
+            WalkImage im= getImage(imageURI);
+            int i= displayImages.indexOf(im);
+            pcs.firePropertyChange( PROP_BADGE_CHANGE, -1, i );
+
+        } 
         
         int loadingCount=0;
         int loadedCount=0;

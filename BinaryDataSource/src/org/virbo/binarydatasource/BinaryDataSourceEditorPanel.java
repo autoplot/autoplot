@@ -11,6 +11,7 @@
 
 package org.virbo.binarydatasource;
 
+import java.awt.Window;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -18,16 +19,18 @@ import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.table.TableModel;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.dsutil.QDataSetTableModel;
 import java.lang.Short; // because of Short object in this package.
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -39,6 +42,8 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
     /** Creates new form BinaryDataSourceEditorPanel */
     public BinaryDataSourceEditorPanel() {
         initComponents();
+        jTable1.getTableHeader().setReorderingAllowed(false);
+        
     }
 
     String suri;
@@ -163,5 +168,20 @@ public class BinaryDataSourceEditorPanel extends javax.swing.JPanel implements D
     public javax.swing.JTable jTable1;
     public org.virbo.datasource.ui.ParamsTextArea paramsTextArea1;
     // End of variables declaration//GEN-END:variables
+
+    public boolean reject( String url ) throws IOException, URISyntaxException {
+        URISplit split = URISplit.parse(url);
+        FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
+        if ( fs.isDirectory( split.file.substring(split.path.length()) ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
+        URISplit split = URISplit.parse(uri);
+        File f = DataSetURI.getFile(new URL(split.file), mon );
+        return true;
+    }
 
 }

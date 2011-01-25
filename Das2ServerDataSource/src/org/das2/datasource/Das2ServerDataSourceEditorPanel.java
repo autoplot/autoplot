@@ -11,33 +11,59 @@
 
 package org.das2.datasource;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.das2.DasApplication;
 import org.das2.DasException;
 import org.das2.client.DasServer;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  *
  * @author jbf
  */
 public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
+
+    private String DEFAULT_TIMERANGE="2001-01-01";
 
     /** Creates new form Das2ServerDataSourceEditorPanel */
     public Das2ServerDataSourceEditorPanel() {
@@ -63,6 +89,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel4 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         ReaderParamsTextArea = new javax.swing.JTextArea();
+        jLabel5 = new javax.swing.JLabel();
+        tcaTextField = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        tcaItem = new javax.swing.JTextField();
+        viewDsdfButton = new javax.swing.JButton();
+        validRangeLabel = new javax.swing.JLabel();
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", " " }));
 
@@ -70,11 +102,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("loading DataSets list");
         jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jTree1.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                jTree1ValueChanged(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTree1);
 
         jLabel2.setText("Data Set Id:");
 
-        timeRangeTextField.setText("jTextField1");
+        timeRangeTextField.setText("2000-01-01");
 
         jLabel3.setText("Time Range:");
 
@@ -83,6 +120,24 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         ReaderParamsTextArea.setColumns(20);
         ReaderParamsTextArea.setRows(5);
         jScrollPane2.setViewportView(ReaderParamsTextArea);
+
+        jLabel5.setText("TCA Interval (sec):");
+        jLabel5.setToolTipText("<html>\nInterval (in seconds) to use for TCA (ephemeris) data.<br>\nLeave blank for most datasets.<br>\n</html>\n");
+
+        tcaTextField.setText(" ");
+
+        jLabel6.setText("TCA Item:");
+        jLabel6.setToolTipText("The optional item number for TCAs.");
+
+        viewDsdfButton.setText("View DSDF");
+        viewDsdfButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                viewDsdfButtonActionPerformed(evt);
+            }
+        });
+
+        validRangeLabel.setFont(new java.awt.Font("DejaVu LGC Sans", 0, 10)); // NOI18N
+        validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -100,11 +155,25 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                             .add(layout.createSequentialGroup()
                                 .add(jLabel3)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 197, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 197, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 39, Short.MAX_VALUE)
+                                .add(viewDsdfButton))
                             .add(jLabel4)))
                     .add(layout.createSequentialGroup()
                         .add(24, 24, 24)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)))
+                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(jLabel5)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(tcaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 70, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jLabel6)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(tcaItem, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 42, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createSequentialGroup()
+                        .add(32, 32, 32)
+                        .add(validRangeLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -117,18 +186,166 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 .add(5, 5, 5)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 136, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel3)
-                    .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(viewDsdfButton))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(validRangeLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel4)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel5)
+                    .add(tcaTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jLabel6)
+                    .add(tcaItem, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_jTree1ValueChanged
+        TreePath p= evt.getPath();
+        TreeModel m= ((JTree)evt.getSource()).getModel();
+        if ( m.isLeaf( p.getLastPathComponent() ) ) {
+            Object[] oo= p.getPath();
+            String ds= String.valueOf( oo[1] );
+            for ( int i=2; i<oo.length; i++ ) {
+                ds= ds + "/" + oo[i];
+            }
+            String surl = oo[0] + "?server=dsdf&dataset=" + ds;
+            {
+                InputStream in = null;
+                try {
+                    URL url = new URL(surl);
+                    in = url.openStream();
+                    StringBuilder sb = new StringBuilder();
+                    int by = in.read();
+                    while (by != -1) {
+                        sb.append((char) by);
+                        by = in.read();
+                    }
+                    in.close();
+                    String s = sb.toString();
+                    int contentLength = Integer.parseInt(s.substring(4, 10));
+                    String sxml = s.substring(10, 10 + contentLength);
+                    Reader xin = new BufferedReader(new StringReader(sxml));
+                    DocumentBuilder builder;
+                    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    InputSource source = new InputSource(xin);
+                    Document document = builder.parse(source);
+                    XPathFactory factory = XPathFactory.newInstance();
+                    XPath xpath = (XPath) factory.newXPath();
+
+                    String curr= this.timeRangeTextField.getText();
+
+                    Node exampleRange= (Node) xpath.evaluate( "/stream/properties/@exampleRange", document, XPathConstants.NODE );
+                    if ( exampleRange!=null && curr.equals(DEFAULT_TIMERANGE) ) {
+                        this.timeRangeTextField.setText( exampleRange.getNodeValue() );
+                    }
+                    Node validRange= (Node)  xpath.evaluate( "/stream/properties/@validRange", document, XPathConstants.NODE );
+                    if ( validRange!=null ) {
+                        this.validRangeLabel.setText( "valid range: " + validRange.getNodeValue() );
+                    } else {
+                        this.validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
+                    }
+                } catch (XPathExpressionException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SAXException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParserConfigurationException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            
+        }
+    }//GEN-LAST:event_jTree1ValueChanged
+
+    private void viewDsdfButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewDsdfButtonActionPerformed
+        TreePath p= jTree1.getSelectionPath();
+        TreeModel m= jTree1.getModel();
+        if ( m.isLeaf( p.getLastPathComponent() ) ) {
+            {
+                InputStream in = null;
+                try {
+                    Object[] oo = p.getPath();
+                    String ds = String.valueOf(oo[1]);
+                    for (int i = 2; i < oo.length; i++) {
+                        ds = ds + "/" + oo[i];
+                    }
+                    System.err.println(ds);
+                    String surl = oo[0] + "?server=dsdf&dataset=" + ds;
+                    URL url = new URL(surl);
+
+                    System.err.println(url);
+                    
+                    in = url.openStream();
+
+                    StringBuilder sb= new StringBuilder();
+
+                    int by= in.read();
+                    while ( by!=-1 ) {
+                        sb.append( (char)by );
+                        by= in.read();
+                    }
+                    in.close();
+
+                    String s= sb.toString();
+                    int contentLength= Integer.parseInt( s.substring(4,10) );
+                    String sxml= s.substring(10,10+contentLength);
+
+                    Reader xin = new BufferedReader(new StringReader(sxml));
+
+                    DocumentBuilder builder;
+                    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    InputSource source = new InputSource(xin);
+                    Document document = builder.parse(source);
+
+                    XPathFactory factory= XPathFactory.newInstance();
+
+                    XPath xpath= (XPath) factory.newXPath();
+                    NodeList o= (NodeList)xpath.evaluate( "/stream/properties/@*", document, XPathConstants.NODESET );
+
+                    String result= "";
+                    for ( int ii=0; ii<o.getLength(); ii++ ) {
+                        result+= "\n" + o.item(ii).getNodeName() + "  =  " +  o.item(ii).getNodeValue();
+                    }
+                    in.close();
+                    JOptionPane.showMessageDialog( this, result );
+                    
+
+                } catch (XPathExpressionException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SAXException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ParserConfigurationException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_viewDsdfButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -138,10 +355,16 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public javax.swing.JLabel jLabel2;
     public javax.swing.JLabel jLabel3;
     public javax.swing.JLabel jLabel4;
+    public javax.swing.JLabel jLabel5;
+    public javax.swing.JLabel jLabel6;
     public javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JTree jTree1;
+    public javax.swing.JTextField tcaItem;
+    public javax.swing.JTextField tcaTextField;
     public javax.swing.JTextField timeRangeTextField;
+    public javax.swing.JLabel validRangeLabel;
+    public javax.swing.JButton viewDsdfButton;
     // End of variables declaration//GEN-END:variables
 
 
@@ -175,9 +398,42 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         return this;
     }
 
+    public boolean reject(String uri) throws Exception {
+        URISplit split = URISplit.parse(uri);
+        if ( split.file==null || split.file.equals("file:///") ) { // use UIOWA's main one by default.
+            split.file= "http://www-pw.physics.uiowa.edu/das/das2Server";
+        }
+        String s= split.file.toString();
+        if ( s.equals("http://www-pw.physics.uiowa.edu/das/das2Server") ) {
+            return false;
+        }
+        URL url= new URL(s+"?server=logo");
+        URLConnection connect= url.openConnection();
+        InputStream in= connect.getInputStream();
+        if ( connect.getContentType().startsWith("image") ) {
+            in.close();
+            return false;
+        } else {
+            in.close();
+            return true;
+        }
+    }
+
+
+    public boolean prepare( String uri, java.awt.Window parent, ProgressMonitor mon) {
+        return true;
+    }
+
     public void setURI(String uri) {
         URISplit split= URISplit.parse(uri);
-        serverURL= split.resourceUri.toString();
+        if ( split.file==null || split.file.equals("file:///") ) {
+            try {
+                split.resourceUri = new URI("http://www-pw.physics.uiowa.edu/das/das2Server");
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        serverURL= DataSetURI.fromUri( split.resourceUri );
         Map<String,String> params= URISplit.parseParams(split.params);
         dataSetId= params.remove("dataset");
         String startTime= params.remove("start_time");
@@ -189,8 +445,18 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             } catch (ParseException ex) {
                 Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } else {
+            timeRangeTextField.setText( DEFAULT_TIMERANGE );
         }
         String resolution= params.remove("resolution");
+        String interval= params.remove("interval");
+        if ( interval!=null ) {
+            tcaTextField.setText(interval);
+        }
+        String item= params.remove("item");
+        if ( item!=null ) {
+            tcaItem.setText(item);
+        }
         StringBuffer paramsStr= new StringBuffer();
         for ( Entry<String,String> e: params.entrySet() ) {
             paramsStr.append(e.getKey()+"="+e.getValue()+"\n");
@@ -280,6 +546,15 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                 "dataset="+dataSetId  +
                 "&start_time="+ timeRange.min() +
                 "&end_time="+ timeRange.max();
+
+        String tcaInterval= tcaTextField.getText().trim();
+        if ( !tcaInterval.equals("") ) {
+            result+= "&interval="+ tcaInterval;
+        }
+        if ( !tcaItem.getText().trim().equals("") ) {
+            result+= "&item="+ tcaItem.getText().trim();
+        }
+        
         if ( params.length()>0 ) result= result + "&" + params;
         return result;
     }

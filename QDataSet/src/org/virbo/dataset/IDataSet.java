@@ -20,15 +20,9 @@ import java.util.Map;
  *
  * @author jbf
  */
-public final class IDataSet extends AbstractDataSet implements WritableDataSet {
+public final class IDataSet extends ArrayDataSet {
     int[] back;
     
-    int rank;
-    
-    int len0;
-    int len1;
-    int len2;
-    int len3;
     
     public static final String version="20070529";
     
@@ -73,43 +67,26 @@ public final class IDataSet extends AbstractDataSet implements WritableDataSet {
         return new IDataSet( rank, len0, len1, len2, 1, back );
     }
     
-    /** Creates a new instance of IDataSet */
-    private IDataSet( int rank, int len0, int len1, int len2, int len3 ) {
+    protected IDataSet( int rank, int len0, int len1, int len2, int len3 ) {
         this( rank, len0, len1, len2, len3, new int[ len0 * len1 * len2 * len3] );
     }
 
-    private IDataSet( int rank, int len0, int len1, int len2, int len3, int[] back ) {
+    protected IDataSet( int rank, int len0, int len1, int len2, int len3, int[] back ) {
        this.back= back;
        this.rank= rank;
        this.len0= len0;
        this.len1= len1;
        this.len2= len2;
        this.len3= len3;
-       DataSetUtil.addQube(this);
-    }
-    
-    public int rank() {
-        return rank;
+       if ( rank>1 ) putProperty(QDataSet.QUBE, Boolean.TRUE);
     }
 
-    @Override
-    public int length() {
-        return len0;
+    protected Object getBack() {
+        return this.back;
     }
 
-    @Override
-    public int length(int i) {
-        return len1;
-    }
-    
-    @Override
-    public int length( int i0, int i1 ) {
-        return len2;
-    }
-
-    @Override
-    public int length( int i0, int i1, int i2 ) {
-        return len3;
+    protected void setBack(Object back) {
+        this.back= (int[])back;
     }
 
     @Override
@@ -188,7 +165,13 @@ public final class IDataSet extends AbstractDataSet implements WritableDataSet {
                 throw new IllegalArgumentException("dataset is dependent on itsself!");
             }
             if (dep != null) {
-                result.put("DEPEND_" + i, copy(dep));
+                if ( dep instanceof FDataSet ) {
+                    result.put("DEPEND_" + i, FDataSet.copy(dep));
+                } else if ( dep instanceof DDataSet ) {
+                    result.put("DEPEND_" + i, DDataSet.copy(dep));
+                } else {
+                    result.put("DEPEND_" + i, copy(dep));
+                }
             }
         }
 
@@ -342,5 +325,63 @@ public final class IDataSet extends AbstractDataSet implements WritableDataSet {
         joinProperties( ds );
     }
 
+
+    /**
+     * the slice operator is better implemented here.  Presently, we
+     * use System.arraycopy to copy out the data, but this should be
+     * reimplemented along with an offset parameter so the original data
+     * can be used to back the data.
+     * @param i
+     * @return
+     */
+    @Override
+    public QDataSet slice(int i) {
+        int nrank = this.rank-1;
+        int noff1= i * len1 * len2 * len3;
+        int noff2= (i+1) * len1 * len2 * len3;
+        int[] newback = new int[noff2-noff1];
+        System.arraycopy( this.back, noff1, newback, 0, noff2-noff1 );
+        Map<String,Object> props= DataSetOps.sliceProperties0(i,DataSetUtil.getProperties(this));
+        IDataSet result= new IDataSet( nrank, len1, len2, len3, 1, newback );
+        DataSetUtil.putProperties( props, result );
+        return result;
+    }
+
+    /**
+     * trim operator copies the data into a new dataset.
+     * @param start
+     * @param end
+     * @return
+     */
+    @Override
+    public QDataSet trim(int start, int end) {
+        int nrank = this.rank;
+        int noff1= start * len1 * len2 * len3;
+        int noff2= end * len1 * len2 * len3;
+        int[] newback = new int[noff2-noff1];
+        System.arraycopy( this.back, noff1, newback, 0, noff2-noff1 );
+        IDataSet result= new IDataSet( nrank, end-start, len1, len2, len3, newback );
+        DataSetUtil.putProperties( DataSetUtil.getProperties(this), result );
+        QDataSet dep0= (QDataSet) property(QDataSet.DEPEND_0);
+        if ( dep0!=null ) result.putProperty( QDataSet.DEPEND_0, dep0.trim(start, end) );
+        return result;
+    }
+
+    /**
+     * TODO: this is untested, but is left in to demonstrate how the capability
+     * method should be implemented.  Clients should use this instead of
+     * casting the class to the capability class.
+     * @param <T>
+     * @param clazz
+     * @return
+     */
+    @Override
+    public <T> T capability(Class<T> clazz) {
+        if ( clazz==WritableDataSet.class ) {
+            return (T) this;
+        } else {
+            return super.capability(clazz);
+        }
+    }
     
 }

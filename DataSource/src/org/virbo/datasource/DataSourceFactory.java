@@ -32,11 +32,6 @@ public interface DataSourceFactory {
     public List<CompletionContext> getCompletions( CompletionContext cc, ProgressMonitor mon ) throws Exception;
     
     /**
-     * present the editor for customizing this URL.
-     */
-   // String editPanel( String surl ) throws Exception;
-    
-    /**
      * quick check to see that an url looks acceptable.  This is introduced to 
      * get Bob's desired behavior, that hitting return after a CDF filename should
      * bring up the completions list.

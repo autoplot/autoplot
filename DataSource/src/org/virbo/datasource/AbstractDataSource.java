@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.capability.Updating;
 
@@ -40,15 +41,23 @@ public abstract class AbstractDataSource implements DataSource {
     protected URI resourceURI;
 
     public AbstractDataSource(java.net.URI uri) {
-        try {
-            this.uri = uri;
-            String s = uri.toString();
-            URISplit split = URISplit.parse(s);
+        this.uri = uri;
+        String s = DataSetURI.fromUri(uri);
+        if ( !s.startsWith("vap") ) {
+            Logger.getLogger("vap.abstractDataSource").fine( "uri didn't start with vap!" );
+        }
+        URISplit split = URISplit.parse(s);
 
-            params = URISplit.parseParams(split.params);
-            resourceURI = new URI(split.file);
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
+        params = URISplit.parseParams(split.params);
+
+        String f= split.file;
+        if ( split.scheme!=null ) {
+            try {
+                resourceURI = DataSetURI.toUri(f);
+            } catch (Exception e) {
+                //URI syntax exception
+                System.err.println(e); // InlineDataSource is subclass, need to fix this...
+            }
         }
     }
 
@@ -100,11 +109,11 @@ public abstract class AbstractDataSource implements DataSource {
 
     @Override
     public String toString() {
-        return uri.toString();
+        return DataSetURI.fromUri(uri);
     }
 
     public String getURI() {
-        return uri.toString();
+        return DataSetURI.fromUri(uri);
     }
 
 
@@ -147,6 +156,20 @@ public abstract class AbstractDataSource implements DataSource {
      */
     protected Map getParams() {
         return params;
+    }
+
+    /**
+     * return the named parameter, or the default.  
+     * Note arg_0, arg_1, etc are for unnamed positional parameters.  It's recommended
+     * that there be only one positional parameter.
+     */
+    protected String getParam( String name, String dflt ) {
+        String result= params.get(name);
+        if (result!=null ) {
+            return result;
+        } else {
+            return dflt;
+        }
     }
 
     /**

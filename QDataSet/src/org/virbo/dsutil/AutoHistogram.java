@@ -22,7 +22,6 @@ import org.das2.util.DasMath;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.DataSetIterator;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.IDataSet;
 import org.virbo.dataset.QDataSet;
@@ -46,10 +45,13 @@ public final class AutoHistogram {
     public static final String USER_PROP_BIN_WIDTH = "binWidth";
     public static final String USER_PROP_INVALID_COUNT = "invalidCount";
     public static final String USER_PROP_OUTLIERS = "outliers";
+    public static final String USER_PROP_MIN_GT_ZERO = "minGtZero";
+
     /**
      * Long, total number of valid points.
      */
     public static final String USER_PROP_TOTAL = "total";
+
     public final int BIN_COUNT = 100;
     private final int INITIAL_BINW = 1;
     private final double INITIAL_BINW_DENOM = 1E30;
@@ -72,6 +74,10 @@ public final class AutoHistogram {
     long invalidCount;
     Units units;
     int rescaleCount;  // number of times we rescaled, useful for debugging.
+    double minGtZero= Double.MAX_VALUE; // useful for detecting log spacing, the smallest positive non-zero number observed.
+
+    QDataSet context;  // range over which histogram is taken.
+
     /**
      * list of outliers and thier count.  When we rescale, we see if any outliers can be added to the distribution.
      */
@@ -189,6 +195,7 @@ public final class AutoHistogram {
         user.put(USER_PROP_TOTAL, total);
         user.put(USER_PROP_OUTLIERS, outliers);
         user.put(USER_PROP_INVALID_COUNT, invalidCount);
+        //user.put(USER_PROP_MIN_GT_ZERO, minGtZero );
         int outlierCount = 0;
         for (int i : outliers.values()) {
             outlierCount += i;
@@ -217,6 +224,34 @@ public final class AutoHistogram {
         return doit(ds, null);
     }
 
+    /**
+     * fast extent only works when monotonic.
+     * Returns null if there is no valid data.
+     * @param dep0
+     * @return rank 1 bins dataset or null
+     */
+    public QDataSet monoExtent( QDataSet dep0 ) {
+        QDataSet wdsdep0= DataSetUtil.weightsDataSet(dep0);
+        int imin, imax;
+        for ( imin=0; imin<dep0.length(); imin++ ) {
+            if ( wdsdep0.value(imin)>0 ) break;
+        }
+        for ( imax=dep0.length()-1; imax>=0; imax-- ) {
+            if ( wdsdep0.value(imax)>0 ) break;
+        }
+        if ( imin<imax ) {
+            DDataSet result= DDataSet.createRank1(2);
+            result.putProperty( QDataSet.BINS_0, "min,max" );
+            result.putProperty( QDataSet.UNITS, dep0.property(QDataSet.UNITS) );
+            result.putValue( 0, dep0.value(imin) );
+            result.putValue( 1, dep0.value(imax) );
+            return result;
+        } else {
+            return null;
+        }
+
+    }
+
     //public QDataSet getTiming() {
     //    return timer.getDataSet();
     //}
@@ -242,6 +277,21 @@ public final class AutoHistogram {
             wds = DataSetUtil.weightsDataSet(ds);
         }
 
+        QDataSet context1;
+        // try to get an extent of the data depend0.
+        QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
+//        if ( dep0!= null ) {
+//            if ( DataSetUtil.isMonotonic(dep0 ) ) {
+//                context1= monoExtent(dep0);
+//                if ( context==null ) {
+//                    context= context1;
+//                } else {
+//                    context= null; //TODO: only support one pass.
+//                }
+//            }
+//        }
+        context= null;
+
         Units d1 = (Units) ds.property(QDataSet.UNITS);
         if (d1 != null) units = d1;
 
@@ -263,6 +313,10 @@ public final class AutoHistogram {
             }
 
             double d = iter.getValue(ds);
+
+            if ( d<minGtZero && d>0 ) {
+                minGtZero= d;
+            }
 
             if (initialOutliers) {
                 if (outliers.size() < 5) { // collect points as outliers until we have enough points to prime the bins.
@@ -327,7 +381,8 @@ public final class AutoHistogram {
         }
 
         DDataSet result = getHistogram();
-
+        if ( context!=null ) result.putProperty( QDataSet.CONTEXT_0, context );
+        
         return result;
     }
 
@@ -379,10 +434,10 @@ public final class AutoHistogram {
 
         binw = Math.abs(closestB - closestA) / (nbin / 100);
         if (binw < 1.0) {
-            binwDenom = DasMath.exp10(Math.ceil(DasMath.log10(1 / binw)));
+            binwDenom = Math.pow(10,Math.ceil(Math.log10(1 / binw)));
             binw = 1.0;
         } else {
-            binw = DasMath.exp10(Math.floor(DasMath.log10(binw)));
+            binw = Math.pow(10,Math.floor(Math.log10(binw)));
             binwDenom = 1.0;
         }
 
@@ -624,10 +679,10 @@ public final class AutoHistogram {
 
     private int nextFactor() {
         int factor;
-        int exp = (int) Math.floor(DasMath.log10(binw) + 0.001);
-        int mant = (int) Math.round(binw / DasMath.exp10(exp));
-        int expDenom = (int) Math.floor(DasMath.log10(binwDenom));
-        int mantDenom = (int) Math.round(binwDenom / DasMath.exp10(expDenom));
+        int exp = (int) Math.floor(Math.log10(binw) + 0.001);
+        int mant = (int) Math.round(binw / Math.pow(10,exp));
+        int expDenom = (int) Math.floor(Math.log10(binwDenom));
+        int mantDenom = (int) Math.round(binwDenom / Math.pow(10,expDenom));
         if (mantDenom > 1) {
             mant = 10 / mantDenom;
         }
@@ -800,6 +855,45 @@ public final class AutoHistogram {
         result.putProperty("validCount", total);
         result.putProperty("invalidCount", ((Map) hist.property(QDataSet.USER_PROPERTIES)).get(USER_PROP_INVALID_COUNT));
 
+        return result;
+    }
+
+    /**
+     * returns the simple range, the min and the max containing the data.
+     * @param hist2 the result of autoHistogram.
+     * @return rank 1 bins dataset showing the min and max.  value(0) is the
+     * min, value(1) is the max.
+     */
+    public static QDataSet simpleRange(QDataSet hist2) {
+        int imin= -1;
+        int imax= -1;
+        for ( int i=0; i<hist2.length(); i++ ) {
+            if ( hist2.value(i)>0 ) {
+                if ( imin==-1 ) imin= i;
+                imax= i;
+            }
+        }
+        DDataSet result;
+        if ( imin==-1 ) {
+            result= DDataSet.wrap( new double[] { -1e31, -1e31 } );
+            result.putProperty( QDataSet.BINS_0, "min,max" );
+            result.putProperty( QDataSet.FILL_VALUE, -1e31 );
+        } else {
+            QDataSet dep0= (QDataSet) hist2.property(QDataSet.DEPEND_0);
+            //if ( dep0==null ) {
+           //     System.err.println("huh?");
+            //}
+            QDataSet cadence= (QDataSet)dep0.property(QDataSet.CADENCE);
+            if ( cadence==null ) {
+                // huh?
+                result= DDataSet.wrap( new double[] { dep0.value(imin),
+                dep0.value(imax) } );
+            } else {
+                result= DDataSet.wrap( new double[] { dep0.value(imin),
+                dep0.value(imax) + cadence.value() } );
+            }
+            result.putProperty( QDataSet.BINS_0, "min,max" );
+        }
         return result;
     }
 

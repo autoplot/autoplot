@@ -4,6 +4,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.File;
@@ -17,6 +18,7 @@ import javax.imageio.ImageIO;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -25,10 +27,11 @@ import org.virbo.datasource.URISplit;
  * 
  * @author Ed Jackson
  */
-// TODO: implementation of Comparable wasn't being used and was incomplete.  Will we ever need it?
-public class WalkImage /*implements Comparable<WalkImage>*/ {
+public class WalkImage  {
 
     public static final String PROP_STATUS_CHANGE = "status"; // this should to be the same as the property name to be beany.
+    public static final String PROP_BADGE_CHANGE = "badgeChange";
+
     public static final int THUMB_SIZE = 400;
     private static final int SQUASH_FACTOR = 10; // amount to horizontally squash thumbs for covers and contextFlow
     private static final int LOADED_IMAGE_COUNT_LIMIT = 50;
@@ -41,6 +44,7 @@ public class WalkImage /*implements Comparable<WalkImage>*/ {
     private String caption;
     private Status status;
     private PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final boolean haveThumbs400;
 
     private static BufferedImage missingImage = initMissingImage();
 
@@ -70,18 +74,24 @@ public class WalkImage /*implements Comparable<WalkImage>*/ {
         ERROR;
     }
 
-    public WalkImage(URI uri) {
+    /**
+     *
+     * @param uri the image URI, or null if this is a placeholder.
+     * @param haveThumbs400
+     */
+    public WalkImage( URI uri, boolean haveThumbs400 ) {
         imgURI = uri;
+        this.haveThumbs400= haveThumbs400;
         if (imgURI != null) {
-            uriString = uri.toString();
+            uriString = DataSetURI.fromUri(uri);
             status = Status.UNKNOWN;
         } else {
             uriString = null;
             status = Status.MISSING;
         }
-    // image and thumbnail are initialized lazily
-    }
 
+        // image and thumbnail are initialized lazily
+    }
 
     public Status getStatus() {
         return status;
@@ -129,6 +139,71 @@ public class WalkImage /*implements Comparable<WalkImage>*/ {
     }
 
     /**
+     * attempt to create the thumbnail on the current thread.  If there is no
+     * "thumbs400" directory and the image is not yet loaded, then no
+     * action takes place.
+     */
+    public void getThumbnailImmediately( ) {
+        BufferedImage rawThumb;
+        try {
+            if ( haveThumbs400!=false ) {
+                URI fsRoot = DataSetURI.toUri( URISplit.parse( imgURI ).path + "thumbs400");
+                //System.err.println("Thumb path: " + fsRoot);
+                FileSystem fs = FileSystem.create(fsRoot);
+                String s = DataSetURI.fromUri( imgURI );
+                FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
+
+                File localFile = fo.getFile();
+                rawThumb = ImageIO.read(localFile);
+
+                if ( rawThumb==null ) {
+                    throw new RuntimeException( "Unable to read: "+localFile );
+                }
+            } else {
+                throw new IOException("silly code to jump");
+            }
+
+        } catch (IOException ex) {
+            // Assume the error is that the thumbs folder doesn't exist; other errors
+            // will occur again in loadImage()
+            //System.err.println("Thumb dir doesn't exist; using image.");
+            if (im == null) {
+                // Otherwise we'll have to create the thumb from the full-sized image
+                // Initiate loading and return; clients listen for prop change
+                loadImage();  // won't do anything if image is already loading
+                return;
+            }
+            rawThumb = im;
+
+        } catch ( IllegalArgumentException ex ) { // local filesystem throws IllegalArgument when the root does not exist.
+            // Assume the error is that the thumbs folder doesn't exist; other errors
+            // will occur again in loadImage()
+            //System.err.println("Thumb dir doesn't exist; using image.");
+            if (im == null) {
+                // Otherwise we'll have to create the thumb from the full-sized image
+                // Initiate loading and return; clients listen for prop change
+                loadImageImmediately();  // won't do anything if image is already loading
+                return;
+            }
+            rawThumb = im;
+
+        }
+        double aspect = (double) rawThumb.getWidth() / (double) rawThumb.getHeight();
+
+        int height = (int) Math.round(Math.sqrt((THUMB_SIZE * THUMB_SIZE) / (aspect * aspect + 1)));
+        int width = (int) Math.round(height * aspect);
+
+        synchronized ( this ) {
+            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
+            thumb = resizeOp.filter(rawThumb, null);
+            if (status == Status.THUMB_LOADING) {
+                setStatus(Status.THUMB_LOADED);
+            }
+        }
+
+    }
+
+    /**
      *
      * @param loadIfNeeded if false, then be reluctant to load the thumbnail.
      * @return the thumbnail, or null if it is not loaded.
@@ -140,6 +215,11 @@ public class WalkImage /*implements Comparable<WalkImage>*/ {
                 return null;
 
             case THUMB_LOADED:
+                if ( thumb==null ) {
+                    throw new RuntimeException("thumb should not be null");
+                }
+                return thumb;
+
             case IMAGE_LOADED:
                 return thumb;
 
@@ -158,48 +238,8 @@ public class WalkImage /*implements Comparable<WalkImage>*/ {
                 if (!loadIfNeeded) return null;
                 //acquire thumbnail
                 Runnable r = new Runnable() {
-
                     public void run() {
-                        BufferedImage rawThumb;
-                        try {
-                            URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path + "thumbs400");
-                            //System.err.println("Thumb path: " + fsRoot);
-                            FileSystem fs = FileSystem.create(fsRoot);
-                            String s = imgURI.toString();
-                            FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
-
-                            File localFile = fo.getFile();
-                            rawThumb = ImageIO.read(localFile);
-
-                        } catch (IOException ex) {
-                            // Assume the error is that the thumbs folder doesn't exist; other errors
-                            // will occur again in loadImage()
-                            //System.err.println("Thumb dir doesn't exist; using image.");
-                            if (im == null) {
-                                // Otherwise we'll have to create the thumb from the full-sized image
-                                // Initiate loading and return; clients listen for prop change
-                                loadImage();  // won't do anything if image is already loading
-                                return;
-                            }
-                            rawThumb = im;
-
-                        } catch (URISyntaxException ex) {
-                            //This should never happen; what would break if it it did?
-                            Logger.getLogger(WalkImage.class.getName()).log(Level.WARNING, null, ex);
-                            return;
-                        }
-                        double aspect = (double) rawThumb.getWidth() / (double) rawThumb.getHeight();
-
-                        int height = (int) Math.round(Math.sqrt((THUMB_SIZE * THUMB_SIZE) / (aspect * aspect + 1)));
-                        int width = (int) Math.round(height * aspect);
-
-                        synchronized ( this ) {
-                            BufferedImageOp resizeOp = new ScalePerspectiveImageOp(rawThumb.getWidth(), rawThumb.getHeight(), 0, 0, width, height, 0, 1, 1, 0, false);
-                            thumb = resizeOp.filter(rawThumb, null);
-                            if (status == Status.THUMB_LOADING) {
-                                setStatus(Status.THUMB_LOADED);
-                            }
-                        }
+                        getThumbnailImmediately();
                     }
                 };
                 RequestProcessor.invokeLater(r);
@@ -238,50 +278,57 @@ public class WalkImage /*implements Comparable<WalkImage>*/ {
         return squishedThumb;
     }
 
+    private void loadImageImmediately() {
+        try {
+            //System.err.println("download "+imgURI );
+
+            URI fsRoot = DataSetURI.toUri( URISplit.parse(imgURI).path );
+            FileSystem fs = FileSystem.create(fsRoot);
+
+            String s = DataSetURI.fromUri(imgURI);
+            FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
+
+            File localFile = fo.getFile();
+
+            Thread.yield();
+
+            im = ImageIO.read(localFile);
+
+            if ( im==null ) {
+                throw new RuntimeException( "unable to read: "+localFile );
+            }
+
+            synchronized ( freshness ) {
+                while ( freshness.size() > LOADED_IMAGE_COUNT_LIMIT ) {
+                    WalkImage old= freshness.getLast();
+                    freshness.remove(old);
+                    Logger.getLogger("org.autoplot.pngwalk.WalkImage").fine( "unloading image for "+old );
+                    old.im= null;
+                    old.setStatus( Status.THUMB_LOADED );
+                }
+            }
+
+            if (thumb == null) {
+                getThumbnailImmediately(); //force thumbnail creation
+            }
+            setStatus(Status.IMAGE_LOADED);
+
+        } catch (Exception ex) {
+            System.err.println("Error loading image file from " + DataSetURI.fromUri(imgURI) );
+            Logger.getLogger(WalkImage.class.getName()).log(Level.SEVERE, null, ex);
+            setStatus(Status.MISSING);
+            throw new RuntimeException(ex);
+        }
+
+    }
+
     private void loadImage() {
         if (status == Status.IMAGE_LOADING || status == Status.IMAGE_LOADED) {
             return;
         }
         Runnable r = new Runnable() {
-
             public void run() {
-                try {
-                    //System.err.println("download "+imgURI );
-
-                    URI fsRoot = new URI(URISplit.parse(imgURI.toString()).path);
-                    FileSystem fs = FileSystem.create(fsRoot);
-
-                    String s = imgURI.toString();
-                    FileObject fo = fs.getFileObject(s.substring(s.lastIndexOf('/') + 1));
-
-                    File localFile = fo.getFile();
-
-                    Thread.yield();
-
-                    im = ImageIO.read(localFile);
-
-                    synchronized ( freshness ) {
-                        while ( freshness.size() > LOADED_IMAGE_COUNT_LIMIT ) {
-                            WalkImage old= freshness.getLast();
-                            freshness.remove(old);
-                            Logger.getLogger("org.autoplot.pngwalk.WalkImage").fine( "unloading image for "+old );
-                            old.im= null;
-                            old.setStatus( Status.THUMB_LOADED );
-                        }
-                    }
-
-                    if (thumb == null) {
-                        getThumbnail(); //force thumbnail creation
-                    }
-                    setStatus(Status.IMAGE_LOADED);
-
-                } catch (Exception ex) {
-                    System.err.println("Error loading image file from " + imgURI.toString());
-                    Logger.getLogger(WalkImage.class.getName()).log(Level.SEVERE, null, ex);
-                    setStatus(Status.MISSING);
-                    throw new RuntimeException(ex);
-                }
-
+                loadImageImmediately();
             }
         };
         setStatus(Status.IMAGE_LOADING);
@@ -311,6 +358,7 @@ public class WalkImage /*implements Comparable<WalkImage>*/ {
         pcs.removePropertyChangeListener(listener);
     }
 
+    @Override
     public String toString() {
         return this.getCaption()==null ? this.uriString : this.getCaption();
     }

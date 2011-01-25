@@ -16,12 +16,12 @@ import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.das2.datum.DatumRange;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -30,7 +30,7 @@ import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.URISplit;
 
 /**
- * ftp://cdaweb.gsfc.nasa.gov/pub/istp/noaa/noaa14/%Y/noaa14_meped1min_sem_%Y%m%d_v01.cdf?timerange=2000-01-01
+ * ftp://cdaweb.gsfc.nasa.gov/pub/istp/noaa/noaa14/$Y/noaa14_meped1min_sem_$Y$m$d_v01.cdf?timerange=2000-01-01
  * @author jbf
  */
 public class AggregatingDataSourceFactory implements DataSourceFactory {
@@ -43,16 +43,16 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
     public DataSource getDataSource(URI uri) throws Exception {
         if ( delegateFactory==null ) {
-            delegateFactory= AggregatingDataSourceFactory.getDelegateDataSourceFactory(uri.toString());
+            delegateFactory= AggregatingDataSourceFactory.getDelegateDataSourceFactory( DataSetURI.fromUri(uri) );
         }
         AggregatingDataSource ads = new AggregatingDataSource(uri,delegateFactory);
-        String surl = uri.toString();
-        surl= surl.replaceAll("%25","%");
+        String surl = DataSetURI.fromUri( uri );
         FileStorageModelNew fsm = getFileStorageModel(surl);
         ads.setFsm(fsm);
         URISplit split = URISplit.parse(surl);
         Map parms = URISplit.parseParams(split.params);
         String stimeRange= (String) parms.get("timerange");
+        stimeRange= stimeRange.replaceAll("\\+", " " );
         ads.setViewRange(DatumRangeUtil.parseTimeRange(stimeRange));
         parms.remove("timerange");
         if (parms.size() > 0) {
@@ -84,11 +84,8 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         i = splitIndex(sansArgs);
         FileSystem fs;
-        try {
-            fs = FileSystem.create(new URI(sansArgs.substring(0, i)));
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        fs = FileSystem.create( DataSetURI.toUri(sansArgs.substring(0, i)));
+
         if ( sansArgs.charAt(i)=='/' ) i=i+1; // kludgy
         String spec= sansArgs.substring(i).replaceAll("\\$", "%");
         FileStorageModelNew fsm = FileStorageModelNew.create(fs, spec );
@@ -127,7 +124,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
 
         Map parms = URISplit.parseParams(split.params);
 
-        Object value = parms.remove("timerange");
+        parms.remove("timerange");
 
         split.params = URISplit.formatParams(parms);
 
@@ -137,7 +134,9 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         delegatecc.surl = delegateUrl;
         delegatecc.surlpos = carotPos;
         delegatecc.context = cc.context;
-        delegatecc.resource= new URL( delegateFfile ); 
+        
+        //delegatecc.resource= new URL( delegateFfile );
+        delegatecc.resourceURI = DataSetURI.toUri(delegateFfile);
 
         return delegatecc;
     }
@@ -145,50 +144,58 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     /**
      * @throws IllegalArgumentException if it is not able to find any data files.
      */
-    public static String getDelegateDataSourceFactoryUrl(String surl) throws IOException, IllegalArgumentException {
-        surl= surl.replaceAll("%25","%");
-        FileStorageModelNew fsm = getFileStorageModel(surl);
+    public static String getDelegateDataSourceFactoryUri(String suri) throws IOException, IllegalArgumentException {
 
-        String file = fsm.getRepresentativeFile(new NullProgressMonitor());
+        URISplit split= URISplit.parse(suri);
+
+        Map parms = URISplit.parseParams(split.params);
+        String timeRange= ((String) parms.remove("timerange"));
+        if ( timeRange!=null ) timeRange= timeRange.replaceAll("\\+", " ");
+
+        split.params = URISplit.formatParams(parms);
+
+        FileStorageModelNew fsm = getFileStorageModel( DataSetURI.fromUri(split.resourceUri) );
+
+        String file= null;
+        if ( timeRange!=null && !timeRange.equals("") ) {
+            try {
+                DatumRange timeRangeDatum= DatumRangeUtil.parseTimeRange(timeRange);
+                String[] names = fsm.getBestNamesFor(timeRangeDatum,new NullProgressMonitor());
+                if ( names.length>0 ) {
+                    file= names[0];
+                }
+            } catch (ParseException ex) {
+                Logger.getLogger(AggregatingDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        if ( file==null ) {
+            file = fsm.getRepresentativeFile(new NullProgressMonitor());
+        }
 
         if (file == null) {
             throw new IllegalArgumentException("unable to find any files");
         }
 
-        URISplit split = URISplit.parse(surl);
-
-        Map parms = URISplit.parseParams(split.params);
-        parms.remove("timerange");
-        split.params = URISplit.formatParams(parms);
-
-        try {
-            String scompUrl = fsm.getFileSystem().getRootURI().resolve(file).toString();
-            if (split.params.length() > 0) {
-                scompUrl += "?" + split.params;
-            }
-            URL compUrl = new URL(scompUrl);
-            return compUrl.toString();
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException(ex);
+        split.resourceUri= fsm.getFileSystem().getRootURI().resolve(file);
+        String scompUrl = DataSetURI.fromUri( split.resourceUri );
+        if (split.params.length() > 0) {
+            scompUrl += "?" + split.params;
         }
+
+        split.file=  DataSetURI.fromUri( split.resourceUri );
+        //split.path= // URISplit.format ignores this.
+        split.surl= scompUrl; 
+        return URISplit.format(split);
     }
 
     public static DataSourceFactory getDelegateDataSourceFactory(String surl) throws IOException, IllegalArgumentException {
-        String delegateSurl = getDelegateDataSourceFactoryUrl(surl);
+        String delegateSurl = getDelegateDataSourceFactoryUri(surl);
         URISplit split= URISplit.parse(surl);
         URISplit delegateSplit= URISplit.parse(delegateSurl);
-        try {
-            delegateSplit.vapScheme= split.vapScheme;
-            URI uri= new URI( URISplit.format(delegateSplit) );
-            return DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(AggregatingDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public String editPanel(String surl) throws Exception {
-        return surl;
+        delegateSplit.vapScheme= split.vapScheme;
+        URI uri= DataSetURI.toUri( URISplit.format(delegateSplit) );
+        return DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
     }
 
 
@@ -198,7 +205,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         }
         DataSourceFactory f = delegateFactory;
         List<CompletionContext> result = new ArrayList<CompletionContext>();
-        String afile = getDelegateDataSourceFactoryUrl(cc.surl);
+        String afile = getDelegateDataSourceFactoryUri(cc.surl);
         CompletionContext delegatecc = getDelegateDataSourceCompletionContext(cc);
 
         List<CompletionContext> delegateCompletions = f.getCompletions(delegatecc,mon);
@@ -225,11 +232,18 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
             if (!map.containsKey("timerange")) {
                 return true;
             }
-            String timeRange = (String) map.get("timerange");
+            String timeRange = ((String) map.get("timerange"));
+            timeRange= timeRange.replaceAll("\\+"," ");
             if (timeRange.length() < 4) {
                 return true;
             }
-            String delegateSurl = getDelegateDataSourceFactoryUrl(surl);
+            try {
+                DatumRange dr= DatumRangeUtil.parseTimeRange(timeRange);
+            } catch ( ParseException ex ) {
+                return true;
+            }
+
+            String delegateSurl = getDelegateDataSourceFactoryUri(surl);
             if ( delegateFactory==null ) {
                 delegateFactory= getDelegateDataSourceFactory(surl);
             }

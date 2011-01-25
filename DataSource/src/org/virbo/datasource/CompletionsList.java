@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -46,6 +47,9 @@ public class CompletionsList {
                 };
                 JMenuItem menuItem= new JMenuItem(a);
                 if ( s1.doc!=null ) menuItem.setToolTipText(s1.doc);
+                if ( !s1.label.endsWith("/") && s1.completion.contains("?") ) {
+                    if ( s1.maybePlot ) menuItem.setIcon( new javax.swing.ImageIcon( CompletionsList.class.getResource("/org/virbo/datasource/go-small.png")) );
+                }
                 if (subMenu == null) {
                     popupMenu.add(menuItem);
                 } else {

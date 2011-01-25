@@ -2,6 +2,9 @@
 <index version="2.0">
     <indexitem target="aphelp_main" text="Introduction to Autoplot"/>
     <indexitem target="axisPanel" text="Axis Panel"/>
+    <indexitem target="stylePanel" text="Style Panel"/>
     <indexitem target="layoutPanel" text="Layout Panel"/>
-    <indexitem target="dataPanel" text="Data Panel"/>
+    <indexitem target="metadataPanel" text="Metadata Panel"/>
+    <indexitem target="dataPanel_1" text="Data Panel"/>
+    <indexitem target="dataPanel_2" text="Data Panel"/>
 </index>

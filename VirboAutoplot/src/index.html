@@ -7,104 +7,72 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Bugfix in huge scatter improves appearance.  Add Plot->Copy Panels Right makes it
-                easier to add side-by-side plots.  The vap filename is indicated in the title.
+        <p><small>PNGWalk's quality control is more complete with icon decorations in each view.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
-	Datasets are identified with URLs, and by the URL's extension a module is used to load the data into the internal data model.  Data is then
+	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
 	</p>
 
-        <p>This development release is an untagged version with experimental features.
+        <p>This is the new production branch.
         </p>
+
+        <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
+            via the Java-based reader and URIs must be prefixed with "vap+cdfj:".  </p>
         
-        <p>Recent changes include:</p>
+        <p>Bugfixes:</p>
         <ul>
-            <li>bug 2896789: command key used on mac (e.g. command-Z), instead of control.</li>
-            <li>QDataSet interface gets experimental native (implementation-specific) slice and trim operations.</li>
-            <li>help document for data tab.</li>
-            <li>start findbugs analysis, final code cleanup before production branch.</li>
-            <li>python editor panel allows inspection of variables when an error is hit.</li>
-            <li>new vap scheme introduced, old vaps are parsed but not formatted.</li>
-            <li>"native" slice and trim dataset operators will improve performance</li>
-            <li>vap filename indicated in the title</li>
-            <li>support bundle_1 dataset schema to better support Z(X,Y) where X and Y are rank 1.</li>
-            <li>python "link(x,y,z)" command returns data equivalent to "plot(x,y,z)"
-            <li>bugfixes:
-            <ul>
-                <li>2899475: edit data source ds order wrong</li>
-                <li>2900384: huge scatter renderer didn't saturate.</li>
-                <li>2899734: copy panels right would fail to repaint left plot.</li>
-                <li>cadence set for buckshot data could cause inappropriate plot symbol connector.</li>
-                <li>minor errors in reset application</li>
-                <li>loading new vap resets undo/redo</li>
-                <li>bug in axis bounds calculation could lead to autolayout marching axes</li>
-                <li>when editing multiple nodes at once, avoid "child is not instanceof leader class</li>
-            </ul>
-<li>New PNG Walk Tool that is more flexible and improves the user interface.</li>
-<ul><li> scrollbars used to provide more usable control.
-</li><li> simple, serviceable views composed to make complex displays
-</li><li> tear off tabbed pane used to support wide displays, e.g. grid + single
-</li><li> missing sequence images indicated.
-</li><li> experimental problem/okay buttons allow images to be annotated.
-</li><li> pre-computed thumbnail support.
+            <li>cdaweb data source masters logic corrected</li>
+            <li>ftp plugin works off-line (cdaweb used to verify)</li>
+            <li>clean up source to allow checkout onto filesystems that ignore upper and lower case.</li> 
+            <li>pngwalk decorations need to be in each view.</li>
+            <li>goto range command line switch fixed on pngwalk when access is restricted.</li>
+            <li>Epoch16 support fixed in cdf java.</li>
+        </ul>
+        <p>Less recent bugfixes:</p>
+        <ul>
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3137434&group_id=199733&atid=970682">3137434</a>  Turning off axis does not persist through vap
+            <li>holding ctrl or shift when bookmark is selected will add it below or on top instead of just replacing.
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3148143&group_id=199733&atid=970682">3148143</a>  Null Pointer Exception in bookmark manager delete.  Also add test in another branch for similar bug.
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3150599&group_id=199733&atid=970682">3150599</a>  feedback when aggregating error.
+            <li>initial view when pngwalk is of non-time ordered sequence
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3136470&group_id=199733&atid=970682">3136470</a>  selected plot highlite on pdf output
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3131734&group_id=199733&atid=970682">3131734</a>  units= "0.1nT" ge_k0_mgf
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3133687&group_id=199733&atid=970682">3133687</a>  FILL_VALUE ignored in cdf files
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3117719&group_id=199733&atid=970682">3117719</a>  Units not saved to CDF file
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3116643&group_id=199733&atid=970682">3116643</a>  aggregation editor should get spec from timeaxis
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3115941&group_id=199733&atid=970682">3115941</a>  Difficulty selecting plot element when fill values exist
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3115699&group_id=199733&atid=970682">3115699</a>  CDF access problem on Windows 7 when compressed CDF
+            <li>a number of bugfixes along with production version.</li>
+        </ul>
+        <p>Features:</p>
+        <ul>
+            <li>Options->Plot Style->Canvas Size dialog added.
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3103682&group_id=199733&atid=970685">3103682</a>  nested bookmarks
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3154241&group_id=199733&atid=970685">3154241</a>  add template command line switch to pngwalk
+            <li>das2server can send QStreams instead of das2Streams.
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2984078&group_id=199733&atid=970685">2984078</a>  remote bookmarks folder
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3134977&group_id=199733&atid=970685">3134977</a>  pngwalk as URI.
+            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3115957&group_id=199733&atid=970685">3115957</a>  File -> New Window
+            <li>CDAWeb plugin has discovery: File->Add Plot->CDAWeb...</li>
 
-</li><li> bookmarks and recent entries
-</li></ul>
-</li><li> QDataSet histogram peaks analysis, gcd.
-</li><li> QStream ascii format evaluates resolution needed for time tag output.
-</li><li> AsciiDataSource and Excel panel editors made more intuitive.
-</li><li> AsciiDataSource rejects URIs that don't specify column when there are more than two columns.
-<ul><li> reduce confusion when user points to ascii file, use the editor GUI instead of plotting first column (often just the year).
-</li></ul>
-</li><li> Aggregating
-<ul><li> editor panel (at the bottom) lists remote site to provide year, month, day droplists of available data.
+        </ul>
 
-</li><li> file browsers allow multiple files to be selected, and aggregation URI is result.
-</li><li> file system completion presents aggregation options when aggregations are detected.
-</li></ul>
-</li><li> Introduce experimental vap format that uses new serializer
-<ul><li> improves serviceability of this serialization, Java Beans serialization is too opaque
-</li><li> decouples vap from DOM to support forward-compatibility of vap files.
-</li><li> more explicit yet hackable
-</li><li> save to vap will create ".vapx" which is the new format.
-</li><li> .vap and .vapx can contain either xml scheme.
-
-</li><li> leverage QStream serialization so that one serialization type is used.
-</li></ul>
-</li><li> miscellaneous bugfixes and gui improvements for example:
-<ul><li> automatic slice of rank 3 slices the middle of each dimension, where there is more likely to be valid data.
-</li><li> remove properties buttons from style tab that were left over from the old gui.
-        </li></ul></ul>
-
-<p>
-
-<img src="screen2.png">
-        <p><small>Support for the bundle dataset scheme is improved.  This scheme
-                models Z(X,Y) where X and Y are rank 1 datasets which was always
-                awkward in das2, and will clean up modeling of parameters
-                sampled along a trajectory.
-            </small></p>
-
-            <img src="screen3.png">
-        <p><small>DataSet URI editor panel with aggregation subpanel now lists server to
-                provide data availability.
-            </small></p>
 <p>Known issues:</p>
 <ul>
 <li> <a href="https://sourceforge.net/tracker/?func=browse&group_id=199733&atid=970682">see Source Forge</a>
 </ul>
 <p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
-	<p>data is input from: 
+	<p>data is input from:
 	<li>ASCII files (.dat,.txt)</li>
         <li>binary files (.bin)</li>
 	<li>Excel spread sheets (.xls)</li>
 	<li>das2Streams (.d2s or .das2Stream)</li>
         <li>QStreams (.qds), QDataSet on a das2Stream
 	<li>netcdf files (.nc,.ncml)</li>
-    <li>HDF5 files</li>
+        <li>HDF5 files</li>
         <li>cdf files(.cdf)</li>
 	<li>dods servers (.dds)</li>
         <li>Cluster Exchange Format files (.cef)</li>

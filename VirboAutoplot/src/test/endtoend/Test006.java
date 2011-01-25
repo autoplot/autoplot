@@ -13,7 +13,7 @@ import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 
 /**
- *
+ * Misc tests
  * @author jbf
  */
 public class Test006 {
@@ -49,7 +49,7 @@ public class Test006 {
             return ex;
     }
     
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
         try {
 
             Exception e=null;
@@ -65,7 +65,7 @@ public class Test006 {
             }
             
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
+        } catch ( Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }

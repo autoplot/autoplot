@@ -4,17 +4,19 @@
  */
 package org.virbo.idlsupport;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.datum.Units;
+import org.das2.datum.UnitsConverter;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
+import org.virbo.dataset.SemanticOps;
 
 /**
  * It's impossible to pass the QDataSet directly back to IDL, in fact structures
@@ -31,14 +33,90 @@ public abstract class QDataSetBridge {
     
     String name;
     Map<String, QDataSet> datasets;
+    Map<String, String> sliceDep;
     Map<QDataSet, String> names;
+    List<Units> prefUnits; // convert to these if possible
+    double fill; // use this fill value
+    boolean useFill=false; // true means convert fill values
 
+    boolean debug= false;
+    
     QDataSetBridge() {
-        datasets = new HashMap<String, QDataSet>();
-        names = new HashMap<QDataSet, String>();
-        System.err.println("QDataSetBridge v1.4.0");
+        datasets = new LinkedHashMap<String, QDataSet>();
+        names = new LinkedHashMap<QDataSet, String>();
+        sliceDep= new LinkedHashMap<String,String>();
+        System.err.println("QDataSetBridge v1.6.04");
     }
 
+    /**
+     * set the preferred units for the data.  The code will convert
+     * to these units when a converter is found.
+     * If a preference is indicated when it is convertible to an existing
+     * preference, the existing preference is removed.
+     * See clearPreferredUnits to remove all preferences.
+     * Example units strings (capitalization matters):
+     *    seconds since 2010-01-01T00:00
+     *    days since 2010-01-01T00:00
+     *    Hz
+     *    kHz
+     *    MHz
+     *
+     * @param sunits
+     */
+    public synchronized void setPreferredUnits( String sunit ) {
+        Units unit;
+        if ( sunit.contains(" since ") ) {
+            unit= SemanticOps.lookupUnits(sunit);
+        } else {
+            unit= Units.getByName(sunit);
+        }
+        if ( prefUnits==null ) {
+            prefUnits= new ArrayList();
+        }
+        boolean add= true;
+        for ( int i=0; i<prefUnits.size(); i++ ) {
+            if ( prefUnits.get(i).isConvertableTo(unit) ) {
+                if ( debug ) {
+                    System.err.println("replacing preferred unit "+prefUnits.get(i)+ " with "+unit);
+                }
+                prefUnits.set(i,unit);
+                add= false;
+            }
+        }
+        if ( add ) {
+            if ( debug ) System.err.println( "add preferred unit: "+unit );
+            prefUnits.add(unit);
+        }
+    }
+
+    public void clearPreferredUnits() {
+        prefUnits= null;
+    }
+
+    /**
+     * set the value to return when the data is invalid.
+     * @param d
+     */
+    public void setFillValue( double d ) {
+        this.fill= d;
+        this.useFill= true;
+    }
+
+    /**
+     * turn on/off debug messages
+     * @param debug
+     */
+    public void setDebug( boolean debug ) {
+        System.err.println("setting debug="+debug);
+        this.debug= debug;
+    }
+
+    /**
+     * don't use fill value.
+     */
+    public void clearFillValue() {
+        this.useFill= false;
+    }
     /**
      * initiates the read after 
      */
@@ -53,11 +131,16 @@ public abstract class QDataSetBridge {
         for (int i = 0; i < ds.rank(); i++) {
             QDataSet dep = (QDataSet) ds.property("DEPEND_" + i);
             if (dep != null) datasets.put(nameFor(dep), dep);
+            QDataSet depslice= (QDataSet) ds.property("DEPEND_" + i, 0 );
+            if ( depslice!=null ) {
+                sliceDep.put( nameFor(depslice), "DEPEND_"+i );
+            }
         }
     }
 
     /**
-     * initiates the read after 
+     * initiates the read after.  See getProgressMonitor for use.  
+     *
      */
     public void doGetDataSet(final ProgressMonitor mon)  {
         Runnable run = new Runnable() {
@@ -67,6 +150,8 @@ public abstract class QDataSetBridge {
                 name= "";
                 try {
                     ds = getDataSet(mon);
+                    if ( ds==null ) return;
+                    
                 } catch (Exception ex) {
                     exception= ex;
                     mon.setProgressMessage("EXCEPTION");
@@ -81,6 +166,10 @@ public abstract class QDataSetBridge {
                 for (int i = 0; i < ds.rank(); i++) {
                     QDataSet dep = (QDataSet) ds.property("DEPEND_" + i);
                     if (dep != null) datasets.put(nameFor(dep), dep);
+                    QDataSet depslice= (QDataSet) ds.property("DEPEND_" + i, 0 );
+                    if ( depslice!=null ) {
+                        sliceDep.put( nameFor(depslice), "DEPEND_"+i );
+                    }
                 }
 
             }
@@ -113,6 +202,10 @@ public abstract class QDataSetBridge {
 
     /**
      * returns an object that can be used to monitor the progress of a download.
+     * NOTE: I don't think this would work right now, since getDataSet is
+     * implemented as a synchronous process--meaning it returns after the download
+     * is done.
+     * 
      * mon= qds->getProgressMonitor();
      * qds->getDataSet( mon )
      * while ( ! mon->isFinished() ) do begin
@@ -126,30 +219,40 @@ public abstract class QDataSetBridge {
     }
 
     public void values(String name, double[] result) {
-        QDataSet ds1 = datasets.get(name);
-        for (int i0 = 0; i0 < ds1.length(); i0++) {
-            result[i0] = ds1.value(i0);
+        if ( debug ) {
+            System.err.println("reading "+name+" into double["+result.length+"]" );
         }
+        QDataSet ds1 = datasets.get(name);
+        copyValues( ds1, result );
     }
 
     public void values(String name, double[][] result) {
-        QDataSet ds1 = datasets.get(name);
-        for (int i0 = 0; i0 < ds1.length(); i0++) {
-            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
-                result[i0][i1] = ds1.value(i0, i1);
-            }
+        if ( debug ) {
+            System.err.println("reading "+name+" into double["+result.length+","+result[0].length+"]" );
         }
+        QDataSet ds1 = datasets.get(name);
+        copyValues( ds1, result );
     }
 
     public void values(String name, double[][][] result) {
-        QDataSet ds1 = datasets.get(name);
-        for (int i0 = 0; i0 < ds1.length(); i0++) {
-            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
-                for (int i2 = 0; i2 < ds1.length(i0); i2++) {
-                    result[i0][i1][i2] = ds1.value(i0, i1, i2);
-                }
-            }
+        if ( debug ) {
+            System.err.println("reading "+name+" into double["+result.length
+                +","+result[0].length
+                +","+result[0][0].length+"]" );
         }
+        QDataSet ds1 = datasets.get(name);
+        copyValues( ds1, result );
+    }
+
+    public void values(String name, double[][][][] result) {
+        if ( debug ) {
+            System.err.println("reading "+name+" into double["+result.length
+                +","+result[0].length
+                +","+result[0][0].length
+                +","+result[0][0][0].length+"]" );
+        }
+        QDataSet ds1 = datasets.get(name);
+        copyValues( ds1, result );
     }
 
     public void values(double[] result) {
@@ -164,6 +267,163 @@ public abstract class QDataSetBridge {
         values(this.name(), result);
     }
 
+    public void values(double[][][][] result) {
+        values(this.name(), result);
+    }
+
+    /**
+     * returns the converter if there is one
+     * @param ds1
+     * @return
+     */
+    private UnitsConverter maybeGetConverter( QDataSet ds1 ) {
+        Units u= SemanticOps.getUnits(ds1);
+        UnitsConverter uc= UnitsConverter.IDENTITY;
+        if ( prefUnits!=null ) {
+            for ( Units prefUnit: prefUnits ) {
+                if ( prefUnit.isConvertableTo(u) ) {
+                    uc= u.getConverter(prefUnit);
+                    if ( uc!=UnitsConverter.IDENTITY ) {
+                        if ( debug ) {
+                            System.err.println("Using units converter to get "+prefUnit );
+                        }
+                    }
+                }
+            }
+        }
+        return uc;
+    }
+
+    /* -- convert qubes to double arrays -- */
+    private void copyValues( QDataSet ds1, double[] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        if ( debug ) {
+            System.err.println("copyValues rank1 into double using "+uc);
+        }
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            if ( useFill && wds.value(i0)==0 ) {
+                result[i0] = fill;
+            } else {
+                result[i0] = uc.convert( ds1.value(i0) );
+            }
+        }
+    }
+
+    private void copyValues( QDataSet ds1, double[][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                if ( useFill && wds.value(i0, i1 )==0 ) {
+                    result[i0][i1] = fill;
+                } else {
+                    result[i0][i1] = uc.convert( ds1.value(i0, i1) );
+                }
+            }
+        }
+    }
+    private void copyValues( QDataSet ds1, double[][][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                for (int i2 = 0; i2 < ds1.length(i0); i2++) {
+                    if ( useFill && wds.value(i0, i1, i2 )==0 ) {
+                        result[i0][i1][i2] = fill;
+                    } else {
+                        result[i0][i1][i2] = uc.convert( ds1.value(i0, i1, i2) );
+                    }
+                }
+            }
+        }
+    }
+    private void copyValues( QDataSet ds1, double[][][][] result ) {
+        UnitsConverter uc= maybeGetConverter(ds1);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds1);
+        for (int i0 = 0; i0 < ds1.length(); i0++) {
+            for (int i1 = 0; i1 < ds1.length(i0); i1++) {
+                for (int i2 = 0; i2 < ds1.length(i0,i1); i2++) {
+                    for (int i3 = 0; i3 < ds1.length(i0,i1,i2); i2++) {
+                        if ( useFill && wds.value(i0, i1, i2, i3 )==0 ) {
+                            result[i0][i1][i2][i3] = fill;
+                        } else {
+                            result[i0][i1][i2][i3] = uc.convert( ds1.value(i0, i1, i2, i3 ) );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * accessor for non-qube
+     * @param name
+     * @param i
+     * @param result
+     */
+    public void slice(String name, int i, double[] result) {
+        if ( debug ) {
+            System.err.println("reading "+name+"["+i+"] into double["+result.length +"]" );
+        }
+        QDataSet ds1;
+        if ( datasets.get(name)!=null ) {
+            ds1 = datasets.get(name).slice(i);
+        } else {
+            ds1 = (QDataSet) datasets.get(this.name).property(sliceDep.get(i));
+        }
+        copyValues( ds, result );
+    }
+
+    /**
+     * accessor for non-qube
+     * @param name
+     * @param i
+     * @param result
+     */
+    public void slice(String name, int i, double[][] result) {
+        if ( debug ) {
+            System.err.println("reading "+name+"["+i+"] into double["+result.length
+                +","+result[0].length
+                +"]" );
+        }
+        QDataSet ds1;
+        if ( datasets.get(name)!=null ) {
+            ds1 = datasets.get(name).slice(i);
+        } else {
+            ds1 = (QDataSet) datasets.get(this.name).property(sliceDep.get(i));
+        }
+        copyValues( ds1, result );
+    }
+
+    public void slice(String name, int i, double[][][] result) {
+        if ( debug ) {
+           System.err.println("reading "+name+"["+i+"] into double["+result.length
+                +","+result[0].length
+                +","+result[0][0].length
+                +"]" );
+        }
+        QDataSet ds1;
+        if ( datasets.get(name)!=null ) {
+            ds1 = datasets.get(name).slice(i);
+        } else {
+            ds1 = (QDataSet) datasets.get(this.name).property(sliceDep.get(i));
+        }
+        copyValues( ds1, result );
+    }
+
+    public void slice(int i, double[] result) {
+        slice(this.name(), i, result);
+    }
+
+    public void slice(int i, double[][] result) {
+        slice(this.name(), i, result);
+    }
+
+    public void slice(int i, double[][][] result) {
+        slice(this.name(), i, result);
+    }
+
     /**
      * return an 1,2,or 3-D array of doubles or floats containing the values
      * in the specified dataset.
@@ -171,6 +431,9 @@ public abstract class QDataSetBridge {
      * @return
      */
     public Object values(String name) {
+        if ( debug ) {
+            System.err.println("reading values for dataset " + name );
+        }
         QDataSet ds1 = datasets.get(name);
         if (ds1.rank() == 1) {
             double[] result = new double[ds1.length()];
@@ -183,6 +446,69 @@ public abstract class QDataSetBridge {
         } else if (ds1.rank() == 3) {
             double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)];
             values(name, result);
+            return result;
+        } else if (ds1.rank() == 4) {
+            double[][][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0, 0)][ds1.length(0,0,0)];
+            values(name, result);
+            return result;
+        } else {
+            throw new IllegalArgumentException("rank limit");
+        }
+    }
+
+    /**
+     * return the i-th 1 or 2-D array of doubles or floats containing the values
+     * in the specified rank 2 or 3 dataset.  This is to support non-qube datasets.
+     * @param name
+     * @param i
+     * @return
+     */
+    public Object slice( String name, int i ) {
+        if ( debug ) {
+            System.err.println("reading values for slice " + i + " of dataset " + name );
+        }
+        QDataSet ds1 = datasets.get(name);
+        if ( ds1==null && sliceDep.containsKey(name) ) {
+            return sliceDep(name,i);
+        }
+        if (ds1.rank() == 1 ) {
+            throw new IllegalArgumentException("dataset is rank 1, slice not allowed");
+        } else if (ds1.rank() == 2) {
+            double[] result = new double[ds1.length(i)];
+            slice(name, i, result);
+            return result;
+        } else if (ds1.rank() == 3) {
+            double[][] result = new double[ds1.length(i)][ds1.length(i,0)];
+            slice(name, i,result);
+            return result;
+        } else if (ds1.rank() == 4) {
+            double[][][] result = new double[ds1.length(i)][ds1.length(i,0)][ds1.length(i,0,0)];
+            slice(name, i,result);
+            return result;
+        } else {
+            throw new IllegalArgumentException("rank limit");
+        }
+    }
+
+    /**
+     * we have to slice the main dataset first, then copy the values of the depend dataset
+     * @param name
+     * @param i
+     * @return
+     */
+    private Object sliceDep( String name, int i ) {
+        QDataSet ds1= (QDataSet) datasets.get(this.name).slice(i).property(sliceDep.get(name));
+        if (ds1.rank() == 1 ) {
+            double[] result = new double[ds1.length()];
+            copyValues( ds1, result );
+            return result;
+        } else if (ds1.rank() == 2) {
+            double[][] result = new double[ds1.length()][ds1.length(0)];
+            copyValues( ds1, result );
+            return result;
+        } else if (ds1.rank() == 3) {
+            double[][][] result = new double[ds1.length()][ds1.length(0)][ds1.length(0,0)];
+            copyValues( ds1, result );
             return result;
         } else {
             throw new IllegalArgumentException("rank limit");
@@ -197,6 +523,16 @@ public abstract class QDataSetBridge {
      */
     public Object values() {
         return values(name);
+    }
+
+    /**
+     * return an 1,2,or 3-D array of doubles or floats containing the values
+     * in a slice of the default dataset.
+     * @param name
+     * @return
+     */
+    public Object slice(int i0 ) {
+        return slice(name,i0);
     }
 
     public String depend(int dim) {
@@ -289,6 +625,54 @@ public abstract class QDataSetBridge {
     }
 
     /**
+     * return the length of the zeroth dimension of the dataset
+     * @param name
+     * @return
+     */
+    public int[] lengths(String name, int i) {
+        QDataSet ds1= datasets.get(name);
+        if ( ds1==null && sliceDep.containsKey(name) ) {
+            ds1= (QDataSet) datasets.get(this.name).slice(i).property(sliceDep.get(name));
+            return DataSetUtil.qubeDims(ds1);
+        } else {
+            return DataSetUtil.qubeDims(ds1.slice(i));
+        }
+    }
+
+    /**
+     * return the length of the zeroth dimension of the main dataset.
+     * @param name
+     * @return
+     */
+    public int[] lengths(int i) {
+        return lengths(name,i);
+    }
+
+    /**
+     * return the length of the zeroth dimension of the dataset
+     * @param name
+     * @return
+     */
+    public int length(String name) {
+        QDataSet ds1= datasets.get(name);
+        if ( ds1==null ) {
+            throw new IllegalArgumentException("unable to get length for slice dataset, use lengths");
+        } else {
+            return ds1.length();
+        }
+    }
+
+    /**
+     * return the length of the zeroth dimension of the main dataset.
+     * @param name
+     * @return
+     */
+    public int length() {
+        return length(name);
+    }
+
+    
+    /**
      * return the number of dimensions of the specified dataset.
      * @param name
      * @return
@@ -304,6 +688,42 @@ public abstract class QDataSetBridge {
     public int rank() {
         return datasets.get(name).rank();
     }
+
+    public boolean isQube() {
+        return DataSetUtil.isQube( datasets.get(name) );
+    }
+
+    /**
+     * returns one of String, int, double, float, int[], double, float[]
+     * @param name
+     * @param propname
+     * @return
+     */
+    public Object property(String name, String propname, int i ) {
+        Object prop = datasets.get(name).property(propname,i);
+        if (prop instanceof QDataSet) {
+            return nameFor((QDataSet) prop);
+        } else if (prop instanceof Units) {
+            return prop.toString();
+        } else {
+            return prop;
+        }
+    }
+
+    public boolean hasProperty(String name, String propname, int i) {
+        return datasets.get(name).property(propname,i) != null;
+    }
+
+    /**
+     * get the properties for the named dataset
+     * @param name
+     * @return
+     */
+    public Map<String, Object> properties(String name,int i) {
+        LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(DataSetUtil.getProperties(datasets.get(name).slice(i)));
+        return result;
+    }
+
 
     /**
      * returns one of String, int, double, float, int[], double, float[]
@@ -326,6 +746,11 @@ public abstract class QDataSetBridge {
         return datasets.get(name).property(propname) != null;
     }
 
+    /**
+     * get the properties for the named dataset
+     * @param name
+     * @return
+     */
     public Map<String, Object> properties(String name) {
         LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>(DataSetUtil.getProperties(datasets.get(name)));
         for (String s : result.keySet()) {
@@ -360,6 +785,32 @@ public abstract class QDataSetBridge {
         for (String s : result.keySet()) {
             result.put(s, property(name, s));
         }
+        return result;
+    }
+
+    /**
+     * returns one of String, int, double, float, int[], double, float[]
+     * @param name
+     * @param propname
+     * @return
+     */
+    public Object property(String propname,int i) {
+        Object prop = datasets.get(name).property(propname,i);
+        if (prop instanceof QDataSet) {
+            return nameFor((QDataSet) prop);
+        } else if (prop instanceof Units) {
+            return prop.toString();
+        } else {
+            return prop;
+        }
+    }
+
+    public boolean hasProperty(String propname,int i) {
+        return datasets.get(name).property(propname,i) != null;
+    }
+
+    public Map<String, Object> properties(int i) {
+        LinkedHashMap<String, Object> result = new LinkedHashMap(DataSetUtil.getProperties(datasets.get(name).slice(i) ));
         return result;
     }
 

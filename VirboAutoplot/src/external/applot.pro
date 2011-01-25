@@ -129,8 +129,51 @@ function tryPortConnect, host, port, unit=unit
    return, error
 end
 
-pro applot, x, y, z, _extra=e, respawn=respawn, panel=panel, $
-   ytitle=ytitle, xtitle=xtitle, title=title
+function sendCommand, unit, cmd
+   printf, unit, cmd
+
+   response=''
+
+   return, 0
+;   wait, 0.2
+;
+;   x= file_poll_input( unit, timeout=0, count=count )
+;   while ( count gt 0 ) do begin
+;      readf, unit, response
+;      print, response
+;      x= file_poll_input( unit, timeout=0, count=count )
+;   endwhile
+
+end
+
+function kwToString, keywords
+   kw=''
+   t= tag_names(keywords)
+   for i=0,n_elements(t)-1 do begin
+      kw1= strlowcase( t[i] )
+      val1= keywords.(i)
+      type= size( val1 )
+      if ( type[0] eq 0 ) then begin
+         sval= string(val1)
+         if ( type[1] eq 7 ) then sval="'" + sval + "'"
+      endif else if ( type[0] eq 1 ) then begin
+        sval= '['
+        for j=0, type[3]-1 do begin
+          sval1= strtrim(val1[j],2)
+          if ( type[2] eq 7 ) then sval1="'" + sval1 + "'"
+          sval= sval+sval1
+          if ( j lt type[3]-1 ) then sval= sval+', '
+        endfor
+        sval= sval+']'
+      endif else begin
+        message, '2D and up arrays not supported.'
+      endelse
+      kw= kw + ', ' + kw1 + '=' + sval
+   endfor
+   return, strmid( kw, 2 )
+end
+
+pro applot, x, y, z, _extra=e, respawn=respawn
 
    common applot_common, appid
 
@@ -143,8 +186,6 @@ pro applot, x, y, z, _extra=e, respawn=respawn, panel=panel, $
    sep= !version.os_family eq 'Windows' ? ';' : ':'
 
    port= 12345
-   javahome= getenv( 'JAVA_HOME' )
-   if javahome eq '' then javahome= 'c:/"program files"/java/jre1.6.0_03/'
 
    ; AUTOPLOT_HOME is the location of the Autoplot jar files
    aphome= getenv( 'AUTOPLOT_HOME' )
@@ -154,8 +195,11 @@ pro applot, x, y, z, _extra=e, respawn=respawn, panel=panel, $
    classpath= strjoin( jars, sep )
 
    if keyword_set(respawn) then begin
+      javahome= getenv( 'JAVA_HOME' )
+      if javahome eq '' then javahome= 'c:/"program files"/java/jre1.6.0_03/'
+
       print, 'spawn autoplot java process'
-      cmd= javahome+'/bin/java -cp '+classpath+ ' org.virbo.autoplot.AutoPlotUI --port='+strtrim(port,2)
+      cmd= javahome+'/bin/java -cp '+classpath+ ' org.virbo.autoplot.AutoplotUI --port='+strtrim(port,2)
       print, cmd
       if !version.os_family eq 'Windows' then begin
         spawn, cmd, pid=appid, /nowait
@@ -204,25 +248,30 @@ pro applot, x, y, z, _extra=e, respawn=respawn, panel=panel, $
    ;close, unit
    ;free_lun, unit
 
+   ex= ''
+
+   if ( n_elements( e ) gt 0 ) then begin
+      ex= kwToString( e )
+   endif
+
+
    catch, err
    if ( err eq 0 ) then begin
        socket, unit, 'localhost', port, /get_lun, write_timeout=1
        ;cmd= 'plot( ''file:/'+tmpfile+'?depend0=field0&column=field1'' )'
        if ( !version.os_family eq 'Windows' ) then tmpfile= '/'+tmpfile
 
-       if n_elements( panel ) eq 1 then begin
-          cmd= 'plot( '+strtrim(panel,2)+', ''file:'+tmpfile+''' );'  ; semicolon means no echo
+       if n_elements( e ) gt 0 then begin
+          cmd= 'plotx( ''file:'+tmpfile+''', '+ex+ ');'  ; semicolon means no echo
        endif else begin
-          cmd= 'plot( ''file:'+tmpfile+''' );'  ; semicolon means no echo
+          cmd= 'plotx( ''file:'+tmpfile+''' );'  ; semicolon means no echo
        endelse
 
-       print, cmd
-       printf, unit, cmd
+       foo= sendCommand( unit, cmd )
 
        if n_elements( ytitle ) eq 1 then begin
-          cmd= 'print dom.controller.plot.yaxis'  ;.label='''+ytitle+'''
-          print, cmd
-          printf, unit, cmd
+          cmd= 'dom.controller.plot.yaxis.label='''+ytitle+'''
+          foo= sendCommand( unit, cmd )
        endif
 
        close, unit

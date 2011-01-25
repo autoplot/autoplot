@@ -6,7 +6,7 @@
 
 package org.virbo.autoplot;
 
-import org.das2.util.PersistentStateSupport;
+import org.das2.dasml.PersistentStateSupport;
 import java.io.File;
 import javax.swing.JFileChooser;
 

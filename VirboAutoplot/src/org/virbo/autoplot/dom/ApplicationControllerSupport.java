@@ -16,35 +16,35 @@ public class ApplicationControllerSupport {
         this.controller = controller;
     }
 
-    void plot( Plot plot, Panel panel, String primaryUri) {
-        if ( panel==null ) panel = controller.addPanel(plot, null ); // timeseriesbrowse
+    void plot( Plot plot, PlotElement panel, String primaryUri) {
+        if ( panel==null ) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
         panel.getController().getDataSourceFilter().setUri(primaryUri);
     }
 
-    void plot( Plot plot, Panel panel, String secondaryUri, String primaryUri) {
+    void plot( Plot plot, PlotElement panel, String secondaryUri, String primaryUri) {
         DataSourceFilter dsf1 = controller.addDataSourceFilter();
         DataSourceFilter dsf2 = controller.addDataSourceFilter();
-        if ( panel==null ) panel = controller.addPanel(plot, null ); // timeseriesbrowse
+        if ( panel==null ) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
         panel.getController().getDataSourceFilter().setUri("vap+internal:" + dsf1.getId() + "," + dsf2.getId());
         dsf1.setUri(secondaryUri);
         dsf2.setUri(primaryUri);
     }
 
-    void plot( Plot plot, Panel panel, String secondaryUri, String teriaryUri, String primaryUri) {
+    void plot( Plot plot, PlotElement panel, String secondaryUri, String teriaryUri, String primaryUri) {
         DataSourceFilter dsf1 = controller.addDataSourceFilter();
         DataSourceFilter dsf2 = controller.addDataSourceFilter();
         DataSourceFilter dsf3 = controller.addDataSourceFilter();
-        if (panel==null) panel = controller.addPanel(plot, null ); // timeseriesbrowse
+        if (panel==null) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
         panel.getController().getDataSourceFilter().setUri("vap+internal:" +  dsf1.getId() + "," + dsf2.getId()+","+dsf3.getId() );
         dsf1.setUri(secondaryUri);
         dsf2.setUri(teriaryUri);
         dsf3.setUri(primaryUri);
     }
 
-    public Panel addScatter(String suri1, String suri2) {
+    public PlotElement addScatter(String suri1, String suri2) {
         DataSourceFilter dsf1 = controller.addDataSourceFilter();
         DataSourceFilter dsf2 = controller.addDataSourceFilter();
-        Panel panel = controller.addPanel(controller.getPlot(), dsf1); // timeseriesbrowse
+        PlotElement panel = controller.addPlotElement(controller.getPlot(), dsf1); // timeseriesbrowse
         panel.setDataSourceFilterId(dsf1.getId() + "," + dsf2.getId());
         dsf1.setUri(suri1);
         dsf2.setUri(suri2);

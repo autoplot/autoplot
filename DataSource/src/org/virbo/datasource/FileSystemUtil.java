@@ -9,10 +9,11 @@
 
 package org.virbo.datasource;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.das2.util.monitor.ProgressMonitor;
@@ -26,7 +27,7 @@ public class FileSystemUtil {
     public static String getNameRelativeTo( FileSystem fs, String resource ) {
         String s= fs.getRootURI().toString();
         //TODO:
-        //return new URI(resource).relativize(fs.getRootURI()).toString();
+        //return DataSetURI.toUri(resource).relativize(fs.getRootURI()).toString();
         if ( resource.startsWith(s) ) return resource.substring(s.length()); else return resource;
     }
 
@@ -38,9 +39,9 @@ public class FileSystemUtil {
      * @param context URI, such as http://server.org/data/asciitable.dat
      * @return
      */
-    public static boolean resourceExists( String context ) throws FileSystemOfflineException, URISyntaxException {
+    public static boolean resourceExists( String context ) throws FileSystemOfflineException, UnknownHostException, URISyntaxException {
         URISplit split= URISplit.parse(context);
-        FileSystem fs= FileSystem.create( new URI( split.path ) );
+        FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).exists() ) {
             return true;
         } else {
@@ -49,15 +50,17 @@ public class FileSystemUtil {
     }
 
     /**
-     * have the filesystem download the resource.
+     * have the filesystem download the resource, without having to worry about
+     * creating a FileSystem just to get the one file.
      *
      * @param context URI, such as http://server.org/data/asciitable.dat
      * @return
      */
-    public static void doDownload(String context,ProgressMonitor mon) throws FileSystemOfflineException, IOException, URISyntaxException  {
+    public static File doDownload(String context,ProgressMonitor mon) throws FileSystemOfflineException, IOException, URISyntaxException  {
         URISplit split= URISplit.parse(context);
-        FileSystem fs= FileSystem.create( new URI( split.path ) );
-        fs.getFileObject(split.file.substring(split.path.length())).getFile(mon);
+        FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
+        File result= fs.getFileObject(split.file.substring(split.path.length())).getFile(mon);
+        return result;
     }
 
     /**
@@ -68,9 +71,9 @@ public class FileSystemUtil {
      * @throws org.das2.util.filesystem.FileSystem.FileSystemOfflineException
      * @throws java.net.MalformedURLException
      */
-    static boolean resourceIsLocal(String context) throws FileSystemOfflineException, URISyntaxException {
+    static boolean resourceIsLocal(String context) throws FileSystemOfflineException, UnknownHostException, URISyntaxException {
         URISplit split= URISplit.parse(context);
-        FileSystem fs= FileSystem.create( new URI( split.path ) );
+        FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).isLocal() ) {
             return true;
         } else {
@@ -78,9 +81,9 @@ public class FileSystemUtil {
         }
     }
 
-    static boolean resourceIsFile(String context) throws FileSystemOfflineException, URISyntaxException {
+    static boolean resourceIsFile(String context) throws FileSystemOfflineException, UnknownHostException, URISyntaxException {
         URISplit split= URISplit.parse(context);
-        FileSystem fs= FileSystem.create( new URI( split.path ) );
+        FileSystem fs= FileSystem.create( DataSetURI.toUri( split.path ) );
         if ( fs.getFileObject(split.file.substring(split.path.length())).isData() ) {
             return true;
         } else {

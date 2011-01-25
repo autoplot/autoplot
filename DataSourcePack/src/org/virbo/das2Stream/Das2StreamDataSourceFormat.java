@@ -12,8 +12,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.TableDataSetAdapter;
-import org.virbo.dataset.VectorDataSetAdapter;
+import org.das2.dataset.TableDataSetAdapter;
+import org.das2.dataset.VectorDataSetAdapter;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -38,7 +38,16 @@ public class Das2StreamDataSourceFormat implements DataSourceFormat {
             }
             fo.close();
         } else {
-            if (data.rank() == 2) {
+            if (data.rank()==3 ) {
+                TableDataSet tds = TableDataSetAdapter.create(data);
+                FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
+                if ( binary ) {
+                    TableUtil.dumpToBinaryStream(tds, fo);
+                } else {
+                    TableUtil.dumpToAsciiStream(tds, fo);
+                }
+                fo.close();
+            } else if (data.rank() == 2) {
                 TableDataSet tds = TableDataSetAdapter.create(data);
                 FileOutputStream fo = new FileOutputStream( new File( split.resourceUri ) );
                 if ( binary ) {

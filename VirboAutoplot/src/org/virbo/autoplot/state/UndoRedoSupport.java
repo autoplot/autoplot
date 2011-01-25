@@ -146,6 +146,7 @@ public class UndoRedoSupport {
     }
 
     public void redo() {
+        String oldRedoLabel= getRedoLabel();
         int oldDepth= stateStackPos;
         if (stateStackPos >= stateStack.size()) {
             stateStackPos = stateStack.size() - 1;
@@ -153,14 +154,21 @@ public class UndoRedoSupport {
         if (stateStackPos < stateStack.size()) {
             StateStackElement elephant = stateStack.get(stateStackPos);
             ignoringUpdates = true;
+            applicationModel.setRestoringState(true);
             applicationModel.restoreState(elephant.state);
+            applicationModel.setRestoringState(false);
             ignoringUpdates = false;
             stateStackPos++;
         }
+        propertyChangeSupport.firePropertyChange(PROP_REDOLABEL, oldRedoLabel, redoLabel);
         propertyChangeSupport.firePropertyChange( PROP_DEPTH, oldDepth, stateStackPos );
     }
 
     public void pushState(PropertyChangeEvent ev) {
+        pushState(ev,null);
+    }
+
+    public void pushState( PropertyChangeEvent ev, String label ) {
         if (ignoringUpdates) {
             return;
         }
@@ -180,23 +188,33 @@ public class UndoRedoSupport {
         String docString= "initial state of application";
         if (elephant != null) {
             List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses
-                StringBuffer docBuf= new StringBuffer();
-                for (Diff s : diffss) {
-                    docBuf.append("<br>");
-                    docBuf.append(s.getDescription());
-                }
-                docString= docBuf.length()>4 ? docBuf.substring(4) : "";
-                docString= "<html>"+docString+"</html>";
+            StringBuffer docBuf= new StringBuffer();
 
-            if (diffss.size() == 0) {
+            int count=0;
+            for (Diff s : diffss) {
+                if ( s.getDescription().contains("plotDefaults" ) ) continue;
+                count++;
+                docBuf.append("<br>");
+                docBuf.append(s.getDescription());
+            }
+            docString= docBuf.length()>4 ? docBuf.substring(4) : "";
+            docString= "<html>"+docString+"</html>";
+
+            if ( diffss.isEmpty() ) {
                 state.diffs(elephant.state);
                 labelStr = "unidentified change";
                 docString= "change was detected but could not be identified.";
-            } else if (diffss.size() > 6) {
-                labelStr = "" + diffss.size() + " changes";
+                return;
+            } else if (count > 6) {
+                if ( label!=null ) {
+                   labelStr = label;
+                } else {
+                    labelStr = "" + count + " changes";
+                }
             } else {
                 StringBuffer buf = new StringBuffer();
                 for (Diff s : diffss) {
+                    if ( s.getDescription().contains("plotDefaults") ) continue;
                     buf.append(", " + s.getLabel());
                 }
                 labelStr = buf.length() > 2 ? buf.substring(2) : "";

@@ -137,8 +137,10 @@ public class DataSourceFilter extends DomNode {
         super.syncTo(n);
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
-        this.setValidRange(that.getValidRange());        
-        this.setSliceDimension(that.getSliceDimension());
+        this.setValidRange(that.getValidRange());
+        if ( that.getSliceIndex()!=-1 ) {
+            this.setSliceDimension(that.getSliceDimension());
+        }
         this.setSliceIndex(that.getSliceIndex());
         this.setTranspose( that.isTranspose() );
         this.setUri(that.getUri());
@@ -149,7 +151,9 @@ public class DataSourceFilter extends DomNode {
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setValidRange(that.getValidRange());        
-        this.setSliceDimension(that.getSliceDimension());
+        if ( that.getSliceIndex()!=-1 ) {
+            this.setSliceDimension(that.getSliceDimension());
+        }
         this.setSliceIndex(that.getSliceIndex());
         this.setTranspose( that.isTranspose() );
         if ( !exclude.contains("uri" ) ) this.setUri(that.getUri());
@@ -183,5 +187,9 @@ public class DataSourceFilter extends DomNode {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + " ("+this.getUri()+")";
+    }
         
 }

@@ -5,6 +5,8 @@
  */
 package org.virbo.autoplot.bookmarks;
 
+import java.net.MalformedURLException;
+import org.virbo.datasource.AutoplotSettings;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import org.virbo.autoplot.*;
@@ -437,7 +439,12 @@ private void jTree1ValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN
         if (b instanceof Bookmark.Item) {
             URLTextField.setText(((Bookmark.Item) b).getUrl());
         } else {
-            URLTextField.setText("");
+            if ( b instanceof Bookmark.Folder && ((Bookmark.Folder)b).getRemoteUrl()!=null ) {
+                String url= ((Bookmark.Folder)b).getRemoteUrl();
+                URLTextField.setText(url);
+            } else {
+                URLTextField.setText("");
+            }
         }
     } else {
         titleTextField.setText("");
@@ -483,9 +490,18 @@ private void closeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 }//GEN-LAST:event_closeMenuItemActionPerformed
 
 private void newFolderMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newFolderMenuItemActionPerformed
-    String s = JOptionPane.showInputDialog("New Folder Name:");
+    String s = JOptionPane.showInputDialog(this,"New Folder Name:");
     if (s != null && !s.equals("")) {
-        model.addBookmark(new Bookmark.Folder(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
+        if ( s.startsWith("http:") || s.startsWith("https:") || s.startsWith("ftp:") ) { // kludge for testing remote bookmarks
+            try {
+                // kludge for testing remote bookmarks
+                model.addRemoteBookmarks(s, model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(BookmarksManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            model.addBookmark(new Bookmark.Folder(s), model.getSelectedBookmark(jTree1.getModel(), jTree1.getSelectionPath()));
+        }
     }
 }//GEN-LAST:event_newFolderMenuItemActionPerformed
 
@@ -663,6 +679,16 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
         };
     }
 
+    /**
+     * returns true if the preference node exists.
+     * @param nodeName
+     * @return
+     */
+    public boolean hasPrefNode( String nodeName ) {
+        final File f = new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ), "bookmarks/" + nodeName + ".xml");
+        return f.exists();
+    }
+    
     String prefNode= null;
 
     /**
@@ -674,9 +700,16 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
         
         BufferedReader read = null;
         try {
-            new File(FileSystem.settings().getLocalCacheDir(), "bookmarks/" ).mkdirs();
+
+            File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
+            if ( !f2.exists() ) {
+                boolean ok= f2.mkdirs();
+                if ( !ok ) {
+                    throw new RuntimeException("unable to create folder "+ f2 );
+                }
+            }
             
-            final File f = new File(FileSystem.settings().getLocalCacheDir(), "bookmarks/" + nodeName + ".xml");
+            final File f = new File( f2, nodeName + ".xml");
             if ( !f.exists() )  {
                 model.setList( new ArrayList<Bookmark>() );
             } else {
@@ -746,39 +779,6 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
             }
         });
 
-//        item= bookmarksMenu.add( new AbstractAction("Export Recent...") {
-//            public void actionPerformed(ActionEvent e) {
-//                support.exportRecent(AutoPlotUI.this);
-//            }
-//        } );
-//        item.setToolTipText("Export recent URIs to a bookmarks file.  (There is no method for importing recent URIs.)");
-
-//        bookmarksMenu.add(new JSeparator());
-//        item = new JMenuItem(new AbstractAction("Make Aggregation From URL") {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                String s = dataSetSelector.getValue();
-//                String agg = org.virbo.datasource.DataSourceUtil.makeAggregation(s);
-//                if (agg != null) {
-//                    dataSetSelector.setValue(agg);
-//                } else {
-//                    JOptionPane.showMessageDialog(AutoPlotUI.this, "Unable to create aggregation spec, couldn't find yyyymmdd.");
-//                }
-//            }
-//        });
-//        item.setToolTipText("<html>create aggregation template from the URL to combine a time series spanning multiple files</html>");
-//        bookmarksMenu.add(item);
-//
-//        item = new JMenuItem(new AbstractAction("Decode URL") {
-//
-//            public void actionPerformed(ActionEvent e) {
-//                String s = dataSetSelector.getEditor().getText();
-//                s = org.virbo.datasource.DataSourceUtil.unescape(s);
-//                dataSetSelector.getEditor().setText(s);
-//            }
-//        });
-//        item.setToolTipText("<html>decode escapes to correct URL</html>");
-//        bookmarksMenu.add(item);
         bookmarksMenu.add(new JSeparator());
 
         addBookmarks( bookmarksMenu, bookmarks, dataSetSelector );
@@ -794,7 +794,7 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
                 JMenuItem mi = new JMenuItem(new AbstractAction(book.getTitle()) {
                     public void actionPerformed(ActionEvent e) {
                         sel.setValue(((Bookmark.Item) book).getUrl());
-                        sel.maybePlot(false);
+                        sel.maybePlot(e.getModifiers());
                     }
                 });
 
@@ -816,11 +816,9 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
 
         Bookmark.Item item = new Bookmark.Item(surl);
         URISplit split = URISplit.parse(surl);
-        String autoTitle = split.file.substring(split.path.length());
+        String autoTitle = split.file==null ? surl : split.file.substring(split.path.length());
         if (autoTitle.length() == 0) autoTitle = surl;
         item.setTitle(autoTitle);
-
-        List<Bookmark> oldValue = Collections.unmodifiableList(new ArrayList<Bookmark>());
 
         List<Bookmark> bookmarks= model.getList();
 

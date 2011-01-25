@@ -70,15 +70,18 @@ public class SerializeUtil {
             for (int i = 0; i < properties.length; i++) {
                 PropertyDescriptor pd = properties[i];
                 String propertyName = pd.getName();
+
+                if ( propertyName.equals("class") ) continue;
+                
                 if (propertyName.equals("controller")) {
                     //special node should runtime data
                     continue;
                 }
-                log.fine("serializing property " + propertyName + " of " + elementName + " id=" + node.getId());
+                log.fine("serializing property \"" + propertyName + "\" of " + elementName + " id=" + node.getId());
                 Method readMethod = pd.getReadMethod();
                 Method writeMethod = pd.getWriteMethod();
                 if (writeMethod == null || readMethod == null) {
-                    log.info("skipping property " + propertyName + " of " + elementName + ", failed to find read and write method.");
+                    log.info("skipping property \"" + propertyName + "\" of " + elementName + ", failed to find read and write method.");
                     continue;
                 }
                 Object value = null;
@@ -202,6 +205,22 @@ public class SerializeUtil {
         }
     }
 
+    /**
+     * returns the first child that is an element.
+     * @param e
+     * @throws IllegalArgumentException if the element has not children that are elements.
+     * @return
+     */
+    private static Element firstChildElement( Element element ) {
+        NodeList nl= element.getChildNodes();
+        for ( int i=0; i<nl.getLength(); i++ ) {
+            if ( nl.item(i) instanceof Element ) {
+                return (Element)nl.item(i);
+            }
+        }
+        throw new IllegalArgumentException("Element has no children that are elements");
+    }
+
     public static Object getLeafNode( Element element ) throws ParseException {
         String type= element.getAttribute("type");
         SerializeDelegate sd= SerializeRegistry.getByName(type);
@@ -209,7 +228,7 @@ public class SerializeUtil {
             throw new IllegalArgumentException("unable to find serialize delegate for \""+type+"\"");
         }
         if ( element.hasChildNodes() ) {
-            return ((XMLSerializeDelegate)sd).xmlParse((Element) element.getChildNodes().item(0));
+            return ((XMLSerializeDelegate)sd).xmlParse( firstChildElement( element ) );
         } else {
             return sd.parse(type, element.getAttribute("value") );
         }
@@ -229,6 +248,7 @@ public class SerializeUtil {
             String clasName= element.getNodeName();
 
             Class claz= scheme.getClass(clasName);
+
             node = (DomNode) claz.newInstance();
 
             BeanInfo info = BeansUtil.getBeanInfo(node.getClass());
@@ -250,6 +270,7 @@ public class SerializeUtil {
                 if ( k instanceof Element ) {
                     Element e= (Element)k;
                     try {
+                        //System.err.println( e.getAttribute("name") );
                         PropertyDescriptor pd= pp.get( e.getAttribute("name") );
                         String slen= e.getAttribute("length");
                         if ( slen!=null && slen.length()>0 ) {
@@ -261,7 +282,10 @@ public class SerializeUtil {
                                 NodeList arraykids= e.getChildNodes();
                                 int ik=0;
                                 for ( int j=0; j<n; j++ ) { //DANGER
-                                    while ( !( arraykids.item(ik) instanceof Element ) ) ik++;
+                                    while ( ik<arraykids.getLength() && !( arraykids.item(ik) instanceof Element ) ) ik++;
+                                    if ( ! ( arraykids.item(ik) instanceof Element ) ) {
+                                        throw new ParseException( "didn't find "+n+" elements under array item in "+e.getAttribute("name"), 0);
+                                    }
                                     DomNode c1= getDomNode( (Element)arraykids.item(ik), scheme );
                                     ik++;
                                     Array.set( arr, j, c1 );
@@ -305,6 +329,11 @@ public class SerializeUtil {
                         }
                     }
                 }
+            }
+
+            String unres= scheme.describeUnresolved();
+            if ( unres!=null && unres.trim().length()>0 ) {
+                System.err.println(unres);
             }
 
             return node;

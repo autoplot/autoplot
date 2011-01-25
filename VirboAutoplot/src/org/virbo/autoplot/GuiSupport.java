@@ -10,6 +10,9 @@ package org.virbo.autoplot;
 
 import java.awt.Component;
 import java.awt.Frame;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.components.DasProgressPanel;
 import org.das2.graph.DasCanvas;
 import java.awt.Image;
@@ -22,9 +25,15 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -33,6 +42,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ComponentInputMap;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -45,13 +55,15 @@ import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.datum.UnitsUtil;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
 import org.das2.event.PointSlopeDragRenderer;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
+import org.das2.system.RequestProcessor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.bookmarks.Bookmark;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -59,18 +71,20 @@ import org.virbo.autoplot.dom.Axis;
 import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
-import org.virbo.autoplot.dom.DomOps;
 import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.layout.LayoutConstants;
+import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.datasource.DataSourceFormat;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -78,9 +92,9 @@ import org.virbo.datasource.datasource.DataSourceFormat;
  */
 public class GuiSupport {
 
-    AutoPlotUI parent;
+    AutoplotUI parent;
 
-    public GuiSupport(AutoPlotUI parent) {
+    public GuiSupport(AutoplotUI parent) {
         this.parent = parent;
     }
 
@@ -109,7 +123,7 @@ public class GuiSupport {
     }
 
     public void doCopyDataSetURL() {
-        StringSelection stringSelection = new StringSelection(parent.dataSetSelector.getValue());
+        StringSelection stringSelection = new StringSelection( DataSetURI.toUri(parent.dataSetSelector.getValue()).toASCIIString() );
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(stringSelection, new ClipboardOwner() {
 
@@ -137,13 +151,31 @@ public class GuiSupport {
         new Thread(run, "CopyDataSetToClipboardThread").start();
     }
 
-    public static void editPanel( ApplicationModel applicationModel, Component parent ) {
+    public static void editPlotElement( ApplicationModel applicationModel, Component parent ) {
         
         Application dom = applicationModel.dom;
 
-        AddPanelDialog dia = new AddPanelDialog( (Frame)SwingUtilities.getWindowAncestor(parent), true);
+        AddPlotElementDialog dia = new AddPlotElementDialog( (Frame)SwingUtilities.getWindowAncestor(parent), true);
+        dia.getPrimaryDataSetSelector().setTimeRange(dom.getTimeRange());
+        dia.getSecondaryDataSetSelector().setTimeRange(dom.getTimeRange());
+        dia.getTertiaryDataSetSelector().setTimeRange(dom.getTimeRange());
 
         String suri= dom.getController().getFocusUri();
+
+        setAddPlotElementUris( applicationModel, dom, dia, suri );
+
+        dia.setTitle( "Editing Plot Element" ); 
+        dia.setVisible(true);
+        if (dia.isCancelled()) {
+            return;
+        }
+        handleAddElementDialog(dia, dom, applicationModel);
+
+    }
+
+    private static void setAddPlotElementUris( ApplicationModel applicationModel,
+            Application dom, AddPlotElementDialog dia, String suri ) {
+
         Pattern hasKidsPattern= Pattern.compile("vap\\+internal\\:(data_\\d+)(,(data_\\d+))?+(,(data_\\d+))?+");
         Matcher m= hasKidsPattern.matcher(suri);
 
@@ -156,8 +188,8 @@ public class GuiSupport {
             dia.setDepCount(depCount);
             int[] groups;
             DataSetSelector[] selectors;
-            selectors= new DataSetSelector[] { dia.getPrimaryDataSetSelector(), 
-                dia.getSecondaryDataSetSelector(), 
+            selectors= new DataSetSelector[] { dia.getPrimaryDataSetSelector(),
+                dia.getSecondaryDataSetSelector(),
                 dia.getTertiaryDataSetSelector(), };
             if ( depCount==2 ) {
                 groups= new int[] { 5,1,3 };
@@ -168,40 +200,108 @@ public class GuiSupport {
             }
             for ( int i=0; i<groups.length; i++ ) {
                 DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(groups[i]) );
-                selectors[i].setValue(dsf.getUri());
+                if ( dsf==null ) {
+                    selectors[i].setValue( m.group(groups[i]) );
+                } else if ( dsf.getUri().startsWith("vap+internal:")) {
+                    selectors[i].setValue( m.group(groups[i]) ); //TODO: does this work, multiple levels?
+                } else {
+                    selectors[i].setValue(dsf.getUri());
+                }
             }
         } else {
             dia.getPrimaryDataSetSelector().setValue( suri );
         }
-        
-        dia.setVisible(true);
-        if (dia.isCancelled()) {
-            return;
-        }
-        handleAddPanelDialog(dia, dom, applicationModel);
-
     }
 
-    void addPanel() {
+
+    void addPlotElement() {
 
         ApplicationModel applicationModel = parent.applicationModel;
         DataSetSelector dataSetSelector = parent.dataSetSelector;
         Application dom = applicationModel.dom;
 
-        AddPanelDialog dia = new AddPanelDialog((Frame) SwingUtilities.getWindowAncestor(parent), true);
-        dia.getPrimaryDataSetSelector().setValue(dataSetSelector.getValue());
-        dia.getSecondaryDataSetSelector().setValue(dataSetSelector.getValue());
-        dia.getTertiaryDataSetSelector().setValue(dataSetSelector.getValue());
-        dia.getPrimaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
-        dia.getSecondaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
-        dia.getTertiaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+        AddPlotElementDialog dia = new AddPlotElementDialog( parent, true);
+        dia.getPrimaryDataSetSelector().setTimeRange(dom.getTimeRange());
+        dia.getSecondaryDataSetSelector().setTimeRange(dom.getTimeRange());
+        dia.getTertiaryDataSetSelector().setTimeRange(dom.getTimeRange());
 
+        String val= dataSetSelector.getValue();
+        if ( val.startsWith("vap+internal:") ) {
+            setAddPlotElementUris( applicationModel, dom, dia, val );
+        } else {
+            dia.getPrimaryDataSetSelector().setValue(val);
+            dia.getSecondaryDataSetSelector().setValue(val);
+            dia.getTertiaryDataSetSelector().setValue(val);
+            dia.getPrimaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+            dia.getSecondaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+            dia.getTertiaryDataSetSelector().setRecent(AutoplotUtil.getUrls(applicationModel.getRecent()));
+        }
+
+        dia.setTitle( "Adding Plot Element" );
         dia.setVisible(true);
         if (dia.isCancelled()) {
             return;
         }
-        handleAddPanelDialog(dia, dom, applicationModel);
+        handleAddElementDialog(dia, dom, applicationModel);
 
+    }
+
+    Action getDumpDataAction2( final Application dom ) {
+        return new AbstractAction("Export Data 2...") {
+            public void actionPerformed( ActionEvent e ) {
+                ExportDataPanel edp= new ExportDataPanel();
+                edp.setDataSet(dom);
+                List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
+                edp.getFormatDL().setModel( new DefaultComboBoxModel(exts.toArray()) );
+                Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
+                String currentFileString = prefs.get("DumpDataCurrentFile", "");
+                String currentExtString = prefs.get("DumpDataCurrentExt", "");
+                if ( !currentExtString.equals("") ) {
+                    edp.getFormatDL().setSelectedItem(currentExtString);
+                }
+                if ( !currentFileString.equals("") ) {
+                    edp.getFilenameTF().setText(currentFileString);
+                }
+                
+                if ( JOptionPane.showConfirmDialog( parent, edp )==JOptionPane.OK_OPTION ) {
+                     try {
+                        prefs.put("DumpDataCurrentFile", edp.getFilenameTF().toString());
+
+                        String s = new File( edp.getFilenameTF().getText() ).toURI().toString();
+
+                        String ext = DataSetURI.getExt(s);
+                        if (ext == null) {
+                            ext = "";
+                        }
+
+                        DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext);
+                        if (format == null) {
+                            JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
+                            return;
+                        }
+
+                        if ( edp.isFormatPlotElement() ) {
+                            QDataSet ds= dom.getController().getPlotElement().getController().getDataSet();
+                            format.formatData( s, ds, new DasProgressPanel("formatting data"));
+                        } else {
+                            QDataSet ds= dom.getController().getDataSourceFilter().getController().getFillDataSet();
+                            format.formatData( s, ds, new DasProgressPanel("formatting data"));
+                        }
+                        parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(s) );
+
+                    } catch ( IOException ex ) {
+                        parent.applicationModel.getExceptionHandler().handle(ex);
+                    } catch ( IllegalArgumentException ex ) {
+                        parent.applicationModel.getExceptionHandler().handle(ex);
+                    } catch (RuntimeException ex ) {
+                        parent.applicationModel.getExceptionHandler().handleUncaught(ex);
+                    } catch (Exception ex) {
+                        parent.applicationModel.getExceptionHandler().handle(ex);
+                    }
+
+                }
+            }
+        };
     }
 
     Action getDumpDataAction() {
@@ -210,7 +310,11 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 DataSourceController dsc = parent.applicationModel.getDataSourceFilterController();
 
-                if (dsc.getFillDataSet() == null) {
+                //final QDataSet dataSet = dsc.getFillDataSet();
+                final QDataSet dataSet = parent.applicationModel.dom
+                        .getController().getPlotElement().getController().getDataSet();
+
+                if (dataSet == null) {
                     JOptionPane.showMessageDialog(parent, "No Data to Export.");
                     return;
                 }
@@ -226,6 +330,7 @@ public class GuiSupport {
 
                         @Override
                         public boolean accept(File f) {
+                            if ( f.toString()==null ) return false;
                             return f.toString().endsWith(ex) || f.isDirectory();
                         }
 
@@ -242,11 +347,11 @@ public class GuiSupport {
 
                 chooser.setFileFilter(deflt);
 
-                Preferences prefs = Preferences.userNodeForPackage(AutoPlotUI.class);
+                Preferences prefs = Preferences.userNodeForPackage(AutoplotUI.class);
                 String currentFileString = prefs.get("DumpDataCurrentFile", "");
 
-                if (dsc.getFillDataSet() != null) {
-                    String name = (String) dsc.getFillDataSet().property(QDataSet.NAME);
+                if (dataSet != null) {
+                    String name = (String) dataSet.property(QDataSet.NAME);
                     if (name != null) {
                         chooser.setSelectedFile(new File(name.toLowerCase()));
                     }
@@ -262,6 +367,7 @@ public class GuiSupport {
                 if (r == JFileChooser.APPROVE_OPTION) {
                     try {
                         prefs.put("DumpDataCurrentFile", chooser.getSelectedFile().toString());
+                        prefs.flush();
 
                         String s = chooser.getSelectedFile().toURI().toString();
 
@@ -286,7 +392,7 @@ public class GuiSupport {
                                 return;
                             }
                         }
-                        format.formatData( s, dsc.getFillDataSet(), new DasProgressPanel("formatting data"));
+                        format.formatData( s,dataSet, new DasProgressPanel("formatting data"));
                         parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(s) );
 
                     } catch (IOException ex) {
@@ -304,31 +410,41 @@ public class GuiSupport {
     }
 
     public Action createNewDOMAction() {
-        return new AbstractAction("Reset Application...") {
+        return new AbstractAction("Reset Window...") {
             public void actionPerformed( ActionEvent e ) {
                 if ( parent.stateSupport.isDirty() ) {
                     String msg= "The application has been modified.  Do you want to save your changes?";
                     int result= JOptionPane.showConfirmDialog(parent,msg );
                     if ( result==JOptionPane.OK_OPTION ) {
-                        parent.stateSupport.saveAs();
+                        result= parent.stateSupport.saveAs();
+                        if ( result==JFileChooser.CANCEL_OPTION ) {
+                            return;
+                        }
                     } else if ( result==JOptionPane.CANCEL_OPTION || result==JOptionPane.CLOSED_OPTION ) {
                         return;
                     }
                 }
-                parent.dom.getController().reset();
-                parent.undoRedoSupport.resetHistory();
-                parent.applicationModel.setVapFile(null);
+                Runnable run= new Runnable() {
+                    public void run() {
+                        parent.dom.getController().reset();
+                        parent.undoRedoSupport.resetHistory();
+                        parent.applicationModel.setVapFile(null);
+                        parent.stateSupport.close();
+                        parent.tickleTimer.tickle();
+                    }
+                };
+                RequestProcessor.invokeLater(run);
             }
         };
     }
 
     public Action createNewApplicationAction() {
-        return new AbstractAction("New Application") {
+        return new AbstractAction("New Window") {
             public void actionPerformed( ActionEvent e ) {
                 ApplicationModel model = new ApplicationModel();
                 model.setExceptionHandler( parent.applicationModel.getExceptionHandler() );
                 model.addDasPeersToApp();
-                AutoPlotUI view = new AutoPlotUI(model);
+                AutoplotUI view = new AutoplotUI(model);
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
                 view.setVisible(true);
             }
@@ -336,12 +452,12 @@ public class GuiSupport {
     }
 
     public Action createCloneApplicationAction() {
-        return new AbstractAction("Clone Application") {
+        return new AbstractAction("Clone to New Window") {
             public void actionPerformed( ActionEvent e ) {
                 ApplicationModel model = new ApplicationModel();
                 model.setExceptionHandler( model.getExceptionHandler() );
                 model.addDasPeersToApp();
-                AutoPlotUI view = new AutoPlotUI(model);
+                AutoplotUI view = new AutoplotUI(model);
                 view.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
                 view.setVisible(true);
                 model.dom.syncTo( parent.applicationModel.dom );
@@ -354,72 +470,80 @@ public class GuiSupport {
         result.add(new JMenuItem(new AbstractAction("Scatter") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.scatter);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.scatter);
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("Color Scatter") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.colorScatter);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.colorScatter);
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("Series") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.series);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.series);
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("Stair Steps") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.stairSteps);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.stairSteps);
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("Fill To Zero") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.fillToZero);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.fillToZero);
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("Huge Scatter") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.hugeScatter);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.hugeScatter);
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("Spectrogram") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.spectrogram);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.spectrogram);
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("Nearest Neighbor Spectrogram") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.nnSpectrogram);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.nnSpectrogram);
             }
         }));
 
         result.add(new JMenuItem(new AbstractAction("Digital") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = plot.getController().getApplication().getController().getPanel();
-                panel.setRenderType(RenderType.digital);
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.digital);
+            }
+        }));
+
+        result.add(new JMenuItem(new AbstractAction("Pitch Angle Distribution") {
+
+            public void actionPerformed(ActionEvent e) {
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.pitchAngleDistribution);
             }
         }));
 
@@ -448,27 +572,27 @@ public class GuiSupport {
             }
         });
 
-        thisPanel.getActionMap().put("NEXT_PANEL", new AbstractAction() {
+        thisPanel.getActionMap().put("NEXT_PLOT_ELEMENT", new AbstractAction() {
             public void actionPerformed( ActionEvent e ) {
                 Application dom= parent.dom;
-                Panel p= dom.getController().getPanel();
-                int idx= Arrays.asList( dom.getPanels() ).indexOf(p);
+                PlotElement p= dom.getController().getPlotElement();
+                int idx= Arrays.asList( dom.getPlotElements() ).indexOf(p);
                 if ( idx==-1 ) idx=0;
                 idx++;
-                if ( idx==dom.getPanels().length ) idx=0;
-                dom.getController().setPanel( dom.getPanels(idx) );
+                if ( idx==dom.getPlotElements().length ) idx=0;
+                dom.getController().setPlotElement( dom.getPlotElements(idx) );
             }
         });
 
-        thisPanel.getActionMap().put("PREV_PANEL", new AbstractAction() {
+        thisPanel.getActionMap().put("PREV_PLOT_ELEMENT", new AbstractAction() {
             public void actionPerformed( ActionEvent e ) {
                 Application dom= parent.dom;
-                Panel p= dom.getController().getPanel();
-                int idx= Arrays.asList( dom.getPanels() ).indexOf(p);
+                PlotElement p= dom.getController().getPlotElement();
+                int idx= Arrays.asList( dom.getPlotElements() ).indexOf(p);
                 if ( idx==-1 ) idx=0;
                 idx--;
-                if ( idx==-1 ) idx= dom.getPanels().length-1;
-                dom.getController().setPanel( dom.getPanels(idx) );
+                if ( idx==-1 ) idx= dom.getPlotElements().length-1;
+                dom.getController().setPlotElement( dom.getPlotElements(idx) );
             }
         });
 
@@ -482,8 +606,8 @@ public class GuiSupport {
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, tk.getMenuShortcutKeyMask()), "INCREASE_FONT_SIZE");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask()), "INCREASE_FONT_SIZE");
         map.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK | tk.getMenuShortcutKeyMask()), "INCREASE_FONT_SIZE");  // american keyboard
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.CTRL_DOWN_MASK), "NEXT_PANEL");
-        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "PREV_PANEL");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.CTRL_DOWN_MASK), "NEXT_PLOT_ELEMENT");
+        map.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK), "PREV_PLOT_ELEMENT");
         thisPanel.setInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW, map);
 
     }
@@ -493,6 +617,7 @@ public class GuiSupport {
         chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 
             public boolean accept(File f) {
+                if ( f.toString()==null ) return false;
                 return f.isDirectory() || f.getName().endsWith(".xml");
             }
 
@@ -521,6 +646,7 @@ public class GuiSupport {
         return new FileFilter() {
 
             public boolean accept(File f) {
+                if ( f.toString()==null ) return false;
                 return f.isDirectory() || f.toString().endsWith(ext);
             }
 
@@ -576,36 +702,116 @@ public class GuiSupport {
         };
     }
 
-    private static void handleAddPanelDialog(AddPanelDialog dia, Application dom, ApplicationModel applicationModel) {
+    /**
+     * allow user to pick out data from a vap file.
+     * @param dom
+     * @param plot
+     * @param pelement
+     * @param vap
+     */
+    private static void mergeVap( Application dom, Plot plot, PlotElement pelement, String vap ) {
+        try {
+            ImportVapDialog d = new ImportVapDialog();
+            d.setVap(vap);
+            if ( d.showDialog()==JOptionPane.OK_OPTION ) {
+                String lock= "merging vaps";
+                dom.getController().registerPendingChange( d,lock );
+                dom.getController().performingChange( d, lock );
+                List<String> uris= d.getSelectedURIs();
+                for ( String uri: uris ) {
+                    dom.getController().doplot( plot, pelement, uri );
+                    pelement= null; //otherwise we'd clobber last dataset.
+                }
+                dom.getController().changePerformed( d, lock );
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void importBookmarks( String bookmarksFile ) {
+
+        ImportBookmarksGui gui= new ImportBookmarksGui();
+        gui.getBookmarksFilename().setText(bookmarksFile+"?");
+        gui.getRemote().setSelected(true);
+        int r = JOptionPane.showConfirmDialog( parent, gui, "Import bookmarks file", JOptionPane.OK_CANCEL_OPTION );
+        if (r == JOptionPane.OK_OPTION) {
+            InputStream in = null;
+            try {
+                ProgressMonitor mon = DasProgressPanel.createFramed("importing bookmarks");
+                if ( gui.getRemote().isSelected() ) {
+                    parent.getBookmarksManager().getModel().addRemoteBookmarks(bookmarksFile);
+                } else {
+                    in = DataSetURI.getInputStream(DataSetURI.getURI(bookmarksFile), mon);
+                    ByteArrayOutputStream boas=new ByteArrayOutputStream();
+                    WritableByteChannel dest = Channels.newChannel(boas);
+                    ReadableByteChannel src = Channels.newChannel(in);
+                    DataSourceUtil.transfer(src, dest);
+                    String sin= new String( boas.toByteArray() );
+                    List<Bookmark> books= Bookmark.parseBookmarks(sin);
+                    parent.getBookmarksManager().getModel().importList( books );
+                }
+                parent.setMessage( "imported bookmarks file "+bookmarksFile );
+            } catch (SAXException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                parent.applicationModel.showMessage( "Error parsing "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (FileNotFoundException ex ) {
+                parent.applicationModel.showMessage( "File not found: "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } catch (IOException ex) {
+                Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                parent.applicationModel.showMessage( "I/O Error with "+bookmarksFile, "Error in import bookmarks", JOptionPane.WARNING_MESSAGE );
+            } finally {
+                try {
+                    if ( in!=null ) in.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(GuiSupport.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
+    }
+
+
+    private static void handleAddElementDialog(AddPlotElementDialog dia, Application dom, ApplicationModel applicationModel) {
         Plot plot = null;
-        Panel panel = null;
+        PlotElement pelement = null;
         int modifiers = dia.getModifiers();
-        if ((modifiers & KeyEvent.CTRL_MASK) == KeyEvent.CTRL_MASK) {
+        if ( (modifiers & KeyEvent.CTRL_MASK) == KeyEvent.CTRL_MASK && (modifiers & KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK ) {
+            // reserve this for plot above, which we'll add soon.
+            plot = null;
+            pelement = null;
+        } else if ((modifiers & KeyEvent.CTRL_MASK) == KeyEvent.CTRL_MASK) {
             // new plot
             plot = null;
-            panel = null;
+            pelement = null;
             //nothing
         } else if ((modifiers & KeyEvent.SHIFT_MASK) == KeyEvent.SHIFT_MASK) {
             // overplot
             plot = dom.getController().getPlot();
         } else {
-            panel = dom.getController().getPanel();
+            pelement = dom.getController().getPlotElement();
         }
         if (dia.getDepCount() == 0) {
-            applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
-            dom.getController().doplot(plot, panel, dia.getPrimaryDataSetSelector().getValue());
+            String val= dia.getPrimaryDataSetSelector().getValue();
+            if ( val.endsWith(".vap") ) {
+                mergeVap(dom,plot, pelement, val);
+            } else {
+                dom.getController().doplot(plot, pelement, val );
+            }
         } else if (dia.getDepCount() == 1) {
             applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
             applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
-            dom.getController().doplot(plot, panel, dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
+            dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
         } else if (dia.getDepCount() == 2) {
             applicationModel.addRecent(dia.getPrimaryDataSetSelector().getValue());
             applicationModel.addRecent(dia.getSecondaryDataSetSelector().getValue());
             applicationModel.addRecent(dia.getTertiaryDataSetSelector().getValue());
-            dom.getController().doplot(plot, panel, dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
+            dom.getController().doplot(plot, pelement, dia.getSecondaryDataSetSelector().getValue(), dia.getTertiaryDataSetSelector().getValue(), dia.getPrimaryDataSetSelector().getValue());
         } else if (dia.getDepCount() == -1) {
-            if (panel == null) {
-                panel = dom.getController().addPanel(plot, null);
+            if (pelement == null) {
+                pelement = dom.getController().addPlotElement(plot, null);
             }
         }
     }
@@ -756,22 +962,22 @@ public class GuiSupport {
             }
         }));
 
-        plot.getDasMouseInputAdapter().addMenuItem( new JMenuItem(new AbstractAction("Panel Properties") {
+        plot.getDasMouseInputAdapter().addMenuItem( new JMenuItem(new AbstractAction("Plot Element Properties") {
             public void actionPerformed(ActionEvent e) {
-                Panel p = controller.getPanel();
+                PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p);
                 pp.showDialog(plot.getCanvas());
             }
         } ) );
 
-       JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Panel Style Properties") {
+       JMenuItem panelPropsMenuItem= new JMenuItem(new AbstractAction("Plot Element Style Properties") {
             public void actionPerformed(ActionEvent e) {
-                Panel p = controller.getPanel();
+                PlotElement p = controller.getPlotElement();
                 PropertyEditor pp = new PropertyEditor(p.getStyle());
                 pp.showDialog(plot.getCanvas());
             }
         });
-        plotController.setPanelPropsMenuItem(panelPropsMenuItem);
+        plotController.setPlotElementPropsMenuItem(panelPropsMenuItem);
         
         plot.getDasMouseInputAdapter().addMenuItem(panelPropsMenuItem);
 
@@ -780,63 +986,83 @@ public class GuiSupport {
         JMenu addPlotMenu = new JMenu("Add Plot");
         plot.getDasMouseInputAdapter().addMenuItem(addPlotMenu);
 
-        item = new JMenuItem(new AbstractAction("Copy Panels") {
+        item = new JMenuItem(new AbstractAction("Copy Plot Elements Down") {
 
             public void actionPerformed(ActionEvent e) {
-                controller.copyPlotAndPanels(domPlot, null, true, false);
+                Runnable run= new Runnable() {
+                    public void run() {
+                        Plot newPlot= controller.copyPlotAndPlotElements(domPlot, null, false, false);
+                        Application dom= domPlot.getController().getApplication();
+                        List<BindingModel> bms= dom.getController().findBindings( dom, Application.PROP_TIMERANGE, domPlot.getXaxis(), Axis.PROP_RANGE );
+                        if ( bms.size()>0 && UnitsUtil.isTimeLocation( newPlot.getXaxis().getRange().getUnits() ) ) {
+                            controller.bind( controller.getApplication(), Application.PROP_TIMERANGE, newPlot.getXaxis(), Axis.PROP_RANGE );
+                        }
+                    }
+                };
+                RequestProcessor.invokeLater(run);
+                //run.run();
             }
         });
-        item.setToolTipText("make a new plot, and copy the panels into it.  New plot is bound by the x axis.");
+        item.setToolTipText("make a new plot below, and copy the plot elements into it.  New plot is bound by the x axis.");
         addPlotMenu.add(item);
+
+//        item = new JMenuItem(new AbstractAction("Copy Plot Elements Right") {
+//
+//            public void actionPerformed(ActionEvent e) {
+//                DomOps.copyPlotAndPlotElements(domPlot,true,false,false,LayoutConstants.RIGHT);
+//            }
+//        });
+//        item.setToolTipText("make a new plot to the right, and copy the plot elements into it.");
+//        addPlotMenu.add(item);
 
         item = new JMenuItem(new AbstractAction("Context Overview") {
-
             public void actionPerformed(ActionEvent e) {
-                Plot that = controller.copyPlotAndPanels(domPlot, null, false, false);
-                controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
-                controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
-                controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
-                controller.addConnector(domPlot, that);
-                that.getController().resetZoom(true, true, true);
+                Runnable run= new Runnable() {
+                    public void run() {
+                        Plot that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
+                        controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
+                        controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
+                        controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
+                        controller.addConnector(domPlot, that);
+                        that.getController().resetZoom(true, true, false);
+                    }
+                };
+                RequestProcessor.invokeLater(run);
+                //run.run();
             }
         });
-        addPlotMenu.add(item);
-        
-        item = new JMenuItem(new AbstractAction("Copy Panels Right") {
 
-            public void actionPerformed(ActionEvent e) {
-                DomOps.copyPlotAndPanels(domPlot,true,false,false,LayoutConstants.RIGHT);
-            }
-        });
-        item.setToolTipText("make a new plot, and copy the panels into it.  New plot is bound by the x axis.");
-        addPlotMenu.add(item);
-
-
-        item.setToolTipText("make a new plot, and copy the panels into it.  The plot is not bound,\n" +
+        item.setToolTipText("make a new plot, and copy the plot elements into it.  The plot is not bound,\n" +
                 "and a connector is drawn between the two.  The panel uris are bound as well.");
         addPlotMenu.add(item);
-
+        
         JMenu editPlotMenu = new JMenu("Edit Plot");
         plot.getDasMouseInputAdapter().addMenuItem(editPlotMenu);
 
         controller.fillEditPlotMenu(editPlotMenu, domPlot);
 
-        JMenu panelMenu = new JMenu("Edit Panel");
+        JMenu panelMenu = new JMenu("Edit Plot Element");
 
         plot.getDasMouseInputAdapter().addMenuItem(panelMenu);
 
         item = new JMenuItem(new AbstractAction("Move to Plot Above") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = controller.getPanel();
-                Plot plot = controller.getPlotFor(panel);
+                PlotElement pelement = controller.getPlotElement();
+                Plot plot = controller.getPlotFor(pelement);
                 Plot dstPlot = controller.getPlotAbove(plot);
                 if (dstPlot == null) {
                     dstPlot = controller.addPlot(LayoutConstants.ABOVE);
-                    panel.setPlotId(dstPlot.getId());
-                    controller.bind(plot.getXaxis(), Axis.PROP_RANGE, dstPlot.getXaxis(), Axis.PROP_RANGE);
+                    //dstPlot.getXaxis().syncTo(plot.getXaxis(),Collections.singletonList(DomNode.PROP_ID));
+                    //dstPlot.getYaxis().syncTo(plot.getYaxis(),Collections.singletonList(DomNode.PROP_ID));
+                    //dstPlot.getZaxis().syncTo(plot.getZaxis(),Collections.singletonList(DomNode.PROP_ID));
+                    pelement.setPlotId(dstPlot.getId());
+                    //dstPlot.getXaxis().syncTo(plot.getXaxis(),Collections.singletonList(DomNode.PROP_ID));
+                    //dstPlot.getYaxis().syncTo(plot.getYaxis(),Collections.singletonList(DomNode.PROP_ID));
+                    //dstPlot.getZaxis().syncTo(plot.getZaxis(),Collections.singletonList(DomNode.PROP_ID));
+                    //controller.bind(plot.getXaxis(), Axis.PROP_RANGE, dstPlot.getXaxis(), Axis.PROP_RANGE);
                 } else {
-                    panel.setPlotId(dstPlot.getId());
+                    pelement.setPlotId(dstPlot.getId());
                 }
             }
         });
@@ -845,32 +1071,39 @@ public class GuiSupport {
         item = new JMenuItem(new AbstractAction("Move to Plot Below") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = controller.getPanel();
-                Plot plot = controller.getPlotFor(panel);
+                PlotElement pelement = controller.getPlotElement();
+                Plot plot = controller.getPlotFor(pelement);
                 Plot dstPlot = controller.getPlotBelow(plot);
                 if (dstPlot == null) {
                     dstPlot = controller.addPlot(LayoutConstants.BELOW);
-                    panel.setPlotId(dstPlot.getId());
+                    pelement.setPlotId(dstPlot.getId());
                     controller.bind(plot.getXaxis(), Axis.PROP_RANGE, dstPlot.getXaxis(), Axis.PROP_RANGE);
                 } else {
-                    panel.setPlotId(dstPlot.getId());
+                    pelement.setPlotId(dstPlot.getId());
                 }
             }
         });
         panelMenu.add(item);
 
-        item = new JMenuItem(new AbstractAction("Delete Panel") {
+        item = new JMenuItem(new AbstractAction("Delete Plot Element") {
 
             public void actionPerformed(ActionEvent e) {
-                Panel panel = controller.getPanel();
-                controller.deletePanel(panel);
+                PlotElement pelement = controller.getPlotElement();
+                if (controller.getApplication().getPlotElements().length < 2) {
+                    DataSourceFilter dsf= controller.getDataSourceFilterFor(controller.getApplication().getPlotElements(0));
+                    dsf.setUri(null);
+                    pelement.setLegendLabelAutomatically(""); //TODO: null should reset everything.
+                    pelement.setActive(true);
+                    return;
+                }
+                controller.deletePlotElement(pelement);
             }
         });
         panelMenu.add(item);
 
         JMenuItem editDataMenu = new JMenuItem(new AbstractAction("Edit Data Source") {
             public void actionPerformed(ActionEvent e) {
-                GuiSupport.editPanel( controller.getApplicationModel(), plot );
+                GuiSupport.editPlotElement( controller.getApplicationModel(), plot );
             }
         });
 
@@ -887,6 +1120,38 @@ public class GuiSupport {
 
 
         plot.getDasMouseInputAdapter().addMenuItem(GuiSupport.createEZAccessMenu(domPlot));
+    }
+
+    protected void doInspectVap() {
+
+        JFileChooser chooser= new JFileChooser();
+        FileFilter ff = new FileFilter() {
+
+            @Override
+            public boolean accept(File f) {
+                if ( f.toString()==null ) return false;
+                return f.toString().endsWith(".vap") || f.isDirectory();
+            }
+
+            @Override
+            public String getDescription() {
+                return "*.vap";
+            }
+        };
+        chooser.addChoosableFileFilter(ff);
+
+        chooser.setFileFilter(ff);
+        chooser.setCurrentDirectory( new File( parent.stateSupport.getDirectory() ) );
+        if ( JFileChooser.APPROVE_OPTION==chooser.showOpenDialog(parent) ) {
+            try {
+                Application vap = (Application) StatePersistence.restoreState( chooser.getSelectedFile() );
+                PropertyEditor edit = new PropertyEditor(vap);
+                edit.showDialog(this.parent);
+            } catch ( Exception ex ) {
+                JOptionPane.showMessageDialog( parent, "File does not appear to well-formatted .vap file" );
+            }
+
+        }
     }
 
 }

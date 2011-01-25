@@ -72,8 +72,8 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
         return result;
     }
 
-    private HSSFWorkbook getWorkbook(URL url, ProgressMonitor mon) throws IOException {
-        File file = DataSetURI.getFile(url, mon);
+    private HSSFWorkbook getWorkbook(URI uri, ProgressMonitor mon) throws IOException {
+        File file = DataSetURI.getFile(uri, mon);
         InputStream in = new FileInputStream(file);
         POIFSFileSystem fs = new POIFSFileSystem(in);
         HSSFWorkbook wb = new HSSFWorkbook(fs);
@@ -82,7 +82,7 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
 
     
     private List<String> getSheets(CompletionContext cc, ProgressMonitor mon) throws IOException {
-        HSSFWorkbook wb = getWorkbook(cc.resource, mon);
+        HSSFWorkbook wb = getWorkbook(cc.resourceURI, mon);
         return ExcelUtil.getSheets(wb,cc, mon);
     } 
     
@@ -96,7 +96,7 @@ public class ExcelSpreadsheetDataSourceFactory implements DataSourceFactory {
      * @throws java.io.IOException
      */
     private List<String> getColumns( CompletionContext cc, ProgressMonitor mon) throws IOException {
-        HSSFWorkbook wb = getWorkbook(cc.resource, mon);
+        HSSFWorkbook wb = getWorkbook(cc.resourceURI, mon);
         Map params = URISplit.parseParams(cc.params);
         return new LinkedList<String>( ExcelUtil.getColumns(wb,  (String) params.get("sheet"),  (String) params.get("firstRow"), mon).values() );
     }

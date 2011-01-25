@@ -2,6 +2,7 @@ package org.autoplot.pngwalk;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -39,6 +40,7 @@ public class GridPngWalkView extends PngWalkView {
 
     private JScrollPane scrollPane;
     private GridViewCanvas canvas;
+    private double restoreScrollPct = -1;
 
     public GridPngWalkView(WalkImageSequence sequence) {
         super(sequence);
@@ -50,17 +52,26 @@ public class GridPngWalkView extends PngWalkView {
         canvas.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (seq == null) return;
                 selectCellAt(e.getX(), e.getY());
             }
         });
 
         canvas.addComponentListener(new ComponentAdapter() {
-           @Override
-           public void componentResized(ComponentEvent e) {
+            @Override
+            public void componentResized(ComponentEvent e) {
                nCols = getWidth() / thumbSize;
                if (nCols == 0) nCols = 1;
+               // Thumbnail set restoreScroll, indicating we need to adjust scroll
+               if (restoreScrollPct >= 0) {
+                    javax.swing.JScrollBar sb = scrollPane.getVerticalScrollBar();
+                    int newScroll = (int)(restoreScrollPct * (sb.getMaximum()-sb.getVisibleAmount()));
+                    sb.setValue(newScroll);
+                    restoreScrollPct = -1;
+               }
                updateLayout();
-           }
+
+            }
         });
 
         scrollPane.getVerticalScrollBar().getModel().addChangeListener(new ChangeListener() {
@@ -103,7 +114,8 @@ public class GridPngWalkView extends PngWalkView {
     private void updateLayout() {
         if (canvas == null) return;
         if (seq != null) canvas.setPreferredSize(new Dimension(thumbSize*nCols, thumbSize*(seq.size()/nCols + 1)));
-        else canvas.setPreferredSize(new Dimension(100,100));
+        else canvas.setPreferredSize(new Dimension(0,0));
+        canvas.revalidate();
         canvas.repaint();
     }
 
@@ -115,11 +127,22 @@ public class GridPngWalkView extends PngWalkView {
 
     @Override
     protected void thumbnailSizeChanged() {
+        // before resizing, figure out the (roughly) central image
+//        int curScrollPos = scrollPane.getVerticalScrollBar().getValue() + scrollPane.getVerticalScrollBar().getVisibleAmount() / 2;
+//        restoreScrollPct = curScrollPos/thumbSize * nCols + (nCols/2);
+        javax.swing.JScrollBar sb = scrollPane.getVerticalScrollBar();
+        restoreScrollPct = ((double)sb.getValue() / (sb.getMaximum()-sb.getVisibleAmount()));
+
+        // do the resize
         thumbSize= getThumbnailSize();
         nCols = getWidth() / thumbSize;
         if (nCols == 0) nCols = 1;
         updateLayout();
 
+        // now scroll to place old central image in center (within scroll limits)
+//        int newScroll = middleIndex/nCols * thumbSize - (scrollPane.getVerticalScrollBar().getVisibleAmount()-thumbSize)/2;
+//        if (newScroll < 0) newScroll = 0;
+//        scrollPane.getVerticalScrollBar().setValue(newScroll);
         super.thumbnailSizeChanged();
     }
 
@@ -179,7 +202,8 @@ public class GridPngWalkView extends PngWalkView {
 
 
     private class GridViewCanvas extends JPanel implements Scrollable {
-
+        private Font smallFont = new Font("Dialog", Font.PLAIN, 6);  //for use with small thumbnails
+        private Font normalFont = new Font("Dialog", Font.PLAIN, 12); // this is the Java default
 
         GridViewCanvas() {
             repaintTimer = new javax.swing.Timer( 300, new ActionListener() {
@@ -205,6 +229,11 @@ public class GridPngWalkView extends PngWalkView {
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
 
+            if (thumbSize < 100)
+                g2.setFont(smallFont);
+            else
+                g2.setFont(normalFont);
+
             g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
             if (seq == null) {
                 return;
@@ -219,20 +248,21 @@ public class GridPngWalkView extends PngWalkView {
 
             for (int row = rowMin; row < rowMax; row++) {
                 for (int col = colMin; col < colMax; col++) {
-                    int n = (row * nCols) + col;
-                    if (n >= seq.size()) {
+                    int i = (row * nCols) + col;
+                    if (i >= seq.size()) {
                         break;
                     }
-                    if (seq.getIndex() == n) {
+                    if (seq.getIndex() == i) {
                         Color oldColor = g2.getColor();
                         g2.setColor(Color.orange);
                         g2.fillRect(col * thumbSize, row * thumbSize, thumbSize, thumbSize);
                         g2.setColor(oldColor);
                     }
                     //g2.draw(new Ellipse2D.Double(col * thumbSize + 2, row * thumbSize + 2, thumbSize - 4, thumbSize - 4));
-                BufferedImage thumb = seq.imageAt(n).getThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting());
+                    WalkImage wimage = seq.imageAt(i);
+                    BufferedImage thumb = wimage.getThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting());
                     if (thumb != null) {
-                        double s = Math.min((double) (thumbSize - 4) / thumb.getWidth(), (double) (thumbSize - 4) / thumb.getHeight());
+                        double s = Math.min((double) (thumbSize - 4) / thumb.getWidth(), (double) (thumbSize - 4 - fm.getHeight()) / thumb.getHeight());
                         if (s < 1.0) {
                             int w = (int) (s * thumb.getWidth());
                             int h = (int) (s * thumb.getHeight());
@@ -242,14 +272,26 @@ public class GridPngWalkView extends PngWalkView {
                     } else {
                         thumb = loadingImage;
                     }
-                    g2.drawImage(thumb, col * thumbSize + (thumbSize - thumb.getWidth()) / 2, row * thumbSize + (thumbSize - thumb.getHeight()) / 2, null);
-                    if (showCaptions && seq.imageAt(n).getCaption()!=null) {
-                        int cx = col*thumbSize + 5;
-                        int cy = (row+1)*thumbSize - fm.getDescent();
+
+                    int imgX= col * thumbSize + (thumbSize - thumb.getWidth()) / 2;
+                    int imgY= row * thumbSize + (thumbSize - thumb.getHeight() - fm.getHeight()) / 2;
+                    g2.drawImage(thumb, imgX, imgY, null);
+
+                    if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                        paintQualityControlIcon( i, g2, imgX, imgY, true );
+                    }
+
+                    if (showCaptions && wimage.getCaption()!=null) {
+                        //These 2 lines center caption below image
+                        //int cx = col*thumbSize + (thumbSize - fm.stringWidth(wimage.getCaption())) / 2;
+                        //cx = Math.max(cx,col*thumbSize + 2);
+                        //Instead, align to left edge of thumbnail:
+                        int cx = col*thumbSize + (thumbSize - thumb.getWidth())/2;
+                        int cy = row*thumbSize + (thumbSize + thumb.getHeight() + fm.getHeight())/2;
                         g2.setColor(Color.BLACK);
                         Shape oldClip = g2.getClip();
-                        g2.clip(new Rectangle(col*thumbSize, row*thumbSize, thumbSize-10, thumbSize));
-                        g2.drawString(seq.imageAt(n).getCaption(), cx, cy);
+                        g2.clip(new Rectangle(cx, row*thumbSize, (thumbSize+thumb.getWidth())/2, thumbSize));
+                        g2.drawString(wimage.getCaption(), cx, cy);
                         g2.setClip(oldClip);
                     }
 
@@ -266,7 +308,8 @@ public class GridPngWalkView extends PngWalkView {
         }
 
         public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return (this.getHeight() / thumbSize) * thumbSize;
+            int x= (scrollPane.getVerticalScrollBar().getVisibleAmount() / thumbSize ) * thumbSize;
+            return x;
         }
 
         public boolean getScrollableTracksViewportWidth() {

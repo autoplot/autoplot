@@ -8,11 +8,13 @@
  */
 package org.virbo.cdfdatasource;
 
+import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import gsfc.nssdc.cdf.Attribute;
 import gsfc.nssdc.cdf.CDF;
+import gsfc.nssdc.cdf.CDFConstants;
 import gsfc.nssdc.cdf.CDFData;
 import gsfc.nssdc.cdf.CDFException;
 import gsfc.nssdc.cdf.Entry;
@@ -20,11 +22,14 @@ import gsfc.nssdc.cdf.Variable;
 import gsfc.nssdc.cdf.util.CDFUtils;
 import java.io.File;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.BDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetUtil;
@@ -460,18 +465,8 @@ public class CdfUtil {
         return result;
     }
 
-    /**
-     * wraps response from CDFVariable.getHyperData() into QDataSet.  The object
-     * should be float[], float[][], double[], double[][], etc.
-     * @deprecated use 4 argument wrapCdfHyperData that takes interval.
-     * @param reccount reccount -1 indicates read the one and only record and do a reform.
-     */
-    public static MutablePropertyDataSet wrapCdfHyperData(Variable variable, long recStart, long recCount) throws CDFException {
-        return wrapCdfHyperData(variable, recStart, recCount, 1);
-    }
-
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
-            Variable variable, long recStart, long recCount, long recInterval ) throws CDFException {
+            Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws CDFException {
 
         long varType = variable.getDataType();
         long[] dimIndeces = new long[]{0};
@@ -509,23 +504,51 @@ public class CdfUtil {
                 dimIntervals = new long[]{1};
             }
         }
+        int recSizeCount= 1;
+        if ( dimSizes!=null ) {
+            for ( int i=0; i<dimSizes.length; i++ ) {
+                recSizeCount*= dimSizes[i];
+            }
+        }
 
-        CDFData cdfData= CDFData.get( variable, recStart, Math.max(1, recCount), recInterval, dimIndeces, dimCounts, dimIntervals, false );
-        Object odata= cdfData.getRawData(); // this is my hack
+        if ( recCount==-1 && recStart>0 && variable.getMaxWrittenRecord()==0 ) { // another kludge for Rockets, where depend was assigned variance
+            recStart= 0;
+        }
 
+        long rc= Math.max(1, recCount);
+
+        Object odata;
+        boolean breakUp= ( ( varType == Variable.CDF_REAL4 ||varType == Variable.CDF_FLOAT ) && recCount*recSizeCount>10000000 && recInterval==1 );
+        if ( breakUp ) {
+            logger.info("breaking up into smaller reads to save memory");
+            odata= new float[(int)(recSizeCount*rc)];
+            long blockSize= Math.max( 20, 10000000 / recSizeCount ); // in records. target blockSize of 10Mb, but read in at least 20 recs each time.
+            int nread= (int)(rc/blockSize);
+            if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
+            mon.started();
+            mon.setTaskSize(nread+1);
+            for ( int i=0; i<nread; i++ ) {
+                mon.setTaskProgress(i);
+                CDFData cdfData= CDFData.get( variable, recStart + i*blockSize, blockSize, recInterval, dimIndeces, dimCounts, dimIntervals, false );
+                float[] odata1= (float[])cdfData.getRawData(); // this is my hack
+                System.arraycopy( odata1, 0, (float[])odata, (int)(recSizeCount*i*blockSize), (int)(recSizeCount*blockSize) );
+            }
+            // read the remainder
+            long nremain= rc - ( recStart + nread*blockSize );
+            if ( nremain>0 ) {
+                mon.setTaskProgress(nread);
+                CDFData cdfData= CDFData.get( variable, recStart + nread*blockSize, nremain, recInterval, dimIndeces, dimCounts, dimIntervals, false );
+                float[] odata1= (float[])cdfData.getRawData(); // this is my hack
+                System.arraycopy( odata1, 0, (float[])odata, (int)(recSizeCount*nread*blockSize), (int)(recSizeCount*nremain) );
+            }
+            mon.finished();
+        } else {
+            CDFData cdfData= CDFData.get( variable, recStart, rc, recInterval, dimIndeces, dimCounts, dimIntervals, false );
+            odata= cdfData.getRawData(); // this is my hack
+        }
         WritableDataSet result;
 
         if ( dims==0 ) dimSizes= new long[0]; // to simplify code
-
-        // bugfix? in cdf library, where majority has no effect on dimSizes.
-        if ( variable.getMyCDF().getMajority()==CDF.COLUMN_MAJOR  ) {
-            int n= dimSizes.length;
-            for ( int i=0; i<n/2; i++ ) {
-                long t= dimSizes[i];
-                dimSizes[i]= dimSizes[n-i-1];
-                dimSizes[n-i-1]= t;
-            }
-        }
 
         int[] qube;
         if ( recCount==-1 ) {
@@ -575,7 +598,9 @@ public class CdfUtil {
             }
             result = DDataSet.wrap((double[]) odata, qube);
             result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
-            result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
+            result.putProperty(QDataSet.VALID_MIN, 5.68025568E13 ); // 1800-01-01T00:00
+            result.putProperty(QDataSet.VALID_MAX, 6.94253376E13 ); // 2200-01-01T00:00
+            //result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
 
         } else if (varType == Variable.CDF_EPOCH16) {
             // adapt to das2 by translating to Units.us2000, which should be good enough.
@@ -683,25 +708,25 @@ public class CdfUtil {
         }
 
         if (rank == 1) {
-            if (varType == Variable.CDF_REAL4 || varType == Variable.CDF_FLOAT) {
+            if (varType == CDFConstants.CDF_REAL4 || varType == CDFConstants.CDF_FLOAT) {
                 result = FDataSet.wrap((float[]) odata);
 
-            } else if (varType == Variable.CDF_REAL8 || varType == Variable.CDF_DOUBLE) {
+            } else if (varType == CDFConstants.CDF_REAL8 || varType == CDFConstants.CDF_DOUBLE) {
                 result = DDataSet.wrap((double[]) odata);
 
-            } else if (varType == Variable.CDF_UINT4) {
+            } else if (varType == CDFConstants.CDF_UINT4) {
                 result = LDataSet.wrap((long[]) odata);
 
-            } else if (varType == Variable.CDF_INT4 || varType == Variable.CDF_UINT2) {
+            } else if (varType == CDFConstants.CDF_INT4 || varType == CDFConstants.CDF_UINT2) {
                 result = IDataSet.wrap((int[]) odata);
 
-            } else if (varType == Variable.CDF_INT2 || varType == Variable.CDF_UINT1) {
+            } else if (varType == CDFConstants.CDF_INT2 || varType == CDFConstants.CDF_UINT1) {
                 result = SDataSet.wrap((short[]) odata);
 
-            } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE) {
+            } else if (varType == CDFConstants.CDF_INT1 || varType == CDFConstants.CDF_BYTE) {
                 result = BDataSet.wrap((byte[]) odata);
 
-            } else if (varType == Variable.CDF_CHAR) {
+            } else if (varType == CDFConstants.CDF_CHAR) {
                 EnumerationUnits units = EnumerationUnits.create(variable.getName());
                 String[] sdata = (String[]) odata;
                 double[] back = new double[sdata.length];
@@ -711,12 +736,12 @@ public class CdfUtil {
                 result = DDataSet.wrap(back);
                 result.putProperty(QDataSet.UNITS, units);
 
-            } else if (varType == Variable.CDF_EPOCH) {
+            } else if (varType == CDFConstants.CDF_EPOCH) {
                 result = DDataSet.wrap((double[]) odata);
                 result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
                 result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
 
-            } else if (varType == Variable.CDF_EPOCH16) {
+            } else if (varType == CDFConstants.CDF_EPOCH16) {
                 // adapt to das2 by translating to Units.us2000, which should be good enough.
                 // note when this is not good enough, new units types can be introduced, along with conversions.
                 double[] data = (double[]) odata;
@@ -762,15 +787,20 @@ public class CdfUtil {
     public static Map<String, String> getPlottable(CDF cdf, boolean dataOnly, int rankLimit, boolean deep) throws CDFException {
 
         Map<String, String> result = new LinkedHashMap<String, String>();
+        Map<String, String> dependent= new LinkedHashMap<String, String>();
+
+        boolean isMaster= cdf.getName().contains("MASTERS"); // don't show of Epoch=0, just "Epoch"
 
         logger.fine("getting CDF variables");
         Vector v = cdf.getVariables();
-        logger.fine("got " + v.size() + " variables");
+        logger.log(Level.FINE, "got {0} variables", v.size());
 
         Attribute aAttr = null, bAttr = null, cAttr = null, dAttr = null;
 
         Attribute catDesc = null;
         Attribute varNotes= null;
+        Attribute virtual= null;
+        Attribute function= null;
 
         logger.fine("getting CDF attributes");
         try {
@@ -797,12 +827,23 @@ public class CdfUtil {
             varNotes= cdf.getAttribute("VAR_NOTES");
         } catch (CDFException e) {
         }
+        try {
+            virtual= cdf.getAttribute("VIRTUAL");
+        } catch (CDFException e) {
+        }
+        try {
+            function= cdf.getAttribute("FUNCTION");
+        } catch (CDFException e) {
+        }
 
         for (int i = 0; i < v.size(); i++) {
             Variable var = (Variable) v.get(i);
             if (var.getDataType() == Variable.CDF_CHAR) {
                 continue;
             }
+
+            List<String> warn= new ArrayList();
+
             long maxRec = var.getMaxWrittenRecord();
 
             int rank;
@@ -814,6 +855,31 @@ public class CdfUtil {
             }
 
             if (rank > rankLimit) {
+                continue;
+            }
+
+            boolean isVirtual= false;
+            if ( virtual!=null ) {
+                try {
+                    Entry entry = virtual.getEntry(var);
+                    if ( String.valueOf(entry.getData()).equals("TRUE") ) {
+                       String sfunction= String.valueOf( function.getEntry(var).getData() );
+                       if ( CdfVirtualVars.isSupported( sfunction ) ) {
+                            isVirtual= true;
+                       }
+                    }
+                } catch ( CDFException ex ) {
+                    //not a virtual variable
+                }
+            }
+
+            if ( maxRec==0 && ( dims==null || dims.length<1 || dims[0]==1 ) && !isVirtual ) {
+                logger.fine("skipping "+var.getName()+" because maxWrittenRecord is 0");
+                continue;
+            }
+
+            if ( var.getName().equals("Time_PB5") ) {
+                logger.fine("skipping "+var.getName()+" because we always skip Time_PB5");
                 continue;
             }
 
@@ -833,11 +899,29 @@ public class CdfUtil {
                 String svarNotes = null;
 
                 try {
+                    if ( virtual!=null ) {
+                        logger.fine("get attribute " + virtual.getName() + " entry for " + var.getName());
+                        Entry entry = virtual.getEntry(var);
+                        if ( String.valueOf(entry.getData()).equals("TRUE") ) {
+                            if ( !isVirtual ) { // maybe some virtual functions are not supported.
+                                continue;
+                            }
+                        }
+                    }
+                } catch (CDFException e) {
+                    //e.printStackTrace();
+                }
+                try {
                     if (aAttr != null) {  // check for metadata for DEPEND_0
                         logger.fine("get attribute " + aAttr.getName() + " entry for " + var.getName());
                         Entry xEntry = aAttr.getEntry(var);
                         xDependVariable = cdf.getVariable(String.valueOf(xEntry.getData()));
                         xMaxRec = xDependVariable.getMaxWrittenRecord();
+                        if ( xMaxRec!=maxRec ) {
+                            if ( maxRec==-1 ) maxRec+=1; //why?
+                            warn.add("depend0 length is inconsistent with length ("+maxRec+")" );
+                            //TODO: warnings are incorrect for Themis data.
+                        }
                     }
                 } catch (CDFException e) {
                     //e.printStackTrace();
@@ -852,6 +936,13 @@ public class CdfUtil {
                         yMaxRec = yDependVariable.getMaxWrittenRecord();
                         if (yMaxRec == 0) {
                             yMaxRec = yDependVariable.getDimSizes()[0] - 1;
+                        }
+                        if ( yDependVariable.getRecVariance() ) {
+                            //TODO: some sanity check here?
+                        } else {
+                            if ( dims.length>0 && (yMaxRec+1)!=dims[0] ) {
+                                warn.add("depend1 length is inconsistent with length ("+dims[0]+")" );
+                            }
                         }
                     }
                 } catch (CDFException e) {
@@ -906,7 +997,10 @@ public class CdfUtil {
 
                 String desc = "" + var.getName();
                 if (xDependVariable != null) {
-                    desc += "(" + xDependVariable.getName() + "=" + (xMaxRec + 1);
+                    desc += "(" + xDependVariable.getName();
+                    if ( xMaxRec>=0 || !isMaster ) { // small kludge for CDAWeb, where we expect masters to be empty.
+                         desc+= "=" + (xMaxRec + 1);
+                    }
                     if (yDependVariable != null) {
                         desc += "," + yDependVariable.getName() + "=" + (yMaxRec + 1);
                         if (zDependVariable != null) {
@@ -935,17 +1029,33 @@ public class CdfUtil {
                     if (svarNotes !=null ) {
                         descbuf.append("<br><p><small>" + svarNotes + "<small></p>");
                     }
+
+                    for ( String s: warn ) {
+                        descbuf.append("<br>WARNING: "+s);
+                    }
+                    
                     descbuf.append("</html>");
-                    result.put(var.getName(), descbuf.toString());
+                    if ( xDependVariable!=null ) {
+                        dependent.put(var.getName(), descbuf.toString());
+                    } else {
+                        result.put(var.getName(), descbuf.toString());
+                    }
                 } else {
-                    result.put(var.getName(), desc);
+                    if ( xDependVariable!=null ) {
+                        dependent.put(var.getName(), desc);
+                    } else {
+                        result.put(var.getName(), desc);
+                    }
                 }
 
             }
         } // for
 
         logger.fine("done, get plottable ");
-        return result;
+
+        dependent.putAll(result);
+
+        return dependent;
     }
 
     /**

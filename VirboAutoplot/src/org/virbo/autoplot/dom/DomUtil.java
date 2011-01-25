@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.das2.beans.BeansUtil;
@@ -22,6 +23,7 @@ import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.system.MutatorLock;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Converter;
 
@@ -56,14 +58,14 @@ public class DomUtil {
     }
 
     /**
-     * return a list of nodes (panels and dataSourceFilters) that use the DataSourceFilter.
+     * return a list of nodes (plotElements and dataSourceFilters) that use the DataSourceFilter.
      * @param app
      * @param plotId
      * @return
      */
     static List<DomNode> dataSourceUsages(Application app, String id) {
         List<DomNode> result = new ArrayList<DomNode>();
-        for (Panel p : app.getPanels()) {
+        for (PlotElement p : app.getPlotElements()) {
             if (p.getDataSourceFilterId().equals(id)) {
                 result.add(p);
             }
@@ -141,7 +143,7 @@ public class DomUtil {
             iprop++;
         }
 
-        if ( result==null ) throw new IllegalArgumentException( "unable to find property \""+propertyName+"\" in "+node );
+        if ( !setit && result==null ) throw new IllegalArgumentException( "unable to find property \""+propertyName+"\" in "+node );
         return result;
     }
 
@@ -535,21 +537,120 @@ public class DomUtil {
     };
 
     /**
-     * returns true if all the panels are a parent and its children.
-     * @param panels
+     * returns true if all the plotElements are a parent and its children.
+     * @param elementsIn
      * @return
      */
-    public static boolean oneFamily( List<Panel> panelsIn ) {
-        if ( panelsIn.size()==0 ) return false;
-        List<Panel> panels= new ArrayList(panelsIn);
-        Panel p= panels.get(0);
-        if ( p.getController().getParentPanel()!=null ) {
-            p= p.getController().getParentPanel();
+    public static boolean oneFamily( List<PlotElement> elementsIn ) {
+        if ( elementsIn.size()==0 ) return false;
+        List<PlotElement> elements= new ArrayList(elementsIn);
+        PlotElement pe= elements.get(0);
+        if ( pe.getController().getParentPlotElement()!=null ) {
+            pe= pe.getController().getParentPlotElement();
         }
-        panels.remove(p);
-        panels.removeAll( p.getController().getChildPanels() );
+        elements.remove(pe);
+        elements.removeAll( pe.getController().getChildPlotElements() );
 
-        if ( panels.size()==0 ) return true; else return false;
+        if ( elements.size()==0 ) return true; else return false;
 
+    }
+
+    /**
+     * returns true if the dom is valid, throws a runtime exception otherwise
+     * @param dom
+     * @return
+     */
+    public static boolean validateDom( Application application, List<String> problems ) {
+
+        Lock lock=null;
+
+        if ( application.getController()!=null ) {
+           lock= application.getController().mutatorLock();
+           lock.lock();
+        }
+
+        try {
+            for ( int i=0; i<application.getBindings().length; i++ ) {
+                BindingModel b= application.getBindings(i);
+                if ( getElementById( application, b.getSrcId() )==null ) {
+                    problems.add("unable to find source "+b.getSrcId()+" for binding "+i );
+                }
+                if ( getElementById( application, b.getDstId() )==null ) {
+                    problems.add("unable to find dest "+b.getSrcId()+" for binding "+i );
+                }
+            }
+
+            for ( int i=0; i<application.getDataSourceFilters().length; i++ ) {
+                DataSourceFilter dsf= application.getDataSourceFilters(i);
+                String uri= dsf.getUri();
+                if ( uri==null ) continue;
+                if ( uri.startsWith("vap+internal:") && uri.length()>13 ) {
+                    String[] dep= uri.substring(13).split(",");
+                    for ( int j=0; j<dep.length; j++ ) {
+                        if ( getElementById( application,dep[j])==null )
+                            problems.add("unable to find dsf "+dep[j]+" for dsf "+dsf.getId() );
+                    }
+                }
+            }
+
+            for ( int i=0; i<application.getPlotElements().length; i++ ) {
+                PlotElement p= application.getPlotElements(i);
+                if ( getElementById(application, p.getPlotId() )==null )
+                    problems.add("unable to find plot "+p.getPlotId()+" for plot element "+p.getId() );
+                if ( getElementById(application, p.getDataSourceFilterId() )==null )
+                    problems.add("unable to find data "+p.getDataSourceFilterId()+" for plot element "+p.getId());
+            }
+
+
+            for ( int i=0; i<application.getPlots().length; i++ ) {
+                Plot p= application.getPlots(i);
+                if ( getElementById(application, p.getRowId() )==null )
+                    problems.add("unable to find row "+p.getRowId()+" for plot "+p.getId() );
+                if ( getElementById(application, p.getColumnId() )==null )
+                    problems.add("unable to find column "+p.getColumnId()+" for plot  "+p.getId());
+            }
+
+        } finally {
+            if ( lock!=null ) {
+                lock.unlock();
+            }
+        }
+        
+        return problems.size()==0;
+    }
+
+    /**
+     * returns true if the dom structure changes.  For example the number of
+     * plotElements changes, then this returns true.  If only the range of
+     * an axis changes, then return false;
+     * 
+     * @param dom
+     * @param state
+     * @return true if the dom structure changes.
+     */
+    public static boolean structureChanges(Application dom, Application state) {
+        if ( dom.bindings.size()!=state.bindings.size() ) return true;
+        if ( dom.connectors.size()!=state.connectors.size() ) return true;
+        if ( dom.dataSourceFilters.size()!=state.dataSourceFilters.size() ) return true;
+        if ( dom.plots.size()!=state.plots.size() ) return true;
+        if ( dom.plotElements.size()!=state.plotElements.size() ) return true;
+        return false;
+    }
+
+    /**
+     * This does not use controllers.
+     * @param application
+     * @param plot
+     * @return
+     */
+    public static List<PlotElement> getPlotElementsFor( Application application, Plot plot ) {
+        String id = plot.getId();
+        List<PlotElement> result = new ArrayList<PlotElement>();
+        for (PlotElement p : application.getPlotElements()) {
+            if (p.getPlotId().equals(id)) {
+                result.add(p);
+            }
+        }
+        return result;
     }
 }

@@ -13,7 +13,7 @@ import org.virbo.autoplot.*;
  * @author jbf
  */
 public class Test003 {
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
 
         boolean headless= true;
 
@@ -25,25 +25,25 @@ public class Test003 {
             ScriptContext.getDocumentModel().getCanvases(0).setFitted(false);
             ScriptContext.setCanvasSize( 800, 600 );
             
-            ScriptContext.load( "file:///home/jbf/ct/lanl/hudson/geo_pitch_stack_test1_local.vap" );
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/geo_pitch_stack_test1_local_1.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_001.png" );
 
             ScriptContext.reset();
             
-            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/contextOverview2.vap" );
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/contextOverview2_v1.03a.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_002.png" );
 
             ScriptContext.reset();
 
-            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_3.vap" );
+            ScriptContext.load( "file:///home/jbf/ct/hudson/vap/lanl_97A_sopa_panel_slices_3_v1.03a.vap" );
             ScriptContext.setCanvasSize( 800, 600 );
             ScriptContext.writeToPng( "test003_003.png" );
 
             if ( headless ) System.exit(0);
             
-        } catch ( RuntimeException ex ) {
+        } catch ( Exception ex ) {
             ex.printStackTrace();
             if ( headless ) System.exit(1);
         }

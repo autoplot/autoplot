@@ -18,6 +18,8 @@ if [ "" = "$JAVA_HOME" ]; then
     JAVA_HOME=/usr/local/jdk1.5.0_17/
 fi
 
+echo "\${AP_VERSION}=${AP_VERSION}"
+
 JAVAC=$JAVA_HOME/bin/javac
 JAR=$JAVA_HOME/bin/jar
 
@@ -52,15 +54,18 @@ echo "done copy jar file classes."
 
 echo "copy sources..."
 for i in \
-  QDataSet QStream dasCore DataSource \
+  dasCore dasCoreUtil dasCoreDatum \
+  QDataSet QStream  DataSource \
   JythonSupport \
+  AutoplotHelp \
   IdlMatlabSupport \
   AudioSystemDataSource \
   BinaryDataSource DataSourcePack JythonDataSource \
   Das2ServerDataSource TsdsDataSource  \
-  NetCdfDataSource CdfDataSource CefDataSource \
+  NetCdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
+  CdfDataSource CdfJavaDataSource CDAWebDataSource \
   VirboAutoplot; do
     echo rsync -a --exclude .svn ../${i}/src/ temp-src/
     rsync -a --exclude .svn ../${i}/src/ temp-src/
@@ -71,48 +76,38 @@ echo "done copy sources"
 
 echo "special handling of META-INF stuff..."
 
+#TODO: check for end-of-lines on each entry.
+
 file=org.virbo.datasource.DataSourceFactory.extensions
-touch temp-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-classes/META-INF/$file
-done
+sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
 file=org.virbo.datasource.DataSourceFactory.mimeTypes
-touch temp-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-classes/META-INF/$file
-done
+sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
 file=org.virbo.datasource.DataSourceFormat.extensions
-touch temp-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-classes/META-INF/$file
-done
+sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
 file=org.virbo.datasource.DataSourceEditorPanel.extensions
-touch temp-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-classes/META-INF/$file
-done
+sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
 file=helpsets.txt
-touch temp-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-classes/META-INF/$file
-done
+sed -n p ../*/src/META-INF/$file > temp-classes/META-INF/$file
 
-echo "Main-Class: org.virbo.autoplot.AutoPlotUI" > temp-src/MANIFEST.MF
+echo "Main-Class: org.virbo.autoplot.AutoplotUI" > temp-src/MANIFEST.MF
 
 # remove signatures
 rm temp-classes/META-INF/*.RSA
+rm temp-classes/META-INF/*.DSA
 rm temp-classes/META-INF/*.SF
+
+cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-classes/META-INF/build.txt
 
 # end, special handling of the META-INF stuff.
 echo "done special handling of META-INF stuff."
 
 echo "copy resources..."
 cd temp-src
-for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' ); do
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.xsl' -o -name '*.xsd' ); do
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
@@ -121,8 +116,10 @@ echo "done copy resources."
 
 echo "copy help files..."
 for i in \
-  QDataSet QStream dasCore DataSource \
+  dasCore dasCoreUtil dasCoreDatum \
+  QDataSet QStream DataSource \
   JythonSupport \
+  AutoplotHelp \
   IdlMatlabSupport \
   AudioSystemDataSource \
   BinaryDataSource DataSourcePack JythonDataSource \
@@ -131,8 +128,10 @@ for i in \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
   VirboAutoplot; do
-    echo rsync -a --exclude .svn ../${i}/javahelp/ temp-classes/
-    rsync -a --exclude .svn ../${i}/javahelp/ temp-classes/
+    if [ -d ../${i}/javahelp/ ]; then
+        echo rsync -av --exclude .svn ../${i}/javahelp/ temp-classes/
+        rsync -av --exclude .svn ../${i}/javahelp/ temp-classes/
+    fi
 done
 
 echo "done copy help files."
@@ -142,32 +141,37 @@ hasErrors=0
 # compile key java classes.
 echo "compile sources..."
 cd temp-src
-if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoPlotUI.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotHelpViewer.java; then hasErrors=1; fi
-if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
 
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
-   if ! $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
+   if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFormat.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
-   if ! $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
+   if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1
 for i in `cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceEditorPanel.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
-   echo $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
-   if ! $JAVAC -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
+   echo $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java
+   if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 
-# NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
-if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+## NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
+#if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+#
 
 cd ..
 echo "done compile sources."
@@ -177,19 +181,15 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 
+echo "setting version to \${AP_VERSION}=${AP_VERSION} in build.tag"
+cat temp-classes/META-INF/build.txt | sed "s/build.tag:/build.tag: ${AP_VERSION}/g" > temp-classes/META-INF/build.txt.1
+mv temp-classes/META-INF/build.txt.1 temp-classes/META-INF/build.txt
+
 echo "make jumbo jar file..."
 cd temp-classes
-
 mkdir -p ../dist/
 $JAR cmf ../temp-src/MANIFEST.MF ../dist/AutoplotAll.jar *
 cd ..
-echo "done make jumbo jar file..."
 
-# Progaurd stuff on hold for now:
-# 
-#echo "proguard/pack200 stuff..."
-##proguard is compiled for Java 6.  This needs to be fixed.
-#$JAVA6_HOME/bin/java -jar ../APLibs/lib/proguard.jar @apApplicationAll.proguard
-#$JAVA6_HOME/bin/pack200 dist/AutoplotAll.pro.jar.pack.gz dist/AutoplotAll.pro.jar
-#echo "done proguard/pack200 stuff."
+echo "done make jumbo jar file..."
 

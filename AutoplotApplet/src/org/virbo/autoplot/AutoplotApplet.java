@@ -18,6 +18,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -48,7 +49,7 @@ import org.das2.event.CrossHairRenderer;
 import org.das2.event.MouseModule;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
-import org.das2.system.ExceptionHandler;
+import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
@@ -57,6 +58,7 @@ import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.dom.Canvas;
 import org.virbo.autoplot.dom.Diff;
 import org.virbo.autoplot.dom.DomUtil;
 import org.virbo.autoplot.dom.Plot;
@@ -345,6 +347,41 @@ public class AutoplotApplet extends JApplet {
         setInitializationStatus("readParameters");
         System.err.println("done readParameters @ " + (System.currentTimeMillis() - t0) + " msec");
 
+        String vap = getParameter("vap");
+        if (vap != null) {
+            InputStream in = null;
+            try {
+
+                URL url= new URL(vap);
+                System.err.println("load vap "+url+" @ " + (System.currentTimeMillis() - t0) + " msec");
+
+                in = url.openStream();
+
+                System.err.println("open vap stream "+url+" @ " + (System.currentTimeMillis() - t0) + " msec");
+
+                appmodel.doOpen(in, null);
+                System.err.println("done open vap @ " + (System.currentTimeMillis() - t0) + " msec");
+                
+                appmodel.waitUntilIdle(false);
+                System.err.println("done load vap and waitUntilIdle @ " + (System.currentTimeMillis() - t0) + " msec");
+                Canvas cc= appmodel.getDocumentModel().getCanvases(0);
+                System.err.println("vap height, width= " + cc.getHeight() + ","+ cc.getWidth() );
+                width= getIntParameter( "width", cc.getWidth() );
+                height= getIntParameter( "height", cc.getHeight() );
+                System.err.println("output height, width= " + width + ","+ height );
+            } catch ( InterruptedException ex ) {
+                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch ( IOException ex) {
+                Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+            } finally {
+                try {
+                    in.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+
         //     appmodel.getCanvas().setVisible(false);
         appmodel.getCanvas().setSize(width, height);
         appmodel.getCanvas().revalidate();
@@ -401,8 +438,6 @@ public class AutoplotApplet extends JApplet {
         });
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item); */
 
-        //if (vap != null) appmodel.doOpen(new File(vap));
-
         if (sforegroundColor != null && !sforegroundColor.equals("")) {
             appmodel.canvas.setForeground(Color.decode(sforegroundColor));
         }
@@ -419,7 +454,7 @@ public class AutoplotApplet extends JApplet {
 
         String surl = getParameter("url");
         String process = getStringParameter("process", "");
-        //String vap = getParameter("vap");
+
         String script = getStringParameter("script", "");
 
         if (surl == null) {
@@ -556,7 +591,7 @@ public class AutoplotApplet extends JApplet {
         if (srenderType != null && !srenderType.equals("")) {
             try {
                 RenderType renderType = RenderType.valueOf(srenderType);
-                dom.getController().getPanel().setRenderType(renderType);
+                dom.getController().getPlotElement().setRenderType(renderType);
             } catch (IllegalArgumentException ex) {
                 ex.printStackTrace();
             }
@@ -566,7 +601,7 @@ public class AutoplotApplet extends JApplet {
 
         if (!scolor.equals("")) {
             try {
-                dom.getController().getPanel().getStyle().setColor(Color.decode(scolor));
+                dom.getController().getPlotElement().getStyle().setColor(Color.decode(scolor));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -574,7 +609,7 @@ public class AutoplotApplet extends JApplet {
 
         if (!sfillColor.equals("")) {
             try {
-                dom.getController().getPanel().getStyle().setFillColor(Color.decode(sfillColor));
+                dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColor));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -903,7 +938,7 @@ public class AutoplotApplet extends JApplet {
         Plot domPlot = dom.getPlots(0);
         if (t) {
             ApplicationController controller = dom.getController();
-            Plot that = controller.copyPlotAndPanels(domPlot, null, false, false);
+            Plot that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
             that.setTitle("");
             controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
             controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
@@ -913,7 +948,7 @@ public class AutoplotApplet extends JApplet {
             dom.getCanvases(0).getRows(1).setTop("60%+2em");
         } else {
             ApplicationController controller = dom.getController();
-            controller.deletePanel(dom.getPanels(1));
+            controller.deletePlotElement(dom.getPlotElements(1));
             controller.deletePlot(dom.getPlots(1));
         }
         overviewMenuItem.setSelected(t);

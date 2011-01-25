@@ -8,11 +8,12 @@
 package ftpfs;
 
 import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.filesystem.*;
 import ftpfs.ftp.FtpBean;
 import ftpfs.ftp.FtpException;
-import ftpfs.ftp.FtpListResult;
 import ftpfs.ftp.FtpObserver;
 import java.io.BufferedReader;
 import java.io.File;
@@ -35,23 +36,53 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import org.das2.util.monitor.CancelledOperationException;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.das2.system.MutatorLock;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
- *
+ * Alternate implementation of FTP that was originally introduced when the
+ * built-in-ftp-based that comes with das2 didn't work.  This also provides
+ * an upload capability.
+ * 
  * @author Jeremy
  */
 public class FTPBeanFileSystem extends WebFileSystem {
 
-    FTPBeanFileSystem(URI root) {
-        super(root, localRoot(root));
+    FTPBeanFileSystem(URI root) throws FileSystemOfflineException {
+        super(root, userLocalRoot(root) );
+        try {
+            this.listDirectory("/"); // list the root to see if it is offline.
+        } catch (IOException ex) {
+            //TODO: how to distinguist UnknownHostException to be offline?  avoid firing an event until I come up with a way.
+            this.offline= true;
+        }
+        
+    }
+
+    private static File userLocalRoot( URI root ) {
+        File local = FileSystem.settings().getLocalCacheDir();
+
+        String userInfo= root.getUserInfo();
+        if ( userInfo!=null && userInfo.contains(":") ) {
+            userInfo= userInfo.substring(0,userInfo.indexOf(':') );
+        }
+
+        String s = root.getScheme() + "/" 
+                + ( (userInfo!=null ) ? userInfo + "@" : "" )
+                + root.getHost() + "/" + root.getPath(); 
+
+        local = new File(local, s);
+
+        local.mkdirs();
+        return local;
+
     }
 
     /* dumb method looks for / in parent directory's listing */
-    public boolean isDirectory(String filename) {
+    public boolean isDirectory(String filename) throws IOException {
         File f = new File(localRoot, filename);
         if (f.exists()) {
             return f.isDirectory();
@@ -140,14 +171,14 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                 if (types.indexOf(type) != -1) {
                     int i = aline.lastIndexOf(' ');
-                    String name = aline.substring(i + 1);
-                    long size = 0;
+                    //String name = aline.substring(i + 1);
+                    //long size = 0;
                     //try {
                     //size= Long.parseLong( aline.substring( 31, 31+11 ) ); // tested on: linux server
                     //} catch ( NumberFormatException e ) {
                     //}
 
-                    boolean isFolder = type == 'd';
+                    //boolean isFolder = type == 'd';
 
                     DirectoryEntry item = new DirectoryEntry();
                     item.name = aline.substring(i + 1);
@@ -161,7 +192,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                     result.add(item);
 
-                //sumSize= sumSize + size;
+                    //sumSize= sumSize + size;
 
                 }
 
@@ -180,9 +211,17 @@ public class FTPBeanFileSystem extends WebFileSystem {
         return (DirectoryEntry[]) result.toArray(new DirectoryEntry[result.size()]);
     }
 
+    protected void resetListCache( String directory ) {
+        directory = toCanonicalFolderName(directory);
+
+        String[] result= listings.remove(directory);
+        new File(localRoot, directory + ".listing").delete();
+        
+    }
+
     Map<String,String[]> listings= Collections.synchronizedMap( new HashMap() );
 
-    public synchronized String[] listDirectory(String directory) {
+    public synchronized String[] listDirectory(String directory) throws IOException {
         directory = toCanonicalFolderName(directory);
 
         String[] result= listings.get(directory);
@@ -190,74 +229,115 @@ public class FTPBeanFileSystem extends WebFileSystem {
             logger.fine("using cached listing for "+directory);
             return result;
         }
-        
-        try {
-            new File(localRoot, directory).mkdirs();
-            File listing = new File(localRoot, directory + ".listing");
-            if (!listing.canRead()) {
 
-                FtpBean bean = new FtpBean();
-                try {
-                    String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
-                    if ( userInfo!=null ) {
-                        String[] userHostArr= userInfo.split(":");
-                        bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
-                        String cwd= bean.getDirectory();
-                        bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
-                    } else {
-                        bean.ftpConnect(getRootURL().getHost(), "ftp");
-                        String cwd= bean.getDirectory();
-                        bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1));
-                    }
-                } catch (NullPointerException ex) {
-                    throw new IOException("Unable to make connection to " + getRootURL().getHost());
-                }
+        boolean successOrCancel= false;
 
-                FtpObserver observer = new FtpObserver() {
-
-                    int totalBytes = 0;
-
-                    public void byteRead(int bytes) {
-                        totalBytes += bytes;
-                    //mon.setTaskProgress( totalBytes );
-                    }
-
-                    public void byteWrite(int bytes) {
-                        totalBytes += bytes;
-                    //mon.setTaskProgress( totalBytes );
-                    }
-                };
-
-                String ss = bean.getDirectoryContentAsString();
-                FileWriter fw = new FileWriter(listing);
-                fw.write(ss);
-                fw.close();
-
-            }
-            listing.deleteOnExit();
-
-            DirectoryEntry[] des = parseLsl(directory, listing);
-            result = new String[des.length];
-            for (int i = 0; i < des.length; i++) {
-                result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
-            }
-            listings.put(directory, result);
-            return result;
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (FtpException e) {
-            return new String[]{""};
+        if ( this.isOffline() ) {
+            File f= new File(localRoot, directory);
+            if ( !f.exists() ) throw new FileSystemOfflineException("unable to list "+f+" when offline");
+            String[] listing = f.list();
+            return listing;
         }
+        while ( !successOrCancel ) {
+            try {
+                new File(localRoot, directory).mkdirs();
+                File listing = new File(localRoot, directory + ".listing");
+                if (!listing.canRead()) {
+
+                    FtpBean bean = new FtpBean();
+                    try {
+                        String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
+                        if ( userInfo!=null ) {
+                            String[] userHostArr= userInfo.split(":");
+                            if ( userHostArr.length==1 ) {
+                                return new String[] { "not logged in" };
+                            }
+                            bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
+                        } else {
+                            bean.ftpConnect(getRootURL().getHost(), "ftp");
+                        }
+                        String cwd= bean.getDirectory(); // URI should not contain remote root.  // will allow for this.
+                        bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
+
+                    } catch (NullPointerException ex) {
+                        throw new IOException("Unable to make connection to " + getRootURL().getHost());
+                    } catch (CancelledOperationException ex ) {
+                        successOrCancel= true;
+                        continue;
+                    }
+
+                    FtpObserver observer = new FtpObserver() {
+                        int totalBytes = 0;
+                        public void byteRead(int bytes) {
+                            totalBytes += bytes;
+                        }
+                        public void byteWrite(int bytes) {
+                            totalBytes += bytes;
+                        }
+                    };
+
+                    String ss = bean.getDirectoryContentAsString();
+                    FileWriter fw = new FileWriter(listing);
+                    fw.write(ss);
+                    fw.close();
+
+                }
+                listing.deleteOnExit();
+                successOrCancel= true;
+                
+                DirectoryEntry[] des = parseLsl(directory, listing);
+                result = new String[des.length];
+                for (int i = 0; i < des.length; i++) {
+                    result[i] = des[i].name + (des[i].type == 'd' ? "/" : "");
+                }
+                listings.put(directory, result);
+                return result;
+            } catch (FtpException e) {
+                if ( e.getMessage().startsWith("530" ) ) { // invalid login
+                    KeyChain.getDefault().clearUserPassword(getRootURL());
+                    // loop for them to try again.
+                } else {
+                    throw new IOException(e.getMessage()); //JAVA5
+                }
+            }
+        }
+        return( new String[] { "should not get here" } ); // we should not be able to reach this point
     }
 
-    public String[] listDirectoryOld(String directory) {
-        try {
-            directory = toCanonicalFolderName(directory);
+    protected void uploadFile( String filename, File srcFile, final ProgressMonitor mon ) throws IOException {
+        logger.fine("ftpfs uploadFile(" + filename + ")");
 
+        FileOutputStream out = null;
+        InputStream is = null;
+        
+        filename = toCanonicalFilename(filename);
+        URL url = new URL(getRootURL(), filename.substring(1));
+
+        String[] ss = FileSystem.splitUrl(url.toString());
+
+        try {
             FtpBean bean = new FtpBean();
-            bean.ftpConnect(getRootURL().getHost(), "ftp");
-            bean.setDirectory(getRootURL().getPath() + directory.substring(1));
+
+            String fname= ss[2].substring(ss[1].length()); // the name within the filesystem
+
+            String userInfo= KeyChain.getDefault().getUserInfo(getRootURL());
+            if ( userInfo!=null ) {
+                String[] userHostArr= userInfo.split(":");
+                bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
+            } else {
+                bean.ftpConnect(getRootURL().getHost(), "ftp");
+            }
+            
+            String cwd= bean.getDirectory();
+            bean.setDirectory( cwd + fname );
+
+            String lfilename= ss[3].substring(ss[2].length());
+
+            long size = srcFile.length();
+
+            mon.setTaskSize(size);
+            mon.started();
+            final long t0 = System.currentTimeMillis();
 
             FtpObserver observer = new FtpObserver() {
 
@@ -265,38 +345,55 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
                 public void byteRead(int bytes) {
                     totalBytes += bytes;
-                //mon.setTaskProgress( totalBytes );
+                    if (mon.isCancelled()) {
+                        throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
+                    }
+                    long dt = System.currentTimeMillis() - t0;
+                    mon.setTaskProgress(totalBytes);
+                    mon.setProgressMessage(totalBytes / 1000 + "KB read at " + (totalBytes / dt) + " KB/sec");
+
                 }
 
                 public void byteWrite(int bytes) {
                     totalBytes += bytes;
-                //mon.setTaskProgress( totalBytes );
+                    mon.setTaskProgress(totalBytes);
+                    if (mon.isCancelled()) {
+                        throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
+                    }
+                    long dt = System.currentTimeMillis() - t0;
+                    mon.setTaskProgress(totalBytes);
+                    mon.setProgressMessage(totalBytes / 1000 + "KB written at " + (totalBytes / dt) + " KB/sec");
                 }
             };
 
-            String ss = bean.getDirectoryContentAsString();
+            bean.putBinaryFile( srcFile.getAbsolutePath(), lfilename, observer );
 
-            FtpListResult list = bean.getDirectoryContent();
+            // update the local cache
+            FtpFileObject fo= (FtpFileObject)getFileObject(filename);
+            resetListCache( fo.getParent().getNameExt() );
+            listDirectory( fo.getParent().getNameExt() );
+            bean.close();
 
-            ArrayList result = new ArrayList();
-
-            while (list.next()) {
-                String s = list.getName();
-                result.add(s);
+        } catch (RuntimeException ex) {
+            ex.printStackTrace();
+            if (ex.getCause() instanceof IOException) {
+                throw (IOException) ex.getCause();
+            } else {
+                throw new IOException(ex.toString());
             }
+        } catch (FtpException ex) {
+            throw new IOException(ex.getMessage());
 
-            return (String[]) result.toArray(new String[result.size()]);
-        } catch (IOException e) {
-            return new String[]{""};
-        } catch (FtpException e) {
-            return new String[]{""};
+        } catch ( CancelledOperationException ex ) {
+            throw new IOException(ex.getMessage());
         }
+
 
     }
 
     protected void downloadFile( String filename, File targetFile, File partFile, final ProgressMonitor mon) throws java.io.IOException {
 
-        MutatorLock lock= getDownloadLock( filename, targetFile, mon );
+        Lock lock= getDownloadLock( filename, targetFile, mon );
 
         if ( lock==null ) return;
 
@@ -371,7 +468,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
             } catch (FtpException ex) {
                 throw new IOException(ex.getMessage());
 
+            } catch ( CancelledOperationException ex ) {
+                throw new IOException(ex.getMessage());
             }
+
             if (copyFile(partFile, targetFile)) {
                 partFile.delete();
             }
@@ -396,5 +496,52 @@ public class FTPBeanFileSystem extends WebFileSystem {
     @Override
     public FileObject getFileObject(String filename) {
         return new FtpFileObject(this, filename, new Date(System.currentTimeMillis()));
+    }
+
+    boolean delete(FtpFileObject aThis) throws IOException {
+        FtpBean bean = new FtpBean();
+
+        String userInfo;
+        try {
+            userInfo = KeyChain.getDefault().getUserInfo(getRootURL());
+        } catch (CancelledOperationException ex) {
+            IOException result= new IOException(ex.toString());
+            throw result; // I'd expect we would have hit an IOException already.
+        }
+
+        String filename = toCanonicalFilename(aThis.getNameExt() );
+        URL url = new URL(getRootURL(), filename.substring(1));
+
+        String[] ss = FileSystem.splitUrl(url.toString());
+
+        try {
+            if (userInfo != null) {
+                String[] userHostArr = userInfo.split(":");
+                bean.ftpConnect(getRootURL().getHost(), userHostArr[0], userHostArr[1]);
+                String cwd = bean.getDirectory();
+                bean.setDirectory(cwd + ss[2].substring(ss[1].length()));
+            } else {
+                bean.ftpConnect(getRootURL().getHost(), "ftp");
+                String cwd = bean.getDirectory();
+                bean.setDirectory(cwd + ss[2].substring(ss[1].length()));
+            }
+            bean.fileDelete(ss[3].substring(ss[2].length()));
+            bean.close();
+            return true;
+        } catch (IOException iOException) {
+            try {
+                bean.close();
+            } catch (FtpException ex) {
+                Logger.getLogger(FTPBeanFileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return false;
+        } catch (FtpException ftpException) {
+            try {
+                bean.close();
+            } catch (FtpException ex) {
+                Logger.getLogger(FTPBeanFileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return false;
+        }
     }
 }

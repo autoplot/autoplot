@@ -22,7 +22,7 @@ if (1)
     classpath = regexprep(jars,'.jar',['.jar',sep]);
     classpath = [classpath,'VirboAutoplot.jar'];
     com = [javahome,' -cp ',classpath,...
-	   ' org.virbo.autoplot.AutoPlotUI --port=',num2str(port),' &']
+	   ' org.virbo.autoplot.AutoplotUI --port=',num2str(port),' &']
     system(com);
 
     fid = fopen('applot.bin','w');

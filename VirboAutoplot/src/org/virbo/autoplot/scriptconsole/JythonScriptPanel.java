@@ -136,7 +136,27 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 applicationController.setStatus(JythonCompletionProvider.getInstance().getMessage());
             }
         });
-        
+
+        support.addPropertyChangeListener(support.PROP_INTERRUPTABLE,new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getNewValue()==null ) {
+                    //interruptButton.setIcon(
+                    //        new javax.swing.ImageIcon(
+                    //        getClass().getResource(
+                    //        "/org/virbo/autoplot/resources/stop-icon-disabled.png")) );
+                    interruptButton.setEnabled(false);
+                    savePlotButton.setEnabled(true);
+                } else {
+                    //interruptButton.setIcon(
+                    //        new javax.swing.ImageIcon(
+                    //        getClass().getResource(
+                    //        "/org/virbo/autoplot/resources/stop-icon.png")) );
+                    interruptButton.setEnabled(true);
+                    savePlotButton.setEnabled(false);
+                }
+            }
+        } );
+
         CompletionImpl impl = CompletionImpl.get();
         impl.startPopup(this.textArea);
 
@@ -156,14 +176,11 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     protected void updateStatus() {
         if ( filename==null ) {
-            fileNameLabel.setText( "" + ( dirty ? " *" : "" ));
+            fileNameTextField.setText( "" + ( dirty ? " *" : "" ));
         } else {
-            File file= new File(filename);
-            getEditorPanel().setEditable(file.canWrite());
-            if ( file.canWrite()==false ) {
-                System.err.println("help!");
-            }
-            fileNameLabel.setText( filename + ( file.canWrite() ? "" : " (read only)" ) + ( dirty ? " *" : "" ) ) ;
+            File lfile= new File(filename);
+            getEditorPanel().setEditable(lfile.canWrite());
+            fileNameTextField.setText( filename + ( lfile.canWrite() ? "" : " (read only)" ) + ( dirty ? " *" : "" ) ) ;
         }
     }
 
@@ -193,6 +210,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     interp.set("monitor", new NullProgressMonitor());
                     interp.set("params", new PyDictionary());
                     interp.set("resourceURI", Py.None );
+                    interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
+
                     return interp;
                 }
             });
@@ -212,13 +231,15 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         savePlotButton = new javax.swing.JButton();
         saveAsButton = new javax.swing.JButton();
         openButton = new javax.swing.JButton();
-        fileNameLabel = new javax.swing.JLabel();
         contextSelector = new javax.swing.JComboBox();
         caretPositionLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
+        newScriptButton = new javax.swing.JButton();
+        interruptButton = new javax.swing.JButton();
+        fileNameTextField = new javax.swing.JTextField();
 
-        textArea.setFont(new java.awt.Font("Monospaced", 0, 13)); // NOI18N
+        textArea.setFont(new java.awt.Font("Monospaced", 0, 13));
         textArea.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 textAreaFocusGained(evt);
@@ -227,29 +248,32 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(textArea);
 
         savePlotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/go.png"))); // NOI18N
-        savePlotButton.setText("execute");
+        savePlotButton.setText("Execute");
+        savePlotButton.setToolTipText("Execute script.  Ctrl modifier attempts to trace program location.  ");
         savePlotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 savePlotButtonActionPerformed(evt);
             }
         });
 
-        saveAsButton.setText("save as...");
+        saveAsButton.setText("Save As...");
+        saveAsButton.setToolTipText("Save the buffer to a local file.");
         saveAsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveAsButtonActionPerformed(evt);
             }
         });
 
-        openButton.setText("open...");
+        openButton.setText("Open...");
+        openButton.setToolTipText("Open the local file to the buffer.");
         openButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 openButtonActionPerformed(evt);
             }
         });
 
-        contextSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "application context", "data source context" }));
-        contextSelector.setToolTipText("select the context for the script: to create new datasets, or to control an application.");
+        contextSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Application Context", "Data Source Context" }));
+        contextSelector.setToolTipText("<html>select the context for the script: to create new datasets (data source context), or to control an application (application context)</html>\n");
         contextSelector.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 contextSelectorActionPerformed(evt);
@@ -261,6 +285,28 @@ public class JythonScriptPanel extends javax.swing.JPanel {
         jPanel1.setLayout(new java.awt.BorderLayout());
         jScrollPane2.setViewportView(jPanel1);
 
+        newScriptButton.setText("New");
+        newScriptButton.setToolTipText("Reset the buffer to a new file.");
+        newScriptButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                newScriptButtonActionPerformed(evt);
+            }
+        });
+
+        interruptButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/stop.png"))); // NOI18N
+        interruptButton.setText("Stop");
+        interruptButton.setToolTipText("Interrupt running script");
+        interruptButton.setEnabled(false);
+        interruptButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                interruptButtonActionPerformed(evt);
+            }
+        });
+
+        fileNameTextField.setEditable(false);
+        fileNameTextField.setFont(fileNameTextField.getFont().deriveFont(fileNameTextField.getFont().getSize()-2f));
+        fileNameTextField.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -268,37 +314,40 @@ public class JythonScriptPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .add(savePlotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 124, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(interruptButton)
+                .add(7, 7, 7)
                 .add(saveAsButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(openButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 89, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(newScriptButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 44, Short.MAX_VALUE)
                 .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
+                .add(fileNameTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 87, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 511, Short.MAX_VALUE)
+                .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 81, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(savePlotButton)
+                    .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(saveAsButton)
                     .add(openButton)
-                    .add(contextSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(newScriptButton)
+                    .add(interruptButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(caretPositionLabel)
-                    .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 18, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(fileNameTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
 
-        layout.linkSize(new java.awt.Component[] {openButton, saveAsButton, savePlotButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
-
-        layout.linkSize(new java.awt.Component[] {caretPositionLabel, fileNameLabel}, org.jdesktop.layout.GroupLayout.VERTICAL);
+        layout.linkSize(new java.awt.Component[] {interruptButton, newScriptButton, openButton, saveAsButton, savePlotButton}, org.jdesktop.layout.GroupLayout.VERTICAL);
 
     }// </editor-fold>//GEN-END:initComponents
     private void savePlotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_savePlotButtonActionPerformed
@@ -327,13 +376,23 @@ private void textAreaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:eve
     impl.startPopup(textArea);
 }//GEN-LAST:event_textAreaFocusGained
 
+private void newScriptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newScriptButtonActionPerformed
+    support.newScript();
+}//GEN-LAST:event_newScriptButtonActionPerformed
+
+private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_interruptButtonActionPerformed
+    support.interrupt();
+}//GEN-LAST:event_interruptButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel caretPositionLabel;
     private javax.swing.JComboBox contextSelector;
-    protected javax.swing.JLabel fileNameLabel;
+    private javax.swing.JTextField fileNameTextField;
+    private javax.swing.JButton interruptButton;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JButton newScriptButton;
     private javax.swing.JButton openButton;
     private javax.swing.JButton saveAsButton;
     private javax.swing.JButton savePlotButton;

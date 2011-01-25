@@ -1,0 +1,8 @@
+ra= floor( rand(100)* 10 )
+
+print uniq(ra,None)
+
+s= sort( ra )
+ 
+print uniq(ra,s)
+

@@ -1159,10 +1159,10 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
     }
 
     /** Attempt to find the editor keystroke for the given editor action. */
-    private KeyStroke[] findEditorKeys(String editorActionName, KeyStroke defaultKey) {
+    private KeyStroke[] findEditorKeys(String editorActionName, KeyStroke ... defaultKey) {
         // This method is implemented due to the issue
         // #25715 - Attempt to search keymap for the keybinding that logically corresponds to the action
-        KeyStroke[] ret = new KeyStroke[] { defaultKey };
+        KeyStroke[] ret = defaultKey;
         if (editorActionName != null && getActiveComponent() != null) {
             TextUI ui = getActiveComponent().getUI();
             Keymap km = getActiveComponent().getKeymap();
@@ -1195,7 +1195,10 @@ outer:      for (Iterator it = localCompletionResult.getResultSets().iterator();
         completionShortcut = null;
         
         // Register completion show
-        KeyStroke[] keys = findEditorKeys( "completion", KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
+        KeyStroke[] keys = findEditorKeys( "completion", 
+                KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK),
+                KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0 )
+                );
         for (int i = 0; i < keys.length; i++) {
             inputMap.put(keys[i], COMPLETION_SHOW);
             if (completionShortcut == null) {

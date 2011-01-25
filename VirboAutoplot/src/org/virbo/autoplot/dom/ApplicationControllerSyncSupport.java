@@ -34,30 +34,37 @@ public class ApplicationControllerSyncSupport {
         }
     }
 
-    protected void syncToPanels(Panel[] panels, Map<String, String> nameMap) {
-        while (application.panels.size() < panels.length) {
-            int i = application.panels.size();
-            String idd = panels[i].getPlotId();
+    protected void syncToPlotElements(PlotElement[] elements, Map<String, String> nameMap) {
+        while (application.plotElements.size() < elements.length) {
+            int i = application.plotElements.size();
+            String idd = elements[i].getPlotId();
             Plot p = null;
             for (int j = 0; j < application.getPlots().length; j++) {
-                if (application.getPlots(j).getId().equals(idd))
+                if (application.getPlots(j).getId().equals(idd)) {
                     p = application.getPlots(j);
+                }
             }
-            controller.addPanel(p, null);
+            DataSourceFilter dsf= null;
+            for (int j = 0; j < application.getDataSourceFilters().length; j++) {
+                if ( application.getDataSourceFilters(j).getId().equals( elements[i].getDataSourceFilterId() ) ) {
+                    dsf = application.getDataSourceFilters(j);
+                }
+            }
+            controller.addPlotElement(p, dsf);
         }
-        while (application.panels.size() > panels.length) {
-            controller.deletePanel(application.panels.get(application.panels.size() - 1));
+        while (application.plotElements.size() > elements.length) {
+            controller.deletePlotElement(application.plotElements.get(application.plotElements.size() - 1));
         }
-        for (int i = 0; i < panels.length; i++) {
-            //application.panels.get(i).getStyle().syncTo(panels[i].getStyle());
-            application.panels.get(i).syncTo(panels[i], Arrays.asList(Panel.PROP_PLOTID, Panel.PROP_DATASOURCEFILTERID, Panel.PROP_RENDERTYPE, Panel.PROP_STYLE ) );
-            application.panels.get(i).setPlotId(nameMap.get(panels[i].getPlotId()));
-            application.panels.get(i).setRenderType(panels[i].getRenderType()); // create das2 peers after setting the plotid.
-            application.panels.get(i).getController().maybeCreateDasPeer();
-            application.panels.get(i).getStyle().syncTo(panels[i].getStyle());
-            //application.panels.get(i).getController().resetRenderType( panels[i].getRenderType() );
-            application.panels.get(i).setDataSourceFilterId(nameMap.get(panels[i].getDataSourceFilterId()));
-            application.panels.get(i).getController().setDsfReset(false);
+        for (int i = 0; i < elements.length; i++) {
+            //application.plotElements.get(i).getStyle().syncTo(plotElements[i].getStyle());
+            application.plotElements.get(i).syncTo(elements[i], Arrays.asList(PlotElement.PROP_PLOTID, PlotElement.PROP_DATASOURCEFILTERID, PlotElement.PROP_RENDERTYPE, PlotElement.PROP_STYLE ) );
+            application.plotElements.get(i).setPlotId(nameMap.get(elements[i].getPlotId())); //bug 2992903
+            application.plotElements.get(i).setRenderType(elements[i].getRenderType()); // create das2 peers after setting the plotid.
+            application.plotElements.get(i).getController().maybeCreateDasPeer();
+            application.plotElements.get(i).getStyle().syncTo(elements[i].getStyle());
+            //application.plotElements.get(i).getController().resetRenderType( plotElements[i].getRenderType() );
+            application.plotElements.get(i).setDataSourceFilterId(nameMap.get(elements[i].getDataSourceFilterId()));
+            application.plotElements.get(i).getController().setDsfReset(false);
         }
     }
 
@@ -69,6 +76,7 @@ public class ApplicationControllerSyncSupport {
                 if ( and.getAction()==ArrayNodeDiff.Action.Delete ) {
                     // disconnect from das2 peer
                     Plot domPlot= (Plot) and.getNode();
+                    List<PlotElement> eles= controller.getPlotElementsFor(domPlot);
                     if ( domPlot.controller!=null ) {
                         domPlot.controller.deleteDasPeer( );
                     }
@@ -76,6 +84,12 @@ public class ApplicationControllerSyncSupport {
                     controller.unbind(domPlot.getXaxis());
                     controller.unbind(domPlot.getYaxis());
                     controller.unbind(domPlot.getZaxis());
+                    for ( PlotElement pe: eles ) {
+                        domPlot.controller.removePlotElement(pe);
+                        pe.plotId="";
+                        pe.getController().renderer= null;
+                        pe.getController().setResetPlotElement(true);
+                    }
                 }
             }
             // TODO: this bypasses the child nodes' sync to method.
@@ -205,9 +219,9 @@ public class ApplicationControllerSyncSupport {
         }
         while (application.dataSourceFilters.size() > dataSourceFilters.length) {
             DataSourceFilter dsf = application.dataSourceFilters.get(application.dataSourceFilters.size() - 1);
-            List<Panel> panelss = controller.getPanelsFor(dsf);
-            for (Panel panell : panelss) {
-                panell.setDataSourceFilterId(""); // make it an orphan -- it should get deleted
+            List<PlotElement> elements = controller.getPlotElementsFor(dsf);
+            for (PlotElement element : elements) {
+                element.setDataSourceFilterId(""); // make it an orphan -- it should get deleted
             }
         }
         for (int i = 0; i < dataSourceFilters.length; i++) {

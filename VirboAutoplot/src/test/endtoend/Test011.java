@@ -10,13 +10,13 @@ import org.das2.dataset.VectorDataSet;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.virbo.dataset.BundleDataSet;
-import org.virbo.dataset.DataSetAdapter;
+import org.das2.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
-import org.virbo.dataset.VectorDataSetAdapter;
+import org.das2.dataset.VectorDataSetAdapter;
 import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 
@@ -33,8 +33,8 @@ public class Test011 {
         t0 = System.currentTimeMillis();
     }
 
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
-
+    public static void main(String[] args) {
+        try {
         timer("reset");
         
         QDataSet ds= Ops.findgen(4000,30);
@@ -42,7 +42,7 @@ public class Test011 {
 
         for ( int i=0; i<4000; i++ ) {
         String cmd= "_s0(40)"; //String.format("_s0(%d)", i );
-        QDataSet ds1= DataSetOps.sprocess( cmd, ds);
+        QDataSet ds1= DataSetOps.sprocess( cmd, ds, null);
         }
 
         timer("sprocess ds 4000 times");
@@ -168,6 +168,12 @@ public class Test011 {
             System.exit(0);
         } else {
             System.exit(1);
+        }
+
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            System.exit(1);;
+
         }
     }
 }

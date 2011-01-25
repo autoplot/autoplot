@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
+import java.beans.PropertyChangeSupport;
 import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import java.awt.HeadlessException;
 import java.beans.ExceptionListener;
@@ -29,8 +30,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import org.das2.components.DasProgressPanel;
-import org.das2.jythoncompletion.JythonCompletionTask;
-import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
@@ -38,9 +37,12 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.monitor.ProgressMonitor;
+import org.python.core.Py;
 import org.python.core.PyException;
 import org.python.core.PyInteger;
 import org.python.core.PySyntaxError;
+import org.python.core.ThreadState;
+import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.JythonUtil;
 import org.virbo.autoplot.dom.ApplicationController;
@@ -60,6 +62,8 @@ public class ScriptPanelSupport {
     final JythonScriptPanel panel;
     final EditorAnnotationsSupport annotationsSupport;
     private String PREFERENCE_OPEN_FILE = "openFile";
+    private InteractiveInterpreter interruptible;
+    ThreadState ts;
 
     ScriptPanelSupport(final JythonScriptPanel panel, final ApplicationModel model, final DataSetSelector selector) {
         this.model = model;
@@ -90,7 +94,7 @@ public class ScriptPanelSupport {
                 return false;
             }
             split = URISplit.parse(sfile);
-            if (!(split.vapScheme.endsWith("jyds") || split.file.endsWith(".jyds"))) {
+            if (!( split.vapScheme.endsWith("jyds") || ( split.file!=null && split.file.endsWith(".jyds") ) ) ) {
                 return false;
             }
             if (panel.isDirty()) {
@@ -143,7 +147,7 @@ public class ScriptPanelSupport {
         }
         OutputStream out = null;
         try {
-            if ( !file.canWrite() ) throw new IOException("unable to write to file: "+file);
+            if ( !( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) throw new IOException("unable to write to file: "+file);
             out = new FileOutputStream(file);
             String text = panel.getEditorPanel().getText();
             out.write(text.getBytes());
@@ -154,14 +158,19 @@ public class ScriptPanelSupport {
     }
 
     protected void loadFile(File file) throws IOException, FileNotFoundException {
-        InputStream r= new FileInputStream(file);
-        this.file= file;
-        panel.setFilename( file.toString() );
-        loadInputStream( r );
-        if (file.toString().endsWith(".jyds")) {
-            panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
-        } else {
-            panel.setContext(JythonScriptPanel.CONTEXT_APPLICATION);
+        InputStream r= null;
+        try {
+            r= new FileInputStream(file);
+            this.file= file;
+            panel.setFilename( file.toString() );
+            loadInputStream( r );
+            if (file.toString().endsWith(".jyds")) {
+                panel.setContext(JythonScriptPanel.CONTEXT_DATA_SOURCE);
+            } else {
+                panel.setContext(JythonScriptPanel.CONTEXT_APPLICATION);
+            }
+        } finally {
+            if ( r!=null ) r.close();
         }
     }
 
@@ -230,7 +239,7 @@ public class ScriptPanelSupport {
                 if (file != null) {
                     URI uri;
                     try {
-                        uri = new URI("vap+jyds:" + file.toURI().toString());
+                        uri = new URI("vap+jyds:" + file.toURI().toString()); // bug 3055130 okay
                     } catch (URISyntaxException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -269,7 +278,7 @@ public class ScriptPanelSupport {
                         updateSurl = true;
                     }
 
-                    if (panel.isDirty() && file.canWrite() ) {
+                    if (panel.isDirty() && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
                         save();
                     }
 
@@ -292,15 +301,17 @@ public class ScriptPanelSupport {
                     public void run() {
                         int offset = 0;
                         try {
-                            if (file != null && file.canWrite() ) {
+                            if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
                                 save();
                             }
                             ProgressMonitor mon= DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
-                            PythonInterpreter interp = null;
+                            InteractiveInterpreter interp = null;
                             try {
                                 interp= JythonUtil.createInterpreter(true, false);
                                 interp.set("dom", model.getDocumentModel() );
                                 interp.set("monitor", mon );
+                                setInterruptible( interp );
+                                ts= Py.getThreadState();
                                 boolean dirty0 = panel.isDirty();
                                 annotationsSupport.clearAnnotations();
                                 panel.setDirty(dirty0);
@@ -320,6 +331,8 @@ public class ScriptPanelSupport {
                                             s = text.substring(i0);
                                         }
                                         try {
+                                            annotationsSupport.clearAnnotations();
+                                            annotationsSupport.annotateChars( i0, i1, "programCounter", "pc", interp );
                                             interp.exec(s);
                                         } catch (PyException ex) {
                                             throw ex;
@@ -328,9 +341,11 @@ public class ScriptPanelSupport {
                                         offset += 1;
                                         System.err.println(s);
                                     }
+                                    annotationsSupport.clearAnnotations();
                                 } else {
                                     interp.exec(panel.getEditorPanel().getText());
                                 }
+                                setInterruptible( null );
                                 mon.finished();
                                 applicationController.setStatus("done executing script");
                             } catch (IOException ex) {
@@ -347,6 +362,14 @@ public class ScriptPanelSupport {
                             throw new RuntimeException(ex);
                         } catch (BadLocationException ex2) {
                             throw new RuntimeException(ex2);
+                        } catch ( Error ex ) {
+                            if ( !ex.getMessage().contains("Python interrupt") ) {
+                                throw ex;
+                            } else {
+                                applicationController.setStatus("script interrupted");
+                            }
+                        } finally {
+                            setInterruptible( null );
                         }
 
                     }
@@ -365,6 +388,7 @@ public class ScriptPanelSupport {
 
             @Override
             public boolean accept(File f) {
+                if ( f.toString()==null ) return false;
                 return (f.isDirectory() || f.toString().endsWith(".jy") || f.toString().endsWith(".py") || f.toString().endsWith(".jyds"));
             }
 
@@ -375,11 +399,17 @@ public class ScriptPanelSupport {
         };
     }
 
-    protected void saveAs() {
+    /**
+     * returns JFileChooser.APPROVE_OPTION or JFileChooser.CANCEL_OPTION
+     * @return
+     */
+    protected int saveAs() {
         OutputStream out = null;
+        int result= JFileChooser.CANCEL_OPTION;
         try {
             boolean updateSurl = false;
-            if (getSaveFile() == JFileChooser.APPROVE_OPTION) {
+            result= getSaveFile();
+            if (result == JFileChooser.APPROVE_OPTION) {
                 updateSurl = panel.getContext() == JythonScriptPanel.CONTEXT_DATA_SOURCE;
                 out = new FileOutputStream(file);
                 String text = panel.getEditorPanel().getText();
@@ -395,6 +425,7 @@ public class ScriptPanelSupport {
 
         } catch (IOException iOException) {
             model.getExceptionHandler().handle(iOException);
+            
         } finally {
             try {
                 if (out != null) {
@@ -403,6 +434,29 @@ public class ScriptPanelSupport {
             } catch (IOException ex) {
                 Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+        return result;
+    }
+
+    protected void newScript() {
+        if (panel.isDirty()) {
+           int result = JOptionPane.showConfirmDialog(panel,
+                "save edits first?", "new script", JOptionPane.YES_NO_CANCEL_OPTION );
+                if (result == JOptionPane.OK_CANCEL_OPTION) {
+                    return;
+                }
+                if ( result==JOptionPane.OK_OPTION ) {
+                    if ( saveAs()==JOptionPane.CANCEL_OPTION ) return;
+                }
+            }
+        try {
+            Document d = panel.getEditorPanel().getDocument();
+            d.remove(0, d.getLength());
+            panel.setDirty(false);
+            panel.setFilename(null);
+            this.file= null;
+        } catch (BadLocationException ex) {
+            Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -414,7 +468,7 @@ public class ScriptPanelSupport {
                 if (sfile != null) {
                     split = URISplit.parse(sfile);
                 }
-                if (split == null || !(split.file.endsWith(".py") || split.file.endsWith(".jy"))) {
+                if (split == null || !( split.file!=null && ( split.file.endsWith(".py") || split.file.endsWith(".jy") ) ) ) {
                     file = null;
                 } else {
                     file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
@@ -444,5 +498,44 @@ public class ScriptPanelSupport {
             model.getExceptionHandler().handle(ex);
         }
     }
+
+    void interrupt() {
+        if ( getInterruptible()!=null ) {
+            getInterruptible().interrupt( ts );
+        }
+    }
+
+    public static final String PROP_INTERRUPTABLE= "interruptable";
+    /**
+     * @return the interruptible
+     */
+    public InteractiveInterpreter getInterruptible() {
+        return interruptible;
+    }
+
+    private void setInterruptible( InteractiveInterpreter interruptable ) {
+        InteractiveInterpreter old= this.interruptible;
+        this.interruptible= interruptable;
+        propertyChangeSupport.firePropertyChange( PROP_INTERRUPTABLE, old, interruptable );
+    }
+
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String name, PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(name, listener);
+    }
+
+    public void removePropertyChangeListener(String name,PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(name,listener);
+    }
+
 }
 

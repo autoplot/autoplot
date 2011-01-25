@@ -12,6 +12,8 @@ import java.util.Map.Entry;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 
@@ -31,7 +33,7 @@ public class PropertiesTreeModel extends DefaultTreeModel {
     }
     
     /**
-     * 
+     * This is really for human consumption and may change.
      * @param prefix String to prefix the root label.
      * @param ds the dataset source of the metadata.
      */
@@ -40,12 +42,20 @@ public class PropertiesTreeModel extends DefaultTreeModel {
         super( new DefaultMutableTreeNode( ( prefix==null ? "" : prefix ) + DataSetUtil.toString(ds) ) );
         this.ds = ds;
         
-        Map properties= DataSetUtil.getProperties(ds);
+        Map<String,Object> properties= DataSetUtil.getProperties(ds);
         
-        for ( Object key: properties.keySet() ) {
+        for ( String key: properties.keySet() ) {
             Object value= properties.get(key);
             MutableTreeNode nextChild;
-            if ( value instanceof QDataSet ) {
+            if ( key.equals("BUNDLE_1") && ( value instanceof QDataSet ) ) {
+                QDataSet bdsd= (QDataSet)value;
+                String svalue= "";
+                if ( bdsd.length()>0 ) svalue+= bdsd.property( QDataSet.NAME, 0 );
+                for ( int i=1; i<bdsd.length(); i++ ) {
+                    svalue+= "," + bdsd.property( QDataSet.NAME, i );
+                }
+                nextChild= new DefaultMutableTreeNode(""+key+"="+svalue);
+            } else if ( value instanceof QDataSet ) {
                 PropertiesTreeModel model= new PropertiesTreeModel( key + "=", (QDataSet)value,valuesSizeLimit);
                 nextChild= (MutableTreeNode) model.getRoot();
             } else if ( value.getClass().isArray() ) {
@@ -62,9 +72,18 @@ public class PropertiesTreeModel extends DefaultTreeModel {
             } else if ( Map.class.isAssignableFrom( value.getClass() ) ) {
                 nextChild= (MutableTreeNode) new MapTreeModel( key + " (map)", (Map)value ).getRoot();
             } else {
-                nextChild= new DefaultMutableTreeNode(""+key+"="+value);
+                String svalue= String.valueOf(value);
+                if ( value instanceof Number
+                        && ( key.equals(QDataSet.VALID_MIN) || key.equals(QDataSet.VALID_MAX)
+                        || key.equals(QDataSet.TYPICAL_MIN ) || key.equals(QDataSet.TYPICAL_MAX ) ) ) {
+                    Units u= (Units) properties.get(QDataSet.UNITS);
+                    if ( u!=null && UnitsUtil.isTimeLocation(u) ) {
+                        svalue= u.createDatum((Number)value).toString() + " (" + svalue + ")";
+                    }
+                }
+                nextChild= new DefaultMutableTreeNode(""+key+"="+svalue);
             }
-            mroot.insert( nextChild, mroot.getChildCount() ); 
+            mroot.insert( nextChild, mroot.getChildCount() );
         }
 
         if ( ds.rank()>0 ) {

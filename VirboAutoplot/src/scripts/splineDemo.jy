@@ -1,0 +1,19 @@
+# demo of spline using apache math library.  Note this appears to yield a 
+# result different than IDL's result.
+
+from org.apache.commons.math.analysis.interpolation import SplineInterpolator
+
+x= coerce( [ 2., 3., 4. ] )
+y= (x-3)**2
+
+si= SplineInterpolator()
+psf= si.interpolate( x, y )
+
+xx= findgen(100)/50 + 2.
+yy= fltarr(100) 
+for i in range(100):
+   yy[i]= psf.value(xx[i])
+
+plot( 0, xx, yy )
+plot( 1, x, y )
+

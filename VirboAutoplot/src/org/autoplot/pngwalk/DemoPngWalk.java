@@ -21,7 +21,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import org.das2.datum.DatumRange;
 import org.das2.util.ArgumentList;
-import org.das2.util.TimeParser;
+import org.das2.datum.TimeParser;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.bookmarks.Bookmark;
@@ -41,7 +41,7 @@ public class DemoPngWalk {
         DataSetURI.init();  // FtpFileSystem implementation
         
         System.err.println("this is pngwalk 20090529");
-        final ArgumentList alm = new ArgumentList("AutoPlotUI");
+        final ArgumentList alm = new ArgumentList("DemoPngWalk");
         alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
         alm.addOptionalPositionArgument(0, "template",  "file:/tmp/pngwalk/product_$Y$m$d.png", "initial template to use.");
         

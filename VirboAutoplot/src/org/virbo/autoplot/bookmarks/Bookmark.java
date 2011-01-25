@@ -13,9 +13,12 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -28,6 +31,10 @@ import javax.swing.ImageIcon;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import org.das2.util.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -75,16 +82,6 @@ public abstract class Bookmark {
         }
     }
 
-    /**
-     * @deprecated use parseBookmarks( doc.getDocumentElement() ) instead
-     * @param doc
-     * @return
-     */
-    public static List<Bookmark> parseBookmarks(Document doc) {
-        Element root = doc.getDocumentElement();
-        return parseBookmarks(root);
-    }
-
     public static Bookmark parseBookmark(Node element) throws UnsupportedEncodingException, IOException {
 
         String url = null;
@@ -122,13 +119,58 @@ public abstract class Bookmark {
 
             List<Bookmark> contents = null;
 
-            nl = ((Element) element).getElementsByTagName("bookmark-list");
-            Element flist = (Element) nl.item(0);
-            contents = parseBookmarks(flist);
+            Node remoteUrlNode= ((Element)element).getAttributes().getNamedItem("remoteUrl");
+            String remoteUrl= null;
+            if ( remoteUrlNode!=null ) { // 2984078
+                remoteUrl= URLDecoder.decode( remoteUrlNode.getNodeValue(), "US-ASCII" );
+                try {
+                    URL rurl= new URL(remoteUrl);
+                    InputStream inn = rurl.openStream();
+                    Reader in = new InputStreamReader( inn );
+                    DocumentBuilder builder;
+                    builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    InputSource source = new InputSource(in);
+                    Document document = builder.parse(source);
+
+                    XPathFactory factory= XPathFactory.newInstance();
+
+                    XPath xpath= (XPath) factory.newXPath();
+                    Object o= xpath.evaluate( "/bookmark-list/bookmark-folder/bookmark-list", document, XPathConstants.NODESET );
+                    nl= (NodeList)o;
+                    //nl = ((Element) document.getDocumentElement()).getElementsByTagName("bookmark-list");
+                    Element flist = (Element) nl.item(0);
+                    contents = parseBookmarks(flist);
+                    in.close();
+                } catch (XPathExpressionException ex) {
+                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SAXException ex) {
+                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
+                } catch (ParserConfigurationException ex) {
+                    Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
+                } catch ( IllegalArgumentException ex ) {
+                    ex.printStackTrace();
+                }
+                if ( contents==null || contents.size()==0 ) {
+                    System.err.println("unable to parse bookmarks at "+remoteUrl);
+                } else {
+                    title= title + " (remote)";
+                }
+            } else {
+
+            }
+            
+            if ( contents==null || contents.size()==0 ) {
+                nl = ((Element) element).getElementsByTagName("bookmark-list");
+                Element flist = (Element) nl.item(0);
+                contents = parseBookmarks(flist);
+            }
 
             Bookmark.Folder book = new Bookmark.Folder(title);
             if ( icon!=null ) book.setIcon(icon);
-            
+            if ( remoteUrl!=null ) book.setRemoteUrl(remoteUrl);
+
             book.getBookmarks().addAll(contents);
             return book;
         } else {
@@ -209,8 +251,14 @@ public abstract class Bookmark {
                 buf.append("  </bookmark>\n");
             } else if (bookmark instanceof Bookmark.Folder) {
                 Bookmark.Folder f = (Bookmark.Folder) bookmark;
-                buf.append("  <bookmark-folder>\n");
-                buf.append("    <title>" + URLEncoder.encode(f.getTitle(), "UTF-8") + "</title>\n");
+                String title= f.getTitle();
+                if ( f.getRemoteUrl()!=null ) {
+                    if ( title.endsWith(" (remote)") ) title= title.substring(0,title.length()-" (remote)".length());
+                    buf.append("  <bookmark-folder remoteUrl=\"" +URLEncoder.encode(f.getRemoteUrl(), "UTF-8")  +"\">\n");
+                } else {
+                    buf.append("  <bookmark-folder>\n");
+                }
+                buf.append("    <title>" + URLEncoder.encode(title, "UTF-8") + "</title>\n");
                 if (f.icon != null) buf.append("     <icon>" + encodeImage((BufferedImage) f.icon.getImage()) + "</icon>\n");
                 buf.append(formatBooks(f.getBookmarks()));
                 buf.append("  </bookmark-folder>\n");
@@ -234,7 +282,7 @@ public abstract class Bookmark {
         InputSource source = new InputSource(in);
         Document document = builder.parse(source);
 
-        System.err.println(parseBookmarks(document));
+        System.err.println(parseBookmarks(document.getDocumentElement()));
     }
 
     private Bookmark(String title) {
@@ -305,8 +353,29 @@ public abstract class Bookmark {
 
         List<Bookmark> bookmarks;
 
+        /**
+         * a remote bookmark is one that is a copy of a folder at the remote
+         * location.  If it's a remote folder, then we use it to maintain the
+         * bookmarks.  We'll keep a local copy, but this may be updated.
+         */
+        String remoteUrl= null;
+
+        public void setRemoteUrl( String url ) {
+            this.remoteUrl= url;
+        }
+
+        public String getRemoteUrl( ) {
+            return this.remoteUrl;
+        }
+
         public Folder(String title) {
             super(title);
+            bookmarks = new ArrayList<Bookmark>();
+        }
+
+        public Folder( String title, String remoteUrl ) {
+            super(title);
+            this.remoteUrl= remoteUrl;
             bookmarks = new ArrayList<Bookmark>();
         }
 
@@ -321,7 +390,7 @@ public abstract class Bookmark {
         }
 
         public int hashCode() {
-            return bookmarks.hashCode();
+            return bookmarks.hashCode() + ( remoteUrl!=null ? remoteUrl.hashCode() : 0 );
         }
 
         public boolean equals(Object obj) {
@@ -334,6 +403,7 @@ public abstract class Bookmark {
 
         public Bookmark copy() {
             Bookmark.Folder result = new Bookmark.Folder(getTitle());
+            result.remoteUrl= remoteUrl;
             result.bookmarks = new ArrayList<Bookmark>(this.bookmarks);
             return result;
         }

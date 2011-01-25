@@ -1,0 +1,161 @@
+package org.autoplot.help;
+
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.help.CSH;
+import javax.help.HelpBroker;
+import javax.help.HelpSet;
+import javax.help.SwingHelpUtilities;
+
+/**
+ * Encapsulates JavaHelp functionality for convenient access by components.
+ * @author ed
+ */
+public class AutoplotHelpSystem {
+    
+    private static AutoplotHelpSystem instance;
+
+    private static Logger log= Logger.getLogger("org.autoplot.help");
+
+    //This is the pathname used for all help EXCEPT main autplot help:
+    private HelpSet mainHS;
+    private HelpBroker broker;
+    private CSH.DisplayHelpFromSource helper;
+    
+    private AutoplotHelpSystem(Component uiBase) {
+        // custom viewer supports external web links
+        SwingHelpUtilities.setContentViewerUI("org.autoplot.help.AutoplotHelpViewer");
+
+        // First, load the main autoplot helpset.
+        URL hsurl;
+        try {
+            hsurl= getClass().getResource("/helpfiles/autoplotHelp.hs");
+            mainHS = new HelpSet(null, hsurl);
+        } catch ( Exception ex ) {
+            log.warning("Error loading helpset " + "/helpfiles/autoplotHelp.hs" );
+        }
+        // Now find and merge any additional helpsets that are present
+        Enumeration<URL> hsurls=null;
+        try {
+            hsurls = getClass().getClassLoader().getResources("META-INF/helpsets.txt");
+        } catch (IOException ex) {
+            log.warning(ex.toString());
+        }
+
+        while( hsurls!=null && hsurls.hasMoreElements()) {
+            hsurl = hsurls.nextElement();
+            log.fine("found /META-INF/helpsets.txt at " + hsurl);
+            BufferedReader read = null;
+            try {
+                read= new BufferedReader( new InputStreamReader( hsurl.openStream() ) );
+                String spec= read.readLine();
+                while ( spec!=null ) {
+                    int i= spec.indexOf("#");
+                    if ( i!=-1 ) {
+                        spec= spec.substring(0,i);
+                    }
+                    spec= spec.trim();
+                    if ( spec.length()>0 ) {
+                        URL hsurl1=null;
+                        try {
+                            log.fine("Merging external helpset: " + hsurl);
+                            if ( spec.startsWith("/") ) {
+                                hsurl1= getClass().getResource(spec);
+                            } else {
+                                hsurl1= new URL(spec);
+                            }
+                            mainHS.add(new HelpSet(null, hsurl1));
+                        } catch ( Exception ex ) {
+                            log.warning("Error loading helpset " + hsurl1);
+                        }
+                    }
+                    spec= read.readLine();
+                }
+            } catch ( IOException ex ) {
+                log.warning(ex.toString());
+            } finally {  // make sure stream is closed
+                try {
+                    if (read != null) read.close();
+                } catch(IOException ex) {
+                    log.warning(ex.toString());
+                }
+            }
+
+        }
+        broker = mainHS.createHelpBroker();
+
+        // Bind the F1 help key. The keystroke will percolate up the component hierarchy
+        // until it reaches one that has had a helpID defined, allowing context sensitivity.
+        // If it reaches root pane, dispaly default help.
+        broker.enableHelpKey(uiBase, "aphelp_main", mainHS);
+
+        // This is the actionListener used by displayHelpFromEvent
+        helper = new CSH.DisplayHelpFromSource(broker);
+        
+    }
+    
+    public static synchronized void initialize(Component uiBase) {
+        if (instance == null) {
+            instance = new AutoplotHelpSystem(uiBase);
+        } else {
+            System.err.println("Ignoring attempt to re-initialize help system.");
+        }
+    }
+
+    /** Returns a reference to the help system, or <code>null</code> if it hasn't been
+     * intitialized.
+     */
+    public static AutoplotHelpSystem getHelpSystem() {
+        return instance;
+    }
+
+    /**
+     * Components can call this method to register a help ID string.  The JavaHelp
+     * system will use this ID string as a hash key to find the correct HTML file
+     * to display for context-sensitive help.
+     *
+     * @param c
+     * @param helpID
+     */
+    public void registerHelpID(Component c, String helpID) {
+       broker.enableHelp(c, helpID, mainHS);
+    }
+
+    /** A component action listener can pass the event here and the
+     * help topic corresponding to the event source will be displayed, assuming an
+     * appropriate call has been made to <code>registerHelpID</code>.
+     */
+    public void displayHelpFromEvent(ActionEvent e) {
+        helper.actionPerformed(e);
+    }
+
+    /** Display the help window with default page displayed */
+    public void displayDefaultHelp() {
+        broker.setCurrentID("aphelp_main");
+        broker.setDisplayed(true);
+    }
+
+    /** Request another helpset be merged with the main help. This way, plugin
+     * authors can have their help displayed in the main help window.
+     * @param hsPath
+     */
+    /*public void addHelpSet(String hsPath) {
+    HelpSet newHS;
+    try {
+    URL hsurl = getClass().getResource(hsPath);
+    newHS = new HelpSet(null, hsurl);
+    } catch (Exception e) {
+    System.err.println("Error merging helpset: " + hsPath);
+    return;
+    }
+
+    mainHS.add(newHS);
+    }*/
+}

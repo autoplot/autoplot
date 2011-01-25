@@ -33,8 +33,8 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
         return new CefDataSource(uri);
     }
 
-    private List<String> getPlottable(URL url, ProgressMonitor mon ) throws IOException {
-        File f = DataSetURI.getFile(url, mon );
+    private List<String> getPlottable(URI uri, ProgressMonitor mon ) throws IOException {
+        File f = DataSetURI.getFile(uri, mon );
         ReadableByteChannel in = Channels.newChannel(new FileInputStream(f));
         CefReaderHeader reader = new CefReaderHeader();
         Cef cef = reader.read(in);
@@ -51,7 +51,7 @@ public class CefDataSourceFactory extends AbstractDataSourceFactory {
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
             try {
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
-                List<String> plottable = getPlottable(new URL(surl), mon );
+                List<String> plottable = getPlottable( DataSetURI.getResourceURI(surl), mon );
                 for (String s : plottable) {
                     result.add(new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0" ,null ,null, true ));
                 }

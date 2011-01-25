@@ -43,20 +43,30 @@ public class Test012 {
         plot( ds );
         setCanvasSize( 750, 300 );
         int i= uri.lastIndexOf("/");
-        setTitle(uri.substring(i+1));
+
+        getApplicationModel().waitUntilIdle(true);
+
+        String fileUri= uri.substring(i+1);
+
+        if ( !getDocumentModel().getPlotElements(0).getComponent().equals("") ) {
+            String dsstr= String.valueOf( getDocumentModel().getDataSourceFilters(0).getController().getDataSet() );
+            fileUri= fileUri + " " + dsstr +" " + getDocumentModel().getPlotElements(0).getComponent();
+        }
+
+        setTitle(fileUri);
         writeToPng( String.format( "test012_%03d.png", id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
     
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args) {
         try {
 
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
             //TODO: test012_000 shows a potential bug with autoHistogram: zero-point average is formatted to "2292-04-10T00:12:43...."
-            doTest( 0, "vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/cluster/c4/cp/2003/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN" );
+            doTest( 0, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN" );
 
             doTest( 1, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_efw_20080402_v01.cdf?tha_efw" );
             doTest( 2, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?dens_e" );
@@ -80,9 +90,11 @@ public class Test012 {
             // rank 3
             doTest( 12, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H" );
 
+            // recursion bug https://sourceforge.net/tracker/index.php?func=detail&aid=2981336&group_id=199733&atid=970682
+            doTest( 13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_fgm_20100101_v01.cdf?tha_fgh[0:10000]" );
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
+        } catch ( Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }

@@ -4,7 +4,7 @@
  */
 package org.virbo.autoplot.scriptconsole;
 
-import org.das2.system.ExceptionHandler;
+import org.das2.util.ExceptionHandler;
 
 /**
  * Exception handler introduced for Hudson.  Prints the exception and exits.
@@ -15,12 +15,12 @@ public class ExitExceptionHandler implements ExceptionHandler {
     public void handle(Throwable t) {
         System.err.println("exception occurred.");
         t.printStackTrace();
-        System.exit(1);
+        System.exit(1);  // findbugs OKAY
     }
 
     public void handleUncaught(Throwable t) {
         System.err.println("uncaught exception occurred.");
         t.printStackTrace();
-        System.exit(1);
+        System.exit(1);  // findbugs OKAY
     }
 }

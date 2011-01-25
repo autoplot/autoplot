@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import org.das2.DasApplication;
+import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.AutoplotApplet;
 
 /**
@@ -158,6 +160,9 @@ public class TestApplet001 {
         //params.put("statusCallback" , "status"); // doesn't work because "javascript:" is MalformedURL.  Note new protocols can be registered.  http://accu.org/index.php/journals/1434
         params.put("codebase_lookup", "false");
         params.put("java_arguments", "-Djnlp.packEnabled=true");
+
+        DasApplication.setRestrictPermission(true);
+        FileSystem.settings().setRestrictPermission(true);
 
         try {
             doTest( params, headless, "height", "200", "width", "600" );

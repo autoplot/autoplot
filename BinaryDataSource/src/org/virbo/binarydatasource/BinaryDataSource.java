@@ -131,7 +131,12 @@ public class BinaryDataSource extends AbstractDataSource {
 
         final int offset = getIntParameter("byteOffset", 0);
 
-        int length = getIntParameter("byteLength", (((int) f.length()) - offset));
+        int defLen= (int) f.length() - offset;
+        int length = getIntParameter("byteLength", defLen );
+
+        if ( length == defLen && ( f.length()-(long)offset ) > Integer.MAX_VALUE ) {
+            throw new IllegalArgumentException("default length is too big!");
+        }
 
         int fieldCount = getIntParameter("fieldCount", params.get("depend0") == null ? 1 : 2);
 
@@ -139,6 +144,8 @@ public class BinaryDataSource extends AbstractDataSource {
                 
         ByteBuffer buf = fc.map(MapMode.READ_ONLY, offset, length);
 
+        fc.close();
+        
         String recFormat= getParameter( "recFormat", null );
 
         Object[] recFormatParse= null;
@@ -168,10 +175,10 @@ public class BinaryDataSource extends AbstractDataSource {
         String colType= String.valueOf(BufferDataSet.UBYTE);
         if ( recFormatParse!=null ) {
             String o = params.get("rank2");
-            Object[] types= ((Object[])recFormatParse[1]);
             if (o != null) {
                 throw new IllegalArgumentException("rank2 and columnFormat are not supported");
             } else {
+                Object[] types= ((Object[])recFormatParse[1]);
                 colType= String.valueOf( types[col] );
             }
         }

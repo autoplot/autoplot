@@ -1,0 +1,370 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.autoplot.cdaweb;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import org.das2.components.DasProgressPanel;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeUtil;
+import org.das2.datum.Units;
+import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.SubTaskMonitor;
+import org.virbo.datasource.DataSetURI;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+/**
+ * Class for encapsulating the functions of the database
+ * @author jbf
+ */
+public class CDAWebDB {
+
+    private static CDAWebDB instance=null;
+    private static String dbloc= "ftp://cdaweb.gsfc.nasa.gov/pub/cdaweb/all.xml";
+
+    private String version;
+    private Document document; // should consume ~ 2 MB
+    private Map<String,String> ids;  // serviceproviderId,Id
+    private long refreshTime=0;
+
+    public static synchronized CDAWebDB getInstance() {
+        if ( instance==null ) {
+            instance= new CDAWebDB();
+        }
+        return instance;
+    }
+
+    /**
+     * refresh no more often than once per 10 minutes.  We don't need to refresh
+     * often.  Note it only takes a few seconds to refresh, plus download time,
+     * but we don't want to pound on the CDAWeb server needlessly.
+     * @param mon
+     */
+    public synchronized void maybeRefresh( ProgressMonitor mon ) {
+        long t= System.currentTimeMillis();
+        if ( t - refreshTime > 600000 ) { // 10 minutes
+            refresh(mon);
+            refreshTime= t;
+        }
+    }
+
+    public synchronized void refresh( ProgressMonitor mon ) {
+        try {
+
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+
+            mon.started();
+            mon.setTaskSize(3);
+            mon.setProgressMessage("downloading file "+dbloc );
+
+            FileInputStream fin= new FileInputStream( DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) );
+            
+            InputSource source = new InputSource( fin );
+
+            mon.setTaskProgress(1);
+            mon.setProgressMessage("parsing file "+dbloc );
+            document = builder.parse(source);
+
+            Element element = document.getDocumentElement();
+            System.out.println(element.getTagName());
+
+            XPath xp = XPathFactory.newInstance().newXPath();
+            version= xp.evaluate( "/sites/datasite/@version", document );
+
+            mon.setTaskProgress(2);
+            mon.setProgressMessage("reading IDs");
+
+            refreshServiceProviderIds();;
+            mon.setTaskProgress(3);
+
+            mon.finished();
+
+        } catch (XPathExpressionException ex) {
+            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException ex) {
+            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public String getNaming( String spid ) throws IOException {
+        try {
+            spid= spid.toUpperCase();
+            XPath xp = XPathFactory.newInstance().newXPath();
+            Node node = (Node) xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access", spid), document, XPathConstants.NODE );
+            NamedNodeMap attrs= node.getAttributes();
+            String subdividedby=attrs.getNamedItem("subdividedby").getTextContent();
+            String filenaming= attrs.getNamedItem("filenaming").getTextContent();
+            filenaming= filenaming.replace("%Q", "?%v"); // templates don't quite match
+            if ( subdividedby.equals("None") ) {
+                return filenaming;
+            } else {
+                return subdividedby + "/" + filenaming;
+            }
+
+        } catch (XPathExpressionException ex) {
+            throw new IOException("unable to read node "+spid);
+        }
+    }
+
+    public String getBaseUrl( String spid ) throws IOException {
+        try {
+            spid= spid.toUpperCase();
+            XPath xp = XPathFactory.newInstance().newXPath();
+            String url= (String)xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access/URL/text()", spid), document, XPathConstants.STRING );
+            url= url.trim();
+            if ( url.startsWith("/tower3/public/pub/istp/") ) {
+                url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/public/".length() );
+            }
+            return url;
+
+        } catch (XPathExpressionException ex) {
+            throw new IOException("unable to read node "+spid);
+        }
+
+    }
+
+    /**
+     * return a range of a file that could be plotted.  Right now, this
+     * just creates a FSM and gets a file.
+     * @param spid
+     * @return
+     * @throws IOException
+     */
+    public String getSampleTime( String spid ) throws IOException {
+        try {
+            FileStorageModelNew fsm = FileStorageModelNew.create( FileSystem.create( new URI( getBaseUrl(spid) ) ), getNaming(spid) );
+            String last = getTimeRange(spid);
+            int i = last.indexOf(" to ");
+            last = last.substring(i + 4);
+            Datum d = TimeUtil.prevMidnight(TimeUtil.create(last)); // TODO: getFilename, when $v is handled
+            Datum d1= d.add( 24, Units.hours );
+            DatumRange dr= new DatumRange( d, d1 );
+            return dr.toString();
+        } catch (ParseException ex) {
+            throw new IOException(ex.toString());
+        } catch (URISyntaxException ex) {
+            throw new IOException(ex.toString());
+        }
+    }
+
+    /**
+     * return the timerange spanning the availability of the dataset.
+     * @param spid
+     * @return
+     * @throws IOException
+     */
+    public String getTimeRange( String spid ) throws IOException {
+        try {
+            spid= spid.toUpperCase();
+            XPath xp = XPathFactory.newInstance().newXPath();
+            Node node = (Node) xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']", spid), document, XPathConstants.NODE );
+            NamedNodeMap attrs= node.getAttributes();
+            String start=attrs.getNamedItem("timerange_start").getTextContent();
+            String stop= attrs.getNamedItem("timerange_stop").getTextContent();
+
+            return start + " to " + stop;
+
+        } catch (XPathExpressionException ex) {
+            throw new IOException("unable to read node "+spid);
+        }
+    }
+
+    public String getMasterFile( String ds ) throws IOException {
+        String master= "ftp://cdaweb.gsfc.nasa.gov/pub/CDAWlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
+
+        DasProgressPanel p= new DasProgressPanel("downloading master cdf");
+
+        try {
+            try {
+                DataSetURI.getFile(new URI(master), p);
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } catch ( IOException ex ) {
+            // datasets don't have to have masters.  In this case we use the default timerange to grab a file as the master.
+
+            String tmpl= getNaming(ds.toUpperCase());
+            String base= getBaseUrl(ds.toUpperCase());
+            URI baseUri;
+            try {
+                baseUri = new URI(base);
+            } catch (URISyntaxException ex1) {
+                throw new IllegalArgumentException("unable to make URI from "+base );
+            }
+            FileSystem fs= FileSystem.create( baseUri );
+            
+            FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
+
+            String avail= CDAWebDB.getInstance().getSampleTime(ds);
+            DatumRange dr;
+            try {
+                dr = DatumRangeUtil.parseTimeRange(avail);
+            } catch (ParseException ex1) {
+                Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex1);
+                master= fsm.getRepresentativeFile(p);
+                dr= fsm.getRangeFor(master);
+            }
+
+            String[] files= fsm.getBestNamesFor( dr, p );
+            if ( files.length==0 ) {
+                master= fsm.getRepresentativeFile(p);
+                if ( master==null ) {
+                    throw new FileNotFoundException("unable to find any files to serve as master file in "+fsm );
+                } else {
+                    master= fs.getRootURI().toString() + master;
+                }
+            } else {
+                master= fs.getRootURI().toString() + files[0];
+            }
+
+        }
+        return master;
+    }
+
+    private String getURL( Node dataset ) {
+        NodeList kids= dataset.getChildNodes();
+        for ( int j=0; j<kids.getLength(); j++ ) {
+            Node childNode= kids.item(j);
+            if ( childNode.getNodeName().equals("access") ) {
+                NodeList kids2= childNode.getChildNodes();
+                for ( int k=0; k<kids2.getLength(); k++ ) {
+                    if ( kids2.item(k).getNodeName().equals("URL") ) {
+                        return kids2.item(k).getFirstChild().getTextContent().trim();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getDescription( Node dataset ) {
+        NodeList kids= dataset.getChildNodes();
+        for ( int j=0; j<kids.getLength(); j++ ) {
+            Node childNode= kids.item(j);
+            if ( childNode.getNodeName().equals("description") ) {
+                NamedNodeMap kids2= childNode.getAttributes();
+                Node shortDesc= kids2.getNamedItem("short");
+                if ( shortDesc!=null ) {
+                    return shortDesc.getNodeValue();
+                } else {
+                    return null;
+                }
+            }
+        }
+        return null;
+    }
+
+    public Map<String,String> getServiceProviderIds() {
+        return ids;
+    }
+
+    /**
+     * return the list of IDs that this reader can consume.
+     * We apply a number of constraints:
+     * 1. files must end in .cdf
+     * 2. timerange_start and timerange_stop must be ISO8601 times.
+     * 3. URL must start with a /, and may not be another website.
+     * @return
+     * @throws IOException
+     */
+    public void refreshServiceProviderIds() throws IOException {
+        try {
+            XPath xp = XPathFactory.newInstance().newXPath();
+            NodeList nodes = (NodeList) xp.evaluate( "//sites/datasite/dataset", document, XPathConstants.NODESET );
+
+            Map<String,String> result= new LinkedHashMap<String,String>();
+
+            for ( int i=0; i<nodes.getLength(); i++ ) {
+                Node node= nodes.item(i);
+                NamedNodeMap attrs= node.getAttributes();
+                try {
+                    String st= attrs.getNamedItem("timerange_start").getTextContent();
+                    String en= attrs.getNamedItem("timerange_stop").getTextContent();
+                    String nssdc_ID= attrs.getNamedItem("nssdc_ID").getTextContent();
+                    if ( st.length()>1 && Character.isDigit(st.charAt(0))
+                            && en.length()>1 && Character.isDigit(en.charAt(0))
+                            //&& nssdc_ID.contains("None") ) {
+                             ) {
+                        String url= getURL(node);
+                        if ( url!=null && url.startsWith("/") ) {
+                            String desc= getDescription(node);
+                            String s=attrs.getNamedItem("serviceprovider_ID").getTextContent();
+                            //String sid=attrs.getNamedItem("ID").getTextContent();
+                            result.put(s,desc);
+                        }
+                    }
+                } catch ( Exception ex2 ) {
+                    ex2.printStackTrace();
+                }
+            }
+
+            ids= result;
+
+        } catch (XPathExpressionException ex) {
+            ex.printStackTrace();
+            throw new IOException("unable to read serviceprovider_IDs");
+        }
+
+    }
+
+    /**
+     * 4.2 seconds before getting description.  After too!
+     * @param args
+     * @throws IOException
+     */
+    public static void main( String [] args ) throws IOException {
+        CDAWebDB db= getInstance();
+
+        long t0= System.currentTimeMillis();
+
+        db.refresh( DasProgressPanel.createFramed("refreshing database") );
+
+        Map<String,String> ids= db.getServiceProviderIds( );
+
+        for ( String s: ids.keySet() ) {
+            System.err.println(s + ":\t" + ids.get(s) );
+        }
+        System.err.println( ids.size() );
+        System.err.println( db.getNaming( "AC_H0_MFI" )  );
+        System.err.println( db.getTimeRange( "AC_H0_MFI" )  );
+        
+        System.err.println( "Timer: " + ( System.currentTimeMillis() - t0 ) );
+
+    }
+}

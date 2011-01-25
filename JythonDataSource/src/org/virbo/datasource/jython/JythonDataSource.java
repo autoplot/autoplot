@@ -95,6 +95,21 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         return s;
     }
 
+    private synchronized QDataSet getInlineDataSet(URI uri) throws Exception {
+
+        interp = JythonUtil.createInterpreter(false);
+        PyObject result= interp.eval(uri.getRawSchemeSpecificPart());
+
+        QDataSet res;
+
+        if (result instanceof PyList) {
+            res = JythonOps.coerce((PyList) result);
+        } else {
+            res = (QDataSet) result.__tojava__(QDataSet.class);
+        }
+        return res;
+    }
+
     @Override
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
@@ -102,11 +117,15 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         File jythonScript;   // script to run.
         String resourceURI;  // optional resource URI that is argument to script, excluding script argument.
-        
+
+        URISplit split= URISplit.parse(uri);
+        if ( split.scheme.equals("inline") ) {
+            return getInlineDataSet(new URI(uri.getRawSchemeSpecificPart()));
+        }
+
         if ( params.get( PARAM_SCRIPT )!=null ) {
             jythonScript= getFile( new URL(params.get( PARAM_SCRIPT )), new NullProgressMonitor() );
             mon.setProgressMessage( "loading "+uri );
-            URISplit split= URISplit.parse(uri.toString());
             split.params= null;
             resourceURI= DataSetURI.fromUri( DataSetURI.getResourceURI(URISplit.format(split)) );
 
@@ -136,7 +155,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     }
                 }
 
-                interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
+                //interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
                 
                 interp.set("resourceURI", resourceURI);
                 
@@ -144,7 +163,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 
                 LineNumberReader reader=null;
                 try {
-                    boolean debug = true;  //TODO: exceptions will have the wrong line number in this mode.
+                    boolean debug = false;  //TODO: exceptions will have the wrong line number in this mode.
                     if (debug) {
                         reader = new LineNumberReader( new FileReader( jythonScript ) );
                         String[] nextLine= new String[1];
@@ -194,10 +213,10 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             
             if (expr == null) {
                 try {
-                    result = interp.eval("data");
+                    result = interp.eval("result"); // legacy
                 } catch ( PyException ex ) {
                     try {
-                        result = interp.eval("result"); // legacy
+                        result = interp.eval("data"); 
                     } catch ( PyException ex2 ) {
                         if ( causedBy!=null ) {
                             throw ex2;
@@ -280,7 +299,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     PythonInterpreter interp = null;
 
     private String cacheUrl(URI uri) {
-        URISplit split = URISplit.parse(uri.toString());
+        URISplit split = URISplit.parse(uri);
         Map<String, String> params = URISplit.parseParams(split.params);
         params.remove("arg_0");
         split.params = URISplit.formatParams(params);
@@ -316,7 +335,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     public void resetURI(String surl) {
         try {
             this.uri = new URI(surl);
-            URISplit split = URISplit.parse(uri.toString());
+            URISplit split = URISplit.parse(uri);
             params = URISplit.parseParams(split.params);
             resourceURI = new URI(split.file);
         } catch (URISyntaxException ex) {

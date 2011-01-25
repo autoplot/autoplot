@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -28,6 +29,7 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSetURI;
 
 /**
  *
@@ -61,7 +63,9 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         if (ssheet == null) {
             sheet = wb.getSheetAt(0);
         } else {
+            ssheet= DataSetURI.maybePlusToSpace(ssheet);
             sheet = wb.getSheet(ssheet);
+            if ( sheet==null ) throw new IllegalArgumentException("no such sheet: "+ssheet);
             logger.fine("found sheet "+ssheet+" with "+sheet.getLastRowNum() +" rows");
         }
         if (sheet == null) {
@@ -202,6 +206,7 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
         int firstRow;
         int length;
         boolean isDate;
+        Units units;
         
         /**
          * @param firstRow is the first row to read.  0 is the first row.
@@ -223,9 +228,22 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             }
             this.firstRow= firstRow;
             HSSFCell cell = row.getCell(columnNumber);
-            isDate = HSSFDateUtil.isCellDateFormatted(cell);
-            if (isDate) {
-                properties.put(QDataSet.UNITS, Units.t1970);
+            units= Units.dimensionless;
+            if ( cell.getCellType()!=HSSFCell.CELL_TYPE_STRING ) {
+                isDate = HSSFDateUtil.isCellDateFormatted(cell);
+                if (isDate) {
+                    properties.put(QDataSet.UNITS, Units.t1970);
+                    units= Units.t1970;
+                }
+            } else if ( cell.getCellType()==HSSFCell.CELL_TYPE_STRING ) {
+                String s= cell.getStringCellValue();
+                try {
+                    Units.t1970.parse(s);
+                    properties.put(QDataSet.UNITS, Units.t1970);
+                    units= Units.t1970;
+                } catch ( ParseException ex ) {
+                    properties.put(QDataSet.UNITS, Units.dimensionless);
+                }
             }
         }
 
@@ -243,11 +261,21 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     Date d = cell.getDateCellValue();
                     return d.getTime() / 1000;
                 } else {
-                    double d = cell.getNumericCellValue();
-                    return d;
+                    if ( cell.getCellType()==HSSFCell.CELL_TYPE_NUMERIC ) {
+                        double d = cell.getNumericCellValue();
+                        return d;
+                    } else if ( cell.getCellType()==HSSFCell.CELL_TYPE_STRING ) {
+                        try {
+                            double d= units.parse(cell.getStringCellValue()).doubleValue(units);
+                            return d;
+                        } catch ( ParseException ex ) {
+                            return Double.NaN;
+                        }
+                    } else {
+                        return Double.NaN;
+                    }
                 }
             } catch (RuntimeException e) {
-                String cellID = String.valueOf((char) ('A' + columnNumber)) + (firstRow + i);
                 return Double.NaN;
             }
         }

@@ -6,6 +6,7 @@ package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.das2.graph.DasColorBar;
 
 /**
  *
@@ -85,6 +86,23 @@ public class Plot extends DomNode {
     }
 
     /**
+     * false indicates that the plot and its data will not
+     * be drawn.
+     */
+    public static final String PROP_VISIBLE = "visible";
+    protected boolean visible = true;
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        boolean oldVisible = this.visible;
+        this.visible = visible;
+        propertyChangeSupport.firePropertyChange(PROP_VISIBLE, oldVisible, visible);
+    }
+
+    /**
      * indicates the application is allowed to automatically create bindings to
      * the plot, typically when it is first created.
      */
@@ -113,6 +131,21 @@ public class Plot extends DomNode {
         this.isotropic = isotropic;
         propertyChangeSupport.firePropertyChange(PROP_ISOTROPIC, oldIsotropic, isotropic);
     }
+    
+    public final static String PROP_COLORTABLE= "colortable";
+
+    private DasColorBar.Type colortable= DasColorBar.Type.COLOR_WEDGE;
+
+    public DasColorBar.Type getColortable() {
+        return this.colortable;
+    }
+
+    public void setColortable(DasColorBar.Type colortable) {
+        Object oldVal= this.colortable;
+        this.colortable = colortable;
+        propertyChangeSupport.firePropertyChange( PROP_COLORTABLE, oldVal, this.colortable );
+    }
+
     protected String rowId="";
     public static final String PROP_ROWID = "rowId";
 
@@ -162,12 +195,14 @@ public class Plot extends DomNode {
         Plot that = (Plot) n;
         if (!exclude.contains(PROP_TITLE)) this.setTitle(that.getTitle());
         if (!exclude.contains(PROP_ISOTROPIC)) this.setIsotropic(that.isIsotropic());
+        if (!exclude.contains(PROP_COLORTABLE ) ) this.setColortable( that.colortable );
         if (!exclude.contains(PROP_ROWID)) this.setRowId(that.getRowId());
         if (!exclude.contains(PROP_COLUMNID)) this.setColumnId(that.getColumnId());
         if (!exclude.contains(PROP_AUTOLABEL)) this.setAutoLabel(that.isAutoLabel());
         if (!exclude.contains(PROP_XAXIS)) this.xaxis.syncTo(that.getXaxis(),exclude); // possibly exclude id's.
         if (!exclude.contains(PROP_YAXIS)) this.yaxis.syncTo(that.getYaxis(),exclude);
         if (!exclude.contains(PROP_ZAXIS)) this.zaxis.syncTo(that.getZaxis(),exclude);
+        if (!exclude.contains(PROP_VISIBLE)) this.setVisible(that.isVisible());
     }
 
     @Override
@@ -188,20 +223,24 @@ public class Plot extends DomNode {
         boolean b;
 
         b = that.title.equals(this.title);
-        if (!b) result.add(new PropertyChangeDiff("title", that.title, this.title));
+        if (!b) result.add(new PropertyChangeDiff(PROP_TITLE, that.title, this.title));
         b = that.isotropic == this.isotropic;
-        if (!b) result.add(new PropertyChangeDiff("isotropic", that.isotropic, this.isotropic));
+        if (!b) result.add(new PropertyChangeDiff(PROP_ISOTROPIC, that.isotropic, this.isotropic));
+        b=  that.colortable.equals(this.colortable) ;
+        if ( !b ) result.add( new PropertyChangeDiff( "colortable", that.colortable , this.colortable ) );
         b = that.autoLabel == this.autoLabel;
         if (!b) result.add(new PropertyChangeDiff(PROP_AUTOLABEL, that.autoLabel, this.autoLabel));
         b = that.autoBinding == this.autoBinding;
         if (!b) result.add(new PropertyChangeDiff(PROP_AUTOBINDING, that.autoBinding, this.autoBinding));
         b = that.rowId.equals(this.rowId);
-        if (!b) result.add(new PropertyChangeDiff("rowId", that.rowId, this.rowId));
+        if (!b) result.add(new PropertyChangeDiff(PROP_ROWID, that.rowId, this.rowId));
         b = that.columnId.equals(this.columnId);
-        if (!b) result.add(new PropertyChangeDiff("columnId", that.columnId, this.columnId));
-        result.addAll(DomUtil.childDiffs("xaxis", this.getXaxis().diffs(that.getXaxis())));
-        result.addAll(DomUtil.childDiffs("yaxis", this.getYaxis().diffs(that.getYaxis())));
-        result.addAll(DomUtil.childDiffs("zaxis", this.getZaxis().diffs(that.getZaxis())));
+        if (!b) result.add(new PropertyChangeDiff(PROP_COLUMNID, that.columnId, this.columnId));
+        b = that.visible == this.visible;
+        if (!b) result.add(new PropertyChangeDiff(PROP_VISIBLE, that.visible, this.visible));
+        result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));
+        result.addAll(DomUtil.childDiffs( PROP_YAXIS, this.getYaxis().diffs(that.getYaxis())));
+        result.addAll(DomUtil.childDiffs( PROP_ZAXIS, this.getZaxis().diffs(that.getZaxis())));
         return result;
     }
 }

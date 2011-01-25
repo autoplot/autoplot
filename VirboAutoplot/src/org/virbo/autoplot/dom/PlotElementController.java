@@ -1,0 +1,1818 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.virbo.autoplot.dom;
+
+import java.awt.Color;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JMenuItem;
+import org.das2.components.DasProgressPanel;
+import org.das2.datum.DatumRange;
+import org.das2.datum.EnumerationUnits;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
+import org.das2.graph.DasColorBar;
+import org.das2.graph.DasPlot;
+import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.ImageVectorDataSetRenderer;
+import org.das2.graph.PsymConnector;
+import org.das2.graph.Renderer;
+import org.das2.graph.SeriesRenderer;
+import org.das2.graph.SpectrogramRenderer;
+import org.das2.system.RequestProcessor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.jdesktop.beansbinding.Converter;
+import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.RenderType;
+import org.virbo.autoplot.AutoplotUtil;
+import org.virbo.autoplot.RenderTypeUtil;
+import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.JoinDataSet;
+import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
+import org.virbo.dsops.Ops;
+import org.virbo.metatree.MetadataUtil;
+
+/**
+ * PlotElementController manages the PlotElement, for example resolving the datasource and loading the dataset.
+ *
+ * Three state flags:
+ *   * resetRanges means all work needs to be done
+ *   * resetPlotElement means we might need to introduce child plotElements and reset the rendertype
+ *   * resetRenderType means we might need to refresh the peer.
+ * @author jbf
+ */
+public class PlotElementController extends DomNodeController {
+
+    private static final String PENDING_RESET_RANGE = "resetRanges";
+    private static final String PENDING_SET_DATASET= "setDataSet";
+    private static final String PENDING_COMPONENT_OP= "componentOp";
+
+    static final Logger logger = Logger.getLogger("vap.plotElementController");
+    private Application dom;
+    private PlotElement plotElement;
+    private DataSourceFilter dsf; // This is the one we are listening to.
+    /**
+     * switch over between fine and course points.
+     */
+    public static final int SYMSIZE_DATAPOINT_COUNT = 500;
+    public static final int LARGE_DATASET_COUNT = 30000;
+
+    public PlotElementController(final ApplicationModel model, final Application dom, final PlotElement plotElement) {
+        super(plotElement);
+        plotElement.controller = this;
+        this.dom = dom;
+        this.plotElement = plotElement;
+
+        plotElement.addPropertyChangeListener(PlotElement.PROP_RENDERTYPE, plotElementListener);
+        plotElement.addPropertyChangeListener(PlotElement.PROP_DATASOURCEFILTERID, plotElementListener);
+        plotElement.addPropertyChangeListener(PlotElement.PROP_COMPONENT, plotElementListener);
+        plotElement.getStyle().addPropertyChangeListener(styleListener);
+    }
+
+    /**
+     * return child plotElements, which are plotElements that share a datasource but pull out
+     * a component of the data.
+     * @return
+     */
+    public List<PlotElement> getChildPlotElements() {
+        ArrayList<PlotElement> result= new ArrayList();
+        for ( PlotElement pp: dom.plotElements ) {
+            if ( pp.getParent().equals( plotElement.getId() ) ) result.add(pp);
+        }
+        return result;
+    }
+
+    /**
+     * set the child plotElements.
+     * @param plotElements
+     */
+    protected void setChildPlotElements(List<PlotElement> peles) {
+        for ( PlotElement p: peles ) {
+            p.setParent(plotElement.getId());
+        }
+    }
+
+    /**
+     * set the parent plotElement.  this is used when copying.
+     * @param p
+     */
+    protected void setParentPlotElement(PlotElement p) {
+        plotElement.setParent( p.getId() );
+    }
+
+    /**
+     * return the parent plotElement, or null if the plotElement doesn't have a parent.
+     * @return
+     */
+    public PlotElement getParentPlotElement() {
+        if ( plotElement.getParent().equals("") ) {
+            return null;
+        } else {
+            for ( PlotElement pp: dom.plotElements ) {
+                if ( pp.getId().equals( plotElement.getParent() ) ) return pp;
+            }
+            return null; // TODO: maybe throw exception!
+        }
+    }
+
+    /**
+     * remove any bindings and listeners
+     */
+    void unbindDsf() {
+        dsf.removePropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
+        dsf.removePropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
+        dsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
+        dsf.controller.removePropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
+    }
+    
+    PropertyChangeListener dsfListener = new PropertyChangeListener() {
+
+        @Override
+        public String toString() {
+            return "" + PlotElementController.this;
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals(DataSourceFilter.PROP_SLICEDIMENSION) || evt.getPropertyName().equals(DataSourceFilter.PROP_TRANSPOSE)) {
+                logger.log(Level.FINE, "property change in DSF means I need to autorange: {0}", evt.getPropertyName());
+                setResetRanges(true);
+                maybeSetPlotAutorange();
+            }
+        }
+    };
+    
+    PropertyChangeListener plotElementListener = new PropertyChangeListener() {
+
+        @Override
+        public String toString() {
+            return "" + PlotElementController.this;
+        }
+
+        public void propertyChange(PropertyChangeEvent evt) {
+            logger.log(Level.FINE, "plotElementListener: {0} {1}->{2}", new Object[]{evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
+            if ( evt.getPropertyName().equals(PlotElement.PROP_RENDERTYPE) && !PlotElementController.this.isValueAdjusting() ) {
+                if ( dom.getController().isValueAdjusting() ) {
+                    //return; // occasional NullPointerException, bug 2988979
+                }
+                RenderType newRenderType = (RenderType) evt.getNewValue();
+                RenderType oldRenderType = (RenderType) evt.getOldValue();
+                PlotElement parentEle= getParentPlotElement();
+                if (parentEle != null) {
+                    parentEle.setRenderType(newRenderType);
+                } else {
+                    if ( axisDimensionsChange(oldRenderType, newRenderType) ) {
+                        resetRanges= true;
+                        resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType());
+                    } else {
+                        doResetRenderType(newRenderType);
+                    }
+                    setResetPlotElement(false);
+                }
+            } else if (evt.getPropertyName().equals(PlotElement.PROP_DATASOURCEFILTERID)) {
+                changeDataSourceFilter();
+                if ( dsfReset ) {
+                    if ( evt.getOldValue()!=null ) {
+                        setResetPlotElement(true);
+                        setResetRanges(true);
+                    }
+                    updateDataSet();
+                }
+            } else if ( evt.getPropertyName().equals( PlotElement.PROP_COMPONENT ) ) {
+                String newv= (String)evt.getNewValue();
+                if ( DataSetOps.changesDimensions( (String)evt.getOldValue(), newv ) ) { //TODO: why two methods see axisDimensionsChange 10 lines above
+                    logger.log(Level.FINER, "component property change requires we reset render and dimensions: {0}->{1}", new Object[]{(String) evt.getOldValue(), (String) evt.getNewValue()});
+                    setResetPlotElement(true);
+                    setResetRanges(true);
+                    if ( !dom.getController().isValueAdjusting() ) maybeSetPlotAutorange();
+                }
+                if ( newv.startsWith("|") ) dom.getOptions().setDataVisible(true);
+                Runnable run= new Runnable() {
+                    public void run() {
+                        // we reenter this code, so only set lock once.  See test.endtoend.Test015.java
+                        // vap+cef:file:///home/jbf/ct/hudson/data.backup/cef/C1_CP_PEA_CP3DXPH_DNFlux__20020811_140000_20020811_150000_V061018.cef?Data__C1_CP_PEA_CP3DXPH_DNFlux
+                        List<Object> lock= changesSupport.whoIsChanging(PENDING_COMPONENT_OP); 
+                        if ( lock.isEmpty() ) {
+                            changesSupport.performingChange(plotElementListener, PENDING_COMPONENT_OP);
+                        } else {
+                            if ( !lock.contains(plotElementListener) ) throw new IllegalStateException("shouldn't happen");
+                        }
+                        setStatus("busy: update data set");
+                        updateDataSet();
+                        setStatus("done update data set");
+                        if ( lock.isEmpty() ) changesSupport.changePerformed(PlotElementController.this, PENDING_COMPONENT_OP);
+                    }
+                };
+                if ( isAsyncProcess(newv) ) {
+                    RequestProcessor.invokeLater(run);
+                } else {
+                    run.run();
+                }
+            }
+        }
+    };
+
+    /**
+     * listen for changes in the parent plotElement that this child can respond to.
+     */
+    PropertyChangeListener parentStyleListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            try {
+                DomUtil.setPropertyValue(plotElement.style, evt.getPropertyName(), evt.getNewValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(PlotElementController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    };
+
+    /*
+     * listen for changes that might change the renderType.  Try to pick one that is close.  Don't
+     * fire changes.
+     */
+    PropertyChangeListener styleListener= new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( evt.getPropertyName().equals( PlotElementStyle.PROP_REBINMETHOD ) ) {
+                if ( plotElement.getRenderType()==RenderType.nnSpectrogram || plotElement.getRenderType()==RenderType.spectrogram ) {
+                    if ( evt.getNewValue()==SpectrogramRenderer.RebinnerEnum.nearestNeighbor ) {
+                        plotElement.renderType= RenderType.nnSpectrogram;
+                    } else if ( evt.getNewValue()==SpectrogramRenderer.RebinnerEnum.binAverage ) {
+                        plotElement.renderType= RenderType.spectrogram;
+                    }
+                }
+            } 
+        }
+    };
+
+    private boolean needNewChildren(String[] labels, List<PlotElement> childPeles) {
+        if ( childPeles.isEmpty() ) return true;
+        List<String> ll= Arrays.asList(labels);
+        for ( PlotElement p: childPeles ) {
+            if ( !ll.contains( p.getComponent() ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * the DataSourceFilter id has changed, so we need to stop listening to the
+     * old one and connect to the new one.  Also, if the old dataSourceFilter is
+     * now an orphan, delete it from the application.
+     */
+    private void changeDataSourceFilter() {
+        if (dsf != null) {
+            unbindDsf();
+            List<DomNode> usages= DomUtil.dataSourceUsages(dom, dsf.getId() );
+            if ( usages.isEmpty() ) {
+                dom.controller.deleteDataSourceFilter(dsf);
+            }
+        }
+
+        assert (plotElement.getDataSourceFilterId() != null);
+        if ( plotElement.getDataSourceFilterId().equals("") ) return;
+
+        dsf = dom.controller.getDataSourceFilterFor(plotElement);
+
+        if ( dsf==null ) {
+            throw new NullPointerException("couldn't find the data for this plot element");
+        } else {
+            dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
+            dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
+        }
+        setDataSourceFilterController( dsf.controller );
+    }
+
+    private Color deriveColor( Color color, int i ) {
+
+        float[] colorHSV = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
+        if (colorHSV[2] < 0.7f) {
+            colorHSV[2] = 0.7f;
+        }
+        if (colorHSV[1] < 0.7f) {
+            colorHSV[1] = 0.7f;
+        }
+        return Color.getHSBColor(i / 6.f, colorHSV[1], colorHSV[2]);
+    }
+
+    /**
+     * apply process to the data.  In general these can be done on the same thread (like
+     * slice1), but some are slow (like fftPower).
+     * 
+     * @param c
+     * @param fillDs
+     * @return
+     * @throws RuntimeException
+     */
+    private QDataSet processDataSet(String c, QDataSet fillDs) throws RuntimeException {
+        String label= null;
+        if (c.length() > 5 && c.startsWith("|")) {
+            // slice and collapse specification
+            if ( DataSetOps.isProcessAsync(c) ) {
+                ProgressMonitor mon= DasProgressPanel.createComponentPanel( getDasPlot(), "process data set" );
+                fillDs = DataSetOps.sprocess(c, fillDs, mon );
+            } else {
+                fillDs = DataSetOps.sprocess(c, fillDs, null);
+            }
+        } else {
+            if (!plotElement.getComponent().equals("") && fillDs.length() > 0 && fillDs.rank() == 2) {
+                String[] labels = SemanticOps.getComponentLabels(fillDs);
+                if (plotElement.getComponent().equals("X")) {
+                    fillDs = DataSetOps.slice1(fillDs, 0);
+                    label = labels[0];
+                } else if (plotElement.getComponent().equals("Y")) {
+                    fillDs = DataSetOps.slice1(fillDs, 1);
+                    label = labels[1];
+                } else if (plotElement.getComponent().equals("Z")) {
+                    fillDs = DataSetOps.slice1(fillDs, 2);
+                    label = labels[2];
+                } else {
+                    for (int i = 0; i < labels.length; i++) {
+                        if (labels[i].equals(plotElement.getComponent())) {
+                            fillDs = DataSetOps.slice1(fillDs, i);
+                            label = labels[i];
+                            break;
+                        }
+                    }
+                }
+                if (label == null && !isPendingChanges()) {
+                    RuntimeException ex = new RuntimeException("component not found " + plotElement.getComponent());
+                    throw ex;
+                }
+            }
+        }
+        return fillDs;
+    }
+
+    /**
+     * calculate the interpretted metadata after the slicing.
+     * @param c
+     * @param properties
+     * @return
+     */
+    Map<String,Object> processProperties( String c, Map<String,Object> properties ) {
+        if (c.length() > 5 && c.startsWith("|")) {
+            // slice and collapse specification
+            properties = MetadataUtil.sprocess(c, properties );
+        }
+        return properties;  
+    }
+
+    private boolean rendererAcceptsData(QDataSet fillDs) {
+        if ( getRenderer() instanceof SpectrogramRenderer ) {
+            if ( fillDs.rank()==3 ) {
+                QDataSet dep0= (QDataSet) fillDs.property( QDataSet.DEPEND_0 );  // only support das2 tabledataset scheme.
+                if ( dep0!=null ) return false;
+                return rendererAcceptsData( DataSetOps.slice0(fillDs,0) );
+            } else {
+                return fillDs.rank()==2;
+            } 
+        } else if ( getRenderer() instanceof SeriesRenderer) {
+            if ( fillDs.rank()==1 ) {
+                return true;
+            } else if ( fillDs.rank()==2 ) {
+                return SemanticOps.isBundle(fillDs);
+            } else {
+                return false;
+            }
+        } else if ( getRenderer() instanceof ImageVectorDataSetRenderer ) {
+            if ( fillDs.rank()==1 ) {
+                return true;
+            } else if ( fillDs.rank()==2 ) {
+                return SemanticOps.isBundle(fillDs);
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * returns true for commands (executed by sprocess, see the Operations element)
+     * that cannot occur in interactive time.  They would block the AWT event thread
+     * making the GUI uncontrollable while the process is running.  
+     * Right now just the FFT processes are marked and run on a different thread.
+     * 
+     * @param cmd
+     * @return
+     */
+    private boolean isAsyncProcess( String cmd ) {
+        return cmd.contains("fft");
+    }
+
+    /**
+     * set the dataset that will be plotted.  If the component property is non-null, then
+     * additional filtering will be performed.  See http://papco.org/wiki/index.php/DataReductionSpecs
+     * @param fillDs
+     * @throws IllegalArgumentException
+     */
+    private void setDataSet(QDataSet fillDs, boolean checkUnits) throws IllegalArgumentException {
+
+        // since we might delete sibling plotElements here, make sure each plotElement is still part of the application
+        if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
+            return;
+        }
+
+        String c= plotElement.getComponent();
+        try {
+            if ( fillDs!=null ) {
+                fillDs = processDataSet(c, fillDs );
+                if ( checkUnits && doUnitsCheck( fillDs ) ) { // bug 3104572: slicing would drop units, so old vaps wouldn't work
+                    Plot plot= this.dom.getController().getPlotFor(plotElement);
+                    PlotController pc= plot.getController();
+                    pc.doPlotElementDefaultsUnitsChange(plotElement);
+                }
+            }
+            _setDataSet(fillDs);
+        } catch ( RuntimeException ex ) {
+            if (getRenderer() != null) {
+                getRenderer().setException(ex);
+                getRenderer().setDataSet(null);
+                _setDataSet(null);
+            } else {
+                throw ex;
+            }
+            return;
+        }
+
+        if ( fillDs!=null && getRenderer() != null) {
+            if (rendererAcceptsData(fillDs)) {
+                getRenderer().setDataSet(fillDs);
+//                setStatus("adapting to legacy data model...");
+//                org.das2.dataset.DataSet das2ds= DataSetAdapter.createLegacyDataSet(fillDs);
+//                setStatus("done, adapting to legacy data model");
+//                setStatus("pass dataset to renderer...");
+//                getRenderer().setDataSet(das2ds);
+//                setStatus("done, pass dataset to renderer");
+            } else {
+                getRenderer().setDataSet(null);
+                getRenderer().setException(new Exception("renderer cannot plot " + fillDs));
+            }
+        }
+
+    }
+
+    /**
+     * the current dataset plotted.  
+     */
+    public static final String PROP_DATASET = "dataSet";
+
+    protected QDataSet dataSet = null;
+
+    public QDataSet getDataSet() {
+        return dataSet;
+    }
+
+    public void _setDataSet(QDataSet dataSet) {
+        QDataSet oldDataSet = this.dataSet;
+        this.dataSet = dataSet;
+        if ( plotElement.getLegendLabel().contains("%{") && renderer!=null ) {
+            String s= (String)getLabelConverter().convertForward(plotElement.getLegendLabel());
+            renderer.setLegendLabel(s);
+        }
+        propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
+    }
+
+
+    PropertyChangeListener fillDataSetListener = new PropertyChangeListener() {
+
+        public synchronized void propertyChange(PropertyChangeEvent evt) {
+            changesSupport.performingChange( this, PENDING_SET_DATASET );
+            if (!Arrays.asList(dom.getPlotElements()).contains(plotElement)) {
+                System.err.println("kludge pec446 cannot be removed");
+                return;  // TODO: kludge, I was deleted. I think this can be removed now.  The applicationController was preventing GC.
+            }
+            QDataSet fillDs = dsf.controller.getFillDataSet();
+            logger.log(Level.FINE, "{0} got new dataset: {1}  resetComponent={2}  resetPele={3}  resetRanges={4}", new Object[]{plotElement, fillDs, resetComponent, resetPlotElement, resetRanges});
+            if ( resetComponent ) {
+                //if ( !plotElement.component.equals("") )  {
+                //    plotElement.setComponent("");
+                //} else {
+                    plotElement.component=""; // we must avoid firing an event here, causes problems //TODO: why?
+                //}
+                setResetComponent(false);
+            }
+            updateDataSet();
+            changesSupport.changePerformed( this, PENDING_SET_DATASET );
+        }
+
+        @Override
+        public String toString() {
+            return "" + PlotElementController.this;
+        }
+
+    };
+
+    /**
+     * get the dataset from the dataSourceFilter, and plot it possibly after
+     * slicing component.
+     * @throws IllegalArgumentException
+     */
+    private void updateDataSet() throws IllegalArgumentException {
+        if ( getRenderer()!=null ) getRenderer().setDataSet(null);
+        QDataSet fillDs = dsf.controller.getFillDataSet();
+        if (fillDs != null) {
+            if (resetPlotElement) {
+                if (plotElement.getComponent().equals("")) {
+                    RenderType renderType = AutoplotUtil.guessRenderType(fillDs);
+                    plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
+                    resetPlotElement(fillDs, renderType);
+                    setResetPlotElement(false);
+                } else if ( plotElement.getComponent().startsWith("|") ) {
+                    try {
+                        QDataSet fillDs2 = processDataSet( plotElement.getComponent(), fillDs );
+                        RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
+                        plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
+                        resetPlotElement(fillDs2, renderType);
+                        setResetPlotElement(false);
+                    } catch ( RuntimeException ex ) {
+                        setStatus("warning: Exception in process: " + ex );
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    if (renderer == null) maybeCreateDasPeer();
+                    if (resetRanges) doResetRanges();
+                    setResetPlotElement(false);
+                }
+            } else if (resetRanges) {
+                doResetRanges();
+                setResetRanges(false);
+            } else if (resetRenderType) {
+                doResetRenderType(plotElement.getRenderType());
+            }
+        }
+        if (fillDs == null) {
+            if (getRenderer() != null) {
+                getRenderer().setDataSet(null);
+                getRenderer().setException(null); // remove leftover message.
+            }
+            setDataSet(fillDs, false);
+        } else {
+            setDataSet(fillDs, true);
+        }
+    }
+
+    /**
+     * true indicates that the new renderType makes the axis dimensions change.
+     * For example, switching from spectrogram to series (to get a stack of components)
+     * causes the z axis to become the yaxis.
+     * @param oldRenderType
+     * @param newRenderType
+     */
+    private boolean axisDimensionsChange( RenderType oldRenderType, RenderType newRenderType ) {
+        if ( oldRenderType==newRenderType ) return false;
+        if ( newRenderType==RenderType.pitchAngleDistribution ) return true;
+        if ( oldRenderType==RenderType.spectrogram && newRenderType==RenderType.nnSpectrogram ) {
+            return false;
+        } else if ( newRenderType==RenderType.nnSpectrogram && oldRenderType==RenderType.spectrogram ) {
+            return false;
+        } else if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
+            return true;
+        } else {
+            if ( oldRenderType==RenderType.spectrogram || oldRenderType==RenderType.nnSpectrogram ) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private static String[] getDimensionNames( QDataSet ds ) {
+
+        String[] depNames = new String[ds.rank()];
+        for (int i = 0; i < ds.rank(); i++) {
+            depNames[i] = "dim" + i;
+            QDataSet dep0 = (QDataSet) ds.property("DEPEND_" + i);
+            if (dep0 != null) {
+                String dname = (String) dep0.property(QDataSet.NAME);
+                if (dname != null) {
+                    depNames[i] = dname;
+                }
+            }
+        }
+
+        return depNames;
+    }
+
+    /**
+     * guess the best sprocess to reduce the rank to something we can display.
+     * guess the best dimension to slice by default, based on metadata.  Currently,
+     * this looks for the names lat, lon, and angle.
+     *
+     * @param fillDs
+     * @return sprocess string like "slice1(0)"
+     */
+    private static String guessSlice( QDataSet fillDs ) {
+        String[] depNames= getDimensionNames(fillDs);
+
+        int lat = -1, lon = -1;
+
+        int[] slicePref = new int[]{2, 2, 2}; // slicePref big means more likely to slice.
+        for (int i = 0; i < depNames.length; i++) {
+            String n = depNames[i].toLowerCase();
+            if (n.startsWith("lat")) {
+                slicePref[i] = 0;
+                lat = i;
+            } else if (n.startsWith("lon")) {
+                slicePref[i] = 0;
+                lon = i;
+            } else if (n.contains("time") ) {
+                slicePref[i] = 1;
+            } else if (n.contains("epoch") ) {
+                slicePref[i] = 1;
+            } else if (n.contains("angle")) {
+                slicePref[i] = 4;
+            } else if (n.contains("alpha") ) { // commonly used for pitch angle in space physics
+                slicePref[i] = 4;
+            } else if (n.contains("bundle")) {
+                slicePref[i] = 4;
+            }
+        }
+
+        int sliceIndex = 0;
+        int bestSlice = 0;
+        boolean noPref= true;
+        for (int i = 0; i < 3; i++) {
+            if ( i>0 && slicePref[i]!=slicePref[i-1] ) noPref= false;
+            if (slicePref[i] > bestSlice) {
+                sliceIndex = i;
+                bestSlice = slicePref[i];
+            }
+        }
+
+        // if we have large dims and one small dim (image), then pick small dim.
+        if ( noPref ) {
+            int[] qubeDims= DataSetUtil.qubeDims(fillDs);
+            if ( qubeDims!=null ) {
+                int imin= -1;
+                int min= Integer.MAX_VALUE;
+                int nextMin= Integer.MAX_VALUE;
+                for ( int i=0; i<qubeDims.length; i++ ) {
+                    if ( qubeDims[i]<min ) {
+                        nextMin= min;
+                        min= qubeDims[i];
+                        imin= i;
+                    }
+                }
+                if ( min<4 && nextMin>10 ) {
+                    sliceIndex= imin;
+                }
+            }
+        }
+
+        // pick a slice index near the middle, which is less likely to be all fill.
+        int n=0;
+        if ( sliceIndex==0 ) {
+            n= fillDs.length() / 2;
+        } else if ( sliceIndex==1 ) {
+            n= fillDs.length(0) / 2;
+        } else if ( sliceIndex==2 ) {
+            n= fillDs.length(0,0) / 2;
+        } else if ( sliceIndex==3 ) {
+            n= fillDs.length(0,0,0) / 2;
+        }
+
+        String result= "|slice"+sliceIndex+"("+n+")";
+        if (lat > -1 && lon > -1 && lat < lon) {
+            result+="|transpose()";
+        }
+
+        //if ( fillDs.rank()>3 ) {
+        //    result="|slice0(0)"+result;
+        //}
+
+        return result;
+
+    }
+
+    private boolean isLastDimBundle( QDataSet ds ) {
+        if ( ds.rank()==1 ) {
+            return ds.property(QDataSet.BUNDLE_0)!=null;
+        } else if ( ds.rank()==2 ) {
+            return ds.property(QDataSet.BUNDLE_1)!=null;
+        } else if ( ds.rank()==3 ) {
+            boolean result= ds.property(QDataSet.BUNDLE_1,0)!=null;
+            QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1,0);
+            if ( dep1!=null && ( dep1.property(QDataSet.UNITS) instanceof EnumerationUnits ) ) result=true;
+            return result;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * preconditions:
+     *   the new renderType has been identified.
+     *   The dataset to be rendered has been identified.
+     * postconditions:
+     *   old child plotElements have been deleted.
+     *   child plotElements have been added when needed.
+     * @param fillDs
+     * @param renderType
+     */
+    private void resetPlotElement(QDataSet fillDs, RenderType renderType) {
+        logger.log(Level.FINEST, "resetPlotElement({0} {1}) ele={2}", new Object[]{fillDs, renderType, plotElement});
+        if (renderer != null) {
+            renderer.setActive(true);
+        }
+
+        if (fillDs != null) {
+
+            //boolean lastDimBundle= isLastDimBundle( fillDs );
+            //boolean joinOfBundle= fillDs.property(QDataSet.JOIN_0)!=null && lastDimBundle;
+            int ndim= Ops.dimensionCount(fillDs);
+            boolean shouldSlice= ndim>3 && plotElement.isAutoComponent();
+
+            boolean shouldHaveChildren= fillDs.rank() == 2
+                    &&  ( renderType != RenderType.spectrogram 
+                    && renderType != RenderType.nnSpectrogram
+                    && renderType != RenderType.digital
+                    && renderType != RenderType.pitchAngleDistribution )
+                    &&  fillDs.length(0) < QDataSet.MAX_UNIT_BUNDLE_COUNT;
+            //if ( joinOfBundle ) shouldHaveChildren= true;
+
+            if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) {
+                QDataSet bdesc= (QDataSet) fillDs.property(QDataSet.BUNDLE_1);
+                if ( null!=bdesc.property(QDataSet.CONTEXT_0,bdesc.length()-1) ) {
+                    shouldHaveChildren= false;
+                }
+            }
+
+            String[] labels = null;
+            if ( shouldHaveChildren ) labels= SemanticOps.getComponentLabels(fillDs);
+
+            boolean weShallAddChildren=
+                    plotElement.isAutoComponent()
+                    && shouldHaveChildren
+                    && needNewChildren( labels, getChildPlotElements() );
+
+            if ( !shouldHaveChildren || weShallAddChildren ) { // delete any old child plotElements
+                List<PlotElement> childEles= getChildPlotElements();
+                for ( PlotElement p : childEles ) {
+                    if ( dom.plotElements.contains(p) ) {  // kludge to avoid runtime exception.  Why is it deleted twice?
+                        dom.controller.deletePlotElement(p);
+                    }
+                    plotElement.getStyle().removePropertyChangeListener( p.getController().parentStyleListener );
+                }
+            }
+
+            if ( !shouldSlice ) doResetRenderType(plotElement.getRenderType());
+            setResetPlotElement(false);
+
+            if ( resetRanges && !shouldSlice ) {
+                doResetRanges();
+                setResetRanges(false);
+            }
+
+            if ( shouldHaveChildren ) {
+                renderer.setActive(false);
+                plotElement.setDisplayLegend(false);
+            }
+
+            if ( shouldSlice ) {
+                String component= guessSlice( fillDs );
+                String existingComponent= plotElement.getComponent();
+                if ( !existingComponent.equals("") ) {
+                    plotElement.setComponentAutomatically( existingComponent + component );
+                } else {
+                    plotElement.setComponentAutomatically( component );  // it'll reenter this code now.  problem--autorange is based on slice.
+                }
+                doResetRenderType(plotElement.getRenderType());
+                return;
+            }
+
+            // add additional plotElements when it's a bundle of rank1 datasets.
+            if ( weShallAddChildren ) {
+
+                Lock lock = dom.controller.mutatorLock();
+                lock.lock();
+                try {
+                    Color c = plotElement.getStyle().getColor();
+                    Color fc= plotElement.getStyle().getFillColor();
+                    Plot domPlot = dom.controller.getPlotFor(plotElement);
+                    List<PlotElement> cp = new ArrayList<PlotElement>(fillDs.length(0));
+                    for (int i = 0; i < fillDs.length(0); i++) {
+                        PlotElement ele = dom.controller.copyPlotElement(plotElement, domPlot, dsf);
+                        ele.controller.getRenderer().setActive(false);
+                        cp.add(ele);
+                        ele.setParent( plotElement.getId() );
+                        plotElement.getStyle().addPropertyChangeListener( ele.controller.parentStyleListener );
+                        ele.getStyle().setColor(deriveColor(c, i));
+                        ele.getStyle().setFillColor( deriveColor(fc,i).brighter() );
+                        String s= plotElement.getComponent();
+                        if ( s.equals("") ) {
+                            s= labels[i];
+                        } else {
+                            s= s+"|unbundle('"+labels[i]+"')";
+                        }
+                        ele.setComponentAutomatically(s);
+                        ele.setDisplayLegend(true);
+                        if ( ele.isAutoLabel() ) ele.setLegendLabelAutomatically(s.trim());
+                        ele.setRenderTypeAutomatically(plotElement.getRenderType()); // this creates the das2 SeriesRenderer.
+                        ele.controller.setDataSet(fillDs, false);
+                    }
+                    for ( PlotElement ele: cp ) {
+                        ele.controller.getRenderer().setActive(true);
+                    }
+                    renderer.setActive(false);
+                    setChildPlotElements(cp);
+                } finally {
+                    lock.unlock();
+                }
+            }
+
+        } else {
+            doResetRenderType(plotElement.getRenderType());
+            
+        }
+    }
+
+    /**
+     * When the data source changes, we will need to autorange so that the axis
+     * units are set correctly and things are in a consistent state.  One exception
+     * to this is when we are doing state transistions with save/load redo/undo, where
+     * we need to avoid autoranging.  Note a kludge in ApplicationController sync
+     * sets resetRanges to false after the load.
+     */
+    PropertyChangeListener dataSourceDataSetListener = new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            if ( dsfReset ) {
+                setResetComponent(true);
+                setResetPlotElement(true);
+                setResetRanges(true);
+                plotElement.setAutoLabel(true);
+                plotElement.setAutoComponent(true);
+                plotElement.setAutoRenderType(true);
+                maybeSetPlotAutorange();
+            }
+        }
+    };
+
+    /**
+     * we'd like the plot to autorange, so check to see if we are the only
+     * plotElement, and if so, set its autorange and autoLabel flags.
+     */
+    private void maybeSetPlotAutorange() {
+        Plot p= dom.controller.getPlotFor(plotElement);
+        if ( p==null ) return;
+        List<PlotElement> eles= dom.controller.getPlotElementsFor(p);
+        if ( DomUtil.oneFamily(eles) ) {
+            p.getXaxis().setAutoRange(true);
+            p.getYaxis().setAutoRange(true);
+            p.getZaxis().setAutoRange(true);
+            p.getXaxis().setAutoLabel(true);
+            p.getYaxis().setAutoLabel(true);
+            p.getZaxis().setAutoLabel(true);
+            p.setAutoLabel(true);
+            p.setAutoBinding(true);
+        }
+    }
+    private void setDataSourceFilterController(final DataSourceController dsc) {
+        dsc.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
+        dsc.addPropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
+    }
+    /**
+     * true indicates the controller should autorange next time the fillDataSet is changed.
+     */
+    public static final String PROP_RESETRANGES = "resetRanges";
+    private boolean resetRanges = false;
+
+    public boolean isResetRanges() {
+        return resetRanges;
+    }
+
+    public void setResetRanges(boolean resetRanges) {
+        boolean oldResetRanges = this.resetRanges;
+        this.resetRanges = resetRanges;
+        propertyChangeSupport.firePropertyChange(PROP_RESETRANGES, oldResetRanges, resetRanges);
+    }
+
+    /**
+     * true indicates the controller should install a new renderer to implement the
+     * renderType selection.  This may mean that we introduce or remove child plotElements.
+     * This implies resetRenderType.
+     */
+    public static final String PROP_RESETPLOTELEMENT = "resetPlotElement";
+    private boolean resetPlotElement = false;
+
+    public boolean isResetPlotElement() {
+        return resetPlotElement;
+    }
+
+    public void setResetPlotElement(boolean resetPlotElement) {
+        boolean old = this.resetPlotElement;
+        this.resetPlotElement = resetPlotElement;
+        propertyChangeSupport.firePropertyChange(PROP_RESETPLOTELEMENT, old, resetPlotElement);
+    }
+
+    /**
+     * true indicates that the component should be reset when the dataset arrives.  This
+     * is added as a controller property so that clients can clear this setting if
+     * they do not want the component to be reset.  This is only considered if resetPlotElement is
+     * set.
+     */
+    public static final String PROP_RESETCOMPONENT = "resetComponent";
+
+    private boolean resetComponent = false;
+
+    public boolean isResetComponent() {
+        return resetComponent;
+    }
+
+    public void setResetComponent(boolean resetComponent) {
+        boolean oldResetComponent = this.resetComponent;
+        this.resetComponent = resetComponent;
+        propertyChangeSupport.firePropertyChange(PROP_RESETCOMPONENT, oldResetComponent, resetComponent);
+    }
+
+
+    /**
+     * true indicates the peer should be reset to the current renderType.
+     */
+    public static final String PROP_RESETRENDERTYPE = "resetRenderType";
+    private boolean resetRenderType = false;
+
+    public boolean isResetRenderType() {
+        return resetRenderType;
+    }
+
+    public void setResetRenderType(boolean resetRenderType) {
+        boolean oldResetRenderType = this.resetRenderType;
+        this.resetRenderType = resetRenderType;
+        propertyChangeSupport.firePropertyChange(PROP_RESETRENDERTYPE, oldResetRenderType, resetRenderType);
+    }
+
+    /**
+     * when true, a change in the DataSourceFilter should reset the plotElement.
+     */
+    public static final String PROP_DSFRESET = "dsfReset";
+
+    private boolean dsfReset = true;
+
+    public boolean isDsfReset() {
+        return dsfReset;
+    }
+
+    public void setDsfReset(boolean dsfReset) {
+        boolean oldDsfReset = this.dsfReset;
+        this.dsfReset = dsfReset;
+        propertyChangeSupport.firePropertyChange(PROP_DSFRESET, oldDsfReset, dsfReset);
+    }
+
+    protected Renderer renderer = null;
+
+    public Renderer getRenderer() {
+        return renderer;
+    }
+
+    private void setRenderer(Renderer renderer) {
+        Renderer oldRenderer= this.renderer;
+        ApplicationController ac = this.dom.controller;
+        if ( oldRenderer!=null ) {
+            ac.unbind( plotElement, PlotElement.PROP_LEGENDLABEL, oldRenderer, Renderer.PROP_LEGENDLABEL );
+            ac.unbind( plotElement, PlotElement.PROP_DISPLAYLEGEND, oldRenderer, Renderer.PROP_DRAWLEGENDLABEL);
+            ac.unbind( plotElement, PlotElement.PROP_ACTIVE, oldRenderer, Renderer.PROP_ACTIVE );
+        }
+        this.renderer = renderer;
+        ac.unbindImpl(node);
+        if (renderer instanceof SeriesRenderer) {
+            bindToSeriesRenderer((SeriesRenderer) renderer);
+            bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
+        } else if (renderer instanceof SpectrogramRenderer) {
+            bindToSpectrogramRenderer((SpectrogramRenderer) renderer);
+            bindToSeriesRenderer(new SeriesRenderer());
+        } else if (renderer instanceof ImageVectorDataSetRenderer) {
+            bindToImageVectorDataSetRenderer((ImageVectorDataSetRenderer) renderer);
+        } else {
+            bindToSpectrogramRenderer(new SpectrogramRenderer(null, null));
+            bindToSeriesRenderer(new SeriesRenderer());
+        }
+        Plot mip= ac.getPlotFor(plotElement);
+        if ( mip!=null ) {  // transitional state
+            JMenuItem mi= mip.getController().getPlotElementPropsMenuItem();
+            if ( mi!=null ) mi.setIcon( renderer.getListIcon() );
+        }
+        renderer.setId( "rend_"+plotElement.getId());
+        ac.bind(plotElement, PlotElement.PROP_LEGENDLABEL, renderer, Renderer.PROP_LEGENDLABEL, getLabelConverter() );
+        ac.bind(plotElement, PlotElement.PROP_DISPLAYLEGEND, renderer, Renderer.PROP_DRAWLEGENDLABEL);
+        ac.bind(plotElement, PlotElement.PROP_ACTIVE, renderer, Renderer.PROP_ACTIVE );
+    }
+
+    /**
+     * Do initialization to get the plotElement and attached plot to have reasonable
+     * settings.
+     * preconditions:
+     *   renderType has been identified for the plotElement.
+     * postconditions:
+     *   plotElement's plotDefaults are set based on metadata and autoranging.
+     *   listening plot may invoke its resetZoom method.
+     */
+    private synchronized void doResetRanges() {
+        logger.finest("doResetRanges...");
+        setStatus("busy: do autorange");
+        changesSupport.performingChange(this, PENDING_RESET_RANGE);
+
+        Plot plot = dom.controller.getPlotFor(plotElement);
+
+        PlotElement peleCopy = (PlotElement) plotElement.copy();
+        peleCopy.setId("");
+        peleCopy.setParent("");
+        peleCopy.getPlotDefaults().syncTo( plot, Arrays.asList(DomNode.PROP_ID, Plot.PROP_ROWID, Plot.PROP_COLUMNID) );
+
+        DataSourceController dsc= getDataSourceFilter().getController();
+
+        QDataSet fillDs = processDataSet( plotElement.getComponent(), getDataSourceFilter().controller.getFillDataSet() );
+        Map props= processProperties( plotElement.getComponent(), dsc.getFillProperties() ); //TODO: support components
+
+        if ( props==null ) {
+            System.err.println("null properties in doResetRanges");
+        }
+        
+        if (dom.getOptions().isAutolabelling()) { //TODO: this is pre-autoLabel property.
+
+            doMetadata(peleCopy, props, fillDs );
+
+            String reduceRankString = getDataSourceFilter().controller.getReduceDataSetString();
+            if (dsf.controller.getReduceDataSetString() != null) { //TODO remove dsf slicing
+                String title = peleCopy.getPlotDefaults().getTitle();
+                title += "!c" + reduceRankString;
+                peleCopy.getPlotDefaults().setTitle(title);
+            }
+            if ( !plotElement.getComponent().equals("") ) {
+                String title = peleCopy.getPlotDefaults().getTitle();
+                title += "!c%{CONTEXT}";
+                peleCopy.getPlotDefaults().setTitle(title);
+            }
+        }
+
+        if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
+            
+            doAutoranging( peleCopy,props,fillDs );
+
+            Renderer newRenderer = getRenderer();
+            if (newRenderer instanceof SeriesRenderer && fillDs != null) {
+                QDataSet d = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                if (d != null) {
+                    ((SeriesRenderer) newRenderer).setCadenceCheck((d.property(QDataSet.CADENCE) != null));
+                } else {
+                    ((SeriesRenderer) newRenderer).setCadenceCheck(true);
+                }
+            }
+            
+        } else {
+            setStatus( "autoranging is disabled" );
+        }
+
+        if ( plotElement.getComponent().equals("") && plotElement.isAutoLabel() ) plotElement.setLegendLabelAutomatically( peleCopy.getLegendLabel() );
+
+        peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // this is how we distinguish it from the original, useless plot defaults.
+        peleCopy.getPlotDefaults().getYaxis().setAutoRange(true);
+        peleCopy.getPlotDefaults().getZaxis().setAutoRange(true);
+
+        if ( logger.isLoggable(Level.FINEST) ) {
+            logger.finest( String.format( "done, autorange  x:%s, y:%s ",
+                    peleCopy.getPlotDefaults().getXaxis().getRange().toString(),
+                    peleCopy.getPlotDefaults().getYaxis().getRange().toString() ) );
+        }
+
+        plotElement.setPlotDefaults( peleCopy.getPlotDefaults() );  // bug 2992903 runs through here
+        plotElement.style.syncTo( peleCopy.style );
+        plotElement.renderType= peleCopy.renderType;  // don't fire an event
+        // and hope that the plot is listening.
+
+        if ( dom.getOptions().isAutoranging() ) {
+            setStatus("done, autorange");
+        }
+
+        changesSupport.changePerformed(this, PENDING_RESET_RANGE);
+    }
+
+
+    /**
+     * extract properties from the data and metadata to get axis labels, fill values, and
+     * preconditions:
+     *    fillData is set.
+     *    fillProperties is set.
+     * postconditions:
+     *    metadata is inspected to get axis labels, fill values, etc.
+     *    renderType is determined and set.
+     * @param autorange
+     * @param interpretMetadata
+     */
+    private static void doMetadata( PlotElement peleCopy, Map<String,Object> properties, QDataSet fillDs ) {
+
+        peleCopy.getPlotDefaults().getXaxis().setLabel("");
+        peleCopy.getPlotDefaults().getYaxis().setLabel("");
+        peleCopy.getPlotDefaults().getZaxis().setLabel("");
+        peleCopy.getPlotDefaults().setTitle("");
+        peleCopy.setLegendLabelAutomatically("");
+        
+        doInterpretMetadata(peleCopy, properties, peleCopy.getRenderType());
+
+        PlotElementUtil.unitsCheck(properties, fillDs); // DANGER--this may cause overplotting problems in the future by removing units
+
+    }
+
+    private static void doInterpretMetadata( PlotElement peleCopy, Map properties, RenderType spec) {
+
+        Object v;
+        final Plot plotDefaults = peleCopy.getPlotDefaults();
+
+        if ((v = properties.get(QDataSet.TITLE)) != null) {
+            plotDefaults.setTitle((String) v);
+        }
+        String legendLabel= null;
+        if ((v = properties.get(QDataSet.NAME)) != null) {
+            legendLabel= (String)v;
+        }
+        if ((v = properties.get(QDataSet.LABEL)) != null) {
+            legendLabel= (String)v;
+        }
+        if ( legendLabel!=null ) {
+            peleCopy.setLegendLabelAutomatically((String) legendLabel);
+        }
+
+        if ( spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ) {
+            if ( (v = properties.get(QDataSet.SCALE_TYPE)) != null) {
+                plotDefaults.getZaxis().setLog(v.equals("log"));
+            }
+
+            if ( (v = properties.get(QDataSet.LABEL)) != null) {
+                plotDefaults.getZaxis().setLabel((String) v);
+            }
+
+            if ( (v = properties.get(QDataSet.DEPEND_1)) != null) {
+                Map m = (Map) v;
+                Object v2 = m.get(QDataSet.LABEL);
+                if (v2 != null) {
+                    plotDefaults.getYaxis().setLabel((String) v2);
+                }
+
+            }
+        } else { // hugeScatter okay
+
+            Map<String,Object> yprop=null, xprop=null, prop=null;
+
+            QDataSet bundle1= (QDataSet) properties.get(QDataSet.BUNDLE_1);
+            if ( bundle1!=null ) {
+                prop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, bundle1.length()-1 ) );
+                xprop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 0 ) );
+                yprop=  DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 1 ) ); // may be the same as prop.
+            } else {
+                prop= properties;
+                xprop= (Map<String, Object>) properties.get( QDataSet.DEPEND_0 );
+                yprop= properties;
+                v = properties.get(QDataSet.PLANE_0);
+                if ( v!=null ) {
+                    yprop= prop;
+                    prop= (Map<String, Object>) v;
+                }
+            }
+
+            if ( (v = yprop.get(QDataSet.SCALE_TYPE)) != null) {
+                plotDefaults.getYaxis().setLog(v.equals("log"));
+            }
+
+            if ( (v = yprop.get(QDataSet.LABEL)) != null) {
+                plotDefaults.getYaxis().setLabel((String) v);
+            }
+
+            if ( xprop!=null && (v = xprop.get(QDataSet.LABEL)) != null) {
+                plotDefaults.getXaxis().setLabel((String) v);
+            }
+
+            if (spec == RenderType.colorScatter) {
+                v = prop.get(QDataSet.LABEL);
+                if (v != null) {
+                    plotDefaults.getZaxis().setLabel((String) v);
+                }
+            }
+
+
+        }
+
+        if ((v = properties.get(QDataSet.DEPEND_0)) != null) {
+            Map m = (Map) v;
+            Object v2 = m.get(QDataSet.LABEL);
+            if ( v2 != null) {
+                plotDefaults.getXaxis().setLabel((String) v2);
+            }
+
+        }
+
+    }
+
+    /**
+     * this is the old updateFillSeries and updateFillSpectrogram code.  This calculates
+     * ranges and preferred symbol settings, and puts the values in peleCopy.plotDefaults.
+     * The dom Plot containing this plotElement should be listening for changes in plotElement.plotDefaults,
+     * and can then decide if it wants to use the autorange settings.
+     *
+     * This also sets the style node of the plotElement copy, so its values should be sync'ed as well.
+     * 
+     * @param peleCopy
+     * @param props
+     * @param spec
+     */
+    private static void doAutoranging( PlotElement peleCopy, Map<String,Object> props, QDataSet fillDs ) {
+
+        RenderType spec = peleCopy.getRenderType();
+
+        if (props == null) {
+            props = Collections.EMPTY_MAP;
+        }
+
+
+        if (spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ||  spec== RenderType.pitchAngleDistribution ) {
+
+            QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            if (xds == null) {
+                if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
+                    JoinDataSet ds= new JoinDataSet(2);
+                    int xtag=0;
+                    for ( int i=0; i<fillDs.length(); i++ ) {
+                        QDataSet xds1= (QDataSet)fillDs.property(QDataSet.DEPEND_0,i);
+                        if ( xds1==null ) {
+                            xds1= Ops.linspace( xtag, xtag+fillDs.length(i)-1, fillDs.length(i) );
+                            xtag= xtag + fillDs.length(i);
+                        }
+                        ds.join(xds1);
+                    }
+                    xds = ds;
+                } else {
+                    xds = DataSetUtil.indexGenDataSet(fillDs.length());
+                }
+            }
+
+            QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
+            Map<String,Object> yprops= (Map) props.get(QDataSet.DEPEND_1);
+            if (yds == null) {
+                if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
+                    JoinDataSet ds= new JoinDataSet(2);
+                    for ( int i=0; i<fillDs.length(); i++ ) {
+                        QDataSet yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,i);
+                        if ( yds1==null ) {
+                            yds1= Ops.linspace( 0, fillDs.length(i,0)-1, fillDs.length(i,0) );
+                        }
+                        ds.join(yds1);
+                    }
+                    yds = ds;
+                } else if ( fillDs.property(QDataSet.JOIN_0)==null
+                        && fillDs.length()>0 
+                        && fillDs.property(QDataSet.DEPEND_0,0)!=null ) { 
+                    JoinDataSet ds= new JoinDataSet(2);
+                    Units u= null;
+                    for ( int i=0; i<fillDs.length(); i++ ) {
+                        QDataSet tds= (QDataSet)fillDs.property(QDataSet.DEPEND_0,i);
+                        if ( u==null ) {
+                            u= SemanticOps.getUnits(tds);
+                        } else {
+                            Units tu= SemanticOps.getUnits(tds);
+                            if ( tu==null ) tu= Units.dimensionless;
+                            if ( tu!=u ) {
+                                throw new IllegalArgumentException("Unequal units: wanted "+u+" got "+tu );
+                            }
+                        }
+                        ds.join(tds);
+                    }
+                    ds.putProperty(QDataSet.UNITS, u);
+                    yds = ds;
+                } else if ( fillDs.rank()>1 ) {
+                    yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); //TODO: QUBE assumed
+                } else {
+                    yds = DataSetUtil.indexGenDataSet(10); // later the user will get a message "renderer cannot plot..."
+                    yprops= null;
+                }
+            }
+
+            Units xunits= SemanticOps.getUnits(xds); 
+            Units yunits= SemanticOps.getUnits(yds);
+            Units zunits= SemanticOps.getUnits(fillDs);
+
+            if ( UnitsUtil.isOrdinalMeasurement( xunits ) || UnitsUtil.isOrdinalMeasurement(yunits) || UnitsUtil.isOrdinalMeasurement(zunits) ) {
+                return;
+            }
+
+            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
+
+            AutoplotUtil.AutoRangeDescriptor ydesc = AutoplotUtil.autoRange(yds, yprops );
+
+            //QDataSet hist= getDataSourceFilter().controller.getHistogram();
+            AutoplotUtil.AutoRangeDescriptor desc;
+            //if ( false && hist!=null ) {
+            //    desc= AutoplotUtil.autoRange( hist, fillDs, props );
+            //} else {
+                desc = AutoplotUtil.autoRange( fillDs, props );
+            //}
+
+            peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);
+            peleCopy.getPlotDefaults().getZaxis().setLog(desc.log);
+
+            if ( spec==RenderType.pitchAngleDistribution ) {
+                ydesc.range= new DatumRange( ydesc.range.max().multiply(-1), ydesc.range.max() );
+                peleCopy.getPlotDefaults().getXaxis().setLog(false);
+                peleCopy.getPlotDefaults().getXaxis().setRange(ydesc.range);
+                peleCopy.getPlotDefaults().getYaxis().setLog(false);
+                peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+                peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+                peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
+                peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
+            }
+
+        } else {
+
+            QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
+            AutoplotUtil.AutoRangeDescriptor ydesc;
+            
+            QDataSet depend0;
+
+            if ( false && hist!=null ) {
+                ydesc= AutoplotUtil.autoRange( hist, fillDs, props );
+                depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            } else {
+                if ( SemanticOps.isBundle(fillDs) ) {
+                    depend0= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                    if ( depend0==null ) {
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props );
+                        depend0= DataSetOps.unbundle(fillDs,0);
+                    } else {
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 0 ), props ); //TODO: why just the first?
+                    }
+                } else {
+                    ydesc = AutoplotUtil.autoRange( fillDs, props );
+                    depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                }
+            }
+
+            //TODO: This is really sloppy.
+            boolean isSeries;
+            boolean hasRenderType= props.get( QDataSet.RENDER_TYPE ) !=null;
+            isSeries = (depend0 == null || DataSetUtil.isMonotonic(depend0));
+            if ( !hasRenderType ) {
+                if (isSeries) {
+                    peleCopy.getStyle().setSymbolConnector(PsymConnector.SOLID);
+                } else {
+                    peleCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
+                    if ( peleCopy.getRenderType()==RenderType.series )
+                        peleCopy.setRenderType( RenderType.scatter );
+                }
+                peleCopy.getStyle().setLineWidth(1.0f);
+
+            }
+
+            peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
+            peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
+
+            QDataSet xds= depend0;
+            if (xds == null) {
+                xds = DataSetUtil.indexGenDataSet(fillDs.length());
+            }
+
+            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
+
+            peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+            peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+
+            if (spec == RenderType.colorScatter) {
+                AutoplotUtil.AutoRangeDescriptor zdesc;
+                if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
+                    zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, 2 ),null);
+                } else {
+                    QDataSet plane0= (QDataSet) fillDs.property(QDataSet.PLANE_0);
+                    if ( plane0!=null ) {
+                        zdesc= AutoplotUtil.autoRange(plane0,
+                            (Map) props.get(QDataSet.PLANE_0));
+                        peleCopy.getPlotDefaults().getZaxis().setLog(zdesc.log);
+                        peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
+                        peleCopy.getPlotDefaults().getZaxis().setRange(zdesc.range);
+                    } else {
+                        Logger.getLogger("autoplot.plotelementcontroller").warning("expected color plane_0");
+                    }
+                }
+                 
+
+            }
+
+            if (fillDs.length() > LARGE_DATASET_COUNT) {
+                peleCopy.getStyle().setSymbolConnector(PsymConnector.NONE);
+                peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+                peleCopy.getStyle().setSymbolSize(1.0);
+            } else {
+                peleCopy.getStyle().setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+                if (fillDs.length() > SYMSIZE_DATAPOINT_COUNT) {
+                    peleCopy.getStyle().setSymbolSize(1.0);
+                } else {
+                    peleCopy.getStyle().setSymbolSize(3.0);
+                }
+
+            }
+
+        }
+    }
+
+    /**
+     * get the units of the datasets without autoranging, which is expensive.
+     * This was introduced to fix bug 3104572, where slicing dropped units.
+     * @param peleCopy
+     * @param fillDs
+     * @return true if we had to fix a unit and the plot should be adjusted.
+     */
+    private boolean doUnitsCheck( QDataSet fillDs ) {
+        RenderType spec = plotElement.getRenderType();
+
+        Map<String,Object> props= new HashMap();
+
+        if (props == null) {
+            props = Collections.EMPTY_MAP;
+        }
+
+        DatumRange xrange= plotElement.getPlotDefaults().getXaxis().getRange();
+        DatumRange yrange= plotElement.getPlotDefaults().getYaxis().getRange();
+        DatumRange zrange= plotElement.getPlotDefaults().getZaxis().getRange();
+
+        Units xunits;
+        Units yunits;
+        Units zunits;
+
+        if (spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ||  spec== RenderType.pitchAngleDistribution ) {
+
+            QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            if (xds == null) {
+                if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
+                    JoinDataSet ds= new JoinDataSet(2);
+                    int xtag=0;
+                    for ( int i=0; i<fillDs.length(); i++ ) {
+                        QDataSet xds1= (QDataSet)fillDs.property(QDataSet.DEPEND_0,i);
+                        if ( xds1==null ) {
+                            xds1= Ops.linspace( xtag, xtag+fillDs.length(i)-1, fillDs.length(i) );
+                            xtag= xtag + fillDs.length(i);
+                        }
+                        ds.join(xds1);
+                    }
+                    xds = ds;
+                } else {
+                    xds = DataSetUtil.indexGenDataSet(fillDs.length());
+                }
+            }
+
+            QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
+            Map<String,Object> yprops= (Map) props.get(QDataSet.DEPEND_1);
+            if (yds == null) {
+                if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
+                    JoinDataSet ds= new JoinDataSet(2);
+                    for ( int i=0; i<fillDs.length(); i++ ) {
+                        QDataSet yds1= (QDataSet)fillDs.property(QDataSet.DEPEND_1,i);
+                        if ( yds1==null ) {
+                            yds1= Ops.linspace( 0, fillDs.length(i,0)-1, fillDs.length(i,0) );
+                        }
+                        ds.join(yds1);
+                    }
+                    yds = ds;
+                } else if ( fillDs.property(QDataSet.JOIN_0)==null
+                        && fillDs.length()>0
+                        && fillDs.property(QDataSet.DEPEND_0,0)!=null ) {
+                    JoinDataSet ds= new JoinDataSet(2);
+                    Units u= null;
+                    for ( int i=0; i<fillDs.length(); i++ ) {
+                        QDataSet tds= (QDataSet)fillDs.property(QDataSet.DEPEND_0,i);
+                        if ( u==null ) {
+                            u= (Units)tds.property( QDataSet.UNITS );
+                            if ( u==null ) u= Units.dimensionless;
+                        } else {
+                            Units tu= (Units) tds.property( QDataSet.UNITS );
+                            if ( tu==null ) tu= Units.dimensionless;
+                            if ( tu!=u ) throw new IllegalArgumentException("Inconvertable units: wanted "+u);
+                        }
+                        ds.join(tds);
+                    }
+                    ds.putProperty(QDataSet.UNITS, u);
+                    yds = ds;
+                } else if ( fillDs.rank()>1 ) {
+                    yds = DataSetUtil.indexGenDataSet(fillDs.length(0)); //TODO: QUBE assumed
+                } else {
+                    yds = DataSetUtil.indexGenDataSet(10); // later the user will get a message "renderer cannot plot..."
+                    yprops= null;
+                }
+            }
+
+            xunits= SemanticOps.getUnits(xds);
+            yunits= SemanticOps.getUnits(yds);
+            zunits= SemanticOps.getUnits(fillDs);
+
+            if ( spec==RenderType.pitchAngleDistribution ) {
+                xunits= yunits;
+            }
+
+        } else {
+
+            QDataSet depend0;
+
+            if ( SemanticOps.isBundle(fillDs) ) {
+                depend0= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+                if ( depend0==null ) {
+                    yunits= SemanticOps.getUnits( DataSetOps.unbundle(fillDs, 1 ) );
+                    depend0= DataSetOps.unbundle(fillDs,0);
+                } else {
+                    yunits= SemanticOps.getUnits( DataSetOps.unbundle(fillDs, 0 ) ); //TODO: why just the first?
+                }
+            } else {
+                yunits = SemanticOps.getUnits( fillDs );
+                depend0= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            }
+ 
+            QDataSet xds= depend0;
+            if (xds == null) {
+                xds = DataSetUtil.indexGenDataSet(fillDs.length());
+            }
+
+            xunits= SemanticOps.getUnits(xds);
+
+            zunits= Units.dimensionless;
+            if (spec == RenderType.colorScatter) {
+                if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
+                    zunits= SemanticOps.getUnits( ( QDataSet) DataSetOps.unbundle( fillDs, 2 ) );
+                } else {
+                    QDataSet plane0= (QDataSet) fillDs.property(QDataSet.PLANE_0);
+                    if ( plane0!=null ) {
+                        zunits= Units.dimensionless; // NOT SUPPORTED
+                    } else {
+                        Logger.getLogger("autoplot.plotelementcontroller").warning("expected color plane_0");
+                    }
+                }
+
+
+            }
+
+        }
+
+        boolean change= false;
+        if ( xrange.getUnits()==Units.dimensionless && !xunits.isConvertableTo( xrange.getUnits() ) ) {
+            plotElement.getPlotDefaults().getXaxis().setRange( new DatumRange( xrange.min().doubleValue(Units.dimensionless), xrange.max().doubleValue(Units.dimensionless), xunits ) );
+            change= true;
+        }
+        if ( yrange.getUnits()==Units.dimensionless && !yunits.isConvertableTo( yrange.getUnits() ) ) {
+            plotElement.getPlotDefaults().getYaxis().setRange( new DatumRange( yrange.min().doubleValue(Units.dimensionless), yrange.max().doubleValue(Units.dimensionless), yunits ) );
+            change= true;
+        }
+        if ( zrange.getUnits()==Units.dimensionless && !zunits.isConvertableTo( zrange.getUnits() ) ) {
+            plotElement.getPlotDefaults().getZaxis().setRange( new DatumRange( zrange.min().doubleValue(Units.dimensionless), zrange.max().doubleValue(Units.dimensionless), zunits ) );
+            change= true;
+        }
+
+        return change;
+
+    }
+
+
+    /**
+     * return the plot containing this plotElement's renderer, or null.
+     * @return the plot containing this plotElement's renderer, or null.
+     */
+    public DasPlot getDasPlot() {
+        Plot p= dom.controller.getPlotFor(plotElement);
+        if ( p==null ) return null;
+        return p.controller.getDasPlot();
+    }
+
+    private DasColorBar getColorbar() {
+        Plot p= dom.controller.getPlotFor(plotElement);
+        if ( p==null ) {
+            throw new IllegalArgumentException("no plot found for element ("+plotElement+","+plotElement.getPlotId()+")");
+        }
+        return p.controller.getDasColorBar();
+    }
+
+    /**
+     * return the data source and filter for this plotElement.
+     * @return
+     */
+    public DataSourceFilter getDataSourceFilter() {
+        return dsf;
+    }
+
+    /**
+     * return the application that the plotElement belongs to.
+     * @return
+     */
+    public Application getApplication() {
+        return dom;
+    }
+
+    /**
+     * copy style from renderType property to style node.
+     * @param ele
+     */
+    private static void setupStyle( PlotElement ele ) {
+        PlotElementStyle s= ele.getStyle();
+        if ( ele.getRenderType()==RenderType.colorScatter ) {
+            s.setPlotSymbol( DefaultPlotSymbol.CIRCLES );
+            s.setSymbolConnector(PsymConnector.NONE);
+            s.setFillToReference(false);
+        } else if ( ele.getRenderType()==RenderType.series ) {
+            s.setSymbolConnector(PsymConnector.SOLID);
+            s.setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+            s.setFillToReference(false);
+        } else if ( ele.getRenderType()==RenderType.scatter ) {
+            s.setSymbolConnector(PsymConnector.NONE);
+            s.setPlotSymbol(DefaultPlotSymbol.CIRCLES);
+            s.setFillToReference(false);
+        } else if ( ele.getRenderType()==RenderType.stairSteps ) {
+            s.setSymbolConnector(PsymConnector.SOLID);
+            s.setFillToReference(true);
+        } else if ( ele.getRenderType()==RenderType.fillToZero ) {
+            s.setSymbolConnector(PsymConnector.SOLID);
+            s.setFillToReference(true);
+        } else if ( ele.getRenderType()==RenderType.nnSpectrogram ) {
+            s.setRebinMethod( SpectrogramRenderer.RebinnerEnum.nearestNeighbor );
+        } else if ( ele.getRenderType()==RenderType.spectrogram ) {
+            s.setRebinMethod( SpectrogramRenderer.RebinnerEnum.binAverage );
+        }
+    }
+
+    protected void maybeCreateDasPeer(){
+        Renderer oldRenderer = getRenderer();
+        DasColorBar cb= null;
+        if ( RenderTypeUtil.needsColorbar(plotElement.getRenderType()) ) cb= getColorbar();
+
+        setupStyle( plotElement );
+
+        Renderer newRenderer =
+                AutoplotUtil.maybeCreateRenderer( plotElement.getRenderType(),
+                oldRenderer, cb, false );
+
+        if ( cb!=null 
+                && !dom.getController().isValueAdjusting()
+                && RenderTypeUtil.needsColorbar(plotElement.getRenderType()) ) cb.setVisible( true );
+
+        if (oldRenderer != newRenderer || getDasPlot()!=newRenderer.getParent() ) {
+            if ( oldRenderer != newRenderer ) {
+                setRenderer(newRenderer);
+            }
+
+            DasPlot plot = getDasPlot();
+            if ( plot==null ) {
+                System.err.println("brace yourself for crash...");
+                plot = getDasPlot(); // for debugging  Spectrogram->Series
+            }
+
+            DasPlot oldPlot=null;
+            if (oldRenderer != null) {
+                oldPlot= oldRenderer.getParent();
+                if ( oldPlot!=null && oldPlot!=getDasPlot() ) oldRenderer.getParent().removeRenderer(oldRenderer);
+                if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
+            }
+            if ( oldPlot==null || oldRenderer!=newRenderer ) {
+                if ( newRenderer instanceof SpectrogramRenderer ) {
+                    plot.addRenderer(0,newRenderer);
+                } else {
+                    plot.addRenderer(newRenderer);
+                }
+            }
+
+            logger.log(Level.FINEST, "plot.addRenderer {0} {1}", new Object[]{plot, newRenderer});
+            //if (getDataSourceFilter().controller.getFillDataSet() != null) {
+                // this is danger code, I think inserted to support changing render type.
+                // when we change renderType on vector dataset, this is called.
+                //setDataSet( getDataSourceFilter().controller.getFillDataSet(), false );
+            //}
+        }
+
+    }
+
+    /**
+     * used to explicitly set the rendering type.  This installs a das2 renderer
+     * into the plot to implement the render type.
+     *
+     * preconditions:
+     *   renderer type has been identified.
+     * postconditions:
+     *   das2 renderer peer is created and bindings made.
+     * @param renderType
+     */
+    public void doResetRenderType(RenderType renderType) {
+        PlotElement parentPele= getParentPlotElement();
+        if ( parentPele != null ) {
+            parentPele.setRenderType(renderType);
+            return;
+        }
+
+        for ( PlotElement ch: getChildPlotElements() ) {
+            Renderer oldRenderer= ch.getController().getRenderer();
+            ch.renderType= renderType;  // we don't want to enter doResetRenderType.
+            ch.getController().maybeCreateDasPeer();
+            if ( oldRenderer!=ch.getController().getRenderer() ) {
+                QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
+                ch.getController().getRenderer().setDataSet(oldDs);
+            }
+        }
+        Lock lock= this.mutatorLock();
+        lock.lock();
+        try {
+            plotElement.propertyChangeSupport.firePropertyChange( PlotElement.PROP_RENDERTYPE, null, renderType );
+        } finally {
+            lock.unlock();
+        }
+        Renderer oldRenderer= getRenderer();
+        maybeCreateDasPeer();
+        if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
+            QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
+            getRenderer().setDataSet(oldDs);
+        }
+    }
+
+    public synchronized void bindToSeriesRenderer(SeriesRenderer seriesRenderer) {
+        ApplicationController ac = this.dom.controller;
+        ac.bind(plotElement.style, "lineWidth", seriesRenderer, "lineWidth");
+        ac.bind(plotElement.style, "color", seriesRenderer, "color");
+        ac.bind(plotElement.style, "symbolSize", seriesRenderer, "symSize");
+        ac.bind(plotElement.style, "symbolConnector", seriesRenderer, "psymConnector");
+        ac.bind(plotElement.style, "plotSymbol", seriesRenderer, "psym");
+        ac.bind(plotElement.style, "fillColor", seriesRenderer, "fillColor");
+        ac.bind(plotElement.style, PlotElementStyle.PROP_FILL_TO_REFERENCE, seriesRenderer, "fillToReference");
+        ac.bind(plotElement.style, "reference", seriesRenderer, "reference");
+        ac.bind(plotElement.style, "antiAliased", seriesRenderer, "antiAliased");
+    }
+
+    public void bindToSpectrogramRenderer(SpectrogramRenderer spectrogramRenderer) {
+        ApplicationController ac = this.dom.controller;
+
+        ac.bind(plotElement.style, "rebinMethod", spectrogramRenderer, "rebinner");
+        if ( spectrogramRenderer.getColorBar()!=null )
+            ac.bind(plotElement.style, "colortable", spectrogramRenderer.getColorBar(), "type");
+
+    }
+
+    public void bindToImageVectorDataSetRenderer(ImageVectorDataSetRenderer renderer) {
+        ApplicationController ac = this.dom.controller;
+        ac.bind(plotElement.style, "color", renderer, "color");
+    }
+
+    /**
+     * special converter that fills in %{CONTEXT} macro, or inserts it when label is consistent with macro.
+     * @return
+     */
+    private Converter getLabelConverter() {
+        return new Converter() {
+            @Override
+            public Object convertForward(Object value) {
+                String title= (String)value;
+                if ( title.contains("%{CONTEXT}" ) ) {
+                    String contextStr="";
+                    if ( plotElement!=null ) {
+                        if ( dataSet!=null ) {
+                            contextStr= DataSetUtil.contextAsString(dataSet);
+                        }
+                    }
+                    title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+                }
+                return title;
+            }
+
+            @Override
+            public Object convertReverse(Object value) {
+                String title= (String)value;
+                String ptitle=  plotElement.getLegendLabel();
+                if (ptitle.contains("%{CONTEXT}") ) {
+                    String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
+                    if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
+                        return ptitle;
+                    }
+                }
+                return title;
+            }
+        };
+    }
+
+    @Override
+    public boolean isPendingChanges() {
+        return getDataSourceFilter().controller.isPendingChanges() || super.isPendingChanges();
+    }
+
+    private void setStatus(String string) {
+        this.dom.controller.setStatus(string);
+    }
+
+    @Override
+    public String toString() {
+        return "" + this.plotElement + " controller";
+    }
+}

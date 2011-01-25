@@ -13,8 +13,11 @@
 # This should be run from the folder "VirboAutoplot"
 
 # set JAVA5_HOME and JAVA6_HOME
+if [ "" = "$JAVA_HOME" ]; then
+    JAVA_HOME=/usr/local/jdk1.5.0_17/
+fi
 if [ "" = "$JAVA5_HOME" ]; then
-    JAVA5_HOME=/usr/local/jdk1.5.0_17/
+    JAVA5_HOME=$JAVA_HOME
 fi
 if [ "" = "$JAVA6_HOME" ]; then
     JAVA6_HOME=/usr/local/jre1.6.0_14/
@@ -44,15 +47,18 @@ echo "done copy jar file classes."
 
 echo "copy sources..."
 for i in \
-  QDataSet QStream dasCore DataSource \
+  dasCore dasCoreUtil dasCoreDatum \
+  QDataSet QStream DataSource \
   JythonSupport \
+  AutoplotHelp \
   IdlMatlabSupport \
   AudioSystemDataSource \
   BinaryDataSource DataSourcePack JythonDataSource \
   Das2ServerDataSource TsdsDataSource  \
-  NetCdfDataSource CdfDataSource CefDataSource \
+  NetCdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
+  CdfDataSource CdfJavaDataSource CDAWebDataSource \
   VirboAutoplot; do
     echo rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
     rsync -a --exclude .svn ../${i}/src/ temp-volatile-src/
@@ -65,38 +71,21 @@ echo "special handling of META-INF stuff..."
 mkdir temp-volatile-classes/META-INF
 
 file=org.virbo.datasource.DataSourceFactory.extensions
-touch temp-volatile-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-volatile-classes/META-INF/$file
-done
+sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
 file=org.virbo.datasource.DataSourceFactory.mimeTypes
-touch temp-volatile-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-volatile-classes/META-INF/$file
-done
+sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
 file=org.virbo.datasource.DataSourceFormat.extensions
-touch temp-volatile-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-volatile-classes/META-INF/$file
-done
-
+sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
 file=org.virbo.datasource.DataSourceEditorPanel.extensions
-touch temp-volatile-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-volatile-classes/META-INF/$file
-done
-
+sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
 file=helpsets.txt
-touch temp-volatile-classes/META-INF/$file
-for i in `ls ../*/src/META-INF/$file` ; do
-   cat $i >> temp-volatile-classes/META-INF/$file
-done
+sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 
-echo "Main-Class: org.virbo.autoplot.AutoPlotUI" > temp-volatile-src/MANIFEST.MF
+echo "Main-Class: org.virbo.autoplot.AutoplotUI" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
 rm temp-volatile-classes/META-INF/*.RSA
@@ -109,37 +98,19 @@ echo "done special handling of META-INF stuff."
 
 echo "copy resources..."
 cd temp-volatile-src
-#mkdir -p ../temp-volatile-classes/images/toolbox/
-#mkdir -p ../temp-volatile-classes/images/icons/
-#mkdir -p ../temp-volatile-classes/images/toolbar/
-#mkdir -p ../temp-volatile-classes/com/cottagesystems/jdiskhog/resources/
-#mkdir -p ../temp-volatile-classes/org/virbo/autoplot/resources/
-#mkdir -p ../temp-volatile-classes/org/virbo/datasource/
-#mkdir -p ../temp-volatile-classes/org/netbeans/modules/editor/completion/resources/
-
-for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' ); do
+for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.xsl' -o -name '*.xsd' ); do
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
-#for i in `find * -name '*.gif'`; do
-#   cp $i ../temp-volatile-classes/$i
-#done
-#for i in `find * -name '*.html'`; do
-#   cp $i ../temp-volatile-classes/$i
-#done
-#for i in `find * -name '*.py'`; do
-#   cp $i ../temp-volatile-classes/$i
-#done
-#for i in `find * -name '*.jy'`; do
-#   cp $i ../temp-volatile-classes/$i
-#done
 cd ..
 echo "done copy resources."
 
 echo "copy help files..."
 for i in \
-  QDataSet QStream dasCore DataSource \
+  dasCore dasCoreUtil dasCoreDatum \
+  QDataSet QStream DataSource \
   JythonSupport \
+  AutoplotHelp \
   IdlMatlabSupport \
   AudioSystemDataSource \
   BinaryDataSource DataSourcePack JythonDataSource \
@@ -147,9 +118,12 @@ for i in \
   NetCdfDataSource CdfDataSource CefDataSource \
   WavDataSource ImageDataSource ExcelDataSource \
   FitsDataSource OpenDapDataSource \
+  CdfJavaDataSource \
   VirboAutoplot; do
-    echo rsync -a --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
-    rsync -a --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+    if [ -d ../${i}/javahelp/ ]; then
+        echo rsync -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+        rsync -av --exclude .svn ../${i}/javahelp/ temp-volatile-classes/
+    fi
 done
 
 echo "done copy help files."
@@ -160,14 +134,18 @@ hasErrors=0
 echo "compile sources..."
 cd temp-volatile-src
 echo `pwd`
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoPlotUI.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotHelpViewer.java; then hasErrors=1; fi
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/DemoPngWalk.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/beans/*.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
+if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
+
 cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
 for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1 | sed 's/\./\//g'`; do
    echo $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java
@@ -184,8 +162,9 @@ for i in `cat ../temp-volatile-classes/META-INF/org.virbo.datasource.DataSourceE
    if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 $i.java; then hasErrors=1; fi
 done
 
-# NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
-if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+## NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
+#if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:.. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
+#
 
 cd ..
 echo "done compile sources."
@@ -214,13 +193,16 @@ cp src/autoplot_two_jar.jnlp dist
 cp src/autoplot_two_jar_pack200.jnlp dist
 cp src/pngwalk_two_jar.jnlp dist
 
+echo "copy branding for release, such as png icon images"
+cp src/*.png dist
 
+echo "modify jar files for this particular release"
 cd temp-volatile-src
-$JAVA5_HOME/bin/javac -d ../temp-volatile-classes external/FileSearchReplace.java
+$JAVA5_HOME/bin/javac -target 1.5 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
-$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar_pack200.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/pngwalk_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url}' $HUDSON_URL
+$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot_two_jar_pack200.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url}' $HUDSON_URL
+$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/pngwalk_two_jar.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE '#{hudson_url}' $HUDSON_URL
 
 #echo "proguard/pack200 stuff..."
 #$JAVA5_HOME/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar

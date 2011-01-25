@@ -11,9 +11,11 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import java.lang.reflect.Array;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.DataSourceUtil;
 
@@ -25,7 +27,14 @@ import org.virbo.datasource.DataSourceUtil;
 public class IstpMetadataModel extends MetadataModel {
 
     /**
-     * returns the Entry that is convertable to double as a double.
+     * Non-null, non-empty String if it is virtual.  The string will be like "compute_magnitude(B_xyz_gse)"
+     */
+    public static final String USER_PROP_VIRTUAL_FUNCTION= "FUNCTION";
+
+    public static final String USER_PROP_VIRTUAL_COMPONENT_= "COMPONENT_";
+
+    /**
+     * returns the Entry that is convertible to double as a double.
      * @throws IllegalArgumentException for strings
      */
     private double doubleValue(Object o, Units units) {
@@ -33,7 +42,7 @@ public class IstpMetadataModel extends MetadataModel {
     }
 
     /**
-     * returns the Entry that is convertable to double as a double.
+     * returns the Entry that is convertible to double as a double.
      * @throws IllegalArgumentException for strings
      */
     private double doubleValue(Object o, Units units, double deflt) {
@@ -114,6 +123,9 @@ public class IstpMetadataModel extends MetadataModel {
             } else {
                 max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE );
                 min = doubleValue(attrs.get("VALIDMIN"), units, -1e29 );
+                if ( min>0 && max/min>1e20 ) {
+                    return null;
+                }
             }
         }
         if ("log".equals(getScaleType(attrs)) && min <= 0) {
@@ -131,7 +143,7 @@ public class IstpMetadataModel extends MetadataModel {
      */
     private String getScaleType(Map attrs) {
         String type = null;
-        if (attrs.containsKey("SCALETYP")) {
+        if (attrs.containsKey("SCALETYP") && attrs.get("SCALETYP") instanceof String ) { // CAA STAFF
             type = (String) attrs.get("SCALETYP");
         }
         return type;
@@ -139,6 +151,7 @@ public class IstpMetadataModel extends MetadataModel {
 
     public Map<String, Object> properties(Map<String, Object> meta) {
         Map attrs = meta;
+        Map<String,Object> user= new LinkedHashMap<String,Object>();
 
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
 
@@ -154,17 +167,40 @@ public class IstpMetadataModel extends MetadataModel {
             String type = (String) attrs.get("DISPLAY_TYPE");
             properties.put(QDataSet.RENDER_TYPE, type);
         }
+
+        if (attrs.containsKey("VIRTUAL") ) {
+            String v= (String) attrs.get("VIRTUAL");
+            String function= (String)attrs.get("FUNCTION");
+            user.put( IstpMetadataModel.USER_PROP_VIRTUAL_FUNCTION, function );
+            for ( int i=0; i<4; i++ ) {
+                if ( attrs.get("COMPONENT_"+i)!=null ) {
+                    user.put( IstpMetadataModel.USER_PROP_VIRTUAL_COMPONENT_ + i, attrs.get("COMPONENT_"+i) );
+                } else {
+                    break;
+                }
+            }
+            
+        }
+
         Units units = Units.dimensionless;
         if (attrs.containsKey("UNITS")) {
             String sunits = (String) attrs.get("UNITS");
 
             try {
-                units = MetadataUtil.lookupUnits(DataSourceUtil.unquote(sunits));
+                units = SemanticOps.lookupUnits(DataSourceUtil.unquote(sunits));
             } catch (IllegalArgumentException e) {
                 units = Units.dimensionless;
             }
 
-            boolean isEpoch = (units == Units.milliseconds) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
+            // we need to distinguish between ms and epoch times.
+            boolean isMillis=false;
+            Object ovalidMax= meta.get("VALIDMAX");
+            if ( ovalidMax!=null && ovalidMax instanceof Number && units!=null && units==Units.milliseconds ) {
+                double validMax= ((Number)ovalidMax).doubleValue();
+                isMillis= validMax < 1e12 ; 
+            }
+
+            boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
             if (isEpoch) {
                 units = Units.cdfEpoch;
                 properties.put(QDataSet.LABEL, "");
@@ -186,12 +222,36 @@ public class IstpMetadataModel extends MetadataModel {
 
             DatumRange range = getRange(attrs, units);
             if (!attrs.containsKey("COMPONENT_0")) { // Themis kludge
-                properties.put(QDataSet.TYPICAL_MIN, range.min().doubleValue(units));
-                properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units));
+                if ( range!=null ) properties.put(QDataSet.TYPICAL_MIN, range.min().doubleValue(units));
+                if ( range!=null ) properties.put(QDataSet.TYPICAL_MAX, range.max().doubleValue(units));
 
                 range = getValidRange(attrs, units);
                 properties.put(QDataSet.VALID_MIN, range.min().doubleValue(units));
                 properties.put(QDataSet.VALID_MAX, range.max().doubleValue(units));
+
+                Object ofv= attrs.get( "FILLVAL" );
+                if ( ofv!=null && ofv instanceof Number ) {
+                    Number fillVal= (Number) ofv;
+                    double fillVald= fillVal.doubleValue();
+                    if( fillVald>=range.min().doubleValue(units) && fillVald<=range.max().doubleValue(units) ) {
+                        properties.put( QDataSet.FILL_VALUE, fillVal );
+                    }
+                } else if ( ofv!=null && ofv.getClass().isArray() ) {
+                    // try to reduce it to one number.
+                    Number fillVal= (Number) Array.get(ofv,0);
+                    int n= Array.getLength(ofv);
+                    for ( int i=1; i<n; i++ ) {
+                        if ( ! Array.get(ofv,i).equals(fillVal) ) {
+                            fillVal= Double.NaN;
+                        }
+                    }
+                    double fillVald= fillVal.doubleValue();
+                    if( fillVald>=range.min().doubleValue(units) && fillVald<=range.max().doubleValue(units) ) {
+                        properties.put( QDataSet.FILL_VALUE, fillVal );
+                    }
+                    
+                }
+
             }
 
             properties.put(QDataSet.SCALE_TYPE, getScaleType(attrs));
@@ -210,9 +270,18 @@ public class IstpMetadataModel extends MetadataModel {
                 continue;
             }
             Map<String, Object> props = (Map<String, Object>) o;
+            for ( int j=0; j<4; j++ ) {
+                if ( props.containsKey("DEPEND_"+j ) ) {
+                    props.remove("DEPEND_"+j); // remove DEPEND property from DEPEND property.
+                }
+            }
             properties.put(key, properties(props));
         }
 
+        if ( !user.isEmpty() ) {
+            properties.put( QDataSet.USER_PROPERTIES, user );
+        }
+        
         return properties;
 
     }

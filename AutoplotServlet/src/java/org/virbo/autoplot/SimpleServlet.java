@@ -52,8 +52,8 @@ import org.virbo.dsops.Ops;
 public class SimpleServlet extends HttpServlet {
 
     static FileHandler handler;
-    
-    private static void addHandlers( long requestId ) {
+
+    private static void addHandlers(long requestId) {
         try {
             FileHandler h = new FileHandler("/tmp/testservlet/log" + requestId + ".txt");
             TimerConsoleFormatter form = new TimerConsoleFormatter();
@@ -61,15 +61,15 @@ public class SimpleServlet extends HttpServlet {
             h.setFormatter(form);
             h.setLevel(Level.ALL);
             DasLogger.addHandlerToAll(h);
-            if ( handler!=null ) handler.close();
-            handler= h;
+            if (handler != null) handler.close();
+            handler = h;
         } catch (IOException ex) {
             Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
             Logger.getLogger(SimpleServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * @param request servlet request
@@ -79,19 +79,19 @@ public class SimpleServlet extends HttpServlet {
             throws ServletException, IOException {
 
         //System.err.println( "requestMethod="+request.getMethod() );
-        long t0= System.currentTimeMillis();
-        String suniq= request.getParameter("requestId");
+        long t0 = System.currentTimeMillis();
+        String suniq = request.getParameter("requestId");
         long uniq;
-        if ( suniq==null ) {
-            uniq= (long)(Math.random()*100);
+        if (suniq == null) {
+            uniq = (long) (Math.random() * 100);
         } else {
-            uniq= Long.parseLong(suniq);
+            uniq = Long.parseLong(suniq);
             addHandlers(uniq);
         }
-        
-        String debug= request.getParameter("debug");
 
-        logit("-- new request "+uniq, t0,uniq,debug);
+        String debug = request.getParameter("debug");
+
+        logit("-- new request " + uniq, t0, uniq, debug);
         try {
 
             String surl = request.getParameter("url");
@@ -100,7 +100,7 @@ public class SimpleServlet extends HttpServlet {
             String script = ServletUtil.getStringParameter(request, "script", "");
             int width = ServletUtil.getIntParameter(request, "width", -1);
             int height = ServletUtil.getIntParameter(request, "height", -1);
-            String scanvasAspect= ServletUtil.getStringParameter(request, "canvas.aspect", "");
+            String scanvasAspect = ServletUtil.getStringParameter(request, "canvas.aspect", "");
             String format = ServletUtil.getStringParameter(request, "format", "image/png");
             String font = ServletUtil.getStringParameter(request, "font", "");
             String column = ServletUtil.getStringParameter(request, "column", "");
@@ -111,34 +111,34 @@ public class SimpleServlet extends HttpServlet {
             String sfillColor = ServletUtil.getStringParameter(request, "fillColor", "");
             String sforegroundColor = ServletUtil.getStringParameter(request, "foregroundColor", "");
             String sbackgroundColor = ServletUtil.getStringParameter(request, "backgroundColor", "");
-            String title = ServletUtil.getStringParameter(request, "plot.title", "" );
-            String xlabel= ServletUtil.getStringParameter(request, "plot.xaxis.label", "" );
-            String xrange= ServletUtil.getStringParameter(request, "plot.xaxis.range", "" );
-            String xlog= ServletUtil.getStringParameter(request, "plot.xaxis.log", "" );
-            String xdrawTickLabels= ServletUtil.getStringParameter(request, "plot.xaxis.drawTickLabels", "" );
-            String ylabel= ServletUtil.getStringParameter(request, "plot.yaxis.label", "" );
-            String yrange= ServletUtil.getStringParameter(request, "plot.yaxis.range", "" );
-            String ylog= ServletUtil.getStringParameter(request, "plot.yaxis.log", "" );
-            String ydrawTickLabels= ServletUtil.getStringParameter(request, "plot.yaxis.drawTickLabels", "" );
-            String zlabel= ServletUtil.getStringParameter(request, "plot.zaxis.label", "" );
-            String zrange= ServletUtil.getStringParameter(request, "plot.zaxis.range", "" );
-            String zlog= ServletUtil.getStringParameter(request, "plot.zaxis.log", "" );
-            String zdrawTickLabels= ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "" );
+            String title = ServletUtil.getStringParameter(request, "plot.title", "");
+            String xlabel = ServletUtil.getStringParameter(request, "plot.xaxis.label", "");
+            String xrange = ServletUtil.getStringParameter(request, "plot.xaxis.range", "");
+            String xlog = ServletUtil.getStringParameter(request, "plot.xaxis.log", "");
+            String xdrawTickLabels = ServletUtil.getStringParameter(request, "plot.xaxis.drawTickLabels", "");
+            String ylabel = ServletUtil.getStringParameter(request, "plot.yaxis.label", "");
+            String yrange = ServletUtil.getStringParameter(request, "plot.yaxis.range", "");
+            String ylog = ServletUtil.getStringParameter(request, "plot.yaxis.log", "");
+            String ydrawTickLabels = ServletUtil.getStringParameter(request, "plot.yaxis.drawTickLabels", "");
+            String zlabel = ServletUtil.getStringParameter(request, "plot.zaxis.label", "");
+            String zrange = ServletUtil.getStringParameter(request, "plot.zaxis.range", "");
+            String zlog = ServletUtil.getStringParameter(request, "plot.zaxis.log", "");
+            String zdrawTickLabels = ServletUtil.getStringParameter(request, "plot.zaxis.drawTickLabels", "");
 
-            if ( debug!=null && !debug.equals("false") ) {
-                for ( Enumeration en=request.getParameterNames(); en.hasMoreElements(); ) {
-                    String n= (String) en.nextElement();
-                    System.err.println( ""+n+": "+ Arrays.asList(request.getParameterValues(n)));
+            if (debug != null && !debug.equals("false")) {
+                for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
+                    String n = (String) en.nextElement();
+                    System.err.println("" + n + ": " + Arrays.asList(request.getParameterValues(n)));
                 }
             }
 
-            if ( srenderType.equals("fill_to_zero") ) {
-                srenderType= "fillToZero";
+            if (srenderType.equals("fill_to_zero")) {
+                srenderType = "fillToZero";
             }
 
             OutputStream out = response.getOutputStream();
 
-            if ( vap!=null ) {
+            if (vap != null) {
                 response.setContentType(format);
             } else if (surl.equals("about:plugins")) {
                 response.setContentType("text/html");
@@ -149,7 +149,7 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType("text/html");
                 String s = AboutUtil.getAboutHtml();
                 s = s.substring(0, s.length() - 7);
-                s = s + "<br><br>servlet version=20081029_1009<br></html>";
+                s = s + "<br><br>servlet version=20100821_0644<br></html>";
                 out.write(s.getBytes());
                 out.close();
                 return;
@@ -157,58 +157,63 @@ public class SimpleServlet extends HttpServlet {
                 response.setContentType(format);
             }
 
-            logit("get parameters",t0,uniq,debug);
-            
+            logit("get parameters", t0, uniq, debug);
+
             System.setProperty("java.awt.headless", "true");
 
             ApplicationModel appmodel = new ApplicationModel();
             appmodel.addDasPeersToApp();
 
-            logit("create application model",t0,uniq,debug);
+            logit("create application model", t0, uniq, debug);
 
-            Application dom= appmodel.getDocumentModel();
+            Application dom = appmodel.getDocumentModel();
 
             if ("true".equals(request.getParameter("autolayout"))) {
                 dom.getOptions().setAutolayout(true);
             } else {
                 dom.getOptions().setAutolayout(false);
-                if (!row.equals("")) dom.getController().getCanvas().getController().setRow(row);
-                if (!column.equals("")) dom.getController().getCanvas().getController().setColumn(column);
+                if (!row.equals(""))
+                    dom.getController().getCanvas().getController().setRow(row);
+                if (!column.equals(""))
+                    dom.getController().getCanvas().getController().setColumn(column);
                 dom.getCanvases(0).getRows(0).setTop("0%");
                 dom.getCanvases(0).getRows(0).setBottom("100%");
             }
 
-            if (!font.equals("")) appmodel.getCanvas().setBaseFont(Font.decode(font));
+            if (!font.equals(""))
+                appmodel.getCanvas().setBaseFont(Font.decode(font));
 
 
             // do dimensions
-            if ( "".equals(scanvasAspect) ) {
-                if ( width==-1 ) width= 700;
-                if ( height==-1 ) height= 400;
+            if ("".equals(scanvasAspect)) {
+                if (width == -1) width = 700;
+                if (height == -1) height = 400;
             } else {
-                double aspect= Units.dimensionless.parse(scanvasAspect).doubleValue(Units.dimensionless);
-                if ( width==-1 && height!=-1 ) width= (int)( height * aspect );
-                if ( height==-1 && width!=-1 ) height= (int)( width / aspect );
+                double aspect = Units.dimensionless.parse(scanvasAspect).doubleValue(Units.dimensionless);
+                if (width == -1 && height != -1)
+                    width = (int) (height * aspect);
+                if (height == -1 && width != -1)
+                    height = (int) (width / aspect);
             }
-            if ( vap==null ) {
-                dom.getController().getCanvas().setWidth( width );
-                dom.getController().getCanvas().setHeight( height );
-                DasCanvas c= dom.getController().getCanvas().getController().getDasCanvas();
-                c.prepareForOutput( width, height); // KLUDGE, resize all components for TimeSeriesBrowse
+            if (vap == null) {
+                dom.getController().getCanvas().setWidth(width);
+                dom.getController().getCanvas().setHeight(height);
+                DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
+                c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             }
 
-            logit("set canvas parameters",t0,uniq,debug);
-            
+            logit("set canvas parameters", t0, uniq, debug);
+
             if (vap != null) {
                 appmodel.doOpen(new File(vap));
-                logit("opened vap",t0,uniq,debug);
-                width= appmodel.dom.getCanvases(0).getWidth();
-                height= appmodel.dom.getCanvases(0).getHeight();
-                DasCanvas c= dom.getController().getCanvas().getController().getDasCanvas();
-                c.prepareForOutput( width, height); // KLUDGE, resize all components for TimeSeriesBrowse
+                logit("opened vap", t0, uniq, debug);
+                width = appmodel.dom.getCanvases(0).getWidth();
+                height = appmodel.dom.getCanvases(0).getHeight();
+                DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
+                c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             }
 
-            if (surl!=null && !"".equals(surl)) {
+            if (surl != null && !"".equals(surl)) {
                 DataSource dsource;
                 try {
                     dsource = DataSetURI.getDataSource(surl);
@@ -217,100 +222,106 @@ public class SimpleServlet extends HttpServlet {
                 } catch (Exception ex) {
                     throw ex;
                 }
-                logit("got data source",t0,uniq,debug);
-                
-                DatumRange timeRange=null;
+                logit("got data source", t0, uniq, debug);
+
+                DatumRange timeRange = null;
                 if (!stimeRange.equals("")) {
                     timeRange = DatumRangeUtil.parseTimeRangeValid(stimeRange);
                     TimeSeriesBrowse tsb = dsource.getCapability(TimeSeriesBrowse.class);
                     if (tsb != null) {
                         tsb.setTimeRange(timeRange);
-                        logit("timeSeriesBrowse got data source",t0,uniq,debug);
+                        logit("timeSeriesBrowse got data source", t0, uniq, debug);
                     }
                 }
 
-            QDataSet ds;
-            try {
-                ds = dsource==null ? null : dsource.getDataSet(new NullProgressMonitor());
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
+                QDataSet ds;
+                try {
+                    ds = dsource == null ? null : dsource.getDataSet(new NullProgressMonitor());
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
 
                 if (!process.equals("")) {
                     QDataSet r = dsource.getDataSet(new NullProgressMonitor());
-                    logit("done with read",t0,uniq,debug);
+                    logit("done with read", t0, uniq, debug);
                     if (process.equals("histogram")) {
-                        appmodel.setDataSet( Ops.histogram(r, 100 ) );
-                    } else if ( process.equals("magnitude(fft)") ) {
-                        r= Ops.magnitude(Ops.fft(r));
-                        appmodel.setDataSet( r );
-                    } else if ( process.equals("nop") ) {
-                        appmodel.setDataSet( r );
+                        appmodel.setDataSet(Ops.histogram(r, 100));
+                    } else if (process.equals("magnitude(fft)")) {
+                        r = Ops.magnitude(Ops.fft(r));
+                        appmodel.setDataSet(r);
+                    } else if (process.equals("nop")) {
+                        appmodel.setDataSet(r);
                     }
-                    logit("done with process",t0,uniq,debug);
+                    logit("done with process", t0, uniq, debug);
                 } else {
                     appmodel.setDataSource(dsource);
-                    logit("done with setDataSource",t0,uniq,debug);
+                    logit("done with setDataSource", t0, uniq, debug);
                 }
-                
-                if (!stimeRange.equals("") ) {
+
+                if (!stimeRange.equals("")) {
                     appmodel.waitUntilIdle(true);
-                    if ( UnitsUtil.isTimeLocation( dom.getTimeRange().getUnits() ) ) {
+                    if (UnitsUtil.isTimeLocation(dom.getTimeRange().getUnits())) {
                         dom.setTimeRange(timeRange);
                     }
-                    logit("done with setTimeRange",t0,uniq,debug);
+                    logit("done with setTimeRange", t0, uniq, debug);
                 }
 
             }
 
+            // wait for autoranging, etc.
+            dom.getController().waitUntilIdle();
+            
             // axis settings
-            Plot p= dom.getController().getPlot();
+            Plot p = dom.getController().getPlot();
 
-            if ( !title.equals("") )  p.setTitle(title);
+            if (!title.equals("")) p.setTitle(title);
 
             Axis axis = p.getXaxis();
-            if ( !xlabel.equals("") )  axis.setLabel(xlabel);
-            if ( !xrange.equals("") )  {
-                Units u= axis.getController().getDasAxis().getUnits();
-                DatumRange newRange= DatumRangeUtil.parseDatumRange(xrange, u);
+            if (!xlabel.equals("")) axis.setLabel(xlabel);
+            if (!xrange.equals("")) {
+                Units u = axis.getController().getDasAxis().getUnits();
+                DatumRange newRange = DatumRangeUtil.parseDatumRange(xrange, u);
                 axis.setRange(newRange);
             }
-            if ( !xlog.equals("") )  axis.setLog("true".equals(xlog) );
-            if ( !xdrawTickLabels.equals("") )  axis.setDrawTickLabels("true".equals(xdrawTickLabels));
-            
+            if (!xlog.equals("")) axis.setLog("true".equals(xlog));
+            if (!xdrawTickLabels.equals(""))
+                axis.setDrawTickLabels("true".equals(xdrawTickLabels));
+
             axis = p.getYaxis();
-            if ( !ylabel.equals("") )  axis.setLabel(ylabel);
-            if ( !yrange.equals("") )  {
-                Units u= axis.getController().getDasAxis().getUnits();
-                DatumRange newRange= DatumRangeUtil.parseDatumRange(yrange, u);
+            if (!ylabel.equals("")) axis.setLabel(ylabel);
+            if (!yrange.equals("")) {
+                Units u = axis.getController().getDasAxis().getUnits();
+                DatumRange newRange = DatumRangeUtil.parseDatumRange(yrange, u);
                 axis.setRange(newRange);
             }
-            if ( !ylog.equals("") )  axis.setLog("true".equals(ylog) );
-            if ( !ydrawTickLabels.equals("") )  axis.setDrawTickLabels("true".equals(ydrawTickLabels));
+            if (!ylog.equals("")) axis.setLog("true".equals(ylog));
+            if (!ydrawTickLabels.equals(""))
+                axis.setDrawTickLabels("true".equals(ydrawTickLabels));
 
             axis = p.getZaxis();
-            if ( !zlabel.equals("") )  axis.setLabel(zlabel);
-            if ( !zrange.equals("") )  {
-                Units u= axis.getController().getDasAxis().getUnits();
-                DatumRange newRange= DatumRangeUtil.parseDatumRange(zrange, u);
+            if (!zlabel.equals("")) axis.setLabel(zlabel);
+            if (!zrange.equals("")) {
+                Units u = axis.getController().getDasAxis().getUnits();
+                DatumRange newRange = DatumRangeUtil.parseDatumRange(zrange, u);
                 axis.setRange(newRange);
             }
-            if ( !zlog.equals("") )  axis.setLog("true".equals(zlog) );
-            if ( !zdrawTickLabels.equals("") )  axis.setDrawTickLabels("true".equals(zdrawTickLabels));
+            if (!zlog.equals("")) axis.setLog("true".equals(zlog));
+            if (!zdrawTickLabels.equals(""))
+                axis.setDrawTickLabels("true".equals(zdrawTickLabels));
 
 
 
             if (!srenderType.equals("")) {
                 RenderType renderType = RenderType.valueOf(srenderType);
-                dom.getController().getPanel().setRenderType(renderType);
+                dom.getController().getPlotElement().setRenderType(renderType);
             }
 
             if (!scolor.equals("")) {
-                dom.getController().getPanel().getStyle().setColor(Color.decode(scolor));
+                dom.getController().getPlotElement().getStyle().setColor(Color.decode(scolor));
             }
 
             if (!sfillColor.equals("")) {
-                dom.getController().getPanel().getStyle().setFillColor(Color.decode(sfillColor));
+                dom.getController().getPlotElement().getStyle().setFillColor(Color.decode(sfillColor));
             }
             if (!sforegroundColor.equals("")) {
                 dom.getOptions().setForeground(Color.decode(sforegroundColor));
@@ -319,7 +330,7 @@ public class SimpleServlet extends HttpServlet {
                 dom.getOptions().setBackground(Color.decode(sbackgroundColor));
             }
 
-            logit("done with setStyle",t0,uniq,debug);
+            logit("done with setStyle", t0, uniq, debug);
             if (!script.equals("")) {
                 URL url = new URL(request.getRequestURL().toString());
                 URL scriptUrl = new URL(url, script);
@@ -327,18 +338,18 @@ public class SimpleServlet extends HttpServlet {
                 //can't do anything more until script context is not static
                 PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
 
-                interp.execfile(AutoPlotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
+                interp.execfile(AutoplotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
 
-                logit("done with script",t0,uniq,debug);
+                logit("done with script", t0, uniq, debug);
             }
-            
+
             dom.getController().waitUntilIdle();
 
             if (format.equals("image/png")) {
-                logit("waiting for image",t0,uniq,debug);
+                logit("waiting for image", t0, uniq, debug);
                 Image image = appmodel.canvas.getImage(width, height);
-                logit("got image",t0,uniq,debug);
-                
+                logit("got image", t0, uniq, debug);
+
                 DasPNGEncoder encoder = new DasPNGEncoder();
                 encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
                 try {
@@ -352,30 +363,30 @@ public class SimpleServlet extends HttpServlet {
                     }
                 }
             } else if (format.equals("application/pdf")) {
-                logit("do prepareForOutput",t0,uniq,debug);
+                logit("do prepareForOutput", t0, uniq, debug);
                 appmodel.canvas.prepareForOutput(width, height);
-                logit("done with prepareForOutput",t0,uniq,debug);
+                logit("done with prepareForOutput", t0, uniq, debug);
                 GraphicsOutput go = new org.das2.util.awt.PdfGraphicsOutput();
 
                 appmodel.canvas.writeToGraphicsOutput(out, go);
-                logit("done with write to output",t0,uniq,debug);
+                logit("done with write to output", t0, uniq, debug);
             } else if (format.equals("image/svg+xml")) {
-                logit("do prepareForOutput...",t0,uniq,debug);
+                logit("do prepareForOutput...", t0, uniq, debug);
                 appmodel.canvas.prepareForOutput(width, height);
-                logit("done with prepareForOutput",t0,uniq,debug);
+                logit("done with prepareForOutput", t0, uniq, debug);
                 GraphicsOutput go = new org.das2.util.awt.SvgGraphicsOutput();
 
                 appmodel.canvas.writeToGraphicsOutput(out, go);
-                logit("done with write to output",t0,uniq,debug);
+                logit("done with write to output", t0, uniq, debug);
             } else {
                 throw new IllegalArgumentException("format must be image/png, application/pdf, or image/svg+xml");
 
             }
 
-            
+
             out.close();
-            logit( "done with request",t0,uniq,debug);
-            
+            logit("done with request", t0, uniq, debug);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -412,7 +423,8 @@ public class SimpleServlet extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private void logit(String string, long t0,long id,String debug) {
-        if ( debug!=null && !debug.equals("false") ) System.err.printf("##%d# %s: %d\n", id, string, ( System.currentTimeMillis()-t0) );
+    private void logit(String string, long t0, long id, String debug) {
+        if (debug != null && !debug.equals("false"))
+            System.err.printf("##%d# %s: %d\n", id, string, (System.currentTimeMillis() - t0));
     }
 }

@@ -42,7 +42,7 @@ public class WavDataSourceFactory extends AbstractDataSourceFactory {
         } else if ( cc.context.equals(CompletionContext.CONTEXT_PARAMETER_VALUE ) ) {
             String paramName= CompletionContext.get( CompletionContext.CONTEXT_PARAMETER_NAME, cc );
             if ( paramName.equals("channel") ) {
-                int channels= getChannels(cc.resource, mon);
+                int channels= getChannels(cc.resourceURI, mon);
                 for ( int i=0; i<channels; i++ ) {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ""+i ) );
                 }
@@ -53,8 +53,8 @@ public class WavDataSourceFactory extends AbstractDataSourceFactory {
         return result;
     }
 
-    private int getChannels( URL url, ProgressMonitor mon  ) throws IOException, UnsupportedAudioFileException {
-        File wavFile = DataSetURI.getFile(url, mon);
+    private int getChannels( URI uri, ProgressMonitor mon  ) throws IOException, UnsupportedAudioFileException {
+        File wavFile = DataSetURI.getFile(uri, mon);
 
         AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(wavFile);
         AudioFormat audioFormat = fileFormat.getFormat();

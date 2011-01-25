@@ -69,43 +69,145 @@ public class DomOps {
 
     }
 
-    public static List<Panel> copyPanels( Plot srcPlot, Plot dstPlot ) {
+
+    public static List<PlotElement> copyPlotElements( Plot srcPlot, Plot dstPlot ) {
 
         DataSourceFilter dsf= null;
 
         ApplicationController ac=  srcPlot.getController().getApplication().getController();
-        List<Panel> srcPanels = ac.getPanelsFor(srcPlot);
+        List<PlotElement> srcElements = ac.getPlotElementsFor(srcPlot);
 
-        List<Panel> newPanels = new ArrayList<Panel>();
-        for (Panel srcPanel : srcPanels) {
-            if (!srcPanel.getComponent().equals("")) {
-                if ( srcPanel.getController().getParentPanel()==null ) {
-                    Panel newp = ac.copyPanel(srcPanel, dstPlot, dsf);
-                    newPanels.add(newp);
+        List<PlotElement> newElements = new ArrayList<PlotElement>();
+        for (PlotElement srcElement : srcElements) {
+            if (!srcElement.getComponent().equals("")) {
+                if ( srcElement.getController().getParentPlotElement()==null ) {
+                    PlotElement newp = ac.copyPlotElement(srcElement, dstPlot, dsf);
+                    newElements.add(newp);
                 }
             } else {
-                Panel newp = ac.copyPanel(srcPanel, dstPlot, dsf);
-                newPanels.add(newp);
-                List<Panel> srcKids = srcPanel.controller.getChildPanels();
-                List<Panel> newKids = new ArrayList();
+                PlotElement newp = ac.copyPlotElement(srcElement, dstPlot, dsf);
+                newElements.add(newp);
+                List<PlotElement> srcKids = srcElement.controller.getChildPlotElements();
+                List<PlotElement> newKids = new ArrayList();
                 DataSourceFilter dsf1 = ac.getDataSourceFilterFor(newp);
-                for (Panel k : srcKids) {
-                    if (srcPanels.contains(k)) {
-                        Panel kidp = ac.copyPanel(k, dstPlot, dsf1);
-                        kidp.getController().setParentPanel(newp);
-                        newPanels.add(kidp);
+                for (PlotElement k : srcKids) {
+                    if (srcElements.contains(k)) {
+                        PlotElement kidp = ac.copyPlotElement(k, dstPlot, dsf1);
+                        kidp.getController().setParentPlotElement(newp);
+                        newElements.add(kidp);
                         newKids.add(kidp);
                     }
                 }
             }
         }
-        return newPanels;
+        return newElements;
 
     }
 
-    public static Plot copyPlotAndPanels( Plot srcPlot, boolean copyPanels, boolean bindx, boolean bindy, Object direction ) {
+    
+    public static Plot copyPlotAndPlotElements( Plot srcPlot, boolean copyPlotElements, boolean bindx, boolean bindy, Object direction ) {
         Plot dstPlot= copyPlot( srcPlot, bindx, bindy, direction );
-        if ( copyPanels ) copyPanels( srcPlot, dstPlot );
+        if ( copyPlotElements ) copyPlotElements( srcPlot, dstPlot );
         return dstPlot;
+    }
+
+    public static Column getOrCreateSelectedColumn( Application dom, List<Plot> selectedPlots, boolean create ) {
+        List<String> n= new ArrayList<String>();
+        for ( Plot p: selectedPlots ) {
+            n.add( p.getColumnId() );
+        }
+        if ( n.size()==1 ) {
+            return (Column) DomUtil.getElementById(dom,n.get(0));
+        } else {
+            if ( create ) {
+                Canvas c= dom.getCanvases(0); //TODO: do this
+                Column col= c.getController().addColumn();
+                col.setLeft("0%");
+                col.setRight("100%");
+                return col;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    public static Row getOrCreateSelectedRow( Application dom, List<Plot> selectedPlots, boolean create ) {
+        List<String> n= new ArrayList<String>();
+        for ( Plot p: selectedPlots ) {
+            if ( !n.contains(p.getRowId()) ) n.add( p.getRowId() );
+        }
+        if ( n.size()==1 ) {
+            return (Row) DomUtil.getElementById(dom,n.get(0));
+        } else {
+            if ( create ) {
+                Row r= (Row) DomUtil.getElementById( dom.getCanvases(0), n.get(0) );
+                Row rmax= r;
+                Row rmin= r;
+                for ( int i=1; i<n.size(); i++ ) {
+                    r= (Row) DomUtil.getElementById( dom.getCanvases(0), n.get(i) );
+                    if ( r.getController().getDasRow().getDMaximum()>rmax.getController().getDasRow().getDMaximum() ) {
+                        rmax= r;
+                    }
+                    if ( r.getController().getDasRow().getDMinimum()<rmin.getController().getDasRow().getDMinimum() ) {
+                        rmin= r;
+                    }
+                }
+                Canvas c= dom.getCanvases(0);
+                Row row= c.getController().addRow();
+                row.setTop(rmin.getTop());
+                row.setBottom(rmax.getBottom());
+                return row;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * return the bottom and top most plot of a list of plots.  
+     * This does use controllers.
+     * @param dom
+     * @param plots
+     * @return
+     */
+    public static Plot[] bottomAndTopMostPlot( Application dom, List<Plot> plots ) {
+        Plot pmax=plots.get(0);
+        Plot pmin=plots.get(0);
+        Row r= (Row) DomUtil.getElementById( dom.getCanvases(0), pmax.getRowId() );
+        Row rmax= r;
+        Row rmin= r;
+        for ( Plot p: plots ) {
+            r= (Row) DomUtil.getElementById( dom.getCanvases(0), p.getRowId() );
+            if ( r.getController().getDasRow().getDMaximum()>rmax.getController().getDasRow().getDMaximum() ) {
+                rmax= r;
+                pmax= p;
+            }
+            if ( r.getController().getDasRow().getDMinimum()<rmin.getController().getDasRow().getDMinimum() ) {
+                rmin= r;
+                pmin= p;
+            }
+        }
+        return new Plot[] { pmax, pmin };
+    }
+
+    /**
+     * return a list of the plots using the given row.
+     * This does not use controllers.
+     * @param row the row to search for.
+     * @param visible  if true, then the plot must also be visible.  (Note its colorbar visible is ignored.)
+     * @return a list of plots.
+     */
+    public static List<Plot> getPlotsFor( Application dom, Row row, boolean visible ) {
+        ArrayList<Plot> result= new ArrayList();
+        for ( Plot p: dom.getPlots() ) {
+            if ( p.getRowId().equals(row.getId()) ) {
+                if ( visible ) {
+                    if ( p.isVisible() ) result.add(p);
+                } else {
+                    result.add(p);
+                }
+            }
+        }
+        return result;
     }
 }

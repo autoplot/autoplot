@@ -15,6 +15,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +25,9 @@ import org.virbo.datasource.DataSetSelector;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Adds a Data Source to the application.  Note this does not work with Webstart
+ * because of security limitations but does with the jumbojar version.
+ * TODO: This has not been used in a while and needs attention (PREF_RECENT).
  * @author jbf
  */
 public class AddDataSourcePanel extends javax.swing.JPanel {
@@ -59,7 +62,9 @@ public class AddDataSourcePanel extends javax.swing.JPanel {
                 Logger.getLogger(AddDataSourcePanel.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            dataSetSelector1.setRecent( new ArrayList<String>() );
+            String[] recent= new String[] { "(no recent entries)" };
+            dataSetSelector1.setRecent( new ArrayList<String>( Arrays.asList(recent) ) );
+            dataSetSelector1.setValue("");
         }
 
         dataSetSelector1.addPropertyChangeListener( DataSetSelector.PROP_RECENT, new PropertyChangeListener() {

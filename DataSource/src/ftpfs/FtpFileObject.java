@@ -6,14 +6,19 @@
 package ftpfs;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.DirectoryEntry;
+import org.das2.util.filesystem.LocalFileObject;
 import org.das2.util.filesystem.WebFileObject;
 import org.das2.util.filesystem.WebFileSystem;
+import org.das2.util.filesystem.WriteCapability;
+import org.das2.util.monitor.NullProgressMonitor;
 
 /**
  *
@@ -60,7 +65,12 @@ public class FtpFileObject extends WebFileObject {
 
         File listing= new File( this.getLocalFile().getParent(), ".listing" );
         if ( !listing.exists() ) {
-            ftpfs.listDirectory( getParent().getNameExt() );
+            try {
+                ftpfs.listDirectory(getParent().getNameExt());
+            } catch (IOException ex) {
+                Logger.getLogger(FtpFileObject.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
+            }
         }
         if ( listing.exists() ) {
             try {
@@ -83,5 +93,73 @@ public class FtpFileObject extends WebFileObject {
         }
     }
 
+    WriteCapability write= new WriteCapability() {
+        public OutputStream getOutputStream() throws IOException {
+            return FtpFileObject.this.getOutputStream(false);
+        }
+        public boolean canWrite() {
+            return true; //TODO: implement this
+        }
+        public synchronized boolean delete() throws IOException {
+            // we need to remove cache of listing
+            File listingFile= new File( getLocalFile().getParent(), ".listing" );
+            if ( listingFile.exists() ) {
+                ftpfs.resetListCache( getParent().getNameExt() );
+            }
+            File localFile= getLocalFile();
+            if ( localFile.exists() ) {
+                if ( !localFile.delete() ) {
+                    throw new IOException( "unable to delete local file "+localFile );
+                }
+            }
+            return FtpFileObject.this.ftpfs.delete(FtpFileObject.this);
+        }
+    };
+
+    @Override
+    public <T> T getCapability(Class<T> clazz) {
+        if ( clazz==WriteCapability.class ) {
+            return (T) write;
+        } else {
+            return super.getCapability(clazz);
+        }
+    }
+
+    /**
+     * returns an output stream that writes to a local file in the file cache, then
+     * sends over the result when it is closed.  So this will not work with applets,
+     * but this is no big deal.
+     * 
+     * @param append
+     * @return
+     */
+    public OutputStream getOutputStream( boolean append ) throws IOException {
+        try {
+            getFile( new NullProgressMonitor() );
+        } catch ( IOException ex ) {
+
+        }
+        if ( !append ) {
+            if ( exists() ) throw new IllegalArgumentException("file exists in file system already!");
+        }
+
+        try {
+            return new FileOutputStream(getLocalFile(),append) {
+                @Override
+                public void close() {
+                    try {
+                        super.close();
+                        System.err.println("closing");
+                        ftpfs.uploadFile( getNameExt(), getLocalFile(), new NullProgressMonitor() );
+                    } catch ( IOException ex ) {
+                        ex.printStackTrace();
+                    }
+                }
+            };
+        } catch ( IOException ex ) {
+            throw ex;
+        }
+
+    }
 
 }

@@ -91,6 +91,8 @@
         <!-- copied from build-impl.xml.  This must be updated by hand. -->
         <ant antfile="${project.BinaryDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.CdfDataSource}/build.xml" inheritall="false" target="do-tag"/>
+        <ant antfile="${project.CdfJavaDataSource}/build.xml" inheritall="false" target="do-tag"/>
+        <ant antfile="${project.CDAWebDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.CefDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.Das2ServerDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.DataSource}/build.xml" inheritall="false" target="do-tag"/>
@@ -99,7 +101,7 @@
         <ant antfile="${project.FitsDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.ImageDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.JythonDataSource}/build.xml" inheritall="false" target="do-tag"/>
-        <ant antfile="${project.JythonSupport}/build.xml" inheritall="false" target="do-tag"/>
+        <ant antfile="${project.JythonSupport}/build.xml"    inheritall="false" target="do-tag"/>
         <ant antfile="${project.NetCdfDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.OpenDapDataSource}/build.xml" inheritall="false" target="do-tag"/>
         <ant antfile="${project.QDataSet}/build.xml" inheritall="false" target="do-tag"/>
@@ -129,12 +131,40 @@
             <entry key="build.tag" value="${release_tag}"/>
         </propertyfile>
     </target>
-    <target name="jnlp-release" depends="jnlp-release-pre-jar,jar,init-jnlp" description="create a jnlp release and website">
 
-        <copy file="${dist.jar}" todir="${jnlp.dir}" >
+    <target name="copy-kludge" depends="init" description="netbeans 6.9.1 is suddenly not copying library files.  DANGER code">
+       <copy overwrite="true" todir="${dist.dir}/lib/">
+            <fileset dir="../AutoplotApplet/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../AutoplotHelp/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../AutoplotServlet/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../BinaryDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../CdfDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../CdfJavaDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../CefDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../Das2ServerDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../DataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../DataSourcePack/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../ExcelDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../FitsDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../IdlMatlabSupport/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../ImageDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../JythonDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../JythonSupport/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../NetCdfDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../OpenDapDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../QDataSet/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../QStream/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../TsdsDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+            <fileset dir="../WavDataSource/dist/" includes="*.jar" excludes="**/[a-z]*.jar" />
+       </copy>
+    </target>
+
+    <target name="jnlp-release" depends="jnlp-release-pre-jar,jar, init-jnlp" description="create a jnlp release and website">
+
+        <copy  overwrite="true" file="${dist.jar}" todir="${jnlp.dir}" >
         </copy>
-        <copy todir="${jnlp.dir}/lib/">
-            <fileset dir="${dist.dir}/lib" includes="**/*.jar,**/dasCore.jar" excludes="**/[a-z]*.jar" />
+        <copy  overwrite="true" todir="${jnlp.dir}/lib/">
+            <fileset dir="${dist.dir}/lib" includes="**/*.jar,**/dasCore**.jar" excludes="**/[a-z]*.jar" />
         </copy>
         
         <delete> <!-- these are third-party libraries live on the server -->
@@ -156,13 +186,19 @@
             <fileset file="${jnlp.dir}/lib/jpeg2000.jar" />
             <fileset file="${jnlp.dir}/lib/jython.jar" />
             <fileset file="${jnlp.dir}/lib/metadata-extractor-2.1.0.jar" />
-            <fileset file="${jnlp.dir}/lib/netcdf-2.2.22.jar" />
+            <fileset file="${jnlp.dir}/lib/netcdf-4.1.jar" />
             <fileset file="${jnlp.dir}/lib/nlog4j-1.2.21.jar" />
             <fileset file="${jnlp.dir}/lib/poi-3.1-FINAL-20080629.jar" />
             <fileset file="${jnlp.dir}/lib/poi-contrib-3.1-FINAL-20080629.jar" />
             <fileset file="${jnlp.dir}/lib/poi-scratchpad-3.1-FINAL-20080629.jar" />
             <fileset file="${jnlp.dir}/lib/slf4j-jdk14.jar" />
             <fileset file="${jnlp.dir}/lib/swing-layout-1.0.3.jar" />
+            <fileset file="${jnlp.dir}/lib/jh.jar" />
+            <fileset file="${jnlp.dir}/lib/beansbinding-1.2.1.jar" />
+            <fileset file="${jnlp.dir}/lib/commons-net-2.0.jar" />
+            <fileset file="${jnlp.dir}/lib/commons-net-ftp-2.0.jar" />
+            <fileset file="${jnlp.dir}/lib/commons-vfs-1.0.jar" />
+            <fileset file="${jnlp.dir}/lib/jsch-20090723.jar" />
         </delete>
 
         <signjar alias="virbo"
@@ -184,7 +220,7 @@
         <copy file="${build.classes.dir}/FORMDATA.JS" todir="${dist.dir}" />
         <copy file="${build.classes.dir}/logo32x32.png" todir="${dist.dir}" />
     </target>
-    <target name="-pre-init" >
+    <target name="-pre-init" depends="do-manifest" >        <!--http://netbeans.org/bugzilla/show_bug.cgi?id=181999 -->
         <property name="org.das2.dotag" value="true" />
     </target>
     <target name="jumbojar" depends="jar" >
@@ -228,16 +264,16 @@
         <property name="jnlp.dir" location="${dist.dir}/jnlp/"/>
         <mkdir dir="${jnlp.dir}"/>
         
-        <copy file="${build.classes.dir}/autoplot.jnlp" tofile="${jnlp.dir}/autoplot.jnlp" />
-        <copy file="${build.classes.dir}/index.html" tofile="${jnlp.dir}/index.html" />
-        <copy file="${build.classes.dir}/logo16x16.png" tofile="${jnlp.dir}/logo16x16.png" />
-        <copy file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
-        <copy file="${build.classes.dir}/logo64x64.png" tofile="${jnlp.dir}/logo64x64.png" />
-        <copy file="${build.classes.dir}/logo128x128.png" tofile="${jnlp.dir}/logo128x128.png" />
-        <copy file="${build.classes.dir}/screen.png" tofile="${jnlp.dir}/screen.png" />
-        <copy file="${build.classes.dir}/screen.vap" tofile="${jnlp.dir}/screen.vap" />
-        <copy file="${build.classes.dir}/splash.png" tofile="${jnlp.dir}/splash.png" />
-        <copy file="${build.classes.dir}/launch.png" tofile="${jnlp.dir}/launch.png" />
+        <copy overwrite="true"  file="${build.classes.dir}/autoplot.jnlp" tofile="${jnlp.dir}/autoplot.jnlp" />
+        <copy overwrite="true"  file="${build.classes.dir}/index.html" tofile="${jnlp.dir}/index.html" />
+        <copy overwrite="true"  file="${build.classes.dir}/logo16x16.png" tofile="${jnlp.dir}/logo16x16.png" />
+        <copy overwrite="true"  file="${build.classes.dir}/logo32x32.png" tofile="${jnlp.dir}/logo32x32.png" />
+        <copy overwrite="true"  file="${build.classes.dir}/logo64x64.png" tofile="${jnlp.dir}/logo64x64.png" />
+        <copy overwrite="true"  file="${build.classes.dir}/logo128x128.png" tofile="${jnlp.dir}/logo128x128.png" />
+        <copy overwrite="true"  file="${build.classes.dir}/screen.png" tofile="${jnlp.dir}/screen.png" />
+        <copy overwrite="true"  file="${build.classes.dir}/screen.vap" tofile="${jnlp.dir}/screen.vap" />
+        <copy overwrite="true"  file="${build.classes.dir}/splash.png" tofile="${jnlp.dir}/splash.png" />
+        <copy overwrite="true"  file="${build.classes.dir}/launch.png" tofile="${jnlp.dir}/launch.png" />
         <replace file="${jnlp.dir}/autoplot.jnlp" >
             <replacefilter token="#{tag}" value="${release_tag}" />
         </replace>
@@ -326,6 +362,14 @@
         <pack200 src="${jnlp.dir}/lib/TsdsDataSource.jar" destfile="${jnlp.dir}/lib/unpacked/TsdsDataSource.jar" repack="true" />
         <pack200 src="${jnlp.dir}/lib/dasCore.jar" destfile="${jnlp.dir}/lib/unpacked/dasCore.jar" repack="true" />
 
+    </target>
+    
+    <!--
+        Just create the manifest file if it doesn't exist, otherwise lib
+        directory isn't created. Cf.  http://netbeans.org/bugzilla/show_bug.cgi?id=181999
+    -->
+    <target name="do-manifest">
+        <manifest file="manifest.mf" mode="update" />
     </target>
 
 </project>

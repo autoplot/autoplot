@@ -8,6 +8,8 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.Component;
+import org.virbo.datasource.AutoplotSettings;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import org.virbo.autoplot.bookmarks.Bookmark;
@@ -22,10 +24,15 @@ import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -37,11 +44,16 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.xml.parsers.ParserConfigurationException;
 import org.das2.beans.BeansUtil;
 import org.das2.components.propertyeditor.EnumerationEditor;
-import org.das2.system.ExceptionHandler;
+import org.das2.datum.Datum;
+import org.das2.datum.TimeParser;
+import org.das2.datum.Units;
+import org.das2.util.ExceptionHandler;
 import org.das2.util.Base64;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.dom.Application;
@@ -51,7 +63,7 @@ import org.virbo.autoplot.dom.CanvasUtil;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.dom.DomUtil;
-import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.Row;
 import org.virbo.autoplot.layout.LayoutUtil;
@@ -67,6 +79,11 @@ import org.virbo.qstream.SerializeRegistry;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.xml.sax.SAXException;
 
+import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
+import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
+import org.jdesktop.beansbinding.Bindings;
+import org.virbo.autoplot.dom.BindingModel;
 /**
  * Internal model of the application to separate model from view.
  * @author jbf
@@ -95,6 +112,26 @@ public class ApplicationModel {
     public void setExceptionHandler(ExceptionHandler eh) {
         this.exceptionHandler= eh;
         DasApplication.getDefaultApplication().setExceptionHandler(exceptionHandler);
+        FileSystem.setExceptionHandler(exceptionHandler);
+    }
+
+    /**
+     * show a message to the user.
+     * @param message
+     * @param title
+     * @param messageType JOptionPane.WARNING_MESSAGE, JOptionPane.INFORMATION_MESSAGE
+     */
+    public void showMessage( String message, String title, int messageType ) {
+        if (  ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false") ) ) {
+            Component p= SwingUtilities.getRoot(canvas);
+            JOptionPane.showMessageDialog( p, message, title, messageType );
+        } else {
+            if ( messageType!=JOptionPane.INFORMATION_MESSAGE || messageType!=JOptionPane.PLAIN_MESSAGE ) {
+                throw new RuntimeException( title + ": " + message );
+            } else {
+                System.err.println( title + ": " + message );
+            }
+        }
     }
 
     static final Logger logger = Logger.getLogger("virbo.autoplot");
@@ -113,7 +150,7 @@ public class ApplicationModel {
 
     /**
      * This needs to be called after the application model is initialized and
-     * preferrably from the event thread.
+     * preferably from the event thread.
      */
     public void addDasPeersToApp() {
         if ( !applet ) {
@@ -126,7 +163,7 @@ public class ApplicationModel {
 
         this.application = canvas.getApplication();
 
-        dom.getController().addPanel(null, null);
+        dom.getController().addPlotElement(null, null);
     }
 
     public DasCanvas getCanvas() {
@@ -142,7 +179,7 @@ public class ApplicationModel {
      * @param ds
      */
     void setDataSet(QDataSet ds) {
-        dom.getController().getPanel().getController().setResetRanges(true);
+        dom.getController().getPlotElement().getController().setResetRanges(true);
         dom.getController().getDataSourceFilter().getController().setDataSource(null);
         dom.getController().getDataSourceFilter().setUri("vap+internal:");
         dom.getController().getDataSourceFilter().getController().setDataSetInternal(null); // clear out properties and metadata
@@ -150,69 +187,69 @@ public class ApplicationModel {
     }
 
     /**
-     * just plot this dataset using the specified dataSourceFilter index.  panels and dataSourceFilters
+     * just plot this dataset using the specified dataSourceFilter index.  plotElements and dataSourceFilters
      * are added until the index exists.  This is introduced to support jython scripting, but may be
      * useful elsewhere.
      * @param chNum the index of the DataSourceFilter to use.
-     * @param label label for the dataset's panels, if non-null.
+     * @param label label for the dataset's plotElements, if non-null.
      * @param ds the dataset to plot.
      */
     public void setDataSet( int chNum, String label, QDataSet ds ) {
         while ( dom.getDataSourceFilters().length <= chNum ) {
             Plot p= CanvasUtil.getMostBottomPlot(dom.getController().getCanvas());
             dom.getController().setPlot(p);
-            dom.getController().addPanel( null, null  );
+            dom.getController().addPlotElement( null, null  );
         }
         DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
-        List<Panel> panels= dom.getController().getPanelsFor( dsf );
-        for ( Panel p: panels ) {
-            p.getController().setResetPanel(true); //TODO: I would think this would be set anyway with the new datasource.
-            p.getController().setResetComponent(true);
-        }
+        List<PlotElement> elements= dom.getController().getPlotElementsFor( dsf );
+        //for ( PlotElement pe: elements ) {
+        //    pe.getController().setResetPlotElement(true); //TODO: I would think this would be set anyway with the new datasource.
+        //    pe.getController().setResetComponent(true);
+        //}
         dsf.getController().setDataSource(null);
         dsf.setUri("vap+internal:");
         dsf.getController().setDataSetInternal(null); // clear out properties and metadata
         dsf.getController().setDataSetInternal(ds);
         if ( label!=null ) {
-            for ( Panel p: panels ) {
-                p.setLegendLabel(label);
-                p.setDisplayLegend(true);
+            for ( PlotElement pe: elements ) {
+                pe.setLegendLabel(label);
+                pe.setDisplayLegend(true);
             }
         }
     }
 
     /**
-     * just plot this dataset using the specified dataSourceFilter index.  panels and dataSourceFilters
+     * just plot this dataset using the specified dataSourceFilter index.  plotElements and dataSourceFilters
      * are added until the index exists.  This is introduced to support jython scripting, but may be
      * useful elsewhere.
      * @param chNum the index of the DataSourceFilter to use.
-     * @param label label for the dataset's panels, if non-null.
+     * @param label label for the dataset's plotElements, if non-null.
      * @param suri the data source id to plot.
      */
     public void setDataSet( int chNum, String label, String suri ) {
         while ( dom.getDataSourceFilters().length <= chNum ) {
             Plot p= CanvasUtil.getMostBottomPlot(dom.getController().getCanvas());
             dom.getController().setPlot(p);
-            dom.getController().addPanel( null, null  );
+            dom.getController().addPlotElement( null, null  );
         }
         DataSourceFilter dsf= dom.getDataSourceFilters(chNum);
-        List<Panel> panels= dom.getController().getPanelsFor( dsf );
-        for ( Panel p: panels ) {
-            p.getController().setResetPanel(true);
-            p.getController().setResetComponent(true);
+        List<PlotElement> elements= dom.getController().getPlotElementsFor( dsf );
+        for ( PlotElement pe: elements ) {
+            pe.getController().setResetPlotElement(true);
+            pe.getController().setResetComponent(true);
         }
         dsf.getController().setDataSource(null);
         dsf.setUri(suri);
         if ( label!=null ) {
-            for ( Panel p: panels ) {
-                p.setLegendLabel(label);
-                p.setDisplayLegend(true);
+            for ( PlotElement pe: elements ) {
+                pe.setLegendLabel(label);
+                pe.setDisplayLegend(true);
             }
         }
     }
 
     public void setDataSource(DataSource dataSource) {
-        dom.getController().getDataSourceFilter().getController().setDataSource(false, dataSource);
+        dom.getController().getDataSourceFilter().getController().resetDataSource(false, dataSource);
     }
 
     public DataSource dataSource() {
@@ -262,21 +299,26 @@ public class ApplicationModel {
         //surl = DataSetURI.maybeAddFile(surl);
 
         try {
-            if (split.file.endsWith(".vap") || split.file.endsWith(".vapx" )) {
+            if ( split.file!=null && ( split.file.endsWith(".vap") || split.file.endsWith(".vapx" ) ) ) {
                 try {
-                    URL url = DataSetURI.getURL(surl);
+                    URI uri = DataSetURI.getURI(surl);
                     mon.started();
                     mon.setProgressMessage("loading vap file");
-                    File openable = DataSetURI.getFile(url, application.getMonitorFactory().getMonitor(canvas, "loading vap", ""));
+                    File openable = DataSetURI.getFile(uri, application.getMonitorFactory().getMonitor(canvas, "loading vap", ""));
                     if (split.params != null) {
                         LinkedHashMap<String, String> params = URISplit.parseParams(split.params);
+                        if ( params.containsKey("timerange") && !params.containsKey("timeRange") ) {
+                            params.put("timeRange", params.remove("timerange") );
+                        }
                         doOpen(openable, params);
                     } else {
                         doOpen(openable);
                     }
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
+                    addRecent( surl );
                 } catch (IOException ex) {
+                    mon.finished();
                     throw new RuntimeException(ex);
                 }
             } else {
@@ -315,67 +357,91 @@ public class ApplicationModel {
 
     public List<Bookmark> getRecent() {
         if (recent != null) return recent;
-        Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        String srecent = prefs.get(PREF_RECENT,"");
 
-        if (srecent.equals("") || !srecent.startsWith("<")) {
-            String srecenturl = AutoplotUtil.getProperty("autoplot.default.recent", "");
-            if (!srecenturl.equals("")) {
-                try {
-                    URL url = new URL(srecenturl);
-                    recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(url.openStream()).getDocumentElement());
-                    prefs.put(PREF_RECENT, Bookmark.formatBooks(recent));
+        String nodeName= "recent";
+
+        File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
+        if ( !f2.exists() ) {
+            boolean ok= f2.mkdirs();
+            if ( !ok ) {
+                throw new RuntimeException("unable to create folder "+ f2 );
+            }
+        }
+
+        final File f = new File( f2, nodeName + ".xml");
+        if ( f.exists() ) {
+            try {
+                recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new FileInputStream(f)).getDocumentElement());
+            } catch (SAXException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                return new ArrayList<Bookmark>();
+            } catch (IOException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                return new ArrayList<Bookmark>();
+            } catch (ParserConfigurationException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+                return new ArrayList<Bookmark>();
+            }
+
+        } else {
+
+            Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
+            String srecent = prefs.get(PREF_RECENT,"");
+
+            if (srecent.equals("") || !srecent.startsWith("<")) {
+                String srecenturl = AutoplotUtil.getProperty("autoplot.default.recent", "");
+                if (!srecenturl.equals("")) {
                     try {
-                        prefs.flush();
-                    } catch (BackingStoreException ex) {
-                        ex.printStackTrace();
+                        URL url = new URL(srecenturl);
+                        recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(url.openStream()).getDocumentElement());
+                        prefs.put(PREF_RECENT, Bookmark.formatBooks(recent));
+                        try {
+                            prefs.flush();
+                        } catch (BackingStoreException ex) {
+                            ex.printStackTrace();
+                        }
+                    } catch (MalformedURLException e) {
+                        return new ArrayList<Bookmark>();
+                    } catch (IOException e) {
+                        return new ArrayList<Bookmark>();
+                    } catch (SAXException e) {
+                        return new ArrayList<Bookmark>();
+                    } catch (ParserConfigurationException e) {
+                        return new ArrayList<Bookmark>();
                     }
-                } catch (MalformedURLException e) {
-                    return new ArrayList<Bookmark>();
-                } catch (IOException e) {
-                    return new ArrayList<Bookmark>();
-                } catch (SAXException e) {
-                    return new ArrayList<Bookmark>();
-                } catch (ParserConfigurationException e) {
+                } else {
                     return new ArrayList<Bookmark>();
                 }
             } else {
-                return new ArrayList<Bookmark>();
+                try {
+                    recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(srecent.getBytes())).getDocumentElement());
+                } catch (SAXException e) {
+                    return new ArrayList<Bookmark>();
+
+                } catch (IOException e) {
+                    return new ArrayList<Bookmark>();
+
+                } catch (ParserConfigurationException e) {
+                    return new ArrayList<Bookmark>();
+
+                }
             }
-        } else {
-            try {
-                recent = Bookmark.parseBookmarks(AutoplotUtil.readDoc(new ByteArrayInputStream(srecent.getBytes())).getDocumentElement());
-            } catch (SAXException e) {
-                return new ArrayList<Bookmark>();
-
-            } catch (IOException e) {
-                return new ArrayList<Bookmark>();
-
-            } catch (ParserConfigurationException e) {
-                return new ArrayList<Bookmark>();
-
-            }
+            addRecent(""); // cause the new format to be written.
         }
+
         return recent;
     }
 
-    public List<Bookmark> getBookmarks() {
-        if (bookmarks != null) return bookmarks;
+    public List<Bookmark> getLegacyBookmarks() {
         Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
         String sbookmark = prefs.get("bookmarks", "");
 
         if (sbookmark.equals("") || !sbookmark.startsWith("<")) {
-            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
+            String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://autoplot.org/data/demos.xml");
             if (!surl.equals("")) {
                 try {
                     URL url = new URL(surl);
                     bookmarks = Bookmark.parseBookmarks(AutoplotUtil.readDoc(url.openStream()).getDocumentElement());
-                    prefs.put("bookmarks", Bookmark.formatBooks(bookmarks));
-                    try {
-                        prefs.flush();
-                    } catch (BackingStoreException ex) {
-                        ex.printStackTrace();
-                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                     return new ArrayList<Bookmark>();
@@ -398,55 +464,71 @@ public class ApplicationModel {
         return bookmarks;
     }
 
-    public void setBookmarks(List<Bookmark> list) {
-        List oldValue = bookmarks;
-        bookmarks = list;
-        Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put("bookmarks", Bookmark.formatBooks(list));
-        try {
-            prefs.flush();
-        } catch (BackingStoreException ex) {
-            ex.printStackTrace();
-        }
-        propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
-    }
-
     public void addRecent(String surl) {
+
         if ( recent==null ) recent= new ArrayList<Bookmark>(); // kludge for rpwg TODO: why is this null?
         List oldValue = Collections.unmodifiableList(recent);
         ArrayList<Bookmark> newValue = new ArrayList<Bookmark>(recent);
-        Bookmark book = new Bookmark.Item(surl);
-        if (newValue.contains(book)) { // move it to the front of the list
-            newValue.remove(book);
+
+        if ( !surl.equals("") ) {
+            Bookmark book = new Bookmark.Item(surl);
+            if (newValue.contains(book)) { // move it to the front of the list
+                newValue.remove(book);
+            }
+
+            newValue.add(book);
         }
 
-        newValue.add(book);
         while (newValue.size() > MAX_RECENT) {
             newValue.remove(0);
         }
 
-        Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        String s = Bookmark.formatBooks(newValue);
-        while (s.length() > Preferences.MAX_VALUE_LENGTH) {
-            newValue.remove(0);
-            s = Bookmark.formatBooks(newValue);
-        }
-        prefs.put( PREF_RECENT, s);
+        String nodeName= "recent";
 
+        File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
+        if ( !f2.exists() ) {
+            boolean ok= f2.mkdirs();
+            if ( !ok ) {
+                throw new RuntimeException("unable to create folder "+ f2 );
+            }
+        }
+
+        final File f = new File( f2, nodeName + ".xml");
+
+        String s = Bookmark.formatBooks(newValue);
         try {
-            prefs.flush();
-        } catch (BackingStoreException ex) {
+            PrintWriter out = new PrintWriter( new FileOutputStream(f) );
+            out.print(s);
+            out.close();
+        } catch ( IOException ex ) {
             ex.printStackTrace();
         }
+
+        // always tack on the URI to history.dat file
+        final File f3 = new File( f2, "history.txt");
+        try {
+            FileWriter out3 = new FileWriter( f3, true );
+            TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+            Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
+            out3.append( tp.format( now, null) + "\t" + surl + "\n" );
+            out3.close();
+        } catch ( IOException ex ) {
+            ex.printStackTrace();
+        }
+
         this.recent = newValue;
         propertyChangeSupport.firePropertyChange(PROPERTY_RECENT, oldValue, recent);
     }
 
+    /**
+     * //TODO: this should not be called.
+     * @deprecated.  Use BookmarksManager.addBookmark.
+     */
     public Bookmark addBookmark(final String surl) {
 
         Bookmark.Item item = new Bookmark.Item(surl);
         URISplit split = URISplit.parse(surl);
-        String autoTitle = split.file.substring(split.path.length());
+        String autoTitle = split.file==null ? surl : split.file.substring(split.path.length());
         if (autoTitle.length() == 0) autoTitle = surl;
         item.setTitle(autoTitle);
 
@@ -462,14 +544,6 @@ public class ApplicationModel {
 
         newValue.add(item);
 
-        Preferences prefs = Preferences.userNodeForPackage(ApplicationModel.class);
-        prefs.put("bookmarks", Bookmark.formatBooks(newValue));
-
-        try {
-            prefs.flush();
-        } catch (BackingStoreException ex) {
-            ex.printStackTrace();
-        }
         ApplicationModel.this.bookmarks = newValue;
         propertyChangeSupport.firePropertyChange(PROPERTY_BOOKMARKS, oldValue, bookmarks);
 
@@ -528,7 +602,11 @@ public class ApplicationModel {
      * @param state
      */
     public void restoreState(Application state) {
-        this.dom.syncTo(state); 
+        boolean resetFocus= DomUtil.structureChanges( state, this.dom );
+        this.dom.syncTo(state);
+        if ( resetFocus ) {
+            this.dom.getController().setPlot( this.dom.getPlots(0) );
+        }
     }
 
     void doSave(File f) throws IOException {
@@ -571,6 +649,60 @@ public class ApplicationModel {
             }
             c.setRows(rows);
         }
+
+        for ( BindingModel m: state.getBindings() ) {
+            Object src= DomUtil.getElementById( state, m.getSrcId() );
+            Object dst= DomUtil.getElementById( state, m.getDstId() );
+            if ( src==null || dst==null ) {
+                System.err.println("invalid binding:" + m );
+                continue;
+            }
+            BeanProperty srcProp= BeanProperty.create(m.getSrcProperty());
+            BeanProperty dstProp= BeanProperty.create(m.getDstProperty());
+            Object srcVal= srcProp.getValue(src);
+            Object dstVal= dstProp.getValue(dst);
+            if ( srcVal==null && dstVal==null ) {
+                continue; // not sure what to make of this state, shouldn't happen.
+            }
+            if ( !srcVal.equals(dstVal) ) {
+                System.err.println( "fixing inconsistent vap where bound values were no equal: "
+                        +m.getSrcId()+"."+m.getSrcProperty() +"!="+m.getDstId()+"."+m.getDstProperty() );
+                BeanProperty.create(m.getDstProperty()).setValue(dst,srcVal);
+            }
+        }
+    }
+
+    /**
+     * we need to way to implement bindings, since we may mutate the state
+     * before syncing to it.  This makes the state more valid and avoids
+     * bugs like 
+     * https://sourceforge.net/tracker/?func=detail&aid=3017554&group_id=199733&atid=970682
+     * @param state
+     */
+    private void doBindings( Application state ) {
+        for ( BindingModel m: state.getBindings() ) {
+            Object src= DomUtil.getElementById( state, m.getSrcId() );
+            Object dst= DomUtil.getElementById( state, m.getDstId() );
+            Binding binding = Bindings.createAutoBinding(
+                    UpdateStrategy.READ_WRITE,
+                    src,
+                    BeanProperty.create(m.getSrcProperty()),
+                    dst,
+                    BeanProperty.create(m.getDstProperty() ) );
+            binding.bind();
+        }
+    }
+
+    void doOpen( File f, LinkedHashMap<String, String> deltas) throws IOException {
+        if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
+        if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
+
+        InputStream in= new FileInputStream(f);
+
+        doOpen( in,deltas );
+
+        setVapFile( f.toString() );
+
     }
 
     /**
@@ -581,15 +713,14 @@ public class ApplicationModel {
      *   vap DOM after it's loaded.
      * @throws java.io.IOException
      */
-    void doOpen(File f, LinkedHashMap<String, String> deltas) throws IOException {
+    void doOpen( InputStream in, LinkedHashMap<String, String> deltas) throws IOException {
 
-        if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
-        if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
-
-        Application state = (Application) StatePersistence.restoreState(f);
+        Application state = (Application) StatePersistence.restoreState(in);
         makeValid( state );
 
         if (deltas != null) {
+            doBindings( state );
+
             for (Entry<String, String> e : deltas.entrySet()) {
                 logger.finest("applying to vap " + e.getKey() + "=" + e.getValue());
                 String node = e.getKey();
@@ -625,23 +756,32 @@ public class ApplicationModel {
 //                    prop.setValue(state, val);
                     DomUtil.setPropertyValue(state, node, val);
                 } catch (IllegalAccessException ex) {
+                    ex.printStackTrace();
                     Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IllegalArgumentException ex) {
+                    ex.printStackTrace();
                     Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
+                    ex.printStackTrace();
                     Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (ParseException ex) {
+                    ex.printStackTrace();
                     Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        }
+
+        // for now, we reset when loading to make things more robust.  This
+        // should be removed eventually and we can go back to only applying 
+        // deltas.
+        if ( DomUtil.structureChanges( this.dom, state ) ) {
+            this.dom.getController().reset();
         }
 
         //logger.fine("" + state.diffs(this.dom));
         restoreState(state);
         setUseEmbeddedDataSet(false);
 
-        setVapFile( f.toString() );
-        propertyChangeSupport.firePropertyChange("file", null, f);
     }
 
     void doOpen(File f) throws IOException {
@@ -803,12 +943,36 @@ public class ApplicationModel {
     boolean clearCache() throws IllegalArgumentException {
         File local;
 
-        local = FileSystem.settings().getLocalCacheDir();
+        local = new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
         if (local != null) {
-            return Util.deleteFileTree(local);
+            boolean okay= true;
+            okay= okay && Util.deleteFileTree( new File(local,"http") );
+            okay= okay && Util.deleteFileTree( new File(local,"https") );
+            okay= okay && Util.deleteFileTree( new File(local,"ftp") );
+            okay= okay && Util.deleteFileTree( new File(local,"zip") );
+            okay= okay && Util.deleteFileTree( new File(local,"vfsCache") );
+            okay= okay && Util.deleteFileTree( new File(local,"fscache") ); // future
+            return okay;
+            //return Util.deleteFileTree(local);
         } else {
             return true;
         }
+    }
+
+    /**
+     * move the cache.
+     * @param n
+     * @return
+     */
+    boolean moveCache( File n ) {
+        File local = new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_FSCACHE) );
+        boolean y= Util.copyFileTree( local, n );
+        if ( y ) {
+            //y= Util.deleteFileTree(local);
+            JOptionPane.showMessageDialog( this.getCanvas(), "<html>File cache moved to<br>"+n+".<br>The old cache ("+local+") still contains data<br>and should manually be deleted.</html>", "Files moved", JOptionPane.PLAIN_MESSAGE );
+            AutoplotSettings.settings().setFscache(n.toString());
+        }
+        return y;
     }
 
     /**
@@ -821,11 +985,13 @@ public class ApplicationModel {
      */
     public void waitUntilIdle(boolean runtimeException) throws InterruptedException {
         logger.fine("enter waitUntilIdle, pendingChanges=" + dom.getController().isPendingChanges());
-        while (dom.getController().isPendingChanges()) {
-            Thread.sleep(30);
+        while ( dom.getController().isPendingChanges() ) {
+            while (dom.getController().isPendingChanges()) {
+                Thread.sleep(30);
+            }
+            logger.fine("waiting for canvas");
+            canvas.waitUntilIdle();
         }
-        logger.fine("waiting for canvas");
-        canvas.waitUntilIdle();
         logger.fine("done waiting");
     }
 

@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>File Aggregation</title>
+</head>
+<body>
+    <H1>Aggregating Data Files</H1>
+<p>Autoplot allows data from multiple files to be combined into one dataset
+    through an aggregation specification.  Data must be time-ordered,
+    and each file must have time as the first data dimension.
+</p>
+<p>For example,
+    <code>vap:http://cdaweb.gsfc.nasa.gov/istp_public/data/ace/swe/$Y/ac_k0_swe_$Y$m$d_v...cdf?Np&amp;timerange=2009+Apr"</code>
+loads each if the files covering the interval April 2009 and combines them.
+</p>
+
+<p>The text field in this GUI is for specifying the time range.  Most 
+    human-readable formats should be parsed correctly, but here are some
+    examples:
+<ul>
+<li>2009-Apr: The month of April 2009.
+<li>2009-4-11: April 11, 2009.
+<li>2009: The entire year of 2009.
+<li>2009-095: three-digit day of year (April 5, 2009)
+<li>2009-4-5 to 2009-4-11: the time range covering the interval.  Note 2009-4-11
+    is excluded from the interval, "through" includes it.
+</ul>
+</p>
+<p>This component will attempt to show what data is available for
+    the given specification.  The droplist components can be used to select
+    a year, month or date, and then "Copy" will copy the selection to the
+    Time Range text field.  Note the keywords "to" and "through" allow for
+    arbitrary ranges.
+</p>
+<p>Here field codes:</p>
+<ul>
+<li>$Y  four-digit year
+<li>$y  two-digit year
+<li>$j  three-digit day of year
+<li>$m  two-digit month
+<li>$d  two-digit day of month
+<li>$H  two-digit hour
+<li>$M  two-digit minute
+<li>$S  two-digit second
+<li>$v  version number, numerical sort  $(v,alpha)  $(v,sep) for "x.y.z"
+<li>$(milli)  three digit milliseconds
+<li>$(micro)  three digit microseconds
+</ul>
+<a href="http://autoplot.org/help_aggregator_main">this page in the wiki</a>
+</body>
+</html>
+

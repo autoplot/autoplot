@@ -3,6 +3,8 @@
 # this copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.
 
+echo "compile-applet-all v.20101209"
+
 # set JAVA5_HOME and JAVA6_HOME
 if [ "" = "$JAVA5_HOME" ]; then
     JAVA5_HOME=/usr/local/jdk1.5.0_17/
@@ -17,7 +19,9 @@ rm -r -f temp-classes/
 mkdir temp-classes
 
 for i in \
-  QDataSet QStream dasCore DataSource \
+  dasCore dasCoreUtil dasCoreDatum \
+  QDataSet QStream DataSource \
+  AutoplotHelp \
   BinaryDataSource DataSourcePack TsdsDataSource  \
   VirboAutoplot \
   AutoplotApplet; do
@@ -32,8 +36,8 @@ jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support 
 
 cd ../temp-src
 # set traps for things that ought not to be needed by the applet.
-rm org/virbo/autoplot/AutoPlotUI.java
-rm org/virbo/autoplot/AutoPlotUI.form
+rm org/virbo/autoplot/AutoplotUI.java
+rm org/virbo/autoplot/AutoplotUI.form
 rm org/virbo/datasource/DataSetSelector.java
 rm org/virbo/datasource/DataSetSelector.form
 rm org/virbo/autoplot/scriptconsole/*
@@ -49,10 +53,6 @@ if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes 
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/tsds/datasource/TsdsDataSourceFactory.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/das2Stream/Das2StreamDataSourceFactory.java; then hasErrors=1; fi
 if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/binarydatasource/BinaryDataSourceFactory.java; then hasErrors=1; fi
-
-# NetCDF IOServiceProvider allows Autoplot URIs to be used in ncml files.
-#NetCDF isn't enabled for applets yet:   if ! $JAVA5_HOME/bin/javac -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/netCDF/APIOServiceProvider.java; then hasErrors=1; fi
-
 echo "done compile sources."
 
 if [ $hasErrors -eq 1 ]; then
@@ -83,6 +83,13 @@ for i in `ls {../TsdsDataSource/,../BinaryDataSource/,../DataSourcePack/}src/MET
 done
 # end, special handling of the META-INF stuff.
 
+
+# copy over the vap promotion XSL files
+for i in `ls ../VirboAutoplot/src/org/virbo/autoplot/state/*.xsl` ; do
+   echo 'cp $i temp-classes/org/virbo/autoplot/state'
+   cp $i temp-classes/org/virbo/autoplot/state
+done
+
 cd temp-classes
 
 rm -r org/jdesktop/swingbinding/
@@ -111,8 +118,8 @@ cp src/AutoplotAppletAurora.html dist/
 
 if [ "" != "$EXAMPLE_URI" ]; then
    cd temp-src
-   echo $JAVA5_HOME/bin/javac -d ../temp-classes external/FileSearchReplace.java
-   $JAVA5_HOME/bin/javac -d ../temp-classes external/FileSearchReplace.java
+   echo $JAVA5_HOME/bin/javac -target 1.5 -d ../temp-classes external/FileSearchReplace.java
+   $JAVA5_HOME/bin/javac -target 1.5 -d ../temp-classes external/FileSearchReplace.java
    cd ..
    echo $JAVA5_HOME/bin/java -cp temp-classes external.FileSearchReplace dist/AutoplotApplet.html 'http://www.sarahandjeremy.net/jeremy/data/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14' $EXAMPLE_URI
    $JAVA5_HOME/bin/java -cp temp-classes external.FileSearchReplace dist/AutoplotApplet.html 'http://www.sarahandjeremy.net/jeremy/data/0B000800408DD710.$Y$m$d.d2s?timerange=2009-03-14' $EXAMPLE_URI

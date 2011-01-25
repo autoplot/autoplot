@@ -54,7 +54,7 @@ public class EditorAnnotationsSupport {
         Style s1 = doc.addStyle("error", def);
         StyleConstants.setBackground(s1, Color.PINK);
         Style s2 = doc.addStyle("programCounter", def);
-        StyleConstants.setBackground(s2, Color.GREEN);
+        StyleConstants.setBackground(s2, Color.GREEN.brighter().brighter() );
     }
 
     /**
@@ -112,14 +112,22 @@ public class EditorAnnotationsSupport {
         }
     }
 
-    public void annotateLine(int line, String name, String text) throws BadLocationException {
-        annotateLine( line, name, text, null );
-    }
     /**
      * highlite the line by setting the background to color.  null clears the highlite.
      * @param line, the line number to highlite.  1 is the first line.
      * @param name, the name of the style, including "error" and "programCounter"
      * @param text, annotation to display when hovering. Currently ignored.
+     */
+    public void annotateLine(int line, String name, String text) throws BadLocationException {
+        annotateLine( line, name, text, null );
+    }
+
+    /**
+     * highlite the line by setting the background to color.  null clears the highlite.
+     * @param line, the line number to highlite.  1 is the first line.
+     * @param name, the name of the style, including "error" and "programCounter"
+     * @param text, annotation to display when hovering. Currently ignored.
+     * @param interp, the interpretter to focus on.
      */
     public void annotateLine(int line, String name, String text, PythonInterpreter interp ) throws BadLocationException {
         StyledDocument doc = editorPanel.getStyledDocument();
@@ -139,12 +147,19 @@ public class EditorAnnotationsSupport {
             i1 = doc.getLength();
         }
 
+        annotateChars( i0, i1, name, text, interp );
+    }
+
+    public void annotateChars( int i0, int i1, String name, String text, PythonInterpreter interp ) throws BadLocationException {
+        StyledDocument doc = editorPanel.getStyledDocument();
+        Element root = editorPanel.getDocument().getDefaultRootElement();
+
         Style style = doc.getStyle(name);
         if (style == null) {
             addStyles(doc);
             style = doc.getStyle(name);
         }
-        doc.setParagraphAttributes(i0, i1 - i0, StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE), true);
+        doc.setParagraphAttributes(i0, i1 - i0, StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE), false);
         doc.setCharacterAttributes(i0, i1 - i0, style, true);
         Annotation ann = new Annotation();
         ann.len = i1 - i0;
@@ -153,7 +168,7 @@ public class EditorAnnotationsSupport {
         annotations.put(ann.offset, ann);
         this.interp= interp;
     }
-    
+
     private String htmlify( String text ) {
         StringBuffer buff= new StringBuffer();
         buff.append("<html>");

@@ -16,11 +16,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.metatree.MetadataUtil;
-import ucar.ma2.DataType;
+import org.virbo.dataset.SemanticOps;
+import org.virbo.dsops.Ops;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -38,17 +40,27 @@ public class NetCdfVarDataSet extends AbstractDataSet {
     double[] data;
     double[][] data2;
     int[] shape;
-    
-    @SuppressWarnings("unchecked")
-    public NetCdfVarDataSet( Variable variable , NetcdfDataset ncfile ) throws IOException {
+
+    public static NetCdfVarDataSet create( Variable variable , NetcdfDataset ncfile, ProgressMonitor mon ) throws IOException {
+        NetCdfVarDataSet result = new NetCdfVarDataSet(  );
+        result.read( variable, ncfile, mon );
+        return result;
+    }
+
+    private NetCdfVarDataSet(  )  {
+        
+    }
+
+    private void read( Variable variable , NetcdfDataset ncfile, ProgressMonitor mon )  throws IOException {
         this.v= variable;
-                
+        if ( !mon.isStarted() ) mon.started(); //das2 bug: monitor blinks if we call started again here
+        mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
         ucar.ma2.Array a = v.read();
 
         data= (double[])a.get1DJavaArray( Double.class );
-
+       
         shape= v.getShape();
-        properties.put( QDataSet.NAME, variable.getName() );
+        properties.put( QDataSet.NAME, Ops.safeName(variable.getName()) );
         if ( shape.length>1 ) properties.put( QDataSet.QUBE, Boolean.TRUE );
         
         boolean isCoordinateVariable= false;
@@ -59,8 +71,9 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             Variable cv = ncfile.findVariable(d.getName());
             if ((cv != null) && cv.isCoordinateVariable()) {
                 Variable dv= cv;
-                if ( dv!=variable ) {
-                    QDataSet depend0= new NetCdfVarDataSet( dv , ncfile);
+                if ( dv!=variable && dv.getRank()==1 ) {
+                    mon.setProgressMessage( "reading "+dv.getNameAndDimensions() );
+                    QDataSet depend0= create( dv , ncfile, new NullProgressMonitor() );
                     properties.put( "DEPEND_"+ir, depend0 );
                 } else {
                     isCoordinateVariable= true;
@@ -69,7 +82,9 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         }
         
         Map<String,Object> attributes= new HashMap();
-        
+
+        mon.setProgressMessage("reading attributes");
+
         List attrs= v.getAttributes();
         for ( Iterator i= attrs.iterator(); i.hasNext(); ) {
             Attribute attr= (Attribute) i.next();
@@ -89,7 +104,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
             if ( unitsString.contains(" since ") ) {
                 Units u;
                 try {
-                    u = MetadataUtil.lookupTimeUnits(unitsString);
+                    u = SemanticOps.lookupTimeUnits(unitsString);
                 } catch (ParseException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -109,6 +124,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         if ( isCoordinateVariable ) {
             properties.put( QDataSet.CADENCE, DataSetUtil.guessCadenceNew(this,null) );
         }
+        mon.finished();
         
     }
     

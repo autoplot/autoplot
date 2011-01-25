@@ -36,7 +36,7 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws IOException, StreamException {
         List<CompletionContext> result= new ArrayList<CompletionContext>();
         if ( cc.context==cc.CONTEXT_PARAMETER_NAME ) {
-            if ( cc.resource.toString().endsWith(".qds") ) {
+            if ( DataSetURI.fromUri( cc.resourceURI ).endsWith(".qds") ) {
                 List<String> params= getNames( cc, mon );
                 for ( String s: params ) {
                     result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, s ) );
@@ -59,7 +59,7 @@ public class Das2StreamDataSourceFactory implements DataSourceFactory {
         
         Map params= URISplit.parseParams( cc.params );
         Object o;
-        File file= DataSetURI.getFile( cc.resource, mon  );
+        File file= DataSetURI.getFile( cc.resourceURI, mon  );
         
         QDataSetStreamHandler h= new QDataSetStreamHandler();
         h.setReadPackets(false); // don't read any records, just scan for datasets.

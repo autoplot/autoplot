@@ -20,15 +20,20 @@ import org.das2.util.monitor.SubTaskMonitor;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.das2.dataset.NoDataInIntervalException;
+import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.MetadataModel;
@@ -52,17 +57,29 @@ public class AggregatingDataSource extends AbstractDataSource {
 
     private DatumRange quantize(DatumRange timeRange) {
         try {
-            //String s1= fsm.calculateNameFor(timeRange.min());
-            //String s2= fsm.calculateNameFor(timeRange.max());
-
             String[] ss = fsm.getNamesFor(timeRange);
-            if (ss.length == 0) return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
+            if (ss.length == 0) {
+                String ff= fsm.getRepresentativeFile( new NullProgressMonitor() );
+                if ( ff==null ) {
+                    return new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max())); // do what we did before
+                } else {
+                    String f1= fsm.getFilenameFor( timeRange.min(), timeRange.min() );
+                    String f2= fsm.getFilenameFor( timeRange.max(), timeRange.max() );
+                    DatumRange dr1= fsm.getRangeFor(f1);
+                    DatumRange dr2= fsm.getRangeFor(f2);
+                    return DatumRangeUtil.union( dr1, dr2 );
+                }
+            }
             DatumRange result = fsm.getRangeFor(ss[0]);
             for (int i = 0; i < ss.length; i++) {
                 DatumRange r1 = fsm.getRangeFor(ss[i]);
                 result = result.include(r1.max()).include(r1.min());
             }
-            return result;
+            if ( timeRange.contains(result) ) {
+                return timeRange;
+            } else {
+                return result;
+            }
         } catch (IOException ex) {
             Logger.getLogger(AggregatingDataSource.class.getName()).log(Level.SEVERE, null, ex);
             timeRange = new DatumRange(TimeUtil.prevMidnight(timeRange.min()), TimeUtil.nextMidnight(timeRange.max()));
@@ -73,11 +90,15 @@ public class AggregatingDataSource extends AbstractDataSource {
     /** Creates a new instance of AggregatingDataSource */
     public AggregatingDataSource(URI uri,DataSourceFactory delegateFactory) throws MalformedURLException, FileSystem.FileSystemOfflineException, IOException, ParseException {
         super(uri);
-        String surl = uri.toString();
-        surl= surl.replaceAll( "%25", "%");
+        String surl = DataSetURI.fromUri(uri);
         this.delegateDataSourceFactory = delegateFactory;
         addCability(TimeSeriesBrowse.class, createTimeSeriesBrowse() );
         String stimeRange= super.params.get("timerange");
+        if ( super.params.get("timeRange")!=null && stimeRange==null ) {
+            stimeRange= super.params.get("timeRange");
+        }
+        if ( stimeRange==null ) throw new IllegalArgumentException("timeRange not found");
+        stimeRange= stimeRange.replaceAll("\\+"," " );        
         viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
     }
 
@@ -93,7 +114,7 @@ public class AggregatingDataSource extends AbstractDataSource {
             }
 
             public String getURI() {
-                String surl = AggregatingDataSource.this.resourceURI.toString() + "?" ;
+                String surl = DataSetURI.fromUri( AggregatingDataSource.this.resourceURI ) + "?" ;
                 if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
                 surl += "timerange=" + String.valueOf(viewRange);
 
@@ -117,11 +138,13 @@ public class AggregatingDataSource extends AbstractDataSource {
     }
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
-        String[] ss = getFsm().getNamesFor(viewRange);
+        
+        String[] ss = getFsm().getBestNamesFor( viewRange, new NullProgressMonitor() );
 
         Logger.getLogger("virbo.datasource.agg").fine("aggregating " + ss.length + " files for " + viewRange);
 
-        DDataSet result = null;
+        ArrayDataSet result = null;
+        JoinDataSet altResult= null; // used when JoinDataSets are found
 
         if (ss.length > 1) {
             mon.setTaskSize(ss.length * 10);
@@ -135,30 +158,74 @@ public class AggregatingDataSource extends AbstractDataSource {
             if (!sparams.equals("")) {
                 scompUrl += "?" + sparams;
             }
-            URL compUrl = new URL(scompUrl);
 
-            DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(compUrl.toURI());
+            URI delegateUri= DataSetURI.getURI(scompUrl);
+
+            DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
             metadataModel = delegateDataSource.getMetadataModel();
 
             ProgressMonitor mon1;
             if (ss.length > 1) {
                 mon.setProgressMessage("getting " + ss[i]);
                 mon1 = SubTaskMonitor.create(mon, i * 10, 10 * (i + 1));
+                mon1.setTaskProgress(0); // cause it to paint
             } else {
                 mon1 = mon;
             }
 
-            QDataSet ds1 = delegateDataSource.getDataSet(mon1);
+            try {
+                QDataSet ds1 = delegateDataSource.getDataSet(mon1);
 
-            DatumRange dr1 = getFsm().getRangeFor(ss[i]);
+                DatumRange dr1 = getFsm().getRangeFor(ss[i]);
 
-            if (result == null) {
-                result = DDataSet.copy(ds1);
-                this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
-                cacheRange1 = dr1;
-            } else {
-                result.append(DDataSet.copy(ds1));
-                cacheRange1 = new DatumRange(cacheRange1.min(), dr1.max());
+                if (result == null && altResult==null ) {
+                    if ( ds1 instanceof JoinDataSet ) {
+                        altResult= JoinDataSet.copy( (JoinDataSet)ds1 );
+                        altResult.putProperty(QDataSet.JOIN_0,"join");
+                    } else {
+                        if ( ss.length==1 ) {
+                            result= ArrayDataSet.maybeCopy(ds1);
+                        } else {
+                            result = ArrayDataSet.maybeCopy(ds1);
+                            result.grow(result.length()*ss.length*11/10);  //110%
+                        }
+                    }
+                    this.metadata = delegateDataSource.getMetadata(new NullProgressMonitor());
+                    cacheRange1 = dr1;
+
+                } else {
+                    if ( ds1 instanceof JoinDataSet ) {
+                        altResult.joinAll( (JoinDataSet)ds1 );
+                    } else {
+                        ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
+                        try {
+                            if ( result.canAppend(ads1) ) {
+                                result.append( ads1 );
+                            } else {
+                                result.grow( result.length() + ads1.length() * (ss.length-i) );
+                                result.append( ads1 );
+                            }
+                        } catch ( IllegalArgumentException ex ) {
+                            throw new IllegalArgumentException( "can't append data from "+delegateUri, ex );
+                        }
+                    }
+
+                    //TODO: combine metadata.  We don't have a way of doing this.
+                    //this.metadata= null;
+                    //this.metadataModel= null;
+                    cacheRange1 = new DatumRange(cacheRange1.min(), dr1.max());
+                }
+            } catch ( Exception ex ) {
+                if ( ex instanceof NoDataInIntervalException && ss.length>1 ) {
+                    System.err.println("no data found in "+delegateUri );
+                    // do nothing
+                } else if ( ss.length==1 ) {
+                    throw ex;
+                } else {
+                    //ex.printStackTrace(); //TODO: it would be nice to be able to attach the error to the result.
+                    throw ex;
+                    //do nothing
+                }
             }
             if (ss.length > 1) {
                 if (mon.isCancelled()) {
@@ -171,12 +238,29 @@ public class AggregatingDataSource extends AbstractDataSource {
         if (ss.length > 1) {
             mon.finished();
         }
-        DDataSet dep0 = result == null ? null : (DDataSet) result.property(DDataSet.DEPEND_0);
-        if (dep0 != null) {
-            dep0.putProperty(DDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
-        }
 
-        return result;
+        if ( altResult!=null ) {
+            ArrayDataSet dep0 = altResult == null ? null : (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
+            Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
+            if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
+                dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
+                dep0.putProperty(QDataSet.TYPICAL_MIN, viewRange.min().doubleValue(dep0units) );
+                dep0.putProperty(QDataSet.TYPICAL_MAX, viewRange.max().doubleValue(dep0units) );
+            }
+
+            return altResult;
+            
+        } else {
+            ArrayDataSet dep0 = result == null ? null : (ArrayDataSet) result.property(DDataSet.DEPEND_0);
+            Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
+            if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
+                dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
+                dep0.putProperty(QDataSet.TYPICAL_MIN, viewRange.min().doubleValue(dep0units) );
+                dep0.putProperty(QDataSet.TYPICAL_MAX, viewRange.max().doubleValue(dep0units) );
+            }
+
+            return result;
+        }
 
     }
 

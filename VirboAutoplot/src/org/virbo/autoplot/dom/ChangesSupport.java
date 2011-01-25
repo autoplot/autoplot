@@ -10,8 +10,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
-import org.das2.system.MutatorLock;
 import org.virbo.autoplot.util.TransparentLogger;
 
 /**
@@ -144,6 +145,28 @@ public final class ChangesSupport {
     }
     private boolean valueIsAdjusting = false;
 
+    private Lock mutatorLock = new ReentrantLock() {
+            public void lock() {
+                super.lock();
+                if (valueIsAdjusting) {
+                    //System.err.println("lock is already set!");
+                } else {
+                    propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, false, true );
+                    valueIsAdjusting = true;
+                }
+            }
+
+            public void unlock() {
+                super.unlock();
+                if ( !super.isLocked() ) {
+                    valueIsAdjusting = false;
+                    propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, true, false );
+                } else {
+                    //System.err.println("lock is still set, neat!");
+                }
+            }
+        };
+
     /**
      * one client will have write access to the bean, and when unlock
      * is called, a "valueAdjusting" property change event is fired.
@@ -152,21 +175,8 @@ public final class ChangesSupport {
      * clients should check the valueIsAdjusting property.
      * @return
      */
-    protected synchronized MutatorLock mutatorLock() {
-        return new MutatorLock() {
-            public void lock() {
-                if (valueIsAdjusting) {
-                    System.err.println("lock is already set!");
-                }
-                propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, false, true );
-                valueIsAdjusting = true;
-            }
-
-            public void unlock() {
-                valueIsAdjusting = false;
-                propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, true, false );
-            }
-        };
+    protected synchronized Lock mutatorLock() {
+        return mutatorLock;
     }
 
     

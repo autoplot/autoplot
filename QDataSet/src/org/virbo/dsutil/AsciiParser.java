@@ -8,6 +8,7 @@
  */
 package org.virbo.dsutil;
 
+import java.util.logging.Level;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.ProgressMonitor;
@@ -19,23 +20,29 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.*;
-import org.das2.util.TimeParser;
+import org.das2.datum.TimeParser;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.WritableDataSet;
+import org.virbo.dsops.Ops;
 
 /**
- * Class for reading ascii tables into a QDataSet.  This parses a file by breaking
+ * Class for reading ASCII tables into a QDataSet.  This parses a file by breaking
  * it up into records, and passing the record off to a delegate record parser.
  * The record parser then breaks up the record into fields, and each field is 
- * parser by a delegate field parser.  Each column of the table as a Unit and a 
- * field name associated with it.
+ * parsed by a delegate field parser.  Each column of the table has a Unit, field name,
+ * and field label associated with it.
  * 
- * Examples of record parsers include DelimParser,
- * which splits the record by a delimiter such as a tab or comma, and FixedColumnsParser,
- * which splits the record by character positions.  Example of field parsers include
- * DOUBLE_PARSER which parses the value as a double, and UNITS_PARSER, which uses
- * the Unit attached to the column to interpret the value.
+ * Examples of record parsers include 
+ * DelimParser, which splits the record by a delimiter such as a tab or comma,
+ * RegexParser, which processes each record with a regular expression to get the fields,
+ * and FixedColumnsParser, which splits the record by character positions.
+ * Example of field parsers include DOUBLE_PARSER which parses the value
+ * as a double, and UNITS_PARSER, which uses the Unit attached to the column
+ * to interpret the value.
+ *
+ * When the first record with the correct number of fields is found but is not
+ * parseable, we look for field labels and units.
  * 
  * The skipLines property tells the parser to skip a given number of header lines 
  * before attempting to parse the record.  Also, commentPrefix identifies lines to be 
@@ -44,7 +51,7 @@ import org.virbo.dataset.WritableDataSet;
  * is set.  Two Patterns are provided NAME_COLON_VALUE_PATTERN and
  * NAME_EQUAL_VALUE_PATTERN for convenience.   
  *
- * Adapted to v3.0 QDataSet model, Jeremy, May 2007.
+ * Adapted to QDataSet model, Jeremy, May 2007.
  *
  * @author Jeremy
  */
@@ -86,11 +93,12 @@ public class AsciiParser {
     /**
      * detect identifiers for columns.
      */
-    private final static Pattern COLUMN_ID_HEADER_PATTERN = Pattern.compile("\\s*\"?([a-zA-Z][a-zA-Z _0-9]*)(\\(([a-zA-Z_\\.0-9]*)\\))?\"?\\s*");
+    Pattern COLUMN_ID_HEADER_PATTERN = Pattern.compile("\\s*\"?([a-zA-Z][a-zA-Z _0-9]*)([\\(\\[]([a-zA-Z_\\.\\[\\-\\]0-9]*)[\\)\\]])?\"?\\s*");
     /**
      * allow columns to be labeled with some datum ranges, such as 10.0-13.1.  We convert these into an identifier, but depend1labels will present as-is.
+     * Note this pattern will match "-999.000" so check groups 2 and 4 for non null.
      */
-    private final static Pattern COLUMN_CHANNEL_HEADER_PATTERN = Pattern.compile("\\s*\"?((\\d*\\.?\\d*([eE]\\d+)?)\\-(\\d*\\.?\\d*([eE]\\d+)?))\"?\\s*");
+    private final static Pattern COLUMN_CHANNEL_HEADER_PATTERN = Pattern.compile("\\s*\"?(([a-zA-Z_]*)(\\d*\\.?\\d*([eE]\\d+)?)\\-(\\d*\\.?\\d*([eE]\\d+)?))\"?\\s*");
 
     public final static String PROPERTY_FIELD_NAMES = "fieldNames";
     public static final String PROPERTY_FILE_HEADER = "fileHeader";
@@ -99,7 +107,7 @@ public class AsciiParser {
     public static final String DELIM_COMMA = ",";
     public static final String DELIM_TAB = "\t";
     public static final String DELIM_WHITESPACE = "\\s+";
-    private static Logger logger = Logger.getLogger("virbo.dataset.asciiparser");
+    private static final Logger logger = Logger.getLogger("virbo.dataset.asciiparser");
     private static final int HEADER_LENGTH_LIMIT=1000;
 
     private AsciiParser(String[] fieldNames) {
@@ -310,7 +318,7 @@ public class AsciiParser {
         int commaDelimFieldCount= line.split( ",",-2 ).length;
         int whitespaceDelimFieldCount= line.split("\\s+",-2 ).length;
 
-        if ( tabDelimFieldCount > 1) {  // always use tabs over others
+        if ( tabDelimFieldCount > 1 && tabDelimFieldCount!=whitespaceDelimFieldCount ) {  // always use tabs over others, but only if other doesn't work
             fieldSep = "\t";
         } else if ( commaDelimFieldCount > 1 && commaDelimFieldCount>= whitespaceDelimFieldCount/2 ) { //TODO: improve this
             fieldSep = ",";
@@ -378,6 +386,11 @@ public class AsciiParser {
         for (int i = 0; i < fieldCount - 1; i++) {
             regexBuf.append("(" + decimalRegex + ")[\\s+,+]\\s*");
         }
+        fieldParsers= new FieldParser[fieldCount];
+        for (int i = 0; i< fieldCount; i++ ) {
+            fieldParsers[i] = DOUBLE_PARSER;
+        }
+
         regexBuf.append("(" + decimalRegex + ")\\s*");
 
         recordParser = new RegexParser(regexBuf.toString());
@@ -740,14 +753,12 @@ public class AsciiParser {
     }
 
     public static interface FieldParser {
-
         double parseField(String field, int columnIndex) throws ParseException;
     }
     /**
      * parses the field using Double.parseDouble, java's double parser.
      */
     public static final FieldParser DOUBLE_PARSER = new FieldParser() {
-
         public final double parseField(String field, int columnIndex) {
             return Double.parseDouble(field);
         }
@@ -756,7 +767,6 @@ public class AsciiParser {
      * delegates to the unit object set for this field to parse the data.
      */
     public final FieldParser UNITS_PARSER = new FieldParser() {
-
         public final double parseField(String field, int columnIndex) throws ParseException {
             Units u = AsciiParser.this.units[columnIndex];
             return u.parse(field).doubleValue(u);
@@ -811,19 +821,40 @@ public class AsciiParser {
             fieldParsers[i] = DOUBLE_PARSER;
             Matcher m;
             if ((m = COLUMN_ID_HEADER_PATTERN.matcher(ss[i])).matches()) {
-                fieldLabels[i] = m.group(1).trim();
-                fieldNames[i] = fieldLabels[i].replaceAll(" ", "_");
-                fieldUnits[i]= m.group(3);
-                if (fieldUnits[i]!=null) fieldUnits[i]= fieldUnits[i].trim();
-            // TODO: check for units too.
-            // if ( m.groupCount() is 2) String u= m.group(2).trim()
-            } else if ((m=COLUMN_CHANNEL_HEADER_PATTERN.matcher(ss[i])).matches() ) {
-                fieldLabels[i] = m.group(1).trim();
-                fieldNames[i] = "ch_"+m.group(1).trim().replaceAll("-", "_");
+                String n= m.group(1).trim();
+                if ( n.length()!=3 || !n.equalsIgnoreCase("nan") ) {
+                    fieldLabels[i] = n;
+                    fieldNames[i] = Ops.safeName( fieldLabels[i] );
+                    fieldUnits[i]= m.group(3);
+                    if (fieldUnits[i]!=null) {
+                        fieldUnits[i]= fieldUnits[i].trim();
+                        if ( fieldUnits[i].length()>2 ) {
+                            char ch= fieldUnits[i].charAt(0);
+                            if ( !Character.isLetter(ch) ) {
+                                // this can't be turned into a unit, so just tack this on to the label.
+                                fieldLabels[i]= fieldLabels[i] + m.group(2);
+                                fieldUnits[i]= null;
+                            }
+                        }
+                    }
+                } else {
+                    if (isColumnHeaders) {
+                        logger.log(Level.FINEST, "parsed line appears to contain NaN''s, and is not a column header because of field #{0}: {1}", new Object[]{i, ss[i]});
+                    }
+                    isColumnHeaders = false;
+                }
+            } else if ((m=COLUMN_CHANNEL_HEADER_PATTERN.matcher(ss[i])).matches() && m.group(3).length()>0 && m.group(5).length()>0 ) {
+                String n= m.group(1).trim();
+                fieldLabels[i] = n;
+                if ( m.group(2).length()>0 ) { // make valid java identifier
+                    fieldNames[i] = n.replaceAll("-", "_");
+                } else {
+                    fieldNames[i] = "ch_"+n.replaceAll("-", "_");
+                }
                 fieldUnits[i]= null;
             } else {
                 if (isColumnHeaders) {
-                    logger.finest("first parsed line does not appear to be column header because of field #" + i + ": " + ss[i]);
+                    logger.log(Level.FINEST, "first parsed line does not appear to be column header because of field #{0}: {1}", new Object[]{i, ss[i]});
                 }
                 isColumnHeaders = false;
             }
@@ -960,7 +991,10 @@ public class AsciiParser {
                     index= index+1;
                     index0= index;
                     i1= input.indexOf(quote,index);
-                    if ( i1==-1 ) throw new IllegalArgumentException("unclosed quote");
+                    if ( i1==-1 ) {
+                        System.err.println("unclosed quote: " + input);
+                        continue;
+                    }
                     while ( i1+1<input.length() && input.charAt(i1+1)==quote ) {
                         i1= input.indexOf(quote,i1+2);
                         if ( i1==-1 ) throw new IllegalArgumentException("unclosed quote");
@@ -1000,6 +1034,10 @@ public class AsciiParser {
             }
 
             return ( ifield == fields.length && index==len ) ;
+        }
+
+        public String toString() {
+            return "AsciiParser.DelimParser: regex="+this.delimRegex;
         }
     }
 
@@ -1073,6 +1111,10 @@ public class AsciiParser {
             } else {
                 return false;
             }
+        }
+
+        public String toString() {
+            return "RegexParser regex="+this.recordPattern+"";
         }
     }
 
@@ -1196,7 +1238,8 @@ public class AsciiParser {
 
     /**
      * return the units that were associated with the field.  This might also be
-     * the channel label for spectrograms.  In "field0(str)" this is str.
+     * the channel label for spectrograms.  
+     * In "field0(str)" or "field0[str]" this is str.
      * elements may be null if not found.
      * @return
      */
@@ -1233,7 +1276,7 @@ public class AsciiParser {
             System.err.println("great stuff");
         }
 
-        String file = "/media/mini/data.backup/examples/dat/2490lintest90005.raw";
+        String file = "/media/mini/data.backup/examples/dat/sarah/2490lintest90005.raw";
 
         {
             AsciiParser parser = AsciiParser.newParser(5);
@@ -1311,7 +1354,7 @@ public class AsciiParser {
     public void setKeepFileHeader(boolean keepHeader) {
         boolean oldKeepHeader = this.keepFileHeader;
         this.keepFileHeader = keepHeader;
-        propertyChangeSupport.firePropertyChange("keepHeader", new Boolean(oldKeepHeader), new Boolean(keepHeader));
+        propertyChangeSupport.firePropertyChange("keepHeader", oldKeepHeader, keepHeader);
     }
     /**
      * Holds value of property recordParser.
@@ -1360,7 +1403,7 @@ public class AsciiParser {
     }
 
     /**
-     * returns the index of the field
+     * returns the index of the field.  Supports the name, or field0, or 0, etc.
      */
     public int getFieldIndex(String string) {
         for (int i = 0; i < fieldNames.length; i++) {
@@ -1368,7 +1411,17 @@ public class AsciiParser {
                 return i;
             }
         }
-        return -1;
+        int icol= -1;
+        if (Pattern.matches("field[0-9]+", string )) {
+            icol= Integer.parseInt(string.substring(5));
+        } else if (Pattern.matches("[0-9]+", string )) {
+            icol= Integer.parseInt(string);
+        }
+        if ( icol>=fieldCount ) {
+            throw new IllegalArgumentException("bad column parameter: the record parser only expects "+fieldCount+" columns");
+        }
+
+        return icol;
     }
     /**
      * Holds value of property fillValue.

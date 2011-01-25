@@ -1,0 +1,2 @@
+# add reference to .hs files on classpath.
+/helpfiles/aggregator.javahelp.hs

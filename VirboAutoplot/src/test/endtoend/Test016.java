@@ -4,24 +4,16 @@
  */
 package test.endtoend;
 
-import java.awt.Graphics2D;
 import java.io.IOException;
 import java.util.Map;
-import org.das2.datum.DatumRange;
-import org.das2.datum.Units;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
-import org.das2.graph.Painter;
-import org.das2.util.monitor.NullProgressMonitor;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.AutoplotUtil.AutoRangeDescriptor;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
@@ -92,7 +84,7 @@ public class Test016 {
 
     }
     
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
         try {
 
             getDocumentModel().getOptions().setAutolayout(false);
@@ -103,7 +95,8 @@ public class Test016 {
             MetadataModel mm;
             Map<String,Object> metaraw;
 
-            ds= Util.getDataSet( "vap:http://spacedata.bu.edu/data/polar/cammice/k1/1998/po_k1_cam_19980117_v00.cdf?HCounts" );
+            //ds= Util.getDataSet( "vap:http://spacedata.bu.edu/data/polar/cammice/k1/1998/po_k1_cam_19980117_v00.cdf?HCounts" );
+            ds= Util.getDataSet( "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_k1_cam_19980117_v00.cdf?HCounts" );
             mm= MetadataUtil.getMetadataModel( (String) ds.property(QDataSet.METADATA_MODEL));
             metaraw= (Map<String, Object>) ds.property(QDataSet.METADATA);
             meta= mm.properties(metaraw);
@@ -124,7 +117,7 @@ public class Test016 {
 
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
+        } catch ( Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }

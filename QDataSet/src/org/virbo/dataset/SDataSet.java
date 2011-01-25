@@ -9,27 +9,20 @@
 
 package org.virbo.dataset;
 
-import java.util.HashMap;
 import java.util.Map;
 
+
 /**
- * rank 1,2,or 3 dataset backed by Integer (4 byte) array. 
+ * rank 1,2,or 3 dataset backed by Short (2 byte) array.
  * Mutable datasets warning: No dataset should be mutable once it is accessible to the
  * rest of the system.  This would require clients make defensive copies which would 
  * seriously degrade performance.  
  *
  * @author jbf
  */
-public final class SDataSet extends AbstractDataSet implements WritableDataSet {
+public final class SDataSet extends ArrayDataSet {
     short[] back;
-    
-    int rank;
-    
-    int len0;
-    int len1;
-    int len2;
-    int len3;
-    
+        
     public static final String version="20090606";
     
     public static SDataSet createRank1( int len0 ) {
@@ -73,42 +66,26 @@ public final class SDataSet extends AbstractDataSet implements WritableDataSet {
     }
     
     /** Creates a new instance of SDataSet */
-    private SDataSet( int rank, int len0, int len1, int len2, int len3 ) {
+    protected SDataSet( int rank, int len0, int len1, int len2, int len3 ) {
         this( rank, len0, len1, len2, len3, new short[ len0 * len1 * len2 * len3] );
     }
 
-    private SDataSet( int rank, int len0, int len1, int len2, int len3, short[] back ) {
+    protected SDataSet( int rank, int len0, int len1, int len2, int len3, short[] back ) {
        this.back= back;
        this.rank= rank;
        this.len0= len0;
        this.len1= len1;
        this.len2= len2;
        this.len3= len3;
-       DataSetUtil.addQube(this);
-    }
-    
-    public int rank() {
-        return rank;
+       if ( rank>1 ) putProperty(QDataSet.QUBE, Boolean.TRUE);
     }
 
-    @Override
-    public int length() {
-        return len0;
+    protected Object getBack() {
+        return this.back;
     }
 
-    @Override
-    public int length(int i) {
-        return len1;
-    }
-    
-    @Override
-    public int length( int i0, int i1 ) {
-        return len2;
-    }
-
-    @Override
-    public int length( int i0, int i1, int i2 ) {
-        return len3;
+    protected void setBack(Object back) {
+        this.back= (short[])back;
     }
 
     @Override
@@ -171,98 +148,6 @@ public final class SDataSet extends AbstractDataSet implements WritableDataSet {
     }
     
     /**
-     * copies the properties, copying depend datasets as well.
-     */
-    private static Map copyProperties( QDataSet ds ) {
-        Map result = new HashMap();        
-        Map srcProps= DataSetUtil.getProperties(ds);
-        
-        result.putAll(srcProps);
-                
-        for ( int i=0; i < ds.rank(); i++) {
-            QDataSet dep = (QDataSet) ds.property("DEPEND_" + i);
-            if (dep == ds) {
-                throw new IllegalArgumentException("dataset is dependent on itsself!");
-            }
-            if (dep != null) {
-                result.put("DEPEND_" + i, copy(dep));
-            }
-        }
-
-        for (int i = 0; i < QDataSet.MAX_PLANE_COUNT; i++) {
-            QDataSet plane0 = (QDataSet) ds.property("PLANE_" + i);
-            if (plane0 != null) {
-                result.put("PLANE_" + i, copy(plane0));
-            } else {
-                break;
-            }
-        }
-
-        return result;
-    }
-     
-    private static SDataSet ddcopy( SDataSet ds ) {
-        int dsLength= ds.len0 * ds.len1 * ds.len2 * ds.len3;
-        
-        short[] newback= new short[ dsLength ];
-        
-        System.arraycopy( ds.back, 0, newback, 0, dsLength );
-        
-        SDataSet result= new SDataSet( ds.rank, ds.len0, ds.len1, ds.len2, ds.len3, newback );
-        result.properties.putAll( copyProperties(ds) ); // TODO: problems... 
-        
-        return result;
-    }
-    
-    /**
-     * copies the dataset into a writeable dataset, and all of it's depend datasets as well.
-     * //TODO: check for DDataSet, do System.arraycopy.
-     */
-    public static SDataSet copy( QDataSet ds ) {
-        if ( ds instanceof SDataSet ) return ddcopy( (SDataSet)ds );
-        int rank= ds.rank();
-        SDataSet result;
-        switch (rank) {
-            case 1: 
-                result= createRank1( ds.length() ); 
-                for ( int i=0; i<ds.length(); i++ ) {
-                    result.putValue( i, ds.value(i) );
-                }
-                break;
-            case 2: 
-                result= createRank2( ds.length(), ds.length(0) ); 
-                for ( int i=0; i<ds.length(); i++ ) {
-                    for ( int j=0; j<ds.length(i); j++ ) {
-                        result.putValue( i, j, ds.value(i,j) );
-                    }
-                }
-                break;
-            case 3: 
-                result= createRank3( ds.length(), ds.length(0), ds.length(0,0) ); 
-                for ( int i=0; i<ds.length(); i++ ) {
-                    for ( int j=0; j<ds.length(i); j++ ) {
-                        for ( int k=0; k<ds.length(i,j); k++ ) {
-                            result.putValue( i, j, k, ds.value(i,j,k) );
-                        }
-                    }
-                }
-                break;
-            case 4:
-                result = createRank4(ds.length(), ds.length(0), ds.length(0,0), ds.length(0,0,0));
-                for (int i=0; i<ds.length(); i++)
-                    for (int j=0; j<ds.length(i); j++)
-                        for (int k=0; k<ds.length(i,j); k++)
-                            for (int l=0; l<ds.length(i,j,k); l++)
-                                result.putValue(i, j, k, l, ds.value(i,j,k,l));
-                break;
-            default: throw new IllegalArgumentException("bad rank");
-        }
-        result.properties.putAll( copyProperties(ds) ); // TODO: problems...
-        
-        return result;
-    }
-    
-    /**
      * creates a rank1 SDataSet by wrapping an existing array.
      */
     public static SDataSet wrap( short[] back ) {
@@ -283,59 +168,62 @@ public final class SDataSet extends AbstractDataSet implements WritableDataSet {
         return new SDataSet( 3, nx, ny, nz, 1, back );
     }
     
-    private void joinProperties( SDataSet ds ) {
-        Map result= new HashMap();
-        for ( int i=0; i<ds.rank(); i++ ) {
-            QDataSet dep1= (QDataSet) ds.property( "DEPEND_"+i );
-            if ( dep1!=null ) {
-                QDataSet dep0= (QDataSet) this.property( "DEPEND_"+i );
-                SDataSet djoin= SDataSet.copy( dep0 );
-                SDataSet ddep1= dep1 instanceof SDataSet ? (SDataSet) dep1 : SDataSet.copy( dep1 );
-                djoin.join( ddep1 );
-                result.put( "DEPEND_"+i, djoin );
-            }
-        }
-        QDataSet dep1= (QDataSet) ds.property( QDataSet.PLANE_0 );
-        if ( dep1!=null ) {
-            QDataSet dep0= (QDataSet) this.property( QDataSet.PLANE_0 );
-            SDataSet djoin= SDataSet.copy( dep0 );
-            SDataSet dd1= dep1 instanceof SDataSet ? (SDataSet) dep1 : SDataSet.copy( dep1 );
-            djoin.join( dd1 );
-            result.put( QDataSet.PLANE_0, djoin );
-        }
-        //TODO: correlated PLANEs
-        this.properties.putAll( result );
+    /**
+     * the slice operator is better implemented here.  Presently, we
+     * use System.arraycopy to copy out the data, but this should be
+     * reimplemented along with an offset parameter so the original data
+     * can be used to back the data.
+     * @param i
+     * @return
+     */
+    @Override
+    public QDataSet slice(int i) {
+        int nrank = this.rank-1;
+        int noff1= i * len1 * len2 * len3;
+        int noff2= (i+1) * len1 * len2 * len3;
+        short[] newback = new short[noff2-noff1];
+        System.arraycopy( this.back, noff1, newback, 0, noff2-noff1 );
+        Map<String,Object> props= DataSetOps.sliceProperties0(i,DataSetUtil.getProperties(this));
+        SDataSet result= new SDataSet( nrank, len1, len2, len3, 1, newback );
+        DataSetUtil.putProperties( props, result );
+        return result;
     }
 
     /**
-     * append the second dataset onto this dataset.  Not thread safe!!!
-     * @deprecated Use append instead.
+     * trim operator copies the data into a new dataset.
+     * @param start
+     * @param end
+     * @return
      */
-    public void join( SDataSet ds ) {
-        append(ds);
+    @Override
+    public QDataSet trim(int start, int end) {
+        int nrank = this.rank;
+        int noff1= start * len1 * len2 * len3;
+        int noff2= end * len1 * len2 * len3;
+        short[] newback = new short[noff2-noff1];
+        System.arraycopy( this.back, noff1, newback, 0, noff2-noff1 );
+        SDataSet result= new SDataSet( nrank, end-start, len1, len2, len3, newback );
+        DataSetUtil.putProperties( DataSetUtil.getProperties(this), result );
+        QDataSet dep0= (QDataSet) property(QDataSet.DEPEND_0);
+        if ( dep0!=null ) result.putProperty( QDataSet.DEPEND_0, dep0.trim(start, end) );
+        return result;
     }
+
     /**
-     * append the second dataset onto this dataset.  Not thread safe!!!
-     * TODO: this really should return a new dataset.  Presumably this is to avoid copies, but currently it copies anyway!
+     * TODO: this is untested, but is left in to demonstrate how the capability
+     * method should be implemented.  Clients should use this instead of
+     * casting the class to the capability class.
+     * @param <T>
+     * @param clazz
+     * @return
      */
-    public void append( SDataSet ds ) {
-        if ( ds.rank()!=rank ) throw new IllegalArgumentException("rank mismatch");
-        if ( ds.len1!=len1 ) throw new IllegalArgumentException("len1 mismatch");
-        if ( ds.len2!=len2 ) throw new IllegalArgumentException("len2 mismatch");
-        if ( ds.len3!=len3 ) throw new IllegalArgumentException("len3 mismatch");
-        
-        int myLength= len0 * len1 * len2 * len3;
-        int dsLength= ds.len0 * ds.len1 * ds.len2 * ds.len3;
-        
-        short[] newback= new short[ myLength + dsLength ];
-        
-        System.arraycopy( this.back, 0, newback, 0, myLength );
-        System.arraycopy( ds.back, 0, newback, myLength, dsLength );
-        
-        len0= this.len0 + ds.len0;
-        this.back= newback;
-        
-        joinProperties( ds );
+    @Override
+    public <T> T capability(Class<T> clazz) {
+        if ( clazz==WritableDataSet.class ) {
+            return (T) this;
+        } else {
+            return super.capability(clazz);
+        }
     }
 
     

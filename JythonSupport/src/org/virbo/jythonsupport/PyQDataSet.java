@@ -5,9 +5,9 @@
 package org.virbo.jythonsupport;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.python.core.PyLong;
 import org.virbo.dsops.Ops;
 import org.virbo.dataset.DataSetIterator;
 import org.virbo.dataset.IndexListDataSetIterator;
@@ -21,6 +21,7 @@ import org.python.core.PyObject;
 import org.python.core.PyReflectedFunction;
 import org.python.core.PySequence;
 import org.python.core.PySlice;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
@@ -33,7 +34,7 @@ import org.virbo.dataset.WritableDataSet;
  * indexing.  For example, the Python plus "+" operator is implemented in the
  * method "__add__", and ds[0,:] is implemented in __getitem__ and __setitem__.
  * The class PyQDataSetAdapter is responsible for creating the PyQDataSet when
- * a QDataSet is brought into the Python interpretter.
+ * a QDataSet is brought into the Python interpreter.
  *
  * @author jbf
  */
@@ -57,6 +58,10 @@ public class PyQDataSet extends PyJavaInstance {
 
     }
 
+    public QDataSet getQDataSet() {
+        return this.rods;
+    }
+    
     /* plus, minus, multiply, divide */
     @Override
     public PyQDataSet __add__(PyObject arg0) {
@@ -161,6 +166,31 @@ public class PyQDataSet extends PyJavaInstance {
         return new PyQDataSet(Ops.pow(that, rods));
     }
 
+//    @Override
+//    public PyObject __int__() {
+//        if ( rods.rank()>0 ) {
+//            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
+//        }
+//        return Py.newInteger((int)rods.value());
+//    }
+//
+//    @Override
+//    public PyFloat __float__() {
+//        if ( rods.rank()>0 ) {
+//            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
+//        }
+//        return Py.newFloat(rods.value());
+//    }
+//
+//    @Override
+//    public PyLong __long__() {
+//        if ( rods.rank()>0 ) {
+//            throw Py.TypeError("PyQDataSet with rank="+rods.rank()+" found where rank 0 was expected");
+//        }
+//        return Py.newLong((int)rods.value());
+//    }
+//
+//
     private static Map<String,PyReflectedFunction> binaryInfixMethods;
     static {
         binaryInfixMethods= new HashMap<String, PyReflectedFunction>();
@@ -253,12 +283,35 @@ public class PyQDataSet extends PyJavaInstance {
         }
     }
 
-    private Number getNumber( PyObject po ) {
-        Object result=  po.__tojava__( Number.class );
-        if ( result==Py.NoConversion ) {
-            throw Py.TypeError("can't convert to number: "+po.__repr__() );
+    protected static Number getNumber( Object po ) {
+        if ( po instanceof QDataSet ) {
+            QDataSet qpo= (QDataSet)po;
+            if ( qpo.rank()==0 ) {
+                return qpo.value();
+            } else {
+                throw Py.TypeError("QDataSet with rank>0 found where number was expected");
+            }
+        } else if ( po instanceof PyQDataSet ) {
+            PyQDataSet pqd=  ((PyQDataSet)po);
+            QDataSet qpo= pqd.rods;
+            if ( qpo.rank()==0 ) {
+                return qpo.value();
+            } else {
+                throw Py.TypeError("PyQDataSet with rank>0 found where number was expected");
+            }
+        } else if ( po instanceof PyObject ) {
+            Object result=  ((PyObject)po).__tojava__( Number.class );
+            if ( result==Py.NoConversion ) {
+                throw Py.TypeError("can't convert to number: "+((PyObject)po).__repr__() );
+            }
+            return (Number) result;
+        } else {
+            if ( po instanceof Number ) {
+                return (Number) po;
+            } else {
+                throw Py.TypeError("can't convert to number: "+po );
+            }
         }
-        return (Number) result;
     }
 
     @Override
@@ -271,7 +324,7 @@ public class PyQDataSet extends PyJavaInstance {
      * This implements the Python indexing, such as data[4,:,3:5].  Note this
      * includes many QDataSet operations: a single index represents a slice, a 
      * range like 3:5 is a trim, an array is a sort, and a colon leaves a dimension
-     * alone.
+     * alone.  See http://autoplot.org/developer.python.indexing
      *
      * TODO: preserve metadata
      * @param arg0
@@ -283,34 +336,21 @@ public class PyQDataSet extends PyJavaInstance {
         if (o == null || o == Py.NoConversion) {
             if (arg0 instanceof PySlice) {
                 PySlice slice = (PySlice) arg0;
-                QubeDataSetIterator iter = new QubeDataSetIterator(rods);
-                QubeDataSetIterator.DimensionIteratorFactory fit;
                 Number start = (Number) getNumber( slice.start  );
                 Number stop = (Number) getNumber(slice.stop  );
                 Number step = (Number) getNumber(slice.step  );
 
-                if ( 1==1 ) {
+                if ( step==null || step.equals(1) ) {
+                    if ( start==null ) start= 0;
+                    if ( stop==null ) stop= rods.length();
+                    if ( start.intValue()<0 ) start= rods.length() + start.intValue();
+                    if ( stop.intValue()<0 ) stop= rods.length() + stop.intValue();
+                    return new PyQDataSet( rods.trim( start.intValue(), stop.intValue() ) );
+                } else {
                     TrimStrideWrapper wds= new TrimStrideWrapper(rods);
                     wds.setTrim( 0, start, stop, step );
                     return new PyQDataSet(wds);
                 }
-
-                fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
-                iter.setIndexIteratorFactory(0, fit);
-
-                int qube[] = new int[iter.rank()];
-                for (int i = 0; i < iter.rank(); i++) {
-                    qube[i] = iter.length(i);
-                }
-                DDataSet result = DDataSet.create(qube);
-                QubeDataSetIterator resultIter = new QubeDataSetIterator(result);
-                while (iter.hasNext()) {
-                    iter.next();
-                    double d = iter.getValue(rods);
-                    resultIter.next();
-                    resultIter.putValue(result, d);
-                }
-                return new PyQDataSet(result);
 
             } else if (arg0.isNumberType()) {
                 int idx = ((Number) arg0.__tojava__(Number.class)).intValue();
@@ -318,7 +358,9 @@ public class PyQDataSet extends PyJavaInstance {
                     idx= rods.length()+idx;
                 }
                 if ( rods.rank()>1 ) {
-                    return new PyQDataSet( DataSetOps.slice0(rods, idx) );
+                    QDataSet sds= rods.slice(idx);
+                    //TODO: properties and context.
+                    return new PyQDataSet( sds );
                 } else {
                     return Py.java2py(rods.value(idx));
                 }
@@ -326,7 +368,6 @@ public class PyQDataSet extends PyJavaInstance {
             } else if (arg0.isSequenceType()) {
                 QubeDataSetIterator iter = new QubeDataSetIterator(rods);
                 PySequence slices = (PySequence) arg0;
-                boolean[] reform = new boolean[slices.__len__()];
                 for (int i = 0; i < slices.__len__(); i++) {
                     PyObject a = slices.__getitem__(i);
                     QubeDataSetIterator.DimensionIteratorFactory fit;
@@ -337,31 +378,24 @@ public class PyQDataSet extends PyJavaInstance {
                         Number step = (Number)  getNumber(slice.step);
                         fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
 
-                    } else if (a.isNumberType()) {
-                        int idx = (Integer) a.__tojava__(Integer.class);
-                        fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
-                        reform[i] = true;
-
-                    } else {
+                    } else if ( a instanceof PyQDataSet ) {
                         Object o2 = a.__tojava__(QDataSet.class);
                         QDataSet that = (QDataSet) o2;
+                        fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                        
+                    } else if (a.isNumberType()) {
+                        int idx = ((Number) getNumber( a )).intValue();
+                        fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
+
+                    } else {
+                        QDataSet that = coerce_ds(a);
                         fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
                     }
 
                     iter.setIndexIteratorFactory(i, fit);
                 }
 
-                ArrayList<Integer> qqube = new ArrayList<Integer>();
-                for (int i = 0; i < iter.rank(); i++) {
-                    if (!reform[i]) {
-                        qqube.add(iter.length(i));
-                    }
-                }
-                int qube[] = new int[qqube.size()];
-                for (int i = 0; i < qqube.size(); i++) {
-                    qube[i] = qqube.get(i);
-                }
-                DDataSet result = DDataSet.create(qube);
+                DDataSet result= iter.createEmptyDs();
 
                 QubeDataSetIterator resultIter = new QubeDataSetIterator(result);
                 while (iter.hasNext()) {
@@ -370,6 +404,12 @@ public class PyQDataSet extends PyJavaInstance {
                     resultIter.next();
                     resultIter.putValue(result, d);
                 }
+                result.putProperty( QDataSet.UNITS, ds.property(QDataSet.UNITS) );
+                result.putProperty( QDataSet.LABEL, ds.property(QDataSet.LABEL) );
+                result.putProperty( QDataSet.NAME, ds.property(QDataSet.NAME) );
+                result.putProperty( QDataSet.VALID_MAX, ds.property(QDataSet.VALID_MAX) );
+                result.putProperty( QDataSet.VALID_MIN, ds.property(QDataSet.VALID_MIN) );
+                result.putProperty( QDataSet.FILL_VALUE, ds.property(QDataSet.FILL_VALUE) );
 
                 return new PyQDataSet(result);
             } else {
@@ -377,10 +417,51 @@ public class PyQDataSet extends PyJavaInstance {
             }
         } else {
             QDataSet that = (QDataSet) o;
-            return new PyQDataSet(DataSetOps.applyIndex(rods, 0, that, true));
+            
+            DataSetIterator iter = new QubeDataSetIterator(ds);
+
+            QDataSet dep0= null;
+            if ( ds.rank()>1 ) {
+                iter= new IndexListDataSetIterator( that );
+                //don't do anything with dep0 for now...
+            } else {
+                QubeDataSetIterator.DimensionIteratorFactory fit = new QubeDataSetIterator.IndexListIteratorFactory(that);
+                ((QubeDataSetIterator)iter).setIndexIteratorFactory(0, fit);
+                dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                if ( dep0!=null ) {
+                    dep0= DataSetOps.applyIndex( dep0, 0, that, false );
+                }
+            }
+
+            DDataSet result= iter.createEmptyDs();
+            //TODO: look at DataSetOps.applyIndex sometime
+            QubeDataSetIterator resultIter = new QubeDataSetIterator(result);
+            while (iter.hasNext()) {
+                iter.next();
+                double d = iter.getValue(rods);
+                resultIter.next();
+                resultIter.putValue(result, d);
+            }
+
+            if ( dep0!=null && dep0.length()==result.length() ) {
+                result.putProperty( QDataSet.DEPEND_0, dep0 ); // yeah, we did it right!
+            }
+            result.putProperty( QDataSet.UNITS, ds.property(QDataSet.UNITS) );
+            result.putProperty( QDataSet.LABEL, ds.property(QDataSet.LABEL) );
+            result.putProperty( QDataSet.NAME, ds.property(QDataSet.NAME) );
+            result.putProperty( QDataSet.VALID_MAX, ds.property(QDataSet.VALID_MAX) );
+            result.putProperty( QDataSet.VALID_MIN, ds.property(QDataSet.VALID_MIN) );
+            result.putProperty( QDataSet.FILL_VALUE, ds.property(QDataSet.FILL_VALUE) );
+            
+            return new PyQDataSet(result);
         }
     }
 
+    /**
+     * See http://autoplot.org/developer.python.indexing
+     * @param arg0
+     * @param arg1
+     */
     @Override
     public void __setitem__(PyObject arg0, PyObject arg1) {
         if ( ds==null ) {
@@ -393,13 +474,13 @@ public class PyQDataSet extends PyJavaInstance {
             QubeDataSetIterator.DimensionIteratorFactory fit;
             if (a instanceof PySlice) {
                 PySlice slice = (PySlice) a;
-                Integer start = (Integer) slice.start.__tojava__(Integer.class);
-                Integer stop = (Integer) slice.stop.__tojava__(Integer.class);
-                Integer step = (Integer) slice.step.__tojava__(Integer.class);
+                Integer start = ( slice.start==Py.None ) ? null : ( (Number) slice.start.__tojava__(Number.class) ).intValue();
+                Integer stop = ( slice.stop==Py.None ) ? null : ( (Number) slice.stop.__tojava__(Number.class) ).intValue();
+                Integer step = ( slice.step==Py.None ) ? null : ( (Number) slice.step.__tojava__(Number.class) ).intValue();
                 fit = new QubeDataSetIterator.StartStopStepIteratorFactory(start, stop, step);
 
             } else if (a.isNumberType()) {
-                int idx = (Integer) a.__tojava__(Integer.class);
+                int idx = ( (Number) a.__tojava__(Number.class) ).intValue();
                 fit = new QubeDataSetIterator.SingletonIteratorFactory(idx);
             } else {
                 Object o = a.__tojava__(QDataSet.class);
@@ -433,7 +514,7 @@ public class PyQDataSet extends PyJavaInstance {
             }
             if ( allLists ) {
                 int n= lists[0].length();
-                QDataSet val= coerce_ds( new int[] { n }, arg1 );
+                QDataSet val= coerce_ds_int(  arg1 );
                 QubeDataSetIterator it = new QubeDataSetIterator( val );
                 if ( ds.rank()==1 ) {
                     for ( int i=0;i<n;i++ ) {
@@ -493,7 +574,7 @@ public class PyQDataSet extends PyJavaInstance {
         for (int i = 0; i < iter.rank(); i++) {
             qube[i] = iter.length(i);
         }
-        QDataSet val = coerce_ds(qube, arg1);
+        QDataSet val = coerce_ds_int(arg1);
 
         // see org.virbo.dsops.CoerceUtil, make version that makes iterators.
         if ( val.rank()==0 ) {
@@ -522,12 +603,26 @@ public class PyQDataSet extends PyJavaInstance {
      * @param arg0
      * @return
      */
-    private QDataSet coerce_ds(int qube[], PyObject arg0) {
+    private QDataSet coerce_ds_int( PyObject arg0) {
         Object o = arg0.__tojava__(QDataSet.class);
         if (o == null || o == Py.NoConversion) {
             if (arg0.isNumberType()) {
-                double d = (Double) arg0.__tojava__(Double.class);
-                return DataSetUtil.asDataSet(d);
+                try {
+                    double d = (Double) arg0.__tojava__(Double.class);
+                    return DataSetUtil.asDataSet(d);
+                } catch ( RuntimeException ex ) {
+                    Object o2= arg0.__tojava__( Object.class );
+                    QDataSet do2;
+                    if ( o2 instanceof org.das2.datum.TimeUtil.TimeStruct ) {
+                        do2= DataSetUtil.asDataSet( org.das2.datum.TimeUtil.toDatum( (org.das2.datum.TimeUtil.TimeStruct)o2) );
+                    } else if ( o2 instanceof org.das2.datum.Datum ) {
+                        do2= DataSetUtil.asDataSet( (org.das2.datum.Datum)o2 );
+                    } else {
+                        throw ex;
+                    }
+                    return do2;
+                }
+                
             } else if (arg0.isSequenceType()) {
                 return PyQDataSetAdapter.adaptList((PyList) arg0);
             } else {
@@ -556,18 +651,18 @@ public class PyQDataSet extends PyJavaInstance {
         if (o == null || o == Py.NoConversion) {
             if (arg0.isNumberType()) {
                 double d = (Double) arg0.__tojava__(Double.class);
-                result= DDataSet.copy(rods);
-                result.append( DDataSet.wrap( new double[] { d } ) );
+                result= (DDataSet) ArrayDataSet.copy( double.class, rods);
+                result= (DDataSet) ArrayDataSet.append( result, DDataSet.wrap( new double[] { d } ) );
             } else if (arg0.isSequenceType()) {
-                result= DDataSet.copy(rods);
-                result.append( DDataSet.copy( PyQDataSetAdapter.adaptList((PyList) arg0) ) );
+                result= (DDataSet) ArrayDataSet.copy( double.class, rods );
+                result= (DDataSet) ArrayDataSet.append( result, DDataSet.copy( PyQDataSetAdapter.adaptList((PyList) arg0) ) );
             } else {
                 throw Py.TypeError("unable to coerce: " + arg0);
             }
         } else {
             QDataSet ds = (QDataSet) o;
-            result= DDataSet.copy(rods);
-            result.append( DDataSet.copy( ds ) );
+            result= (DDataSet) ArrayDataSet.copy( double.class, rods);
+            result= (DDataSet) ArrayDataSet.append( result, DDataSet.copy( ds ) );
         }
 
         return new PyQDataSet(result);
@@ -575,13 +670,12 @@ public class PyQDataSet extends PyJavaInstance {
 
 // coerce logic doesn't seem to kick in, so I do it!
     private QDataSet coerce_ds(PyObject arg0) {
-        return coerce_ds(DataSetUtil.qubeDims(rods), arg0);
+        return coerce_ds_int( arg0);
     }
 
     @Override
     public Object __coerce_ex__(PyObject arg0) {
-        System.err.println("coerce");
-        return coerce_ds(DataSetUtil.qubeDims(rods), arg0);
+        return coerce_ds_int( arg0);
     }
 
     @Override
@@ -607,6 +701,19 @@ public class PyQDataSet extends PyJavaInstance {
             }
         };
     }
+
+    @Override
+    public Object __tojava__(Class c) {
+        if ( c.isArray() && c.getComponentType()==double.class && rods.rank()==1 ) {
+            double[] result= new double[rods.length()];
+            for ( int i=0; i< rods.length(); i++  ) {
+                result[i]= rods.value(i);
+            }
+            return result;
+        }
+        return super.__tojava__(c);
+    }
+
 
     public String toString() {
         return "PyQDataSet wrapping " + rods.toString();

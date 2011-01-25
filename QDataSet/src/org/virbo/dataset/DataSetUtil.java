@@ -88,17 +88,17 @@ public class DataSetUtil {
     }
 
     /**
-     * returns true if the dataset is monotonically increasing, and contains no fill.
+     * returns true if the dataset is monotonically increasing.
      * If the dataset says it's monotonic, believe it.
      * An empty dataset is not monotonic.
+     * We now use a weights dataset to more thoroughly check for fill.
+     * The dataset may now contain fill data.
+     * See QDataSet.MONOTONIC.
      */
     public static boolean isMonotonic(QDataSet ds) {
-        if (ds.rank() != 1) {
+        if (ds.rank() != 1) { // TODO: support bins dataset rank 2 with BINS_1="min,max"
             return false;
         }
-        int i = 0;
-
-        final Units u = (Units) ds.property(QDataSet.UNITS);
 
         if (ds.length() == 0) {
             return false;
@@ -108,17 +108,26 @@ public class DataSetUtil {
             return true;
         }
 
-        double last = ds.value(i);
+        QDataSet wds= DataSetUtil.weightsDataSet(ds);
+        int i = 0;
 
-        if (u != null && u.isFill(last)) {
+        for ( i=0; i<ds.length() && wds.value(i)==0; i++ ) {
+            // find first valid point.
+        }
+
+        if ( i==ds.length() ) {
             return false;
         }
 
-        for (i = 1; i < ds.length(); i++) {
+        double last = ds.value(i);
+
+        for ( i = i+1; i < ds.length(); i++) {
             double d = ds.value(i);
-            if (d < last || (u != null && u.isFill(d))) {
+            double w = wds.value(i);
+            if ( w==0 ) continue;
+            if ( d < last  ) {
                 return false;
-            }
+            } 
             last = d;
         }
         return true;
@@ -193,6 +202,14 @@ public class DataSetUtil {
         return result;
     }
 
+    /**
+     * return the "User" property, which allow for extensions of the data model that
+     * aren't used.  This returns the property "name" under the name USER_PROPERTIES,
+     * which must either be null or a Map<String,Object>.
+     * @param ds  The dataset containing the property.
+     * @param name  The name of the user property.
+     * @return
+     */
     public static Object getUserProperty( QDataSet ds, String name ) {
         Map<String,Object> userProps= (Map<String, Object>) ds.property(QDataSet.USER_PROPERTIES);
         if ( userProps==null ) return null;
@@ -201,11 +218,12 @@ public class DataSetUtil {
 
     public static String[] propertyNames() {
         return new String[]{
-                    QDataSet.UNITS, QDataSet.FORMAT, QDataSet.CADENCE,
-                    QDataSet.MONOTONIC, QDataSet.SCALE_TYPE,
-                    QDataSet.TYPICAL_MIN, QDataSet.TYPICAL_MAX, QDataSet.RENDER_TYPE,
+                    QDataSet.UNITS, 
                     QDataSet.VALID_MIN, QDataSet.VALID_MAX,
                     QDataSet.FILL_VALUE,
+                    QDataSet.FORMAT, QDataSet.CADENCE,
+                    QDataSet.MONOTONIC, QDataSet.SCALE_TYPE,
+                    QDataSet.TYPICAL_MIN, QDataSet.TYPICAL_MAX, QDataSet.RENDER_TYPE,
                     QDataSet.QUBE,
                     QDataSet.NAME, QDataSet.LABEL, QDataSet.TITLE,
                     QDataSet.CACHE_TAG,
@@ -217,11 +235,25 @@ public class DataSetUtil {
     }
 
     /**
+     * copy over all the dimension properties.
+     * This DOES NOT support join datasets yet.
+     * @param source
+     * @param dest
+     */
+    public static void copyDimensionProperties( QDataSet source, MutablePropertyDataSet dest ) {
+        String[] names= dimensionProperties();
+        for ( String n: names ) {
+            Object p= source.property(n);
+            if ( p!=null ) dest.putProperty( n, p );
+        }
+    }
+
+    /**
      * return the list of properties that pertain to the dimension that dataset
      * values exist.  These are the properties that survive through most operations.
      * For example, if you flattened the dataset, what properties 
-     * would still exist?  These are not structural properties like DEPEND_0,
-     * BUNDLE_1, etc.
+     * would still exist?  If you shuffled the data?  These are not structural
+     * properties like DEPEND_0, BUNDLE_1, etc.
      * @return
      */
     public static String[] dimensionProperties() {
@@ -231,7 +263,27 @@ public class DataSetUtil {
             QDataSet.VALID_MIN, QDataSet.VALID_MAX, QDataSet.FILL_VALUE,
             QDataSet.RENDER_TYPE,
             QDataSet.NAME, QDataSet.LABEL, QDataSet.TITLE,
+            QDataSet.USER_PROPERTIES
         };
+    }
+
+    /**
+     * true if the property is one that is global and is relevant throughout the
+     * dataset, such as a title or the units.
+     *    property( "TITLE",0,0 ) often returns property("TITLE"), but
+     *    property( "DEPEND_0",0,0 ) should never return property("DEPEND_0").
+     * This is false, for example, for DEPEND_1.
+     * @param prop the property name.
+     * @return
+     */
+    public static boolean isInheritedProperty( String prop ) {
+        boolean indexProp= prop.startsWith("DEPEND_")
+                || prop.startsWith("BUNDLE_")
+                || prop.startsWith("BINS_")
+                || prop.startsWith("JOIN_")
+                || prop.startsWith("PLANE_");
+        // note CONTEXT* is inherited.
+        return !indexProp;
     }
 
     /**
@@ -259,6 +311,13 @@ public class DataSetUtil {
             Object dep = ds.property("BINS_" + i);
             if (dep != null) {
                 result.put("BINS_" + i, dep);
+            }
+        }
+
+        for (int i = 0; i <= ds.rank(); i++) {
+            Object dep = ds.property("JOIN_" + i);
+            if (dep != null) {
+                result.put("JOIN_" + i, dep);
             }
         }
 
@@ -339,7 +398,9 @@ public class DataSetUtil {
     }
 
     /**
-     * cleans up code by doing the cast, and handles default value
+     * cleans up code by doing the cast, and handles default value.  The
+     * result of this is for human-consumption!
+     *
      */
     /*public static <T> getProperty( QDataSet ds, String propertyName, Class<T> clazz, Object<T> defaultValue ) {
     T p = ds.property( propertyName );
@@ -349,6 +410,9 @@ public class DataSetUtil {
     }*/
     public static String toString(QDataSet ds) {
 
+        if ( ds==null ) {
+            throw new IllegalArgumentException( "null dataset" );
+        }
         Units u= (Units)ds.property(QDataSet.UNITS);
         if ( u==null ) u= Units.dimensionless;
 
@@ -359,10 +423,29 @@ public class DataSetUtil {
 
         if ( ds.rank()==0 ) {
             if ( name.equals("dataSet") ) {
-                return String.valueOf( DataSetUtil.asDatum((RankZeroDataSet)ds) );
+                return String.valueOf( DataSetUtil.asDatum(ds) );
             } else {
-                return name + "=" + DataSetUtil.asDatum((RankZeroDataSet)ds) ;
+                return name + "=" + DataSetUtil.asDatum(ds) ;
             }
+        }
+
+        if ( ds.rank()==1 && "min,max".equals(ds.property(QDataSet.BINS_0)) ) {
+            DatumRange dr= new DatumRange( ds.value(0), ds.value(1), u );
+            return dr.toString();
+        }
+
+        if ( ds.rank()==1 && "min,maxInclusive".equals(ds.property(QDataSet.BINS_0)) ) {
+            DatumRange dr= new DatumRange( ds.value(0), ds.value(1), u );
+            return dr.toString() + "  (inclusive)";
+        }
+
+        if ( ds.rank()==2 && ds.length()==2 && ds.length(0)==2 && "min,maxInclusive".equals(ds.property( QDataSet.BINS_1) ) ) {
+            Units u1= (Units) ds.property(QDataSet.UNITS,0);
+            Units u2= (Units) ds.property(QDataSet.UNITS,1);
+
+            DatumRange dr1= new DatumRange( ds.value(0,0), ds.value(0,1), u1==null ? Units.dimensionless : u1 );
+            DatumRange dr2= new DatumRange( ds.value(1,0), ds.value(1,1), u2==null ? Units.dimensionless : u2 );
+            return dr1.toString() + "; "+ dr2.toString() + "  (inclusive)";
         }
 
         String qubeStr = DataSetUtil.isQube(ds) ? "" : "*";
@@ -396,7 +479,7 @@ public class DataSetUtil {
 
         StringBuffer dimStr = new StringBuffer("" + depNames[0] + ds.length());
         for ( int i=1; i<ds.rank(); i++ ) {
-            dimStr.append("," + depNames[1] + qubeDims[i] + qubeStr);
+            dimStr.append("," + depNames[i] + qubeDims[i] + qubeStr);
         }
         
         String su = String.valueOf(u);
@@ -571,7 +654,7 @@ public class DataSetUtil {
         if (yds == null) {
             yds = DataSetUtil.replicateDataSet(xds.length(), 1.0);
         }
-        assert (xds.length() == yds.length());
+        assert (xds.length() == yds.length());  // note we need to turn assertions on as a test.  test012_003 shows where this is ignored.
 
         if ( yds.rank()>1 ) { //TODO: check for fill columns.  Note the fill check was to support a flakey dataset.
             yds = DataSetUtil.replicateDataSet(xds.length(), 1.0);
@@ -653,7 +736,7 @@ public class DataSetUtil {
         if ( monoDecreasing>(9*count/10) ) {
             diffs= Ops.multiply( diffs, asDataSet(-1) );
         }
-        QDataSet hist= ah.doit( Ops.diff(xds),DataSetUtil.weightsDataSet(yds)); //TODO: sloppy!
+        QDataSet hist= ah.doit( diffs ); 
 
         long total= (Long)( ((Map<String,Object>)hist.property( QDataSet.USER_PROPERTIES )).get(AutoHistogram.USER_PROP_TOTAL) );
 
@@ -743,7 +826,7 @@ public class DataSetUtil {
 
             int highestPeak= linHighestPeak;
 
-            if ( everIncreasing>everIncreasingLimit || ( logPeak>0 && (1.*logMedian/loghist.length() > 1.*linMedian/hist.length() ) ) ) {
+            if ( everIncreasing>everIncreasingLimit || ( logPeak>1 && (1.*logMedian/loghist.length() > 1.*linMedian/hist.length() ) ) ) {
                 hist= loghist;
                 ipeak= logPeak;
                 peakv= logPeakv;
@@ -936,7 +1019,7 @@ public class DataSetUtil {
      * @return true if the dataset is a qube.
      */
     public static boolean isQube(QDataSet ds) {
-        if (ds.rank() == 1) return true;
+        if (ds.rank() <= 1) return true;
         Boolean q = (Boolean) ds.property(QDataSet.QUBE);
         if (q == null || q.equals(Boolean.FALSE)) {
             QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1);
@@ -1073,22 +1156,18 @@ public class DataSetUtil {
 
             String[] ss= ((String)ds.property(QDataSet.BINS_0)).split(",",-2);
             if (ss.length!=ds.length() ) throw new IllegalArgumentException("bins count != length in ds");
-            for ( int i=0; i<ds.length(); i++ ) {
-                result.append( ss[i]+"="+u.createDatum(ds.value(i)) );
-                if ( i<ds.length()-1 ) result.append(", ");
-            }
+            return result.toString();
+
         } else if ( "min,maxInclusive".equals( ds.property(QDataSet.BINS_0) ) && ds.rank()==1) {
             StringBuffer result= new StringBuffer();
             Units u= (Units) ds.property(QDataSet.UNITS);
             if ( u==null ) u= Units.dimensionless;
             result.append( new DatumRange( ds.value(0), ds.value(1), u ).toString() );
-
+            result.append( "(inclusive)" );
             String[] ss= ((String)ds.property(QDataSet.BINS_0)).split(",",-2);
             if (ss.length!=ds.length() ) throw new IllegalArgumentException("bins count != length in ds");
-            for ( int i=0; i<ds.length(); i++ ) {
-                result.append( ss[i]+"="+u.createDatum(ds.value(i)) );
-                if ( i<ds.length()-1 ) result.append(", ");
-            }
+            return result.toString();
+
         } else if ( ds.property(QDataSet.BINS_0)!=null && ds.rank()==1) {
             StringBuffer result= new StringBuffer();
             Units u= (Units) ds.property(QDataSet.UNITS);
@@ -1225,10 +1304,32 @@ public class DataSetUtil {
                 problems.add(String.format("DEPEND_%d length is %d, should be %d.", dimOffset, dep.length(), ds.length()));
             }
             if (ds.rank() > 1 && ds.length() > 0) {
-                validate(DataSetOps.slice0(ds, 0), problems, dimOffset + 1);
+                 validate(DataSetOps.slice0(ds, 0), problems, dimOffset + 1); // don't use native, because it may copy. Note we only check the first assuming QUBE.
             }
         }
-        return problems.size() == 0;
+        if ( ds.property(QDataSet.JOIN_0)!=null ) {
+            if ( dimOffset>0 ) {
+                problems.add( "JOIN_0 must only be on zeroth dimension: "+dimOffset );
+            } else {
+                Units u= null;
+                boolean onceNotify= false;
+                for ( int i=0; i<ds.length(); i++ ) {
+                    QDataSet ds1= DataSetOps.slice0(ds,i);
+                    if ( !validate( ds1, problems, dimOffset + 1 ) ) {
+                        problems.add( "join("+i+") not valid JOINED dataset." );
+                    }
+                    if ( u==null ) {
+                        u= SemanticOps.getUnits(ds1);
+                    } else {
+                        if ( u!=SemanticOps.getUnits(ds1) && !onceNotify ) {
+                            problems.add( "units change in joined datasets");
+                            onceNotify= true;
+                        }
+                    }
+                }
+            }
+        }
+        return problems.isEmpty();
     }
 
     /**
@@ -1332,7 +1433,7 @@ public class DataSetUtil {
         Units su= (Units) ds.property(QDataSet.UNITS);
         if ( su==null ) su= Units.dimensionless;
         UnitsConverter uc= su.getConverter(u);
-        DDataSet result = DDataSet.copy(ds);  // assumes ds is QUBE right now...
+        DDataSet result = (DDataSet) ArrayDataSet.copy(ds);  // assumes ds is QUBE right now...
         QubeDataSetIterator it= new QubeDataSetIterator(ds);
         while ( it.hasNext() ) {
             it.next();
@@ -1367,12 +1468,30 @@ public class DataSetUtil {
     }
 
     public static Datum asDatum( RankZeroDataSet ds ) {
-        Units u= (Units) ds.property(QDataSet.UNITS);
-        if ( u==null ) {
-            return Units.dimensionless.createDatum(ds.value());
+        return asDatum((QDataSet)ds);
+    }
+
+    public static Datum asDatum( QDataSet ds ) {
+        if ( ds.rank()>0 ) {
+            throw new IllegalArgumentException("dataset is not rank 0");
         } else {
-            return u.createDatum(ds.value());
+            Units u= (Units) ds.property(QDataSet.UNITS);
+            if ( u==null ) {
+                return Units.dimensionless.createDatum(ds.value());
+            } else {
+                return u.createDatum(ds.value());
+            }
         }
+    }
+
+    public static DatumRange asDatumRange( QDataSet ds, boolean sloppy ) {
+        Units u= SemanticOps.getUnits(ds);
+        if ( sloppy==false ) {
+            if ( !ds.property( QDataSet.BINS_0 ).equals("min,max") ) {
+                throw new IllegalArgumentException("expected min,max for BINS_0 because we are not allowing sloppy.");
+            }
+        }
+        return new DatumRange( ds.value(0), ds.value(1), u );
     }
 
     public static DRank0DataSet asDataSet( double d, Units u ) {
@@ -1386,7 +1505,7 @@ public class DataSetUtil {
     public static DRank0DataSet asDataSet( Datum d ) {
         return DRank0DataSet.create(d);
     }
-    
+
     /**
      * convert java arrays into QDataSets.
      * @param arr
@@ -1444,12 +1563,152 @@ public class DataSetUtil {
         QDataSet cds= (QDataSet) ds.property( QDataSet.CONTEXT_0 );
         int idx=0;
         while ( cds!=null ) {
-            result.append( DataSetUtil.format(cds) );
+            if ( cds.rank()>0 ) {
+                if ( cds.rank()==1 && cds.property(QDataSet.BINS_0)!=null ) {
+                    result.append( DataSetUtil.format(cds) );
+                } else {
+                    QDataSet extent= Ops.extent(cds);
+                    if ( extent.value(1)==extent.value(0) ) {
+                        result.append( DataSetUtil.format(cds.slice(0)) );  // for CLUSTER/PEACE this happens where rank 1 context is all the same value
+                    } else {
+                        result.append( DataSetUtil.format(extent) ).append( " " +cds.length() + " different values" ); // slice was probably done when we should't have.
+                    }
+                }
+            } else {
+                result.append( DataSetUtil.format(cds) );
+            }
             idx++;
             cds= (QDataSet) ds.property( "CONTEXT_"+idx );
             if ( cds!=null ) result.append(", ");
         }
         return result.toString();
+    }
+    
+    /**
+     * returns the indeces of the min and max elements of the monotonic dataset.
+     * This uses DataSetUtil.isMonotonic() which would be slow if MONOTONIC is
+     * not set.
+     * @param ds
+     * @return
+     * @see Ops.extent which returns the range containing any data.
+     */
+    public static int[] rangeOfMonotonic( QDataSet ds ) {
+        if ( ds.rank()!=1 ) throw new IllegalArgumentException("must be rank 1");
+        if ( DataSetUtil.isMonotonic(ds) ) {
+            QDataSet wds= DataSetUtil.weightsDataSet(ds);
+            int firstValid= 0;
+            while ( firstValid<wds.length() && wds.value(firstValid)==0 ) firstValid++;
+            if ( firstValid==wds.length() ) throw new IllegalArgumentException("data contains no valid measurements");
+            int lastValid=wds.length()-1;
+            while ( lastValid>=0 && wds.value(lastValid)==0 ) lastValid--;
+            if ( ( lastValid-firstValid+1 ) == 0 ) {
+                throw new IllegalArgumentException("special case where monotonic dataset contains no valid data");
+            }
+            return new int[] { firstValid, lastValid };
+        } else {
+            throw new IllegalArgumentException("expected monotonic dataset");
+        }
+    }
+    /**
+     * returns the index of a tag, or the  <tt>(-(<i>insertion point</i>) - 1)</tt>.  (See Arrays.binarySearch)
+     */
+    public static int xTagBinarySearch( QDataSet ds, Datum datum, int low, int high ) {
+        Units units= datum.getUnits();
+        Units toUnits= SemanticOps.getUnits( ds );
+        UnitsConverter uc= units.getConverter(toUnits);
+        double key= datum.doubleValue(toUnits);
+        while (low <= high) {
+            int mid = (low + high) >> 1;
+            double midVal = ds.value(mid);
+            int cmp;
+            if (midVal < key) {
+                cmp = -1;   // Neither val is NaN, thisVal is smaller
+            } else if (midVal > key) {
+                cmp = 1;    // Neither val is NaN, thisVal is larger
+            } else {
+                long midBits = Double.doubleToLongBits(midVal);
+                long keyBits = Double.doubleToLongBits(key);
+                cmp = (midBits == keyBits ?  0 : // Values are equal
+                    (midBits < keyBits ? -1 : // (-0.0, 0.0) or (!NaN, NaN)
+                        1));                     // (0.0, -0.0) or (NaN, !NaN)
+            }
+
+            if (cmp < 0)
+                low = mid + 1;
+            else if (cmp > 0)
+                high = mid - 1;
+            else
+                return mid; // key found
+        }
+        return -(low + 1);  // key not found.
+    }
+
+    /**
+     * returns the index of the closest index in the data. "column" comes
+     * from the legacy operator.
+     * @param ds
+     * @param datum
+     * @return
+     */
+    public static int closestIndex( QDataSet ds, Datum datum ) {
+        if ( !isMonotonic(ds) ) {
+            System.err.println("dataset is not monotonic");
+            isMonotonic(ds);
+            throw new IllegalArgumentException("dataset is not monotonic");
+        }
+        int result= xTagBinarySearch( ds, datum, 0, ds.length()-1 );
+        double ddatum= datum.doubleValue( SemanticOps.getUnits(ds) );
+        if (result == -1) {
+            result = 0; //insertion point is 0
+        } else if (result < 0) {
+            result= ~result; // usually this is the case
+            if ( result >= ds.length()-1 ) {
+                result= ds.length()-1;
+            } else {
+                double x= ddatum;
+                double x0= ds.value(result-1 );
+                double x1= ds.value(result );
+                result= ( ( x-x0 ) / ( x1 - x0 ) < 0.5 ? result-1 : result );
+            }
+        }
+        return result;
+    }
+
+    public static int closestIndex( QDataSet table, double x, Units units ) {
+        return closestIndex( table, units.createDatum(x) );
+    }
+
+
+    /**
+     * returns the first column that is before the given datum.  Note the
+     * if the datum identifies (==) an xtag, then the previous column is
+     * returned.
+     */
+    public static int getPreviousIndex( QDataSet ds, Datum datum ) {
+        int i= closestIndex( ds, datum );
+        Units dsUnits= SemanticOps.getUnits(ds);
+        // TODO: consider the virtue of ge
+        if ( i>0 && ds.value(i)>=(datum.doubleValue(dsUnits)) ) {
+            return i-1;
+        } else {
+            return i;
+        }
+    }
+
+    /**
+     * returns the first column that is after the given datum.  Note the
+     * if the datum identifies (==) an xtag, then the previous column is
+     * returned.
+     */
+    public static int getNextIndex( QDataSet ds, Datum datum ) {
+        int i= closestIndex( ds, datum );
+        Units dsUnits= SemanticOps.getUnits(ds);
+        // TODO: consider the virtue of le
+        if ( i<ds.length()-1 && ds.value(i)<=(datum.doubleValue(dsUnits)) ) {
+            return i+1;
+        } else {
+            return i;
+        }
     }
 
 }

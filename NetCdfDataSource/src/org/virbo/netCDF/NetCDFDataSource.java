@@ -9,8 +9,6 @@
 
 package org.virbo.netCDF;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import java.io.File;
 import java.io.IOException;
@@ -19,8 +17,10 @@ import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.dsutil.TransposeRankNDataSet;
 import ucar.nc2.Attribute;
@@ -40,7 +40,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     String svariable;
     NetcdfDataset ncfile;
 
-    static {
+/*    static {
         try {
             NetcdfFile.registerIOProvider("org.virbo.netCDF.APIOServiceProvider");
         } catch (IllegalAccessException ex) {
@@ -51,6 +51,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             Logger.getLogger(NetCDFDataSource.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+*/
     /** Creates a new instance of NetCDFDataSource */
     public NetCDFDataSource( URI uri ) throws IOException {
         super(uri);
@@ -59,7 +60,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     }
     
     private void parseUrl() {
-        String surl= uri.toString();
+        String surl= DataSetURI.fromUri(uri);
         int i= surl.lastIndexOf('?');
         URL myUrl;
         if ( i>-1 ) {
@@ -83,14 +84,15 @@ public class NetCDFDataSource extends AbstractDataSource {
                 svariable= (String) p.get( "id" );
             } else {
                 svariable= (String) p.get("arg_0"); // legacy support
+                svariable= svariable.replaceAll(" ","+");
             }
         }
     }
     
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         mon.started();
-        readData(mon);
-        NetCdfVarDataSet result= new NetCdfVarDataSet( variable , ncfile);
+        readData( new NullProgressMonitor() );
+        NetCdfVarDataSet result= NetCdfVarDataSet.create( variable , ncfile, mon );
         QDataSet qresult= checkLatLon(result);
         mon.finished();
         return qresult;
@@ -134,11 +136,12 @@ public class NetCDFDataSource extends AbstractDataSource {
             File file= getFile(mon);
             location= file.toURI().toURL().toString();
         } else {
-            location= resourceURI.toString();
+            location= DataSetURI.fromUri(resourceURI);
         }
         
         NetcdfDataset dataset=null;
-        
+
+        mon.started();
         if ( sMyUrl.endsWith(".ncml" ) ) {
             dataset= NcMLReader.readNcML( location, null );
         } else {
@@ -161,11 +164,12 @@ public class NetCDFDataSource extends AbstractDataSource {
         } else {
             for ( int i=0; i<variables.size(); i++ ) {
                 Variable v= variables.get(i);
-                if ( v.getName().equals( svariable ) ) {
+                if ( v.getName().replaceAll(" ", "+").equals( svariable ) ) {
                     variable= v;
                 }
             }
         }
+        mon.finished();
     }
     
     public static DataSourceFactory getFactory() {
@@ -173,6 +177,8 @@ public class NetCDFDataSource extends AbstractDataSource {
     }
     
     public Map<String,Object> getMetadata( ProgressMonitor mon ) throws Exception {
+        mon.started();
+        mon.setProgressMessage("reading metadata");
         readData( mon );
         List attr= variable.getAttributes();
         
@@ -183,7 +189,7 @@ public class NetCDFDataSource extends AbstractDataSource {
             Attribute at= (Attribute) attr.get(i);
             result.put( at.getName(), at.getStringValue() );
         }
-        
+        mon.finished();
         return result;
         
     }

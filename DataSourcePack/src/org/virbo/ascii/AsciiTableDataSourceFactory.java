@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
@@ -59,6 +57,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "column="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "fixedColumns="));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "rank2=", "read in more than one column to create a rank 2 dataset."));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "bundle=", "read in more than one column to create a rank 2 bundle dataset."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend1Labels=", "label each of the columns, bundling different data together in rank 2 dataset"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "depend1Values=", "values for each column, making a rank 2 table of values."));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "time="));
@@ -97,6 +96,14 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             } else if (paramName.equals("rank2")) {
                 List<CompletionContext> result = new ArrayList<CompletionContext>();
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
+                return result;
+            } else if (paramName.equals("bundle")) {
+                List<CompletionContext> result = new ArrayList<CompletionContext>();
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "<int>", "number of columns to expect"));
+                result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "Bx-Bz", "three named columns"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:", "all but first column"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "1:5", "second through 5th columns"));
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_VALUE, "-5:", "last five columns"));
@@ -153,8 +160,16 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
             Map<String, String> params = URISplit.parseParams(split.params);
             
             if ( params.get("rank2")!=null ) return false;
-            
+            if ( params.get("bundle")!=null ) return false;
+
+            String arg_0= params.get("arg_0");
+            if ( arg_0!=null ) {
+                if ( arg_0.equals("rank2") || arg_0.equals("bundle") ) return false;
+            }
+
             File file = DataSetURI.getFile(split.resourceUri, mon);
+            if ( !file.isFile() ) return true;
+            
             List<CompletionContext> cc= getFieldNames( file, params, mon );
 
             if ( cc.size()<=2 ) {
@@ -187,8 +202,14 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
         if (params.containsKey("headerDelim") ) {
             parser.setHeaderDelimiter(params.get("headerDelim"));
         }
-        String line= parser.readFirstRecord(file.toString());
-        DelimParser dp= parser.guessDelimParser(line);
+        DelimParser dp= parser.guessSkipAndDelimParser(file.toString());
+
+        String line= parser.readFirstParseableRecord(file.toString());
+        if ( line==null ) {
+            //dp= parser.guessSkipAndDelimParser(file.toString());
+            throw new IllegalArgumentException("unable to find parseable record");
+        }
+        
         String[] fields= new String[ dp.fieldCount() ];
         dp.splitRecord( line, fields );
 
@@ -212,8 +233,7 @@ public class AsciiTableDataSourceFactory implements DataSourceFactory {
     private List<CompletionContext> getFieldNames(CompletionContext cc, ProgressMonitor mon) throws IOException {
 
         Map<String,String> params = URISplit.parseParams(cc.params);
-        Object o;
-        File file = DataSetURI.getFile(cc.resource, mon);
+        File file = DataSetURI.getFile(cc.resourceURI, mon);
 
         return getFieldNames( file, params, mon );
 

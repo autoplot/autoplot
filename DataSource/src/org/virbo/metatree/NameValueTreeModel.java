@@ -198,7 +198,11 @@ public class NameValueTreeModel implements TreeModel {
         } else if (value.getClass().isArray()) {
             return new ArrayPropertyNode(name, value);
         } else if (value instanceof String) {
-            return new StringPropertyNode(name, (String) value);
+            String svalue= (String) value;
+            if ( svalue.length()>800 ) {
+                svalue= svalue.substring(0,797) + "...";
+            }
+            return new StringPropertyNode(name, svalue);
         } else if (value instanceof Map) {
             return new MapPropertyNode(name, (Map) value);
         } else if (value instanceof QDataSet ) {

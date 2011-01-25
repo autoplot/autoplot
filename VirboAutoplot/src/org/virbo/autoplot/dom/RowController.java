@@ -56,7 +56,7 @@ public class RowController extends DomNodeController {
                     } else if ( evt.getPropertyName().equals(Row.PROP_BOTTOM) ) {
                         dasRow.setMax( dd[0], dd[1], (int) dd[2] );
                     }
-                    DasDevicePosition.parseLayoutStr( dasRow, row.getTop() + "," + row.getBottom() );
+                    //DasDevicePosition.parseLayoutStr( dasRow, row.getTop() + "," + row.getBottom() );
                 } catch (ParseException ex) {
                     Logger.getLogger(RowController.class.getName()).warning("parse exception: "+ex);
                     row.setTop( DasDevicePosition.formatLayoutStr(dasRow, true) );

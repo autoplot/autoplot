@@ -5,19 +5,15 @@
 
 package org.virbo.cefdatasource;
 
-import org.das2.graph.GraphUtil;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.text.ParseException;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.VectorDataSetAdapter;
 
 /**
  *
@@ -59,7 +55,7 @@ public class TestCefReader {
         System.err.println( result );
         
         QDataSet ds= DataSetOps.slice1( result,1 );
-        GraphUtil.visualize( VectorDataSetAdapter.create(ds) );
+        //GraphUtil.visualize( VectorDataSetAdapter.create(ds) );
         
     }
 

@@ -3,7 +3,7 @@
 "http://www.cottagesystems.com/lib/dtd/jnlp-1.5.dtd">
 <jnlp 
     spec="1.0+" 
-    codebase="http://www.autoplot.org/jnlp/#{tag}/"
+    codebase="http://autoplot.org/jnlp/#{tag}/"
     href="autoplot.jnlp">
     
     <information> 
@@ -18,7 +18,7 @@
         <icon href="splash.png" kind="splash" />
         <shortcut online="true">
             <desktop />
-            <menu submenu="virbo-autoplot" />
+            <menu submenu="autoplot" />
         </shortcut>
         <offline-allowed/>
         <association mime-type="application/x-netcdf" extensions="cdf"/>
@@ -38,41 +38,48 @@
         
         <jar href="VirboAutoplot.jar" />
         
-        <jar href="http://www.autoplot.org/jnlp-lib/batik-awt-util.jar" part="batik" />
-        <jar href="http://www.autoplot.org/jnlp-lib/batik-svggen.jar" part="batik"  download='lazy' />
-        <jar href="http://www.autoplot.org/jnlp-lib/batik-util.jar"  part="batik"  download='lazy' />
-        <package name="org.apache.batik" part="batik" recursive="true"  />
-        <jar href="http://www.autoplot.org/jnlp-lib/commons-codec-1.3.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/commons-httpclient-3.0.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/commons-logging-1.0.4.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/dods-1.1.7.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/gnu-regexp-1.1.4.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/gnu-getopt-1.0.6.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/itext-1.2.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/jdom.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/netcdf-2.2.22.jar"/>
-        <jar href="http://www.autoplot.org/jnlp-lib/slf4j-jdk14.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/poi-3.1-FINAL-20080629.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/poi-contrib-3.1-FINAL-20080629.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/resourcesOptional.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/swing-layout-1.0.3.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/jython.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/jfits-0.93.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/beansbinding-1.2.1.jar"/>
-        <jar href="http://www.autoplot.org/jnlp-lib/metadata-extractor-2.1.0.jar" />
-        <jar href="http://www.autoplot.org/jnlp-lib/jh.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/batik-awt-util.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/batik-svggen.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/batik-util.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/commons-codec-1.3.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/commons-httpclient-3.0.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/commons-logging-1.0.4.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/dods-1.1.7.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/gnu-regexp-1.1.4.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/gnu-getopt-1.0.6.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/itext-1.2.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/jdom.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/netcdf-4.1.jar"/>
+        <jar href="http://autoplot.org/jnlp-lib/slf4j-jdk14.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/poi-3.1-FINAL-20080629.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/poi-contrib-3.1-FINAL-20080629.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/resourcesOptional.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/swing-layout-1.0.3.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/jython.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/jfits-0.93.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/beansbinding-1.2.1.jar"/>
+        <jar href="http://autoplot.org/jnlp-lib/metadata-extractor-2.1.0.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/jh.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/commons-net-2.0.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/commons-net-ftp-2.0.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/commons-vfs-1.0.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/jsch-20090723.jar" />
         
         <!-- cdf -->
-        <jar href="http://www.autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
+        <jar href="http://autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" />
+        <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2.1a.jnlp" > -->
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.0.jnlp" > -->
-        <extension name="cdf" href="http://www.autoplot.org/cdf-jnlp/cdf-3.3.0-hack.jnlp" >
+        <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.0-hack.jnlp" > -->
+        <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1-hack.jnlp" > -->
+           <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.1.jnlp" >
         </extension>
-        <!--<extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2.1a.jnlp" >  
-        </extension>-->
         
         <jar href="lib/dasCore.jar" />
+        <jar href="lib/dasCoreUtil.jar" />
+        <jar href="lib/dasCoreDatum.jar" />
         <jar href="lib/QDataSet.jar" />
+        <jar href="lib/AutoplotHelp.jar" />
         <jar href="lib/QStream.jar" />
         <jar href="lib/JythonSupport.jar" />
         <jar href="lib/DataSource.jar" />
@@ -80,6 +87,8 @@
         <jar href="lib/JythonDataSource.jar" />
         <jar href="lib/JFontChooser.jar" />
         <jar href="lib/CdfDataSource.jar" />
+        <jar href="lib/CdfJavaDataSource.jar" />
+        <jar href="lib/CDAWebDataSource.jar" />
         <jar href="lib/WavDataSource.jar" />
         <jar href="lib/CefDataSource.jar" />
         <jar href="lib/OpenDapDataSource.jar" />
@@ -93,7 +102,7 @@
         
     </resources> 
     
-    <application-desc  main-class="org.virbo.autoplot.AutoPlotUI">  
+    <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
         <argument>--nativeLAF</argument>
         <!--<argument>http://www.cottagesystems.com/virbo/apps/autoplot/data/ascii/omni2_1972.dat?column=field17</argument>-->
         <!--<argument>&hyphen;&hyphen;bookmarks</argument>

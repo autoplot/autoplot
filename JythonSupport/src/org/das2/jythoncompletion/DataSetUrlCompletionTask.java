@@ -42,11 +42,21 @@ class DataSetUrlCompletionTask implements CompletionTask {
             String line = editor.getText(i0, i1 - i0);
             int ipos = editor.getCaretPosition() - i0;
             i0 = line.lastIndexOf('\'', ipos-1);
+            boolean doubleQuotes=false;
             if (i0 == -1) {
-                throw new IllegalArgumentException("expected single quote");
+                i0 = line.lastIndexOf('\"', ipos-1);
+                if ( i0==-1 ) {
+                    throw new IllegalArgumentException("expected single quote");
+                } else {
+                    doubleQuotes= true;
+                }
             }
 	    i0+=1;
-            i1 = line.indexOf('\'', ipos);
+            if ( doubleQuotes ) {
+                i1 = line.indexOf('\"', ipos);
+            } else {
+                i1 = line.indexOf('\'', ipos);
+            }
             if (i1 == -1) {
                 i1 = line.length();
             }
@@ -59,7 +69,7 @@ class DataSetUrlCompletionTask implements CompletionTask {
             if ( surl1.contains("?") || DataSourceRegistry.getInstance().hasSourceByExt(split.ext) ) {
                 rs= DataSetURI.getFactoryCompletions( surl1, carotPos,  new NullProgressMonitor() );
             } else {
-                rs= DataSetURI.getFileSystemCompletions(surl1, carotPos, new NullProgressMonitor() );
+                rs= DataSetURI.getFileSystemCompletions(surl1, carotPos, true, true, null, new NullProgressMonitor() );
             }
             
             for ( CompletionResult rs1:rs ) {

@@ -40,6 +40,13 @@ public abstract class DomNode implements Cloneable {
         this.id= n.id; 
     }
 
+    /**
+     * Bulk assignment of properties, but allow specification of properties to exclude.  Note exclude
+     * should be passed to children when this is overriden, normally to exclude id property.
+     *
+     * @param n
+     * @param exclude
+     */
     public void syncTo( DomNode n, List<String> exclude ) {
         if ( !exclude.contains(PROP_ID) ) this.id= n.id;
     }

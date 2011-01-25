@@ -45,21 +45,21 @@ public class DataSetURLDemo {
                 break;
             case 3: // file system completion
                 //context= "file:/net/spot3/home/jbf/ct/lanl/gpsdata/";
-                context= "bin.file:/net/spot3/home/jbf/ct/lanl/gpsda";
+                context= "vap+bin:file:/net/spot3/home/jbf/ct/lanl/gpsda";
                 carotPos= context.indexOf("lanl/gp") + "lanl/gp".length();
                 break;
             case 4: // file system completion
                 //context= "file:/net/spot3/home/jbf/ct/lanl/gpsdata/";
-                context= "bin.file:/n";
+                context= "vap+bin:file:/n";
                 carotPos= context.indexOf(":/n") + ":/n".length();
                 break;
                               
             case 5: // bad insertion -- co was interpreted as arg_0...
-                context= "dat.file:///media/mini/data.backup/examples/asciitable/2490lintest90005.raw?skip=34&co";
+                context= "vap+dat:file:///media/mini/data.backup/examples/asciitable/2490lintest90005.raw?skip=34&co";
                 carotPos= context.indexOf("34&co") + "34&co".length();
                 break;
             case 6: // bad insertion -- doesn't work to go back
-                context= "dat.file:///media/mini/data.backup/examples/asciitable/2490lintest90005.raw?skip=34&racolumn=field2";
+                context= "vap+dat:file:///media/mini/data.backup/examples/asciitable/2490lintest90005.raw?skip=34&racolumn=field2";
                 carotPos= context.indexOf("34&ra") + "34&ra".length();
                 break;
             default:
@@ -82,7 +82,7 @@ public class DataSetURLDemo {
         System.err.println(uri.toURL());
         URL url= new URL( "file:///home/jbf/foo_%Y.txt"); // java doesn't complain about percents like this, but they are not allowed.
         System.err.println(url);
-        System.err.println(url.toURI());
+        //System.err.println(url.toURI());
         demoGetCompletions();
     }
     

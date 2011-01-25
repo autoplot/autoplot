@@ -49,7 +49,7 @@ public class Test015 {
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
     
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args) {
         try {
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
@@ -61,7 +61,7 @@ public class Test015 {
             //doTest( 4, "vap+tsds:http://timeseries.org/get3.cgi?StartDate=19950101&EndDate=20050201&ppd=24&ext=bin&out=ncml&param1=Kanekal_SAMPEX_elo_1hour-1-v0" );
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
+        } catch ( Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }

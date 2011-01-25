@@ -1,0 +1,27 @@
+# example script for autoplot. 
+# for this example:
+
+#   java -Djava.awt.headless=true -Djava.library.path=/home/jbf/ct/hudson/x86_32/:. -cp AutoplotAll.jar org.virbo.autoplot.AutoplotUI --script /home/jbf/rbsp_ect_example.jy
+
+vap= 'http://autoplot.org/vap/hydra_two_panel.vap'  # 'product file to load'
+frmt= 'png'
+tf= TimeParser.create( '%Y%m%d' )   # control parser
+
+def doit( srange, name ):
+  range= tf.parse( srange ).getTimeRange()
+  dom.timeRange= range
+  print 'write to ' + name
+  if ( frmt=='png' ):
+     writeToPng( name )
+  elif ( frmt=='pdf' ):
+     writeToPdf( name )
+  else:
+     print 'bad format, only png and pdf supported: '+frmt
+
+
+load( vap )
+setCanvasSize( 800, 600 );  # vap should do this, but it doesn't.
+doit( '20000101', '/tmp/foo-2000-01-01' )
+doit( '20000102', '/tmp/foo-2000-01-02' )
+doit( '20000103', '/tmp/foo-2000-01-03' )
+

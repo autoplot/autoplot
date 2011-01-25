@@ -11,6 +11,9 @@ package org.virbo.dataset;
  * Slicing a rank 1 dataset results in a rank 0 dataset.
  *
  * Supports rank 2 depend_1 datasets.  Supports CONTEXT_0, DELTA_PLUS, DELTA_MINUS
+ *
+ * Supports BINS_1, JOIN_0
+ *
  * @author jbf
  */
 public class Slice0DataSet extends AbstractDataSet implements RankZeroDataSet {
@@ -19,6 +22,10 @@ public class Slice0DataSet extends AbstractDataSet implements RankZeroDataSet {
     int index;
 
     public Slice0DataSet(QDataSet ds, int index) {
+        this( ds, index, true );
+    }
+
+    public Slice0DataSet( QDataSet ds, int index, boolean addContext ) {
         if ( ds.rank() > 4 ) {
             throw new IllegalArgumentException("rank limit > 4");
         }
@@ -27,29 +34,46 @@ public class Slice0DataSet extends AbstractDataSet implements RankZeroDataSet {
         QDataSet dep0= (QDataSet) ds.property( QDataSet.DEPEND_0 );
         QDataSet dep1= (QDataSet) ds.property( QDataSet.DEPEND_1 );
         if ( dep0!=null && dep1!=null && dep0.rank()>1 && dep1.rank()>1 ) {
-            throw new IllegalArgumentException("both DEPEND_0 and DEPEND_1 have rank>1");
-        }
-        if ( DataSetUtil.isQube(ds) || ds.property(QDataSet.DEPEND_1)!=null ) { //DEPEND_1 rank 1 implies qube
-            if ( dep0!=null ) DataSetUtil.addContext( this, new Slice0DataSet( dep0, index ) );
+            // special case where we are pulling out a table, this used to be a runtime exception
+            putProperty( QDataSet.DEPEND_0, new Slice0DataSet(dep0, index, false ));
+            putProperty( QDataSet.DEPEND_1, new Slice0DataSet(dep1, index, false ));
+        } else if ( DataSetUtil.isQube(ds) || ds.property(QDataSet.DEPEND_1)!=null ) { //DEPEND_1 rank 1 implies qube
+            if ( addContext ) {
+                if ( dep0!=null ) {
+                    DataSetUtil.addContext( this, new Slice0DataSet( dep0, index, false ) );
+                } else {
+                    DRank0DataSet context= DataSetUtil.asDataSet(index);
+                    context.putProperty( QDataSet.NAME, "slice0" );
+                    DataSetUtil.addContext( this, context );
+                }
+            }
             if ( dep1!=null && dep1.rank()==2 ) {
-                putProperty( QDataSet.DEPEND_0, new Slice0DataSet( dep1, index ) );
-            } else {
+                putProperty( QDataSet.DEPEND_0, new Slice0DataSet( dep1, index, false ) );
+            } else if ( dep1!=null ) {
                 putProperty( QDataSet.DEPEND_0, dep1 );
             }
+            putProperty( QDataSet.BINS_0, ds.property( QDataSet.BINS_1 ) );
             putProperty( QDataSet.DEPEND_1, ds.property( QDataSet.DEPEND_2 ) );
             putProperty( QDataSet.DEPEND_2, ds.property( QDataSet.DEPEND_3 ) );
 
         } else {
             if ( dep0!=null && dep0.rank()>1 ) {
-                putProperty( QDataSet.DEPEND_0, new Slice0DataSet(dep0, index));  //DEPEND_0 rank>1
-            } else if ( dep0!=null && dep0.rank()==1 ) {
-                if ( dep0!=null ) DataSetUtil.addContext( this, new Slice0DataSet( dep0, index ) );
+                putProperty( QDataSet.DEPEND_0, new Slice0DataSet(dep0, index, false ));  //DEPEND_0 rank>1
+            } else if ( dep0!=null ) {
+                if ( addContext ) DataSetUtil.addContext( this, new Slice0DataSet( dep0, index, false ) );
             } else {
                 if ( ds.property(QDataSet.DEPEND_0,index)==null ) { // bundle dataset  //TODO: this needs more review
                     putProperty( QDataSet.DEPEND_0, null );
+                } else {
+                    if ( addContext )  {
+                        DRank0DataSet context= DataSetUtil.asDataSet(index);
+                        context.putProperty( QDataSet.NAME, "slice0" );
+                        DataSetUtil.addContext( this, context );
+                    }
                 }
             }
         }
+        putProperty( QDataSet.JOIN_0, null );
         
         for ( int i=0; i<QDataSet.MAX_PLANE_COUNT; i++ ) {
             String prop= "PLANE_"+i;
@@ -58,7 +82,7 @@ public class Slice0DataSet extends AbstractDataSet implements RankZeroDataSet {
                 if ( plane0.rank()<1 ) {
                     putProperty( prop, plane0 );
                 } else {
-                    putProperty( prop, new Slice0DataSet( plane0, index ) );
+                    putProperty( prop, new Slice0DataSet( plane0, index, addContext ) );
                 }
             } else {
                 break;
@@ -66,13 +90,16 @@ public class Slice0DataSet extends AbstractDataSet implements RankZeroDataSet {
         }
 
         String[] p= new String[] { QDataSet.DELTA_MINUS, QDataSet.DELTA_PLUS };
-
         for ( int i=0; i<p.length; i++ ) {
             QDataSet delta= (QDataSet) ds.property( p[i] );
             if ( delta!=null && delta.rank()>0 ) {
-                putProperty( p[i], new Slice0DataSet(delta,index) );
+                putProperty( p[i], new Slice0DataSet(delta,index,addContext) );
             }
         }
+
+        putProperty( QDataSet.WEIGHTS_PLANE, null );
+
+        DataSetUtil.copyDimensionProperties( ds, this );
         
     }
 

@@ -6,17 +6,15 @@
 package test.endtoend;
 
 import java.io.IOException;
-import org.das2.dataset.VectorDataSet;
 import org.das2.dataset.VectorUtil;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
 import org.virbo.autoplot.ScriptContext;
 import org.virbo.autoplot.dom.Application;
-import org.virbo.dataset.DataSetAdapter;
 import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dataset.VectorDataSetAdapter;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
 
@@ -39,7 +37,7 @@ public class Test009 {
         t0= System.currentTimeMillis();
     }
 
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
         try {
             Application dom= ScriptContext.getDocumentModel();
             ScriptContext.setCanvasSize( 800, 600 );
@@ -51,6 +49,7 @@ public class Test009 {
 
             resetTimer();
             writePng( "test009_001.png" );
+            ScriptContext.save( "test009_001.vap" );
             dom.getPlots(0).getXaxis().setRange( DatumRangeUtil.parseTimeRangeValid("2009-08-10") );
             writePng( "test009_002.png" );
             dom.getPlots(0).getXaxis().setRange( DatumRangeUtil.parseTimeRangeValid("1990-01-01 03:15:01 to 03:15:02") );
@@ -76,9 +75,10 @@ public class Test009 {
             ScriptContext.plot( DataSetOps.trim( rank1Rand, 0, 10000000) );
             writePng( "test009_011.png" );
 
-            VectorDataSet vds= VectorDataSetAdapter.create(rank1Rand);
-            vds= VectorUtil.reduce2D( vds, 0, vds.getXLength(), Units.dimensionless.createDatum(1e5), Units.dimensionless.createDatum(100) );
-            ScriptContext.plot( DataSetAdapter.create(vds) );
+            QDataSet vds= rank1Rand;
+            QDataSet xds= Ops.findgen( vds.length() );
+            vds= VectorUtil.reduce2D( xds, vds, 0, vds.length(), Units.dimensionless.createDatum(1e5), Units.dimensionless.createDatum(100) );
+            ScriptContext.plot( vds );
             writePng( "test009_011a.png" );
 
             QDataSet rank2Rand= Ops.add( Ops.randomn(-12345,100000,100),
@@ -88,7 +88,7 @@ public class Test009 {
 
             resetTimer();
 
-            ScriptContext.plot( DataSetOps.trim( rank2Rand, 0, 100 ) );
+            ScriptContext.plot( DataSetOps.trim( rank2Rand, 0, 100 ) ); // redo these tests with rank2Rand.trim() native trim.
             writePng( "test009_012.png" );
             ScriptContext.plot( DataSetOps.trim( rank2Rand, 0, 10000) );
             writePng( "test009_013.png" );
@@ -99,7 +99,7 @@ public class Test009 {
             QDataSet y=  Ops.randomn(-12344,1000);
             ScriptContext.plot( x, y, Ops.sqrt( Ops.add( Ops.pow(x,2), Ops.pow(y,2) ) ) );
             ScriptContext.setRenderStyle("colorScatter");
-            dom.getPanels(0).getStyle().setSymbolSize(10);
+            dom.getPlotElements(0).getStyle().setSymbolSize(10);
 
             writePng( "test009_015.png" );
             ScriptContext.writeToPdf("test009_015.pdf");
@@ -107,19 +107,20 @@ public class Test009 {
             ScriptContext.setCanvasSize(200,160);
             dom.getCanvases(0).getMarginColumn().setRight("100%-3em");
             dom.getCanvases(0).setFont("sans-8");
-            
+
             dom.getPlots(0).getXaxis().setRange( DatumRange.newDatumRange( 999, 1021, Units.dimensionless ) );
             writePng( "test009_016.png" );
 
             x= Ops.linspace( -9, 9, 1000 );
             y= Ops.cos(x);
+            ((MutablePropertyDataSet)y).putProperty( QDataSet.FILL_VALUE, -1e31 );
             for ( int i=50; i<60; i++ ) ((WritableDataSet)y).putValue(i,-1e31);
 
             ScriptContext.plot( x, y );
             ScriptContext.setRenderStyle("fillToZero");
             ScriptContext.setCanvasSize(800,600);
-            dom.getPanels(0).getStyle().setSymbolSize(2);
-            
+            dom.getPlotElements(0).getStyle().setSymbolSize(2);
+
             writePng( "test009_017.png" );
 
             //dom.getPlots(0).getXaxis().setLog( true );
@@ -128,7 +129,7 @@ public class Test009 {
             //writePng( "test009_018.png" );
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch ( RuntimeException ex ) {
+        } catch ( Exception ex ) {
             ex.printStackTrace();
             System.exit(1);
         }

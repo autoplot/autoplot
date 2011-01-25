@@ -51,7 +51,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
 
     public final static Object DOUBLE= "double";
     public final static Object FLOAT= "float";
-    public final static Object TRUNCATEDFLOAT= "truncatedfloat";
+    public final static Object TRUNCATEDFLOAT= "truncatedfloat"; // 16 bit real that has exponent like a FLOAT but mantissa precision is reduced.
     public final static Object LONG= "long";
     public final static Object INT= "int";
     public final static Object UINT= "uint";
@@ -100,6 +100,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      */
     public static BufferDataSet makeDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, ByteBuffer buf, Object type ) {
         BufferDataSet result;
+        if ( rank==1 && len1>1 ) throw new IllegalArgumentException("rank is 1, but len1 is not 1");
+        if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller that length of type "+type);
         if ( type.equals(DOUBLE) ) {
             result=new Double( rank, reclen, recoffs, len0, len1, len2, buf );
         } else if ( type.equals(FLOAT) ) {
@@ -238,7 +240,11 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         throw new IllegalArgumentException("rank limit");
     }
 
-    public BufferDataSet trim( int ist, int ien ) {
+    /**
+     * provide a subset of the dataset.  Note that writes to the result dataset
+     * will affect the original dataset.  TODO: correct this since it's a WriteableDataSet.
+     */
+    public QDataSet trim( int ist, int ien ) {
         return makeDataSet( rank, reclen, offset(ist), ien-ist, len1, len2, back, type );
     }
 

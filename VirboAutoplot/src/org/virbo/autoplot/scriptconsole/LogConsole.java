@@ -7,6 +7,7 @@ package org.virbo.autoplot.scriptconsole;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
@@ -14,6 +15,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,8 +35,10 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import javax.swing.AbstractAction;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.text.AttributeSet;
@@ -121,6 +126,30 @@ public class LogConsole extends javax.swing.JPanel {
         });
         timer2.setRepeats(false);
 
+        final javax.swing.JTextPane ftxt= this.logTextArea;
+
+        this.logTextArea.getActionMap().put( "biggerFont", new AbstractAction( "Text Size Bigger" ) {
+            public void actionPerformed( ActionEvent e ) {
+               Font f= ftxt.getFont();
+               float size= f.getSize2D();
+               float step= size < 14 ? 1 : 2;
+               ftxt.setFont( f.deriveFont( Math.min( 40, size + step ) ) );
+            }
+        } );
+
+        this.logTextArea.getActionMap().put( "smallerFont", new AbstractAction( "Text Size Smaller" ) {
+            public void actionPerformed( ActionEvent e ) {
+               Font f= ftxt.getFont();
+               float size= f.getSize2D();
+               float step= size < 14 ? 1 : 2;
+               ftxt.setFont( f.deriveFont( Math.max( 4, size - step ) ) );
+            }
+        } );
+
+        Toolkit tk= Toolkit.getDefaultToolkit();
+        this.logTextArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_EQUALS, tk.getMenuShortcutKeyMask() ), "biggerFont" );
+        this.logTextArea.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_MINUS, tk.getMenuShortcutKeyMask() ), "smallerFont" );
+
     }
 
     private void maybeInitializeInterpreter( ) throws IOException {
@@ -196,8 +225,21 @@ public class LogConsole extends javax.swing.JPanel {
                 //}
                 }
                 if (rec.getLevel().intValue() >= Level.WARNING.intValue()) {
-                    if (LogConsole.this.oldStdErr != null)
-                        LogConsole.this.oldStdErr.println(rec.getMessage());
+                    if (LogConsole.this.oldStdErr != null) {
+                        String recMsg;
+//                        if ( rec.getMessage().contains("org.das2.graph") ) {
+//                           System.err.println("27245: here");
+//                            new Exception().printStackTrace();
+//                        }
+                        String msg= rec.getMessage();
+                        Object[] parms= rec.getParameters();
+                        if ( parms==null || parms.length==0 ) {
+                            recMsg = msg;
+                        } else {
+                            recMsg = MessageFormat.format( msg, parms );
+                        }
+                        LogConsole.this.oldStdErr.println( recMsg );
+                    }
                 }
             }
 
@@ -244,7 +286,7 @@ public class LogConsole extends javax.swing.JPanel {
         System.setErr(new PrintStream(los, true));
     }
 
-    public void undoLogConsoleMessages() {
+    public synchronized void undoLogConsoleMessages() {
         System.setOut(oldStdOut);
         System.setErr(oldStdErr);
     }
@@ -255,7 +297,7 @@ public class LogConsole extends javax.swing.JPanel {
      * @see logConsoleMessages
      */
     public void turnOffConsoleHandlers() {
-        System.err.println("turning off console log, look for messages in LogConsole");
+        System.err.println("turning off default log, look for messages in console tab.");
         for (Handler h : Logger.getLogger("").getHandlers()) {
             if (h instanceof ConsoleHandler) {
                 h.setLevel(Level.OFF);
@@ -263,9 +305,12 @@ public class LogConsole extends javax.swing.JPanel {
         }
     }
 
+    /**
+     * note this is generally called from a timer that coalesces events.  But
+     * may be called explicitly in response to a user event as well.
+     */
     public synchronized void update() {
         try {
-            final StringBuffer buf = new StringBuffer();
             int n = records.size();
             long t = n == 0 ? 0 : records.get(n - 1).getMillis();
             boolean timeStamps = showTimeStamps;
@@ -288,7 +333,15 @@ public class LogConsole extends javax.swing.JPanel {
                         doc.insertString(doc.getLength(), "\n", null);
                     }
                     lastT = rec.getMillis();
-                    String recMsg = rec.getMessage();
+                    
+                    String recMsg;
+                    String msg= rec.getMessage();
+                    Object[] parms= rec.getParameters();
+                    if ( parms==null || parms.length==0 ) {
+                        recMsg = msg;
+                    } else {
+                        recMsg = MessageFormat.format( msg, parms );
+                    }
                     String prefix = "";
                     if (showLoggerId) {
                         prefix += rec.getLoggerName() + " ";
@@ -319,12 +372,6 @@ public class LogConsole extends javax.swing.JPanel {
                     }
                 }
             }
-            SwingUtilities.invokeLater(new Runnable() {
-
-                public void run() {
-                    //logTextArea.setText(buf.toString());
-                }
-            });
             while (records.size() > RECORD_SIZE_LIMIT) {
                 records.remove(0);
             }
@@ -346,15 +393,14 @@ public class LogConsole extends javax.swing.JPanel {
         clearButton = new javax.swing.JButton();
         saveButton = new javax.swing.JButton();
         copyButton = new javax.swing.JButton();
-        verbosityPanel = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         commandLineTextPane1 = new org.virbo.autoplot.scriptconsole.CommandLineTextPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         logTextArea = new javax.swing.JTextPane();
+        jButton1 = new javax.swing.JButton();
 
-        clearButton.setText("clear");
+        clearButton.setText("Clear");
         clearButton.setToolTipText("clear all messages.  ");
         clearButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -362,15 +408,15 @@ public class LogConsole extends javax.swing.JPanel {
             }
         });
 
-        saveButton.setText("save...");
-        saveButton.setToolTipText("Saves the records to file for use by software support team.");
+        saveButton.setText("Save As...");
+        saveButton.setToolTipText("saves the records to file for use by software support team.");
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveButtonActionPerformed(evt);
             }
         });
 
-        copyButton.setText("copy");
+        copyButton.setText("Copy");
         copyButton.setToolTipText("copy xml of log records into system clipboard, for pasting into email.\n");
         copyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -399,30 +445,9 @@ public class LogConsole extends javax.swing.JPanel {
                 .add(copyButton))
         );
 
-        jButton1.setText("Console Settings...");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout verbosityPanelLayout = new org.jdesktop.layout.GroupLayout(verbosityPanel);
-        verbosityPanel.setLayout(verbosityPanelLayout);
-        verbosityPanelLayout.setHorizontalGroup(
-            verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
-                .addContainerGap(132, Short.MAX_VALUE)
-                .add(jButton1))
-        );
-        verbosityPanelLayout.setVerticalGroup(
-            verbosityPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, verbosityPanelLayout.createSequentialGroup()
-                .addContainerGap(35, Short.MAX_VALUE)
-                .add(jButton1))
-        );
-
         jLabel2.setText("AP>");
 
+        commandLineTextPane1.setToolTipText("enter jython commands here to control the application, for example \"plot([1,2,3])\"");
         commandLineTextPane1.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 commandLineTextPane1FocusGained(evt);
@@ -432,35 +457,42 @@ public class LogConsole extends javax.swing.JPanel {
 
         jScrollPane1.setViewportView(logTextArea);
 
+        jButton1.setText("Console Settings...");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 352, Short.MAX_VALUE)))
+            .add(layout.createSequentialGroup()
+                .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 287, Short.MAX_VALUE)
+                .add(jButton1)
+                .addContainerGap())
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 674, Short.MAX_VALUE)
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 574, Short.MAX_VALUE)
+                .addContainerGap())
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 638, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 320, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(verbosityPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel2))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                    .add(jLabel2)
+                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(actionsPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jButton1)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -553,6 +585,5 @@ private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextPane logTextArea;
     private javax.swing.JButton saveButton;
-    private javax.swing.JPanel verbosityPanel;
     // End of variables declaration//GEN-END:variables
 }

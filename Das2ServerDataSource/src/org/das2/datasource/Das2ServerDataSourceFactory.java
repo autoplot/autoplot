@@ -44,11 +44,13 @@ public class Das2ServerDataSourceFactory implements DataSourceFactory {
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "start_time=", "ISO8601 start time"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "end_time=", "ISO8601 end time"));
             result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "resolution=", "resolution in seconds"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "interval=", "cadence in seconds for TCAs"));
+            result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "item=", "item number for TCAs"));
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if (paramName.equals("dataset")) {
-                URL url= cc.resource;
-                List<String> dss= getDatasetsList( url.toString() );
+                URI uri= cc.resourceURI;
+                List<String> dss= getDatasetsList( uri.toString() ); // bug 3055130 okay
                 for ( String ds: dss ) {
                     if ( ds.startsWith(cc.completable) ) {
                         result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, ds ) );

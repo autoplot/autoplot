@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
@@ -16,14 +16,12 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="statusLabel" alignment="0" pref="870" max="32767" attributes="1"/>
           <Group type="102" alignment="0" attributes="0">
               <Component id="jPanel1" min="-2" max="-2" attributes="1"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace pref="54" max="32767" attributes="0"/>
               <Component id="actionButtonsPanel" min="-2" pref="463" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="pngsPanel" alignment="1" pref="870" max="32767" attributes="0"/>
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -37,17 +35,21 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="showMissingCheckBox" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="dataSetSelector1" alignment="0" pref="846" max="32767" attributes="0"/>
+                  <Component id="dataSetSelector1" alignment="0" pref="870" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
+          <Group type="102" alignment="0" attributes="0">
+              <Component id="statusLabel" pref="882" max="32767" attributes="1"/>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+          <Component id="pngsPanel" alignment="1" pref="894" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="pngsPanel" pref="539" max="32767" attributes="0"/>
+              <Component id="pngsPanel" pref="636" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="dataSetSelector1" min="-2" pref="27" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -58,9 +60,9 @@
                   <Component id="showMissingCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jPanel1" linkSize="2" min="-2" pref="30" max="-2" attributes="0"/>
-                  <Component id="actionButtonsPanel" linkSize="2" min="-2" pref="30" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Component id="actionButtonsPanel" max="32767" attributes="1"/>
+                  <Component id="jPanel1" alignment="0" pref="30" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="statusLabel" min="-2" max="-2" attributes="0"/>
@@ -134,6 +136,7 @@
         <Component class="javax.swing.JButton" name="prevSetButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="&lt;&lt;&lt;"/>
+            <Property name="toolTipText" type="java.lang.String" value="Skip 7"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prevSetButtonActionPerformed"/>
@@ -142,6 +145,7 @@
         <Component class="javax.swing.JButton" name="prevButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="&lt;"/>
+            <Property name="toolTipText" type="java.lang.String" value="previous"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prevButtonActionPerformed"/>
@@ -150,6 +154,7 @@
         <Component class="javax.swing.JButton" name="nextButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="&gt;"/>
+            <Property name="toolTipText" type="java.lang.String" value="next"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextButtonActionPerformed"/>
@@ -158,6 +163,7 @@
         <Component class="javax.swing.JButton" name="nextSetButton">
           <Properties>
             <Property name="text" type="java.lang.String" value="&gt;&gt;&gt;"/>
+            <Property name="toolTipText" type="java.lang.String" value="Skip 7"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextSetButtonActionPerformed"/>
@@ -198,15 +204,18 @@
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Show Missing"/>
         <Property name="toolTipText" type="java.lang.String" value="Insert placeholder images where there are gaps detected in the sequence"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="showMissingCheckBoxItemStateChanged"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showMissingCheckBoxActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="useRangeCheckBox">
       <Properties>
         <Property name="text" type="java.lang.String" value="Limit range to:"/>
         <Property name="toolTipText" type="java.lang.String" value="Limit the time range of the images in the sequence."/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="useRangeCheckBoxItemStateChanged"/>
@@ -215,6 +224,7 @@
     <Component class="javax.swing.JButton" name="editRangeButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Select..."/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="editRangeButtonActionPerformed"/>

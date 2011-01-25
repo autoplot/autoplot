@@ -7,7 +7,6 @@ package org.virbo.fits;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,13 +39,11 @@ public class FitsDataSourceFactory extends AbstractDataSourceFactory {
         if (cc.context.equals(CompletionContext.CONTEXT_PARAMETER_NAME)) {
             try {
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
-                Set<String> plottable = getPlottable(new URI(surl), mon).keySet();
+                Set<String> plottable = getPlottable( DataSetURI.toUri(surl), mon).keySet();
                 for (String s : plottable) {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, s, this, "arg_0"));
                 }
 
-            } catch (URISyntaxException ex) {
-                throw new RuntimeException(ex);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

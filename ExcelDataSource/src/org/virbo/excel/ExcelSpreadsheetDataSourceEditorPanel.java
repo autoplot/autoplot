@@ -6,12 +6,16 @@
 package org.virbo.excel;
 
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +35,9 @@ import org.apache.poi.hssf.contrib.view.SVTableModel;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
@@ -48,6 +54,23 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
     boolean focusDepend0 = false;
     Map<String, String> params;
     URISplit split;
+
+    public boolean reject( String url ) throws IOException, URISyntaxException {
+        split = URISplit.parse(url);
+        FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
+        if ( fs.isDirectory( split.file.substring(split.path.length()) ) ) {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
+        split = URISplit.parse(uri);
+        params = URISplit.parseParams(split.params);
+
+        File f = DataSetURI.getFile(new URL(split.file), mon );
+        return true;
+    }
 
     private enum Tool {
         NONE, FIRSTROW, COLUMN, DEPEND_0, TIMEFORMAT,
@@ -81,9 +104,36 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         });
 
         jScrollPane1.setRowHeaderView(new TableRowHeader(jTable1));
+        jTable1.getTableHeader().setReorderingAllowed(false);
+
+        jTable1.getTableHeader().addMouseListener( new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                int col= jTable1.getTableHeader().columnAtPoint(e.getPoint());
+                String name= columns.get(col);
+                if (name == null) {
+                    name = String.valueOf((char)('A' + col));
+                }
+                if ( currentTool==Tool.DEPEND_0 ) {
+                    params.put(PROP_DEP0, name);
+                    dep0Columns.setSelectedItem(name);
+                    clearTool(); // otherwise we would respond to deselection event
+                } else if ( currentTool==Tool.COLUMN ) {
+                    params.put(PROP_COLUMN, name);
+                    columnsComboBox.setSelectedItem(name);
+                    clearTool(); // otherwise we would respond to deselection event
+                }
+            }
+        } );
+
     }
 
     private void doSelect( Tool tool ) {
+
+        if (tool == Tool.NONE ) return;
+
         if (tool == Tool.FIRSTROW) {
             if (jTable1.getSelectedRow() > 0) {
                 params.put(PROP_FIRST_ROW, String.valueOf(jTable1.getSelectedRow() + 1));
@@ -93,9 +143,9 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
             firstRowTextField.setValue(jTable1.getSelectedRow() + 1);
 
             resetFirstRow();
-            clearTool();
-        }
-        if (jTable1.getColumnModel().getSelectedColumnCount() == 0) {
+            jTable1.getSelectionModel().clearSelection();
+            
+        } else if (jTable1.getColumnModel().getSelectedColumnCount() == 0) {
         } else if (jTable1.getColumnModel().getSelectedColumnCount() == 1) {
             int col = jTable1.getColumnModel().getSelectedColumns()[0];
             String name = columns.get(col);
@@ -109,9 +159,9 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
             } else if (currentTool == Tool.COLUMN) {
                 params.put(PROP_COLUMN, name);
                 columnsComboBox.setSelectedItem(name);
-
             }
-
+            jTable1.getSelectionModel().clearSelection();
+            
         } else {
             int[] cols = jTable1.getColumnModel().getSelectedColumns();
             int first = cols[0];
@@ -128,6 +178,11 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
             }
 
             if (currentTool == Tool.DEPEND_0) {
+                if (haveColumnNames) {
+                    params.put(PROP_DEP0, sfirst + "-" + slast);
+                } else {
+                    params.put(PROP_DEP0, "" + first + ":" + (last + 1));
+                }
             } else if (currentTool == Tool.COLUMN) {
                 if (haveColumnNames) {
                     params.put(PROP_COLUMN, sfirst + "-" + slast);
@@ -135,12 +190,10 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                     params.put(PROP_COLUMN, "" + first + ":" + (last + 1));
                 }
             }
+            jTable1.getSelectionModel().clearSelection();
+            
         }
         clearTool();
-        if ( tool!=Tool.NONE ) {
-            jTable1.getSelectionModel().clearSelection();
-            jTable1.getColumnModel().getSelectionModel().clearSelection();
-        }
     }
 
     Action createToolAction(final String label, final Tool t) {
@@ -211,6 +264,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
             .add(0, 300, Short.MAX_VALUE)
         );
 
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jScrollPane1.setViewportView(jTable1);
 
         jLabel3.setText("Column:");
@@ -302,7 +356,7 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(firstRowTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
+                        .add(firstRowTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jToggleButton1)))
                 .addContainerGap())
@@ -368,13 +422,20 @@ public class ExcelSpreadsheetDataSourceEditorPanel extends javax.swing.JPanel im
         } catch (IOException ex) {
             Logger.getLogger(ExcelSpreadsheetDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        columnsComboBox.setModel(new DefaultComboBoxModel(columns.values().toArray()));
-        int col = jTable1.getSelectedColumn();
+        String column= (String) columnsComboBox.getSelectedItem();
+        String dep0= (String) dep0Columns.getSelectedItem();
+        List<String> colValues= new ArrayList<String>(columns.values());
+        colValues.add(0,"");
+        columnsComboBox.setModel(new DefaultComboBoxModel(colValues.toArray()));
 
         List<String> dep0Values = new ArrayList<String>(columns.values());
         dep0Values.add(0, "");
         dep0Columns.setModel(new DefaultComboBoxModel(dep0Values.toArray()));
 
+        if ( !column.equals("Item 1") ) {
+            columnsComboBox.setSelectedItem(column);
+            dep0Columns.setSelectedItem(dep0);
+        }
     }
 
     private void resetSheet(String string) {
@@ -516,6 +577,14 @@ private void firstRowTextFieldFocusLost(java.awt.event.FocusEvent evt) {//GEN-FI
     }
 
     public String getURI() {
+
+        if ( params.containsKey(PROP_COLUMN) ) {
+            if ( params.get(PROP_COLUMN).equals("") ) params.remove(PROP_COLUMN);
+        }
+
+        if ( params.containsKey(PROP_DEP0 ) ) {
+            if ( params.get(PROP_DEP0).equals("") ) params.remove(PROP_DEP0);
+        }
 
         split.params = URISplit.formatParams(params);
 

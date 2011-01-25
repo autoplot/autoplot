@@ -18,6 +18,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
+import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.QDataSet;
 
 /**
@@ -26,11 +27,11 @@ import org.virbo.dataset.QDataSet;
  */
 public class TimeSeriesBrowseController {
 
-    Panel p;
+    PlotElement p;
     DasAxis xAxis;
     DasPlot plot;
     Plot domPlot;
-    PanelController panelController;
+    PlotElementController panelController;
     DataSourceController dataSourceController;
     DataSourceFilter dsf;
     private ChangesSupport changesSupport;
@@ -41,14 +42,19 @@ public class TimeSeriesBrowseController {
     Timer updateTsbTimer;
     PropertyChangeListener timeSeriesBrowseListener;
 
-    TimeSeriesBrowseController( DataSourceController dataSourceController, Panel p ) {
+    TimeSeriesBrowseController( DataSourceController dataSourceController, PlotElement p ) {
 
         this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         
         updateTsbTimer = new Timer(100, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                updateTsb(false);
-                changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
+                if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) {
+                    updateTsbTimer.restart();
+                    return;
+                } else {
+                    updateTsb(false);
+                    changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
+                }
             }
         });
         
@@ -63,12 +69,32 @@ public class TimeSeriesBrowseController {
         this.xAxis = panelController.getDasPlot().getXAxis();
     }
 
-    public void setup( boolean valueWasAdjusting ) {
+    private boolean isBoundTimeRange( BindingModel[] bms, String dstId ) {
+        for ( int i=0; i<bms.length; i++ ) {
+            if ( bms[i].getSrcProperty().equals("timeRange")
+                    && bms[i].getDstProperty().equals("range") ) {
+                if ( !bms[i].getDstId().equals(dstId) ) return true;
+            }
+        }
+        return false;
+    }
+
+    protected void setup( boolean valueWasAdjusting ) {
         boolean setTsbInitialResolution = true;
         if (setTsbInitialResolution) {
             try {
                 DatumRange tr = dataSourceController.getTsb().getTimeRange();
-                if ( this.domPlot.getXaxis().isAutoRange() ) this.plot.getXAxis().resetRange(tr);
+                if ( this.domPlot.getXaxis().isAutoRange() ) {
+                    BindingModel[] bms= this.panelController.getApplication().getBindings();
+                    DatumRange appRange= this.panelController.getApplication().getTimeRange();
+                    if ( appRange.getUnits().isConvertableTo( tr.getUnits() )
+                            && isBoundTimeRange( bms, this.domPlot.getXaxis().getId() ) ) { // check to see if the dom has a compatible timerange.
+                        this.plot.getXAxis().resetRange(appRange);
+                    } else {
+                        this.plot.getXAxis().resetRange(tr);
+                    }
+                    this.plot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter()); // See PlotController.createDasPeer and listener that doesn't get event
+                }
                 updateTsb(true);
             } catch ( RuntimeException e ) {
                 throw e;
@@ -129,6 +155,7 @@ public class TimeSeriesBrowseController {
                 if (!autorange && surl.equals( dataSourceController.getTsbSuri())) {
                     logger.fine("we do no better with tsb");
                 } else {
+                    dataSourceController.cancel();
                     dataSourceController.update(autorange, autorange);
                     dataSourceController.setTsbSuri(surl);
                 }

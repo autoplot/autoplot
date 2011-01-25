@@ -55,6 +55,10 @@ public class DataSourceRegistry {
         return instance;
     }
 
+    /**
+     * return a list of registered extensions the can format.  These will contain the dot prefix.
+     * @return
+     */
     public List<String> getFormatterExtensions() {
         List<String> result= new ArrayList<String>();
         for ( Object k: dataSourceFormatByExt.keySet() ) {
@@ -63,6 +67,30 @@ public class DataSourceRegistry {
         return result;
     }
 
+
+    /**
+     * return a list of registered extensions.  These will contain the dot prefix.
+     * @return
+     */
+    public List<String> getSourceExtensions() {
+        List<String> result= new ArrayList<String>();
+        for ( Object k: dataSourcesByExt.keySet() ) {
+            result.add( (String)k );
+        }
+        return result;
+    }
+
+    /**
+     * return a list of registered extensions.  These will contain the dot prefix.
+     * @return
+     */
+    public List<String> getSourceEditorExtensions() {
+        List<String> result= new ArrayList<String>();
+        for ( Object k: dataSourceEditorByExt.keySet() ) {
+            result.add( (String)k );
+        }
+        return result;
+    }
 
     /**
      * look for META-INF/org.virbo.datasource.DataSourceFactory, create the
@@ -344,6 +372,10 @@ public class DataSourceRegistry {
      */
     public void registerExtension(String className, String extension, String description ) {
         extension= getExtension(extension);
+        String old= (String) dataSourcesByExt.get(extension);
+        if ( old!=null && !old.equals(className) ) {
+            System.err.println("extension: "+extension+ " is already handled by "+className );
+        }
         dataSourcesByExt.put(extension, className);
         if ( description!=null ) extToDescription.put( extension, description );
     }
@@ -376,6 +408,13 @@ public class DataSourceRegistry {
         dataSourcesByMime.put(mime.toLowerCase(), className);
     }
 
+    /**
+     * look up the source by its id.  If a filename is provided, then the
+     * filename's extension is used, otherwise ".<ext>" or "<ext>" are accepted.
+     * 
+     * @param extension
+     * @return
+     */
     public synchronized DataSourceFactory getSource(String extension) {
         if ( extension==null ) return null;
         extension= getExtension(extension);

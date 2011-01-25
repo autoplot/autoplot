@@ -10,10 +10,22 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.undo.UndoManager;
+import org.python.core.PyObject;
+import org.virbo.jythonsupport.PyQDataSet;
+import org.virbo.qstream.StreamException;
 
 /**
  *
@@ -82,5 +94,38 @@ public class EditorTextPane extends JTextPane {
     
     public EditorAnnotationsSupport getEditorAnnotationsSupport() {
         return support;
+    }
+
+    void plot(String doThis) {
+        System.err.println( "===============================" );
+        if ( support.interp==null ) {
+            JOptionPane.showMessageDialog(this,"session is not running");
+            return;
+        }
+        PyObject po= support.interp.eval(doThis);
+        if ( po instanceof PyQDataSet ) {
+            try {
+                PyQDataSet pds = (PyQDataSet) po;
+                File tmpDir= File.createTempFile( "autoplot", ".qds" ).getParentFile();
+                File tmpfile =  new File( tmpDir, "autoplot.qds" );
+                String cmd = "plot( 'file:" + tmpfile.toString() + "' );";
+                new org.virbo.qstream.SimpleStreamFormatter().format(pds.getQDataSet(), new FileOutputStream(tmpfile), true );
+                Socket s= new Socket("localhost",12345);
+                OutputStream out= s.getOutputStream();
+                out.write( ( cmd + "\n").getBytes() );
+                out.close();
+            } catch (StreamException ex) {
+                Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                if ( ex instanceof ConnectException ) {
+                    JOptionPane.showMessageDialog(this,"<html>Unable to connect to socket 12345.  Start a second Autoplot and enable the Server feature.</html>");
+                    return;
+                }
+                Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(this,"Selected item is not a dataset");
+        }
     }
 }

@@ -1,0 +1,43 @@
+<html>
+<head>
+<title>Data Panel Help</title>
+</head>
+<body>
+<p><b>Data Post Processing</b> specifies the operations that should applied before displaying the data.  Originally introduced to allow for slicing of high-dimensional (high "rank") data sets, this also has a number of operators that are described below.
+When the Operations field is "|slice&lt;dim&gt;(&lt;index&gt;)" the slice dimension and transpose gui controls become enabled to provide a more usable control for the slice.
+For example, turning the mouse wheel over the slice index control will rapidly adjust the slice position. (Undock the data tab to see the slices as the adjustment is made.)
+Slice dimension controls which dimension should be sliced.
+Note that the plot element will automatically set this when a high dimensional dataset is plotted.
+Transpose will flip the dimensions of the data before plotting.
+When a vector component is plotted, component simply identifies the component to plot.
+</p>
+<a name="Additional_Operators"></a><h3> Additional Operators</span></h3>
+<p>When the operations field starts with the pipe (|) character, it is a list of filters that are to be applied to the data.  These
+filters include:
+</p><p><tt>|histogram()</tt>  perform an "auto" histogram of the data that automatically sets bins.
+
+</p><p><tt>|logHistogram()</tt> perform the auto histogram in the log space.
+</p><p><tt>|log10()</tt> take the base-10 log of the data.
+</p><p><tt>|exp10()</tt> plot pow(10,ds)
+</p><p><tt>|sqrt()</tt> square root of all elements    
+</p><p><tt>|slice0(index)</tt> slice the data on the zeroth dimension (often time) at the given index.
+</p><p><tt>|slice1(index)</tt> slice the data on the first dimension at the given index.
+</p><p><tt>|collapse0()</tt> average over the zeroth dimension to reduce the dimensionality.
+</p><p><tt>|collapse1()</tt> average over the first dimension to reduce the dimensionality.
+</p><p><tt>|transpose()</tt> transpose the rank 2 dataset.
+</p><p><tt>|fftWindow(size)</tt> plot power spectrum by breaking waveform data in windows of length <em>size</em> (powers of 2) (experimental, not for publication).
+</p><p><tt>|flatten()</tt> make the rank 2 grid Z(X,Y) be a flat rank 2 series of X,Y,Z.
+</p><p><tt>|grid()</tt> make the flat rank 2 series of X,Y,Z be a rank 2 grid Z(X,Y).
+</p><p><tt>|magnitude()</tt> take the magnitude of each vectors X,Y,Z.
+</p><p><tt>|total(dim)</tt> total over the dimension, minding fill.
+
+
+</p><p>These filters can be chained together like so:
+<tt>|slice1(10)|histogram</tt>.
+This is the same as the "component" property of a plotElement in the DOM.
+</p>
+
+<a href="http://autoplot.org/help_dataPanel_2">this page in the wiki</a></p>
+
+</body>
+</html>

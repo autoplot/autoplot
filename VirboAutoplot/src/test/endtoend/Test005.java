@@ -29,7 +29,7 @@ public class Test005 {
         t0= System.currentTimeMillis();
     }
 
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
         try {
             setCanvasSize(800, 600);
             getDocumentModel().getOptions().setAutolayout(false);
@@ -73,14 +73,14 @@ public class Test005 {
             plot("http://autoplot.org/data/autoplot.cdf?BGSM");
             writeToPng("test005_demo5.png");
             xxx("demo5");
-            plot("http://autoplot.org/data/autoplot.xls?column=A");   // must delete extra panels from BGSM
+            plot("http://autoplot.org/data/autoplot.xls?column=A");   // must delete extra plot elements from BGSM
             writeToPng("test005_demo4_r.png");
             xxx("demo4 return");
             plot("http://autoplot.org/data/autoplot.xml");
             writeToPng("test005_demo6.png");
             xxx("demo6");
-            String omniSrc= "ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/";
-            //String omniSrc= "file:/root/autoplot_data/ftp/nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/";
+            //String omniSrc= "ftp://nssdcftp.gsfc.nasa.gov/spacecraft_data/omni/";
+            String omniSrc= "file:/home/jbf/ct/hudson/data.backup/dat/";
             plot( omniSrc + "/omni2_1963.dat");
             writeToPng("test005_demo7.png");
             xxx("demo7");
@@ -90,9 +90,11 @@ public class Test005 {
             plot( omniSrc + "omni2_$Y.dat?column=field17&timeFormat=$Y+$j+$H&time=field0&validMax=999&timerange=1972");
             writeToPng("test005_demo9.png");
             xxx("demo9");
+            
             plot("http://autoplot.org/data/autoplot.ncml");
             writeToPng("test005_demo10.png");
             xxx("demo10");
+
             {
                 String[] list = org.virbo.jythonsupport.Util.list("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
                 PrintWriter out = new PrintWriter("test005_demo11.txt");
@@ -105,7 +107,7 @@ public class Test005 {
             {
             plot("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");
             getDocumentModel().getDataSourceFilters(0).setSliceIndex(2);
-            getDocumentModel().getPanels(0).setComponent("");
+            getDocumentModel().getPlotElements(0).setComponent("");
             getDocumentModel().getPlots(0).getZaxis().setRange(DatumRange.newDatumRange(-20e4, 20e4, Units.dimensionless));
             writeToPng("test005_demo12.png");
             }
@@ -121,7 +123,7 @@ public class Test005 {
             xxx("demo14");
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
+        } catch ( Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }

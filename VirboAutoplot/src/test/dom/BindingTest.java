@@ -19,7 +19,7 @@ import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.dom.DomNode;
-import org.virbo.autoplot.dom.Panel;
+import org.virbo.autoplot.dom.PlotElement;
 
 /**
  * Attempt to measure performance problems with Bindings.  By binding many
@@ -79,18 +79,18 @@ public class BindingTest {
 
 
     public static void main(String[] args) {
-        List<Panel> panels1 = new ArrayList();
-        Panel master = new Panel();
+        List<PlotElement> plotElements1 = new ArrayList();
+        PlotElement master = new PlotElement();
 
         for (int i = 0; i < 40; i++) {
-            panels1.add(new Panel());
+            plotElements1.add(new PlotElement());
         }
 
         long t0 = System.currentTimeMillis();
 
 
-        for (Panel p : panels1) {
-            bind2(master, Panel.PROP_LEGENDLABEL, p, Panel.PROP_LEGENDLABEL,null);
+        for (PlotElement p : plotElements1) {
+            bind2(master, PlotElement.PROP_LEGENDLABEL, p, PlotElement.PROP_LEGENDLABEL,null);
             System.err.printf("%5d: bind %s\n", System.currentTimeMillis() - t0, p);
         }
 
@@ -98,7 +98,7 @@ public class BindingTest {
 
         for (int i = 0; i < 10; i++) {
             master.setLegendLabel("foo" + i);
-            System.err.println(panels1.get(20).getLegendLabel());
+            System.err.println(plotElements1.get(20).getLegendLabel());
         }
         System.err.printf("%5d: done \n", System.currentTimeMillis() - t0);
     }

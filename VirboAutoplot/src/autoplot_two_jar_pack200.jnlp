@@ -39,20 +39,23 @@
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
         <jar href="AutoplotVolatile.jar" />
-        <jar href="AutoplotStable.jar" />
+        <jar href="#{hudson_url}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar" />
                 
         <!-- cdf -->
-        <jar href="http://www.autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
+        <!--<jar href="http://autoplot.org/jnlp-lib/cdfjava-hack.jar" /> --> <!-- rank 3 hack -->
         <package name="gsfc.nssdc" part="cdf"  recursive="true" /> 
         <!-- <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.0.jnlp" > -->
-        <extension name="cdf" href="http://www.autoplot.org/cdf-jnlp/cdf-3.3.0-hack.jnlp" >
+        <!--<extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.0-hack.jnlp" > -->
+        <!--  <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1-hack.jnlp" > -->
+          <extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.3.1.jnlp">
+
         </extension>
         <!--<extension name="cdf" href="http://sscweb.gsfc.nasa.gov/skteditor/cdf/cdf-3.2.1a.jnlp" >  
         </extension>-->
         
     </resources> 
     
-    <application-desc  main-class="org.virbo.autoplot.AutoPlotUI">  
+    <application-desc  main-class="org.virbo.autoplot.AutoplotUI">
         <argument>--nativeLAF</argument>
         <!--<argument>http://www.cottagesystems.com/virbo/apps/autoplot/data/ascii/omni2_1972.dat?column=field17</argument>-->
     </application-desc>

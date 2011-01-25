@@ -85,6 +85,24 @@ public class Axis extends DomNode {
     }
 
     /**
+     * false indicates the component will not be drawn.  Note the x and y axes
+     * are only drawn if the plot is drawn, and the colorbar may be drawn
+     * if the plot is not drawn.
+     */
+    public static final String PROP_VISIBLE = "visible";
+    protected boolean visible = true;
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        boolean oldVisible = this.visible;
+        this.visible = visible;
+        propertyChangeSupport.firePropertyChange(PROP_VISIBLE, oldVisible, visible);
+    }
+
+    /**
      * true indicates the axis hasn't been changed and may/should be autoranged.
      */
     public static final String PROP_AUTORANGE = "autoRange";
@@ -144,6 +162,7 @@ public class Axis extends DomNode {
             if ( !exclude.contains( PROP_AUTORANGE ) ) this.setAutoRange(that.isAutoRange());
             if ( !exclude.contains( PROP_AUTOLABEL ) ) this.setAutoLabel(that.isAutoLabel());
             if ( !exclude.contains( PROP_DRAWTICKLABELS ) ) this.setDrawTickLabels(that.isDrawTickLabels());
+            if ( !exclude.contains( PROP_VISIBLE ) ) this.setVisible(that.isVisible());
         }
     }
 
@@ -162,17 +181,19 @@ public class Axis extends DomNode {
         boolean b;
 
         b= that.log==this.log ;
-        if ( !b ) result.add( new PropertyChangeDiff( "log" , that.log, this.log) );
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_LOG , that.log, this.log) );
         b=  that.range.equals(this.range) ;
-        if ( !b ) result.add(new PropertyChangeDiff("range", that.range , this.range ) );
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_RANGE, that.range , this.range ) );
         b=  that.label.equals(this.label) ;
-        if ( !b ) result.add(new PropertyChangeDiff("label", that.label , this.label ) );
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_LABEL, that.label , this.label ) );
         b=  that.autoRange==this.autoRange;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTORANGE, that.autoRange , this.autoRange ) );
         b=  that.autoLabel==this.autoLabel;
         if ( !b ) result.add(new PropertyChangeDiff( PROP_AUTOLABEL, that.autoLabel , this.autoLabel ) );
         b=  that.drawTickLabels==this.drawTickLabels;
-        if ( !b ) result.add(new PropertyChangeDiff("drawTickLabels", that.drawTickLabels, this.drawTickLabels ) );
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_DRAWTICKLABELS, that.drawTickLabels, this.drawTickLabels ) );
+        b=  that.visible==this.visible;
+        if ( !b ) result.add(new PropertyChangeDiff( PROP_VISIBLE, that.visible, this.visible ) );
 
         return result;
     }

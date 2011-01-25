@@ -16,18 +16,18 @@ import org.das2.graph.DasColorBar;
  */
 public class CloneTest {
     public static void main(String[] args) {
-        PanelStyle style= new PanelStyle();
+        PlotElementStyle style= new PlotElementStyle();
         style.setReference(Datum.create(4.0, Units.kiloHertz ));
 
-        PanelStyle cln= (PanelStyle) style.copy();
+        PlotElementStyle cln= (PlotElementStyle) style.copy();
 
         System.err.println( cln.getReference());
 
-        Panel myPanel= new Panel();
+        PlotElement myPanel= new PlotElement();
 
         myPanel.getStyle().setColortable( DasColorBar.Type.GRAYSCALE );
 
-        Panel clonePanel= (Panel) myPanel.copy();
+        PlotElement clonePanel= (PlotElement) myPanel.copy();
         System.err.println( clonePanel.getStyle().getColortable() );
     }
 }

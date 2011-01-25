@@ -20,8 +20,6 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.FDataSet;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -29,6 +27,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.WritableDataSet;
 import org.virbo.dsops.Ops;
+import static org.virbo.dsops.Ops.*;
 import org.virbo.qstream.QDataSetStreamHandler;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
@@ -173,6 +172,42 @@ public class Test013 {
         return result;
     }
 
+    private static void test8() throws ParseException, IOException, StreamException {
+        MutablePropertyDataSet ds1;
+        MutablePropertyDataSet ds2;
+        MutablePropertyDataSet ds3;
+
+        QDataSet ds0;
+
+        MutablePropertyDataSet dsBundle= (MutablePropertyDataSet) labels( new String[] { "X", "Y", "Z" } );
+
+        int seed= 1234;
+
+        final int len0 = 34;
+        //ds3.putProperty( QDataSet.NAME, "_ds4" );
+        ds1= (MutablePropertyDataSet) add( randomn(seed,len0,3), outerProduct( replicate(30, len0), ones(3) ) );
+        ds0= timegen( "2000-01-01T10:00", "1s", len0);
+        ds1.putProperty( QDataSet.DEPEND_0, ds0 );
+        ds1.putProperty( QDataSet.DEPEND_1, dsBundle );
+
+        final int len1 = 44;
+        ds2= (MutablePropertyDataSet) add( randomn(seed,len1,3), outerProduct( replicate(35, len1), ones(3) ) );
+        ds0= timegen( "2000-01-01T11:00", "1s", len1);
+        ds2.putProperty( QDataSet.DEPEND_0, ds0 );
+        ds2.putProperty( QDataSet.DEPEND_1, dsBundle );
+
+        final int len2 = 54;
+        ds3= (MutablePropertyDataSet) add( randomn(seed,len2,3), outerProduct( replicate(40, len2), ones(3) ) );
+        ds0= timegen( "2000-01-01T12:00", "1s", len2);
+        ds3.putProperty( QDataSet.DEPEND_0, ds0 );
+        ds3.putProperty( QDataSet.DEPEND_1, dsBundle );
+
+        MutablePropertyDataSet ds= (MutablePropertyDataSet) join( join( ds1, ds2 ), ds3 );
+
+        formatParse( ds, "test013_test8.qds");
+
+    }
+
     /**
      * test performance of formatting  200K records with 15 planes.
      * @return
@@ -285,7 +320,7 @@ public class Test013 {
             long t0 = System.currentTimeMillis();
             InputStream in = new FileInputStream(f);
             DataSetStreamHandler handler = new DataSetStreamHandler( new HashMap(), new NullProgressMonitor() );
-            org.das2.util.StreamTool.readStream(Channels.newChannel(in), handler);
+            org.das2.stream.StreamTool.readStream(Channels.newChannel(in), handler);
             DataSet ds = handler.getDataSet();
             System.err.println("Time to read " + ds.getXLength() + " records: " + (System.currentTimeMillis() - t0));
         }
@@ -325,10 +360,14 @@ public class Test013 {
 
     }
 
-    public static void main(String[] args) throws InterruptedException, IOException, Exception {
+    public static void main(String[] args)  {
         try {
 
             MutablePropertyDataSet ds;
+
+            test8();
+
+            test6();
 
             xxx("init");
 
@@ -356,7 +395,7 @@ public class Test013 {
             test5();
             xxx("test5");
 
-            //test6();
+            test6();
             xxx("test6 disabled until bug is resolved");
 
             test7();
@@ -386,9 +425,10 @@ public class Test013 {
             xxx("test013_002.qds");
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch (RuntimeException ex) {
+        } catch ( Exception ex) {
             ex.printStackTrace();
             System.exit(1);
         }
     }
+
 }

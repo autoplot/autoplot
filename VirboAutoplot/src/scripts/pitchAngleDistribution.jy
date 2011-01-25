@@ -1,0 +1,14 @@
+dist= zeros( 18, 30 )
+en= linspace( 10,2000, 30 )
+an= linspace( 5, 175, 18 )
+an.putProperty( QDataSet.UNITS, Units.degrees )
+
+dist.putProperty( QDataSet.DEPEND_0, an )
+dist.putProperty( QDataSet.DEPEND_1, en )
+dist.putProperty( QDataSet.RENDER_TYPE, 'pitchAngleDistribution' )
+
+for i in range(len(an)):
+   for j in range(len(en)):
+       dist[i,j]= -1 * log( coerce( en[j] ) ) 
+
+plot( dist )

@@ -1,4 +1,7 @@
-theplot= getApplicationModel().plot
+# this shows how Autoplot/das2 can be hacked with a jython script to accomplish
+# a goal.  Note .vap files of this will not work.
+
+theplot= dom.controller.plot.controller.dasPlot
 
 from org.das2.graph import Renderer
 from math import cos, sin
@@ -15,7 +18,7 @@ class MyRenderer( Renderer ):
    
 myRend= MyRenderer()
 
-theplot.removeRenderer( theplot.getRenderer(2) )
+theplot.removeRenderer( theplot.getRenderer(0) )
 theplot.addRenderer( myRend )
 
 from org.virbo.dsops.Ops import cos as dscos

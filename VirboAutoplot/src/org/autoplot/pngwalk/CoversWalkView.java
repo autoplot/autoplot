@@ -8,8 +8,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -39,8 +42,8 @@ public class CoversWalkView extends PngWalkView  {
 
     Canvas canvas;
     
-    public CoversWalkView(final WalkImageSequence seq) {
-        super(seq);
+    public CoversWalkView(final WalkImageSequence sequence) {
+        super(sequence);
         setLayout(new java.awt.BorderLayout());
         canvas= new Canvas();
         
@@ -50,20 +53,32 @@ public class CoversWalkView extends PngWalkView  {
 
             @Override
             public void mouseClicked(MouseEvent e) {
+                if (seq == null) return;
                 int clickCell = (int) Math.floor((double) e.getX() / (double) cellWidth);
                 //System.err.printf("Click at %d, %d (cell %d)%n", e.getX(), e.getY(), clickCell);
-                CoversWalkView.this.seq.setIndex(clickCell);
+                selectCell(clickCell);
             }
         });
 
-        scrollPane.getVerticalScrollBar().getModel().addChangeListener(new ChangeListener() {
+        canvas.addComponentListener(new ComponentAdapter() {  // jbf has no idea what this is!
+            @Override
+            public void componentResized(ComponentEvent e) {
+                //cellSize = getHeight();
+                cellSize = getThumbnailSize();
+                //System.err.printf("Set cell size to %d.%n", cellSize);
+                updateLayout();
+            }
+        });
+
+        //I'm not sure that this actually does anything.  Changed verticalScrollBar to horiz with no effect.
+        scrollPane.getHorizontalScrollBar().getModel().addChangeListener(new ChangeListener() {
             Timer repaintTimer = new Timer("CoversViewRepaintDelay", true);
             TimerTask task;
 
             public void stateChanged(ChangeEvent e) {
                 // Cancel any pending timer events
                 if (task != null) task.cancel();
-                if (seq == null) return;
+                if (sequence == null) return;
                 if ( !canvas.isShowing() ) return;
                 
                 // Schedule a new one
@@ -72,9 +87,9 @@ public class CoversWalkView extends PngWalkView  {
                     public void run() {
                         Rectangle bounds = scrollPane.getViewport().getViewRect();
                         int first = bounds.x / cellWidth;
-                        int last = Math.min(seq.size(), (bounds.x + bounds.width) / cellWidth + 1);
+                        int last = Math.min(sequence.size(), (bounds.x + bounds.width) / cellWidth + 1);
                         for(int i=first; i<last; i++) {
-                            seq.imageAt(i).getThumbnail(true);
+                            sequence.imageAt(i).getThumbnail(true);
                         }
                     }
                 };
@@ -99,16 +114,6 @@ public class CoversWalkView extends PngWalkView  {
         firePropertyChange(PROP_PERSPECTIVE, oldPerspective, perspective);
     }
 
-    //why?
-    private void updateLayout() {
-        if (canvas==null) return;  // super constructor causes this to be called before canvas init
-        if (seq != null) {
-            canvas.setPreferredSize(new Dimension(cellWidth * seq.size(), cellSize));
-        } else {
-            canvas.setPreferredSize(new Dimension(DEFAULT_CELL_SIZE, DEFAULT_CELL_SIZE));
-        }
-        canvas.repaint();
-    }
 
     @Override
     protected void sequenceChanged() {
@@ -124,9 +129,28 @@ public class CoversWalkView extends PngWalkView  {
         super.thumbnailSizeChanged();
     }
 
+
     @Override
     public JComponent getMouseTarget() {
         return canvas;
+    }
+
+    //why?
+    private void updateLayout() {
+        if (canvas==null) return;  // super constructor causes this to be called before canvas init
+        if (seq != null) {
+            canvas.setPreferredSize(new Dimension(cellWidth * seq.size(), cellSize));
+        } else {
+            canvas.setPreferredSize(new Dimension(0, 0));
+        }
+        scrollPane.revalidate(); //force scrollpane to re-do layout
+        canvas.revalidate();
+        canvas.repaint();
+    }
+
+    private void selectCell(int n) {
+        // This will fire a property change and cause the view to repaint
+        seq.setIndex(n);
     }
 
     @Override
@@ -154,8 +178,6 @@ public class CoversWalkView extends PngWalkView  {
         } else if (e.getPropertyName().equals(WalkImageSequence.PROP_SEQUENCE_CHANGED)) {
             sequenceChanged();
         }
-
-
     }
 
     private class Canvas extends JPanel implements Scrollable {
@@ -182,6 +204,7 @@ public class CoversWalkView extends PngWalkView  {
 
             super.paintComponent(g1);
             Graphics2D g2 = (Graphics2D) g1;
+            g2.setRenderingHint( RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON );
 
             Rectangle bounds = g2.getClipBounds();
             //cellSize = this.getHeight();
@@ -204,6 +227,11 @@ public class CoversWalkView extends PngWalkView  {
                     g2.setColor(java.awt.Color.orange);
                     g2.fillRect(i * cellWidth, 0, cellWidth, cellSize);
                 }
+
+                if ( seq.imageAt(i).getStatus()==WalkImage.Status.MISSING ) {
+                    continue;
+                }
+
                 //g2.draw(new Ellipse2D.Double(i*cellSize+2, 2, cellSize-4, cellSize-4));
                 BufferedImage thumb = useSquished ? seq.imageAt(i).getSquishedThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting()) :  seq.imageAt(i).getThumbnail(!scrollPane.getVerticalScrollBar().getValueIsAdjusting());
                 if (thumb != null) {
@@ -229,7 +257,12 @@ public class CoversWalkView extends PngWalkView  {
                     BufferedImageOp resizeOp = new ScalePerspectiveImageOp(thumb.getWidth(), thumb.getHeight(), 0, 0, w, h, 0, 1, 1, pp, true);
                     thumb = resizeOp.filter(thumb, null);
                 }
-                g2.drawImage(thumb, i * cellWidth + (cellWidth - thumb.getWidth()) / 2, (cellSize - thumb.getHeight()) / 2, null);
+                int imgX= i * cellWidth + (cellWidth - thumb.getWidth()) / 2;
+                int imgY= (cellSize - thumb.getHeight()) / 2;
+                g2.drawImage(thumb, imgX, imgY, null);
+                if (PngWalkTool1.isQualityControlEnabled() && seq.getQualityControlSequence()!=null ) {
+                    paintQualityControlIcon( i, g2, imgX, imgY, cellSize>300 );
+                }
             }
         }
 
@@ -243,8 +276,8 @@ public class CoversWalkView extends PngWalkView  {
 
         public int getScrollableBlockIncrement(Rectangle arg0, int arg1, int arg2) {
             // There is integer division here, so not as redundant as it looks
-            //TODO: communicate viewport size to get width.
-            return cellSize / HEIGHT_WIDTH_RATIO * 5;
+            int x= (scrollPane.getHorizontalScrollBar().getVisibleAmount() / cellSize ) * cellSize;
+            return x;
         }
 
         public boolean getScrollableTracksViewportWidth() {
