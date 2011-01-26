@@ -140,17 +140,22 @@ public class Util {
         QDataSet ds= getDataSet(virtUrl,mon);
         return ds;
     }
-    
+
+    public static String[] list( String surl ) throws IOException, URISyntaxException {
+        System.err.println("deprecated--use listDirectory instead.");
+        return listDirectory( surl );
+    }
+
     /**
      * returns a list of the files in the local or remote filesystem pointed to by surl.
-     * print list( 'http://www.papco.org/data/de/eics/*' )
+     * print listDirectory( 'http://www.papco.org/data/de/eics/*' )
      *  --> '81355_eics_de_96s_v01.cdf', '81356_eics_de_96s_v01.cdf', '81357_eics_de_96s_v01.cdf', ...
      * @param surl
      * @return 
      * @throws java.net.MalformedURLException
      * @throws java.io.IOException
      */
-    public static String[] list(String surl) throws IOException, URISyntaxException {
+    public static String[] listDirectory(String surl) throws IOException, URISyntaxException {
         String[] ss = FileSystem.splitUrl(surl);
         FileSystem fs = FileSystem.create( DataSetURI.toUri(ss[2]));
         String glob = ss[3].substring(ss[2].length());
