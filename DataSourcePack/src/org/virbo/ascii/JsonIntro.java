@@ -7,8 +7,6 @@ package org.virbo.ascii;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +21,24 @@ public class JsonIntro {
         String ss = "# {\n"
                 + "#   \"LABEL\": [ \"Time,UTC\", \"Density\" ],\n"
                 + "#   \"UNITS\": [ \"Time_UTC\", \"cc-3\" ],\n"
+                + "#   \"VALID_MIN\": 0,\n"
+                + "# }\n";
+        System.err.println(ss);
+        System.err.println(prep(ss));
+
+        JSONObject jo;
+        jo = new JSONObject(prep(ss));
+
+        System.err.println(jo.toString());
+    }
+
+    private static void test1_1() throws JSONException {
+        String ss = "# {\n"
+                + "#   \"LABEL\": \n"
+                + "#       [ \"Time,UTC\", \"Density\" ],\n"
+                + "#   \"UNITS\": [ \"Time_UTC\", \n"
+                + "#                \"cc-3\",\n"
+                + "#              ],\n"
                 + "#   \"VALID_MIN\": 0,\n"
                 + "# }\n";
         System.err.println(ss);
@@ -71,7 +87,7 @@ public class JsonIntro {
     }
 
     /**
-     * test that commas are added.
+     * test that commas are added.  blank lines.  end of JSON code.
      * @throws JSONException
      */
     private static void test3_1() throws JSONException {
@@ -80,10 +96,12 @@ public class JsonIntro {
                 + "#   UNITS: [ \"Time_UTC\",\n"
                 + "#            \"cc-3\" \n"
                 + "#          ]\n"
-                + "#   VALID_MIN \n"
+                + "#   VALID_MIN: \n"
                 + "# \n"
-                + "#       :0\n"
+                + "#       0,\n"
+                + "# this is a line that could break it"
                 + "# \n";
+
 
         System.err.println(ss);
         System.err.println(prep(ss));
@@ -98,6 +116,7 @@ public class JsonIntro {
         String ss = "# {\n"
                 + "#   LABEL: [ \"Time,UTC\", \"Density\" ],\n"
                 + "#   UNITS: [ \"Time_UTC\", \"cc-3\" ],\n"
+                + "#\n" 
                 + "#   VALID_MIN: 0\n"
                 + "# }\n";
 
@@ -134,18 +153,19 @@ public class JsonIntro {
     }
 
     private static void test6() throws JSONException {
-        String ssa = "# { \n"
+        String ssa = "#  \n"
                 + "# TIME:{ LABEL: \"Time_UTC\" }\n"
                 + "# DENSITY:{ LABEL: \"Density\", \n"
                 + "#   SCALE_MIN:1E-2, SCALE_MAX:1e2, \n"
                 + "#   SCALE_TYPE:\"LOG\" } \n"
-                + "# }\n"
+                + "# \n"
+                + "# this line should cause failure in parser\n"
                 + "# Legacy supports following line:\n"
                 + "# TIME DENSITY \n"
                 + "2011-01-01T00:00 0.12\n"
                 + "2011-01-01T00:01 0.14\n";
 
-        String ss= extractJsonHeader( ssa );
+        String ss= ssa;
         System.err.println(ss);
         System.err.println(prep(ss));
 
@@ -175,53 +195,43 @@ public class JsonIntro {
     }
 
     /**
-     * from the text, trim off the data and parts that don't appear to be 
-     * part of the header.  For now let this be commented lines.
-     * @param ss
+     * return the next comment line with content, dropping empty lines, or null.
+     * @param reader
      * @return
      */
-    private static String extractJsonHeader( String ss ) {
-        
-        StringBuilder build= new StringBuilder();
-
-        BufferedReader buf= new BufferedReader( new StringReader(ss) );
-        try {
-            String s = buf.readLine();
-            while ( s!=null ) {
-                if ( s.startsWith("#") ) {
-                    build.append(s).append("\n");
-                    s= buf.readLine();
-                } else {
-                    break;
-                }
+    private static String readNextLine( BufferedReader reader ) throws IOException {
+         String line = reader.readLine();
+         if ( line != null && line.startsWith("#") ) {
+             line = line.substring(1);
+         }
+         while ( line!=null && line.trim().isEmpty() ) {
+            line = reader.readLine();
+            if ( line != null && line.startsWith("#") ) {
+                line = line.substring(1);
             }
-            buf.close();
-            return build.toString();
-
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);  // shouldn't happen--StringReader
-        }
-
+         }
+         return line;
     }
+
     /**
      * Preprocess the string to make more valid JSON.
      * 1. pop off comment character (#) from line.
-     * 2. add leading and trailing braces if the first char is not an opening brace.
-     * 3. add implicit comma at line breaks unless the next line starts with comma.
+     * 2. add leading and trailing braces (}) if the first char is not an opening brace.
+     * 3. add implicit comma at line breaks unless the next line starts with comma or closing bracket (]).
+     * 4. trim excess that is not part of JSON header.
      * @param s
      * @return
      */
     private static String prep(String s) {
         boolean dontHaveOpeningBrace = true;
         boolean addClosingBrace = false;
+        int braceLevel=0; // we keep track of this to detect the end
         try {
             StringBuilder sb = new StringBuilder();
             BufferedReader reader = new BufferedReader(new StringReader(s));
 
-            String line = reader.readLine();
-            if (line != null && line.startsWith("#")) {
-                line = line.substring(1);
-            }
+            String line = readNextLine( reader );
+            if ( line!=null && notJSONFragment(line) ) line=null;
 
             int iline = 1;
             while (line != null) {
@@ -236,22 +246,17 @@ public class JsonIntro {
                     dontHaveOpeningBrace = false;
                 }
 
-                // read ahead to get the next line, so we can avoid adding comma to dangling text.  See test3_1.
-                String nextLine = reader.readLine();
-                if (nextLine != null && nextLine.startsWith("#")) {
-                    nextLine = nextLine.substring(1);
-                }
+                // read ahead to get the next line containing text, so we can avoid adding comma to dangling text.  See test3_1.
+                String nextLine = readNextLine( reader );
 
                 // we can add a comma at the end of a line to make it valid.
-                if (trimLine.length() > 0) {
-                    char lastChar = trimLine.charAt(trimLine.length() - 1);
-                    if (lastChar == '"' || Character.isDigit(lastChar) || lastChar == ']' || lastChar == '}') {
-                        char nextChar;
-                        if (nextLine != null && nextLine.trim().length() > 0) {
-                            nextChar = nextLine.trim().charAt(0);
-                            if (nextChar != ',' && nextChar != ']') {
-                                line = line + ",";
-                            }
+                char lastChar = trimLine.charAt(trimLine.length() - 1);
+                if (lastChar == '"' || Character.isDigit(lastChar) || lastChar == ']' || lastChar == '}') {
+                    char nextChar;
+                    if (nextLine != null && nextLine.trim().length() > 0) {
+                        nextChar = nextLine.trim().charAt(0);
+                        if (nextChar != ',' && nextChar != ']') {
+                            line = line + ",";
                         }
                     }
                 }
@@ -261,8 +266,12 @@ public class JsonIntro {
                 line = nextLine;
                 iline++;
 
+                if ( line!=null && notJSONFragment(line) ) break;
+
             }
 
+            reader.close();
+            
             if (addClosingBrace) {
                 sb.append("}");
             }
@@ -275,6 +284,17 @@ public class JsonIntro {
 
     }
 
+    /**
+     * each line must be either blank or contain one of:
+     * :[]={}",
+     * @param line
+     * @return
+     */
+    private static boolean notJSONFragment( String line ) {
+        String[] ss= line.split( "[:\\[\\]=\\{\\}\\\",]",2 );
+        return ( ss.length==1 );
+    }
+
     public static void main(String[] arg) throws JSONException {
         JSONObject jo;
         jo = new JSONObject("{ \"fOO\":\"MY_FIRST_JSON\" }");
@@ -284,6 +304,8 @@ public class JsonIntro {
 
         System.err.println("\n== test1 ==");
         test1();
+        System.err.println("\n== test1_1 ==");
+        test1_1();
         System.err.println("\n== test2 ==");
         test2();
         System.err.println("\n== test3 ==");
