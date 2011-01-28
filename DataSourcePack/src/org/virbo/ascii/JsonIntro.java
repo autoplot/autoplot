@@ -7,7 +7,6 @@ package org.virbo.ascii;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.StringTokenizer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -170,19 +169,27 @@ public class JsonIntro {
 
     }
 
-    /**
-     * we'll need a method to detect if the string is actually a JSON
-     * header that can be parsed.
-     * @param ss
-     * @return
-     */
-    private static boolean isJsonHeader(String ss) {
-        try {
-            new JSONObject(prep(ss));
-        } catch (JSONException ex) {
-            return false;
-        }
-        return true;
+    private static void test6_1() throws JSONException {
+        String ssa = "#  {\n"
+
+                + "# TIME:{ LABEL: \"Time_UTC\" }\n"
+                + "# DENSITY:{ LABEL: \"Density\", \n"
+                + "#   SCALE_MIN:1E-2, SCALE_MAX:1e2, \n"
+                + "#   SCALE_TYPE:\"LOG\" } \n"
+                + "# }\n"
+                + "#TIME DENSITY \n"
+                + "2011-01-01T00:00 0.12\n"
+                + "2011-01-01T00:01 0.14\n";
+
+        String ss= ssa;
+        System.err.println(ss);
+        System.err.println(prep(ss));
+
+        JSONObject jo;
+        jo = new JSONObject(prep(ss));
+
+        System.err.println(jo.toString());
+
     }
 
     /**
@@ -214,12 +221,15 @@ public class JsonIntro {
      * 1. pop off comment character (#) from line.
      * 2. add leading and trailing braces (}) if the first char is not an opening brace.
      * 3. add implicit comma at line breaks unless the next line starts with comma or closing bracket (]).
+     * 4. closing brace closes JSON.
      * @param s
      * @return
      */
     private static String prep(String s) {
         boolean dontHaveOpeningBrace = true;
         boolean addClosingBrace = false;
+        boolean expectClosingBrace= false;
+        int braceLevel= 0;
         try {
             StringBuilder sb = new StringBuilder();
             BufferedReader reader = new BufferedReader(new StringReader(s));
@@ -235,6 +245,8 @@ public class JsonIntro {
                     if (!trimLine.startsWith("{")) {
                         line = "{" + line;
                         addClosingBrace = true;
+                    } else {
+                        expectClosingBrace= true;
                     }
                     dontHaveOpeningBrace = false;
                 }
@@ -254,10 +266,35 @@ public class JsonIntro {
                     }
                 }
 
+                // update the brace level
+                boolean inQuote= false;
+                boolean backSlash= false;
+                for ( int i=0; i<trimLine.length(); i++ ) {
+                    int ch= trimLine.charAt(i);
+                    if ( backSlash ) {
+                        backSlash= false;
+                        if ( ch=='"' ) {
+                            continue;
+                        }
+                    }
+                    switch ( ch ) {
+                        case '{': if ( !inQuote ) braceLevel++; break;
+                        case '}': if ( !inQuote ) braceLevel--; break;
+                        case '"': inQuote= !inQuote; break;
+                        case '\\': backSlash= true; break;
+                        default:
+                    }
+                }
+
                 sb.append(line).append("\n");
 
                 line = nextLine;
                 iline++;
+
+                // If we had an opening brace, then the closing brace can finish off the JSON so additional comments are ignored.
+                if ( expectClosingBrace && braceLevel==0 ) {
+                    line=null;
+                }
 
             }
 
@@ -275,23 +312,14 @@ public class JsonIntro {
 
     }
 
-    /**
-     * each line must be either blank or contain one of:
-     * :[]={}",
-     * @param line
-     * @return
-     */
-    private static boolean notJSONFragment( String line ) {
-        String[] ss= line.split( "[:\\[\\]=\\{\\}\\\",]",2 );
-        return ( ss.length==1 );
-    }
-
     public static void main(String[] arg) throws JSONException {
         JSONObject jo;
         jo = new JSONObject("{ \"fOO\":\"MY_FIRST_JSON\" }");
         System.err.println(jo.toString());
         jo = new JSONObject("{ fOO:\"MY_FIRST_JSON\" }");
         System.err.println(jo.toString());
+        System.err.println("\n== test6_1 ==");
+        test6_1();
 
         System.err.println("\n== test1 ==");
         test1();
