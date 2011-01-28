@@ -7,6 +7,7 @@ package org.virbo.ascii;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.StringTokenizer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -87,7 +88,7 @@ public class JsonIntro {
     }
 
     /**
-     * test that commas are added.  blank lines.  end of JSON code.
+     * test that commas are added.  blank lines.  
      * @throws JSONException
      */
     private static void test3_1() throws JSONException {
@@ -99,7 +100,6 @@ public class JsonIntro {
                 + "#   VALID_MIN: \n"
                 + "# \n"
                 + "#       0,\n"
-                + "# this is a line that could break it"
                 + "# \n";
 
 
@@ -142,14 +142,10 @@ public class JsonIntro {
         System.err.println(ss);
         System.err.println(prep(ss));
 
-        if (isJsonHeader(ss)) {
-            JSONObject jo;
-            jo = new JSONObject(prep(ss));
+        JSONObject jo;
+        jo = new JSONObject(prep(ss));
 
-            System.err.println(jo.toString());
-        } else {
-            System.err.println("Not a JSON header");
-        }
+        System.err.println(jo.toString());
     }
 
     private static void test6() throws JSONException {
@@ -159,9 +155,7 @@ public class JsonIntro {
                 + "#   SCALE_MIN:1E-2, SCALE_MAX:1e2, \n"
                 + "#   SCALE_TYPE:\"LOG\" } \n"
                 + "# \n"
-                + "# this line should cause failure in parser\n"
-                + "# Legacy supports following line:\n"
-                + "# TIME DENSITY \n"
+                + "TIME DENSITY \n"
                 + "2011-01-01T00:00 0.12\n"
                 + "2011-01-01T00:01 0.14\n";
 
@@ -169,14 +163,11 @@ public class JsonIntro {
         System.err.println(ss);
         System.err.println(prep(ss));
 
-        if (isJsonHeader(ss)) {
-            JSONObject jo;
-            jo = new JSONObject(prep(ss));
+        JSONObject jo;
+        jo = new JSONObject(prep(ss));
 
-            System.err.println(jo.toString());
-        } else {
-            System.err.println("Not a JSON header");
-        }
+        System.err.println(jo.toString());
+
     }
 
     /**
@@ -196,6 +187,7 @@ public class JsonIntro {
 
     /**
      * return the next comment line with content, dropping empty lines, or null.
+     * The comment line is returned without the comment character
      * @param reader
      * @return
      */
@@ -203,11 +195,15 @@ public class JsonIntro {
          String line = reader.readLine();
          if ( line != null && line.startsWith("#") ) {
              line = line.substring(1);
+         } else {
+             return null;
          }
          while ( line!=null && line.trim().isEmpty() ) {
             line = reader.readLine();
             if ( line != null && line.startsWith("#") ) {
                 line = line.substring(1);
+            } else {
+                return null;
             }
          }
          return line;
@@ -218,20 +214,18 @@ public class JsonIntro {
      * 1. pop off comment character (#) from line.
      * 2. add leading and trailing braces (}) if the first char is not an opening brace.
      * 3. add implicit comma at line breaks unless the next line starts with comma or closing bracket (]).
-     * 4. trim excess that is not part of JSON header.
+     * 4. trim up to two lines at the end that are not part of JSON header.
      * @param s
      * @return
      */
     private static String prep(String s) {
         boolean dontHaveOpeningBrace = true;
         boolean addClosingBrace = false;
-        int braceLevel=0; // we keep track of this to detect the end
         try {
             StringBuilder sb = new StringBuilder();
             BufferedReader reader = new BufferedReader(new StringReader(s));
 
             String line = readNextLine( reader );
-            if ( line!=null && notJSONFragment(line) ) line=null;
 
             int iline = 1;
             while (line != null) {
@@ -265,8 +259,6 @@ public class JsonIntro {
 
                 line = nextLine;
                 iline++;
-
-                if ( line!=null && notJSONFragment(line) ) break;
 
             }
 
