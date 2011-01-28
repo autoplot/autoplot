@@ -225,7 +225,7 @@ public class JsonIntro {
      * @param s
      * @return
      */
-    private static String prep(String s) {
+    protected static String prep(String s) {
         boolean dontHaveOpeningBrace = true;
         boolean addClosingBrace = false;
         boolean expectClosingBrace= false;
