@@ -214,7 +214,6 @@ public class JsonIntro {
      * 1. pop off comment character (#) from line.
      * 2. add leading and trailing braces (}) if the first char is not an opening brace.
      * 3. add implicit comma at line breaks unless the next line starts with comma or closing bracket (]).
-     * 4. trim up to two lines at the end that are not part of JSON header.
      * @param s
      * @return
      */
