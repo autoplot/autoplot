@@ -113,7 +113,7 @@ public class Test021 {
             try {
                 
                 if (s.startsWith("CC ")) {
-                    String[] list = org.virbo.jythonsupport.Util.list(s.substring(3));
+                    String[] list = org.virbo.jythonsupport.Util.listDirectory(s.substring(3));
                     PrintWriter out = new PrintWriter( label+".txt" );
                     for (String l : list) {
                         out.println(l);

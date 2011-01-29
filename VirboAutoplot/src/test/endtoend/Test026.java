@@ -65,6 +65,7 @@ public class Test026 {
             doTest(33, "2000-01-01T00:00:00 span .000000001 sec",  "2000-01-01T00:00:00.000000 to 2000-01-01T00:00:00.000000001" );
             doTest(34, "2002-01-01T10:10:10 span .000000001 sec",  "2002-01-01T10:10:10.000000 to 2002-01-01T10:10:10.000000001" );
 
+            doTest(35, "2011001", "this should fail but doesn't" );
             
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {

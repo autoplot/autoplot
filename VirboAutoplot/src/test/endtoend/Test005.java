@@ -96,7 +96,7 @@ public class Test005 {
             xxx("demo10");
 
             {
-                String[] list = org.virbo.jythonsupport.Util.list("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
+                String[] list = org.virbo.jythonsupport.Util.listDirectory("http://cdaweb.gsfc.nasa.gov/istp_public/data/");
                 PrintWriter out = new PrintWriter("test005_demo11.txt");
                 for (String l : list) {
                     out.println(l);
