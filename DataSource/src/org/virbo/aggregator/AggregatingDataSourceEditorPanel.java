@@ -46,6 +46,7 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
+import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.URISplit;
 
@@ -99,7 +100,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         timeRangeTextField.setText("jTextField1");
 
-        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10)); // NOI18N
+        outerRangeTextField.setFont(new java.awt.Font("SansSerif", 0, 10));
         outerRangeTextField.setText("listing to get available time ranges...");
 
         yearsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "..." }));
@@ -141,6 +142,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
 
         delegateFileLabel.setFont(new java.awt.Font("SansSerif", 0, 10)); // NOI18N
         delegateFileLabel.setText("example file used for editing goes here");
+        delegateFileLabel.setToolTipText("Aggregation works by automatically generating a set of \"delegate uris\" that are read and combined into one dataset.  This editor works by picking a delegate and providing an editor for the delegate as well.\n");
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -150,7 +152,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 204, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 208, Short.MAX_VALUE)
                 .add(jButton3))
             .add(jPanel1Layout.createSequentialGroup()
                 .add(7, 7, 7)
@@ -161,12 +163,12 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
                 .add(daysComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 72, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jButton1)
-                .addContainerGap(314, Short.MAX_VALUE))
+                .addContainerGap(318, Short.MAX_VALUE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, delegateFileLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
-                    .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, delegateFileLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE)
+                    .add(outerRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE))
                 .add(26, 26, 26))
         );
 
@@ -196,7 +198,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 645, Short.MAX_VALUE)
+            .add(delegatePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 649, Short.MAX_VALUE)
             .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -430,6 +432,22 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
             delegateDataSetSelector.getEditor().setCaretPosition(text.length());
             //delegateDataSetSelector.showCompletions();
             //TODO: bug 3046638: it would be nice if we didn't show "empty" when there are no completions.
+        }
+        
+        // set the focus to the timerange if that's all we need.
+        String delegateUrl = null;
+        try {
+            delegateUrl = AggregatingDataSourceFactory.getDelegateDataSourceFactoryUri( getURI() );
+            DataSourceFactory dsf= DataSetURI.getDataSourceFactory( DataSetURI.toUri(delegateUrl),new NullProgressMonitor() );
+            if ( !dsf.reject( delegateUrl, new NullProgressMonitor() ) ) {
+                if ( timeRangeTextField.getText().trim().length()==0 ) {
+                    timeRangeTextField.requestFocus();
+                }
+            }
+        } catch ( IOException ex ) {
+            
+        } catch ( IllegalArgumentException ex ) {
+            
         }
     }
 
