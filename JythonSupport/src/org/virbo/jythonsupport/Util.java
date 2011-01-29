@@ -16,6 +16,8 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.Glob;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -141,15 +143,35 @@ public class Util {
         return ds;
     }
 
+    /**
+     *
+     * @param surl
+     * @return
+     * @throws IOException
+     * @throws URISyntaxException
+     * @deprecated use listDirectory instead
+     */
     public static String[] list( String surl ) throws IOException, URISyntaxException {
-        System.err.println("deprecated--use listDirectory instead.");
+        System.err.println("======================================================");
+        System.err.println("list( String ) command that lists files is deprecated--use listDirectory( String ) instead.");
+        System.err.println("native python list command will be available soon.  Contact faden @ cottagesystems.com if you need assistance.");
+        System.err.println("  sleeping for 3 seconds.");
+        System.err.println("======================================================");
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return listDirectory( surl );
     }
 
     /**
      * returns a list of the files in the local or remote filesystem pointed to by surl.
-     * print listDirectory( 'http://www.papco.org/data/de/eics/*' )
-     *  --> '81355_eics_de_96s_v01.cdf', '81356_eics_de_96s_v01.cdf', '81357_eics_de_96s_v01.cdf', ...
+     * print listDirectory( 'http://autoplot.org/data/pngwalk/' )
+     *  --> 'product.vap', 'product_20080101.png', 'product_20080102.png', ...
+     * print listDirectory( 'http://autoplot.org/data/pngwalk/*.png' )
+     *  --> 'product_20080101.png', 'product_20080102.png', ...
+     *
      * @param surl
      * @return 
      * @throws java.net.MalformedURLException
