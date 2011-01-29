@@ -57,6 +57,7 @@ import org.das2.system.MonitorFactory;
 import org.das2.system.RequestProcessor;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.aggregator.AggregatingDataSourceEditorPanel;
+import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 
 /**
@@ -232,6 +233,24 @@ public class DataSetSelector extends javax.swing.JPanel {
                     String surl1 = surl;
                     ProgressMonitor mon= getMonitor();
                     if (f.reject(surl1,mon)) {
+                        if ( f instanceof AggregatingDataSourceFactory ) {
+                            AggregatingDataSourceFactory aggf= (AggregatingDataSourceFactory) f;
+                            if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
+                                String delegateUri= aggf.getDelegateDataSourceFactoryUri(surl);
+                                DataSourceFactory ddsf= aggf.getDelegateDataSourceFactory(surl);
+                                if ( !ddsf.reject( delegateUri, completionsMonitor) ) {
+                                    surl1= surl1+ ( surl1.endsWith("?") ? "" : "&" ) + "timerange="+timeRange;
+                                    if ( !f.reject(surl1, mon) ) {
+                                        setMessage("accepted aggregation after setting timerange");
+                                        int modifiers= this.keyModifiers;
+                                        setValue(surl1);
+                                        this.keyModifiers= modifiers;
+                                        firePlotDataSetURL();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
                         setMessage("busy: uri rejected, inspecting resource for parameters");
                         browseSourceType();
                     } else {
