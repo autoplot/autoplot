@@ -11,8 +11,6 @@
 
 package org.virbo.autoplot;
 
-import org.virbo.autoplot.dom.Application;
-
 /**
  *
  * @author jbf
@@ -22,8 +20,8 @@ public class CanvasSizePanel extends javax.swing.JPanel {
     /** Creates new form CanvasSizePanel */
     public CanvasSizePanel( ) {
         initComponents();
-        heightTextField.setValue(0);
-        widthTextField.setValue(0);
+        heightTextField.setValue( 100 );
+        widthTextField.setValue( 100 );
     }
 
     /** This method is called from within the constructor to
@@ -34,6 +32,7 @@ public class CanvasSizePanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         resizeRadioButton = new javax.swing.JRadioButton();
@@ -54,9 +53,17 @@ public class CanvasSizePanel extends javax.swing.JPanel {
 
         jLabel2.setText("Height:");
 
-        widthTextField.setText("0");
+        widthTextField.setText("100");
+        widthTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
 
-        heightTextField.setText("0");
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, fixedRadioButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), widthTextField, org.jdesktop.beansbinding.BeanProperty.create("editable"));
+        bindingGroup.addBinding(binding);
+
+        heightTextField.setText("100");
+        heightTextField.setFocusLostBehavior(javax.swing.JFormattedTextField.COMMIT);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, fixedRadioButton, org.jdesktop.beansbinding.ELProperty.create("${selected}"), heightTextField, org.jdesktop.beansbinding.BeanProperty.create("editable"));
+        bindingGroup.addBinding(binding);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -82,6 +89,9 @@ public class CanvasSizePanel extends javax.swing.JPanel {
                     .add(resizeRadioButton))
                 .addContainerGap(243, Short.MAX_VALUE))
         );
+
+        layout.linkSize(new java.awt.Component[] {heightTextField, widthTextField}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
@@ -99,6 +109,8 @@ public class CanvasSizePanel extends javax.swing.JPanel {
                     .add(heightTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(50, Short.MAX_VALUE))
         );
+
+        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
 
@@ -110,6 +122,7 @@ public class CanvasSizePanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JRadioButton resizeRadioButton;
     private javax.swing.JFormattedTextField widthTextField;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     /**

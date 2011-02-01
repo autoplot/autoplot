@@ -79,7 +79,7 @@ public class APSplash extends JFrame {
     }
 
     private static ImageIcon getSplashImage() {
-        URL url= APSplash.class.getResource("/smallSplash.png");
+        URL url= APSplash.class.getResource("/splash.png");
         if ( url==null ) return null;
         return new ImageIcon(url);
     }

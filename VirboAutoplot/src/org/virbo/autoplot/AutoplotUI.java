@@ -1923,8 +1923,8 @@ private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_canvasSizeMenuItemActionPerformed
     CanvasSizePanel p= new CanvasSizePanel();
     p.getResizeRadioButton().setSelected( dom.getCanvases(0).isFitted() );
-    p.getHeightTextField().setText( String.valueOf( ""+dom.getCanvases(0).getHeight() ) );
-    p.getWidthTextField().setText( String.valueOf( dom.getCanvases(0).getWidth() ) );
+    p.getHeightTextField().setValue( dom.getCanvases(0).getHeight() );
+    p.getWidthTextField().setValue( dom.getCanvases(0).getWidth() );
     if ( JOptionPane.showConfirmDialog( this,p,"Set Canvas Size",JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
         if ( p.getResizeRadioButton().isSelected() ) {
             dom.getCanvases(0).setFitted(true);

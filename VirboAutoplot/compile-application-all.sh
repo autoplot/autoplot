@@ -23,6 +23,13 @@ echo "\${AP_VERSION}=${AP_VERSION}"
 JAVAC=$JAVA_HOME/bin/javac
 JAR=$JAVA_HOME/bin/jar
 
+if [ \! -f $JAVAC ]; then
+   echo ""
+   echo "Can't find javac in JAVA_HOME=$JAVA_HOME"
+   echo ""
+   exit -1
+fi
+
 rm -r -f temp-src/
 mkdir temp-src/
 rm -r -f temp-classes/

@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
     <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
     </Component>
@@ -34,11 +34,11 @@
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="heightTextField" pref="63" max="32767" attributes="1"/>
+                                  <Component id="heightTextField" linkSize="1" pref="63" max="32767" attributes="1"/>
                               </Group>
                               <Group type="102" attributes="1">
                                   <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                                  <Component id="widthTextField" max="32767" attributes="1"/>
+                                  <Component id="widthTextField" linkSize="1" max="32767" attributes="1"/>
                               </Group>
                           </Group>
                       </Group>
@@ -101,13 +101,21 @@
     </Component>
     <Component class="javax.swing.JFormattedTextField" name="widthTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="0"/>
+        <Property name="text" type="java.lang.String" value="100"/>
+        <Property name="focusLostBehavior" type="int" value="0"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="editable" source="fixedRadioButton" sourcePath="${selected}" target="widthTextField" targetPath="editable" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
     <Component class="javax.swing.JFormattedTextField" name="heightTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="0"/>
+        <Property name="text" type="java.lang.String" value="100"/>
+        <Property name="focusLostBehavior" type="int" value="0"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="editable" source="fixedRadioButton" sourcePath="${selected}" target="heightTextField" targetPath="editable" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
   </SubComponents>
 </Form>
