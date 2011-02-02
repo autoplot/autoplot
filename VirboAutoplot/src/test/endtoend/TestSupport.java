@@ -22,6 +22,11 @@ import org.virbo.dsops.Ops;
  * @author jbf
  */
 public class TestSupport {
+
+    public static final String TEST_DATA= "file:/home/jbf/ct/hudson/data.backup/";
+    
+    public static final String TEST_VAP= "file:/home/jbf/ct/hudson/vap/";
+
     public static MutablePropertyDataSet sampleDataRank2( int len0, int len1 ) {
         MutablePropertyDataSet rank2Rand= (MutablePropertyDataSet) Ops.add( Ops.randomn(-12345, len0,len1),
                     Ops.sin( Ops.add( Ops.outerProduct( Ops.linspace( 0, 1000.,len0), Ops.replicate(1,len1)),
