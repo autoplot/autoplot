@@ -12,7 +12,14 @@ import org.python.util.InteractiveInterpreter;
 import org.virbo.jythonsupport.JythonUtil;
 
 /**
+ * Test that built-in functions of python aren't accidentally stepped on.
+ * This was motivated by the unfortunate use of list and coerce.
  *
+ * Note the abs and pow functions are overridden, but we make sure that
+ * they work for ints and floats.
+ *
+ * Note we also compare against python 2.7 built-ins, even though we use Jython 2.2.
+ * 
  * @author jbf
  */
 public class Test029 {
