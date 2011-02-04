@@ -15,7 +15,7 @@
 #  JAVA_HOME=/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK/Home
 
 if [ "" = "$JAVA_HOME" ]; then
-    JAVA_HOME=/usr/local/jdk1.5.0_17/
+    JAVA_HOME=/usr/local/jdk1.5.0_17__32/
 fi
 
 echo "\${AP_VERSION}=${AP_VERSION}"
@@ -37,6 +37,7 @@ mkdir temp-classes
 
 echo "copy jar file classes..."
 cd temp-classes
+ls ../../APLibs/lib/*.jar
 for i in ../../APLibs/lib/*.jar; do
    echo jar xf $i
    jar xf $i
