@@ -30,6 +30,8 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.dsutil.AsciiParser;
 import org.das2.datum.TimeParser;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import org.das2.CancelledOperationException;
@@ -164,12 +166,18 @@ public class AsciiTableDataSource extends AbstractDataSource {
             column = parser.getFieldNames()[timeColumn];
         }
 
+        QDataSet bundleDescriptor= (QDataSet) ds.property(QDataSet.BUNDLE_1);
+
         if (column != null) {
             int icol = parser.getFieldIndex(column);
             if (icol == -1) {
                 throw new IllegalArgumentException("bad column parameter: " + column + ", should be field1, or 1, or <name>");
             }
-            vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+            if ( bundleDescriptor!=null ) {
+                vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,icol));
+            } else {
+                vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+            }
             vds.putProperty(QDataSet.UNITS, parser.getUnits(icol));
             if (validMax != Double.POSITIVE_INFINITY) {
                 vds.putProperty(QDataSet.VALID_MAX, validMax);
@@ -219,23 +227,30 @@ public class AsciiTableDataSource extends AbstractDataSource {
             if ( rank2[0]==-1 ) {
                 throw new IllegalArgumentException("bad parameter: rank2");
             }
-            Units u = parser.getUnits(rank2[0]);
-            for (int i = rank2[0]; i < rank2[1]; i++) {
-                if (u != parser.getUnits(i)) {
-                    u = null;
+            if ( bundleDescriptor==null ) {
+                Units u = parser.getUnits(rank2[0]);
+                for (int i = rank2[0]; i < rank2[1]; i++) {
+                    if (u != parser.getUnits(i)) {
+                        u = null;
+                    }
+                }
+                if (u != null) {
+                    ds.putProperty(QDataSet.UNITS, u);
+                }
+                if (validMax != Double.POSITIVE_INFINITY) {
+                    ds.putProperty(QDataSet.VALID_MAX, validMax);
+                }
+                if (validMin != Double.NEGATIVE_INFINITY) {
+                    ds.putProperty(QDataSet.VALID_MIN, validMin);
                 }
             }
-            if (u != null) {
-                ds.putProperty(QDataSet.UNITS, u);
-            }
-            if (validMax != Double.POSITIVE_INFINITY) {
-                ds.putProperty(QDataSet.VALID_MAX, validMax);
-            }
-            if (validMin != Double.NEGATIVE_INFINITY) {
-                ds.putProperty(QDataSet.VALID_MIN, validMin);
-            }
 
-            MutablePropertyDataSet mds = DataSetOps.leafTrim(ds, rank2[0], rank2[1]);
+            MutablePropertyDataSet mds;
+            if ( rank2[0]==0 && rank2[1]==ds.length(0) ) {
+                mds= ds;
+            } else {
+                mds= DataSetOps.leafTrim(ds, rank2[0], rank2[1]);
+            }
 
             if ( bundle!=null ) {
                 QDataSet labels = Ops.labels(parser.getFieldLabels());
@@ -680,6 +695,15 @@ public class AsciiTableDataSource extends AbstractDataSource {
         if (firstRecord != null) {
             firstRecord = firstRecord.replaceAll("\t", "\\\\t");
             props.put("firstRecord", firstRecord);
+        }
+        List<String> remove= new ArrayList();
+        for ( String k: props.keySet() ) {
+            Object v= props.get(k);
+            if ( v==null ) continue;
+            if ( v==null || !( v instanceof Number || v instanceof String || v instanceof org.das2.datum.Datum ) ) remove.add(k);
+        }
+        for ( String k: remove ) {
+            props.remove(k);
         }
 
         return props;
