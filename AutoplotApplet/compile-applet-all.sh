@@ -3,14 +3,14 @@
 # this copies all the sources into the temp directory, then compiles a few key sources, so
 # that unreferenced routines are not used.
 
-echo "compile-applet-all v.20101209"
+echo "compile-applet-all v.20110207"
 
 # set JAVA5_HOME and JAVA6_HOME
 if [ "" = "$JAVA5_HOME" ]; then
-    JAVA5_HOME=/usr/local/jdk1.5.0_17/
+    JAVA5_HOME=/usr/local/jdk1.5.0_15__32/
 fi
 if [ "" = "$JAVA6_HOME" ]; then
-    JAVA6_HOME=/usr/local/jre1.6.0_14/
+    JAVA6_HOME=/usr/local/jre1.6.0_16__32/
 fi
 
 rm -r -f temp-src/
@@ -32,6 +32,7 @@ echo "done copy sources"
 cd temp-classes
 jar xvf ../../APLibs/lib/beansbinding-1.2.1.jar
 jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support for applet
+jar xvf ../../APLibs/lib/json-2011-01-27-gitrelease.jar
 #jar xvf ../../APLibs/lib/swing-layout-1.0.3.jar
 
 cd ../temp-src
