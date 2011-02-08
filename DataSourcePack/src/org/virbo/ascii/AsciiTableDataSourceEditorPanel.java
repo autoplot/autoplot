@@ -1075,6 +1075,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             params.remove("rank2");
             params.remove("bundle");
         }
+        params.remove("group");
 
         setParam( params, "timeFormat", timeFormatTextField.getText() );
         setParam( params, "fill", fillValueTextField.getText() );
