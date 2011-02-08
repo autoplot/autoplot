@@ -168,13 +168,18 @@ public class AsciiTableDataSource extends AbstractDataSource {
 
         QDataSet bundleDescriptor= (QDataSet) ds.property(QDataSet.BUNDLE_1);
 
-        if (column != null) {
+        String group= getParam( "group", null );
+        if ( group!=null ) {
+            vds= ArrayDataSet.copy( DataSetOps.unbundle( ds, group ) );
+
+        } else if (column != null) {
             int icol = parser.getFieldIndex(column);
             if (icol == -1) {
                 throw new IllegalArgumentException("bad column parameter: " + column + ", should be field1, or 1, or <name>");
             }
             if ( bundleDescriptor!=null ) {
-                vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,icol));
+                vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+                //vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,icol));
             } else {
                 vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
             }
