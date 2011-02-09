@@ -9,12 +9,16 @@
 
 package org.virbo.autoplot;
 
+import java.io.FileOutputStream;
+import org.das2.dataset.DataSetUtil;
 import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
 import org.virbo.autoplot.dom.Application;
+import org.virbo.dataset.QDataSet;
+import org.virbo.qstream.SimpleStreamFormatter;
 
 
 /**
@@ -38,7 +42,7 @@ public class AutoplotServer {
         alm.addOptionalSwitchArgument("width", "w", "width", "-1", "width of result (dflt=700)");
         alm.addOptionalSwitchArgument("height", "h", "height", "-1", "height of result (dflt=400)");
         alm.addOptionalSwitchArgument("canvas.aspect", "a", "canvas.aspect", "", "aspect ratio" );
-        alm.addOptionalSwitchArgument("format", "f", "format", "png", "output format png or pdf (dflt=png)");
+        alm.addOptionalSwitchArgument("format", "f", "format", "png", "output format png or pdf or qds (dflt=png)");
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
         alm.requireOneOf( new String[] { "uri", "vap" } );
         alm.process(args);
@@ -59,7 +63,8 @@ public class AutoplotServer {
         String outfile= alm.getValue("outfile");
 
         if ( outfile.endsWith(".pdf") ) format= "pdf";
-
+        if ( outfile.endsWith(".qds") ) format= "qds";
+        
         Application dom= getDocumentModel();
         
         // do dimensions
@@ -81,15 +86,21 @@ public class AutoplotServer {
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
         }
 
+        Application model= getDocumentModel();
+
+        QDataSet ds=null;
+
         if ( !vap.equals("") ) {
             load(vap);
             DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
         } else {
-            plot(suri);
+            if ( format.equals("qds") ) {
+                ds= org.virbo.jythonsupport.Util.getDataSet(suri);
+            } else {
+                plot(suri);
+            }
         }
-
-        Application model= getDocumentModel();
 
         if ( format.equals("png") ) {
             if ( outfile.equals("-") ) {
@@ -108,6 +119,13 @@ public class AutoplotServer {
                 model.getCanvases(0).setWidth(width);
                 model.getCanvases(0).setHeight(height);
                 writeToPdf( outfile );
+            }
+        } else if ( format.equals("qds") ) {
+            if ( outfile.equals("-") ) {
+                new SimpleStreamFormatter().format( ds, System.out, true );
+            } else {
+                FileOutputStream fout= new FileOutputStream(outfile);
+                new SimpleStreamFormatter().format( ds, fout, true );
             }
         }
 
