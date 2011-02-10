@@ -10,24 +10,29 @@
 package org.virbo.autoplot;
 
 import java.io.FileOutputStream;
-import org.das2.dataset.DataSetUtil;
 import org.das2.datum.Units;
 import org.das2.graph.DasCanvas;
 import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.dataset.QDataSet;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.qstream.SimpleStreamFormatter;
 
 
 /**
- *
+ * Provide simple services to support command-line servers.
+ * This has the following uses:
+ *   1. image server to convert Autoplot URIs into images (U. Michigan)
+ *   2. data server for (U. Iowa P.W. Group)
+ * 
  * @author jbf
  */
 public class AutoplotServer {
     
-    /** Creates a new instance of JythonLauncher */
     public AutoplotServer() {
     }
         
@@ -44,12 +49,17 @@ public class AutoplotServer {
         alm.addOptionalSwitchArgument("canvas.aspect", "a", "canvas.aspect", "", "aspect ratio" );
         alm.addOptionalSwitchArgument("format", "f", "format", "png", "output format png or pdf or qds (dflt=png)");
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
+        alm.addOptionalSwitchArgument("timeRange", "t", "timeRange", "", "timerange for TimeSeriesBrowse datasources" );
+        
         alm.requireOneOf( new String[] { "uri", "vap" } );
         alm.process(args);
 
         String suri = alm.getValue("uri");
         String vap = alm.getValue("vap");
 
+        String timeRange= alm.getValue("timeRange");
+        //String timeRange="2010-01-04";
+        
         if ( suri.equals("") && vap.equals("") ) {
             alm.printUsage();
             System.err.println("Either uri or vap must be specified.");
@@ -96,7 +106,18 @@ public class AutoplotServer {
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
         } else {
             if ( format.equals("qds") ) {
-                ds= org.virbo.jythonsupport.Util.getDataSet(suri);
+                if ( !timeRange.equals("") ) {
+                    System.err.println( "org.virbo.jythonsupport.Util.getDataSet( suri,timeRange, new NullProgressMonitor() ):");
+                    System.err.printf( "   suri=%s\n", suri );
+                    System.err.printf( "   timeRange=%s\n", timeRange );
+
+                    ds= org.virbo.jythonsupport.Util.getDataSet(suri,timeRange, new NullProgressMonitor() );
+                } else {
+                    System.err.println( "org.virbo.jythonsupport.Util.getDataSet( suri ):");
+                    System.err.printf( "   suri=%s\n", suri );
+                    ds= org.virbo.jythonsupport.Util.getDataSet(suri);
+                }
+                
             } else {
                 plot(suri);
             }
