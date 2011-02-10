@@ -16,6 +16,8 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Arrays;
 import java.util.Map;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.filesystem.FileSystem;
@@ -30,12 +32,65 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 
 /**
  * Utilities for Jython scripts in both the datasource and application contexts.
  * @author jbf
  */
 public class Util {
+
+    /**
+     * load the data specified by URL into Autoplot's internal data model.  This will
+     * block until the load is complete, and a ProgressMonitor object can be used to
+     * monitor the load.
+     *
+     * This adds a timeRange parameter so that TimeSeriesBrowse-capable datasources
+     * can be used from AutoplotServer.
+     *
+     * @param ds
+     */
+    public static QDataSet getDataSet( String surl, String stimeRange, ProgressMonitor mon ) throws Exception {
+        URI uri = DataSetURI.getURI(surl);
+        DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
+        DataSource result = factory.getDataSource( uri );
+        if (mon == null) {
+            mon = new NullProgressMonitor();
+        }
+
+        QDataSet qds;
+
+        TimeSeriesBrowse tsb= result.getCapability( TimeSeriesBrowse.class );
+        if ( tsb!=null ) {
+            DatumRange timeRange= DatumRangeUtil.parseTimeRange(stimeRange);
+            tsb.setTimeRange( timeRange );
+        } else {
+            System.err.println("Warning: TimeSeriesBrowse capability not found, simply returning dataset.");
+        }
+        QDataSet rds= result.getDataSet(mon);
+        //Logger.getLogger("virbo.jythonsupport").fine( "created dataset #"+rds.getClass().gethashCode() );
+
+        try {
+            metadata= result.getMetadata( new NullProgressMonitor() );
+        } catch ( Exception e ) {
+
+        }
+        metadataSurl= surl;
+
+        if ( rds==null ) return null;
+        if ( rds instanceof WritableDataSet && DataSetUtil.isQube(rds) ) {
+            return rds;
+        } else {
+            if ( DataSetUtil.isQube(rds) ) {
+                return DDataSet.copy(rds); // fixes a bug where a MutablePropertiesDataSet and WritableDataSet copy in coerce
+            } else {
+                System.err.println("unable to copy read-only dataset, which may cause problems elsewhere.");
+                //TODO: document this.
+                //TODO: fix this.
+                return rds;
+            }
+        }
+    }
 
     
     /**
