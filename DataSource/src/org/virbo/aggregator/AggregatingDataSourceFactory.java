@@ -42,8 +42,12 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     public DataSource getDataSource(URI uri) throws Exception {
+        String suri=  DataSetURI.fromUri(uri);
+        if ( suri.contains("&timerange") && !suri.contains("?") ) {
+            throw new IllegalArgumentException("data URI contains &timerange but no question mark.");
+        }
         if ( delegateFactory==null ) {
-            delegateFactory= AggregatingDataSourceFactory.getDelegateDataSourceFactory( DataSetURI.fromUri(uri) );
+            delegateFactory= AggregatingDataSourceFactory.getDelegateDataSourceFactory( suri );
         }
         AggregatingDataSource ads = new AggregatingDataSource(uri,delegateFactory);
         String surl = DataSetURI.fromUri( uri );
@@ -174,7 +178,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         }
 
         if (file == null) {
-            throw new IllegalArgumentException("unable to find any files");
+            throw new IllegalArgumentException( "unable to find any files in "+fsm );
         }
 
         split.resourceUri= fsm.getFileSystem().getRootURI().resolve(file);
