@@ -13,7 +13,7 @@
 
 # set JAVA5_HOME and JAVA6_HOME
 if [ "" = "$JAVA5_HOME" ]; then
-    JAVA5_HOME=/usr/local/jdk1.5.0_17__32/
+    JAVA5_HOME=/usr/local/jdk1.5.0_15__32/
 fi
 if [ "" = "$JAVA6_HOME" ]; then
     JAVA6_HOME=/usr/local/jdk1.6.0_16__32/
