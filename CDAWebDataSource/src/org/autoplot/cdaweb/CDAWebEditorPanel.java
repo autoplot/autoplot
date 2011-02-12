@@ -12,25 +12,19 @@
 package org.autoplot.cdaweb;
 
 import java.awt.BorderLayout;
+import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,13 +32,9 @@ import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.fsm.FileStorageModelNew;
-import org.das2.util.filesystem.FileSystem;
-import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cdfdatasource.CdfDataSourceEditorPanel;
 import org.virbo.datasource.AutoplotSettings;
-import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
 
@@ -59,23 +49,54 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         initComponents();
     }
 
+    public static final String PARAM_FILTER= "filter"; // for convenience, carry filter around
+
     CdfDataSourceEditorPanel paramEditor;
     JComponent messageComponent=null;
     boolean haveAddedRecent= false;
-    
-    private void refreshDataSet( String ds, Map<String,String> args ) throws Exception {
-        CdfDataSourceEditorPanel panel= new CdfDataSourceEditorPanel();
+    private static final String MSG_NO_DATASET = "<html><em>No dataset selected, pick initial dataset...</em></html>";
+    private String currentDs= "";
+    private String filter="";
 
-        String master= CDAWebDB.getInstance().getMasterFile(ds);
-
-        String id= args.get("id");
-        if ( id!=null ) {
-            master= master + "?" + id;
+    private boolean pickDs() {
+        Window win = SwingUtilities.getWindowAncestor(this);
+        JFrame frame = null;
+        if ( win!=null ) {
+            Window own = win.getOwner();
+            if (own instanceof JFrame) {
+                frame = (JFrame) own;
+            }
         }
-        panel.prepare( master, SwingUtilities.getWindowAncestor(this), DasProgressPanel.createFramed("getting master CDF") );
-        panel.setURI( master );
-        parameterPanel.add( panel, BorderLayout.CENTER );
-        paramEditor= panel;
+        CDAWebDataSetIdDialog t = new CDAWebDataSetIdDialog(frame, true);
+        t.setLocationRelativeTo(this);
+        t.setTitle("Pick Dataset");
+        t.setFilter(filter);
+        t.refresh();
+        t.setResizable(true);
+        t.setVisible(true);
+        if (t.isCancelled()) {
+            return false;
+        }
+        filter= t.getFilter();
+        dsidComboBox.setSelectedItem(t.getSelectedItem());
+        final String uri = getURI();
+        Runnable run= new Runnable() {
+            public void run() {
+                refresh(uri);
+            }
+        };
+        new Thread(run).start();
+        return true;
+    }
+
+    /**
+     * this should be called on the event thread.
+     * @param ds
+     * @param args
+     * @throws Exception
+     */
+    private void refreshDataSet( CdfDataSourceEditorPanel panel, String ds, Map<String,String> args ) throws Exception {
+
 
         try {
             String avail= CDAWebDB.getInstance().getTimeRange(ds);
@@ -97,34 +118,92 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     }
 
+    private void doRefreshDataSet( final String ds, final Map<String,String> args ) throws IOException, Exception {
+
+        currentDs= ds;
+
+        System.err.println( Thread.currentThread() );
+
+        System.err.println( "count=" + parameterPanel.getComponentCount() );
+        parameterPanel.removeAll();
+        //messageComponent= new JLabel("<html><em>Resetting...</em></html>"); // this causes problem when droplist is used.
+        //parameterPanel.add( messageComponent, BorderLayout.CENTER );
+        parameterPanel.revalidate();
+
+        if ( ds!=null ) {
+            String master= CDAWebDB.getInstance().getMasterFile(ds); // do the download off the event thread.
+        }
+
+        Runnable run= new Runnable() {
+            public synchronized void run() {
+                if ( ds!=null ) {
+                    try {
+                        final CdfDataSourceEditorPanel panel= new CdfDataSourceEditorPanel();
+
+                        String master= CDAWebDB.getInstance().getMasterFile(ds);
+
+                        String id= args.get("id");
+                        if ( id!=null ) {
+                            master= master + "?" + id;
+                        }
+
+                        boolean status;
+                        status= panel.prepare( master, SwingUtilities.getWindowAncestor(CDAWebEditorPanel.this), DasProgressPanel.createFramed("getting master CDF") );
+                        panel.setURI( master );
+//System.err.println( "messageComponent="+messageComponent );
+                        if ( messageComponent!=null ) parameterPanel.remove(messageComponent);
+                        parameterPanel.add( panel, BorderLayout.CENTER );
+
+                        paramEditor= panel;
+                        parameterPanel.revalidate();
+//System.err.println( " after count=" + parameterPanel.getComponentCount() );
+                        refreshDataSet( panel, ds, args );
+                    } catch ( Exception ex ) {
+                        messageComponent= new JLabel("<html>Exception:<br>"+ex.toString().replaceAll("\n", "<br>") );
+                        paramEditor= null;
+                    }
+                } else {
+                    messageComponent= new JLabel(MSG_NO_DATASET);
+                }
+                if ( messageComponent!=null ) {
+                    parameterPanel.removeAll();
+                    parameterPanel.add( messageComponent, BorderLayout.NORTH );
+                }
+                parameterPanel.revalidate();
+            }
+        };
+        SwingUtilities.invokeLater(run);
+
+    }
+
     public synchronized void refresh(String suri) {
 
+        if ( EventQueue.isDispatchThread() ) {
+            System.err.println("TODO: refresh should not be called from the event thread");
+        }
         if ( !haveAddedRecent ) {
             addRecent();
             haveAddedRecent= true;
         }
 
-        String ds= (String) dsidComboBox.getSelectedItem();
+        final String ds= (String) dsidComboBox.getSelectedItem();
         if ( paramEditor!=null ) parameterPanel.remove( paramEditor );
         if ( messageComponent!=null ) parameterPanel.remove( messageComponent );
 
         URISplit split= URISplit.parse(suri);
-        Map<String,String> args= URISplit.parseParams(split.params);
+        final Map<String,String> args= URISplit.parseParams(split.params);
 
-        if ( ds!=null ) {
-            try {
-                refreshDataSet( ds, args );
-            } catch ( Exception ex ) {
-                messageComponent= new JLabel("<html>Exception:<br>"+ex.toString().replaceAll("\n", "<br>") );
-                parameterPanel.add( messageComponent, BorderLayout.NORTH );
-                paramEditor= null;
+        messageComponent= null;
+
+        try {
+            if ( ds!=currentDs ) {
+                doRefreshDataSet(ds,args);
+            } else {
+                System.err.println("already refreshed for: "+ds );
             }
-        } else {
-            messageComponent= new JLabel("<html><em>No Data Set Selected</em></html>");
-            parameterPanel.add( messageComponent, BorderLayout.NORTH );
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
         }
-        parameterPanel.revalidate();
-        
     }
 
     private void addRecent() {
@@ -255,9 +334,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(dsidComboBox, 0, 271, Short.MAX_VALUE)
+                .add(dsidComboBox, 0, 259, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(pickDsButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 66, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(pickDsButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 78, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
             .add(parameterPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 434, Short.MAX_VALUE)
             .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -278,27 +357,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     }// </editor-fold>//GEN-END:initComponents
 
     private void pickDsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickDsButtonActionPerformed
-        Window win= SwingUtilities.getWindowAncestor(this);
-        Window own= win.getOwner();
-
-        JFrame frame=null;
-        if ( own instanceof JFrame ) frame= (JFrame)own;
-        CDAWebDataSetIdDialog t= new CDAWebDataSetIdDialog( frame, true );
-        t.setLocationRelativeTo(this);
-        
-        t.setTitle("Pick Dataset");
-        t.refresh();
-
-        t.setResizable(true);
-        t.setVisible(true);
-        if (t.isCancelled()) {
-            return;
-        }
-
-        dsidComboBox.setSelectedItem( t.getSelectedItem() );
-        String uri= getURI();
-        refresh(uri);
-        
+        pickDs();
     }//GEN-LAST:event_pickDsButtonActionPerformed
 
     private void timeRangeTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeRangeTextFieldActionPerformed
@@ -306,7 +365,12 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     }//GEN-LAST:event_timeRangeTextFieldActionPerformed
 
     private void dsidComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dsidComboBoxActionPerformed
-        refresh(getURI());
+        Runnable run= new Runnable() {
+            public void run() {
+                refresh(getURI());
+            }
+        };
+        new Thread(run).start();
     }//GEN-LAST:event_dsidComboBoxActionPerformed
 
 
@@ -325,12 +389,47 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         return this;
     }
 
-    public void setURI(String uri) {
+    private void initialize( String uri ) {
         URISplit split= URISplit.parse(uri);
         Map<String,String> args= URISplit.parseParams(split.params);
         this.dsidComboBox.setSelectedItem( args.get( CDAWebDataSource.PARAM_DS ) );
         String timeRange= args.get( CDAWebDataSource.PARAM_TIMERANGE );
         if ( timeRange!=null ) this.timeRangeTextField.setText( timeRange );
+
+    }
+
+    public void setURI(String uri) {
+        initialize(uri);
+        URISplit split= URISplit.parse(uri);
+        Map<String,String> args= URISplit.parseParams(split.params);
+        String filter= args.get( CDAWebEditorPanel.PARAM_FILTER );
+        if ( filter!=null ) {
+            this.filter= filter;
+        }
+        
+        if ( args.get( CDAWebDataSource.PARAM_DS )==null ) {
+            Runnable run= new Runnable() {
+                public void run() {
+                    try {
+                        while ( !CDAWebEditorPanel.this.isShowing() ) {
+                            Thread.sleep(1000);
+                        }
+                    } catch (InterruptedException ex) {
+                       Logger.getLogger(CDAWebEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            messageComponent= new JLabel(MSG_NO_DATASET);
+                            parameterPanel.removeAll();
+                            parameterPanel.add( messageComponent, BorderLayout.NORTH );
+                            pickDs();
+                        }
+                    } );
+                }
+            };
+            new Thread( run ).start();
+        }
+        
     }
 
     public String getURI() {
@@ -344,15 +443,20 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         if ( id==null ) id="";
         String timeRange= timeRangeTextField.getText();
         timeRange= timeRange.replaceAll(" ", "+");
-        return "vap+cdaweb:ds="+dsidComboBox.getSelectedItem()+"&id="+id+"&timerange="+timeRange;
+        
+        String result= "vap+cdaweb:ds="+dsidComboBox.getSelectedItem()+"&id="+id;
+        if ( filter.length()>0 ) {
+            result+= "&filter="+filter;
+        }
+        return result +"&timerange="+timeRange;
     }
 
     public boolean prepare(String uri, Window parent, ProgressMonitor mon) throws Exception {
-        setURI(uri);
+        initialize(uri);
 
         CDAWebDB.getInstance().maybeRefresh(mon);
         refresh(uri);
-       
+
         return true;
     }
 

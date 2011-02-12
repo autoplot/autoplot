@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>PNGWalk's quality control is more complete with icon decorations in each view.
+        <p><small>Future space scientist Charlie reads this week's EOS.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -22,7 +22,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             via the Java-based reader and URIs must be prefixed with "vap+cdfj:".  </p>
         
         <p>Bugfixes:</p>
-        <ul>
+        <ul><li>check for node SPASE/... in XML files instead of null pointer exception.
+	    <li>bugfixes in CDAWeb source GUI, minor new features
+            <li>update splash screen
             <li>splash screen matches jnlp screen.
             <li>cleanup of canvas size dialog.
             <li>bugfix 3168674: jython conflicts cleaned up a bit, introducing listDirectory and coerceToDs.
@@ -51,6 +53,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Ascii JSON headers, which if used allow for more abstract data to be encoded.
             <li>Options->Plot Style->Canvas Size dialog added.
             <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3103682&group_id=199733&atid=970685">3103682</a>  nested bookmarks
             <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3154241&group_id=199733&atid=970685">3154241</a>  add template command line switch to pngwalk

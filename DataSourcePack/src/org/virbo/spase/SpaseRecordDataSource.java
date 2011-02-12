@@ -99,6 +99,10 @@ public class SpaseRecordDataSource implements DataSource {
         
         NodeList list= document.getElementsByTagName(lookFor[0]);
         Element pos= (Element)list.item(0);
+
+        if ( pos==null ) {
+            throw new IllegalArgumentException("Unable to find node Space/NumericalData/AccessInformation/AccessURL/URL in "+url );
+        }
         
         for ( int i=1; i<lookFor.length; i++ ) {
             list= pos.getElementsByTagName(lookFor[i]);

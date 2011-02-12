@@ -167,7 +167,6 @@ public class CDAWebDB {
      */
     public String getSampleTime( String spid ) throws IOException {
         try {
-            FileStorageModelNew fsm = FileStorageModelNew.create( FileSystem.create( new URI( getBaseUrl(spid) ) ), getNaming(spid) );
             String last = getTimeRange(spid);
             int i = last.indexOf(" to ");
             last = last.substring(i + 4);
@@ -176,8 +175,6 @@ public class CDAWebDB {
             DatumRange dr= new DatumRange( d, d1 );
             return dr.toString();
         } catch (ParseException ex) {
-            throw new IOException(ex.toString());
-        } catch (URISyntaxException ex) {
             throw new IOException(ex.toString());
         }
     }
@@ -207,7 +204,7 @@ public class CDAWebDB {
     public String getMasterFile( String ds ) throws IOException {
         String master= "ftp://cdaweb.gsfc.nasa.gov/pub/CDAWlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
 
-        DasProgressPanel p= new DasProgressPanel("downloading master cdf");
+        DasProgressPanel p= DasProgressPanel.createFramed("downloading master cdf");
 
         try {
             try {

@@ -545,7 +545,31 @@ public class CdfUtil {
         } else {
             CDFData cdfData= CDFData.get( variable, recStart, rc, recInterval, dimIndeces, dimCounts, dimIntervals, false );
             odata= cdfData.getRawData(); // this is my hack
+
+            if ( ! odata.getClass().isArray() ) {
+                Object o2= null;
+                if ( odata.getClass()==Double.class ) {
+                    o2= Array.newInstance( double.class, 1 );
+                } else if ( odata.getClass()==Float.class ) {
+                    o2= Array.newInstance( float.class, 1 );
+                } else if ( odata.getClass()==Long.class ) {
+                    o2= Array.newInstance( long.class, 1 );
+                } else if ( odata.getClass()==Integer.class ) {
+                    o2= Array.newInstance( int.class, 1 );
+                } else if ( odata.getClass()==Short.class ) {
+                    o2= Array.newInstance( short.class, 1 );
+                } else if ( odata.getClass()==Byte.class ) {
+                    o2= Array.newInstance( byte.class, 1 );
+                }
+                if ( o2!=null ) {
+                    System.err.println("handling rank 0 value by making 1-element array");
+                    System.err.println("  in "+variable );        
+                    Array.set( o2, 0, odata );
+                    odata= o2;
+                }
+            }
         }
+        
         WritableDataSet result;
 
         if ( dims==0 ) dimSizes= new long[0]; // to simplify code

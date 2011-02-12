@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -13,10 +14,9 @@
    height="300"
    id="svg1946"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="splash.svg"
-   sodipodi:docbase="N:\nbprojects\virbo\VirboAutoplot\src"
-   inkscape:export-filename="/media/mini/nbprojects/virbo/autoplot/VirboAutoplot/src/splash.png"
+   inkscape:export-filename="/media/mini/nbprojects/autoplot2010/VirboAutoplot/src/splash.png"
    inkscape:export-xdpi="300"
    inkscape:export-ydpi="300"
    inkscape:output_extension="org.inkscape.output.svg.inkscape">
@@ -28,6 +28,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -44,12 +45,13 @@
      pagecolor="#ffffff"
      id="base"
      inkscape:zoom="6.95973"
-     inkscape:cx="195.93347"
-     inkscape:cy="157.27641"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:cx="212.35548"
+     inkscape:cy="157.21302"
+     inkscape:window-x="1619"
+     inkscape:window-y="96"
      inkscape:current-layer="svg1946"
-     showgrid="false" />
+     showgrid="false"
+     inkscape:window-maximized="0" />
   <defs
      id="defs1958">
     <inkscape:perspective
@@ -59,21 +61,28 @@
        inkscape:vp_z="600 : 150 : 1"
        inkscape:persp3d-origin="300 : 100 : 1"
        id="perspective31" />
+    <inkscape:perspective
+       id="perspective2860"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <rect
-     style="opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.58425862;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.49432859;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
      id="rect2226"
-     width="143.68738"
-     height="59.415741"
-     x="105.49046"
-     y="109.99416"
+     width="128.83421"
+     height="47.436237"
+     x="119.38284"
+     y="117.9955"
      inkscape:export-filename="N:\nbprojects\virbo\VirboAutoplot\src\splash.png"
      inkscape:export-xdpi="300.00009"
      inkscape:export-ydpi="300.00009" />
   <path
      id="path2166"
-     style="fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.35280001;stroke-linecap:round;stroke-linejoin:bevel"
-     d="M 149.5418,123.26557 L 144.66426,130.19966 L 139.07603,126.06959 L 113.54442,162.36879 L 108.43235,158.92315 L 134.97092,123.21154 L 127.32949,118.41522 L 136.53241,114.13206 L 149.5418,123.26557 z " />
+     style="fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:none"
+     d="m 153.18067,130.73207 -3.57041,5.07583 -4.09065,-3.02327 -18.68942,26.57144 -3.7421,-2.52225 19.42654,-26.14131 -5.59362,-3.51096 6.73664,-3.13532 9.52302,6.68584 z" />
   <flowRoot
      xml:space="preserve"
      id="flowRoot2184"><flowRegion
@@ -85,92 +94,92 @@
          y="15.068493" /></flowRegion><flowPara
        id="flowPara2190" /></flowRoot>  <path
      id="path5304"
-     style="fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.35280001;stroke-linecap:round;stroke-linejoin:bevel"
-     d="M 123.61929,123.39635 L 128.49683,130.33044 L 134.08506,126.20037 L 159.61667,162.49957 L 164.72874,159.05393 L 138.19017,123.34232 L 145.8316,118.546 L 136.62868,114.26284 L 123.61929,123.39635 z " />
+     style="fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:none"
+     d="m 134.20511,130.82779 3.57041,5.07584 4.09065,-3.02326 18.68942,26.57143 3.7421,-2.52225 -19.42654,-26.1413 5.59361,-3.51096 -6.73663,-3.13533 -9.52302,6.68583 z" />
   <path
-     style="fill:none;fill-rule:evenodd;stroke:#ffff00;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 124.75583,143.33887 C 124.76355,143.34407 124.78801,145.29391 125.08121,145.81994 C 125.53735,146.63834 125.57292,146.99077 126.22003,147.57128 C 126.92263,148.20157 127.15244,148.04834 127.68423,147.57128 C 128.2281,147.08339 128.2223,149.06421 128.33499,149.46856 C 128.5934,150.3958 128.86509,151.07884 129.14843,152.09557 C 129.40634,153.02103 129.63921,153.41089 130.28726,153.84691 C 130.8698,154.23884 131.13987,154.58541 131.75146,154.72258 C 132.52358,154.89574 132.40222,152.82252 132.40222,152.5334 C 132.40222,151.56637 133.26472,151.74171 134.1918,151.94962 C 134.2909,151.97185 134.1918,154.29 134.1918,154.57663 C 134.1918,155.50095 134.1918,156.42527 134.1918,157.34959 C 134.1918,158.34504 134.19913,158.51714 135.33063,158.51714 C 135.73456,158.51714 135.656,156.61827 135.656,156.32797 C 135.656,155.37992 135.59666,154.64761 136.14407,153.99285 C 136.34886,153.7479 136.30676,152.11687 136.30676,151.80368 C 136.30676,151.30323 137.08705,150.69559 137.28289,150.34423 C 137.60173,149.77219 138.1146,149.76045 139.07247,149.76045 C 140.41154,149.76045 140.04861,149.10093 140.04861,148.00911 C 140.04861,147.23074 140.04861,146.45237 140.04861,145.67399 C 140.04861,144.87837 140.2113,144.24189 140.2113,143.48482 C 140.2113,142.68003 141.08795,142.33143 141.6755,142.4632 C 141.76501,142.48328 141.6755,144.70827 141.6755,144.94427 C 141.6755,145.72264 141.6755,146.50101 141.6755,147.27939 C 141.6755,148.37086 141.94734,148.69081 142.65164,149.32262 C 143.46549,150.0527 143.13971,149.1456 143.13971,148.301 C 143.13971,147.20453 143.3024,146.20033 143.3024,145.09021 C 143.3024,144.13062 143.42687,143.62195 143.62777,142.90104 C 144.00258,141.55613 145.35447,143.57436 145.74273,143.92265 C 146.2011,144.33385 145.90542,146.24811 145.90542,146.84155 C 145.90542,147.96764 146.31504,147.85276 146.55618,146.9875 C 146.78002,146.1843 146.47629,145.52543 146.88155,144.79832 C 147.54337,143.61094 147.94349,144.63472 148.34576,145.23616 C 148.74084,145.82686 148.67114,146.80419 148.67114,147.71722 C 148.67114,148.53622 148.29449,149.46856 149.32189,149.46856 C 150.53743,149.46856 150.62341,149.57577 150.62341,150.63612 C 150.62341,152.0644 150.7861,149.98715 150.7861,149.46856 C 150.7861,149.27397 150.7861,149.07937 150.7861,148.88478"
+     style="fill:none;stroke:#ffff00;stroke-width:0.73201138;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+     d="m 135.03706,145.42595 c 0.005,0.004 0.0235,1.4311 0.23818,1.81617 0.33391,0.59907 0.35995,0.85706 0.83364,1.282 0.51431,0.46138 0.68253,0.34922 1.07181,0 0.39812,-0.35714 0.39387,1.09284 0.47636,1.38883 0.18916,0.67875 0.38804,1.17874 0.59544,1.923 0.1888,0.67745 0.35926,0.96283 0.83364,1.28201 0.42643,0.28689 0.62412,0.54058 1.07181,0.64099 0.56521,0.12676 0.47637,-1.39086 0.47637,-1.60251 0,-0.70787 0.63136,-0.57952 1.30999,-0.42732 0.0725,0.0163 0,1.71317 0,1.923 0,0.67661 0,1.35322 0,2.02983 0,0.72869 0.005,0.85466 0.83364,0.85466 0.29568,0 0.23818,-1.39 0.23818,-1.6025 0,-0.69398 -0.0435,-1.23004 0.35727,-1.70933 0.1499,-0.1793 0.11908,-1.37324 0.11908,-1.6025 0,-0.36633 0.57119,-0.81113 0.71454,-1.06833 0.2334,-0.41874 0.60882,-0.42733 1.31,-0.42733 0.98021,0 0.71454,-0.48278 0.71454,-1.28201 0,-0.56977 0,-1.13954 0,-1.70932 0,-0.58241 0.11909,-1.04832 0.11909,-1.60251 0,-0.58911 0.64173,-0.84429 1.07182,-0.74784 0.0655,0.0147 0,1.64343 0,1.81617 0,0.56978 0,1.13956 0,1.70934 0,0.79897 0.19899,1.03318 0.71454,1.49567 0.59575,0.53442 0.35728,-0.12958 0.35728,-0.74783 0,-0.80263 0.11909,-1.53772 0.11909,-2.35034 0,-0.70244 0.0911,-1.07479 0.23816,-1.6025 0.27437,-0.98449 1.26397,0.49288 1.54818,0.74783 0.33554,0.30101 0.11909,1.70227 0.11909,2.13666 0,0.82432 0.29985,0.74022 0.47637,0.10683 0.16385,-0.58795 -0.0585,-1.07026 0.23817,-1.60251 0.48446,-0.86918 0.77736,-0.11976 1.07182,0.32051 0.2892,0.43239 0.23818,1.14781 0.23818,1.81616 0,0.59951 -0.27571,1.28199 0.47636,1.28199 0.88979,0 0.95272,0.0785 0.95272,0.85467 0,1.04553 0.11909,-0.47505 0.11909,-0.85467 0,-0.14244 0,-0.28489 0,-0.42732"
      id="path4232" />
   <text
      xml:space="preserve"
-     style="font-size:5.80585241px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:yellow;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     style="font-size:5.80585241px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
      x="168.77007"
-     y="122.87608"
+     y="128.19238"
      id="text8128"
      sodipodi:linespacing="125%"><tspan
        sodipodi:role="line"
        id="tspan1942"
        x="168.77007"
-       y="122.87608"
+       y="128.19238"
        style="font-size:9px">Autoplot</tspan><tspan
        sodipodi:role="line"
        id="tspan1944"
        x="168.77007"
-       y="134.12608" /><tspan
+       y="139.44238" /><tspan
        sodipodi:role="line"
        id="tspan1948"
        x="168.77007"
-       y="145.37608" /></text>
-  <text
-     xml:space="preserve"
-     style="font-size:12px;font-style:normal;font-weight:normal;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
-     x="168.54326"
-     y="136.29993"
-     id="text1958"><tspan
-       sodipodi:role="line"
-       id="tspan1960"
-       x="168.54326"
-       y="136.29993"
-       style="font-size:4px;fill:yellow;font-family:Bitstream Vera Sans">J. Faden [cottagesystems.org]</tspan><tspan
-       sodipodi:role="line"
-       x="168.54326"
-       y="141.29993"
-       id="tspan1962"
-       style="font-size:4px;fill:yellow;font-family:Bitstream Vera Sans">R.S. Weigel [virbo.org]</tspan><tspan
-       sodipodi:role="line"
-       x="168.54326"
-       y="146.29993"
-       style="font-size:4px;fill:yellow;font-family:Bitstream Vera Sans"
-       id="tspan1974" /></text>
+       y="150.69238" /></text>
   <text
      xml:space="preserve"
      style="font-size:3px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;font-family:Bitstream Vera Sans"
      x="168.54324"
-     y="149.21513"
+     y="149.78989"
      id="text1976"
-     sodipodi:linespacing="125%"><tspan
-       sodipodi:role="line"
-       id="tspan1980"
-       x="168.54324"
-       y="149.21513">Autoplot uses das2, an open-source </tspan><tspan
-       sodipodi:role="line"
-       id="tspan1982"
-       x="168.54324"
-       y="152.96513">library created at the University of Iowa [das2.org]</tspan><tspan
+     sodipodi:linespacing="125%"
+     inkscape:export-filename="/media/mini/nbprojects/autoplot2010/VirboAutoplot/src/splash.png"
+     inkscape:export-xdpi="300"
+     inkscape:export-ydpi="300"><tspan
        sodipodi:role="line"
        x="168.54324"
-       y="160.46513"
-       id="tspan2672">Autoplot was developed with support from NASA</tspan><tspan
+       y="149.78989"
+       id="tspan2880">Autoplot was developed with support or code </tspan><tspan
        sodipodi:role="line"
        x="168.54324"
-       y="160.46513"
-       id="tspan2670">Space and Solar Physics Virtual Observatories</tspan><tspan
+       y="153.53989"
+       id="tspan2882">contributions from NASA Virtual Observatories for </tspan><tspan
        sodipodi:role="line"
        x="168.54324"
-       y="164.21513"
-       id="tspan1898" /><tspan
+       y="157.28989"
+       id="tspan2920">Heliophysics, RBSP instrument teams, and the </tspan><tspan
        sodipodi:role="line"
        x="168.54324"
-       y="167.96513"
-       id="tspan1984" /></text>
+       y="161.03989"
+       id="tspan2965">Plasma Wave Group at The University of Iowa.</tspan></text>
   <text
      xml:space="preserve"
-     style="font-size:4px;font-style:normal;font-weight:normal;fill:yellow;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+     style="font-size:4px;font-style:normal;font-weight:normal;fill:#ffff00;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
      x="168.22038"
-     y="128.55081"
+     y="133.86711"
      id="text2008"><tspan
        sodipodi:role="line"
        id="tspan2010"
        x="168.22038"
-       y="128.55081">a browser for data on the web</tspan></text>
+       y="133.86711">a browser for data on the web</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:3px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#ffff00;font-family:Bitstream Vera Sans"
+     x="168.59581"
+     y="139.87341"
+     id="text1976-2"
+     sodipodi:linespacing="125%"
+     inkscape:export-filename="/media/mini/nbprojects/autoplot2010/VirboAutoplot/src/splash.png"
+     inkscape:export-xdpi="300"
+     inkscape:export-ydpi="300"><tspan
+       sodipodi:role="line"
+       x="168.59581"
+       y="139.87341"
+       id="tspan2920-9">J. Faden [cottagesystems.com]</tspan><tspan
+       sodipodi:role="line"
+       x="168.59581"
+       y="143.62341"
+       id="tspan2903">R. S. Weigel [virbo.org]</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-size:3px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+     x="147.70688"
+     y="118.24008"
+     id="text2905"><tspan
+       sodipodi:role="line"
+       id="tspan2907"></tspan></text>
 </svg>

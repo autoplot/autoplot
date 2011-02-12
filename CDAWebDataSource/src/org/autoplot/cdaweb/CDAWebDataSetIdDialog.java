@@ -14,6 +14,7 @@ package org.autoplot.cdaweb;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.swing.DefaultListModel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -76,8 +77,8 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
 
         jLabel1.setText("Select the dataset to work with:");
 
-        filterCheckBox.setSelected(true);
         filterCheckBox.setText("Filter");
+        filterCheckBox.setToolTipText("Simple filter on ID and description");
         filterCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterCheckBoxActionPerformed(evt);
@@ -88,6 +89,11 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
         filterTF.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 filterTFActionPerformed(evt);
+            }
+        });
+        filterTF.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                filterTFKeyTyped(evt);
             }
         });
 
@@ -121,21 +127,21 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
-                                .add(filterCheckBox)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(filterTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 445, Short.MAX_VALUE))
-                            .add(org.jdesktop.layout.GroupLayout.LEADING, jLabel1))
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
                         .addContainerGap())
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                         .add(cancelButton)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(okButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 57, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(15, 15, 15))))
+                        .add(15, 15, 15))
+                    .add(layout.createSequentialGroup()
+                        .add(filterCheckBox)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(filterTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
+                        .add(24, 24, 24))
+                    .add(layout.createSequentialGroup()
+                        .add(jLabel1)
+                        .addContainerGap(495, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -143,12 +149,12 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 339, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(filterCheckBox)
-                    .add(filterTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                    .add(filterTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(filterCheckBox))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(okButton)
                     .add(cancelButton))
@@ -175,6 +181,15 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
         isCancelled= true;
         setVisible(false);
     }//GEN-LAST:event_cancelButtonActionPerformed
+
+    private void filterTFKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_filterTFKeyTyped
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                filterCheckBox.setSelected(true);
+                refresh();
+            }
+        });
+    }//GEN-LAST:event_filterTFKeyTyped
 
     /**
     * @param args the command line arguments
@@ -207,4 +222,14 @@ public class CDAWebDataSetIdDialog extends javax.swing.JDialog {
         return isCancelled;
     }
 
+    void setFilter(String filter) {
+        filterTF.setText(filter);
+        if ( filter.length()>0 ) {
+            filterCheckBox.setSelected(true);
+        }
+    }
+
+    String getFilter() {
+        return filterTF.getText();
+    }
 }

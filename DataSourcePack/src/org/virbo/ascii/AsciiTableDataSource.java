@@ -662,7 +662,7 @@ public class AsciiTableDataSource extends AbstractDataSource {
             int tailCount=0;
             int ipos=(int)file.length();
             boolean foundNonEOL= false;
-            while ( tailCount<tailNum && ipos>=0 ) {
+            while ( tailCount<tailNum && ipos>0 ) {
                 ipos--;
                 byte ch= buff.get((int)ipos);
                 if ( ch==10 ) {
