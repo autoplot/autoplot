@@ -70,7 +70,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         StringBuilder sb= new StringBuilder();
 
         for ( int i=0; i<lines.length; i++ ) {
-            sb.append( "# "+ lines[i] + "\n" );
+            sb.append("# ").append(lines[i]).append( "\n");
         }
 
         out.print( sb.toString() );
