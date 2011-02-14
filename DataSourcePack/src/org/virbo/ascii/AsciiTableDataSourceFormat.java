@@ -14,6 +14,8 @@ import java.util.List;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.EnumerationDatumFormatter;
 import org.das2.util.monitor.ProgressMonitor;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.URISplit;
@@ -32,6 +34,49 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         }
     }
 
+    private void jsonProp( JSONObject jo1, QDataSet ds, String prop, int i ) throws JSONException {
+        Object o= ds.property(prop,i);
+        if ( o!=null ) {
+            if ( o instanceof QDataSet ) {
+                jo1.put( prop, o.toString() );
+            } else if ( o instanceof Number ) {
+                jo1.put( prop, (Number)o );
+            } else {
+                jo1.put( prop, String.valueOf(o) );
+            }
+        }
+    }
+
+    private void formatBundleDesc(PrintWriter out, QDataSet bundleDesc) throws JSONException {
+        JSONObject jo= new JSONObject();
+        for ( int i=0; i<bundleDesc.length(); i++ ) {
+            String name= (String) bundleDesc.property( QDataSet.NAME,i );
+            if ( name==null ) {
+                System.err.println("unnamed dataset!");
+                name= "field"+i;
+            }
+            JSONObject jo1= new JSONObject();
+            jsonProp( jo1, bundleDesc, QDataSet.UNITS, i );
+            jsonProp( jo1, bundleDesc, QDataSet.VALID_MIN, i );
+            jsonProp( jo1, bundleDesc, QDataSet.VALID_MAX, i );
+            jsonProp( jo1, bundleDesc, QDataSet.FILL_VALUE, i );
+            jsonProp( jo1, bundleDesc, QDataSet.DEPEND_0, i );
+            jo.put( name, jo1 );
+        }
+
+        String json= jo.toString( 3 );
+
+        String[] lines= json.split("\n");
+        StringBuilder sb= new StringBuilder();
+
+        for ( int i=0; i<lines.length; i++ ) {
+            sb.append( "# "+ lines[i] + "\n" );
+        }
+
+        out.print( sb.toString() );
+
+    }
+
     /**
      * format the rank 2 bundle of data.
      * @param out
@@ -39,10 +84,19 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
      * @param mon
      */
     private void formatBundle(PrintWriter out, QDataSet data, ProgressMonitor mon) {
-        maybeOutputProperty(out, data, QDataSet.TITLE);
 
         QDataSet bundleDesc= (QDataSet) data.property(QDataSet.BUNDLE_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
+
+        if ( bundleDesc!=null ) {
+            try {
+                formatBundleDesc( out, bundleDesc );
+            } catch ( JSONException ex ) {
+                ex.printStackTrace();
+            }
+        } else {
+            maybeOutputProperty(out, data, QDataSet.TITLE);
+        }
 
         DatumFormatter[] formats= new DatumFormatter[data.length(0)];
         Units[] uu= new Units[data.length(0)];
@@ -76,6 +130,9 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
             int i;
             for (  i = 0; i < bundleDesc.length()-1; i++) {
                 String l1= (String) bundleDesc.property(QDataSet.LABEL,i);
+                if ( l1==null ) {
+                    throw new IllegalArgumentException("unnamed dataset in bundle at index "+i);
+                }
                 if ( l1.trim().length()==0 ) {
                     Units u1=  (Units) bundleDesc.property(QDataSet.UNITS,i);
                     if ( u1!=null && Units.t2000.isConvertableTo( u1 ) ) {
@@ -293,4 +350,5 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         }
         out.close();
     }
+
 }
