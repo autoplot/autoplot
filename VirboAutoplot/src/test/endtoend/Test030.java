@@ -23,7 +23,9 @@ public class Test030 {
     public static void doTest( int id, String uri ) {
 
         try {
+            System.err.printf( "reading %s...\n", uri );
             QDataSet ds= Util.getDataSet( uri );
+            System.err.printf( "   read %s.\n", String.valueOf(ds) );
 
             QDataSet bds= (QDataSet) ds.property(QDataSet.BUNDLE_1);
             
@@ -35,6 +37,7 @@ public class Test030 {
             writeToPng( label+".png" );
             //((MutablePropertyDataSet)bundle1).putProperty( QDataSet.LABEL, uri );
             formatDataSet( ds, label+".qds");
+            formatDataSet( ds, label+".txt");
 
         } catch ( Exception ex ) {
             ex.printStackTrace();
@@ -46,6 +49,8 @@ public class Test030 {
     public static void main(String[] args) throws Exception  {
         doTest( 0, TestSupport.TEST_DATA + "dat/headers/demo1.txt?rank2" );
         doTest( 1, TestSupport.TEST_DATA + "dat/headers/proton_density.dat?rank2" );
+
+        System.exit(0);  // TODO: something is firing up the event thread
     }
     
 }
