@@ -59,6 +59,8 @@ import org.das2.util.filesystem.FileSystem;
 import org.virbo.aggregator.AggregatingDataSourceEditorPanel;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.DataSetURI.CompletionResult;
+import org.virbo.datasource.ui.PromptComboBoxEditor;
+import org.virbo.datasource.ui.PromptTextField;
 
 /**
  * Swing Component for selecting dataset URIs.  This provides hooks for completions.
@@ -73,6 +75,8 @@ public class DataSetSelector extends javax.swing.JPanel {
     /** Creates new form DataSetSelector */
     public DataSetSelector() {
         initComponents();
+        dataSetSelector.setEditor( new PromptComboBoxEditor("Enter data location") );
+
         editor = ((JTextField) dataSetSelector.getEditor().getEditorComponent());        
         dataSetSelector.addActionListener( new ActionListener() {
 
@@ -86,21 +90,6 @@ public class DataSetSelector extends javax.swing.JPanel {
         addAbouts();
         foregroundColor= getForeground();
         
-        editor.addFocusListener(new FocusListener() {
-            // Focus listener populates editor with prompt text if necessary
-            public void focusGained(FocusEvent e) {
-                if (editor.getText().equals(promptText)) {
-                    setValue("");
-                    editor.setForeground(foregroundColor);
-                }
-
-            }
-
-            public void focusLost(FocusEvent e) {
-                doShowMessage();
-            }
-
-        });
         maybePlotTimer = new Timer(100, new ActionListener() {
 
             public void actionPerformed(ActionEvent ev) {
@@ -115,11 +104,6 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
         maybePlotTimer.setRepeats(false);
-        SwingUtilities.invokeLater( new Runnable() {
-            public void run() {
-                doShowMessage();
-            }
-        } );
     }
     
     boolean needToAddKeys = true;
@@ -137,12 +121,6 @@ public class DataSetSelector extends javax.swing.JPanel {
     Timer maybePlotTimer;
     int keyModifiers = 0;
 
-    public void doShowMessage() {
-        if (editor.getText().equals("")) {
-           setValue(promptText);
-           editor.setForeground(Color.GRAY);
-        }
-    }
 
     public JTextField getEditor() {
         return editor;
@@ -174,7 +152,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      */
     private void maybePlotImmediately() {
         String surl = getValue();
-        if (surl.equals("") || surl.equals(promptText) ) { //kludge promptText
+        if (surl.equals("") ) { 
             logger.finest("empty value, returning");
             return;
         }
@@ -901,7 +879,6 @@ public class DataSetSelector extends javax.swing.JPanel {
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         String context = (String) dataSetSelector.getSelectedItem();
         if ( context==null ) context= "";
-        if ( context.equals(promptText) ) context= "";
         String ext = context==null ? "" : DataSetURI.getExt(context);
         final String fcontext= context;
 
@@ -1029,11 +1006,6 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     public void setValue(String value) {
         if (value == null) {
             throw new NullPointerException("value must not be null");
-        }
-        if (value.equals(promptText)) {
-            editor.setForeground(Color.GRAY);
-        } else {
-            editor.setForeground(Color.BLACK);
         }
         doItemStateChange = false;
         this.dataSetSelector.setSelectedItem(value);
@@ -1304,22 +1276,15 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         this.acceptPattern = acceptPattern;
     }
     
-    private String promptText = "Enter data location";
-
     public void setPromptText(String text) {
         if (text==null) {
             throw new NullPointerException("Prompt text can't be null; use empty string instead.");
         }
-
-        if (getValue().equals(promptText)) {
-            setValue(text);
-        }
-        promptText = text;
-
+        ((PromptTextField)getEditor()).setPromptText(text);
     }
 
     public String getPromptText() {
-        return promptText;
+        return ((PromptTextField)getEditor()).getPromptText();
     }
 
     public static void main( String[] args ) {
