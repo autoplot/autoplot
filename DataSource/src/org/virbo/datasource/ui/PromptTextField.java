@@ -43,6 +43,7 @@ public class PromptTextField extends JTextField {
         super.paintComponent(g);
         if ( getText().length()==0 && !hasFocus() ) {
             promptLabel.setBounds( 0, 0, getWidth(), getHeight() );
+            g.translate( 4, 0 );
             promptLabel.paint(g);
         }        
     }
