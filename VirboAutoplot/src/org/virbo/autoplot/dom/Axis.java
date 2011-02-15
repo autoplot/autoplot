@@ -15,7 +15,10 @@ import org.das2.datum.Units;
  */
 public class Axis extends DomNode {
 
-    protected DatumRange range = new DatumRange(0, 100, Units.dimensionless);
+    public static final DatumRange DEFAULT_RANGE=  new DatumRange(0, 100, Units.dimensionless);
+
+    protected DatumRange range = DEFAULT_RANGE;
+    
     public static final String PROP_RANGE = "range";
 
     public DatumRange getRange() {
