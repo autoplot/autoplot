@@ -354,7 +354,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         
         tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
 
-        dataSetSelector.doShowMessage();
+        //dataSetSelector.doShowMessage();
         tabs.requestFocus();
         
         final ApplicationModel fmodel= model;
