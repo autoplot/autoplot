@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
@@ -143,6 +143,7 @@
         <Component class="javax.swing.JTextField" name="componentTextField">
           <Properties>
             <Property name="text" type="java.lang.String" value="jTextField1"/>
+            <Property name="toolTipText" type="java.lang.String" value="Process string that specifies component to plot, or how a data set&apos;s dimensionality should be reduced before display."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="componentTextFieldActionPerformed"/>
@@ -237,6 +238,7 @@
                 <StringItem index="3" value="0 to 1e38"/>
               </StringArray>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="Measurements within this range are considered valid.  This field may be changed to exclude outliers or data that has not automatically been detected as fill. "/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="validRangeComboBoxActionPerformed"/>
@@ -259,6 +261,7 @@
                 <StringItem index="3" value="-1"/>
               </StringArray>
             </Property>
+            <Property name="toolTipText" type="java.lang.String" value="This value is used to identify invalid data that should not be plotted."/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fillValueComboBoxActionPerformed"/>

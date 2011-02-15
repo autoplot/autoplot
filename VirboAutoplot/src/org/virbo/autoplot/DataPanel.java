@@ -390,6 +390,7 @@ public class DataPanel extends javax.swing.JPanel {
         jLabel3.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
 
         componentTextField.setText("jTextField1");
+        componentTextField.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
         componentTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 componentTextFieldActionPerformed(evt);
@@ -472,6 +473,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         validRangeComboBox.setEditable(true);
         validRangeComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "-1e30 to 1e30", "-1 to 101", "0 to 1e38" }));
+        validRangeComboBox.setToolTipText("Measurements within this range are considered valid.  This field may be changed to exclude outliers or data that has not automatically been detected as fill. ");
         validRangeComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 validRangeComboBoxActionPerformed(evt);
@@ -483,6 +485,7 @@ public class DataPanel extends javax.swing.JPanel {
 
         fillValueComboBox.setEditable(true);
         fillValueComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "-1e31", "0.0", "-1" }));
+        fillValueComboBox.setToolTipText("This value is used to identify invalid data that should not be plotted.");
         fillValueComboBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fillValueComboBoxActionPerformed(evt);

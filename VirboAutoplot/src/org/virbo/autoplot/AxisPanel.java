@@ -5,8 +5,10 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.event.FocusEvent;
 import org.das2.components.DatumRangeEditor;
 import java.awt.BorderLayout;
+import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
@@ -73,14 +75,20 @@ public class AxisPanel extends javax.swing.JPanel {
 
         xredit = new DatumRangeEditor();
         xredit.setValue(plot.getXAxis().getDatumRange());
+        xredit.addFocusListener( createDatumRangeEditorListener(xredit) );
+        xredit.setToolTipText("X axis range");
         xAxisRangePanel.add(xredit, BorderLayout.CENTER);
 
         yredit = new DatumRangeEditor();
         yredit.setValue(plot.getYAxis().getDatumRange());
+        yredit.addFocusListener( createDatumRangeEditorListener(yredit) );
+        yredit.setToolTipText("Y axis range");
         yAxisRangePanel.add(yredit, BorderLayout.CENTER);
 
         zredit = new DatumRangeEditor();
         zredit.setValue(colorbar.getDatumRange());
+        zredit.addFocusListener( createDatumRangeEditorListener(zredit) );
+        zredit.setToolTipText("Z axis range");
         zAxisRangePanel.add(zredit, BorderLayout.CENTER);
 
         xredit.addPropertyChangeListener( new PropertyChangeListener() {
@@ -117,6 +125,16 @@ public class AxisPanel extends javax.swing.JPanel {
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axisPanel");
 
+    }
+
+    private FocusListener createDatumRangeEditorListener( final DatumRangeEditor edit ) {
+        return new FocusListener() {
+            public void focusGained(FocusEvent e) {
+            }
+            public void focusLost(FocusEvent e) {
+                edit.setValue( edit.getValue() );
+            }
+        };
     }
 
     private void doApplicationBindings() {
@@ -238,11 +256,13 @@ public class AxisPanel extends javax.swing.JPanel {
         xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis"));
 
         xLog.setText("log");
+        xLog.setToolTipText("X axis logarithmic scale");
         xLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         xAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
         xTitleTextField.setText("jTextField1");
+        xTitleTextField.setToolTipText("X axis title");
 
         org.jdesktop.layout.GroupLayout xAxisPanelLayout = new org.jdesktop.layout.GroupLayout(xAxisPanel);
         xAxisPanel.setLayout(xAxisPanelLayout);
@@ -270,13 +290,16 @@ public class AxisPanel extends javax.swing.JPanel {
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Colorbar"));
 
         zLog.setText("log");
+        zLog.setToolTipText("colorbar logarithmic scale");
         zLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         zAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
         zTitleTextField.setText("jTextField1");
+        zTitleTextField.setToolTipText("Colorbar title");
 
         cbVisibleCB.setText("visible");
+        cbVisibleCB.setToolTipText("hide/show colorbar");
 
         org.jdesktop.layout.GroupLayout zAxisPanelLayout = new org.jdesktop.layout.GroupLayout(zAxisPanel);
         zAxisPanel.setLayout(zAxisPanelLayout);
@@ -311,6 +334,7 @@ public class AxisPanel extends javax.swing.JPanel {
         yAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
         yLog.setText("log");
+        yLog.setToolTipText("Y axis logarithmic scale");
         yLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         isotropicCheckBox.setText("Isotropic");
@@ -318,6 +342,7 @@ public class AxisPanel extends javax.swing.JPanel {
         isotropicCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
         yTitleTextField.setText("jTextField1");
+        yTitleTextField.setToolTipText("Y axis title");
 
         org.jdesktop.layout.GroupLayout yAxisPanelLayout = new org.jdesktop.layout.GroupLayout(yAxisPanel);
         yAxisPanel.setLayout(yAxisPanelLayout);

@@ -19,6 +19,13 @@ my $url = $ENV{'QUERY_STRING'};
 # Replace depreciated uri= with open=
 $url =~ s/uri\=/open\=/;
 
+# Allow only version=VERSION to be specified with no other arguments
+if ($url =~ m/^version\=/) {
+    if ($url !~ m/\&/) { 
+	$url = $url .  "&open=";
+    }
+}
+
 # Temporarily replace template= (used by pngwalk) with open=
 $url =~ s/template\=/open\=/;
 
@@ -44,6 +51,8 @@ $url =~ s/(.*)open\=.*/$1/; # Strip off URI to pass to Autoplot
 
 $uri =~ s/.*open\=(.*)/$1/; # Extract URI to pass to Autoplot
 #print "uri-->". $uri . "\n";
+
+$tmptext = "<argument>--nativeLAF</argument>";
 
 $uri = URLDecode($uri);
 # URLDecode will change vap+cdf:http:// etc to vap cdf:http://

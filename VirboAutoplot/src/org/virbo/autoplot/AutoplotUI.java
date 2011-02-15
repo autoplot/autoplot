@@ -115,6 +115,16 @@ import org.w3c.dom.Element;
  * @author  jbf
  */
 public class AutoplotUI extends javax.swing.JFrame {
+    
+    final String TAB_TOOLTIP_CANVAS = "<html>Canvas tab contains the plot and plot elements.<br>Click on plot elements to select.<br>%s</html>";
+    final String TAB_TOOLTIP_AXES = "<html>Adjust selected plot axes.<br>%s<html>";
+    final String TAB_TOOLTIP_LOGCONSOLE = "<html>Log console displays log messages and stdout/stderr.<br>%s</html>";
+    final String TAB_TOOLTIP_STYLE = "<html>Adjust selected plot element's colors, shapes, and other style settings.<br>%s</html>";
+    final String TAB_TOOLTIP_LAYOUT = "<html>Inspect the canvas layout and property bindings, and<br>provides access to all plot elements.<br>%s</html>";
+    final String TAB_TOOLTIP_DATA = "<html>Specify valid ranges and apply additional operations to data.<br>%s</html>";
+    final String TAB_TOOLTIP_METADATA = "<html>Inspect selected element's metadata and data statistics.<br>%s</html>";
+    final String TAB_TOOLTIP_SCRIPT = "<html>Editor panel for Jython scripts and data sources.<br>%s</html>";
+    final String TABS_TOOLTIP = "Right-click or drag to undock.";
 
     TearoffTabbedPane tabs;
     ApplicationModel applicationModel;
@@ -124,7 +134,6 @@ public class AutoplotUI extends javax.swing.JFrame {
     TickleTimer tickleTimer;
     GuiSupport support;
     LayoutListener autoLayout;
-    final String TABS_TOOLTIP = "right-click to undock";
     transient PersistentStateSupport.SerializationStrategy serStrategy = new PersistentStateSupport.SerializationStrategy() {
 
         public Element serialize(Document document, ProgressMonitor monitor) {
@@ -339,7 +348,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         applicationModel.getCanvas().setFitted(true);
         JScrollPane scrollPane = new JScrollPane(applicationModel.getCanvas());
         scrollPane.getViewport().setBackground( new JLabel().getBackground() );
-        tabs.insertTab("canvas", null, scrollPane, TABS_TOOLTIP, 0);
+        tabs.insertTab("canvas", null, scrollPane, 
+                String.format(  TAB_TOOLTIP_CANVAS, TABS_TOOLTIP), 0);
         tabs.validate();
         
         tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
@@ -400,13 +410,14 @@ public class AutoplotUI extends javax.swing.JFrame {
                 JComponent c= new AxisPanel(applicationModel);
                 JScrollPane sp= new JScrollPane();
                 sp.setViewportView(c);
-                tabs.insertTab("axes", null, sp, TABS_TOOLTIP, 1);
+                tabs.insertTab("axes", null, sp,
+                        String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
             }
         };
     }
 
     /**
-     * this method is disabled from webstart version, since it doesn't work with
+     * this method is disabled from Webstart version, since it doesn't work with
      * the security model.
      * @throws HeadlessException
      */
@@ -428,7 +439,8 @@ public class AutoplotUI extends javax.swing.JFrame {
     private Runnable addStyle() {
         return new Runnable() {
             public void run() {
-                tabs.insertTab("style", null, new PlotStylePanel(applicationModel), TABS_TOOLTIP, 2);
+                tabs.insertTab("style", null, new PlotStylePanel(applicationModel),
+                        String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
             }
         };
     }
@@ -438,22 +450,26 @@ public class AutoplotUI extends javax.swing.JFrame {
             LayoutPanel lui= new LayoutPanel();
             lui.setApplication(dom);
             layoutPanel= lui;
-            tabs.insertTab("layout",null, lui, TABS_TOOLTIP, tabs.getTabCount() );
+            tabs.insertTab("layout",null, lui,
+                    String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP), tabs.getTabCount() );
         }
 
         if (model.getDocumentModel().getOptions().isDataVisible()) {
             final DataPanel dp= new DataPanel(dom);
             dataPanel= dp;
-            tabs.insertTab("data", null, dp, TABS_TOOLTIP, tabs.getTabCount() );
+            tabs.insertTab("data", null, dp,
+                    String.format(  TAB_TOOLTIP_DATA, TABS_TOOLTIP), tabs.getTabCount() );
         }
 
         final MetadataPanel mdp = new MetadataPanel(applicationModel);
         JScrollPane sp= new JScrollPane();
         sp.setViewportView(mdp);
-        tabs.insertTab("metadata", null, sp, TABS_TOOLTIP, tabs.getTabCount() );
+        tabs.insertTab("metadata", null, sp, 
+                String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
-            tabs.add("script", new JythonScriptPanel(applicationModel, this.dataSetSelector));
+            tabs.addTab( "script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector),
+                  String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             scriptPanelMenuItem.setSelected(true);
         }
         if (model.getDocumentModel().getOptions().isLogConsoleVisible()) {
@@ -782,7 +798,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         Logger.getLogger("console").addHandler(h); // stderr, stdout
 
         setMessage("log console added");
-        tabs.addTab("console", logConsole);
+        tabs.addTab("console", null, logConsole,
+                String.format(  TAB_TOOLTIP_LOGCONSOLE, TABS_TOOLTIP) );
         applicationModel.getDocumentModel().getOptions().setLogConsoleVisible(true);
 
         if ( applicationModel.getExceptionHandler() instanceof GuiExceptionHandler ) {
@@ -1755,7 +1772,8 @@ private void scriptPanelMenuItemActionPerformed(java.awt.event.ActionEvent evt) 
     applicationModel.getDocumentModel().getOptions().setScriptVisible(scriptPanelMenuItem.isSelected());
     if (scriptPanelMenuItem.isSelected() && scriptPanel == null) {
         scriptPanel = new JythonScriptPanel(applicationModel, this.dataSetSelector);
-        tabs.insertTab("script", null, scriptPanel, TABS_TOOLTIP, 4);
+        tabs.insertTab("script", null, scriptPanel, 
+                String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP), 4);
     } else {
         JOptionPane.showMessageDialog(rootPane, "The feature will be disabled next time the application is run.");
     }
@@ -1946,7 +1964,8 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                 }
                 int idx= tabs.indexOfTab("style");
                 if ( idx==-1 ) idx=  tabs.getTabCount();
-                tabs.insertTab("layout", null, layoutPanel, TABS_TOOLTIP, idx+1 );
+                tabs.insertTab("layout", null, layoutPanel, 
+                        String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP ), idx+1 );
             } else {
                 if ( layoutPanel!=null ) tabs.remove(layoutPanel);
             }
@@ -1957,7 +1976,8 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                 }
                 int idx= tabs.indexOfTab("metadata");
                 if ( idx==-1 ) idx=  tabs.getTabCount();
-                tabs.insertTab("data", null, dataPanel, TABS_TOOLTIP, idx );
+                tabs.insertTab("data", null, dataPanel,
+                        String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
             } else {
                 if ( dataPanel!=null ) tabs.remove(dataPanel);
             }

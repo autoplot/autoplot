@@ -56,7 +56,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     boolean haveAddedRecent= false;
     private static final String MSG_NO_DATASET = "<html><em>No dataset selected, pick initial dataset...</em></html>";
     private String currentDs= "";
-    private String filter="";
+    private String filter=""; 
 
     private boolean pickDs() {
         Window win = SwingUtilities.getWindowAncestor(this);
@@ -122,9 +122,6 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         currentDs= ds;
 
-        System.err.println( Thread.currentThread() );
-
-        System.err.println( "count=" + parameterPanel.getComponentCount() );
         parameterPanel.removeAll();
         //messageComponent= new JLabel("<html><em>Resetting...</em></html>"); // this causes problem when droplist is used.
         //parameterPanel.add( messageComponent, BorderLayout.CENTER );
@@ -199,7 +196,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             if ( ds!=currentDs ) {
                 doRefreshDataSet(ds,args);
             } else {
-                System.err.println("already refreshed for: "+ds );
+                //System.err.println("already refreshed for: "+ds );
             }
         } catch ( Exception ex ) {
             ex.printStackTrace();

@@ -8,7 +8,7 @@
     
     <information> 
         <title>Autoplot PNG Walk(#{tag})</title>
-        <vendor>VxOware</vendor> 
+        <vendor>http://virbo.org/</vendor>
         <description>Tool for rapidly browsing pre-rendered plot images, which can launch Autoplot for deeper inspection</description>
         <description kind="short">PNG Walk tool for pre-rendered plot images.</description>
         <icon href="logo16x16.png" width="16" height="16" />

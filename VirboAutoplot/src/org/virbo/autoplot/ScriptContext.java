@@ -355,8 +355,14 @@ public class ScriptContext extends PyJavaInstance {
     public static void setStatus( String message ) {
         dom.getController().setStatus(message);
     }
-    
+
+    /**
+     * add a tab to the running application
+     * @param label
+     * @param c
+     */
     public static void addTab( String label, JComponent c  ) {
+        maybeInitView();
         int n= view.getTabs().getComponentCount();
         for ( int i=0; i<n; i++ ) {
             final String titleAt = view.getTabs().getTitleAt(i);
