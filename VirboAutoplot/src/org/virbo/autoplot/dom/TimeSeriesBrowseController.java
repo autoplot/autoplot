@@ -37,6 +37,7 @@ public class TimeSeriesBrowseController {
     private ChangesSupport changesSupport;
 
     private static final String PENDING_AXIS_DIRTY= "tsbAxisDirty";
+    private static final String PENDING_TIMERANGE_DIRTY= "tsbTimerangeDirty";
 
     private static final Logger logger = Logger.getLogger("ap.tsb");
     Timer updateTsbTimer;
@@ -79,11 +80,30 @@ public class TimeSeriesBrowseController {
         return false;
     }
 
+    protected void setupGen( DomNode node, final String property ) {
+        timeSeriesBrowseListener = new PropertyChangeListener() {
+            public String toString() {
+               return ""+TimeSeriesBrowseController.this;
+            }
+            public void propertyChange(PropertyChangeEvent e) {
+                //we should have something to listen for locks.
+                if (e.getPropertyName().equals(property)) {
+                    changesSupport.registerPendingChange( this, PENDING_TIMERANGE_DIRTY );
+                    DatumRange dr=(DatumRange)e.getNewValue();
+                    setTimeRange( UnitsUtil.isTimeLocation(dr.getUnits()) ? dr : null );
+                    updateTsbTimer.restart();
+                }
+            }
+        };
+        node.addPropertyChangeListener( property, timeSeriesBrowseListener );
+    }
+
     protected void setup( boolean valueWasAdjusting ) {
         boolean setTsbInitialResolution = true;
         if (setTsbInitialResolution) {
             try {
                 DatumRange tr = dataSourceController.getTsb().getTimeRange();
+                this.setTimeRange( tr );
                 if ( this.domPlot.getXaxis().isAutoRange() ) {
                     BindingModel[] bms= this.panelController.getApplication().getBindings();
                     DatumRange appRange= this.panelController.getApplication().getTimeRange();
@@ -94,6 +114,7 @@ public class TimeSeriesBrowseController {
                         this.plot.getXAxis().resetRange(tr);
                     }
                     this.plot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter()); // See PlotController.createDasPeer and listener that doesn't get event
+                    this.domPlot.getXaxis().setAutoRange(true); // need to turn it back on because resetRange
                 }
                 updateTsb(true);
             } catch ( RuntimeException e ) {
@@ -111,6 +132,8 @@ public class TimeSeriesBrowseController {
                 } 
                 if (e.getPropertyName().equals("datumRange")) {
                     changesSupport.registerPendingChange( this, PENDING_AXIS_DIRTY );
+                    DatumRange dr=(DatumRange)e.getNewValue();
+                    setTimeRange( UnitsUtil.isTimeLocation(dr.getUnits()) ? dr : null );
                     updateTsbTimer.restart();
                 }
             }
@@ -126,29 +149,42 @@ public class TimeSeriesBrowseController {
             return;
         }
 
-        if (UnitsUtil.isTimeLocation(xAxis.getUnits())) {
+        DatumRange trange= this.getTimeRange();
+
+        if ( trange!=null ) {
 
             // CacheTag "tag" identifies what we have already
             QDataSet ds = this.dataSourceController.getDataSet();
             QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
             CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
 
-            DatumRange visibleRange = xAxis.getDatumRange();
-
-            Datum newResolution = visibleRange.width().divide(xAxis.getDLength());
-
-            // don't waste time by chasing after 10% of a dataset.
-            DatumRange newRange = visibleRange;
-            newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
-
-            CacheTag newCacheTag = new CacheTag(newRange, newResolution);
+            DatumRange visibleRange = null;
+            Datum newResolution = null;
+            CacheTag newCacheTag = null;
+            if ( xAxis!=null ) {
+                visibleRange= xAxis.getDatumRange();
+                newResolution = visibleRange.width().divide(xAxis.getDLength());
+                // don't waste time by chasing after 10% of a dataset.
+                DatumRange newRange = visibleRange;
+                newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
+                newCacheTag = new CacheTag(newRange, newResolution);
+                trange= newRange;
+            } else {
+                newCacheTag = new CacheTag(trange,null);
+            }
 
             if (tag == null || !tag.contains(newCacheTag)) {
-                if (plot.isOverSize() && autorange==false ) {
-                    visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3);
+                if ( xAxis!=null ) {
+                    if (plot.isOverSize() && autorange==false ) {
+                        visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3);
+                    }
+                    dataSourceController.getTsb().setTimeRange(trange);
+                    dataSourceController.getTsb().setTimeResolution(newResolution);
+                } else {
+                    dataSourceController.getTsb().setTimeRange(trange);
+                    dataSourceController.getTsb().setTimeResolution(null);
                 }
-                dataSourceController.getTsb().setTimeRange(visibleRange);
-                dataSourceController.getTsb().setTimeResolution(newResolution);
+
                 String surl;
                 surl = dataSourceController.tsb.getURI();
                 // check the registry for URLs, compare to surl, append prefix if necessary.
@@ -172,6 +208,7 @@ public class TimeSeriesBrowseController {
 
     void release() {
         this.plot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
+        this.xAxis= null;
         timeSeriesBrowseListener = null;
     }
     
@@ -221,5 +258,14 @@ public class TimeSeriesBrowseController {
 
     public String toString() {
         return this.dsf + " timeSeriesBrowse controller";
+    }
+
+    /**
+     * returns true if the TSB is listening to an axis and not the application timeRange property.
+     * This is the typical mode.
+     * @return
+     */
+    boolean isListeningToAxis() {
+        return xAxis!=null;
     }
 }
