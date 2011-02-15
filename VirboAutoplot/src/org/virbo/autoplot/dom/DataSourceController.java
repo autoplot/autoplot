@@ -17,6 +17,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.CancelledOperationException;
+import org.das2.datum.Units;
+import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -30,6 +32,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dataset.TransposeRank2DataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
@@ -98,7 +101,11 @@ public class DataSourceController extends DomNodeController {
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
-                if ( changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE ).size()>0 ) return;
+                List<Object> whoIsChanging= changesSupport.whoIsChanging( PENDING_SET_DATA_SOURCE );
+                if ( whoIsChanging.size()>0 ) {
+                    System.err.println("!!! "+whoIsChanging +" !!!"); // we probably need to do something with this.
+                    return;
+                }
                 DataSourceController.this.changesSupport.registerPendingChange( resetMePropertyChangeListener, PENDING_RESOLVE_DATA_SOURCE );
                 setUriNeedsResolution(true);
                 if (!dom.controller.isValueAdjusting()) {
@@ -258,8 +265,8 @@ public class DataSourceController extends DomNodeController {
         } else {
             changesSupport.performingChange( this, PENDING_SET_DATA_SOURCE );
             setCaching(dataSource.getCapability(Caching.class));
-            List<PlotElement> ps = dom.controller.getPlotElementsFor(dsf);
-            if ( ps.size()>0 && this.doesPlotElementSupportTsb( ps.get(0) ) ) {  //TODO: flakey
+            PlotElement pe= getPlotElement();
+            if ( pe!=null && this.doesPlotElementSupportTsb( pe ) ) {  //TODO: less flakey
                 setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
             } else {
                 setTsb(null);
@@ -299,6 +306,17 @@ public class DataSourceController extends DomNodeController {
 
     public synchronized void setDataSetInternal( QDataSet ds ) {
         setDataSetInternal( ds, null , this.dom.controller.isValueAdjusting() );
+    }
+
+    public static boolean isTimeSeries( QDataSet ds ) {
+        QDataSet dep0= SemanticOps.xtagsDataSet(ds);
+        if ( dep0!=null ) {
+            Units u= SemanticOps.getUnits(dep0);
+            if ( UnitsUtil.isTimeLocation(u) ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -342,6 +360,18 @@ public class DataSourceController extends DomNodeController {
                 return;
             } else {
                 return;
+            }
+        }
+
+        if ( this.getTimeSeriesBrowseController()!=null && ds!=null && !isTimeSeries(ds) && this.getTimeSeriesBrowseController().isListeningToAxis() ) {
+            // the dataset we get back isn't part of a time series.  So we should connect the TSB
+            // to the application TimeRange property.
+            this.timeSeriesBrowseController.release();
+            dom.setTimeRange( this.timeSeriesBrowseController.getTimeRange() );
+            this.timeSeriesBrowseController.setupGen( dom, Application.PROP_TIMERANGE );
+            // kludge--check for axis ranges and set to those, since we won't be autoranging.
+            if ( !this.timeSeriesBrowseController.p.getPlotDefaults().getXaxis().getRange().equals( Axis.DEFAULT_RANGE ) ) {
+                this.timeSeriesBrowseController.domPlot.getXaxis().syncTo( this.timeSeriesBrowseController.p.getPlotDefaults().getXaxis() );
             }
         }
 
