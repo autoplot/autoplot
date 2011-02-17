@@ -714,6 +714,11 @@ public class ScriptContext extends PyJavaInstance {
 
     }
 
+    /**
+     * get the document model (DOM).  This may initialize the model, in which
+     * case defaults like the cache directory are set.
+     * @return
+     */
     public static Application getDocumentModel() {
         maybeInitModel();
         return dom;
