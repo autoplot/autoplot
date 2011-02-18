@@ -51,7 +51,7 @@ public class AutoplotDataServer {
     }
 
     private static void formatD2S(QDataSet data, OutputStream fo) {
-        boolean binary = false;
+        boolean binary = true;
         if (data.rank() == 3) {
             TableDataSet tds = TableDataSetAdapter.create(data);
             if (binary) {
