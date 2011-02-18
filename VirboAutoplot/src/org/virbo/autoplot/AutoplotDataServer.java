@@ -10,15 +10,10 @@ package org.virbo.autoplot;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.nio.channels.Channels;
 import java.util.List;
-import org.das2.dataset.AverageTableRebinner;
-import org.das2.dataset.RebinDescriptor;
 import org.das2.dataset.TableDataSet;
 import org.das2.dataset.TableDataSetAdapter;
 import org.das2.dataset.TableUtil;
@@ -30,7 +25,6 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.das2.graph.DasCanvas;
 import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
@@ -39,10 +33,7 @@ import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
-import org.virbo.autoplot.dom.Application;
-import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
-import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 
 /**
