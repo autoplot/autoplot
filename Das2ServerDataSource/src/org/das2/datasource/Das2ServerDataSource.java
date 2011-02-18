@@ -111,7 +111,9 @@ class Das2ServerDataSource extends AbstractDataSource {
         }
         
         params2.put("dataset", URLEncoder.encode(dataset) );
-        params2.put("params", URLEncoder.encode(dsParams.replaceAll("\\+", " " )) );
+        if ( dsParams.length()>0 ) {
+            params2.put("params", URLEncoder.encode(dsParams.replaceAll("\\+", " " )) );
+        }
         URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
 
         //if ( interval!=null && tcaDesc==null ) {
@@ -167,6 +169,11 @@ class Das2ServerDataSource extends AbstractDataSource {
             
         }
 
+
+        System.err.println( "==URL==");
+        System.err.println( url2 );
+        System.err.println( "==URL==");
+        
         boolean qds= "1".equals( dsdfParams.get("qstream") );
 
         logger.fine( "opening "+ ( qds ? "as qstream " : "as das2stream " ) + url2 );
