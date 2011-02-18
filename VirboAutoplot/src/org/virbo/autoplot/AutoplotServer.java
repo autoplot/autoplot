@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import org.das2.dataset.AverageTableRebinner;
 import org.das2.dataset.RebinDescriptor;
 import org.das2.dataset.TableDataSet;
@@ -29,7 +30,9 @@ import static org.virbo.autoplot.ScriptContext.*;
 
 import org.das2.util.ArgumentList;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -40,7 +43,8 @@ import org.virbo.qstream.SimpleStreamFormatter;
  * Provide simple services to support command-line servers.
  * This has the following uses:
  *   1. image server to convert Autoplot URIs into images (U. Michigan)
- *   2. data server for (U. Iowa P.W. Group)
+ *   2. data server for (U. Iowa P.W. Group) converts URIs into streams of data
+ *        (qstream or older das2stream).
  * 
  * @author jbf
  */
@@ -155,16 +159,32 @@ public class AutoplotServer {
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
         } else {
             if ( format.equals("qds") || format.equals("d2s") ) {
+                ProgressMonitor mon= new NullProgressMonitor();
+
+                final PrintStream out= outfile.equals("-") ? System.out : System.out;
+                mon= new AbstractProgressMonitor() {
+                    @Override
+                    public void setTaskProgress(long position) throws IllegalArgumentException {
+                        String msg= String.format( "[xx]000060<comment type=\"taskProgress\" value=\"%08d\" source=\"\" />\n", position );
+                        out.print( msg );
+                    }
+                    @Override
+                    public void setTaskSize(long taskSize) {
+                        String msg2= String.format( "[00]000058<stream><properties int:taskSize=\"%08d\" /></stream>\n", taskSize );
+                        out.print( msg2 );
+                    }
+                };
+
                 if (!timeRange.equals("")) {
                     System.err.println("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange, new NullProgressMonitor() ):");
                     System.err.printf("   suri=%s\n", suri);
                     System.err.printf("   timeRange=%s\n", timeRange);
 
-                    ds = org.virbo.jythonsupport.Util.getDataSet(suri, timeRange, new NullProgressMonitor());
+                    ds = org.virbo.jythonsupport.Util.getDataSet(suri, timeRange, mon );
                 } else {
                     System.err.println("org.virbo.jythonsupport.Util.getDataSet( suri ):");
                     System.err.printf("   suri=%s\n", suri);
-                    ds = org.virbo.jythonsupport.Util.getDataSet(suri);
+                    ds = org.virbo.jythonsupport.Util.getDataSet(suri,mon);
                 }
 
                 System.err.println("loaded ds=" + ds);
