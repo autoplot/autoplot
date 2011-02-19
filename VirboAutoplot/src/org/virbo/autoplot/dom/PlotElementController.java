@@ -1783,7 +1783,15 @@ public class PlotElementController extends DomNodeController {
                         }
                     }
                     title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+                } else if ( title.contains("%{TIMERANGE}") ) {
+                    DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, plotElement );
+                    if ( tr==null ) {
+                        title= title.replaceAll("\\%\\{TIMERANGE\\}","(no timerange)");
+                    } else {
+                        title= title.replaceAll("\\%\\{TIMERANGE\\}",tr.toString());
+                    }
                 }
+                //see convertReverse, which must be done as well.
                 return title;
             }
 
@@ -1793,6 +1801,11 @@ public class PlotElementController extends DomNodeController {
                 String ptitle=  plotElement.getLegendLabel();
                 if (ptitle.contains("%{CONTEXT}") ) {
                     String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
+                    if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
+                        return ptitle;
+                    }
+                } else if ( ptitle.contains("%{TIMERANGE}") ) {
+                    String[] ss= ptitle.split("%\\{TIMERANGE\\}",-2);
                     if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
                         return ptitle;
                     }
