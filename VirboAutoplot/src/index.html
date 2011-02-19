@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Future space scientist Charlie reads this week's EOS.
+        <p><small>Experimental version of das2server uses Autoplot URIs and provides reduced versions of datasets to serve slow connections.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -15,37 +15,24 @@
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
 	</p>
 
-        <p>This is the new production branch.
+        <p>This is the development branch of Autoplot2011.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
             via the Java-based reader and URIs must be prefixed with "vap+cdfj:".  </p>
         
         <p>Bugfixes:</p>
-        <ul><li>check for node SPASE/... in XML files instead of null pointer exception.
-	    <li>bugfixes in CDAWeb source GUI, minor new features
-            <li>update splash screen
-            <li>splash screen matches jnlp screen.
-            <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3056945&group_id=199733&atid=970682">3056945</a>  axis range editors update plot without carriage return
-            <li>more tooltips to improve useability
-	    <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3176419&group_id=199733&atid=970682">3176419</a>  bugfixes in CDAWeb source GUI, minor new features
-            <li>bugfix: aggregate dialog doesn't clip okay button
-            <li>update splash screen
-        </ul>
-        <p>Less recent bugfixes:</p>
         <ul>
-            <li>cleanup of canvas size dialog.
-            <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3168674&group_id=199733&atid=970682">3168674</a>  jython conflicts cleaned up a bit, introducing listDirectory and coerceToDs.
-            <li>cdaweb data source masters logic corrected</li>
-            <li>ftp plugin works off-line (cdaweb used to verify)</li>
-            <li>clean up source to allow checkout onto filesystems that ignore upper and lower case.</li>
-            <li>pngwalk decorations need to be in each view.</li>
-            <li>goto range command line switch fixed on pngwalk when access is restricted.</li>
-            <li>Epoch16 support fixed in cdf java.</li>
+            <li>"Enter data set..." message reimplemented using custom component to fix various problems associated with it.
+            <li>other small bugs
+            <li>bugfixes from production branch include improvements to Java CDF reader, supporting stride.
+<li>check for node SPASE/... in XML files instead of null pointer exception.
         </ul>
         <p>Features:</p>
         <ul>
-            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3178953&group_id=199733&atid=970685">3178953</a>  CDAWeb filter GUI is optionally part of URIs now, to keep track of context
+            <li>AutoplotDataServer serves URIs as das2streams and QStreams
+            <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3169744&group_id=199733&atid=970685">3169744</a> aggregation/TimeSeriesBrowse of data without time axes
+            <li>minor features from production branch, such as CDAWeb stuff
         </ul>
         <p>Less recent features:</p>
         <ul>
