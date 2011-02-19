@@ -151,8 +151,8 @@ public class CdfUtil {
         try {
             int[] stride= new int[dims+1];
             for ( int i=0; i<dims+1; i++ ) stride[i]= 1;
-            stride[dims]= (int)recInterval;
-            if ( recInterval>1 ) throw new IllegalArgumentException("stride not supported with this cdf reader");
+            stride[0]= (int)recInterval;
+            //if ( recInterval>1 ) throw new IllegalArgumentException("stride not supported with this cdf reader");
             if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
                 if ( false && ( variable.getType()==44 || variable.getType()==21 ) ) {
                     buf= Extractor.get1DSeriesNio( cdf, variable, null);

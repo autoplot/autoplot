@@ -161,6 +161,7 @@ public class Extractor {
                 break;
             case 3:
                 method = DataTypes.method[type];
+                long longInt = DataTypes.longInt[type];
                 for (int n = first; n <= last; n++) {
                     Number num = (Number)method.invoke(bv, new Object[] {});
                     int x = num.intValue();
@@ -378,6 +379,7 @@ public class Extractor {
         int last, int count, double[][] data) throws
         IllegalAccessException, InvocationTargetException {
         Method method = DataTypes.method[type];
+        long longInt = DataTypes.longInt[type];
         for (int n = first; n <= last; n++) {
             for (int e = 0; e < count; e++) {
                 Number num = (Number)method.invoke(bv, new Object[] {});
@@ -391,6 +393,7 @@ public class Extractor {
         int size, int first, int last, double[] data) throws
         IllegalAccessException, InvocationTargetException {
         Method method = DataTypes.method[type];
+        long longInt = DataTypes.longInt[type];
         bv.position(pos);
         for (int n = first; n <= last; n++) {
             Number num = (Number)method.invoke(bv, new Object[] {});
@@ -405,6 +408,7 @@ public class Extractor {
         int size, int first, int last, double[] data, int index) throws
         IllegalAccessException, InvocationTargetException {
         Method method = DataTypes.method[type];
+        long longInt = DataTypes.longInt[type];
         bv.position(pos);
         for (int n = first; n <= last; n++) {
             Number num = (Number)method.invoke(bv, new Object[] {});
@@ -420,6 +424,7 @@ public class Extractor {
         int size, int first, int last, int[] offsets, double[][] data) throws
         IllegalAccessException, InvocationTargetException {
         Method method = DataTypes.method[type];
+        long longInt = DataTypes.longInt[type];
         bv.position(pos);
         int ne = offsets.length;
         for (int n = first; n <= last; n++) {
@@ -437,6 +442,7 @@ public class Extractor {
         int size, int first, int last, int[] offsets, double[][] data,
         int index) throws IllegalAccessException, InvocationTargetException {
         Method method = DataTypes.method[type];
+        long longInt = DataTypes.longInt[type];
         bv.position(pos);
         int ne = offsets.length;
         for (int n = first; n <= last; n++) {
@@ -639,6 +645,7 @@ public class Extractor {
                 return new Double(num.doubleValue());
             case 3:
                 method = DataTypes.method[type];
+                long longInt = DataTypes.longInt[type];
                 num = (Number)method.invoke(bv, new Object[] {});
                 int x = num.intValue();
                 double d = (x >= 0)?(double)x:(double)(longInt + x);
@@ -686,6 +693,7 @@ public class Extractor {
                 break;
             case 3:
                 method = DataTypes.method[type];
+                long longInt = DataTypes.longInt[type];
                 for (int i = 0; i < n; i++) {
                     Number num = (Number)method.invoke(bv, new Object[] {});
                     int x = num.intValue();
@@ -768,6 +776,7 @@ public class Extractor {
                 return da;
             case 3:
                 method = DataTypes.method[type];
+                long longInt = DataTypes.longInt[type];
                 if (var.rowMajority()) {
                     for (int i = 0; i < n0; i++) {
                         for (int j = 0; j < n1; j++) {
@@ -843,6 +852,7 @@ public class Extractor {
                 break;
             case 3:
                 method = DataTypes.method[type];
+                long longInt = DataTypes.longInt[type];
                 for (int n = first; n <= last; n++) {
                     Number num = (Number)method.invoke(bv, new Object[] {});
                     int x = num.intValue();
@@ -1141,8 +1151,6 @@ public class Extractor {
         return null;
     }
 
-    static long longInt = ((long)1) << 32;
-
     /**
      * returns range of blocks containing the range of records (start, end).
      */
@@ -1371,6 +1379,7 @@ public class Extractor {
                 return da;
             case 3:
                 method = DataTypes.method[type];
+                long longInt = DataTypes.longInt[type];
                 if (var.rowMajority()) {
                     for (int i = 0; i < n0; i++) {
                         for (int j = 0; j < n1; j++) {
@@ -1576,6 +1585,7 @@ public class Extractor {
             break;
         case 3:
             method = DataTypes.method[type];
+            long longInt = DataTypes.longInt[type];
             for (int e = 0; e < number; e++) {
                 Number num = (Number)method.invoke(bv, new Object[] {});
                 int x = num.intValue();
@@ -1609,7 +1619,7 @@ public class Extractor {
         int _stride = strideObject.getStride(nv);
         if (_stride > 1) {
             nv = (nv/_stride);
-            if ((nv % _stride) != 0) nv++;
+            if ((nv % _stride) != 0) nv++; // explain
         }
         int type = var.getType();
         int itemSize = var.getDataItemSize();
@@ -1665,10 +1675,14 @@ public class Extractor {
                     do1D(bv, type, tf, data, offset, count*elements);
                 } else {
                     count = (term - init)/_stride;
+                    if ( term < init ) {
+                        throw new IllegalStateException("something went wrong, term<init");
+                    }
                     if (count*_stride < (term - init)) count++;
                     if (DataTypes.typeCategory[type] == 0) {
                         tf = new float[count*elements];
                     }
+                    //System.err.printf("do1D(bv,type,data,offset=%d,...  loc[2]=%d\noffset is never>0 for bad case.", offset, loc[2]);
                     // need to position to first desired element
                     do1D(bv, type, tf, data, offset, count,
                         elements, _stride);
@@ -1704,6 +1718,30 @@ public class Extractor {
                 offset += elements;
             }
             break;
+        case 2:
+            method = DataTypes.method[type];
+            for (int e = 0; e < count; e++) {
+                Number num = (Number)method.invoke(bv, new Object[] {});
+                data[offset + e] = num.doubleValue();
+                for ( int ii=1; ii<_stride;ii++ ) {
+                    Number x= (Number)method.invoke(bv, new Object[] {});
+                }
+            }
+            break;
+        case 3:
+            method = DataTypes.method[type];
+            long longInt = DataTypes.longInt[type];
+            for (int e = 0; e < count; e++) {
+                Number num = (Number)method.invoke(bv, new Object[] {});
+                int x = num.intValue();
+                data[offset + e] = (x >= 0)?(double)x:(double)(longInt + x);
+                for ( int ii=1; ii<_stride;ii++ ) {
+                    Number xx= (Number)method.invoke(bv, new Object[] {});
+                }
+            }
+            break;
+        default:
+            throw new RuntimeException("case not handled");
         }
     }
     public static double [][] getSampledTimeSeries0(CDF thisCDF, Variable var,
@@ -1857,7 +1895,8 @@ public class Extractor {
                 }
                 break;
             case 3:
-                method = DataTypes.method[type];
+                method = DataTypes.method[type];    
+                long longInt = DataTypes.longInt[type];
                 for (; n <= last; n += _stride) {
                     bv.position(4*n);
                     Number num = (Number)method.invoke(bv, new Object[] {});
@@ -1962,6 +2001,7 @@ public class Extractor {
         int size, int first, int last, double[] data, int[] stride,
         int point) throws IllegalAccessException, InvocationTargetException {
         Method method = DataTypes.method[type];
+        long longInt = DataTypes.longInt[type];
         int index = point;
         bv.position(pos);
         int _stride = stride[0];
@@ -2045,6 +2085,7 @@ public class Extractor {
                 break;
             case 3:
                 method = DataTypes.method[type];
+                long longInt = DataTypes.longInt[type];
                 for (; n <= last; n += _stride) {
                     Number num = (Number)method.invoke(bv, new Object[] {});
                     int x = num.intValue();
@@ -2155,6 +2196,7 @@ public class Extractor {
         int size, int first, int last, double[] data, int index,
         int[] stride) throws IllegalAccessException, InvocationTargetException {
         Method method = DataTypes.method[type];
+        long longInt = DataTypes.longInt[type];
         bv.position(pos);
         for (int n = first; n <= last; n += stride[0]) {
             Number num = (Number)method.invoke(bv, new Object[] {});

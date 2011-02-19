@@ -142,7 +142,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 } catch ( Throwable ex ) {
                     throw new RuntimeException(ex);
                 }
-                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 3);
+                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4 );
                 //cdf.close();
                 int i= param.indexOf("[");
                 if ( i>-1 ) {

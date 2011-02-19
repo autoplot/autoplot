@@ -887,10 +887,14 @@ public class CdfUtil {
                 try {
                     Entry entry = virtual.getEntry(var);
                     if ( String.valueOf(entry.getData()).equals("TRUE") ) {
-                       String sfunction= String.valueOf( function.getEntry(var).getData() );
-                       if ( CdfVirtualVars.isSupported( sfunction ) ) {
-                            isVirtual= true;
-                       }
+                       if ( function!=null ) {
+                            String sfunction= String.valueOf( function.getEntry(var).getData() );
+                            if ( CdfVirtualVars.isSupported( sfunction ) ) {
+                                isVirtual= true;
+                           }
+                        } else {
+                           isVirtual= false;
+                        }
                     }
                 } catch ( CDFException ex ) {
                     //not a virtual variable

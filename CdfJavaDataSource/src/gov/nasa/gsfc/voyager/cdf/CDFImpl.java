@@ -32,7 +32,6 @@ public abstract class CDFImpl implements java.io.Serializable {
     public static final int VXR_RECORD_TYPE = 6;
     public static final int VVR_RECORD_TYPE = 7;
     public static final int CVVR_RECORD_TYPE = 13;
-    public static final long longInt = ((long)1) << 32;
     /**
      * CDF offsets
      */
@@ -448,13 +447,15 @@ public abstract class CDFImpl implements java.io.Serializable {
                 varies[i] = (_buf.getInt() == DIMENSION_VARIES);
             }
             if (type == DataTypes.EPOCH16) varies = new boolean[] {true};
+            dataItemSize = DataTypes.size[type];
             // PadValue immediately follows DimVarys
             if (padValueSpecified()) {
-                padValue = new double[numberOfElements];
+                int padValueSize = getDataItemSize()/dataItemSize;
+                padValue = new double[padValueSize];
                 if (type == DataTypes.EPOCH16) padValue = new double[2];
-                padValue = getNumberAttribute(type, numberOfElements, _buf, byteOrder);
+                padValue = getNumberAttribute(type, padValueSize, _buf,
+                    byteOrder);
             }
-            dataItemSize = DataTypes.size[type];
             // ignore numberOfElements for numeric data types
             if (DataTypes.isStringType(type)) dataItemSize *= numberOfElements;
             if (numberOfValues == 0) return;
@@ -462,6 +463,25 @@ public abstract class CDFImpl implements java.io.Serializable {
         }
         public VariableDataLocator getLocator() {
             return locator;
+        }
+        public VariableDataBuffer[] getDataBuffers() throws Throwable {
+            if ((flags & 4) != 0) throw new Throwable("Function not " +
+                "supported for compressed variables ");
+            int[][] locations = locator.getLocations();
+            Vector dbufs = new Vector();
+            int size = getDataItemSize();
+            for (int i = 0; i < locations.length; i++) {
+                int first = locations[i][0];
+                int last = locations[i][1];
+                ByteBuffer bv = getValueBuffer(locations[i][2]);
+                ByteBuffer bbuf = bv.slice();
+                bbuf.order(getByteOrder());
+                bbuf.limit((last - first + 1)*size);
+                dbufs.add(new VariableDataBuffer(first, last, bbuf));
+            }
+            VariableDataBuffer[] vdbuf = new VariableDataBuffer[dbufs.size()];
+            dbufs.toArray(vdbuf);
+            return vdbuf;
         }
 
         /**
@@ -930,7 +950,8 @@ public abstract class CDFImpl implements java.io.Serializable {
         double [] value = new double[nelement];        
         ByteBuffer vbufLocal = vbuf.duplicate();
         vbufLocal.order(byteOrder);
-
+     
+        long longInt = DataTypes.longInt[type];
         try {
             if ((type > 20) || (type < 10)) {
                 for (int i = 0; i < nelement; i++) {
@@ -1051,6 +1072,10 @@ public abstract class CDFImpl implements java.io.Serializable {
                 times = new double[epoch.length];
                 for (int i = 0; i < epoch.length; i++) {
                     times[i] = epoch[i] - JANUARY_1_1970;
+                    if (times[i] < 0) {
+                        throw new Throwable("Times before January 1, 1970 " +
+                        "are not supported.");
+                    }
                 }
             }
             if (precision == MICROSECOND_PRECISION) {

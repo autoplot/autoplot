@@ -17,16 +17,18 @@ import org.virbo.jythonsupport.Util;
  * @author jbf
  */
 public class Test012 {
+    private static int testid;
 
 
-    public static void doTest( int id, String uri ) throws Exception {
+    public static void doTest( int testid, int id, String uri ) throws Exception {
         QDataSet ds;
         long t0= System.currentTimeMillis();
         ds= Util.getDataSet( uri );
         double t= (System.currentTimeMillis()-t0)/1000.;
         MutablePropertyDataSet hist= (MutablePropertyDataSet) Ops.autoHistogram(ds);
         hist.putProperty( QDataSet.TITLE, uri );
-        String label= String.format( "test012_%03d", id );
+
+        String label= String.format( "test%03d_%03d", testid, id );
         hist.putProperty( QDataSet.LABEL, label );
         formatDataSet( hist, label+".qds");
 
@@ -54,7 +56,7 @@ public class Test012 {
         }
 
         setTitle(fileUri);
-        writeToPng( String.format( "test012_%03d.png", id ) );
+        writeToPng( String.format( "test%03d_%03d.png", testid, id ) );
 
         System.err.printf( "Read in %9.3f seconds (%s): %s\n", t, label, uri );
     }
@@ -65,33 +67,35 @@ public class Test012 {
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
-            //TODO: test012_000 shows a potential bug with autoHistogram: zero-point average is formatted to "2292-04-10T00:12:43...."
-            doTest( 0, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN" );
+            testid = args.length==1 ? Integer.parseInt(args[0]) : 12; // support running test with java reader test032
 
-            doTest( 1, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_efw_20080402_v01.cdf?tha_efw" );
-            doTest( 2, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?dens_e" );
-            doTest( 3, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Theta_l" );
+            //TODO: test012_000 shows a potential bug with autoHistogram: zero-point average is formatted to "2292-04-10T00:12:43...."
+            doTest( testid,0, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN" );
+
+            doTest( testid,1, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_efw_20080402_v01.cdf?tha_efw" );
+            doTest( testid,2, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?dens_e" );
+            doTest( testid,3, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Theta_l" );
             //rank4
-            doTest( 4, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts[1]" );
+            doTest( testid,4, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/l1_h0_mpa_20020202_v02.cdf?Ecounts[1]" );
 
             // cdf_epoch16, subsetting.
-            doTest( 5, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?WBD_Elec[1000000:1100000]" );
+            doTest( testid,5, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?WBD_Elec[1000000:1100000]" );
             // uint1, subsetting.
-            doTest( 6, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?DATA_QUALITY[::1090]" );
+            doTest( testid,6, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/c2_waveform_wbd_200704170840_u01.cdf?DATA_QUALITY[::1090]" );
 
-            doTest( 7, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/i8_15sec_mag_19731030_v02.cdf?F1_Average_B_15s" );
-            doTest( 8, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/i8_15sec_mag_19731030_v02.cdf?B_Vector_GSM" );
+            doTest( testid,7, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/i8_15sec_mag_19731030_v02.cdf?F1_Average_B_15s" );
+            doTest( testid,8, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/i8_15sec_mag_19731030_v02.cdf?B_Vector_GSM" );
 
-            doTest( 9, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/wi_h0_mfi_19941123_v04.cdf?P1GSM" );
-            doTest( 10, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/wi_h0_mfi_19941123_v04.cdf?ORTH_I" );
+            doTest( testid,9, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/wi_h0_mfi_19941123_v04.cdf?P1GSM" );
+            doTest( testid,10, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/wi_h0_mfi_19941123_v04.cdf?ORTH_I" );
 
-            doTest( 11, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_hyd_20010117_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX" );
+            doTest( testid,11, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_hyd_20010117_v01.cdf?ION_DIFFERENTIAL_ENERGY_FLUX" );
 
             // rank 3
-            doTest( 12, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H" );
+            doTest( testid, 12, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_h0_tim_19960409_v03.cdf?Flux_H" );
 
             // recursion bug https://sourceforge.net/tracker/index.php?func=detail&aid=2981336&group_id=199733&atid=970682
-            doTest( 13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_fgm_20100101_v01.cdf?tha_fgh[0:10000]" );
+            doTest( testid,13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_fgm_20100101_v01.cdf?tha_fgh[0:10000]" );
 
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {

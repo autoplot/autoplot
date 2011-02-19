@@ -84,7 +84,9 @@ public final class TrDDataSet extends AbstractDataSet implements WritableDataSet
      * @return DDataSet
      */
     public static TrDDataSet wrap( double[] data, int[] qube ) {
-        if (qube.length == 1) {
+        if (qube.length == 0 ) {
+            return new TrDDataSet( 1, 1, 1, 1, 1, data );
+        } else if (qube.length == 1) {
             return new TrDDataSet( 1, qube[0], 1, 1, 1, data );
         } else if (qube.length == 2) {
             return new TrDDataSet( 2, qube[0], qube[1], 1, 1, data );

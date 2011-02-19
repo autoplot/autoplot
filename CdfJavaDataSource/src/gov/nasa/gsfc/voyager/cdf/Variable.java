@@ -83,5 +83,15 @@ public interface Variable {
      * and offset of the start of region.
      */
     public VariableDataLocator getLocator();
+    /**
+     * Gets an array of VariableDataBuffer objects that provide location of
+     * data for this variable if this variable is not compressed. This method
+     * throws a Throwable if invoked for a compressed variable.
+     * getBuffer method of VariableDataBuffer object returns a read only 
+     * ByteBuffer that contains data for this variable for a range of
+     * records. getFirstRecord() and getLastRecord() define the
+     * range of records.
+     */
+    public VariableDataBuffer[] getDataBuffers() throws Throwable;
     public int getEffectiveRank();
 }

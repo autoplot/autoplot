@@ -20,7 +20,7 @@ public interface CDF3 extends CDF {
     public final int OFFSET_MAXREC = 24;
     public final int VAR_OFFSET_NAME = 84;
     public final int OFFSET_zNumDims = VAR_OFFSET_NAME + 256;
-    public final int VAR_OFFSET_NUM_ELEMENTS = 48;
+    public final int VAR_OFFSET_NUM_ELEMENTS = 64;
     public final int OFFSET_NUM = 68;
     public final int OFFSET_FIRST_VXR = 28;
     public final int OFFSET_FLAGS = 44;

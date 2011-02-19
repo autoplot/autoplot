@@ -31,6 +31,7 @@ public class DataTypes {
     public static Method[] method = new Method[LAST_TYPE];
     public static int[] typeCategory = new int[LAST_TYPE];
     public static int[] size = new int[LAST_TYPE];
+    public static long[] longInt = new long[LAST_TYPE];
     static {
         for (int i = 0; i < LAST_TYPE; i++) {
             method[i] = null;
@@ -85,6 +86,9 @@ public class DataTypes {
             typeCategory[51] = STRING;
             typeCategory[52] = STRING;
         } catch (Exception ex) {
+        }
+        for (int i = 0; i < LAST_TYPE; i++) {
+            if (size[i] <= 4) longInt[i] = ((long)1) << 8*size[i];
         }
     }
     public DataTypes() {
