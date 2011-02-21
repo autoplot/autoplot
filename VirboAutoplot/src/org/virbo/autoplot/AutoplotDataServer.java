@@ -33,6 +33,7 @@ import org.das2.util.monitor.AbstractProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.qstream.SimpleStreamFormatter;
 
@@ -158,11 +159,16 @@ public class AutoplotDataServer {
         }
 
         mon= new AbstractProgressMonitor() {
+            long lastUpdateTime= -1;
             public void setTaskSize(long taskSize) {
                 String msg2= String.format( "[00]000056<stream><properties int:taskSize=\"%08d\" /></stream>\n", taskSize );
                 out.print( msg2 );
             }
             public void setTaskProgress(long position) throws IllegalArgumentException {
+                long tnow= System.currentTimeMillis();
+                if ( this.getTaskProgress()==position && ( tnow-lastUpdateTime < 10000 ) ) return;
+                lastUpdateTime= tnow;
+                super.setTaskProgress(position);
                 String msg= String.format(  "[xx]000059<comment type=\"taskProgress\" value=\"%08d\" source=\"\" />\n", position );
                 out.print( msg );
             }
@@ -195,7 +201,8 @@ public class AutoplotDataServer {
             for ( DatumRange dr: drs ) {
                 mon.setTaskProgress(i*10);
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
-                System.err.println("loaded ds="+ds1);
+                QDataSet range= DataSetOps.dependBounds( ds1 );
+                System.err.println("loaded ds="+ds1 + "  bounds: "+range );
                 if ( ds1!=null ) {
                     writeData( format, out, ds1 );
                     someValid= true;
