@@ -161,7 +161,8 @@ public class CdfUtil {
                     odata= cdf.get1D( variable.getName() ); // this is my hack
                 }
             } else {
-                odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+rc*recInterval), stride ); // this is my hack
+                odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+rc*recInterval), stride ); 
+//                odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+(rc-1)*recInterval), stride ); //TODO: I think an extra record is extracted.  Try this with stride sometime.
             }
         } catch ( Throwable ex ) {
             if ( ex instanceof Exception ) {
@@ -176,7 +177,7 @@ public class CdfUtil {
             throw new NullPointerException("something went wrong");
         }
 
-        WritableDataSet result;
+        MutablePropertyDataSet result;
 
         if ( dims==0 ) dimSizes= new int[0]; // to simplify code
 
@@ -193,7 +194,7 @@ public class CdfUtil {
                 dimSizes[i]= dimSizes[n-i-1];
                 dimSizes[n-i-1]= t;
             }
-        } 
+        }
 
         int[] qube;
         if ( recCount==-1 ) {
@@ -240,18 +241,36 @@ public class CdfUtil {
                 result = DDataSet.wrap((double[]) odata, qube);
             }
         } else {
-            if ( qube.length==3 ) {
-                int tr= qube[2];
-                qube[2]= qube[1];
-                qube[1]= tr;
-            } else if ( qube.length==4 ) {
-                int tr= qube[3];
-                qube[3]= qube[1];
-                qube[1]= tr;
-            } else if ( qube.length>4 ) {
-                throw new IllegalArgumentException("rank limit");
+            if ( recCount==-1 ) {
+                if ( qube.length==2 ) {
+                    int tr= qube[1];
+                    qube[1]= qube[0];
+                    qube[0]= tr;                    
+                } else if ( qube.length==3 ) {
+                    int tr= qube[2];
+                    qube[2]= qube[0];
+                    qube[0]= tr;
+                } else if ( qube.length>4 ) {
+                    throw new IllegalArgumentException("rank limit");
+                }
+                int [] qqube= new int[qube.length+1];
+                qqube[0]= 1;
+                System.arraycopy(qube, 0, qqube, 1, qube.length);
+                result= (MutablePropertyDataSet) TrDDataSet.wrap((double[]) odata, qqube).slice(0);
+            } else {
+                if ( qube.length==3 ) {
+                    int tr= qube[2];
+                    qube[2]= qube[1];
+                    qube[1]= tr;
+                } else if ( qube.length==4 ) {
+                    int tr= qube[3];
+                    qube[3]= qube[1];
+                    qube[1]= tr;
+                } else if ( qube.length>4 ) {
+                    throw new IllegalArgumentException("rank limit");
+                }
+                result = TrDDataSet.wrap((double[]) odata, qube);
             }
-            result = TrDDataSet.wrap((double[]) odata, qube);
         }
 
         if ( varType == CDFConstants.CDF_CHAR ) {

@@ -11,15 +11,18 @@ package org.virbo.cdf;
 import java.util.HashMap;
 import java.util.Map;
 import org.virbo.dataset.AbstractDataSet;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
+import org.virbo.dataset.Slice0DataSet;
 import org.virbo.dataset.WritableDataSet;
 
 /**
  * hacked DDataSet implementation does transpose for column major files.
- * rank 1,2,or 3 dataset backed by double array. 
+ * rank 1,2,or 3 dataset backed by double array.  Note this is not
+ * simply a transpose of DDataSet, as the name implies.  The zeroth index is 
+ * the same, and the remaining index are reversed.
+ * 
  * Mutable datasets warning: No dataset should be mutable once it is accessible to the
  * rest of the system.  This would require clients make defensive copies which would 
  * seriously degrade performance.  
@@ -568,15 +571,8 @@ public final class TrDDataSet extends AbstractDataSet implements WritableDataSet
      */
     @Override
     public QDataSet slice(int i) {
-        int nrank = this.rank-1;
-        int noff1= i * len1 * len2 * len3;
-        int noff2= (i+1) * len1 * len2 * len3;
-        double[] newback = new double[noff2-noff1];
-        System.arraycopy( this.back, noff1, newback, 0, noff2-noff1 );
-        Map<String,Object> props= DataSetOps.sliceProperties0(i,DataSetUtil.getProperties(this));
-        TrDDataSet result= new TrDDataSet( nrank, len1, len2, len3, 1, newback );
-        DataSetUtil.putProperties( props, result );
-        return result;
+        System.err.println("\n\nUsing Slice0DataSet to implement slice\n\n");
+        return new Slice0DataSet(this, i);
     }
 
     /**

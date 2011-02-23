@@ -372,9 +372,12 @@ public class DataSourceRegistry {
      */
     public void registerExtension(String className, String extension, String description ) {
         extension= getExtension(extension);
-        String old= (String) dataSourcesByExt.get(extension);
-        if ( old!=null && !old.equals(className) ) {
-            System.err.println("extension: "+extension+ " is already handled by "+className );
+        Object old= dataSourcesByExt.get(extension);
+        if ( old!=null ) {
+            String oldClassName= ( old instanceof String ) ? (String) old : old.getClass().getName() ;
+            if ( !(oldClassName.equals(className)) ) {
+                System.err.println("extension "+extension+ " is already handled by "+oldClassName + ", replacing with "+className );
+            }
         }
         dataSourcesByExt.put(extension, className);
         if ( description!=null ) extToDescription.put( extension, description );
