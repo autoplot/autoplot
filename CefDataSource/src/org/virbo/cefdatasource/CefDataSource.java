@@ -226,13 +226,7 @@ public class CefDataSource extends AbstractDataSource {
 
                 ArrayDataSet dds = ArrayDataSet.copy(ds);
                 dds.putProperty(QDataSet.UNITS, u);
-                for (int i = 0; i < dds.length(); i++) {
-                    for (int j = 0; j < dds.length(i); j++) {
-                        if (dds.value(i, j) == ceffill) {
-                            dds.putValue(i, j, fill);
-                        }
-                    }
-                }
+                dds.putProperty(QDataSet.FILL_VALUE, ceffill );
                 ds = dds;
                 setDsName(var, ds);
                 
