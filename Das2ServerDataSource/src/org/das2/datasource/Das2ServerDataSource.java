@@ -4,6 +4,7 @@
  */
 package org.das2.datasource;
 
+import java.util.logging.Level;
 import org.das2.client.DataSetStreamHandler;
 import org.das2.dataset.DataSet;
 import org.das2.datum.Datum;
@@ -55,7 +56,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         resolution= null;
     }
 
-    Logger logger= Logger.getLogger("das2serverDataSource");
+    final static Logger logger= Logger.getLogger("das2serverDataSource");
 
     DatumRange timeRange;
     Datum resolution;
@@ -121,7 +122,7 @@ class Das2ServerDataSource extends AbstractDataSource {
             if ( dsdfParams==null ) {
                 String dsdfURL= this.resourceURI + "?server=dsdf&dataset=" + dataset;
                 URL url3= new URL( dsdfURL );
-                logger.fine("opening "+url3);
+                logger.log(Level.FINE, "opening {0}", url3);
                 InputStream in = url3.openStream();
 
                 ReadableByteChannel channel = Channels.newChannel(in);
@@ -176,7 +177,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         
         boolean qds= "1".equals( dsdfParams.get("qstream") );
 
-        logger.fine( "opening "+ ( qds ? "as qstream " : "as das2stream " ) + url2 );
+        logger.log( Level.FINE, "opening {0} {1}", new Object[]{ qds ? "as qstream" : "as das2stream", url2 });
         InputStream in = url2.openStream();
 
         final DasProgressMonitorInputStream mpin = new DasProgressMonitorInputStream(in, mon);
