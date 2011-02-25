@@ -198,8 +198,8 @@ public class AutoplotDataServer {
             int i=0;
             mon.setTaskSize(10*drs.size());
 
+            mon.setTaskProgress( 5 );
             for ( DatumRange dr: drs ) {
-                mon.setTaskProgress(i*10);
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                 QDataSet range= DataSetOps.dependBounds( ds1 );
                 System.err.println("loaded ds="+ds1 + "  bounds: "+range );
@@ -208,6 +208,7 @@ public class AutoplotDataServer {
                     someValid= true;
                 }
                 i++;
+                mon.setTaskProgress(i*10);
             }
             mon.finished();
 
