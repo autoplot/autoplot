@@ -343,11 +343,16 @@ public class PlotElementController extends DomNodeController {
                     fillDs = DataSetOps.slice1(fillDs, 2);
                     label = labels[2];
                 } else {
-                    for (int i = 0; i < labels.length; i++) {
-                        if (labels[i].equals(plotElement.getComponent())) {
-                            fillDs = DataSetOps.slice1(fillDs, i);
-                            label = labels[i];
-                            break;
+                    if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
+                        fillDs= DataSetOps.unbundle( fillDs, plotElement.getComponent() ); //TODO: illegal argument exception
+                        label= plotElement.getComponent();
+                    } else {
+                        for (int i = 0; i < labels.length; i++) {
+                            if (labels[i].equals(plotElement.getComponent())) {
+                                fillDs = DataSetOps.slice1(fillDs, i);
+                                label = labels[i];
+                                break;
+                            }
                         }
                     }
                 }
@@ -1063,7 +1068,9 @@ public class PlotElementController extends DomNodeController {
         }
 
         if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
-            
+            if ( dsf.getController().getTimeSeriesBrowseController()!=null ) { // kludge city: we've already set the range based on the TSB timerange.
+                peleCopy.getPlotDefaults().getXaxis().setAutoRange(false); //TODO: this will probably have problems with
+            }
             doAutoranging( peleCopy,props,fillDs );
 
             Renderer newRenderer = getRenderer();
@@ -1332,8 +1339,10 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getYaxis().setLog(false);
                 peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
             } else {
-                peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
-                peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+                if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
+                    peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+                    peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+                }
                 peleCopy.getPlotDefaults().getYaxis().setLog(ydesc.log);
                 peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
             }
