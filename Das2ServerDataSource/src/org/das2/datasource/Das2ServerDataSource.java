@@ -35,7 +35,11 @@ import org.das2.dataset.CacheTag;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
+import org.virbo.dataset.DataSetOps;
+import org.virbo.dataset.DataSetUtil;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -270,10 +274,27 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         }
 
+
         if ( timeRange==null ) timeRange= DatumRangeUtil.parseTimeRange( params2.get("start_time") + " to "+ params2.get("end_time" ) );
 
         logger.fine("  done. ");
+
+        try {
+            QDataSet dep= (QDataSet) result1.property( QDataSet.DEPEND_0 );
+            if ( dep!=null && dep.property( QDataSet.CACHE_TAG )== null ) {
+                QDataSet bounds= SemanticOps.bounds(result1);
+                CacheTag ct= new CacheTag( DataSetUtil.asDatumRange( bounds.slice(0), true ), resolution );
+                MutablePropertyDataSet dep2= DataSetOps.makePropertiesMutable(dep);
+                dep2.putProperty( QDataSet.CACHE_TAG, ct );
+                MutablePropertyDataSet result2= DataSetOps.makePropertiesMutable(result1);
+                result2.putProperty( QDataSet.DEPEND_0, dep2 );
+                return result2;
+            }
+        } catch ( IllegalArgumentException ex ) {
+            ex.printStackTrace();
+        }
         return result1;
+
     }
 
     public TimeSeriesBrowse getTimeSeriesBrowse() {
