@@ -22,11 +22,15 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -96,7 +100,13 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         viewDsdfButton = new javax.swing.JButton();
         validRangeLabel = new javax.swing.JLabel();
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", " " }));
+        jComboBox1.setEditable(true);
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", "" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Das2 Server URL:");
 
@@ -136,7 +146,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
             }
         });
 
-        validRangeLabel.setFont(new java.awt.Font("DejaVu LGC Sans", 0, 10)); // NOI18N
+        validRangeLabel.setFont(new java.awt.Font("DejaVu LGC Sans", 0, 10));
         validRangeLabel.setText("<html><em>no valid range for dataset provided</em></html>");
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -347,6 +357,10 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
     }//GEN-LAST:event_viewDsdfButtonActionPerformed
 
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        serverURL= jComboBox1.getSelectedItem().toString();
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JTextArea ReaderParamsTextArea;
@@ -425,13 +439,21 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }
 
     public void setURI(String uri) {
+        URI home=null;
+        try {
+            home = new URI("http://www-pw.physics.uiowa.edu/das/das2Server");
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         URISplit split= URISplit.parse(uri);
         if ( split.file==null || split.file.equals("file:///") ) {
-            try {
-                split.resourceUri = new URI("http://www-pw.physics.uiowa.edu/das/das2Server");
-            } catch (URISyntaxException ex) {
-                Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            split.resourceUri = home;
+        }
+        List<URI> servers= new ArrayList();
+        servers.add(home);
+        if ( !split.resourceUri.equals( home ) ) {
+            servers.add( split.resourceUri );
         }
         serverURL= DataSetURI.fromUri( split.resourceUri );
         Map<String,String> params= URISplit.parseParams(split.params);
@@ -463,6 +485,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         ReaderParamsTextArea.setText(paramsStr.toString());
 
+        this.jComboBox1.setModel( new DefaultComboBoxModel(servers.toArray()) );
+        this.jComboBox1.setSelectedItem(split.resourceUri);
+
         new Thread( getDataSetsRunnable() ).start();
 
     }
@@ -471,7 +496,9 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         Runnable run= new Runnable() {
             public void run() {
                 try {
-                    DasServer server= DasServer.create( new URL( serverURL ) );
+                    String ss= jComboBox1.getSelectedItem().toString();
+
+                    DasServer server= DasServer.create( new URL( ss ) );
                     TreeModel model= server.getDataSetList();
                     jTree1.setModel(model);
                     if ( dataSetId!=null ) selectDataSetId();
