@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import org.das2.client.Authenticator;
 import org.das2.client.DasServer;
 import org.das2.client.Key;
+import org.das2.dataset.CacheTag;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractDataSet;
 import org.das2.dataset.DataSetAdapter;
@@ -80,6 +81,9 @@ class Das2ServerDataSource extends AbstractDataSource {
         //&interval=300.0    // interval in seconds
         //&ascii=1'
 
+        mon.started();
+        mon.setProgressMessage("sending request");
+        
         Map params2 = new LinkedHashMap();
         Map otherParams= new LinkedHashMap( params );
         otherParams.remove("start_time");
@@ -97,7 +101,10 @@ class Das2ServerDataSource extends AbstractDataSource {
         if ( timeRange!=null ) {
             params2.put("start_time", URLEncoder.encode(timeRange.min().toString()) );
             params2.put("end_time", URLEncoder.encode(timeRange.max().toString()) );
-        } 
+        } else {
+            throw new IllegalArgumentException("timeRange is null");
+        }
+
         if ( resolution!=null ) {
             params2.put("resolution", ""+resolution.doubleValue(Units.seconds) );
         }
