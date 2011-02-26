@@ -25,6 +25,7 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
+import ucar.nc2.NetcdfFile;
 import ucar.nc2.dataset.NetcdfDataset;
 
 /**
@@ -51,6 +52,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         
     }
 
+    //TODO: NetCDF has a variable.slice().
+    
     private void read( Variable variable , NetcdfDataset ncfile, ProgressMonitor mon )  throws IOException {
         this.v= variable;
         if ( !mon.isStarted() ) mon.started(); //das2 bug: monitor blinks if we call started again here
