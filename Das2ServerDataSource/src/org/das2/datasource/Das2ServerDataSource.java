@@ -313,8 +313,12 @@ class Das2ServerDataSource extends AbstractDataSource {
                     String etime= URLEncoder.encode( timeRange.max().toString(), "US-ASCII" );
                     String sparams= "dataset="+params.get( "dataset" )
                             + "&start_time=" + stime
-                            + "&end_time=" + etime
-                            + "&resolution=" + resolution.doubleValue(Units.seconds);
+                            + "&end_time=" + etime;
+                    if ( resolution!=null ) {
+                            sparams+= "&resolution=" + resolution.doubleValue(Units.seconds);
+                    } else {
+                        System.err.println("no resolution specified");
+                    }
                     if ( dsParams!=null )  sparams+= "&" + dsParams;
                     return "vap+das2Server:" + resourceURI + "?" + sparams;
                 } catch ( UnsupportedEncodingException ex ) {
