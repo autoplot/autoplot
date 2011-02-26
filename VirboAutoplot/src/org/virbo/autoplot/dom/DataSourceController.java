@@ -250,8 +250,9 @@ public class DataSourceController extends DomNodeController {
 
         if (timeSeriesBrowseController != null) {
             timeSeriesBrowseController.release();
+            this.timeSeriesBrowseController= null;
         }
-
+        
         DataSource oldSource = getDataSource();
 
         if (dataSource == null) {
