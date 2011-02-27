@@ -54,9 +54,11 @@ public class Test028 {
         try {
 
             URISplit split;
+            setCanvasSize(640,480);
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-7em");
 
             doTest( 0, "vap+inline:1,2;3,4;5,6;7,2;9,0" );
-            doTest( 1, "vap+inline:1,3,5,7,9;2,4,6,2,0" );
             doTest( 2, "vap+inline:1,3;2,4" );
             doTest( 3, "vap+inline:ripples(100,100)" );
             doTest( 4, "vap+inline:linspace(0,1,100),linspace(0,1,100),ripples(100,100)" );
