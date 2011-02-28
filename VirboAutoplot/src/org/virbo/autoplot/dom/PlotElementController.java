@@ -336,8 +336,13 @@ public class PlotElementController extends DomNodeController {
                         this.procressStr= null;
                         ProgressMonitor mon= DasProgressPanel.createComponentPanel( getDasPlot(), "process data set" );
                         fillDs = DataSetOps.sprocess(c, fillDs, mon );
-                        this.processDataSet= fillDs;
-                        this.procressStr= c;
+                        if ( mon.isCancelled() ) {
+                            this.processDataSet= null; //TODO: this is going to cause a problem because we'll reenter almost immediately.  We need to cache the result and a flag that indicates it should be reloaded.
+                            this.procressStr= null;
+                        } else {
+                            this.processDataSet= fillDs;
+                            this.procressStr= c;
+                        }
                     }
                 }
             } else {
