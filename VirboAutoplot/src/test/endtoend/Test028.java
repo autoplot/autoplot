@@ -53,7 +53,9 @@ public class Test028 {
     public static void main(String[] args)  {
         try {
 
-            URISplit split;
+            setCanvasSize(640,480);
+            getDocumentModel().getOptions().setAutolayout(false);
+            getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-7em");
             setCanvasSize(640,480);
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-7em");

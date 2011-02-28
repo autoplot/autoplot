@@ -98,6 +98,7 @@ class Das2ServerDataSource extends AbstractDataSource {
 
         String item= (String) otherParams.remove("item");
         String interval= (String)otherParams.remove("interval");
+        String key= (String) otherParams.remove("key");
 
         dsParams= (String)  URISplit.formatParams(otherParams);
 

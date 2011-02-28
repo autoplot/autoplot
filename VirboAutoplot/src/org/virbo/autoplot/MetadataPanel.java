@@ -222,16 +222,17 @@ public class MetadataPanel extends javax.swing.JPanel {
         assert EventQueue.isDispatchThread() == false;
         final TreeModel unmount;
         DataSourceFilter dsf = dom.getController().getDataSourceFilter();
-        if (dsf.getController().getDataSet() == null) {
+        QDataSet ds= dsf.getController().getDataSet();
+        if ( ds == null) {
             unmount = dsTree;
             dsTree= NameValueTreeModel.create("Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
-            this.dsTreeDs = dsf.getController().getDataSet(); // (null)
+            this.dsTreeDs = ds; // (null)
             //(PropertiesTreeModel( "no dataset", null );
         } else {
-            if (dsf.getController().getDataSet() != this.dsTreeDs) {
+            if ( ds != this.dsTreeDs) {
                 unmount = dsTree;
-                dsTree = new PropertiesTreeModel("Dataset= ", dsf.getController().getDataSet(), 20);
-                this.dsTreeDs = dsf.getController().getDataSet();
+                dsTree = new PropertiesTreeModel("Dataset= ", ds, 20);
+                this.dsTreeDs = ds;
             } else {
                 unmount = null;
             }
