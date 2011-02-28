@@ -152,6 +152,16 @@ public class CdfFileDataSource extends AbstractDataSource {
 
     }
 
+    private Variable maybeGetVariable( Vector vars, String name ) {
+        for ( Object ov: vars ) {
+            Variable v= (Variable)ov;
+            if ( v.getName().equals(name) ) {
+                return v;
+            }
+        }
+        return null;
+    }
+
     /**
      * Read the variable into a QDataSet, possibly recursing to get depend variables.
      * @param cdf
@@ -290,7 +300,10 @@ public class CdfFileDataSource extends AbstractDataSource {
                             // They have a variable "DELTA_T" that gives time between measurements,
                             // and "Translation" gives offset for the waveform (e.g. 500KHz-525KHz)
                             // see .../po_h7_pwi_1996040423_v01.cdf
-                            Variable deltaTVar= cdf.getVariable("Delta_T");
+
+                            Vector vars= cdf.getVariables();
+
+                            Variable deltaTVar= maybeGetVariable( vars, "Delta_T" );
                             if ( deltaTVar!=null ) {
                                 double deltaT= (Double)deltaTVar.getScalarData();
                                 depDs= DDataSet.maybeCopy( Ops.multiply( DataSetUtil.asDataSet(deltaT), depDs ) );
@@ -308,11 +321,12 @@ public class CdfFileDataSource extends AbstractDataSource {
                                 fixAttr.put( "LABLAXIS", "time_offset" );
                             }
                             
-                            Variable offsetVar= cdf.getVariable("Translation");
+                            Variable offsetVar= maybeGetVariable(vars, "Translation");
                             if ( offsetVar!=null ) {
                                 MutablePropertyDataSet transDs= wrapDataSet( cdf, "Translation", constraints, reform, false, null );
                                 if ( transDs.property(QDataSet.UNITS)==null ) {
                                     transDs.putProperty( QDataSet.UNITS, Units.kiloHertz );
+                                    System.err.println("using Units.kiloHertz for translation units, they were not specified.");
                                 }
                                 Map <String,Object> user= new HashMap();
                                 user.put( "FFT_Translation", transDs );
