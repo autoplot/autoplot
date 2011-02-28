@@ -71,6 +71,9 @@ public class PlotElementController extends DomNodeController {
     public static final int SYMSIZE_DATAPOINT_COUNT = 500;
     public static final int LARGE_DATASET_COUNT = 30000;
 
+    private QDataSet processDataSet= null;
+    String procressStr= null;
+
     public PlotElementController(final ApplicationModel model, final Application dom, final PlotElement plotElement) {
         super(plotElement);
         plotElement.controller = this;
@@ -325,9 +328,21 @@ public class PlotElementController extends DomNodeController {
         if (c.length() > 5 && c.startsWith("|")) {
             // slice and collapse specification
             if ( DataSetOps.isProcessAsync(c) ) {
-                ProgressMonitor mon= DasProgressPanel.createComponentPanel( getDasPlot(), "process data set" );
-                fillDs = DataSetOps.sprocess(c, fillDs, mon );
+                synchronized (this) {
+                    if ( c.equals(this.procressStr) && this.processDataSet!=null ) {
+                        fillDs= this.processDataSet;
+                    } else {
+                        this.processDataSet= null;
+                        this.procressStr= null;
+                        ProgressMonitor mon= DasProgressPanel.createComponentPanel( getDasPlot(), "process data set" );
+                        fillDs = DataSetOps.sprocess(c, fillDs, mon );
+                        this.processDataSet= fillDs;
+                        this.procressStr= c;
+                    }
+                }
             } else {
+                this.processDataSet= null;
+                this.procressStr= null;
                 fillDs = DataSetOps.sprocess(c, fillDs, null);
             }
         } else {
@@ -488,6 +503,8 @@ public class PlotElementController extends DomNodeController {
     public void _setDataSet(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet;
+        this.processDataSet= null;
+        this.procressStr= null;
         if ( plotElement.getLegendLabel().contains("%{") && renderer!=null ) {
             String s= (String)getLabelConverter().convertForward(plotElement.getLegendLabel());
             renderer.setLegendLabel(s);
