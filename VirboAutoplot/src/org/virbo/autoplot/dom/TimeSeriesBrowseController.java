@@ -160,23 +160,25 @@ public class TimeSeriesBrowseController {
 
             DatumRange visibleRange = null;
             Datum newResolution = null;
-            CacheTag newCacheTag = null;
+            CacheTag newCacheTag = null;  // new one we'll retrieve
+            CacheTag testCacheTag = null; // sloppy one
             if ( xAxis!=null ) {
                 visibleRange= xAxis.getDatumRange();
                 newResolution = visibleRange.width().divide(xAxis.getDLength());
                 // don't waste time by chasing after 10% of a dataset.
                 DatumRange newRange = visibleRange;
-                newRange = DatumRangeUtil.rescale(newRange, 0.1, 0.9);
+                testCacheTag = new CacheTag( DatumRangeUtil.rescale(newRange, 0.01, 0.99), newResolution );
                 newCacheTag = new CacheTag(newRange, newResolution);
                 trange= newRange;
             } else {
                 newCacheTag = new CacheTag(trange,null);
+                testCacheTag= newCacheTag;
             }
 
-            if (tag == null || !tag.contains(newCacheTag)) {
+            if (tag == null || !tag.contains(testCacheTag)) {
                 if ( xAxis!=null ) {
                     if (plot.isOverSize() && autorange==false ) {
-                        visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3);
+                        visibleRange = DatumRangeUtil.rescale(visibleRange, -0.3, 1.3); //TODO: be aware of
                     }
                     dataSourceController.getTsb().setTimeRange(trange);
                     dataSourceController.getTsb().setTimeResolution(newResolution);
