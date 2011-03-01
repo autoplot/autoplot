@@ -66,6 +66,12 @@ public class URISplit {
      * contains the parameters part, a ampersand-delimited set of parameters. For example, column=field2&rank2.
      */
     public String params;
+
+    /**
+     * contains the part indicating additional processing to be done on the dataset.  (Not implemented, but it's coming.
+     */
+    public String process;
+
     /**
      * position of the carot after modifications to the surl are made.  This
      * is with respect to surl, the URI for the datasource, without the "vap" scheme.
@@ -206,7 +212,7 @@ public class URISplit {
      * @return
      */
     public static URISplit parse( URI uri ) {
-        return parse( DataSetURI.fromUri(uri) );
+        return parse( DataSetURI.fromUri(uri), 0, true );
     }
 
     /**
@@ -426,6 +432,13 @@ public class URISplit {
         String params = null;
         int fileEnd=-1;
 
+            //int ipipe= file.indexOf("|");
+            //if ( ipipe>-1 ) {
+            //    result.process= file.substring(ipipe);
+            //    file= file.substring(0,ipipe);
+            //} else {
+            //    result.process= "";
+            //}
         if (file != null && iquery != -1) {
             fileEnd = iquery;
             params = rsurl.substring(iquery + 1);
