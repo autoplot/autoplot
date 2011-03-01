@@ -1418,10 +1418,12 @@ public class PlotElementController extends DomNodeController {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
             }
 
-            AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
+            if ( peleCopy.getPlotDefaults().getXaxis().isAutoRange() ) {
+                AutoplotUtil.AutoRangeDescriptor xdesc = AutoplotUtil.autoRange(xds, (Map) props.get(QDataSet.DEPEND_0));
 
-            peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
-            peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+                peleCopy.getPlotDefaults().getXaxis().setLog(xdesc.log);
+                peleCopy.getPlotDefaults().getXaxis().setRange(xdesc.range);
+            }
 
             if (spec == RenderType.colorScatter) {
                 AutoplotUtil.AutoRangeDescriptor zdesc;
