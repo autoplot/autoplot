@@ -244,7 +244,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
         }
 
-        if ( slice && depend ) {
+        if ( slice && depend ) { 
             Map dep0map= (Map) thisAttributes.get( "DEPEND_0" );
             QDataSet dep0= wrapDataSet( cdf, (String) dep0map.get("NAME"), constraints, false, false, null );
             result.putProperty( QDataSet.CONTEXT_0, dep0 );
