@@ -204,6 +204,19 @@ public class TimeSeriesBrowseController {
 
     }
 
+    /**
+     * return the plot element that is responsible for handling this data source.  This
+     * is the guy that was focused when this was created, and is attached to the plot x-axis
+     * that controls this (if there is one).
+     *
+     * This was introduced because classes were accessing the local variable p.
+     *
+     * @return a PlotElement or null.
+     */
+    public PlotElement getPlotElement() {
+        return p;
+    }
+
     public boolean isPendingChanges() {
         return changesSupport.isPendingChanges();
     }
