@@ -1090,9 +1090,6 @@ public class PlotElementController extends DomNodeController {
         }
 
         if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
-            if ( dsf.getController().getTimeSeriesBrowseController()!=null ) { // kludge city: we've already set the range based on the TSB timerange.
-                peleCopy.getPlotDefaults().getXaxis().setAutoRange(false); //TODO: this will probably have problems with
-            }
             doAutoranging( peleCopy,props,fillDs );
 
             Renderer newRenderer = getRenderer();
