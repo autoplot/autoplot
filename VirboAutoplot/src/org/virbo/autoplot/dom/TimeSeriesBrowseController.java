@@ -156,7 +156,11 @@ public class TimeSeriesBrowseController {
             // CacheTag "tag" identifies what we have already
             QDataSet ds = this.dataSourceController.getDataSet();
             QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
+            QDataSet join0 = ds == null ? null : (QDataSet) ds.property(QDataSet.JOIN_0);
             CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
+            if ( tag==null && join0!=null ) {
+                tag= (CacheTag) join0.property( QDataSet.CACHE_TAG );
+            }
 
             DatumRange visibleRange = null;
             Datum newResolution = null;
