@@ -281,14 +281,22 @@ class Das2ServerDataSource extends AbstractDataSource {
         logger.fine("  done. ");
 
         try {
-            QDataSet dep= (QDataSet) result1.property( QDataSet.DEPEND_0 );
+            String prop= QDataSet.DEPEND_0;
+            QDataSet dep= (QDataSet) result1.property( prop );
+            if ( dep==null ) {
+                prop= QDataSet.JOIN_0;
+                Object o= result1.property( prop );
+                if ( o instanceof QDataSet ) {
+                    dep= (QDataSet) o;
+                }
+            }
             if ( dep!=null && dep.property( QDataSet.CACHE_TAG )== null ) {
                 QDataSet bounds= SemanticOps.bounds(result1);
                 CacheTag ct= new CacheTag( DataSetUtil.asDatumRange( bounds.slice(0), true ), resolution );
                 MutablePropertyDataSet dep2= DataSetOps.makePropertiesMutable(dep);
                 dep2.putProperty( QDataSet.CACHE_TAG, ct );
                 MutablePropertyDataSet result2= DataSetOps.makePropertiesMutable(result1);
-                result2.putProperty( QDataSet.DEPEND_0, dep2 );
+                result2.putProperty( prop, dep2 );
                 return result2;
             }
         } catch ( IllegalArgumentException ex ) {
