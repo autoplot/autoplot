@@ -1090,7 +1090,17 @@ public class PlotElementController extends DomNodeController {
         }
 
         if (dom.getOptions().isAutoranging()) { //this is pre-autorange property, but saves time if we know we won't be autoranging.
+
+            if ( dsf.getController().getTimeSeriesBrowseController()!=null && dsf.getController().getTimeSeriesBrowseController().isListeningToAxis() ) {
+                // this means we've already autoranged.
+                peleCopy.getPlotDefaults().getXaxis().setAutoRange(false);
+            }
+
             doAutoranging( peleCopy,props,fillDs );
+
+            if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
+                peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
+            }
 
             Renderer newRenderer = getRenderer();
             if (newRenderer instanceof SeriesRenderer && fillDs != null) {

@@ -368,12 +368,10 @@ public class DataSourceController extends DomNodeController {
             // the dataset we get back isn't part of a time series.  So we should connect the TSB
             // to the application TimeRange property.
             this.timeSeriesBrowseController.release();
-            dom.setTimeRange( this.timeSeriesBrowseController.getTimeRange() );
+            Axis xaxis= this.getTimeSeriesBrowseController().domPlot.getXaxis();
+            dom.getController().unbind( dom, Application.PROP_TIMERANGE, xaxis, Axis.PROP_RANGE );
+            dom.setTimeRange( this.timeSeriesBrowseController.getTimeRange() );//TODO: think about if this is really correct
             this.timeSeriesBrowseController.setupGen( dom, Application.PROP_TIMERANGE );
-            // kludge--check for axis ranges and set to those, since we won't be autoranging.
-            if ( !this.timeSeriesBrowseController.p.getPlotDefaults().getXaxis().getRange().equals( Axis.DEFAULT_RANGE ) ) {
-                this.timeSeriesBrowseController.domPlot.getXaxis().syncTo( this.timeSeriesBrowseController.p.getPlotDefaults().getXaxis() );
-            }
         }
 
         ApplicationController ac= this.dom.controller;
