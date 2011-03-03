@@ -88,6 +88,8 @@ public class AutoplotDataServer {
 
     public static void main(String[] args) throws Exception {
 
+        long t0= System.currentTimeMillis();
+
         System.err.println("org.virbo.autoplot.AutoplotDataServer " + APSplash.getVersion() + " 20110217_1441");
 
         ArgumentList alm = new ArgumentList("AutoplotServer");
@@ -183,6 +185,8 @@ public class AutoplotDataServer {
 
         boolean someValid= false;
 
+        System.err.println( "time read args and prep=" + (( System.currentTimeMillis()-t0 ) ) );
+
         if (!timeRange.equals("")) {
             System.err.println("org.virbo.jythonsupport.Util.getDataSet( suri,timeRange, new NullProgressMonitor() ):");
             System.err.printf("   suri=%s\n", suri);
@@ -200,15 +204,21 @@ public class AutoplotDataServer {
 
             mon.setTaskProgress( 5 );
             for ( DatumRange dr: drs ) {
+                System.err.printf( "time read start read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
-                QDataSet range= DataSetOps.dependBounds( ds1 );
-                System.err.println("loaded ds="+ds1 + "  bounds: "+range );
                 if ( ds1!=null ) {
+                    QDataSet range= DataSetOps.dependBounds( ds1 );
+                    System.err.println("loaded ds="+ds1 + "  bounds: "+range );
+                    System.err.printf( "time read done read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+
                     writeData( format, out, ds1 );
                     someValid= true;
                 }
                 i++;
                 mon.setTaskProgress(i*10);
+                System.err.printf( "time write to output channel %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
+
             }
             mon.finished();
 
@@ -224,6 +234,8 @@ public class AutoplotDataServer {
                 someValid= true;
             }
         }
+
+        System.err.printf( "time done read all= %d\n", System.currentTimeMillis()-t0 );
 
         if ( !someValid ) {
              if ( format.equals("d2s") ) {
