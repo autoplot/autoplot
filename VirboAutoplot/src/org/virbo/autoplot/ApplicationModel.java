@@ -119,17 +119,17 @@ public class ApplicationModel {
      * show a message to the user.
      * @param message
      * @param title
-     * @param messageType JOptionPane.WARNING_MESSAGE, JOptionPane.INFORMATION_MESSAGE
+     * @param messageType JOptionPane.WARNING_MESSAGE, JOptionPane.INFORMATION_MESSAGE, JOptionPane.WARNING_MESSAGE,
      */
     public void showMessage( String message, String title, int messageType ) {
         if (  ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false") ) ) {
             Component p= SwingUtilities.getRoot(canvas);
             JOptionPane.showMessageDialog( p, message, title, messageType );
         } else {
-            if ( messageType!=JOptionPane.INFORMATION_MESSAGE || messageType!=JOptionPane.PLAIN_MESSAGE ) {
+            if ( messageType==JOptionPane.WARNING_MESSAGE || messageType!=JOptionPane.INFORMATION_MESSAGE || messageType!=JOptionPane.PLAIN_MESSAGE ) {
                 throw new RuntimeException( title + ": " + message );
             } else {
-                System.err.println( title + ": " + message );
+                System.err.println( title + ": " + message );  //TODO: when would we ever use this?  We are not getting exception in Hudson tests because of this (TSDS timeout).
             }
         }
     }

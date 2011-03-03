@@ -19,6 +19,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -124,8 +125,12 @@ public abstract class Bookmark {
             if ( remoteUrlNode!=null ) { // 2984078
                 remoteUrl= URLDecoder.decode( remoteUrlNode.getNodeValue(), "US-ASCII" );
                 try {
+                    System.err.println("opening "+remoteUrl+"...");
                     URL rurl= new URL(remoteUrl);
-                    InputStream inn = rurl.openStream();
+                    URLConnection connect= rurl.openConnection();
+                    connect.setConnectTimeout(1000);
+                    connect.setReadTimeout(1000);
+                    InputStream inn = connect.getInputStream();
                     Reader in = new InputStreamReader( inn );
                     DocumentBuilder builder;
                     builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
