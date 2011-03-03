@@ -10,8 +10,8 @@ ant do-tag
 
 export AP_VERSION=20110219x
 
-ant jar -Ddefault_release_tag=$AP_VERSION
-#ant jnlp-release -Ddefault_release_tag=$AP_VERSION
+#ant jar -Ddefault_release_tag=$AP_VERSION
+ant jnlp-release -Ddefault_release_tag=$AP_VERSION
 
 sh ./jumbojar.sh  
 mv dist/autoplot.jar dist/jnlp/

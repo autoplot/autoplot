@@ -10,6 +10,7 @@ import java.applet.AppletStub;
 import java.applet.AudioClip;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -23,6 +24,7 @@ import javax.swing.JFrame;
 import org.das2.DasApplication;
 import org.das2.util.filesystem.FileSystem;
 import org.virbo.autoplot.AutoplotApplet;
+import org.virbo.autoplot.state.StatePersistence;
 
 /**
  * Andrew's server
@@ -130,8 +132,14 @@ public class TestApplet001 {
 
         applet.init();
         applet.start();
-
+        
         applet.getDom().getController().waitUntilIdle();
+
+        try {
+            StatePersistence.saveState(new File("test-applet.vap"), applet.getDom());
+        } catch (IOException ex) {
+            Logger.getLogger(TestApplet001.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         try {
             applet.getDom().getController().getCanvas().getController().getDasCanvas().writeToPng("test-applet.png");

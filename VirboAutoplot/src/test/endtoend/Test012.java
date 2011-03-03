@@ -97,6 +97,9 @@ public class Test012 {
             // recursion bug https://sourceforge.net/tracker/index.php?func=detail&aid=2981336&group_id=199733&atid=970682
             doTest( testid,13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_fgm_20100101_v01.cdf?tha_fgh[0:10000]" );
 
+            // twins data uses extra DEPEND_x variables.
+            doTest( testid,14, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/twins/twins1_l1_imager_2009011102_v01.cdf?smooth_image&interpMeta=no" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();

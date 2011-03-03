@@ -100,7 +100,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             }
 
             MutablePropertyDataSet result;
-            if ( attributes.containsKey("VIRTUAL") && attributes.containsKey("FUNCTION") ) {
+            if ( attributes!=null && attributes.containsKey("VIRTUAL") && attributes.containsKey("FUNCTION") ) {
                 List<QDataSet> attr= new ArrayList();
                 String function= (String)attributes.get("FUNCTION");
                 if ( attributes.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_0"), constraint, false, true, mon ) );
@@ -140,6 +140,13 @@ public class CdfFileDataSource extends AbstractDataSource {
                     }
                 }
             // apply properties.
+            } else {
+                QDataSet dep;
+                dep= (QDataSet)result.property(QDataSet.DEPEND_0); // twins misuses DEPEND properties.
+                if ( dep!=null && dep.length()!=result.length() ) result.putProperty( QDataSet.DEPEND_0, null );
+                result.putProperty( QDataSet.DEPEND_1, null );
+                result.putProperty( QDataSet.DEPEND_2, null );
+                result.putProperty( QDataSet.DEPEND_3, null );
             }
 
             result.putProperty( QDataSet.METADATA, attributes );
