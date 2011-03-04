@@ -257,6 +257,12 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                     if ( exampleRange!=null && curr.equals(DEFAULT_TIMERANGE) ) {
                         this.timeRangeTextField.setText( exampleRange.getNodeValue() );
                     }
+                    if ( exampleRange==null ) {
+                        exampleRange= (Node) xpath.evaluate( "/stream/properties/@x_range", document, XPathConstants.NODE );
+                        if ( exampleRange!=null && curr.equals(DEFAULT_TIMERANGE) ) {
+                            this.timeRangeTextField.setText( exampleRange.getNodeValue() );
+                        }
+                    }
                     Node validRange= (Node)  xpath.evaluate( "/stream/properties/@validRange", document, XPathConstants.NODE );
                     if ( validRange!=null ) {
                         this.validRangeLabel.setText( "valid range: " + validRange.getNodeValue() );
