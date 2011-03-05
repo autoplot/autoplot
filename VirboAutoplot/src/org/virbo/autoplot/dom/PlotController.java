@@ -595,6 +595,7 @@ public class PlotController extends DomNodeController {
                 shouldBindX= false;
                 logger.finer("remove timerange binding that would cause inconvertable units");
             }
+             plot.getXaxis().setAutoRange(true);
         }
 
         if ( newSettings.getXaxis().isLog()==false && plot.getXaxis().isAutoRange() ) {

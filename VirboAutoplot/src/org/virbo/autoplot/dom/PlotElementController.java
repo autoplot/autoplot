@@ -43,6 +43,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
@@ -1100,6 +1101,23 @@ public class PlotElementController extends DomNodeController {
 
             if ( dsf.getController().getTimeSeriesBrowseController()!=null ) {
                 peleCopy.getPlotDefaults().getXaxis().setAutoRange(true); // kludge again: since we actually set it, turn on the autorange flag again so that it can bind to dom.timerange property
+            }
+
+            TimeSeriesBrowse tsb= getDataSourceFilter().getController().getTsb();
+            if ( tsb!=null ) {
+                if ( fillDs!=null ) {
+                    QDataSet xds= SemanticOps.xtagsDataSet(fillDs);
+                    Units xunits;
+                    if ( xds.rank()<=1 ) {
+                        xunits= (Units)xds.property(QDataSet.UNITS);
+                    } else {
+                        //JOIN dataset
+                        xunits= (Units)xds.property(QDataSet.UNITS,0);
+                    }
+                    if ( xunits!=null && UnitsUtil.isTimeLocation( xunits ) ) {
+                        peleCopy.getPlotDefaults().getXaxis().setRange( tsb.getTimeRange() );
+                    }
+                }
             }
 
             Renderer newRenderer = getRenderer();

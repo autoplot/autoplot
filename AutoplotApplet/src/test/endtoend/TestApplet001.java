@@ -175,6 +175,7 @@ public class TestApplet001 {
         try {
             doTest( params, headless, "height", "200", "width", "600" );
         } catch ( Exception ex ) {
+            ex.printStackTrace();
             if ( headless ) System.exit(1);
         }
 

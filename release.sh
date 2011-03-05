@@ -15,7 +15,7 @@ ant jnlp-release -Ddefault_release_tag=$AP_VERSION
 
 sh ./jumbojar.sh  
 mv dist/autoplot.jar dist/jnlp/
-rsync -e ssh -av dist/jnlp/ root@aurora.gmu.edu:/var/www/autoplot/jnlp/$AP_VERSION/
+#rsync -e ssh -av dist/jnlp/ root@aurora.gmu.edu:/var/www/autoplot/jnlp/$AP_VERSION/
 
 echo "If this is to be a new production version, then update the latest link in /var/www/autoplot/jnlp/"
 

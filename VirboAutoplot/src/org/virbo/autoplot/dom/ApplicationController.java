@@ -1033,6 +1033,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public Plot copyPlot(Plot srcPlot, boolean bindx, boolean bindy, boolean addPlotElement) {
         Plot that = addPlot(LayoutConstants.BELOW);
+        that.setAutoBinding(false);
         that.getController().setAutoBinding(false);
         if (addPlotElement) {
             addPlotElement(that, null);

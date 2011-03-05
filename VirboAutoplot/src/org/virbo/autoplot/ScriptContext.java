@@ -90,6 +90,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * return the Window for the application, to be used for dialogs.
+     * See createGui(), which creates the view.
      * @return
      */
     public static Window getViewWindow() {
