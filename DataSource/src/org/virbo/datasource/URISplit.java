@@ -146,7 +146,11 @@ public class URISplit {
             int iquery= surl.indexOf("?");
             if ( iquery==-1 ) {
                 int ieq= surl.indexOf("=");
-                if ( ieq>-1 && !(surl.charAt(0)=='/') ) {
+                //kludge in support for "ripples(30,30")
+                int ch0= surl.length()>0 ? surl.charAt(0) : (char)0;
+                int ch1= surl.length()>1 ? surl.charAt(1) : (char)0;
+                boolean notSlashStart= ch0!='/' && ch0!='\\' && ch1!='/' && ch1!='\\';
+                if ( notSlashStart || ( ieq>-1 && !(surl.charAt(0)=='/') ) ) {
                     isFile= false;
                 }
             }
