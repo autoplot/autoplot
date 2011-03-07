@@ -442,7 +442,9 @@ public class DataSourceController extends DomNodeController {
         if ( dsf.getUri()==null ) return; //TODO: remove
         URISplit split= URISplit.parse(dsf.getUri());
         if ( !dsf.getUri().startsWith("vap+internal:") ) {
-            throw new IllegalArgumentException("expected uri to start with vap+internal:");
+            System.err.println("unbinding because this doesn't have parents.");
+            unbind();
+            return;
         }
         String[] ss = split.surl.split(",", -2);
         for (int i = 0; i < ss.length; i++) {
