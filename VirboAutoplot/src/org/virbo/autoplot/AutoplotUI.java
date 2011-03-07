@@ -181,8 +181,10 @@ public class AutoplotUI extends javax.swing.JFrame {
             model.setExceptionHandler( new GuiExceptionHandler() );
         }
 
-        ScriptContext.setApplicationModel(model);
-        ScriptContext.setView(this);
+        if ( !ScriptContext.isModelInitialized() ) {
+            ScriptContext.setApplicationModel(model);
+            ScriptContext.setView(this);
+        }
 
         this.dom= model.getDocumentModel();
         
