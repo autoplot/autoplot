@@ -608,6 +608,14 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
+     * provide way to see if the model is already initialized (e.g. for clone application)
+     * @return true is the model is already initialized.
+     */
+    public static boolean isModelInitialized() {
+        return model!=null;
+    }
+
+    /**
      * binds two bean properties together.  Bindings are bidirectional, but
      * the initial copy is from src to dst.  In MVC terms, src should be the model
      * and dst should be a view.  The properties must fire property
