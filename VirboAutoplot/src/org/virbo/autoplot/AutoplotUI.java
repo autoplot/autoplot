@@ -2015,7 +2015,7 @@ private void updateFrameTitle() {
         alm.addOptionalSwitchArgument("port", "p", "port", "-1", "enable scripting via this port");
         alm.addBooleanSwitchArgument("scriptPanel", "s", "scriptPanel", "enable script panel");
         alm.addBooleanSwitchArgument("logConsole", "l", "logConsole", "enable log console");
-        alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
+        alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
         alm.addOptionalSwitchArgument("open", "o", "open", "", "open this URI (to support javaws)");
         alm.addOptionalSwitchArgument("print", null, "print", "", "print this URI (to support javaws)");
         alm.addOptionalSwitchArgument("script", null, "script", "", "run this script after starting.  " +

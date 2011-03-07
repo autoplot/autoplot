@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Experimental version of das2server uses Autoplot URIs and provides reduced versions of datasets to serve slow connections.
+        <p><small>Fast EES works again in the Autoplot 2010 branch.  Mode changes were not supported, and the Hudson tests didn't check this dataset.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -27,12 +27,33 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>other small bugs
             <li>bugfixes from production branch include improvements to Java CDF reader, supporting stride.
 <li>check for node SPASE/... in XML files instead of null pointer exception.
+        <ul>
+            <li>bugfix 3201828: File->New Window would cause script context to plot to new window, should be left alone.
+            <li>bugfix: vap+inline:ripples(30,30) would insert "file:///" when parsing and formatting URI.  This is cleaned up.
+            <li>update to the newest version of the Java CDF library, which fixes support for INT1 and INT2.
+            <li>stride properly supported in the Java CDF library.
+            <li>rank 4 variables supported in Java CDF library.
+            <li>column-major CDF files properly supported in Java CDF library.
+            <li>interpmeta=false will throw out DEPEND_1, DEPEND_2, and DEPEND_3 (twins imager files).
+            <li>set timeout on remote bookmarks.  A down server would hang Autoplot.
+            <li>links on help pages fixed to go to anchors on http://autoplot.org/help .
+            <li>Rank 2 Y tags supported in spectrogram (e.g. fa_k0_ees_19980111_v01.cdf).
+            <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3180942&group_id=199733&atid=970682">3180942</a> look and feel is native by default, --nativeLAF=false will disable
+        </ul>
+        <p>Less recent bugfixes:</p>
+        <ul>
+            <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3056945&group_id=199733&atid=970682">3056945</a>  axis range editors update plot without carriage return
+            <li>more tooltips to improve useability
+	    <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3176419&group_id=199733&atid=970682">3176419</a>  bugfixes in CDAWeb source GUI, minor new features
+            <li>bugfix: aggregate dialog doesn't clip okay button
+            <li>update splash screen
         </ul>
         <p>Features:</p>
         <ul>
             <li>AutoplotDataServer serves URIs as das2streams and QStreams
             <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3169744&group_id=199733&atid=970685">3169744</a> aggregation/TimeSeriesBrowse of data without time axes
             <li>minor features from production branch, such as CDAWeb stuff
+            <li>test.endtoend.TryHistory reloads every URI found in the bookmarks/history.txt file, printing exceptions on stats.
         </ul>
         <p>Less recent features:</p>
         <ul>
@@ -55,24 +76,24 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
 	<p>data is input from:
 	<li>ASCII files (.dat,.txt)</li>
-        <li>binary files (.bin)</li>
+        <li>Binary files (.bin)</li>
+        <li>CDF files(.cdf)</li>
 	<li>Excel spread sheets (.xls)</li>
 	<li>das2Streams (.d2s or .das2Stream)</li>
+        <li>ViRBO's TSDS server</li>
         <li>QStreams (.qds), QDataSet on a das2Stream
-	<li>netcdf files (.nc,.ncml)</li>
+        <li>Plasma Wave Group das2 Server</li>
+	<li>NetCDF files (.nc,.ncml)</li>
         <li>HDF5 files</li>
-        <li>cdf files(.cdf)</li>
-	<li>dods servers (.dds)</li>
+	<li>DODs servers (.dds)</li>
         <li>Cluster Exchange Format files (.cef)</li>
         <li>Fits Format Files</li>
-        <li>ViRBO's TSDS server</li>
-        <li>Plasma Wave Group das2 Server</li>
         <li>Images (.jpg, .png, .gif)</li>
         <li>Wav audio files</li>
 	</p>
 	<p>This is not complete, and limitations include:</p>
 	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
-	<li>Quantities of rank 4 dimensionality (e.g. flux(Time,Energy,azimuth,sector) are plotted by slicing.</li>
+	<li>Quantities of rank 4 dimensionality (e.g. flux(Time,Energy,azimuth,sector) are plotted by slicing twice.</li>
          
          <p><a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
          more information than this launch page.</p>

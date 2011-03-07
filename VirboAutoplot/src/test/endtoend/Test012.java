@@ -100,6 +100,9 @@ public class Test012 {
             // twins data uses extra DEPEND_x variables.
             doTest( testid,14, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/twins/twins1_l1_imager_2009011102_v01.cdf?smooth_image&interpMeta=no" );
 
+            // this fast ees has rank 2 DEPEND_1.
+            doTest( testid,15, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/fa_k0_ees_19980111_v01.cdf?el_0" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();
