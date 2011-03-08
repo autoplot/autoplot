@@ -48,7 +48,7 @@ public class FtpFileObject extends WebFileObject {
                         return list[i].size;
                     } else if ( tinyGzFib || list[i].name.equals(lookForGz) ) {
                         System.err.println("approximating size of gzipped file when it is uncompressed");
-                        return 20*Math.round(list[i].size/20.) * 5; // approx
+                        return 2000*Math.round(list[i].size/2000.) * 5; // approx
                     }
                 }
                 return -1;
