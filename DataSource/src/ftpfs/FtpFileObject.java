@@ -35,15 +35,20 @@ public class FtpFileObject extends WebFileObject {
 
     @Override
     public long getSize() {
+        boolean tinyGzFib= true; // return the .gz file size, assuming the server will send it.
         File listing= new File( this.getLocalFile().getParent(), ".listing" );
         if ( listing.exists() ) {
             try {
                 DirectoryEntry[] list = ftpfs.parseLsl(null, listing);
                 int ii= this.getNameExt().lastIndexOf("/");
                 String lookFor= this.getNameExt().substring(ii+1);
+                String lookForGz= this.getNameExt().substring(ii+1) + ".gz";
                 for (int i = 0; i < list.length; i++) {
-                    if (list[i].name.equals(lookFor)) {
+                    if (list[i].name.equals(lookFor) ) {
                         return list[i].size;
+                    } else if ( tinyGzFib || list[i].name.equals(lookForGz) ) {
+                        System.err.println("approximating size of gzipped file when it is uncompressed");
+                        return 20*Math.round(list[i].size/20.) * 5; // approx
                     }
                 }
                 return -1;
