@@ -3,7 +3,7 @@ package org.virbo.binarydatasource;
 import java.nio.ByteBuffer;
 
 /**
- * Unsigned Short.
+ * Unsigned Integer.
  * @author jbf
  */
 public class UInt extends BufferDataSet {
