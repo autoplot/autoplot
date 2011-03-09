@@ -141,6 +141,9 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         if ( rank>1 ) {
             putProperty( QDataSet.QUBE, Boolean.TRUE );
         }
+        if ( fieldLen>reclen ) {
+            System.err.println( String.format( "field length (%d) is greater than record length (%d) for len0=%d.", fieldLen, reclen ) );
+        }
         if ( back.remaining()< recoffs + ( reclen*len0 ) ) {
             System.err.println( String.format( "back buffer is too short (len=%d) for len0=%d.", back.remaining(), len0 ) );
         }
