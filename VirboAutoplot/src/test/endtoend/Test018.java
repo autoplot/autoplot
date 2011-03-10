@@ -48,7 +48,7 @@ public class Test018 {
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
 
-            test1( testId );
+            //test1( testId );
             test2( testId );
 
         } catch ( Exception ex ) {
@@ -74,11 +74,14 @@ public class Test018 {
         
         dom.getDataSourceFilters(0).setUri("file:///home/jbf/ct/hudson/data.backup/qds/series/hyd_%Y%m%d.qds?timerange=2000-01-01 through 2000-01-12");
         
-        dom.getController().waitUntilIdle(); // wait for child plot elements to be created.
+        getApplicationModel().waitUntilIdle(false); // wait for child plot elements to be created.
         Axis xaxis= dom.getPlots(0).getXaxis();
 
         ApplicationController controller= dom.getController();
         Plot domPlot= dom.getPlots(0);
+
+        System.err.println( domPlot.getXaxis().getRange() );
+        
         Plot that = dom.getController().copyPlotAndPlotElements( domPlot, null, false, false);
         controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
         controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
@@ -89,6 +92,7 @@ public class Test018 {
         that.getZaxis().setRange( DatumRange.newDatumRange( 1e4, 1e8, that.getZaxis().getRange().getUnits() ) ); //TODO: why does this autorange so poorly?
 
         xaxis.setRange( DatumRangeUtil.rescale( xaxis.getRange(), 0.2, 0.5 ) );
+        getApplicationModel().waitUntilIdle(false); 
 
         writeToPng(testId + "_003.png");
 
