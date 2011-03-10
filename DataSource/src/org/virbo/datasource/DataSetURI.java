@@ -559,7 +559,22 @@ public class DataSetURI {
             } else {
                 logger.fine("using local copy of " + fo.getNameExt());
             }
-            File tfile = fo.getFile(mon);
+            File tfile;
+            if ( fo.exists() ) {
+                tfile = fo.getFile(mon); //TODO: there's a bug here: where we rename the file after unzipping it, but we don't check to see if the .gz is newer.
+            } else {
+                FileObject foz= fs.getFileObject(filename+".gz"); // repeat the .gz logic that FileStorageModelNew.java has.
+                if ( foz.exists() ) {
+                    File fz= foz.getFile(mon);
+                    File tfile1= new File( fz.getPath().substring(0, fz.getPath().length() - 3) + ".temp" );
+                    tfile= new File( fz.getPath().substring(0, fz.getPath().length() - 3 ) );
+                    org.das2.util.filesystem.FileSystemUtil.unzip( fz, tfile1);
+                    if ( tfile.exists() ) tfile.delete(); // it shouldn't, but to be safe...
+                    tfile1.renameTo(tfile);
+                } else {
+                    throw new IllegalArgumentException("file does not exist: "+url );
+                }
+            }
             return tfile;
         } catch (URISyntaxException ex) {
             throw new IOException("URI Syntax Exception: " + ex.getMessage());
