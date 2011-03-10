@@ -173,25 +173,26 @@ public class AsciiTableDataSource extends AbstractDataSource {
             vds= ArrayDataSet.copy( DataSetOps.unbundle( ds, group ) );
 
         } else if (column != null) {
-            int icol = parser.getFieldIndex(column);
-            if (icol == -1) {
-                throw new IllegalArgumentException("bad column parameter: " + column + ", should be field1, or 1, or <name>");
-            }
             if ( bundleDescriptor!=null ) {
-                vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
-                //vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,icol));
+                //vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+                vds= ArrayDataSet.copy(DataSetOps.unbundle(ds,column));
             } else {
+                int icol = parser.getFieldIndex(column);
+                if (icol == -1) {
+                    throw new IllegalArgumentException("bad column parameter: " + column + ", should be field1, or 1, or <name>");
+                }
                 vds = ArrayDataSet.copy(DataSetOps.slice1(ds, icol));
+                vds.putProperty(QDataSet.UNITS, parser.getUnits(icol));
+                if ( column.length()>1 ) vds.putProperty( QDataSet.NAME, column );
+                vds.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
             }
-            vds.putProperty(QDataSet.UNITS, parser.getUnits(icol));
+            
             if (validMax != Double.POSITIVE_INFINITY) {
                 vds.putProperty(QDataSet.VALID_MAX, validMax);
             }
             if (validMin != Double.NEGATIVE_INFINITY) {
                 vds.putProperty(QDataSet.VALID_MIN, validMin);
             }
-            if ( column.length()>1 ) vds.putProperty( QDataSet.NAME, column );
-            vds.putProperty( QDataSet.LABEL, parser.getFieldNames()[icol] );
         }
 
         if (depend0 != null) {
