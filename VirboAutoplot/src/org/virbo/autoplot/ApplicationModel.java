@@ -981,17 +981,16 @@ public class ApplicationModel {
     private java.beans.PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
 
     /**
-     * wait for autoplot to settle.
+     * wait for autoplot to settle, waiting for pending changes in the application controller and canvas.
      */
     public void waitUntilIdle(boolean runtimeException) throws InterruptedException {
         logger.fine("enter waitUntilIdle, pendingChanges=" + dom.getController().isPendingChanges());
         while ( dom.getController().isPendingChanges() ) {
-            while (dom.getController().isPendingChanges()) {
-                Thread.sleep(30);
-            }
+            dom.getController().waitUntilIdle();
             logger.fine("waiting for canvas");
             canvas.waitUntilIdle();
         }
+        canvas.waitUntilIdle();
         logger.fine("done waiting");
     }
 
