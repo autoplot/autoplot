@@ -48,7 +48,7 @@ public class Test018 {
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
 
 
-            //test1( testId );
+            test1( testId );
             test2( testId );
 
         } catch ( Exception ex ) {
