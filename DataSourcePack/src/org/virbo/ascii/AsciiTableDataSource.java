@@ -278,26 +278,33 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 String[] fieldNames = parser.getFieldNames();
                 String[] fieldUnits = parser.getFieldUnits();
                 DDataSet dep1 = DDataSet.createRank1(depend1Values[1] - depend1Values[0]);
+                boolean firstRecordIsDep1= false;
                 for (int i = depend1Values[0]; i < depend1Values[1]; i++) {
-                    Units u1 = Units.dimensionless;
                     double d;
-                    try {
-                        d = Double.parseDouble(fieldNames[i]);
-                    } catch (NumberFormatException ex) {
+                    if ( firstRecordIsDep1 ) {
+                        d= mds.value( 0, i - depend1Values[0] );
+                    } else {
                         try {
-                            if ( fieldUnits[i]!=null ) {
-                                d = Double.parseDouble(fieldUnits[i]);
-                            } else {
+                            d = Double.parseDouble(fieldNames[i]);
+                        } catch (NumberFormatException ex) {
+                            try {
+                                if ( fieldUnits[i]!=null ) {
+                                    d = Double.parseDouble(fieldUnits[i]);
+                                } else {
+                                    d= mds.value( 0, i - depend1Values[0] );
+                                    firstRecordIsDep1= true;
+                                }
+                            } catch (NumberFormatException ex2) {
                                 d = i - depend1Values[0];
                             }
-                        } catch (NumberFormatException ex2) {
-                            d = i - depend1Values[0];
                         }
                     }
                     dep1.putValue(i-depend1Values[0], d);
                 }
-
                 mds.putProperty(QDataSet.DEPEND_1, dep1);
+                if ( firstRecordIsDep1 ) {
+                    mds= (MutablePropertyDataSet) mds.trim(1,mds.length());
+                }
             }
 
             return mds;
