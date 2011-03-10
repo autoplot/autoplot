@@ -35,6 +35,7 @@ public class LayoutListener implements PropertyChangeListener {
         plot.addPropertyChangeListener(DasPlot.PROP_TITLE, this);
         plot.getXAxis().addPropertyChangeListener(DasAxis.PROP_BOUNDS, this);
         plot.getYAxis().addPropertyChangeListener(DasAxis.PROP_BOUNDS, this);
+        plot.addPropertyChangeListener(DasPlot.PROP_LEGENDPOSITION,this);
     }
     
     public void listenTo( DasAxis colorbar ) {

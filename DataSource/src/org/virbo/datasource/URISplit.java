@@ -94,7 +94,7 @@ public class URISplit {
      * return the parsed string, or null if the string doesn't appear to be from a file.
      * @param surl
      * @param carotPos
-     * @return
+     * @return null or the URISplit
      */
     public static URISplit maybeAddFile(String surl, int carotPos) {
         URISplit result = new URISplit();

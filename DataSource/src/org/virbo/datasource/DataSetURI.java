@@ -617,7 +617,8 @@ public class DataSetURI {
      * 
      */
     public static URI getURI(String surl) throws URISyntaxException {
-        URISplit split = URISplit.maybeAddFile(surl, 0);
+        URISplit split = URISplit.maybeAddFile(surl,0);
+        if ( split==null ) return null;
         surl = split.surl;
         if (surl.endsWith("://")) {
             surl += "/";  // what strange case is this?

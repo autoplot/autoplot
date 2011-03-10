@@ -206,6 +206,7 @@ public class ScriptPanelSupport {
             i2 = surl2.length();
         }
         URI uri2 = DataSetURI.getURI(surl2.substring(0, i2));
+        if ( uri1==null ) return false;
         return uri1.equals(uri2);
     }
 
