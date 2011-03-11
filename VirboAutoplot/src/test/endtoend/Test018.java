@@ -95,11 +95,9 @@ public class Test018 {
         getApplicationModel().waitUntilIdle(false); // TODO: look into why this is necessary.
 
         xaxis.setRange( DatumRangeUtil.rescale( xaxis.getRange(), 0.2, 0.5 ) );
-        getApplicationModel().waitUntilIdle(false); 
+        getApplicationModel().waitUntilIdle(false);
 
         SpectrogramRenderer r= (SpectrogramRenderer) domPlot.getController().getDasPlot().getRenderer(0);
-        System.err.println( "spectrogram memento state= " + r.getXmemento() );
-        
         writeToPng(testId + "_003.png");
 
     }
