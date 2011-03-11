@@ -92,6 +92,8 @@ public class Test018 {
 
         that.getZaxis().setRange( DatumRange.newDatumRange( 1e4, 1e8, that.getZaxis().getRange().getUnits() ) ); //TODO: why does this autorange so poorly?
 
+        getApplicationModel().waitUntilIdle(false); // TODO: look into why this is necessary.
+
         xaxis.setRange( DatumRangeUtil.rescale( xaxis.getRange(), 0.2, 0.5 ) );
         getApplicationModel().waitUntilIdle(false); 
 
