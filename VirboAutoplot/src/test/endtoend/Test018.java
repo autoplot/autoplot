@@ -9,6 +9,7 @@ import java.util.List;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.Units;
+import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.Plot;
@@ -94,6 +95,9 @@ public class Test018 {
         xaxis.setRange( DatumRangeUtil.rescale( xaxis.getRange(), 0.2, 0.5 ) );
         getApplicationModel().waitUntilIdle(false); 
 
+        SpectrogramRenderer r= (SpectrogramRenderer) domPlot.getController().getDasPlot().getRenderer(0);
+        System.err.println( "spectrogram memento state= " + r.getXmemento() );
+        
         writeToPng(testId + "_003.png");
 
     }
