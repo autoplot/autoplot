@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Fast EES works again in the Autoplot 2010 branch.  Mode changes were not supported, and the Hudson tests didn't check this dataset.
+        <p><small>Das2 now have controls to have the ticks control tick length and direction, and the legend can now be outside the plot. 
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -50,6 +50,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Allow ticks to go inward and labels to be outside of plot box.  (This is not yet in the DOM, so won't be saved.)
             <li>AutoplotDataServer serves URIs as das2streams and QStreams
             <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3169744&group_id=199733&atid=970685">3169744</a> aggregation/TimeSeriesBrowse of data without time axes
             <li>minor features from production branch, such as CDAWeb stuff
