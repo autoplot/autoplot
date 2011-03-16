@@ -208,7 +208,7 @@ public class WalkImage  {
      * @param loadIfNeeded if false, then be reluctant to load the thumbnail.
      * @return the thumbnail, or null if it is not loaded.
      */
-    public BufferedImage getThumbnail(boolean loadIfNeeded) {
+    public synchronized BufferedImage getThumbnail(boolean loadIfNeeded) {
         switch (status) {
             case THUMB_LOADING:
                 // We're already working on it in another thread
@@ -232,22 +232,28 @@ public class WalkImage  {
             case UNKNOWN:
                 if(!loadIfNeeded) return null;
                 setStatus(Status.THUMB_LOADING);
-            //fall through
+                return maybeReturnThumb(loadIfNeeded);
+            
             case IMAGE_LOADING:
-                if (thumb != null) return thumb;
-                if (!loadIfNeeded) return null;
-                //acquire thumbnail
-                Runnable r = new Runnable() {
-                    public void run() {
-                        getThumbnailImmediately();
-                    }
-                };
-                RequestProcessor.invokeLater(r);
-                return null;
+                return maybeReturnThumb(loadIfNeeded);
+
             default:
                 //should never get here, but keeps Java from warning about missing return
                 throw new IllegalArgumentException("Encountered invalid status in walk image.");
         } //end switch
+    }
+
+    private BufferedImage maybeReturnThumb(boolean loadIfNeeded) {
+        if (thumb != null) return thumb;
+        if (!loadIfNeeded) return null;
+        //acquire thumbnail
+        Runnable r = new Runnable() {
+            public void run() {
+                getThumbnailImmediately();
+            }
+        };
+        RequestProcessor.invokeLater(r);
+        return null;
     }
 
     public BufferedImage getSquishedThumbnail() {
@@ -308,9 +314,15 @@ public class WalkImage  {
                 }
             }
 
-            if (thumb == null) {
+            BufferedImage lthumb=null;
+            synchronized (this) {
+                lthumb= thumb;
+            }
+
+            if (lthumb == null) {
                 getThumbnailImmediately(); //force thumbnail creation
             }
+
             setStatus(Status.IMAGE_LOADED);
 
         } catch (Exception ex) {

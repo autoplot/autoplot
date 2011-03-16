@@ -50,12 +50,6 @@ public class AxisPanel extends javax.swing.JPanel {
         this.applicationModel = applicationModel;
         this.dom = applicationModel.dom;
         this.applicationController= this.dom.getController();
-
-        this.applicationController.addPropertyChangeListener(ApplicationController.PROP_DATASOURCEFILTER, new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent evt) {
-                doDataSourceFilterBindings();
-            }
-        });
         
         this.applicationController.addPropertyChangeListener( ApplicationController.PROP_PLOT, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
@@ -117,7 +111,6 @@ public class AxisPanel extends javax.swing.JPanel {
                 doPlotBindings();
                 doPanelBindings();
                 doApplicationBindings();
-                doDataSourceFilterBindings();
             }
         };
         run.run();
@@ -146,28 +139,6 @@ public class AxisPanel extends javax.swing.JPanel {
         //bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autolabelling"), this.autolabellingCheckbox, BeanProperty.create( "selected")));
         //bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, dom, BeanProperty.create( "options.autolayout"), this.autolayoutCheckbox,BeanProperty.create(  "selected")));
         //bc.bind();
-    }
-    BindingGroup dataSourceFilterBindingGroup;
-
-
-
-    private synchronized void doDataSourceFilterBindings() {
-
-        if (dataSourceFilterBindingGroup != null) dataSourceFilterBindingGroup.unbind();
-
-        if ( dsf!=null ) {
-            dsf.getController().removePropertyChangeListener(dsfListener);
-        }
-        
-        final DataSourceFilter newDsf = applicationController.getDataSourceFilter();
-        
-        if (newDsf == null) {
-            dataSourceFilterBindingGroup = null;
-            return;
-        }
-        
-        dsf= newDsf;
-
     }
 
     BindingGroup plotBindingGroup;

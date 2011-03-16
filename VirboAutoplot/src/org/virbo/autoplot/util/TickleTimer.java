@@ -11,6 +11,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -24,7 +25,6 @@ import java.util.logging.Logger;
 public class TickleTimer {
     long tickleTime;
     long delay;
-    PropertyChangeListener listener;
     boolean running;
     List<String> messages;
     
@@ -61,14 +61,14 @@ public class TickleTimer {
                 long d=  System.currentTimeMillis() - tickleTime;
                 while ( d < delay ) {
                     try {
-                        log.finer("tickleTimer sleep "+(delay-d));
+                        log.log(Level.FINER, "tickleTimer sleep {0}", (delay - d));
                         Thread.sleep( delay-d );
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
                     d= System.currentTimeMillis() - tickleTime;
                 }
-                log.finer("tickleTimer fire after "+(d));
+                log.log(Level.FINER, "tickleTimer fire after {0}", d );
                 propertyChangeSupport.firePropertyChange("running",true,false);
                 running= false;
                 messages= new ArrayList<String>();
@@ -88,11 +88,11 @@ public class TickleTimer {
     
     private java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport(this);
 
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener l) {
+    public final void addPropertyChangeListener(java.beans.PropertyChangeListener l) {
         propertyChangeSupport.addPropertyChangeListener(l);
     }
 
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
+    public final void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
         propertyChangeSupport.removePropertyChangeListener(l);
     }
 

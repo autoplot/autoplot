@@ -591,7 +591,7 @@ public class PlotElementController extends DomNodeController {
                 getRenderer().setDataSet(null);
                 getRenderer().setException(null); // remove leftover message.
             }
-            setDataSet(fillDs, false);
+            setDataSet(null, false);
         } else {
             setDataSet(fillDs, true);
         }

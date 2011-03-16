@@ -70,12 +70,12 @@ public class Test016 {
         plot( hist );
         setCanvasSize( 600, 600 );
 
-        final DasCanvas cc= getDocumentModel().getCanvases(0).getController().getDasCanvas();
+        //final DasCanvas cc= getDocumentModel().getCanvases(0).getController().getDasCanvas();
         xAxis= getDocumentModel().getPlots(0).getXaxis().getController().getDasAxis();
 
         xAxis.setLabel(DataSetUtil.format(autoRange));
 
-        int i= uri.lastIndexOf("/");
+        //int i= uri.lastIndexOf("/");
 
         writeToPng( String.format( "test016_%03d.png", id ) );
         

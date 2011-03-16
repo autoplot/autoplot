@@ -158,7 +158,8 @@ public class Test022 {
 
     private static boolean doTest( QDataSet ds, QDataSet bounds ) throws Exception {
         QDataSet tbounds= bounds(ds,RenderType.spectrogram);
-
+        System.err.println( "tbounds=" + tbounds );
+        if ( bounds!=null ) System.err.println( "bounds=" + bounds );
         return true;
     }
 

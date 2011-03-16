@@ -42,6 +42,7 @@ public class Test020 {
             tot+= dd[i];
         }
         t1= System.currentTimeMillis();
+        if ( print ) System.err.println("total from array access="+tot);
 
         DDataSet rank1= DDataSet.wrap(dd);
         tot= 0;
@@ -52,8 +53,9 @@ public class Test020 {
             tot+= rank1.value(i);
         }
         t2= System.currentTimeMillis();
+        if ( print ) System.err.println("total from DDataSet access="+tot);
 
-        if ( print ) System.err.println( "array, rank1 DDataSet access (millis): "+( t1-t0 )+", "+(t2-t0) );
+        if ( print ) System.err.println( "array, rank1 DDataSet access (millis): "+( t1-t0 )+", "+(t2-t02) );
     }
 
     private static void testRank2DDatasetAccess( boolean print ) {
@@ -73,6 +75,7 @@ public class Test020 {
             }
         }
         t1= System.currentTimeMillis();
+        if ( print ) System.err.println("total from array access="+tot);
 
         double [] dd1= new double[SIZE*JSIZE];
         DDataSet rank2= DDataSet.wrap(dd1,SIZE,JSIZE);
@@ -86,6 +89,7 @@ public class Test020 {
             }
         }
         t2= System.currentTimeMillis();
+        if ( print ) System.err.println("total from DDataSet access="+tot);
 
         if ( print ) System.err.println( "array, rank2 DDataSet access (millis): " + (t1-t0) + ", " + ( t2-t02 ) );
     }

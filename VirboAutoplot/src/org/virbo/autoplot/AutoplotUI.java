@@ -103,7 +103,6 @@ import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
-import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.URISplit;
@@ -286,7 +285,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             public void focusGained(FocusEvent e) {
                 logger.fine("focus to canvas");
                 if (stateSupport.getCurrentFile() != null) {
-                    dataSetSelector.setValue(stateSupport.getCurrentFile().toString());
+                    dataSetSelector.setValue(stateSupport.getCurrentFile());
                 }
                 super.focusGained(e);
             }
@@ -497,7 +496,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
                 if ( messages.size()>1 ) {
                     //undoRedoSupport.pushState(evt,messages.get(0));
-                    undoRedoSupport.pushState(evt);
+                    undoRedoSupport.pushState(evt,null); // TODO: named undo operations.  fix findbugs DB_DUPLICATE_BRANCHES
                 } else {
                     undoRedoSupport.pushState(evt);
                 }
@@ -515,7 +514,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         applicationModel.dom.getController().addActionListener( new ActionListener() {
             public void actionPerformed( ActionEvent evt ) {
                 if ( dom.getController().isValueAdjusting() ) return;
-                logger.finer( "state change: "+evt );
+                logger.log( Level.FINER, "state change: {0}", evt);
                 if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState()) { // TODO: list the props we want!
                     tickleTimer.tickle( evt.getActionCommand() + " from " + evt.getSource() );
                 }
@@ -772,7 +771,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             JFileChooser chooser = new JFileChooser(dir);
             int r = chooser.showOpenDialog(this);
             String result;
-            if (r == chooser.APPROVE_OPTION) {
+            if (r == JFileChooser.APPROVE_OPTION) {
                 result = chooser.getSelectedFile().toString();
             } else {
                 result = surl;
@@ -840,13 +839,13 @@ public class AutoplotUI extends javax.swing.JFrame {
 
     private void plotUrl( String surl ) {
         try {
-            Logger.getLogger("ap").fine("plotUrl("+surl+")");
+            Logger.getLogger("ap").log(Level.FINE, "plotUrl({0})", surl);
             URISplit split= URISplit.parse(surl);
             ProgressMonitor mon= getStatusBarProgressMonitor("Finished loading "+surl);
             if ( split.file==null || !( split.file.endsWith(".vap")|| split.file.endsWith(".vapx") ) ) {
-                if ( ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false")) ) {
+                if ( ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false")) ) { // findbugs DLS_DEAD_LOCAL_STORE okay
                     try {
-                        DataSourceFactory sourcef = DataSetURI.getDataSourceFactory(DataSetURI.getURI(surl),mon);
+                        DataSetURI.getDataSourceFactory(DataSetURI.getURI(surl),mon);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     } catch (URISyntaxException ex) {
@@ -894,7 +893,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
     private void plotAnotherUrl( final String surl ) {
         try {
-            Logger.getLogger("ap").fine("plotAnotherUrl("+surl+")");
+            Logger.getLogger("ap").log(Level.FINE, "plotAnotherUrl({0})", surl);
             PlotElement panel= dom.getController().addPlotElement( null,null );
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
             dom.getController().setPlotElement(panel);
@@ -914,7 +913,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
     private void overplotAnotherUrl( final String surl ) {
         try {
-            Logger.getLogger("ap").fine("overplotAnotherUrl("+surl+")");
+            Logger.getLogger("ap").log(Level.FINE, "overplotAnotherUrl({0})", surl);
             PlotElement panel= dom.getController().addPlotElement( dom.getController().getPlot() ,null );
             dom.getController().getDataSourceFilterFor(panel).setUri(surl);
             dom.getController().setPlotElement(panel);
@@ -937,10 +936,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         Dimension dout= this.getSize();
         Dimension din= this.applicationModel.getCanvas().getSize();
         System.err.println( "app:" + dout );
-        System.err.println( "canvas: " + din );
+        System.err.println( "canvas: " + din ); // findbugs DLS_DEAD_LOCAL_STORE
         //assume is fitted
-        int dx= dout.width - din.width;
-        int dy= dout.height - din.height;
 
         dout.width= dout.width + (  w - din.width );
         dout.height= dout.height + ( h - din.height );
@@ -1062,12 +1059,14 @@ public class AutoplotUI extends javax.swing.JFrame {
     public static PersistentStateSupport getPersistentStateSupport(final AutoplotUI parent, final ApplicationModel applicationModel) {
         final PersistentStateSupport stateSupport = new PersistentStateSupport(parent, null, "vap") {
 
+            @Override
             protected void saveImpl(File f) throws IOException {
                 applicationModel.doSave(f);
                 applicationModel.addRecent(f.toURI().toString());
                 parent.setStatus("saved " + f);
             }
 
+            @Override
             protected void openImpl(final File file) throws IOException {
                 applicationModel.doOpen(file);
                 parent.setStatus("opened " + file);
@@ -1177,6 +1176,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()-2f));
         statusLabel.setText("starting...");
         statusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 statusLabelMouseClicked(evt);
             }
@@ -1192,6 +1192,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         bindingGroup.addBinding(binding);
 
         statusTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 statusTextFieldMouseClicked(evt);
             }
@@ -1701,7 +1702,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
     private void aboutAutoplotMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aboutAutoplotMenuItemActionPerformed
         try {
-            StringBuffer buffy = new StringBuffer();
+            StringBuilder buffy = new StringBuilder();
 
             buffy.append("<html>\n");
             URL aboutHtml = AutoplotUI.class.getResource("aboutAutoplot.html");
@@ -1710,7 +1711,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(aboutHtml.openStream()));
                 String s = reader.readLine();
                 while (s != null) {
-                    buffy.append(s + "");
+                    buffy.append(s);
                     s = reader.readLine();
                 }
                 reader.close();
@@ -1718,11 +1719,11 @@ public class AutoplotUI extends javax.swing.JFrame {
 
             buffy.append("<h2>Build Information:</h2>");
             buffy.append("<ul>");
-            buffy.append("<li>release tag: " + AboutUtil.getReleaseTag() + "</li>");
+            buffy.append("<li>release tag: ").append(AboutUtil.getReleaseTag()).append("</li>");
 
             List<String> bi = Util.getBuildInfos();
             for (String ss : bi) {
-                buffy.append("    <li>" + ss + "");
+                buffy.append("    <li>").append(ss);
             }
             buffy.append("</ul>" );
 
@@ -1924,7 +1925,7 @@ private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         if ( !newv.equals( AutoplotSettings.settings().getFscache() ) ) {
             Runnable run= new Runnable() {
                 public void run() {
-                    String old= AutoplotSettings.settings().getFscache();
+                    //String old= AutoplotSettings.settings().getFscache(); findbugs DLS_DEAD_LOCAL_STORE
                     File fnewv= new File(newv);
                     if ( !fnewv.exists() ) {
                         if ( !fnewv.mkdirs() ) {
@@ -2062,13 +2063,13 @@ private void updateFrameTitle() {
 
         if (alm.getValue("URL") != null) {
             initialURL = alm.getValue("URL");
-            logger.fine("setting initial URL to >>>" + initialURL + "<<<");
+            logger.log(Level.FINE, "setting initial URL to >>>{0}<<<", initialURL);
 
             bookmarks = alm.getValue("bookmarks");
             
         } else if ( alm.getValue("open") !=null ) {
             initialURL = alm.getValue("open");
-            logger.fine("setting initial URL to >>>" + initialURL + "<<<");
+            logger.log(Level.FINE, "setting initial URL to >>>{0}<<<", initialURL);
             bookmarks= null;
             
         } else {
@@ -2167,7 +2168,7 @@ private void updateFrameTitle() {
                             try {
                                 final URL url = new URL(bookmarks);
                                 Document doc = AutoplotUtil.readDoc(url.openStream());
-                                List<Bookmark> book = Bookmark.parseBookmarks(doc.getDocumentElement());
+                                Bookmark.parseBookmarks(doc.getDocumentElement());  // findbugs DLS_DEAD_LOCAL_STORE fixed
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                                 model.getExceptionHandler().handleUncaught(ex);

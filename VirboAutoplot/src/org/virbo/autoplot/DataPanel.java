@@ -17,6 +17,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -337,7 +338,7 @@ public class DataPanel extends javax.swing.JPanel {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private synchronized void initComponents() {
 
         jPanel2 = new javax.swing.JPanel();
         sliceTypeComboBox = new javax.swing.JComboBox();
@@ -551,9 +552,9 @@ public class DataPanel extends javax.swing.JPanel {
         updateComponent();
 }//GEN-LAST:event_sliceTypeComboBoxItemStateChanged
 
-    private void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
+    private synchronized void sliceTypeComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sliceTypeComboBoxActionPerformed
         if ( adjusting ) return; // TODO: probably get rid of this entirely.
-        logger.fine("set slice dimension " + sliceTypeComboBox.getSelectedIndex());
+        logger.log( Level.FINE, "set slice dimension {0}", sliceTypeComboBox.getSelectedIndex() );
         //DataSourceFilter dsf = applicationController.getDataSourceFilter();
         //dsf.setSliceDimension(sliceTypeComboBox.getSelectedIndex());
         int max = dsf.getController().getMaxSliceIndex(sliceTypeComboBox.getSelectedIndex());

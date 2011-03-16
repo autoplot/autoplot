@@ -74,18 +74,15 @@ public class AutoplotServer {
                 height = (int) (width / aspect);
         }
         
-        if (vap == null) {
-            dom.getController().getCanvas().setWidth(width);
-            dom.getController().getCanvas().setHeight(height);
-            DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
-            c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
-        }
-
-        if ( !vap.equals("") ) {
+        if ( vap!=null && !vap.equals("") ) {
             load(vap);
             DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
             c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
         } else {
+            dom.getController().getCanvas().setWidth(width);
+            dom.getController().getCanvas().setHeight(height);
+            DasCanvas c = dom.getController().getCanvas().getController().getDasCanvas();
+            c.prepareForOutput(width, height); // KLUDGE, resize all components for TimeSeriesBrowse
             plot(suri);
         }
 

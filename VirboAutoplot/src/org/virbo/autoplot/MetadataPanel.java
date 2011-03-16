@@ -92,15 +92,25 @@ public class MetadataPanel extends javax.swing.JPanel {
 
         try {
             DataSourceFilter dsf = dom.getController().getDataSourceFilter();
-
-            DataSource dsrc = null;
+            DataSourceController dsfc= null;
+            DataSource dataSource = null;
             if (dsf != null) {
-                dsrc = dsf.getController().getDataSource();
+                dsfc= dsf.getController();
+                dataSource = dsfc.getDataSource();
             }
-            if (dsrc != null) {
-                tree = new CombinedTreeModel("" + dsrc.getURI());
-                Map<String, Object> meta = dsf.getController().getRawProperties();
-                MetadataModel model = dsrc.getMetadataModel();
+            if ( dsfc==null ) {
+                String label = "(data source controller is null)";
+                tree = new CombinedTreeModel(label);
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        metaDataTree.setModel(tree);
+                    }
+                });
+
+            } else if (dataSource != null) {
+                tree = new CombinedTreeModel("" + dataSource.getURI());
+                Map<String, Object> meta = dsfc.getRawProperties();
+                MetadataModel model = dataSource.getMetadataModel();
                 String root = "Metadata";
                 if (model != null) {
                     if (!model.getLabel().equals("")) {
@@ -118,18 +128,19 @@ public class MetadataPanel extends javax.swing.JPanel {
                         }
                     });
                 }
+
             } else {
                 String label = "(no data source)";
-                if (dsf.getController().getDataSet() != null) {  // findbugs NP_GUARANTEED_DEREF okay
+                if ( dsfc.getDataSet() != null) {  
                     label = "dataset";
                 }
                 tree = new CombinedTreeModel(label);
                 SwingUtilities.invokeLater(new Runnable() {
-
                     public void run() {
                         metaDataTree.setModel(tree);
                     }
                 });
+                
             }
         } catch (Exception e) {
             tree = new CombinedTreeModel("Exception: " + e);
@@ -226,7 +237,7 @@ public class MetadataPanel extends javax.swing.JPanel {
         if ( ds == null) {
             unmount = dsTree;
             dsTree= NameValueTreeModel.create("Dataset", java.util.Collections.singletonMap("dataset", "(no dataset)") );
-            this.dsTreeDs = ds; // (null)
+            this.dsTreeDs = null;
             //(PropertiesTreeModel( "no dataset", null );
         } else {
             if ( ds != this.dsTreeDs) {

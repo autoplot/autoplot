@@ -60,7 +60,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
         
     }
 
-    PropertyChangeListener pc= new PropertyChangeListener() {
+    transient PropertyChangeListener pc= new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals( WalkImageSequence.PROP_BADGE_CHANGE ) ) {
@@ -426,7 +426,7 @@ public class QualityControlPanel extends javax.swing.JPanel {
 
     protected WalkImageSequence walkImageSequence = null;
 
-    public WalkImageSequence getWalkImageSequece() {
+    public synchronized WalkImageSequence getWalkImageSequece() {
         return walkImageSequence;
     }
 

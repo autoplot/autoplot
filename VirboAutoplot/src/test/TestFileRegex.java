@@ -21,9 +21,8 @@ import org.das2.util.filesystem.FileSystem;
 public class TestFileRegex {
     public static void main( String[] args ) throws Exception {
         //String ss= "ftp://virbo.org/POES/n15/$Y/poes_n15_$Y$m$d.cdf.zip/poes_n15_$Y$m$d.cdf?minute&timerange=1998-07-01";
-        String ss= "ftp://virbo.org/POES/n15/1998/poes_n15_19980701.cdf.zip/poes_n15_19980701.cdf?minute";
+        //String ss= "ftp://virbo.org/POES/n15/1998/poes_n15_19980701.cdf.zip/poes_n15_19980701.cdf?minute";
 
-        String agg = org.virbo.datasource.DataSourceUtil.makeAggregation(ss);
         FileSystem fs = FileSystem.create( new URI( "ftp://virbo.org/POES/n15" ) );
         FileStorageModelNew fsm= FileStorageModelNew.create( fs, "%Y/poes_n15_%Y%m%d.cdf.zip/poes_n15_%Y%m%d.cdf" );
 

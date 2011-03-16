@@ -528,7 +528,7 @@ public class QualityControlRecord {
     }
 
     // A data structure to describe an individual commentText
-    private class ReviewComment implements Comparable {
+    private static class ReviewComment implements Comparable {
         String reviewer;    //Name of reviewer
         Date commentDate;
         String commentText;
@@ -539,15 +539,32 @@ public class QualityControlRecord {
         }
        
         public ReviewComment(String reviewer, Date commentDate, String commentText, Status status) {
+            if ( commentText==null ) commentText="";
             this.reviewer = reviewer;
             this.commentDate = commentDate;
             this.commentText = commentText;
             this.reviewStatus = status;
         }
 
-        // This impelmentation of Comparable causes the list to be sorted by date.
+        // This implementation of Comparable causes the list to be sorted by date.
         public int compareTo(Object other) {
-            return commentDate.compareTo( ((ReviewComment)other).commentDate);
+            int i= commentDate.compareTo( ((ReviewComment)other).commentDate);
+            if ( i==0 ) {
+                return commentText.compareTo( ((ReviewComment)other).commentText );
+            } else {
+                return i;
+            }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if ( !( obj instanceof ReviewComment ) ) return false;
+            return compareTo(obj)==0 && commentText.equals( ((ReviewComment)obj).commentText );
+        }
+
+        @Override
+        public int hashCode() {
+            return commentDate.hashCode() * commentText.hashCode();
         }
     }
 }

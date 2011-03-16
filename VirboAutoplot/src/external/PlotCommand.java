@@ -81,8 +81,10 @@ public class PlotCommand extends PyObject {
                         Py.None,
                         Py.None,
                         Py.None, } );
-        Map<String,PyObject> foo= fs.args( args, keywords );
-
+        //Map<String,PyObject> foo= fs.args( args, keywords );
+        //TODO: check on this with Ed.
+        fs.args( args, keywords );
+        
         int nparm= args.length - keywords.length;
 
         if ( nparm==0 ) {

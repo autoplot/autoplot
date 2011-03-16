@@ -64,7 +64,7 @@ public class TestURLSplit {
         if ( scontext.equals("") ) {
             System.err.println( URISplit.format(  URISplit.parse( t ) ) );
         } else {
-            URISplit context= URISplit.parse(scontext);
+            //URISplit context= URISplit.parse(scontext);
             //TODO: restore with context-enabled version System.err.println( URISplit.format(  URISplit.parse( t, context ) ) );
         }
     }

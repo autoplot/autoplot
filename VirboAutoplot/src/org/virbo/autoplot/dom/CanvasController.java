@@ -566,7 +566,6 @@ public class CanvasController extends DomNodeController {
         }
 
         for ( Object o: selectedItems ) {
-            Area sel1=null;
             if ( o instanceof Plot ) {
                 DasPlot p= ((Plot)o).getController().getDasPlot();
                 sel.add( SelectionUtil.getSelectionArea( p ) );
@@ -580,8 +579,6 @@ public class CanvasController extends DomNodeController {
                 sel.add( SelectionUtil.getSelectionArea( rend ) );
                 clip.add( r );
             }
-
-            if (sel1!=null) sel.add(sel1);
         }
 
         final Painter p= new Painter() {

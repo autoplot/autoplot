@@ -301,7 +301,7 @@ public class Test017 {
             }
         }
 
-        if ( "Success!".equals(f.get(  timeoutSeconds, TimeUnit.SECONDS ) ) ) {
+        if ( f!=null && "Success!".equals(f.get(  timeoutSeconds, TimeUnit.SECONDS ) ) ) { //findbugs wrong
             System.err.println("okay!");
         } else {
             PrintWriter pw = new PrintWriter(label + ".error");

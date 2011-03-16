@@ -1764,7 +1764,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             setStatus("no plot element selected");
         } else {
             setStatus(plotElement + " selected");
-            canvas.controller.indicateSelection( Collections.singletonList((DomNode)plotElement) );
+            getCanvas().controller.indicateSelection( Collections.singletonList((DomNode)plotElement) );
             if ( plotElement!=oldPlotElement ) {
                 Plot lplot= getPlotFor(plotElement);
                 if ( lplot!=null && lplot.getController()!=null ) {
@@ -1833,7 +1833,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     protected synchronized void syncTo( Application that, List<String> exclude ) {
         Lock lock = changesSupport.mutatorLock();
         lock.lock();
-        Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
+        Lock canvasLock = getCanvas().controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
 
         try {

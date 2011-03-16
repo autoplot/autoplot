@@ -506,14 +506,20 @@ public class ApplicationModel {
 
         // always tack on the URI to history.dat file
         final File f3 = new File( f2, "history.txt");
+        FileWriter out3=null;
         try {
-            FileWriter out3 = new FileWriter( f3, true );
+            out3 = new FileWriter( f3, true );
             TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
             Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
             out3.append( tp.format( now, null) + "\t" + surl + "\n" );
             out3.close();
         } catch ( IOException ex ) {
             ex.printStackTrace();
+            if ( out3!=null ) try {
+                out3.close();
+            } catch (IOException ex1) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex1);
+            }
         }
 
         this.recent = newValue;
@@ -664,6 +670,9 @@ public class ApplicationModel {
             if ( srcVal==null && dstVal==null ) {
                 continue; // not sure what to make of this state, shouldn't happen.
             }
+            if ( srcVal==null || dstVal==null ) {
+                continue; // findbugs NP_NULL_ON_SOME_PATH
+            }
             if ( !srcVal.equals(dstVal) ) {
                 System.err.println( "fixing inconsistent vap where bound values were no equal: "
                         +m.getSrcId()+"."+m.getSrcProperty() +"!="+m.getDstId()+"."+m.getDstProperty() );
@@ -697,11 +706,17 @@ public class ApplicationModel {
         if ( !f.exists() ) throw new IllegalArgumentException("no such file: "+f);
         if ( f.length()==0 ) throw new IllegalArgumentException("zero-length file: "+f);
 
-        InputStream in= new FileInputStream(f);
+        InputStream in=null;
+        try {
+            in= new FileInputStream(f);
 
-        doOpen( in,deltas );
+            doOpen( in,deltas );
 
-        setVapFile( f.toString() );
+            setVapFile( f.toString() );
+            
+        } finally {
+            if ( in!=null ) in.close();
+        }
 
     }
 

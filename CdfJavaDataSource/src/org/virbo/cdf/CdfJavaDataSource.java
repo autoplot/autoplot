@@ -121,6 +121,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     }
                 }
             // apply properties.
+            } else {
+                QDataSet dep;
+                dep= (QDataSet)result.property(QDataSet.DEPEND_0); // twins misuses DEPEND properties.
+                if ( dep!=null && dep.length()!=result.length() ) result.putProperty( QDataSet.DEPEND_0, null );
+                result.putProperty( QDataSet.DEPEND_1, null );
+                result.putProperty( QDataSet.DEPEND_2, null );
+                result.putProperty( QDataSet.DEPEND_3, null );
             }
 
             //result.putProperty( QDataSet.METADATA, attributes );

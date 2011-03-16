@@ -184,8 +184,8 @@ public class BookmarksManagerModel {
             containsFolder = containsFolder || b instanceof Bookmark.Folder;
         }
         if (context == null ) { 
-            if (newList.contains(context)) {
-                newList.addAll(newList.indexOf(context) + ( insert ? 0 : 1 ), bookmarks);
+            if (newList.contains(null)) { //TODO: verify this code.  findbugs pointed out the error, and this code seems strange.
+                newList.addAll(newList.indexOf(null) + ( insert ? 0 : 1 ), bookmarks);
             } else {
                 newList.addAll(bookmarks);
             }

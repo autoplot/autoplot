@@ -147,8 +147,6 @@ public class DataSetURLDemo {
 
         List<CompletionResult> completions = null;
 
-        final String labelPrefix = surl.substring(0, carotpos);
-
         try {
             completions = DataSetURI.getFileSystemCompletions(surl, carotpos, true, true, null, mon);
         } catch (UnknownHostException ex ) {

@@ -48,7 +48,10 @@ public class ExerciseTest001 {
                 System.err.println("here!!");
                 fail++;
                 File f=  new File( pwd + "/test001_003.png" );
-                f.renameTo( new File( pwd + "/test001_003."+i+".png" ) );
+                String sfn= "test001_003."+i+".png";
+                if ( !f.renameTo( new File( pwd + "/" + sfn ) ) ) {
+                    System.err.println("rename failed: "+f + " to " + sfn );
+                }
                 Thread.sleep(1000);
                 writeToPng( "test001_003."+i+"test.png" );
             } else {

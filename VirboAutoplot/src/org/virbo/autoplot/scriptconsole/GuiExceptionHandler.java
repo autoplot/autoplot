@@ -290,12 +290,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
     private LogConsole lc;
 
-    public void setLogConsole( LogConsole lc ) {
+    public synchronized void setLogConsole( LogConsole lc ) {
         this.lc= lc;
     }
 
     private String focusURI;
-    public void setFocusURI( String uri ) {
+    public synchronized void setFocusURI( String uri ) {
         this.focusURI= uri;
     }
 

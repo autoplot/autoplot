@@ -47,18 +47,28 @@ public class CreatePngWalk {
 
     private static BufferedImage myWriteToPng(String filename, ApplicationModel appmodel, Application ldom, int width, int height) throws InterruptedException, FileNotFoundException, IOException {
         appmodel.waitUntilIdle(false);
-        OutputStream out = new java.io.FileOutputStream(filename);
-        BufferedImage image = (BufferedImage) ldom.getCanvases(0).getController().getDasCanvas().getImage(width, height);
-        DasPNGEncoder encoder = new DasPNGEncoder();
-        encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new java.util.Date().toString());
-        encoder.write(image, out);
-        out.close();
+        OutputStream out=null;
+        BufferedImage image=null;
+        try {
+            out= new java.io.FileOutputStream(filename);
+            image = (BufferedImage) ldom.getCanvases(0).getController().getDasCanvas().getImage(width, height);
+            DasPNGEncoder encoder = new DasPNGEncoder();
+            encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new java.util.Date().toString());
+            encoder.write(image, out);
+        } finally {
+            out.close();
+        }
+        if ( image==null ) throw new IllegalArgumentException("image not assigned, this shouldn't happen.");
         return image;
     }
 
     public static void doBatch(String[] times, Application dom, Params params, ProgressMonitor mon) throws IOException, InterruptedException {
-        new java.io.File(params.outputFolder).mkdirs();
-        new java.io.File(params.outputFolder + "thumbs400/").mkdirs();
+        if ( !( new java.io.File(params.outputFolder).mkdirs() ) ) {
+            throw new IOException( "failed mkdirs: "+params.outputFolder);
+        }
+        if ( !( new java.io.File(params.outputFolder + "thumbs400/").mkdirs() ) ) {
+            throw new IOException( "failed mkdirs: "+params.outputFolder+"thums400/");
+        }
 
         int n = times.length;
         mon.setTaskSize(n);

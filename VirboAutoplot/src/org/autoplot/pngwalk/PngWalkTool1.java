@@ -193,7 +193,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             }
         };
 
-        final String lap= parent==null ? "View in Autoplot" : "View in Autoplot";
+        final String lap= "View in Autoplot";
 
         tool.addFileAction( enabler, "autoplot", new AbstractAction(lap) {
             public void actionPerformed(ActionEvent e) {

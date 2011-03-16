@@ -129,7 +129,13 @@ public class Test009 {
             //writePng( "test009_018.png" );
 
             System.exit(0);  // TODO: something is firing up the event thread
-        } catch ( Exception ex ) {
+        } catch ( RuntimeException ex ) {
+            ex.printStackTrace();
+            System.exit(1);
+        } catch ( InterruptedException ex ) {
+            ex.printStackTrace();
+            System.exit(1);
+        } catch ( IOException ex ) {
             ex.printStackTrace();
             System.exit(1);
         }

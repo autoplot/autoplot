@@ -37,7 +37,7 @@ public class AppManager {
     public void closeApplication( Object app ) {
         this.apps.remove(app);
         if ( this.apps.isEmpty() ) {
-            System.exit(0);
+            System.exit(0); //TODO: findbugs DM_EXIT--and I wonder what happens when Autoplot is used on a Tomcat web server?  Otherwise this is appropriate for swing apps.
         }
     }
 

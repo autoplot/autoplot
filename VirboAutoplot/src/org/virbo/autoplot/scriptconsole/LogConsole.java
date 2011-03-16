@@ -180,6 +180,24 @@ public class LogConsole extends javax.swing.JPanel {
         firePropertyChange(PROP_SEARCHTEXT, oldSearchText, searchText);
     }
 
+
+    public synchronized void setShowLoggerId(boolean selected) {
+        this.showLoggerId= selected;
+    }
+
+    public synchronized void setShowTimeStamps( boolean selected ) {
+        this.showTimeStamps= selected;
+    }
+
+
+    public synchronized void setShowLevel( boolean selected ) {
+        this.showLevel= selected;
+    }
+
+    public synchronized void setLevel( int level ) {
+        this.level= level;
+    }
+
     protected Map<String, Object> scriptContext = null;
     public static final String PROP_SCRIPTCONTEXT = "scriptContext";
 

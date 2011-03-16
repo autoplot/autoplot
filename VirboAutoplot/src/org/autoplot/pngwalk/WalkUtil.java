@@ -143,9 +143,13 @@ public class WalkUtil {
     }
 
     static void writeFile( File pf, String s ) throws IOException {
-        FileWriter write= new FileWriter(pf);
-        write.write(s);
-        write.close();
+        FileWriter write=null;
+        try {
+            write= new FileWriter(pf);
+            write.write(s);
+        } finally {
+            if ( write!=null ) write.close();
+        }
     }
 
 }

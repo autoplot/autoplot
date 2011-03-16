@@ -438,6 +438,10 @@ public class DataSourceController extends DomNodeController {
         }
     }
 
+    private synchronized void clearParentSources() {
+        this.parentSources= null; //TODO: are there listeners to dispose of?
+    }
+
     private synchronized void resolveParents() {
         if ( dsf.getUri()==null ) return; //TODO: remove
         URISplit split= URISplit.parse(dsf.getUri());
@@ -949,13 +953,16 @@ public class DataSourceController extends DomNodeController {
 
     protected DataSource dataSource = null;
     
-    public DataSource getDataSource() {
+    public synchronized DataSource getDataSource() {
         return dataSource;
     }
 
     public void setDataSource(DataSource dataSource) {
-        DataSource oldDataSource = this.dataSource;
-        this.dataSource = dataSource;
+        DataSource oldDataSource = null;
+        synchronized ( this ) {
+            oldDataSource= this.dataSource;
+            this.dataSource = dataSource;
+        }
         propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, oldDataSource, dataSource);
     }
     /**
@@ -1198,7 +1205,7 @@ public class DataSourceController extends DomNodeController {
                     if ( !ok )  dom.controller.setStatus(msg);
                 } else {
                     DataSource source = DataSetURI.getDataSource(surl);
-                    this.parentSources= null; //TODO: are there listeners to dispose of?
+                    clearParentSources();
                     resetDataSource(valueWasAdjusting,source);
                 }
                 setUriNeedsResolution(false);

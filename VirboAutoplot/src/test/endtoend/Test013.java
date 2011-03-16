@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.text.ParseException;
 import java.util.HashMap;
@@ -56,14 +57,26 @@ public class Test013 {
      * @throws StreamException
      */
     private static void formatParse( QDataSet ds, String file) throws FileNotFoundException, IOException, StreamException {
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-        System.err.println("attempt to format "+ds+" into "+file);
-        format.format(ds, new FileOutputStream(file), true);
-        QDataSetStreamHandler handler = new QDataSetStreamHandler();
-        System.err.println("attempt to parse "+file);
-        StreamTool.readStream(Channels.newChannel(new FileInputStream(file)), handler);
-        QDataSet qds = handler.getDataSet();
-        System.err.println(qds);
+        FileOutputStream out= null;
+        try {
+            out= new FileOutputStream(file);
+            SimpleStreamFormatter format = new SimpleStreamFormatter();
+            System.err.println("attempt to format "+ds+" into "+file);
+            format.format(ds, out, true);
+        } finally {
+            if ( out!=null ) out.close();
+        }
+        FileInputStream in= null;
+        try {
+            in= new FileInputStream(file);
+            QDataSetStreamHandler handler = new QDataSetStreamHandler();
+            System.err.println("attempt to parse "+file);
+            StreamTool.readStream(Channels.newChannel(in), handler);
+            QDataSet qds = handler.getDataSet();
+            System.err.println(qds);
+        } finally {
+            if ( in!=null ) in.close();
+        }
     }
 
     private static QDataSet test1() throws ParseException, StreamException, IOException {
@@ -235,10 +248,16 @@ public class Test013 {
         t0= System.currentTimeMillis();
         System.err.println( "formatting... " );
 
-        SimpleStreamFormatter format = new SimpleStreamFormatter();
-        format.format( result, new FileOutputStream("test013_test7.qds"), false );
+        FileOutputStream out=null;
+        try {
+            out= new FileOutputStream("test013_test7.qds");
+            SimpleStreamFormatter format = new SimpleStreamFormatter();
+            format.format( result, out, false );
 
-        System.err.println( "time: "+ ( System.currentTimeMillis()-t0) );
+            System.err.println( "time: "+ ( System.currentTimeMillis()-t0) );
+        } finally {
+            if ( out!=null ) out.close();
+        }
 
         return result;
     }
@@ -289,9 +308,13 @@ public class Test013 {
                 long t0 = System.currentTimeMillis();
 
                 String filename = ascii ? "test013_benchmark1.qds" : "test013_benchmark1.binary.qds";
-                FileOutputStream fo= new FileOutputStream(filename);
-                format.format( ds, fo, ascii );
-                fo.close();
+                FileOutputStream fo= null;
+                try {
+                    fo= new FileOutputStream(filename);
+                    format.format( ds, fo, ascii );
+                } finally {
+                    fo.close();
+                }
 
                 System.err.println("Time to write " + nrec + " records: " + (System.currentTimeMillis() - t0));
             }
@@ -355,8 +378,14 @@ public class Test013 {
         QDataSet ds= handler.getDataSet("means");
 
         SimpleStreamFormatter format = new SimpleStreamFormatter();
-        format.format( ds, new FileOutputStream(f), true );
 
+        OutputStream out=null;
+        try {
+            out= new FileOutputStream(f);
+            format.format( ds, out, true );
+        } finally {
+            if ( out!=null ) out.close();
+        }
 
     }
 

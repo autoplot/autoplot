@@ -43,6 +43,8 @@ public class FileSearchReplace {
         }
         out.close();
         in.close();
-        fout.renameTo( fin );
+        if ( !fout.renameTo( fin ) ) {
+            System.err.println("unable to rename file " +fout + " to " + fin );
+        }
     }
 }

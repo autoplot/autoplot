@@ -25,7 +25,7 @@ public class QualityControlSequence {
         this.walkImageSequence= wis;
         this.qcFolder= qcFolder;
         try {
-            QualityControlRecord rec = QualityControlRecord.getRecord(walkImageSequence.imageAt(0).getUri(), qcFolder);
+            QualityControlRecord.getRecord(walkImageSequence.imageAt(0).getUri(), qcFolder);
         } catch (UnknownHostException ex) {
             Logger.getLogger(QualityControlSequence.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -33,7 +33,7 @@ public class QualityControlSequence {
     }
 
     
-    protected int[] refreshQCTotals() {
+    protected final int[] refreshQCTotals() {
         qcOK = qcProb = qcIgn = qcUnknown = 0;
         for(int i=0; i < walkImageSequence.size(); i++) {
             if ( getQualityControlRecord(i)==null ) continue;

@@ -83,7 +83,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         bc.bind();
     }
 
-    private PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
+    private transient PropertyChangeListener renderTypeListener= new PropertyChangeListener() {
         public void propertyChange( PropertyChangeEvent ev ) {
             doElementBindings();
         }

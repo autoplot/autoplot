@@ -194,7 +194,9 @@ public class Util {
         File[] children = root.listFiles();
         boolean success = true;
 
-        dst.mkdirs();
+        if ( !dst.mkdirs() ) {
+            throw new IllegalArgumentException( "unable to make directory "+dst );
+        }
         for (int i = 0; i < children.length; i++) {
             if (children[i].isDirectory()) {
                 success = success && copyFileTree( children[i],new File(dst,children[i].getName()) );
@@ -229,8 +231,8 @@ public class Util {
         return result.toString();
     }
 
-    public static void main(String[] args) throws IOException {
-        copyFileTree( new File("/home/jbf/temp/foo"), new File("/home/jbf/temp/foo2/" ));
-        getBuildInfos();
-    }
+//    public static void main(String[] args) throws IOException {
+//        copyFileTree( new File("/home/jbf/temp/foo"), new File("/home/jbf/temp/foo2/" ));
+//        getBuildInfos();
+//    }
 }

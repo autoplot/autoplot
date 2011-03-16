@@ -23,9 +23,8 @@ public class Test026 {
             System.err.println( id + ": "+ test + "\t" + drref.min() + "\t" + DatumUtil.asOrderOneUnits( drref.width() ) );
         } else {
             System.err.println( id + ": "+ test + " != " + ref + "     " + dr + " != " + drref );
-            dr= parseTimeRange(test); // for debugging
-            drref= parseTimeRange(ref);
-
+            //dr= parseTimeRange(test); // for debugging
+            //drref= parseTimeRange(ref);
             throw new IllegalArgumentException("no parse exception, but parsed incorrectly.");
         }
     }

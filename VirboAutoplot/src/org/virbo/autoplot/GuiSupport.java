@@ -308,9 +308,7 @@ public class GuiSupport {
         return new AbstractAction("Export Data...") {
 
             public void actionPerformed(ActionEvent e) {
-                DataSourceController dsc = parent.applicationModel.getDataSourceFilterController();
 
-                //final QDataSet dataSet = dsc.getFillDataSet();
                 final QDataSet dataSet = parent.applicationModel.dom
                         .getController().getPlotElement().getController().getDataSet();
 
@@ -633,9 +631,13 @@ public class GuiSupport {
                     f = new File(f.toString() + ".xml");
                 }
                 String format = Bookmark.formatBooks(parent.applicationModel.getRecent());
-                FileOutputStream out = new FileOutputStream(f);
-                out.write(format.getBytes());
-                out.close();
+                FileOutputStream out=null;
+                try {
+                    out = new FileOutputStream(f);
+                    out.write(format.getBytes());
+                } finally {
+                    if ( out!=null ) out.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }

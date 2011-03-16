@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeUtil;
@@ -33,7 +34,17 @@ public class TryHistory {
         BufferedReader reader= new BufferedReader( new FileReader(f) );
         String s= reader.readLine();
 
-        String lastURI= "";
+        //count the number of lines
+        int lineCount=1;
+        while ( s!=null ) {
+            lineCount++;
+            s= reader.readLine();
+        }
+        reader.close();
+
+        reader= new BufferedReader( new FileReader(f) );
+        s= reader.readLine();
+
         Map<String,Integer> plottedURIs= new LinkedHashMap();
 
         int i=1;
@@ -59,7 +70,7 @@ public class TryHistory {
             Integer count= plottedURIs.get(suri);
 
             if ( count==null || count==0 ) {
-                System.err.println("=== " + i + " =======================================================");
+                System.err.println("=== " + i + "/" + lineCount + " ===================================================");
                 System.err.println("readat: " + time);
                 System.err.println("uri:    " + suri );
 
@@ -98,6 +109,7 @@ public class TryHistory {
             i++;
             s= reader.readLine();
         }
+        reader.close();
 
         System.err.println( "\n===== Summary =================================================");
         DatumRange dr= new DatumRange( TimeUtil.prevMidnight(firstTime), TimeUtil.nextMidnight(lastTime) );
@@ -109,9 +121,9 @@ public class TryHistory {
         System.err.println( "Exceptions encountered: "+ exceptions.size() );
 
         System.err.println( "\n=== Exceptions ==============================================");
-        for ( String ex: exceptions.keySet() ) {
-            List<String> uris= exceptions.get(ex);
-            System.err.println( ex );
+        for ( Entry<String,List<String>> en: exceptions.entrySet() ) {
+            List<String> uris= exceptions.get(en.getKey());
+            System.err.println( en.getKey() );
             for ( String uri: uris ) {
                 System.err.println( "  " + uri );
             }

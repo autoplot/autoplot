@@ -146,17 +146,17 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void loggerIDCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loggerIDCheckBoxActionPerformed
-        console.showLoggerId= loggerIDCheckBox.isSelected();
+        console.setShowLoggerId( loggerIDCheckBox.isSelected() );
         console.update();
 }//GEN-LAST:event_loggerIDCheckBoxActionPerformed
 
     private void timeStampsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_timeStampsCheckBoxActionPerformed
-        console.showTimeStamps= timeStampsCheckBox.isSelected();
+        console.setShowTimeStamps( timeStampsCheckBox.isSelected() );
         console.update();
 }//GEN-LAST:event_timeStampsCheckBoxActionPerformed
 
     private void logLevelCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logLevelCheckBoxActionPerformed
-        console.showLevel= logLevelCheckBox.isSelected();
+        console.setShowLevel( logLevelCheckBox.isSelected() );
         console.update();
 }//GEN-LAST:event_logLevelCheckBoxActionPerformed
 
@@ -175,7 +175,7 @@ public class LogConsoleSettingsDialog extends javax.swing.JDialog {
         } else {
             throw new RuntimeException("bad level string: " + o);
         }
-        console.level= level.intValue();
+        console.setLevel( level.intValue() );
         console.update();
 }//GEN-LAST:event_verbositySelectActionPerformed
 

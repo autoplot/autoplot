@@ -144,11 +144,11 @@ public class PersistentStateSupport {
         if (recentFiles.size()==0 ) {
             return "";
         } else {
-            String result= String.valueOf( recentFiles.get(0) );
+            StringBuilder result= new StringBuilder( String.valueOf( recentFiles.get(0) ) );
             for ( int i=1; i<recentFiles.size(); i++ ) {
-                result+= "::"+String.valueOf(recentFiles.get(i));
+                result.append("::").append( String.valueOf(recentFiles.get(i)) );
             }
-            return result;
+            return result.toString();
         }
     }
     
@@ -158,7 +158,7 @@ public class PersistentStateSupport {
         Preferences prefs= Preferences.userNodeForPackage(PersistentStateSupport.class);
         String currentDirString= prefs.get( PREF_DIR+ext, "" );
         if ( !currentDirString.equals("") ) {
-            setDirectory( new File(currentDirString).getAbsolutePath().toString() );
+            setDirectory( new File(currentDirString).getAbsolutePath() );
         } else {
             setDirectory( "" );
         }
@@ -216,37 +216,39 @@ public class PersistentStateSupport {
      * override me
      */
     protected void saveImpl( File f ) throws Exception {
-        OutputStream out= new FileOutputStream( f );
-        
-
-        Document document= DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-        
-        Element element= strategy.serialize( document, DasProgressPanel.createFramed("Serializing") );
-        
-        document.appendChild( element );
-        
-        DOMImplementationLS ls = (DOMImplementationLS)
-                        document.getImplementation().getFeature("LS", "3.0");
-        LSOutput output = ls.createLSOutput();
-        output.setEncoding("UTF-8");
-        output.setByteStream(out);
-        LSSerializer serializer = ls.createLSSerializer();
-
+        OutputStream out= null;
         try {
-            if (serializer.getDomConfig().canSetParameter("format-pretty-print", Boolean.TRUE)) {
-                serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
-            }
-        } catch (Error e) {
-            // Ed's nice trick for finding the implementation
-            //String name = serializer.getClass().getSimpleName();
-            //java.net.URL u = serializer.getClass().getResource(name+".class");
-            //System.err.println(u);
-            e.printStackTrace();
-        }
-	serializer.write(document, output);
+            out= new FileOutputStream( f );
 
-        out.close();
-        
+
+            Document document= DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+            Element element= strategy.serialize( document, DasProgressPanel.createFramed("Serializing") );
+
+            document.appendChild( element );
+
+            DOMImplementationLS ls = (DOMImplementationLS)
+                            document.getImplementation().getFeature("LS", "3.0");
+            LSOutput output = ls.createLSOutput();
+            output.setEncoding("UTF-8");
+            output.setByteStream(out);
+            LSSerializer serializer = ls.createLSSerializer();
+
+            try {
+                if (serializer.getDomConfig().canSetParameter("format-pretty-print", Boolean.TRUE)) {
+                    serializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+                }
+            } catch (Error e) {
+                // Ed's nice trick for finding the implementation
+                //String name = serializer.getClass().getSimpleName();
+                //java.net.URL u = serializer.getClass().getResource(name+".class");
+                //System.err.println(u);
+                e.printStackTrace();
+            }
+            serializer.write(document, output);
+        } finally {
+            if ( out!=null ) out.close();
+        }
     }
     
     private void save( final File file ) {
@@ -302,18 +304,6 @@ public class PersistentStateSupport {
             }
         };
     }
-    
-    /**
-     * In the future, this should prompt for save if the app is dirty.
-     */
-    public Action createQuitAction() {
-        return new AbstractAction("Quit") {
-            public void actionPerformed( ActionEvent e ) {
-                System.exit(0);
-            }
-        };
-    }
-    
     
     public JMenuItem createSaveMenuItem() {
         saveMenuItem= new JMenuItem(createSaveAction());
@@ -474,7 +464,7 @@ public class PersistentStateSupport {
     public void setDirty(boolean dirty) {
         boolean oldDirty = this.dirty;
         this.dirty = dirty;
-        propertyChangeSupport.firePropertyChange ( PROPERTY_DIRTY, new Boolean (oldDirty), new Boolean (dirty));
+        propertyChangeSupport.firePropertyChange ( PROPERTY_DIRTY, oldDirty, dirty);
     }
 
     protected String directory = null;
@@ -563,7 +553,7 @@ public class PersistentStateSupport {
     public void setCurrentFileOpened(boolean currentFileOpened) {
         boolean oldCurrentFileOpened = this.currentFileOpened;
         this.currentFileOpened = currentFileOpened;
-        propertyChangeSupport.firePropertyChange ("currentFileOpened", new Boolean (oldCurrentFileOpened), new Boolean (currentFileOpened));
+        propertyChangeSupport.firePropertyChange ("currentFileOpened", oldCurrentFileOpened, currentFileOpened);
     }
 
 }
