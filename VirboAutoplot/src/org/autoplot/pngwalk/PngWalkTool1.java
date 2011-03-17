@@ -103,7 +103,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         System.err.println("this is pngwalk 20110114");
         final ArgumentList alm = new ArgumentList("PngWalkTool1");
-        alm.addBooleanSwitchArgument("nativeLAF", "n", "nativeLAF", "use the system look and feel");
+        alm.addOptionalSwitchArgument("nativeLAF", "n", "nativeLAF", alm.TRUE, "use the system look and feel (T or F)");
         alm.addOptionalSwitchArgument( "mode", "m", "mode", "filmStrip", "initial display mode: grid, filmStrip, covers, contextFlow, etc");
         alm.addOptionalSwitchArgument( "goto", "g", "goto", "", "start display at the beginning of this range, e.g. 2010-01-01" );
         alm.addBooleanSwitchArgument("qualityControl", "q", "qualityControl", "enable quality control review mode");
@@ -117,6 +117,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         alm.process(args);
 
         if (alm.getBooleanValue("nativeLAF")) {
+            logger.fine("nativeLAF");
             try {
                 javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {

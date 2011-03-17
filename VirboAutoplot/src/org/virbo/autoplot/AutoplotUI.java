@@ -2372,4 +2372,8 @@ private void updateFrameTitle() {
     public UndoRedoSupport getUndoRedoSupport() {
         return this.undoRedoSupport;
     }
+
+    public DataSetSelector getDataSetSelector() {
+        return this.dataSetSelector;
+    }
 }

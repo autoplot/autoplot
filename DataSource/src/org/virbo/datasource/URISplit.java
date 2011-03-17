@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -156,7 +158,7 @@ public class URISplit {
             }
 
             if ( !isFile ) {
-                return null;
+                result.file=null;
 
             } else {
                 result.surl = "file://";
@@ -310,7 +312,9 @@ public class URISplit {
     private static void parseScheme(URISplit result, boolean normalize) throws URISyntaxException {
         String surl = result.surl;
         int h = surl.indexOf(":"); // "c:" should be "file:///c:"
-
+        if ( h==-1 ) {
+            h=0;
+        }
         String scheme = surl.substring(0, h);
 
         if (scheme.startsWith("vap")) {
@@ -381,6 +385,8 @@ public class URISplit {
      * @param normalize normalize the surl by adding implicit "vap", etc.
      */
     public static URISplit parse( String surl, int carotPos , boolean normalize) {
+
+        Logger.getLogger("virbo.dataset").log( Level.FINE, "URISplit.parse(\"$0\",$1,$2)", new Object[] { surl, ""+carotPos, ""+normalize } );
 
         if ( surl.startsWith("file:/") && surl.endsWith(":") && surl.length()<11 && surl.charAt(surl.length()-3)=='/' ) { // kludge for file:///c:<CAROT> on Windows.
             if ( carotPos==surl.length() ) carotPos++;

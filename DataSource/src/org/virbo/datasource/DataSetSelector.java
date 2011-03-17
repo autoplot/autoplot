@@ -268,7 +268,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * show completion list.  Otherwise, fire off event.
      */
     public void maybePlot(boolean allowModifiers) {
-        logger.fine("go " + getValue() + "");
+        logger.log(Level.FINE, "go {0}", getValue());
         if (!allowModifiers) {
             keyModifiers = 0;
         }
@@ -377,6 +377,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     dialog.setVisible(true);
 
                     if (!dialog.isCancelled()) {
+                        logger.log( Level.FINE, "dataSetSelector.setSelectedItem(\"{0}\");", fedit.getURI() );
                         dataSetSelector.setSelectedItem(fedit.getURI());
                         keyModifiers = dialog.getModifiers();
                         maybePlot(true);
@@ -1290,4 +1291,5 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
     public static void main( String[] args ) {
         DataSetSelectorDemo.main(args);
     }
+
 }

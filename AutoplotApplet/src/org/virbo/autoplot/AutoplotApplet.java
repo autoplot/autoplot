@@ -39,6 +39,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UnsupportedLookAndFeelException;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -230,6 +231,18 @@ public class AutoplotApplet extends JApplet {
     @Override
     public void init() {
         super.init();
+        
+        try {
+            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(AutoplotApplet.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         String fontParam = getParameter("font");
         if (fontParam != null) {
@@ -406,12 +419,12 @@ public class AutoplotApplet extends JApplet {
 
         JMenuItem item;
 
-        item = new JMenuItem(new AbstractAction("Edit DOM") {
-            public void actionPerformed(ActionEvent e) {
-                new PropertyEditor(dom).showDialog(AutoplotApplet.this);
-            }
-        });
-        dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item);
+//        item = new JMenuItem(new AbstractAction("Edit DOM") {
+//            public void actionPerformed(ActionEvent e) {
+//                new PropertyEditor(dom).showDialog(AutoplotApplet.this);
+//            }
+//        });
+//        dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(item);
 
         item = new JMenuItem(new AbstractAction("Reset Zoom") {
             public void actionPerformed(ActionEvent e) {
@@ -426,7 +439,6 @@ public class AutoplotApplet extends JApplet {
             }
         });
         dom.getPlots(0).getController().getDasPlot().getDasMouseInputAdapter().addMenuItem(overviewMenuItem);
-
 
         /*        item= new JMenuItem( new AbstractAction( "Execute DOM command..." ) {
         public void actionPerformed(ActionEvent e) {
@@ -700,6 +712,10 @@ public class AutoplotApplet extends JApplet {
         }
 
         p.getController().getDasPlot().getDasMouseInputAdapter().removeMenuItem("Properties");
+        dom.getPlots(0).getXaxis().getController().getDasAxis().getDasMouseInputAdapter().removeMenuItem("Properties");
+        dom.getPlots(0).getYaxis().getController().getDasAxis().getDasMouseInputAdapter().removeMenuItem("Properties");
+        dom.getPlots(0).getZaxis().getController().getDasAxis().getDasMouseInputAdapter().removeMenuItem("Properties");
+
 
         if ( getStringParameter("contextOverview","off").equals("on") ) {
             Runnable run= new Runnable() {
@@ -894,6 +910,7 @@ public class AutoplotApplet extends JApplet {
     }
 
     public void setDomNode(final String node, final String sval) {
+        getAppletContext().showStatus("setDomNode( "+node + ","+sval + ")" );
         Runnable run = new Runnable() {
 
             public void run() {
@@ -909,7 +926,7 @@ public class AutoplotApplet extends JApplet {
                     Object val = sd.parse(sd.typeId(c), sval);
 
                     DomUtil.setPropertyValue(dom, node, val);
-
+                    getAppletContext().showStatus("dom." + node + "=" + DomUtil.getPropertyValue(dom, node) );
                     System.err.println("dom." + node + "=" + DomUtil.getPropertyValue(dom, node));
                 } catch (ParseException ex) {
                     ex.printStackTrace();
@@ -946,6 +963,11 @@ public class AutoplotApplet extends JApplet {
             controller.addConnector(domPlot, that);
             dom.getCanvases(0).getRows(0).setBottom("60%-2em");
             dom.getCanvases(0).getRows(1).setTop("60%+2em");
+            that.getXaxis().getController().getDasAxis().getDasMouseInputAdapter().removeMenuItem("Properties");
+            that.getYaxis().getController().getDasAxis().getDasMouseInputAdapter().removeMenuItem("Properties");
+            that.getZaxis().getController().getDasAxis().getDasMouseInputAdapter().removeMenuItem("Properties");
+            that.getController().getDasPlot().getDasMouseInputAdapter().removeMenuItem("Properties"); // TODO this doesn't work
+            that.getController().getDasPlot().getDasMouseInputAdapter().removeMenuItem("Connector Properties");
         } else {
             ApplicationController controller = dom.getController();
             controller.deletePlotElement(dom.getPlotElements(1));
