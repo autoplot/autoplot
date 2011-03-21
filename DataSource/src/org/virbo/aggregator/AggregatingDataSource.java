@@ -181,7 +181,8 @@ public class AggregatingDataSource extends AbstractDataSource {
                 if (result == null && altResult==null ) {
                     if ( ds1 instanceof JoinDataSet ) {
                         altResult= JoinDataSet.copy( (JoinDataSet)ds1 );
-                        altResult.putProperty(QDataSet.JOIN_0,"join");
+                        DDataSet mpds= DDataSet.create(new int[0]);
+                        altResult.putProperty(QDataSet.JOIN_0,mpds );
                     } else {
                         if ( ss.length==1 ) {
                             result= ArrayDataSet.maybeCopy(ds1);
@@ -242,6 +243,12 @@ public class AggregatingDataSource extends AbstractDataSource {
         if ( altResult!=null ) {
             ArrayDataSet dep0 = altResult == null ? null : (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
             Units dep0units= dep0==null ? null : SemanticOps.getUnits(dep0);
+            if ( dep0==null ) {
+                dep0= (ArrayDataSet) altResult.property(QDataSet.JOIN_0);
+                QDataSet d= (QDataSet) altResult.property(QDataSet.DEPEND_0,0);
+                if ( d!=null ) dep0units= SemanticOps.getUnits(d);
+                dep0.putProperty(QDataSet.UNITS, dep0units );
+            }
             if ( dep0 != null && cacheRange1.getUnits().isConvertableTo( dep0units ) ) {
                 dep0.putProperty(QDataSet.CACHE_TAG, new CacheTag(cacheRange1, null));
                 dep0.putProperty(QDataSet.TYPICAL_MIN, viewRange.min().doubleValue(dep0units) );
