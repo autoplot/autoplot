@@ -156,10 +156,15 @@ public class TimeSeriesBrowseController {
             // CacheTag "tag" identifies what we have already
             QDataSet ds = this.dataSourceController.getDataSet();
             QDataSet dep0 = ds == null ? null : (QDataSet) ds.property(QDataSet.DEPEND_0);
-            QDataSet join0 = ds == null ? null : (QDataSet) ds.property(QDataSet.JOIN_0);
+            Object join0 = ds == null ? null : ds.property(QDataSet.JOIN_0);
             CacheTag tag = dep0 == null ? null : (CacheTag) dep0.property(QDataSet.CACHE_TAG);
-            if ( tag==null && join0!=null ) {
-                tag= (CacheTag) join0.property( QDataSet.CACHE_TAG );
+            if ( tag==null && join0!=null )  {
+                if ( join0 instanceof QDataSet ) {
+                    QDataSet qdsj= (QDataSet)join0;
+                    tag= (CacheTag) qdsj.property( QDataSet.CACHE_TAG );
+                } else {
+                    System.err.println( "join property was not a QDataSet: "+join0.toString() );
+                }
             }
 
             DatumRange visibleRange = null;
