@@ -175,8 +175,8 @@ public class CdfJavaDataSource extends AbstractDataSource {
         if ( dmax>vmin && dmin<vmax ) {
             intersects= true;
         }
-        
-        if ( intersects || dmax<-1e30 || dmin>1e30 )  {
+
+        if ( intersects || dmax==dmin || dmax<-1e30 || dmin>1e30 )  { //bugfix 3235447: all data invalid
             if ( nmax!=null ) ds.putProperty(QDataSet.VALID_MAX, uc.convert(nmax) );
             if ( nmin!=null ) ds.putProperty(QDataSet.VALID_MIN, uc.convert(nmin) );
         }
