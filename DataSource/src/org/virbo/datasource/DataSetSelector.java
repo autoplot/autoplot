@@ -687,12 +687,20 @@ public class DataSetSelector extends javax.swing.JPanel {
                 try {
                     completions2 = DataSetURI.getFactoryCompletions(surl, carotpos, completionsMonitor);
                     setMessage("done getting completions");
+                } catch (IOException ex ) {
+                    //Note we've talked about allowing the DataSource to handle the exception, and this would be cleaner.
+                    if ( ex instanceof FileNotFoundException || ex.toString().contains("root does not exist") ) {
+                        //DataSetSelector.this....getApplicationModel().showMessage(...) would be better maybe
+                        JOptionPane.showMessageDialog( DataSetSelector.this, ex.getMessage(), "No Such File", JOptionPane.WARNING_MESSAGE );
+                        setMessage("" + ex.getMessage());
+                    } else {
+                        ex.printStackTrace();
+                        setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
+                    }
+                    return;
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
-                    if ( ex instanceof FileNotFoundException ) {
-                        // possibly have nice popup.
-                    }
                     return;
                 }
 

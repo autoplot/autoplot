@@ -119,7 +119,7 @@ public class ApplicationModel {
      * show a message to the user.
      * @param message
      * @param title
-     * @param messageType JOptionPane.WARNING_MESSAGE, JOptionPane.INFORMATION_MESSAGE, JOptionPane.WARNING_MESSAGE,
+     * @param messageType JOptionPane.WARNING_MESSAGE, JOptionPane.INFORMATION_MESSAGE, JOptionPane.PLAIN_MESSAGE,
      */
     public void showMessage( String message, String title, int messageType ) {
         if (  ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false") ) ) {

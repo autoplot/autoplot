@@ -14,6 +14,7 @@ import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import ftpfs.FTPBeanFileSystemFactory;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -896,6 +897,13 @@ public class DataSetURI {
             onlyAgg= true;
             
         } else {
+            // Since FileSystem.create can't throw IOExceptions, the error is hidden in an IllegalArgumentException.
+            // Until this is cleaned up, do this kludge.
+            if ( surlDir.startsWith("file:/") ) {
+                if ( !new File( split.path ).exists() ) {
+                    throw new FileNotFoundException("directory does not exist: "+split.path );
+                }
+            }
             fs = FileSystem.create( DataSetURI.toUri(surlDir), mon );
             s = fs.listDirectory("/");
         }

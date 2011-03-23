@@ -22,11 +22,13 @@ import org.das2.event.MouseModule;
 import org.das2.event.ZoomPanMouseModule;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
+import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.Renderer;
+import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.RenderType;
@@ -457,8 +459,15 @@ public class PlotController extends DomNodeController {
 
     synchronized void addPlotElement(PlotElement p,boolean reset) {
         Renderer rr= p.controller.getRenderer();
+
+        if ( rr instanceof SpectrogramRenderer ) {
+            ((SpectrogramRenderer)rr).setColorBar( getDasColorBar() );
+        } else if ( rr instanceof SeriesRenderer ) {
+            ((SeriesRenderer)rr).setColorBar( getDasColorBar() );
+        }
+
         if ( rr!=null ) {
-            if ( rr instanceof SpectrogramRenderer ) {
+            if ( rr instanceof SpectrogramRenderer ) { // kludge to put on the bottom
                 dasPlot.addRenderer(0,rr);
             } else {
                 dasPlot.addRenderer(rr);
@@ -475,16 +484,30 @@ public class PlotController extends DomNodeController {
         }
         p.setPlotId(plot.getId());
         checkRenderType();
+//        DasPlot pl= p.controller.getDasPlot();
+//        if ( pl!=null ) {
+//            DasCanvas c= pl.getCanvas();
+//            System.err.println("==AFTER===");
+//            for ( DasCanvasComponent cc: c.getCanvasComponents() ) {
+//                if ( cc instanceof DasColorBar ) System.err.println(cc);
+//            }
+//        }
     }
 
     synchronized void removePlotElement(PlotElement p) {
         Renderer rr= p.controller.getRenderer();
         if ( rr!=null ) dasPlot.removeRenderer(rr);
+        if ( rr instanceof SpectrogramRenderer ) {
+            ((SpectrogramRenderer)rr).setColorBar(null);
+        } else if ( rr instanceof SeriesRenderer ) {
+            ((SeriesRenderer)rr).setColorBar(null);
+        }
+
         doPlotElementDefaultsChange(null);
         p.removePropertyChangeListener( PlotElement.PROP_PLOT_DEFAULTS, plotDefaultsListener );
         p.removePropertyChangeListener( PlotElement.PROP_RENDERTYPE, renderTypeListener );
         pdListen.remove(p);
-        p.setPlotId("");
+        if ( !p.getPlotId().equals("") ) p.setPlotId("");
         checkRenderType();
     }
 
