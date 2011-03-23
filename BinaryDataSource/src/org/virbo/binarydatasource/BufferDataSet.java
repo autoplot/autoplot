@@ -187,6 +187,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @return the offset, in bytes, of the element.
      */
     protected int offset( ) {
+        if ( this.rank!=0 ) throw new IllegalArgumentException("rank error");
         return recoffset;
     }
 
@@ -196,6 +197,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @return the offset, in bytes, of the element.
      */
     protected int offset(int i0 ) {
+        if ( this.rank!=1 ) throw new IllegalArgumentException("rank error");
         if (RANGE_CHECK) {
             rangeCheck(i0, 0, 0);
         }
@@ -209,6 +211,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @return the offset, in bytes, of the element.
      */
     protected int offset(int i0, int i1 ) {
+        if ( this.rank!=2 ) throw new IllegalArgumentException("rank error");
         if (RANGE_CHECK) {
             rangeCheck(i0, i1, 0);
         }        
@@ -223,6 +226,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * @return the offset, in bytes, of the element.
      */
     protected int offset(int i0, int i1, int i2) {
+        if ( this.rank!=3 ) throw new IllegalArgumentException("rank error");
         if (RANGE_CHECK) {
             rangeCheck(i0, i1, i2);
         }
