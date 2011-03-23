@@ -639,6 +639,23 @@ public class PlotElementController extends DomNodeController {
         return depNames;
     }
 
+    private static Units[] getDimensionUnits( QDataSet ds ) {
+
+        Units[] depUnits = new Units[ds.rank()];
+        for (int i = 0; i < ds.rank(); i++) {
+            depUnits[i] = Units.dimensionless;
+            QDataSet dep0 = (QDataSet) ds.property("DEPEND_" + i);
+            if (dep0 != null) {
+                Units u = (Units) dep0.property(QDataSet.UNITS);
+                if (u != null) {
+                    depUnits[i] = u;
+                }
+            }
+        }
+
+        return depUnits;
+    }
+
     /**
      * guess the best sprocess to reduce the rank to something we can display.
      * guess the best dimension to slice by default, based on metadata.  Currently,
@@ -649,12 +666,14 @@ public class PlotElementController extends DomNodeController {
      */
     private static String guessSlice( QDataSet fillDs ) {
         String[] depNames= getDimensionNames(fillDs);
+        Units[] depUnits= getDimensionUnits(fillDs);
 
         int lat = -1, lon = -1;
 
         int[] slicePref = new int[]{2, 2, 2}; // slicePref big means more likely to slice.
         for (int i = 0; i < depNames.length; i++) {
             String n = depNames[i].toLowerCase();
+            Units u= depUnits[i];
             if (n.startsWith("lat")) {
                 slicePref[i] = 0;
                 lat = i;
@@ -671,7 +690,12 @@ public class PlotElementController extends DomNodeController {
                 slicePref[i] = 4;
             } else if (n.contains("bundle")) {
                 slicePref[i] = 4;
+            } else if ( u instanceof EnumerationUnits ) {
+                slicePref[i]= 5;
+            } else if ( fillDs.property( "BUNDLE_"+i )!=null ) {
+                slicePref[i]= 5;
             }
+
         }
 
         int sliceIndex = 0;

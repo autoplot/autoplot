@@ -82,10 +82,9 @@ public class ZipFileSystem extends FileSystem {
             return filemap.get(f);
         } else if (filemap.containsKey(f+"/")) {  //maybe it's a folder with out trailing /
             return filemap.get(f+"/");
+        } else {
+            return new ZipFileObject( this, null, null, filename );
         }
-        // Otherwise an invalid filename was specified
-        // Can't throw exception because overridden method doesn't.
-        return null;
     }
 
     @Override
@@ -146,4 +145,9 @@ public class ZipFileSystem extends FileSystem {
         return zipCache;
     }
 
+    @Override
+    public String toString() {
+        return "zipfs "+ zipFile.getName();
+                
+    }
 }

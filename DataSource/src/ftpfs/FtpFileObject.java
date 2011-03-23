@@ -14,7 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.DirectoryEntry;
-import org.das2.util.filesystem.LocalFileObject;
 import org.das2.util.filesystem.WebFileObject;
 import org.das2.util.filesystem.WebFileSystem;
 import org.das2.util.filesystem.WriteCapability;

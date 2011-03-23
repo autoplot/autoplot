@@ -249,6 +249,19 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         String errorMessage = extraInfo + t.getClass().getName() + "\n"
             + (t.getMessage() == null ? "" : t.getMessage());
 
+        // kludge for Jython errors
+        if ( t.getClass().getName().contains("PyException" ) ) {
+            String[] ss= t.toString().split("\n");
+            int i=0;
+            if ( ss[i].contains("Traceback") ) i++;
+            if ( ss.length>0 && ss[i].contains( "in ?") ) i++;
+            if ( ss.length > i ) {
+                StringBuilder msg= new StringBuilder(ss[i++]);
+                while ( i<ss.length ) msg.append("\n").append(ss[i++]);
+                errorMessage+= msg.toString();
+            }
+        }
+
         if ( dia1!=null ) {
             errorMessage= errorMessage + "\n\nError hit "+(1+dia1.hits)+ " times" ;
             dia1.hits++;

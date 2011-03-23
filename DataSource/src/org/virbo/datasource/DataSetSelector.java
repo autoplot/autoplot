@@ -23,6 +23,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
@@ -683,6 +684,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
+                    if ( ex instanceof FileNotFoundException ) {
+                        // possibly have nice popup.
+                    }
                     return;
                 }
 

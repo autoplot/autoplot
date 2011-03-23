@@ -40,7 +40,6 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -89,7 +88,7 @@ public class AutoplotApplet extends JApplet {
     String clickCallback;
     ProgressMonitor loadInitialMonitor;
     long t0 = System.currentTimeMillis();
-    public static final String VERSION = "20090914.1";
+    public static final String VERSION = "20110317.1";
     private Image splashImage;
     private JCheckBoxMenuItem overviewMenuItem = null;
 
@@ -415,7 +414,6 @@ public class AutoplotApplet extends JApplet {
         if (!fontParam.equals("")) {
             appmodel.canvas.setBaseFont(Font.decode(fontParam));
         }
-
 
         JMenuItem item;
 

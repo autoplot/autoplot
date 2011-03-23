@@ -89,6 +89,8 @@ public class ZipFileObject extends FileObject {
     @Override
     public File getFile(ProgressMonitor monitor) throws FileNotFoundException, IOException {
         // ignoring the monitor for now; possibly we'll need to use it this proves slow
+        if ( !exists() ) throw new FileNotFoundException(
+                String.format( "file %s does not exist in %s", this.name, this.zfs.toString() ) );
         String tmpFileName = zfs.getLocalRoot().getAbsoluteFile() + "/" + zipEntry.getName();
         File tmpFile = new File(tmpFileName);
         File tmpDir = tmpFile.getParentFile();
@@ -145,8 +147,7 @@ public class ZipFileObject extends FileObject {
 
     @Override
     public boolean exists() {
-        // The zip file is opened read-only and this object is only created for files in it
-        return true;
+        return this.zipEntry!=null && this.parent!=null;
     }
 
     @Override

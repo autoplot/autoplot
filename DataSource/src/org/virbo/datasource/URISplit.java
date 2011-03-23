@@ -158,7 +158,7 @@ public class URISplit {
             }
 
             if ( !isFile ) {
-                result.file=null;
+                return null;
 
             } else {
                 result.surl = "file://";
@@ -312,9 +312,7 @@ public class URISplit {
     private static void parseScheme(URISplit result, boolean normalize) throws URISyntaxException {
         String surl = result.surl;
         int h = surl.indexOf(":"); // "c:" should be "file:///c:"
-        if ( h==-1 ) {
-            h=0;
-        }
+
         String scheme = surl.substring(0, h);
 
         if (scheme.startsWith("vap")) {
@@ -395,6 +393,13 @@ public class URISplit {
 
         URISplit result = maybeAddFile(surl, carotPos);
 
+        if ( result==null ) {
+            result= new URISplit();
+            result.surl= surl;
+            result.vapScheme= "";
+            result.formatCarotPos= carotPos;
+            return result;
+        }
         if ( "vap+internal".equals(result.vapScheme) ) result.file=""; // non-files will get "" for the file, and this should too.
         try {
             if ( result.vapScheme==null || result.file==null ) {
@@ -579,7 +584,7 @@ public class URISplit {
 
     public static String format(URISplit split) {
         String result = "";
-        if ( split.vapScheme!=null ) result= result + split.vapScheme + ":";
+        if ( split.vapScheme!=null && split.vapScheme.length()>0 ) result= result + split.vapScheme + ":";
         if ( split.file==null && split.params!=null ) {
             result= result + split.params;
         } else if ( split.file!=null ) {
@@ -587,6 +592,8 @@ public class URISplit {
             if (split.params != null) {
                 result += "?" + split.params;
             }
+        } else if ( split.surl!=null ) {
+            result+= split.surl;
         }
         return result;
     }

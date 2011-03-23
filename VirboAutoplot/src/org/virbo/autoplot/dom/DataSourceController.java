@@ -1272,53 +1272,6 @@ public class DataSourceController extends DomNodeController {
         propertyChangeSupport.firePropertyChange(PROP_RESETDIMENSIONS, oldResetDimensions, resetDimensions);
     }
 
-
-    /**
-     * guess the best dimension to slice by default, based on metadata.  Currently,
-     * this looks for the names lat, lon, and angle.
-     */
-    private void guessSliceDimension() {
-        int lat = -1, lon = -1;
-
-        int[] slicePref = new int[]{2, 2, 2}; // slicePref big means more likely to slice.
-        for (int i = 0; i < getDepnames().size(); i++) {
-            String n = getDepnames().get(i).toLowerCase();
-            if (n.startsWith("lat")) {
-                slicePref[i] = 0;
-                lat = i;
-            } else if (n.startsWith("lon")) {
-                slicePref[i] = 0;
-                lon = i;
-            } else if (n.contains("time") ) {
-                slicePref[i] = 1;
-            } else if (n.contains("epoch") ) {
-                slicePref[i] = 1;
-            } else if (n.contains("angle")) {
-                slicePref[i] = 4;
-            } else if (n.contains("alpha") ) { // commonly used for pitch angle in space physics
-                slicePref[i] = 4;
-            } else if (n.contains("bundle")) {
-                slicePref[i] = 4;
-            }
-        }
-
-        int sliceIndex = 0;
-        int bestSlice = 0;
-        for (int i = 0; i < 3; i++) {
-            if (slicePref[i] > bestSlice) {
-                sliceIndex = i;
-                bestSlice = slicePref[i];
-            }
-        }
-
-        if (lat > -1 && lon > -1 && lat < lon) {
-            dsf.setTranspose(true);
-        }
-
-        dsf.setSliceDimension(sliceIndex);
-
-    }
-
     public TimeSeriesBrowseController getTimeSeriesBrowseController() {
         return timeSeriesBrowseController;
     }
