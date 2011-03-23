@@ -159,7 +159,7 @@ public class AggregatingDataSource extends AbstractDataSource {
                 scompUrl += "?" + sparams;
             }
 
-            URI delegateUri= DataSetURI.getURI(scompUrl);
+            URI delegateUri= DataSetURI.getURIValid(scompUrl);
 
             DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
             metadataModel = delegateDataSource.getMetadataModel();

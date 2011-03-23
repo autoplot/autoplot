@@ -200,12 +200,12 @@ public class ScriptPanelSupport {
         if (i1 == -1) {
             i1 = surl1.length();
         }
-        URI uri1 = DataSetURI.getURI(surl1.substring(0, i1));
+        URI uri1 = DataSetURI.getURIValid(surl1.substring(0, i1));
         int i2 = surl2.indexOf("?");
         if (i2 == -1) {
             i2 = surl2.length();
         }
-        URI uri2 = DataSetURI.getURI(surl2.substring(0, i2));
+        URI uri2 = DataSetURI.getURIValid(surl2.substring(0, i2));
         if ( uri1==null ) return false;
         return uri1.equals(uri2);
     }

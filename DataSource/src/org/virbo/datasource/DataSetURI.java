@@ -153,7 +153,7 @@ public class DataSetURI {
     }
 
     public static DataSource getDataSource(String surl) throws Exception {
-        return getDataSource(getURI(surl));
+        return getDataSource(getURIValid(surl));
     }
 
     /**
@@ -611,9 +611,30 @@ public class DataSetURI {
     }
 
     /**
+     * get a URI from the string which is believed to be valid.  This was introduced
+     * because a number of codes called getURI without checking for null, which could be
+     * returned when the URI could not be parsed ("This is not a uri").  Codes that
+     * didn't check would produce a null pointer exception, and now they will produce
+     * a more accurate error. 
+     * @param surl
+     * @return
+     * @throws URISyntaxException
+     */
+    public static URI getURIValid( String surl ) throws URISyntaxException {
+        URI result= getURI( surl );
+        if ( result==null ) {
+            throw new IllegalArgumentException("URI cannot be formed from \""+surl+"\"");
+        } else {
+            return result;
+        }
+    }
+    
+    /**
      * canonical method for getting the Autoplot URI.  If no protocol is specified, then file:// is
-     * used.  Note URIs may contain prefix like bin.http://www.cdf.org/data.cdf.  The
+     * used.  Note URIs may contain prefix like vap+bin:http://www.cdf.org/data.cdf.  The
      * result will start with an Autoplot scheme like "vap:" or "vap+cdf:"
+     *
+     * @return the URI or null if it's clearly not a URI.
      * 
      */
     public static URI getURI(String surl) throws URISyntaxException {
@@ -647,7 +668,7 @@ public class DataSetURI {
      */
     public static URL getURL(String surl) throws MalformedURLException {
         try {
-            URI uri = getURI(surl);
+            URI uri = getURIValid(surl);
             return getWebURL(uri);
         } catch (URISyntaxException ex) {
             throw new MalformedURLException(ex.getMessage());
@@ -1026,12 +1047,12 @@ public class DataSetURI {
 
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
 
-            DataSourceFactory factory = getDataSourceFactory(getURI(surl1), new NullProgressMonitor());
+            DataSourceFactory factory = getDataSourceFactory(getURIValid(surl1), new NullProgressMonitor());
             if (factory == null) {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
 
-            URI uri = DataSetURI.getURI(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+            URI uri = DataSetURI.getURIValid(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
 
             cc.resourceURI= DataSetURI.getResourceURI(uri);
             cc.params = split.params;
@@ -1091,10 +1112,10 @@ public class DataSetURI {
 
         } else if (cc.context == CompletionContext.CONTEXT_PARAMETER_VALUE) {
             String file= CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
-            DataSourceFactory factory = getDataSourceFactory(getURI(surl1), mon);
+            DataSourceFactory factory = getDataSourceFactory(getURIValid(surl1), mon);
 
             if ( file!=null ) {
-                URI uri = DataSetURI.getURI(file);
+                URI uri = DataSetURI.getURIValid(file);
                 cc.resourceURI= DataSetURI.getResourceURI(uri);
             }
             cc.params = split.params;
@@ -1137,7 +1158,7 @@ public class DataSetURI {
                     surlDir = surl.substring(0, i + 1);
                 }
 
-                URI url = getURI(surlDir);
+                URI url = getURIValid(surlDir);
                 String prefix = surl.substring(i + 1, newCarotPos);
                 FileSystem fs = FileSystem.create(getWebURL(url),new NullProgressMonitor());
                 String[] s = fs.listDirectory("/");

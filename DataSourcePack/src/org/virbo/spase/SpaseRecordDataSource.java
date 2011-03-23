@@ -82,7 +82,7 @@ public class SpaseRecordDataSource implements DataSource {
             //XPathExpression expr= xpath.compile( "//book/title/text()" );
             //surl= xpath.evaluate( "//Spase/NumericalData/AccessInformation/AccessURL/URL/text()", document );
             surl= findSurl();
-            delegate= DataSetURI.getDataSource( DataSetURI.getURI( surl ) );
+            delegate= DataSetURI.getDataSource( DataSetURI.getURIValid( surl ) );
         } catch ( XPathExpressionException ex) {
             throw new IllegalArgumentException("unable to get /Spase/NumericalData/AccessInformation/AccessURL/URL(): "+ex.getMessage() );
         } catch ( MalformedURLException ex) {

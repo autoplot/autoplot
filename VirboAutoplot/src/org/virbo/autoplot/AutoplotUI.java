@@ -845,7 +845,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             if ( split.file==null || !( split.file.endsWith(".vap")|| split.file.endsWith(".vapx") ) ) {
                 if ( ! "true".equals(AutoplotUtil.getProperty("java.awt.headless", "false")) ) { // findbugs DLS_DEAD_LOCAL_STORE okay
                     try {
-                        DataSetURI.getDataSourceFactory(DataSetURI.getURI(surl),mon);
+                        DataSetURI.getDataSourceFactory(DataSetURI.getURIValid(surl),mon);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     } catch (URISyntaxException ex) {

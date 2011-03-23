@@ -25,6 +25,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -204,7 +205,12 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
             } else {
                 try {
-                    DataSourceFactory f = DataSetURI.getDataSourceFactory(DataSetURI.getURI(surl), getMonitor());
+                    URI uri= DataSetURI.getURI(surl);
+                    if ( uri==null ) {
+                        setMessage("URI cannot be formed from \""+surl+"\"");
+                        return;
+                    }
+                    DataSourceFactory f = DataSetURI.getDataSourceFactory(uri, getMonitor());
                     if (f == null) {
                         throw new RuntimeException("unable to identify data source for URI, try \"about:plugins\"");
                     }
@@ -313,7 +319,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         boolean wasRejected= false;
         DataSourceEditorPanel edit = null;
         try {
-            edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURI(surl));
+            edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURIValid(surl));
             if ( edit!=null && edit.reject(surl) ) {
                 edit= null;
                 wasRejected= true;

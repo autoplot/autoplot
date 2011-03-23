@@ -744,7 +744,7 @@ public class GuiSupport {
                 if ( gui.getRemote().isSelected() ) {
                     parent.getBookmarksManager().getModel().addRemoteBookmarks(bookmarksFile);
                 } else {
-                    in = DataSetURI.getInputStream(DataSetURI.getURI(bookmarksFile), mon);
+                    in = DataSetURI.getInputStream(DataSetURI.getURIValid(bookmarksFile), mon);
                     ByteArrayOutputStream boas=new ByteArrayOutputStream();
                     WritableByteChannel dest = Channels.newChannel(boas);
                     ReadableByteChannel src = Channels.newChannel(in);

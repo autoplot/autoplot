@@ -381,7 +381,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         QDataSet tds;
         HtmlTableParser parser;
         try {
-            parser=  new HtmlTableParser(DataSetURI.getURI(uri));
+            parser=  new HtmlTableParser(DataSetURI.getURIValid(uri));
 
             tableComboBox.setModel( new DefaultComboBoxModel( parser.getTables().toArray( )) );
             String table= params.get("table");
@@ -408,7 +408,7 @@ public class HtmlTableDataSourceEditorPanel extends javax.swing.JPanel implement
         QDataSet tds;
         HtmlTableParser parser;
         try {
-            parser=  new HtmlTableParser(DataSetURI.getURI(uri));
+            parser=  new HtmlTableParser(DataSetURI.getURIValid(uri));
 
             tds = parser.getTable(new NullProgressMonitor());
 

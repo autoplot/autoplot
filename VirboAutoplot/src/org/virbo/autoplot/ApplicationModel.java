@@ -301,7 +301,7 @@ public class ApplicationModel {
         try {
             if ( split.file!=null && ( split.file.endsWith(".vap") || split.file.endsWith(".vapx" ) ) ) {
                 try {
-                    URI uri = DataSetURI.getURI(surl);
+                    URI uri = DataSetURI.getURIValid(surl);
                     mon.started();
                     mon.setProgressMessage("loading vap file");
                     File openable = DataSetURI.getFile(uri, application.getMonitorFactory().getMonitor(canvas, "loading vap", ""));

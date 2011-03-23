@@ -711,7 +711,7 @@ public class ScriptContext extends PyJavaInstance {
         if (!file.contains(":/")) {
             file = new File(file).getCanonicalFile().toString();
         }
-        URI uri = DataSetURI.getURI(file);
+        URI uri = DataSetURI.getURIValid(file);
 
         DataSourceFormat format = DataSetURI.getDataSourceFormat(uri);
         

@@ -100,7 +100,7 @@ public class Util {
      * @param ds
      */
     public static QDataSet getDataSet(String surl, ProgressMonitor mon) throws Exception {
-        URI uri = DataSetURI.getURI(surl);
+        URI uri = DataSetURI.getURIValid(surl);
         DataSourceFactory factory = DataSetURI.getDataSourceFactory(uri, new NullProgressMonitor());
         DataSource result = factory.getDataSource( uri );
         if (mon == null) {
@@ -148,7 +148,7 @@ public class Util {
         if (surl.equals(metadataSurl)) {
             return metadata;
         } else {
-            URI url = DataSetURI.getURI(surl);
+            URI url = DataSetURI.getURIValid(surl);
             DataSourceFactory factory = DataSetURI.getDataSourceFactory(url, new NullProgressMonitor());
             DataSource result = factory.getDataSource(DataSetURI.getResourceURI(url));
             if (mon == null) {
