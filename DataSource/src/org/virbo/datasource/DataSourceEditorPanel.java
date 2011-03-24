@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package org.virbo.datasource;
 
 import javax.swing.JPanel;
@@ -19,11 +14,18 @@ import org.das2.util.monitor.ProgressMonitor;
  * @author jbf
  */
 public interface DataSourceEditorPanel {
+
+    /**
+     * return the GUI to edit the URI.
+     * @return
+     */
     public JPanel getPanel();
 
     /**
      * initialize the editor to edit this URI.  This may be incomplete, and the editor
-     * should make it valid so getUri is valid.
+     * should make it valid so getUri is valid.  Note also that the URI will be
+     * be the same as in prepare.  If exceptions occur here, they must be re-thrown as
+     * runtime exceptions, and they should be checked for in prepare().
      * @param url
      */
     public void setURI( String uri );
@@ -37,8 +39,8 @@ public interface DataSourceEditorPanel {
     public String getURI();
 
     /**
-     * load any needed resources.  Return false if cancel, true to proceed
-     * into gui.
+     * load any needed resources.  Return false if cancel, true to proceed into the gui.
+     * Throw a FileNotFoundException if needed resources is not found.
      * @param uri partially-completed URI
      * @return true to proceed, false if to cancel.
      */
@@ -46,10 +48,10 @@ public interface DataSourceEditorPanel {
 
     /**
      * reject the URI, perhaps because we aren't close enough to identify a resource.
-     * (e.g. folder containing cdf's is identified, but not the cdf, so use
-     * filesystem completion instead.)
+     * For example, a CDF URI contains the name of the file but not the variable to plot,
+     * so we need to enter the editor panel to complete the URI.
      * @param uri
-     * @return
+     * @return true if the URI is not usable.
      */
     public boolean reject( String uri ) throws Exception;
 }

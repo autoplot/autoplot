@@ -468,6 +468,8 @@ public class CdfUtil {
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
             Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws CDFException {
 
+        if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
+
         long varType = variable.getDataType();
         long[] dimIndeces = new long[]{0};
 
@@ -524,7 +526,6 @@ public class CdfUtil {
             odata= new float[(int)(recSizeCount*rc)];
             long blockSize= Math.max( 20, 10000000 / recSizeCount ); // in records. target blockSize of 10Mb, but read in at least 20 recs each time.
             int nread= (int)(rc/blockSize);
-            if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
             mon.started();
             mon.setTaskSize(nread+1);
             for ( int i=0; i<nread; i++ ) {

@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Logger;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
@@ -93,10 +95,16 @@ public class CdfUtil {
         return type;
     }
 
-
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
             CDF cdf, Variable variable, long recStart, long recCount, long recInterval ) throws Exception {
+        return wrapCdfHyperDataHacked( cdf, variable, recStart, recCount, recInterval, new NullProgressMonitor() );
+    }
+    
+    public static MutablePropertyDataSet wrapCdfHyperDataHacked(
+            CDF cdf, Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws Exception {
 
+        if ( mon==null ) mon= new org.das2.util.monitor.NullProgressMonitor();
+        
         long varType = variable.getType();
         long[] dimIndeces = new long[]{0};
 

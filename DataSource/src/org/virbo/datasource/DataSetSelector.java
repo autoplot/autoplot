@@ -309,6 +309,30 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     /**
+     * Some exceptions can be handled by the user, and the error needs to be 
+     * communicated to them.  Typically this is going to present a friendlier
+     * dialog to the user instead of the catch-all Runtime Exception Dialog.
+     * @param ex
+     * @return true if the exception was handled.
+     */
+    private boolean maybeHandleException(Exception ex) {
+        String msg= ex.getMessage().trim();
+        if ( msg==null ) msg="";
+        if ( ex instanceof FileNotFoundException && msg.length()==0 ) {
+            msg= "File not found"; // this may never happen, but to be sure...
+        }
+        if ( ( ex instanceof FileNotFoundException
+                || ex.toString().contains("file not found")
+                || ex.toString().contains("root does not exist") )
+              && msg.length()>0 ) {
+            JOptionPane.showMessageDialog( DataSetSelector.this, msg, "No Such File", JOptionPane.WARNING_MESSAGE );
+            setMessage("" + ex.getMessage());
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * show the initial parameters completions for the type, or the
      * editor, if that's available.
      * This can be called from the event thread.
@@ -347,7 +371,10 @@ public class DataSetSelector extends javax.swing.JPanel {
                         setMessage( "download cancelled" );  //TODO: check FTP
                         return;
                     } catch (Exception ex) {
-                        throw new RuntimeException(ex);
+                        if ( !maybeHandleException(ex) ) {
+                            throw new RuntimeException(ex);
+                        }
+                        return;
                     }
 
                     fedit.setURI(fsurl);
@@ -687,20 +714,11 @@ public class DataSetSelector extends javax.swing.JPanel {
                 try {
                     completions2 = DataSetURI.getFactoryCompletions(surl, carotpos, completionsMonitor);
                     setMessage("done getting completions");
-                } catch (IOException ex ) {
-                    //Note we've talked about allowing the DataSource to handle the exception, and this would be cleaner.
-                    if ( ex instanceof FileNotFoundException || ex.toString().contains("root does not exist") ) {
-                        //DataSetSelector.this....getApplicationModel().showMessage(...) would be better maybe
-                        JOptionPane.showMessageDialog( DataSetSelector.this, ex.getMessage(), "No Such File", JOptionPane.WARNING_MESSAGE );
-                        setMessage("" + ex.getMessage());
-                    } else {
+                } catch (Exception ex ) {
+                    if ( !maybeHandleException(ex) ) {
                         ex.printStackTrace();
                         setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
                     }
-                    return;
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    setMessage("" + ex.getClass().getName() + " " + ex.getMessage());
                     return;
                 }
 

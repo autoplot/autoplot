@@ -5,35 +5,40 @@
 
 package org.virbo.cdf;
 
+import java.util.logging.Level;
+import org.das2.datum.Units;
+import org.virbo.metatree.IstpMetadataModel;
+import org.das2.util.monitor.ProgressMonitor;
 import gov.nasa.gsfc.voyager.cdf.CDF;
 import gov.nasa.gsfc.voyager.cdf.CDFFactory;
 import gov.nasa.gsfc.voyager.cdf.Variable;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URI;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import org.virbo.dataset.DataSetUtil;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
-import org.das2.util.monitor.ProgressMonitor;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
-import org.virbo.dataset.MutablePropertyDataSet;
+import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
+import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.dsops.Ops;
-import org.virbo.metatree.IstpMetadataModel;
 import org.virbo.metatree.MetadataUtil;
 
 /**
@@ -81,7 +86,6 @@ public class CdfJavaDataSource extends AbstractDataSource {
             constraint = svariable.substring(i);
             svariable = svariable.substring(0, i);
         }
-        svariable= svariable.replaceAll(" ", "+");
 
         try {
             Variable variable = cdf.getVariable(svariable);
@@ -94,8 +98,21 @@ public class CdfJavaDataSource extends AbstractDataSource {
                     attributes= MetadataUtil.sliceProperties(attributes, 0);
                 }
             }
-            MutablePropertyDataSet result = wrapDataSet(cdf, svariable, constraint, false, true);
-            //cdf.close();
+
+            MutablePropertyDataSet result;
+            if ( attributes!=null && attributes.containsKey("VIRTUAL") && attributes.containsKey("FUNCTION") ) {
+                List<QDataSet> attr= new ArrayList();
+                String function= (String)attributes.get("FUNCTION");
+                if ( attributes.get("COMPONENT_0")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_0"), constraint, false, true, mon ) );
+                if ( attributes.get("COMPONENT_1")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_1"), constraint, false, true, mon ) );
+                if ( attributes.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_2"), constraint, false, true, mon ) );
+                if ( attributes.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_3"), constraint, false, true, mon ) );
+                if ( attributes.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_4"), constraint, false, true, mon ) );
+                //result= (MutablePropertyDataSet) CdfVirtualVars.execute( function, attr );
+                throw new IllegalArgumentException("virtual not supported");
+            } else { // typical route
+                result= wrapDataSet(cdf, svariable, constraint, false, true, mon );
+            }
 
             if (!"no".equals(interpMeta)) {
                 MetadataModel model = new IstpMetadataModel();
@@ -130,14 +147,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 result.putProperty( QDataSet.DEPEND_3, null );
             }
 
-            //result.putProperty( QDataSet.METADATA, attributes );
+            result.putProperty( QDataSet.METADATA, attributes );
             result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
 
             return result;
         } catch ( Exception e ) {
             throw e;
         }
-
 
     }
 
@@ -213,6 +229,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
         return props;
     }
 
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend) throws Exception, ParseException {
+        return wrapDataSet( cdf, svariable, constraints, reform, depend, new NullProgressMonitor() );
+    }
 
     /**
      * Read the variable into a QDataSet, possibly recursing to get depend variables.
@@ -225,12 +244,14 @@ public class CdfJavaDataSource extends AbstractDataSource {
      * @throws CDFException
      * @throws ParseException
      */
-    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend) throws Exception, ParseException {
+    private MutablePropertyDataSet wrapDataSet(final CDF cdf, final String svariable, final String constraints, boolean reform, boolean depend, ProgressMonitor mon ) throws Exception, ParseException {
         Variable variable = cdf.getVariable(svariable);
 
         HashMap thisAttributes = readAttributes(cdf, variable, 0);
 
         long numRec = variable.getNumberOfValues();
+
+        if ( mon==null ) mon= new NullProgressMonitor();
 
         if (numRec == 0) {
             if (thisAttributes.containsKey("COMPONENT_0")) {
@@ -272,7 +293,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 recCount= -1;
                 recs[2]= 1;
             }
-            result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, recs[0], recCount, recs[2]);
+            result = CdfUtil.wrapCdfHyperDataHacked(cdf,variable, recs[0], recCount, recs[2], mon);
             //result = CdfUtil.wrapCdfHyperData(variable, recs[0], recCount, recs[2]);
         }
         result.putProperty(QDataSet.NAME, svariable);
@@ -302,17 +323,26 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 String labl = (String) thisAttributes.get("LABL_PTR_" + sidep);
                 if ( labl==null ) labl= (String) thisAttributes.get("LABEL_" + sidep); // kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
                 if ( dep != null && qubeDims.length<=idep ) {
-                    logger.info("DEPEND_"+idep+" found but data is lower rank");
+                    logger.log(Level.INFO, "DEPEND_{0} found but data is lower rank", idep);
                     continue;
                 }
                 if (dep != null && ( qubeDims[idep]>6 || labl == null) ) {
                     try {
-
                         boolean reformDep= idep > 0;
                         if ( reformDep && cdf.getVariable( (String)dep.get("NAME") ).recordVariance() ) {
                             reformDep= false;
                         }
-                        MutablePropertyDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, reformDep, false);
+                        MutablePropertyDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, reformDep, false, null);
+
+                        if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
+                            depDs= (MutablePropertyDataSet)depDs.slice(0);
+                            //depDs= Ops.reform(depDs);  // This would be more explicit, but reform doesn't handle metadata properly.
+                        }
+                        if ( idep==0 && depDs!=null ) { // kludge for Rockets: 40025_eepaa2_test.cdf?PA_bin
+                            if ( depDs.length()!=result.length() && result.length()==1 ) {
+                                continue;
+                            }
+                        }
                         
                         if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
@@ -337,7 +367,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                             depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                         } else {
                             if (sidep == 0) {
-                                System.err.println("sorting dep0 to make depend0 monotonic");
+                                logger.info("sorting dep0 to make depend0 monotonic");
                                 QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
                                 result = DataSetOps.applyIndex(result, idep, sort, false);
                                 depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
@@ -375,7 +405,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
                             Variable offsetVar= cdf.getVariable("Translation");
                             if ( offsetVar!=null ) {
-                                MutablePropertyDataSet transDs= wrapDataSet( cdf, "Translation", constraints, reform, false );
+                                MutablePropertyDataSet transDs= wrapDataSet( cdf, "Translation", constraints, reform, false, null );
                                 if ( transDs.property(QDataSet.UNITS)==null ) {
                                     transDs.putProperty( QDataSet.UNITS, Units.kiloHertz );
                                 }
@@ -392,7 +422,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 } else {
                     if (labl != null) {
                         try {
-                            MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false);
+                            MutablePropertyDataSet depDs = wrapDataSet(cdf, labl, idep == 0 ? constraints : null, idep > 0, false, null);
                             result.putProperty("DEPEND_" + idep, depDs);
                         } catch (Exception e) {
                             e.printStackTrace(); // to support lanl.
@@ -462,12 +492,29 @@ public class CdfJavaDataSource extends AbstractDataSource {
     }
 
     @Override
-    public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) {
+    public synchronized Map<String, Object> getMetadata(ProgressMonitor mon) throws IOException {
         if (attributes == null) {
-            return null; // transient state
+            try {
+                File cdfFile;
+                cdfFile = getFile(mon);
+                String fileName = cdfFile.toString();
+                Map map = getParams();
+                CDF cdf;
+                cdf = CDFFactory.getCDF(fileName);
+                String svariable = (String) map.get("id");
+                if (svariable == null) {
+                    svariable = (String) map.get("arg_0");
+                }
+                if (svariable == null) {
+                    throw new IllegalArgumentException("variable not specified");
+                }
+                Variable variable = cdf.getVariable(svariable);
+                attributes= readAttributes(cdf, variable, 0);
+                return attributes; // transient state
+            } catch ( Throwable ex ) {
+                throw new IOException(ex.getMessage());
+            }
         }
         return attributes;
     }
-
-
 }
