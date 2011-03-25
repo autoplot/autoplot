@@ -128,7 +128,24 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         return result;
     }
 
+    /**
+     * Create a new BufferDataSet of the given type.  Simple sanity checks are made, including:
+     *   rank 1 dataset may not have len1>1.
+     *   reclen cannot be shorter than the byte length of the field type. 
+     * @param rank
+     * @param reclen  length in bytes of each record
+     * @param recoffs  byte offet of each record
+     * @param len0   number of elements in the first index
+     * @param len1   number of elements in the second index
+     * @param len2   number of elements in the third index
+     * @param back   ByteBuffer containing the data, which should be at least reclen * len0 bytes long.
+     * @param type   BufferDataSet.INT, BufferDataSet.DOUBLE, etc...
+     * @return
+     */
     public BufferDataSet( int rank, int reclen, int recoffs, int len0, int len1, int len2, Object type, ByteBuffer back  ) {
+        if ( rank==1 && len1>1 ) throw new IllegalArgumentException("rank is 1, but len1 is not 1");
+        if ( reclen < byteCount(type) ) throw new IllegalArgumentException("reclen " + reclen + " is smaller that length of type "+type);
+
         this.back= back;
         this.rank = rank;
         this.reclen= reclen;
