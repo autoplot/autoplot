@@ -28,7 +28,23 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>bugfixes from production branch include improvements to Java CDF reader, supporting stride.
 <li>check for node SPASE/... in XML files instead of null pointer exception.
         <ul>
+            <li>bugfix: c:/foo/xyz.dat would not parse properly due to recent change</li>
+            <li>bugfix 3158113: internationalization problem pointed out by RTE </li>
+            <li>bugfix 3075919: spectrogram not properly bound to colorbar after moving</li>
+            <li>bugfix 3075644:	Null pointer exception with URI found by Bob.</li>
+            <li>bugfix: uniqValues rename from uniq, because unlike the IDL function, this returns the values not the indeces.</li>
+            <li>bugfix: Java CDF reader updated to handle same as C CDF reader.</li>
+            <li>bugfix 3235447:	dropped VALID_MIN VALID_MAX in cdf reader</li>
+            <li>bugfix 3179062: aggregation drops valid_min and valid_max properties
+            <li>bugfix 3232976:	Themis spectrograms fail <li>
+            <li>bugfix: slice label would not be indicated when slice was bundle.</li>
+            <li>bugfix 3219772:	strange null pointer exception with aggr in v2010_5<li>
             <li>bugfix 3201828: File->New Window would cause script context to plot to new window, should be left alone.
+            <li>bugfix 3158110: QDataSet das2 fails to plot H0_SOPA_ESP (RTE report)
+            <li>RuntimeExceptions resulting from file not found handled with a friendlier dialog.</li>
+        </ul>
+        <p>Less recent bugfixes:</p>
+        <ul>
             <li>bugfix: vap+inline:ripples(30,30) would insert "file:///" when parsing and formatting URI.  This is cleaned up.
             <li>update to the newest version of the Java CDF library, which fixes support for INT1 and INT2.
             <li>stride properly supported in the Java CDF library.
@@ -39,14 +55,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>links on help pages fixed to go to anchors on http://autoplot.org/help .
             <li>Rank 2 Y tags supported in spectrogram (e.g. fa_k0_ees_19980111_v01.cdf).
             <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3180942&group_id=199733&atid=970682">3180942</a> look and feel is native by default, --nativeLAF=false will disable
-        </ul>
-        <p>Less recent bugfixes:</p>
-        <ul>
-            <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3056945&group_id=199733&atid=970682">3056945</a>  axis range editors update plot without carriage return
-            <li>more tooltips to improve useability
-	    <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3176419&group_id=199733&atid=970682">3176419</a>  bugfixes in CDAWeb source GUI, minor new features
-            <li>bugfix: aggregate dialog doesn't clip okay button
-            <li>update splash screen
         </ul>
         <p>Features:</p>
         <ul>
