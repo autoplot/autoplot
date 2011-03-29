@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -140,7 +141,7 @@ public class CreatePngWalk {
             double imagesPerSec = count * 1000. / (java.lang.System.currentTimeMillis() - t0);
             //etaSec= (n-count) / imagesPerSec
             //etaStr= org.das2.datum.DatumUtil.asOrderOneUnits( Units.seconds.createDatum(etaSec) )
-            mon.setAdditionalInfo(String.format("(%.1f/sec)", imagesPerSec));
+            mon.setAdditionalInfo(String.format( Locale.US, "(%.1f/sec)", imagesPerSec));
         }
         mon.finished();
     }

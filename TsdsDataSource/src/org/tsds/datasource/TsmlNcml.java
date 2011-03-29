@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
@@ -359,7 +360,7 @@ public class TsmlNcml {
 
         ReadableByteChannel bin = Channels.newChannel(in);
         
-        logger.finer( String.format( "allocating space for dataset (%9.1f KB)",(size/1000.)));
+        logger.finer( String.format( Locale.US, "allocating space for dataset (%9.1f KB)",(size/1000.)));
 
         ByteBuffer bbuf = ByteBuffer.allocate(size);
         int totalBytesRead = 0;

@@ -2000,8 +2000,14 @@ private void updateFrameTitle() {
         URISplit split= URISplit.parse(suri);
 
         boolean dirty= undoRedoSupport.getDepth()>1;
-        String titleStr= split.file.substring( split.path.length() ) + ( dirty ? "*" : "" );
-        setTitle( titleStr + " - " + title0 + isoffline );
+        if ( split.path!=null && split.file!=null ) {
+            String titleStr= split.file.substring( split.path.length() ) + ( dirty ? "*" : "" );
+            setTitle( titleStr + " - " + title0 + isoffline );
+        } else {
+            //I was seeing null pointer exceptions here--see rte_1590234331_20110328_153705_wsk.xml.  I suspect this is Windows.
+            System.err.println("Unable to get path from: "+suri );
+            setTitle( "???" + " - " + title0 + isoffline );
+        }
     }
 
 }

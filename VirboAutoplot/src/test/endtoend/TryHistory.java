@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.das2.datum.Datum;
@@ -94,8 +95,8 @@ public class TryHistory {
                         System.err.println( "ignoring vap files for now" );
                     }
                 }
-                System.err.println( "readtm: " + String.format("%9.2f", (System.currentTimeMillis()-t0)/1000. ).trim() + " sec");
-                System.err.println( "tottim: " + String.format("%9.2f", (System.currentTimeMillis() - t00) / 1000.0 /60 ).trim() + " min");
+                System.err.println( "readtm: " + String.format(Locale.US, "%9.2f", (System.currentTimeMillis()-t0)/1000. ).trim() + " sec");
+                System.err.println( "tottim: " + String.format(Locale.US, "%9.2f", (System.currentTimeMillis() - t00) / 1000.0 /60 ).trim() + " min");
 
                 count=1;
                 plottedURIs.put( suri, count );
@@ -115,9 +116,9 @@ public class TryHistory {
         DatumRange dr= new DatumRange( TimeUtil.prevMidnight(firstTime), TimeUtil.nextMidnight(lastTime) );
         System.err.println( "interval of history: " + dr );
         final double totSec = (System.currentTimeMillis() - t00) / 1000.0;
-        System.err.println( "total time to read: " + String.format("%9.2f", totSec/60 ).trim() + " min");
+        System.err.println( "total time to read: " + String.format( Locale.US, "%9.2f", totSec/60 ).trim() + " min");
         System.err.println( "total URIs read: "+ plottedURIs.size() );
-        System.err.println( "URIs/sec: "+ String.format( "%9.2f", 1.*plottedURIs.size()/totSec ) );
+        System.err.println( "URIs/sec: "+ String.format( Locale.US, "%9.2f", 1.*plottedURIs.size()/totSec ) );
         System.err.println( "Exceptions encountered: "+ exceptions.size() );
 
         System.err.println( "\n=== Exceptions ==============================================");

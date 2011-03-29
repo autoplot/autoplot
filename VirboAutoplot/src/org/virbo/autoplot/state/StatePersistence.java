@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Locale;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.das2.util.AboutUtil;
@@ -276,7 +277,7 @@ public class StatePersistence {
 
                         DOMResult res = new DOMResult( );
 
-                        String fname= String.format( "Vap_%4.2f_to_%4.2f",
+                        String fname= String.format( Locale.US, "Vap_%4.2f_to_%4.2f",
                                 s, s+0.01 );
                         fname= fname.replaceAll("\\.","_") + ".xsl";
 

@@ -1320,7 +1320,7 @@ public class PlotElementController extends DomNodeController {
 
         if (spec == RenderType.spectrogram || spec==RenderType.nnSpectrogram ||  spec== RenderType.pitchAngleDistribution ) {
 
-            QDataSet xds = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
+            QDataSet xds = (QDataSet) SemanticOps.xtagsDataSet(fillDs);
             if (xds == null) {
                 if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
                     JoinDataSet ds= new JoinDataSet(2);
@@ -1339,7 +1339,7 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
-            QDataSet yds = (QDataSet) fillDs.property(QDataSet.DEPEND_1);
+            QDataSet yds = (QDataSet) SemanticOps.ytagsDataSet(fillDs);
             Map<String,Object> yprops= (Map) props.get(QDataSet.DEPEND_1);
             if (yds == null) {
                 if ( fillDs.property(QDataSet.JOIN_0)!=null ) {
@@ -1380,9 +1380,11 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
+            QDataSet zds= SemanticOps.getDependentDataSet(fillDs);
+
             Units xunits= SemanticOps.getUnits(xds); 
             Units yunits= SemanticOps.getUnits(yds);
-            Units zunits= SemanticOps.getUnits(fillDs);
+            Units zunits= SemanticOps.getUnits(zds);
 
             if ( UnitsUtil.isOrdinalMeasurement( xunits ) || UnitsUtil.isOrdinalMeasurement(yunits) || UnitsUtil.isOrdinalMeasurement(zunits) ) {
                 return;
@@ -1397,7 +1399,7 @@ public class PlotElementController extends DomNodeController {
             //if ( false && hist!=null ) {
             //    desc= AutoplotUtil.autoRange( hist, fillDs, props );
             //} else {
-                desc = AutoplotUtil.autoRange( fillDs, props );
+                desc = AutoplotUtil.autoRange( zds, props );
             //}
 
             peleCopy.getPlotDefaults().getZaxis().setRange(desc.range);

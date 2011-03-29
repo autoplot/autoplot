@@ -103,6 +103,9 @@ public class Test012 {
             // this fast ees has rank 2 DEPEND_1.
             doTest( testid,15, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/fa_k0_ees_19980111_v01.cdf?el_0" );
 
+            // this should slice by default on the enumeration (labels) dimension.
+            doTest( testid,16, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/tha_l1_ffp_32_20090101_v01.cdf?tha_ffp_32" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch ( Exception ex) {
             ex.printStackTrace();

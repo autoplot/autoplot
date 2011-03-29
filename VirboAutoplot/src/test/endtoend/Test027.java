@@ -62,7 +62,8 @@ public class Test027 {
             doTest( 11, "vap+cdaweb:" ); // still adds file:///
             doTest( 12, "Enter Data Set" ); //TODO: fix NullPointer
             doTest( 13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_hyd/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09" );
-
+            doTest( 14, "c:/Users/sarah/Desktop/x.vap" );
+            
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();
