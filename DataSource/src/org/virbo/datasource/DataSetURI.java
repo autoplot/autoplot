@@ -988,6 +988,9 @@ public class DataSetURI {
 
                     boolean maybePlot = true;
                     //if ( completion.contains("/?") ) maybePlot= false;
+                    if (  completion.startsWith("file://"+completable) ) { // kludge added because of runtime exception from '/home/jbf/Linux/Des<COMP>'
+                        completion= completion.substring(7);
+                    }
                     completions.add(new DataSetURI.CompletionResult(completion, label, null, completable, maybePlot));
                 }
             }
