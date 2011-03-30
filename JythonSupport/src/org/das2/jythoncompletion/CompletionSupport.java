@@ -95,15 +95,20 @@ public class CompletionSupport {
 
             int i= pos-1;
 
-            if ( i>1 && tokens.get(pos-1).kind==PythonGrammarConstants.RPAREN ) {
-                int rparCount=1;
+            if ( i>1 && ( tokens.get(pos-1).kind==PythonGrammarConstants.RPAREN ||tokens.get(pos-1).kind==PythonGrammarConstants.RBRACKET ) ) {
+                int rparCount= tokens.get(pos-1).kind==PythonGrammarConstants.RPAREN ? 1 : 0;
+                int rbackCount= tokens.get(pos-1).kind==PythonGrammarConstants.RBRACKET ? 1 : 0;
                 int lpar= i-1;
-                while ( lpar>0 && rparCount>0 ) {
+                while ( lpar>0 && ( rparCount>0 || rbackCount>0 ) ) {
                     contextString= tokens.get(lpar).image + contextString;
                     if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.LPAREN ) {
                         rparCount--;
                     } else if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.RPAREN ) {
                         rparCount++;
+                    } else if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.LBRACKET ) {
+                        rbackCount--;
+                    } else if ( lpar>=0 && tokens.get(lpar).kind==PythonGrammarConstants.RBRACKET ) {
+                        rbackCount++;
                     }
                     if ( rparCount==0 ) {
                         if ( lpar>0 && tokens.get(lpar-1).kind==PythonGrammarConstants.NAME ) {
@@ -209,6 +214,10 @@ public class CompletionSupport {
             } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.RPAREN ) {
                 // ds= PlasmaModelDataSet().<COMP>
                 // DasLogger.getLogger(DasLogger.GRAPHICS_LOG).<COMP
+                String contextString= exprBeforeDot(tokens, myTokenIndex);
+                return new CompletionContext( CompletionContext.METHOD_NAME, contextString, "" );
+            } else if ( tokens.get(myTokenIndex).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.RBRACKET ) {
+                // dom.plots[0].<COMP>
                 String contextString= exprBeforeDot(tokens, myTokenIndex);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, "" );
             } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
