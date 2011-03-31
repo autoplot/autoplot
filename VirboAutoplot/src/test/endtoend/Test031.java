@@ -5,7 +5,6 @@
 package test.endtoend;
 
 import org.virbo.autoplot.dom.Application;
-import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.jythonsupport.Util;
 import static org.virbo.autoplot.ScriptContext.*;
@@ -26,10 +25,10 @@ public class Test031 {
 
             QDataSet bds= (QDataSet) ds.property(QDataSet.BUNDLE_1);
             
-            plot( DataSetOps.unbundle(ds,0), DataSetOps.unbundle(ds,1) );
+            plot( ds );
             setTitle( uri );
 
-            String label= String.format( "test030_%03d", id );
+            String label= String.format( "test031_%03d", id );
 
             writeToPng( label+".png" );
             //((MutablePropertyDataSet)bundle1).putProperty( QDataSet.LABEL, uri );
