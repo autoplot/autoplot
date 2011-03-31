@@ -50,39 +50,38 @@ public class Test030 {
 
     }
 
-    public static void doTest( int id, String uri ) {
+    public static void doTest( int id, String uri ) throws Exception {
 
-        try {
-            System.err.printf( "reading %s...\n", uri );
-            QDataSet ds= Util.getDataSet( uri );
-            System.err.printf( "   read %s.\n", String.valueOf(ds) );
+        System.err.printf( "reading %s...\n", uri );
+        QDataSet ds= Util.getDataSet( uri );
+        System.err.printf( "   read %s.\n", String.valueOf(ds) );
 
-            plot( ds );
-            setTitle( uri );
+        plot( ds );
+        setTitle( uri );
 
-            String label= String.format( "test030_%03d", id );
+        String label= String.format( "test030_%03d", id );
 
-            writeToPng( label+".png" );
-            //((MutablePropertyDataSet)bundle1).putProperty( QDataSet.LABEL, uri );
-            formatDataSet( ds, label+".qds");
-            formatDataSet( ds, label+".txt");
+        writeToPng( label+".png" );
+        //((MutablePropertyDataSet)bundle1).putProperty( QDataSet.LABEL, uri );
+        formatDataSet( ds, label+".qds");
+        formatDataSet( ds, label+".txt");
 
-        } catch ( Exception ex ) {
-            ex.printStackTrace();
-
-        }
 
     }
 
     public static void main(String[] args) throws Exception  {
+        try {
+            doTestBundle( 0, TestSupport.TEST_DATA + "dat/headers/proton_density.dat?rank2" );
 
-        doTestBundle( 0, TestSupport.TEST_DATA + "dat/headers/proton_density.dat?rank2" );
+            //TODO: DEPEND_0 is lost here.
+            doTest( 1, TestSupport.TEST_DATA + "dat/headers/proton_density.dat?column=Proton_Density" );
 
-        //TODO: DEPEND_0 is lost here.
-        doTest( 1, TestSupport.TEST_DATA + "dat/headers/proton_density.dat?column=Proton_Density" );
-
-        doTestBundle( 2, TestSupport.TEST_DATA + "dat/headers/CRRES_mod.txt?rank2" );
-
+            doTestBundle( 2, TestSupport.TEST_DATA + "dat/headers/CRRES_mod.txt?rank2" );
+            
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            System.exit(1);
+        }
         System.exit(0);  // TODO: something is firing up the event thread
     }
     
