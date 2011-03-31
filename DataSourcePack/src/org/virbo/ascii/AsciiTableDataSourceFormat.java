@@ -103,21 +103,23 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
 
         int jj=0; // index into rank2 array
         for ( int i=0; i<bundleDesc.length(); i++ ) {
-            uu[i] = (Units) bundleDesc.property(QDataSet.UNITS,i);
-            if (uu[i] == null) uu[i] = Units.dimensionless;
-            try {
-                formats[i]= uu[i].createDatum(data.value(0,jj)).getFormatter();
-            } catch ( IllegalArgumentException ex ) {
-                formats[i]= uu[i].createDatum(data.value(0,jj)).getFormatter();
-            }
-            if ( formats[i] instanceof EnumerationDatumFormatter ) {
-                //((EnumerationDatumFormatter)formats[i]).setAddQuotes(true);
-            }
             int nelements= 1;
             for ( int k=0; k<bundleDesc.length(i); k++ ) {
                 nelements*= bundleDesc.value(i,k);
             }
-            jj+= nelements;
+            for ( int k=0; k<nelements; k++ ) {
+                uu[jj] = (Units) bundleDesc.property(QDataSet.UNITS,i);
+                if (uu[jj] == null) uu[jj] = Units.dimensionless;
+                try {
+                    formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
+                } catch ( IllegalArgumentException ex ) {
+                    formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
+                }
+                if ( formats[jj] instanceof EnumerationDatumFormatter ) {
+                    //((EnumerationDatumFormatter)formats[i]).setAddQuotes(true);
+                }
+                jj++;
+            }
         }
 
         if ( bundleDesc==null ) {
@@ -138,7 +140,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
             }
 
             int i;
-            for (  i = 0; i < bundleDesc.length()-1; i++) {
+            for (  i = 0; i < bundleDesc.length(); i++) {
                 String l1= (String) bundleDesc.property(QDataSet.LABEL,i);
                 if ( l1==null ) {
                     throw new IllegalArgumentException("unnamed dataset in bundle at index "+i);
@@ -151,10 +153,19 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
                         l1= "field"+i;
                     }
                 }
-                out.print( l1 + ", " );
+                int nelements= 1;
+                for ( int k=0; k<bundleDesc.length(i); k++ ) {
+                    nelements*= bundleDesc.value(i,k);
+                }
+                for ( int k=0; k<nelements; k++ ) {
+                    out.print( l1  );
+                    if ( i==bundleDesc.length()-1 && k==nelements-1 ) {
+                        out.print( "\n" );
+                    } else {
+                        out.print( ", " );
+                    }
+                }
             }
-            String l1= (String) bundleDesc.property(QDataSet.LABEL,i);
-            out.println( l1 == null ? ("field"+i) : l1 );
         }
 
         Units u0 = null;
