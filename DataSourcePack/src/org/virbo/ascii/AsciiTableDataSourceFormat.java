@@ -5,27 +5,94 @@
 package org.virbo.ascii;
 
 import java.io.File;
+import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Units;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.das2.datum.EnumerationUnits;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.EnumerationDatumFormatter;
+import org.das2.datum.format.TimeDatumFormatter;
+import org.das2.datum.format.TimeDatumFormatterFactory;
 import org.das2.util.monitor.ProgressMonitor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.datasource.URISplit;
-import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.datasource.datasource.AbstractDataSourceFormat;
+import org.das2.datum.format.FormatStringFormatter;
 
 /**
  * Format the QDataSet into Ascii tables.  
  * @author jbf
  */
-public class AsciiTableDataSourceFormat implements DataSourceFormat {
+public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
+
+    private DatumFormatter getTimeFormatter( String ft ) {
+        DatumFormatter tformat;
+        String ft0= ft;
+        ft= ft.toLowerCase();
+        if (ft.equals("iso8601")) {
+            tformat = TimeDatumFormatterFactory.getInstance().defaultFormatter();
+        } else if ( ft0.startsWith("%")
+                || ft.startsWith("$") ) {
+            if ( ft0.startsWith("$") ) { // provide convenient URI-friendly spec
+                ft0= ft0.replaceAll("\\$", "%");
+            }
+            try {
+                tformat = new TimeDatumFormatter(ft0);
+            } catch (ParseException ex) {
+                Logger.getLogger(AsciiTableDataSourceFormat.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace(); // this is going to happen a lot I'm sure...
+                try {
+                    tformat = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
+                } catch (ParseException ex1) {
+                    throw new RuntimeException(ex1);
+                }
+            }
+        } else {
+            try {
+                if (ft.equals("day")) {
+                    tformat = new TimeDatumFormatter("%Y-%m-%d");
+                } else if (ft.equals("hour")) {
+                    tformat = new TimeDatumFormatter("%Y-%m-%dT%H:%MZ");
+                } else if (ft.startsWith("min")) {
+                    tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%MZ");
+                } else if (ft.startsWith("sec")) {
+                    tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%SZ");
+                } else if (ft.startsWith("millisec")) {
+                    tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}Z");
+                } else if (ft.startsWith("microsec")) {
+                    tformat =  new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S.%{milli}%{micro}Z");
+                } else {
+                    System.err.println("not implemented: " + ft);
+                    tformat = new TimeDatumFormatter("%Y-%m-%dT%H:%M:%S");
+                }
+
+            } catch (ParseException ex) {
+                ex.printStackTrace();
+                tformat = TimeDatumFormatterFactory.getInstance().defaultFormatter();
+                
+            }
+        }
+        return tformat;
+
+    }
+
+    private DatumFormatter getDataFormatter( String df, Units u ) {
+        try {
+            if ( !df.contains("%") ) df= "%"+df;
+            //TODO: would be nice if we could verify formatter.  I had %f5.2 instead of %5.2f and it wasn't telling me.
+            return new FormatStringFormatter( df, false );
+        } catch ( RuntimeException ex ) {
+            return u.getDatumFormatterFactory().defaultFormatter();
+        }
+    }
 
     private void maybeOutputProperty(PrintWriter out, QDataSet data, String property) {
         Object v = data.property(property);
@@ -88,7 +155,9 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         QDataSet bundleDesc= (QDataSet) data.property(QDataSet.BUNDLE_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
 
-        if ( bundleDesc!=null ) {
+        String head= getParam( "header", "" ); // could be "rich"
+
+        if ( bundleDesc!=null && "rich".equals( head ) ) {
             try {
                 formatBundleDesc( out, bundleDesc );
             } catch ( JSONException ex ) {
@@ -101,6 +170,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         DatumFormatter[] formats= new DatumFormatter[data.length(0)];
         Units[] uu= new Units[data.length(0)];
 
+        String df= getParam( "format", "" );
         int jj=0; // index into rank2 array
         for ( int i=0; i<bundleDesc.length(); i++ ) {
             int nelements= 1;
@@ -110,9 +180,13 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
             for ( int k=0; k<nelements; k++ ) {
                 uu[jj] = (Units) bundleDesc.property(QDataSet.UNITS,i);
                 if (uu[jj] == null) uu[jj] = Units.dimensionless;
-                try {
-                    formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
-                } catch ( IllegalArgumentException ex ) {
+                if ( !( uu[jj] instanceof EnumerationUnits ) ) {
+                    if ( df.equals("") ) {
+                        formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
+                    } else {
+                        formats[jj]= getDataFormatter( df, uu[jj] );
+                    }
+                } else {
                     formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
                 }
                 if ( formats[jj] instanceof EnumerationDatumFormatter ) {
@@ -121,6 +195,8 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
                 jj++;
             }
         }
+
+        DatumFormatter tf= getTimeFormatter( getParam( "timeformat", "ISO8601" ) );
 
         if ( bundleDesc==null ) {
             throw new IllegalArgumentException("expected to find bundleDesc in dataset!");
@@ -182,7 +258,7 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
             mon.setTaskProgress(i);
             if ( mon.isCancelled() ) break;
             if (dep0 != null) {
-                out.print("" + u0.createDatum(dep0.value(i)) + ", ");
+                out.print("" + tf.format( u0.createDatum(dep0.value(i)) ) + ", ");
             }
 
             int j;
@@ -199,13 +275,11 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         maybeOutputProperty(out, data, QDataSet.TITLE);
         QDataSet dep1 = (QDataSet) data.property(QDataSet.DEPEND_1);
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
-
+        
         DatumFormatter format=null;
-
 
         Units u = (Units) data.property(QDataSet.UNITS);
         if (u == null) u = Units.dimensionless;
-        format= u.createDatum(data.value(0,0)).getFormatter();
 
         if ( u!=Units.dimensionless ) maybeOutputProperty( out, data, QDataSet.UNITS );
         
@@ -241,19 +315,25 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
 
         mon.setTaskSize(data.length());
         mon.started();
-        
+
+        String ft= getParam( "tformat", "ISO8601" );
+        DatumFormatter tf= ft.equals("") ? Units.us2000.getDatumFormatterFactory().defaultFormatter() : getTimeFormatter(ft);
+
+        String dfs= getParam( "format", "" );
+        DatumFormatter df= dfs.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter( dfs, u );
+
         for (int i = 0; i < data.length(); i++) {
             mon.setTaskProgress(i);
             if ( mon.isCancelled() ) break;
             if (dep0 != null) {
-                out.print("" + u0.createDatum(dep0.value(i)) + ", ");
+                out.print("" + tf.format( u0.createDatum(dep0.value(i)),u0 ) + ", ");
             }
 
             int j;
             for ( j = 0; j < data.length(i) - 1; j++) {
-                out.print( format.format( u.createDatum(data.value(i,j)), u ) + ", ");
+                out.print( df.format( u.createDatum(data.value(i,j)), u ) + ", ");
             }
-            out.println( format.format( u.createDatum(data.value(i,j)), u )  );
+            out.println( df.format( u.createDatum(data.value(i,j)), u )  );
         }
         mon.finished();
     }
@@ -353,10 +433,10 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
      * @throws IOException
      */
     public void formatData( String uri, QDataSet data, ProgressMonitor mon) throws IOException {
-        URISplit split= URISplit.parse(uri);
-        //java.util.Map<String,String> params= URISplit.parseParams(split.params);
 
-        PrintWriter out = new PrintWriter( new File( split.resourceUri ) );
+        setUri(uri);
+
+        PrintWriter out = new PrintWriter( new File( getResourceURI() ) );
 
         out.println("# Generated by Autoplot on " + new Date());
 
