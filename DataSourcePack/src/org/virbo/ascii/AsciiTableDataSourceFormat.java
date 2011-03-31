@@ -101,13 +101,23 @@ public class AsciiTableDataSourceFormat implements DataSourceFormat {
         DatumFormatter[] formats= new DatumFormatter[data.length(0)];
         Units[] uu= new Units[data.length(0)];
 
+        int jj=0; // index into rank2 array
         for ( int i=0; i<bundleDesc.length(); i++ ) {
             uu[i] = (Units) bundleDesc.property(QDataSet.UNITS,i);
             if (uu[i] == null) uu[i] = Units.dimensionless;
-            formats[i]= uu[i].createDatum(data.value(0,i)).getFormatter();
+            try {
+                formats[i]= uu[i].createDatum(data.value(0,jj)).getFormatter();
+            } catch ( IllegalArgumentException ex ) {
+                formats[i]= uu[i].createDatum(data.value(0,jj)).getFormatter();
+            }
             if ( formats[i] instanceof EnumerationDatumFormatter ) {
                 //((EnumerationDatumFormatter)formats[i]).setAddQuotes(true);
             }
+            int nelements= 1;
+            for ( int k=0; k<bundleDesc.length(i); k++ ) {
+                nelements*= bundleDesc.value(i,k);
+            }
+            jj+= nelements;
         }
 
         if ( bundleDesc==null ) {
