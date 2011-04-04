@@ -148,7 +148,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                     if (!s.equals("arg_0") && !s.equals("script") ) {
                         String sval= params.get(s);
                         if ( sval.length()>0 && !Character.isDigit(sval.charAt(0)) && !sval.equals("True") && !sval.equals("False") ) {
-                            sval= String.format( "'%s'", sval );
+                            if ( !( sval.startsWith("'") && sval.endsWith("'") ) ) {
+                                sval= String.format( "'%s'", sval );
+                            }
                         }
                         logger.fine("params['" + s + "']=" + sval);
                         interp.exec("params['" + s + "']=" + sval);

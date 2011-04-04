@@ -1192,6 +1192,8 @@ public class DataSourceController extends DomNodeController {
                 if (caching != null) {
                     if (caching.satisfies(surl)) {
                         caching.resetURI(surl);
+                        //trigger autorange
+                        propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, null, dataSource);
                         update(true, true);
                         return;
                     }

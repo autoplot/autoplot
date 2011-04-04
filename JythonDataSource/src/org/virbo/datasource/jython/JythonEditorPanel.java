@@ -319,7 +319,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
             if ( !value.equals(deft) || params.containsKey(name) ) {
                 if ( type=='A' ) {
-                    params.put( name, "'" + value + "'" );
+                    if ( !( value.startsWith("'") && value.endsWith("'") ) ) {
+                        value=  "'" + value + "'";
+                    }
+                    params.put( name, value );
                 } else {
                     params.put( name, value );
                 }
