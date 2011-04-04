@@ -8,6 +8,7 @@
  */
 package org.virbo.aggregator;
 
+import java.io.FileNotFoundException;
 import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -146,6 +147,11 @@ public class AggregatingDataSource extends AbstractDataSource {
         ArrayDataSet result = null;
         JoinDataSet altResult= null; // used when JoinDataSets are found
 
+        if ( ss.length==0 ) {
+            if ( null==getFsm().getRepresentativeFile( new NullProgressMonitor() ) ) {
+                throw new FileNotFoundException("No such file: No files found matching "+getFsm().toString());
+            }
+        }
         if (ss.length > 1) {
             mon.setTaskSize(ss.length * 10);
             mon.started();

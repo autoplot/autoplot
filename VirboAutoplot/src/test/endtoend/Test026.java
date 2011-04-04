@@ -66,7 +66,7 @@ public class Test026 {
 
             //month boundaries crossing year boundary caused problems.
             doTest(35, "Aug 1969 through Sep 1970", "Aug 1 1969 to Oct 1 1970" );
-            
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();

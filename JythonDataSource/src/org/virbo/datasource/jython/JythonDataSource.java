@@ -119,7 +119,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         String resourceURI;  // optional resource URI that is argument to script, excluding script argument.
 
         URISplit split= URISplit.parse(uri);
-        if ( split.scheme.equals("inline") ) {
+        if ( split.scheme.equals("inline") ) { // note this is handled elsewhere, in InlineDataSource
             return getInlineDataSet(new URI(uri.getRawSchemeSpecificPart()));
         }
 
@@ -147,7 +147,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 for (String s : params.keySet()) {
                     if (!s.equals("arg_0") && !s.equals("script") ) {
                         String sval= params.get(s);
-                        if ( sval.length()>0 && Character.isJavaIdentifierStart(sval.charAt(0)) ) {
+                        if ( sval.length()>0 && !Character.isDigit(sval.charAt(0)) && !sval.equals("True") && !sval.equals("False") ) {
                             sval= String.format( "'%s'", sval );
                         }
                         logger.fine("params['" + s + "']=" + sval);

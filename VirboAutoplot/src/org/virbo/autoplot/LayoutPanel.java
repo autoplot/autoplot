@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,9 +39,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.ApplicationController;
+import org.virbo.autoplot.dom.BindingModel;
 import org.virbo.autoplot.dom.Column;
 import org.virbo.autoplot.dom.DomOps;
 import org.virbo.autoplot.dom.Options;
@@ -75,6 +78,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         MouseListener popupTrigger = createPopupTrigger();
         canvasLayoutPanel1.addMouseListener(popupTrigger);
         panelListComponent.addMouseListener(popupTrigger);
+        bindingListComponent.addMouseListener(popupTrigger);
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "layoutPanel");
     }
@@ -232,6 +236,8 @@ public class LayoutPanel extends javax.swing.JPanel {
         panelContextMenu.add(item);
 
         contextMenus.put(panelListComponent, panelContextMenu);
+        contextMenus.put( bindingListComponent, bindingActionsMenu );
+
     }
     transient ListSelectionListener plotElementSelectionListener = new ListSelectionListener() {
 
@@ -396,6 +402,8 @@ public class LayoutPanel extends javax.swing.JPanel {
         plotsMenu = new javax.swing.JMenu();
         swapMenuItem = new javax.swing.JMenuItem();
         addHiddenMenuItem = new javax.swing.JMenuItem();
+        bindingActionsMenu = new javax.swing.JPopupMenu();
+        deleteBindingsMenuItem = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         canvasLayoutPanel1 = new org.virbo.autoplot.util.CanvasLayoutPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -433,7 +441,7 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         plotActionsMenu.add(plotMenu);
 
-        plotsMenu.setText("Plots");
+        plotsMenu.setText("Canvas");
 
         swapMenuItem.setText("Swap Position");
         swapMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -454,6 +462,16 @@ public class LayoutPanel extends javax.swing.JPanel {
 
         plotActionsMenu.add(plotsMenu);
 
+        bindingActionsMenu.setToolTipText("Binding actions");
+
+        deleteBindingsMenuItem.setText("Delete Selected Bindings");
+        deleteBindingsMenuItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteBindingsMenuItemActionPerformed(evt);
+            }
+        });
+        bindingActionsMenu.add(deleteBindingsMenuItem);
+
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plots"));
         jPanel1.setToolTipText("Plot layout on the canvas");
 
@@ -467,7 +485,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot Elements"));
@@ -488,7 +506,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Bindings"));
@@ -509,7 +527,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 99, Short.MAX_VALUE)
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -642,14 +660,26 @@ public class LayoutPanel extends javax.swing.JPanel {
             }
 
             app.getController().changePerformed( this, lock);
+
+
         }
     }//GEN-LAST:event_addHiddenMenuItemActionPerformed
+
+    private void deleteBindingsMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBindingsMenuItemActionPerformed
+        Object[] bindings= bindingListComponent.getSelectedValues();
+        for ( Object o:bindings ) {
+            BindingModel b= (BindingModel)o;
+            app.getController().deleteBinding(b);
+        }
+    }//GEN-LAST:event_deleteBindingsMenuItemActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem addHiddenMenuItem;
     private javax.swing.JMenuItem addPlotsBelowMenuItem;
+    private javax.swing.JPopupMenu bindingActionsMenu;
     private javax.swing.JList bindingListComponent;
     private org.virbo.autoplot.util.CanvasLayoutPanel canvasLayoutPanel1;
+    private javax.swing.JMenuItem deleteBindingsMenuItem;
     private javax.swing.JMenuItem deleteMenuItem;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;

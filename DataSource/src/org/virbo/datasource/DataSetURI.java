@@ -550,6 +550,9 @@ public class DataSetURI {
         URISplit split = URISplit.parse(url.toString());
 
         try {
+            if ( split.path==null || split.path.length()==0 ) {
+                throw new IllegalArgumentException("expected file but didn't find one, check URI for question mark");
+            }
             FileSystem fs = FileSystem.create( getWebURL( toUri(split.path) ).toURI() );
             String filename = split.file.substring(split.path.length());
             if (fs instanceof LocalFileSystem)

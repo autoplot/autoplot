@@ -34,6 +34,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
@@ -56,7 +57,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     List<String> paramsList;
     List<String> deftsList;
     List<Character> typesList;  // only 'A' and 'F' right now
-    
+
     /** Creates new form JythonEditorPanel */
     public JythonEditorPanel() {
         initComponents();
@@ -65,7 +66,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         support.addCaretLabel(caretPositionLabel);
         support.addFileLabel(fileNameLabel);
 
-        
+        jScrollPane1.getVerticalScrollBar().setUnitIncrement(12); //TODO: should be font height
+
     }
 
     /** This method is called from within the constructor to
@@ -84,6 +86,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         caretPositionLabel = new javax.swing.JLabel();
         fileNameLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
         textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
         paramsPanel = new javax.swing.JPanel();
 
@@ -94,22 +97,25 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
         caretPositionLabel.setText("1,1");
 
-        jScrollPane1.setViewportView(textArea);
+        jPanel1.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(textArea, java.awt.BorderLayout.CENTER);
+
+        jScrollPane1.setViewportView(jPanel1);
 
         org.jdesktop.layout.GroupLayout scriptPanelLayout = new org.jdesktop.layout.GroupLayout(scriptPanel);
         scriptPanel.setLayout(scriptPanelLayout);
         scriptPanelLayout.setHorizontalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 429, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)
         );
         scriptPanelLayout.setVerticalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -129,14 +135,14 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(variableComboBox, 0, 294, Short.MAX_VALUE)
+                .add(variableComboBox, 0, 257, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 294, Short.MAX_VALUE)
+                .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
@@ -146,15 +152,16 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    public javax.swing.JLabel caretPositionLabel;
+    private javax.swing.JLabel caretPositionLabel;
     protected javax.swing.JLabel fileNameLabel;
-    public javax.swing.JLabel jLabel1;
-    public javax.swing.JScrollPane jScrollPane1;
-    public javax.swing.JPanel paramsPanel;
-    public javax.swing.JPanel scriptPanel;
-    public org.das2.components.TearoffTabbedPane tearoffTabbedPane1;
-    public org.virbo.jythonsupport.ui.EditorTextPane textArea;
-    public javax.swing.JComboBox variableComboBox;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel paramsPanel;
+    private javax.swing.JPanel scriptPanel;
+    private org.das2.components.TearoffTabbedPane tearoffTabbedPane1;
+    private org.virbo.jythonsupport.ui.EditorTextPane textArea;
+    private javax.swing.JComboBox variableComboBox;
     // End of variables declaration//GEN-END:variables
 
     public JPanel getPanel() {
@@ -172,20 +179,21 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         try {
             reader = new LineNumberReader(new BufferedReader(new FileReader(f)));
 
-            String vnarg= "\\s*([a-z_][a-z0-9_]*)\\s*"; // any variable name  VERIFIED
-            String sarg= "\\s*\\'([a-z_][a-z0-9_]*)\\'\\s*"; // any variable name  VERIFIED
+            String vnarg= "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
+            String sarg= "\\s*\\'([a-zA-Z_][a-zA-Z0-9_]*)\\'\\s*"; // any variable name  VERIFIED
             String aarg= "\\s*(\\'[^\\']+\\')\\s*"; // any argument
             String farg= "\\s*([0-9\\.\\+-eE]+)\\s*"; // any float variable name
-            
+
             Pattern p= Pattern.compile( vnarg+"=\\s*getParam\\("+sarg+"\\,"+aarg+"(\\,"+aarg + ")?\\).*" );
             Pattern fp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+farg+"(\\,"+aarg + ")?\\).*" );
+            Pattern sp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+sarg+"(\\,"+aarg + ")?\\).*" );
 
             String line= reader.readLine();
             while ( line!=null ) {
                 Matcher m= p.matcher(line);
                 if ( !m.matches() ) {
                     m= fp.matcher(line);
-                }
+                } 
                 if ( m.matches() ) {
                     String vname= m.group(2);
 
@@ -253,7 +261,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             URISplit split= URISplit.parse(suri);
 
             File f = DataSetURI.getFile( DataSetURI.getResourceURI( DataSetURI.toUri(url) ), new NullProgressMonitor());
-            
+
             support.loadFile(f);
             Map<String,String> results= JythonDataSourceFactory.getParameters(url, new NullProgressMonitor() );
             String[] dropList= new String[results.size()+1];
@@ -284,7 +292,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             if ( hasVariables ) {
                 tearoffTabbedPane1.setSelectedIndex(1);
             }
-            
+
         } catch (IOException ex) {
             Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -319,7 +327,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         }
 
         split.params= URISplit.formatParams(params);
-        
+
         if ( support.isDirty() ) {
             try {
                 FileWriter writer = new FileWriter(support.getFile());
@@ -333,7 +341,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
 
     public boolean reject(String uri) throws Exception {
-        URISplit split= URISplit.parse(suri);
+        URISplit split= URISplit.parse(uri);
         if ( split.file==null || split.file.length()==0 ) {
             return true;
         } else {

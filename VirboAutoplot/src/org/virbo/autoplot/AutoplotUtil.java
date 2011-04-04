@@ -44,6 +44,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasDevicePosition;
@@ -596,6 +597,14 @@ public class AutoplotUtil {
                 result.robustMin= positiveMin/10;
             }
 
+            if ( UnitsUtil.isTimeLocation(u) ) {
+                double dmin= TimeUtil.createTimeDatum( 1000, 1, 1, 0, 0, 0, 0 ).doubleValue(u); // years from 1000A.D.
+                double dmax= TimeUtil.createTimeDatum( 9000, 1, 1, 0, 0, 0, 0 ).doubleValue(u); // years to 9000A.D.
+                if ( result.robustMin>dmax ) result.robustMin= dmax;
+                if ( result.robustMin<dmin ) result.robustMin= dmin;
+                if ( result.robustMax>dmax ) result.robustMax= dmax;
+                if ( result.robustMax<dmin ) result.robustMax= dmin;
+            } 
             result.range = DatumRange.newDatumRange(result.robustMin, result.robustMax, u);
 
         }

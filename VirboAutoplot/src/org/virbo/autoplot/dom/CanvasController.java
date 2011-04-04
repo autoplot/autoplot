@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.das2.graph.DasCanvas;
@@ -176,6 +178,22 @@ public class CanvasController extends DomNodeController {
         throw new IllegalArgumentException("no column found for " + domPlot);
     }
 
+    private static void resetToFollow( List<Row> rows, String overlap, Row row ) {
+        String[] overlaps= overlap.split(" ");
+        double min=1;
+        double max=0;
+        for ( int i=0; i<overlaps.length; i++ ) {
+            for ( int j=0; j<rows.size(); j++ ) {
+                if ( rows.get(j).getId().equals(overlaps[i]) ) {
+                    if ( rows.get(j).getController().getDasRow().getMinimum()<min ) min= rows.get(j).getController().getDasRow().getMinimum();
+                    if ( rows.get(j).getController().getDasRow().getMaximum()>max ) max= rows.get(j).getController().getDasRow().getMaximum();
+                }
+            }
+        }
+        row.getController().dasRow.setMinimum(min);
+        row.getController().dasRow.setMaximum(max);
+    }
+
     /**
      * reset this stack of rows, trying to preserve weights.
      * @param rows
@@ -185,15 +203,47 @@ public class CanvasController extends DomNodeController {
         int[] weights = new int[rows.size()]; // in per milli.
 
         int totalWeight = 0;
+
+        String[] overlaps= new String[rows.size()];
+        double[] mins= new double[rows.size()];
+        double[] maxs= new double[rows.size()];
+        int[] count= new int[rows.size()];
+
         for (int i = 0; i < rows.size(); i++) {
             try {
                 double nmin = DasDevicePosition.parseFormatStr(rows.get(i).getTop())[0];
                 double nmax = DasDevicePosition.parseFormatStr(rows.get(i).getBottom())[0];
+                mins[i]= nmin;
+                maxs[i]= nmax;
                 weights[i] = (int) Math.round((nmax - nmin) * 1000);
             } catch (ParseException ex) {
                 weights[i] = 200;
             }
             totalWeight += weights[i];
+        }
+
+        // look for overlaps--at least two panels.
+        for ( int i=0; i<rows.size(); i++ ) {
+            for ( int j=0; j<rows.size(); j++ ) {
+                if ( i==j ) continue;
+                if ( rows.get(i)==newRow || rows.get(j)==newRow ) {
+                    continue;
+                }
+                if ( maxs[i]>mins[j] && mins[i]<maxs[j] ) {
+                    count[i]++;
+                    if ( overlaps[i]==null ) {
+                        overlaps[i]= rows.get(j).id;
+                    } else {
+                        overlaps[i]= overlaps[i] + " " + rows.get(j).id;
+                    }
+                }
+            }
+        }
+        for ( int i=0; i<rows.size(); i++ ) {
+            if ( count[i]>1 ) {
+                totalWeight-= weights[i];
+                weights[i]= 0;
+            }
         }
 
         // normalize to per thousand.
@@ -210,6 +260,17 @@ public class CanvasController extends DomNodeController {
             dasRow.setMinimum(1. * t / totalWeight);
             dasRow.setMaximum(1. * (t + weights[idx]) / totalWeight);
             t += weights[idx];
+        }
+
+        for ( int i=0; i<rows.size(); i++ ) {
+            if ( count[i]>1 ) {
+                // get the new range.  Note this is all really kludgy and likely
+                // to change.  An alternate way to do this would be to add the N
+                // rows to a parent row, and then layout the parent row just like
+                // all the others.  This will require more information than is
+                // stored in the DOM, and I will try to experiment with this.
+                resetToFollow( rows, overlaps[i], rows.get(i) );
+            }
         }
     }
 

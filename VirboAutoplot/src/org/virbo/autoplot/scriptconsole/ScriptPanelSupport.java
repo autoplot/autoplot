@@ -200,12 +200,12 @@ public class ScriptPanelSupport {
         if (i1 == -1) {
             i1 = surl1.length();
         }
-        URI uri1 = DataSetURI.getURIValid(surl1.substring(0, i1));
+        URI uri1 = DataSetURI.getURI(surl1.substring(0, i1));
         int i2 = surl2.indexOf("?");
         if (i2 == -1) {
             i2 = surl2.length();
         }
-        URI uri2 = DataSetURI.getURIValid(surl2.substring(0, i2));
+        URI uri2 = DataSetURI.getURI(surl2.substring(0, i2));
         if ( uri1==null ) return false;
         return uri1.equals(uri2);
     }
@@ -216,8 +216,7 @@ public class ScriptPanelSupport {
      * @param offset line offset from beginning of file where execution began.
      * @throws javax.swing.text.BadLocationException
      */
-    private void annotateError(PyException ex, int offset, final PythonInterpreter interp)
-            throws BadLocationException {
+    private void annotateError(PyException ex, int offset, final PythonInterpreter interp) {
         if (ex instanceof PySyntaxError) {
             Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
             int lineno = offset + ((PyInteger) ex.value.__getitem__(1).__getitem__(1)).getValue();
@@ -250,11 +249,7 @@ public class ScriptPanelSupport {
 
                             public void exceptionThrown(Exception e) {
                                 if (e instanceof PyException) {
-                                    try {
-                                        annotateError((PyException) e, 0, null );
-                                    } catch (BadLocationException ex) {
-                                        Logger.getLogger(ScriptPanelSupport.class.getName()).log(Level.SEVERE, null, ex);
-                                    }
+                                    annotateError((PyException) e, 0, null );
                                 }
                             }
                         });
@@ -284,7 +279,7 @@ public class ScriptPanelSupport {
                     }
 
                     if (updateSurl) {
-                        selector.setValue(file.toURI().toString());
+                        selector.setValue("vap+jyds:"+file.toURI().toString());
                     }
 
                     annotationsSupport.clearAnnotations();
@@ -361,8 +356,6 @@ public class ScriptPanelSupport {
                             }
                         } catch (IOException ex) {
                             throw new RuntimeException(ex);
-                        } catch (BadLocationException ex2) {
-                            throw new RuntimeException(ex2);
                         } catch ( Error ex ) {
                             if ( !ex.getMessage().contains("Python interrupt") ) {
                                 throw ex;
@@ -417,6 +410,10 @@ public class ScriptPanelSupport {
                 out.write(text.getBytes());
                 panel.setDirty(false);
                 panel.setFilename(file.toString());
+
+                Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
+                prefs.put(PREFERENCE_OPEN_FILE, file.toString() );
+
                 //if (updateSurl) {
                 //    model.setDataSourceURL(file.toString());
                 //    model.getDataSourceFilterController().update(true, true);

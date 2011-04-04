@@ -1022,6 +1022,7 @@ public class GuiSupport {
                 Runnable run= new Runnable() {
                     public void run() {
                         Plot that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
+                        that.setTitle( "" );
                         controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
                         controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
                         controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);

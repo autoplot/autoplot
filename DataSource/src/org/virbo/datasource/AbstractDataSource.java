@@ -123,6 +123,9 @@ public abstract class AbstractDataSource implements DataSource {
      * make the remote file available.
      */
     protected File getFile(ProgressMonitor mon) throws IOException {
+        if ( resourceURI==null || resourceURI.equals("")  ) {
+            throw new IllegalArgumentException("expected file but didn't find one, check URI for question mark");
+        }
         return getFile( resourceURI, mon );
     }
 

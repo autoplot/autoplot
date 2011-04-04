@@ -9,6 +9,8 @@ import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -129,44 +131,52 @@ public class EditorAnnotationsSupport {
      * @param text, annotation to display when hovering. Currently ignored.
      * @param interp, the interpretter to focus on.
      */
-    public void annotateLine(int line, String name, String text, PythonInterpreter interp ) throws BadLocationException {
-        StyledDocument doc = editorPanel.getStyledDocument();
-        Element root = editorPanel.getDocument().getDefaultRootElement();
-        
-        if ( line<1 || line>root.getElementCount()+1 ) {
-            throw new IllegalArgumentException( "no such line: "+line );
-        } 
-        
-        int i0, i1;
-        
-        if ( line<=root.getElementCount() ) {
-            i0 = root.getElement(line - 1).getStartOffset();
-            i1 = root.getElement(line - 1).getEndOffset();
-        } else {
-            i0 = Math.max(0, doc.getLength()-2 );
-            i1 = doc.getLength();
-        }
+    public void annotateLine( final int line, final String name, final String text, final PythonInterpreter interp ) {
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                StyledDocument doc = editorPanel.getStyledDocument();
+                Element root = editorPanel.getDocument().getDefaultRootElement();
 
-        annotateChars( i0, i1, name, text, interp );
+                if ( line<1 || line>root.getElementCount()+1 ) {
+                    throw new IllegalArgumentException( "no such line: "+line );
+                }
+
+                int i0, i1;
+
+                if ( line<=root.getElementCount() ) {
+                    i0 = root.getElement(line - 1).getStartOffset();
+                    i1 = root.getElement(line - 1).getEndOffset();
+                } else {
+                    i0 = Math.max(0, doc.getLength()-2 );
+                    i1 = doc.getLength();
+                }
+                annotateChars(i0, i1, name, text, interp);
+            }
+        } );
     }
 
-    public void annotateChars( int i0, int i1, String name, String text, PythonInterpreter interp ) throws BadLocationException {
-        StyledDocument doc = editorPanel.getStyledDocument();
-        Element root = editorPanel.getDocument().getDefaultRootElement();
+    public void annotateChars( final int i0, final int i1, final String name, final String text, final PythonInterpreter interp ) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
 
-        Style style = doc.getStyle(name);
-        if (style == null) {
-            addStyles(doc);
-            style = doc.getStyle(name);
-        }
-        doc.setParagraphAttributes(i0, i1 - i0, StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE), false);
-        doc.setCharacterAttributes(i0, i1 - i0, style, true);
-        Annotation ann = new Annotation();
-        ann.len = i1 - i0;
-        ann.offset = i0;
-        ann.text = text;
-        annotations.put(ann.offset, ann);
-        this.interp= interp;
+                StyledDocument doc = editorPanel.getStyledDocument();
+                Element root = editorPanel.getDocument().getDefaultRootElement();
+
+                Style style = doc.getStyle(name);
+                if (style == null) {
+                    addStyles(doc);
+                    style = doc.getStyle(name);
+                }
+                doc.setParagraphAttributes(i0, i1 - i0, StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE), false);
+                doc.setCharacterAttributes(i0, i1 - i0, style, true);
+                Annotation ann = new Annotation();
+                ann.len = i1 - i0;
+                ann.offset = i0;
+                ann.text = text;
+                annotations.put(ann.offset, ann);
+                EditorAnnotationsSupport.this.interp= interp;
+            }
+        } );
     }
 
     private String htmlify( String text ) {
