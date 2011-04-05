@@ -31,6 +31,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -81,6 +82,7 @@ import org.virbo.autoplot.transferrable.ImageSelection;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.datasource.DataSourceFormat;
@@ -251,6 +253,10 @@ public class GuiSupport {
             public void actionPerformed( ActionEvent e ) {
                 ExportDataPanel edp= new ExportDataPanel();
                 edp.setDataSet(dom);
+
+                String dsid= dom.getController().getPlotElement().getDataSourceFilterId();
+                QDataSet ds= dom.getController().getDataSourceFilterFor( dom.getController().getPlotElement() ).getController().getDataSet();
+
                 List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
                 edp.getFormatDL().setModel( new DefaultComboBoxModel(exts.toArray()) );
                 Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
@@ -261,15 +267,18 @@ public class GuiSupport {
                 }
                 if ( !currentFileString.equals("") ) {
                     edp.getFilenameTF().setText(currentFileString);
+                    edp.getFormatDL().setSelectedItem( "." + DataSetURI.getExt(currentFileString.toLowerCase()) );
+                    edp.setFile( currentFileString );
                 }
                 
                 if ( JOptionPane.showConfirmDialog( parent, edp )==JOptionPane.OK_OPTION ) {
                      try {
-                        prefs.put("DumpDataCurrentFile", edp.getFilenameTF().toString());
+                        String name= edp.getFilenameTF().getText();
+                        prefs.put("DumpDataCurrentFile", name );
+                        prefs.put("DumpDataCurrentExt", "." + DataSetURI.getExt(name.toLowerCase()) );
+                        String s = new URI( edp.getFilenameTF().getText() ).toString();
 
-                        String s = new File( edp.getFilenameTF().getText() ).toURI().toString();
-
-                        String ext = DataSetURI.getExt(s);
+                        String ext = (String)edp.getFormatDL().getSelectedItem();
                         if (ext == null) {
                             ext = "";
                         }
@@ -280,11 +289,14 @@ public class GuiSupport {
                             return;
                         }
 
+                        DataSourceFormatEditorPanel opts= edp.getDataSourceFormatEditorPanel();
+                        if ( opts!=null ) {
+                            s= opts.getURI();
+                        }
+
                         if ( edp.isFormatPlotElement() ) {
-                            QDataSet ds= dom.getController().getPlotElement().getController().getDataSet();
                             format.formatData( s, ds, new DasProgressPanel("formatting data"));
                         } else {
-                            QDataSet ds= dom.getController().getDataSourceFilter().getController().getFillDataSet();
                             format.formatData( s, ds, new DasProgressPanel("formatting data"));
                         }
                         parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(s) );
