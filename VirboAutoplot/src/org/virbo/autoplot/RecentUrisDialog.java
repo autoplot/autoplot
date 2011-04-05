@@ -62,31 +62,27 @@ public class RecentUrisDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        recentUrisGUI1 = new org.virbo.autoplot.RecentUrisGUI();
-        plotButton = new javax.swing.JButton();
-        plotBelowButton = new javax.swing.JButton();
-        cancelButton = new javax.swing.JButton();
-        overplotButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         filterTextField = new javax.swing.JTextField();
         updateButton = new javax.swing.JButton();
+        recentUrisGUI1 = new org.virbo.autoplot.RecentUrisGUI();
+        cancelButton = new javax.swing.JButton();
+        overplotButton = new javax.swing.JButton();
+        plotBelowButton = new javax.swing.JButton();
+        plotButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
-        plotButton.setText("Plot");
-        plotButton.setToolTipText("Replace the current plot with this");
-        plotButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                plotButtonActionPerformed(evt);
-            }
-        });
+        jLabel1.setText("Filter:");
+        jLabel1.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
 
-        plotBelowButton.setText("Plot Below");
-        plotBelowButton.setToolTipText("Plot below the current plot, possibly inserting a plot.");
-        plotBelowButton.addActionListener(new java.awt.event.ActionListener() {
+        filterTextField.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
+
+        updateButton.setText("Update");
+        updateButton.setToolTipText("Apply filter to list of URIs");
+        updateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                plotBelowButtonActionPerformed(evt);
+                updateButtonActionPerformed(evt);
             }
         });
 
@@ -105,76 +101,72 @@ public class RecentUrisDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel1.setText("Filter:");
-        jLabel1.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
-
-        filterTextField.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
-
-        updateButton.setText("Update");
-        updateButton.setToolTipText("Apply filter to list of URIs");
-        updateButton.addActionListener(new java.awt.event.ActionListener() {
+        plotBelowButton.setText("Plot Below");
+        plotBelowButton.setToolTipText("Plot below the current plot, possibly inserting a plot.");
+        plotBelowButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateButtonActionPerformed(evt);
+                plotBelowButtonActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        plotButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/go.png"))); // NOI18N
+        plotButton.setText("Plot");
+        plotButton.setToolTipText("Replace the current plot with this");
+        plotButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                plotButtonActionPerformed(evt);
+            }
+        });
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(recentUrisGUI1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 708, Short.MAX_VALUE)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(424, Short.MAX_VALUE)
-                .addComponent(cancelButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(overplotButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(plotBelowButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(plotButton)
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(412, Short.MAX_VALUE)
+                .add(cancelButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(overplotButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(plotBelowButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(plotButton)
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
+            .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(filterTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 191, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(updateButton)
-                .addContainerGap(393, Short.MAX_VALUE))
+                .add(jLabel1)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(filterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 191, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(updateButton)
+                .addContainerGap(381, Short.MAX_VALUE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, recentUrisGUI1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
-                    .addComponent(filterTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(updateButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(recentUrisGUI1, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(plotButton)
-                    .addComponent(plotBelowButton)
-                    .addComponent(cancelButton)
-                    .addComponent(overplotButton))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                    .add(filterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(updateButton))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(recentUrisGUI1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 388, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(plotButton)
+                    .add(plotBelowButton)
+                    .add(cancelButton)
+                    .add(overplotButton))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
-        cancelled= false;
-        setModifiers( evt.getModifiers() );
-        setVisible(false);
-}//GEN-LAST:event_plotButtonActionPerformed
-
-    private void plotBelowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotBelowButtonActionPerformed
-        cancelled= false;
-        setModifiers( KeyEvent.CTRL_MASK );
-        setVisible(false);
-}//GEN-LAST:event_plotBelowButtonActionPerformed
+    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+        setFilter( filterTextField.getText() );
+}//GEN-LAST:event_updateButtonActionPerformed
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         setVisible(false);
@@ -186,9 +178,17 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         setVisible(false);
 }//GEN-LAST:event_overplotButtonActionPerformed
 
-    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
-        setFilter( filterTextField.getText() );
-    }//GEN-LAST:event_updateButtonActionPerformed
+    private void plotBelowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotBelowButtonActionPerformed
+        cancelled= false;
+        setModifiers( KeyEvent.CTRL_MASK );
+        setVisible(false);
+}//GEN-LAST:event_plotBelowButtonActionPerformed
+
+    private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
+        cancelled= false;
+        setModifiers( evt.getModifiers() );
+        setVisible(false);
+}//GEN-LAST:event_plotButtonActionPerformed
 
     /**
     * @param args the command line arguments
