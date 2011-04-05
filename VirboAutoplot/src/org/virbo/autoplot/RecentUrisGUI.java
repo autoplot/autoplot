@@ -12,10 +12,8 @@
 package org.virbo.autoplot;
 
 import java.awt.Component;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -23,25 +21,19 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -98,7 +90,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         private TreeMap<Datum,String[]> uris;
 
         private DatumRange[] list;
-        int listlen=6;
+        int listlen=8;
 
         MyTreeModel() {
             try {
@@ -109,7 +101,9 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 list[2] = new DatumRange(TimeUtil.prevWeek(list[1].min()), list[1].min());
                 list[3] = new DatumRange(TimeUtil.prev(TimeUtil.MONTH, list[2].min()), list[2].min());
                 list[4] = new DatumRange(TimeUtil.prev(TimeUtil.QUARTER, list[3].min()), list[3].min());
-                list[5] = new DatumRange(Datum.create(0, Units.t1970), list[4].min());
+                list[5] = new DatumRange(TimeUtil.prev(TimeUtil.QUARTER, list[4].min()), list[4].min());
+                list[6] = new DatumRange(TimeUtil.prev(TimeUtil.HALF_YEAR, list[5].min()), list[5].min());
+                list[7] = new DatumRange(Datum.create(0, Units.t1970), list[6].min());
                 File f2 = new File(AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/");
                 if (!f2.exists()) {
                     boolean ok = f2.mkdirs();
