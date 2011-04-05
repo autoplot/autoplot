@@ -79,6 +79,9 @@
       <Properties>
         <Property name="toolTipText" type="java.lang.String" value="Filter URIs with free text, as in &apos;vap+cdf:&apos;"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="filterTextFieldActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="updateButton">
       <Properties>
