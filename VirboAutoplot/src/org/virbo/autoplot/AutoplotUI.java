@@ -681,8 +681,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         mi.setToolTipText("Open local file");
         fileMenu.add(mi);
 
-        fileMenu.add( new JMenuItem( new AbstractAction( "Open Recent..." ) {
-
+        mi= new JMenuItem( new AbstractAction( "Open Recent..." ) {
               public void actionPerformed( ActionEvent e ) {
                   RecentUrisDialog dia= new RecentUrisDialog( (java.awt.Frame)SwingUtilities.getWindowAncestor(fileMenu), true );
                   dia.setVisible(true);
@@ -695,7 +694,9 @@ public class AutoplotUI extends javax.swing.JFrame {
                       dataSetSelector.maybePlot( dia.getModifiers());
                   }
               }
-        } ) );
+        } );
+        mi.setToolTipText("Open recent URIs dialog");
+        fileMenu.add( mi );
         //fileMenu.add(dataSetSelector.getRecentMenu());
 
         mi= new JMenuItem(stateSupport.createSaveAsAction() );
