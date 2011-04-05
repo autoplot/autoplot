@@ -684,14 +684,15 @@ public class AutoplotUI extends javax.swing.JFrame {
         fileMenu.add( new JMenuItem( new AbstractAction( "Open Recent..." ) {
 
               public void actionPerformed( ActionEvent e ) {
-                  System.err.println("here");
-                  RecentUrisGUI g= new RecentUrisGUI();
-                  if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( rootPane, g ) ) {
-                      String suri= g.getSelectedURI();
-                      if ( suri!=null ) {
-                          dataSetSelector.setValue(suri);
-                          dataSetSelector.maybePlot(e.getModifiers());
-                      }
+                  RecentUrisDialog dia= new RecentUrisDialog( (java.awt.Frame)SwingUtilities.getWindowAncestor(fileMenu), true );
+                  dia.setVisible(true);
+                  if (dia.isCancelled()) {
+                    return;
+                  }
+                  String suri= dia.getSelectedURI();
+                  if ( suri!=null ) {
+                      dataSetSelector.setValue(suri);
+                      dataSetSelector.maybePlot( dia.getModifiers());
                   }
               }
         } ) );
