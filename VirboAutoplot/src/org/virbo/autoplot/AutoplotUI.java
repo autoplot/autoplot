@@ -681,7 +681,21 @@ public class AutoplotUI extends javax.swing.JFrame {
         mi.setToolTipText("Open local file");
         fileMenu.add(mi);
 
-        fileMenu.add(dataSetSelector.getRecentMenu());
+        fileMenu.add( new JMenuItem( new AbstractAction( "Open Recent..." ) {
+
+              public void actionPerformed( ActionEvent e ) {
+                  System.err.println("here");
+                  RecentUrisGUI g= new RecentUrisGUI();
+                  if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog( rootPane, g ) ) {
+                      String suri= g.getSelectedURI();
+                      if ( suri!=null ) {
+                          dataSetSelector.setValue(suri);
+                          dataSetSelector.maybePlot(e.getModifiers());
+                      }
+                  }
+              }
+        } ) );
+        //fileMenu.add(dataSetSelector.getRecentMenu());
 
         mi= new JMenuItem(stateSupport.createSaveAsAction() );
         mi.setToolTipText("Save the application state to a file");
@@ -725,8 +739,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         mi.setToolTipText("Export the data that has the focus");
         fileMenu.add( mi );
 
-        //item = new JMenuItem( support.getDumpDataAction2( dom ) );
-        //fileMenu.add( item );
+        item = new JMenuItem( support.getDumpDataAction2( dom ) );
+        fileMenu.add( item );
 
         //fileMenu.add( new )
         //fileMenu.add( GuiSupport.getExportDataAction(AutoplotUI.this) );
