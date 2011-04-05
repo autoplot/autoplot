@@ -249,6 +249,8 @@ public class AsciiTableDataSource extends AbstractDataSource {
                 if (validMin != Double.NEGATIVE_INFINITY) {
                     ds.putProperty(QDataSet.VALID_MIN, validMin);
                 }
+            } else {
+                System.err.println("removing bundleDescriptor because of rank2");
             }
 
             MutablePropertyDataSet mds;
