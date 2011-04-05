@@ -53,8 +53,11 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         jTree1.expandPath( new TreePath( new Object[] { r, jTree1.getModel().getChild( r,0 ) } ) );
         jTree1.addTreeSelectionListener( new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
-                String[] pp= (String[]) e.getPath().getLastPathComponent();
-                selectedURI= pp[1];
+                Object o= e.getPath().getLastPathComponent();
+                if ( o instanceof String[] ) {
+                    String[] pp= (String[]) o;
+                    selectedURI= pp[1];
+                }
             }
         });
         
@@ -88,6 +91,9 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             if (value instanceof String[]) {
                 value = ((String[])value)[1];
+            } else if ( value instanceof DatumRange ) {
+                int count= tree.getModel().getChildCount(value);
+                value= String.format( "%s (%d)", value, count );
             }
             return super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
         }
@@ -125,6 +131,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z);
 
                 String lastURI= null;
+                String lastURIDate= "1970-01-01";
 
                 String filt= RecentUrisGUI.this.filter;
                 if ( filt!=null && filt.length()==0 ) filt=null;
@@ -138,9 +145,10 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                         if ( filt!=null && !ss[1].contains(filt) ) {
                             continue;
                         }
-                        if ( !ss[1].equals(lastURI) ) {
+                        if ( !( ss[1].equals(lastURI) && ss[0].startsWith(lastURIDate) ) ) {
                             uris.put(tp.parse(ss[0]).getTimeDatum(), ss);
                             lastURI= ss[1];
+                            lastURIDate= ss[0].substring(0,10);
                         }
                     } catch (ParseException ex) {
                         Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
