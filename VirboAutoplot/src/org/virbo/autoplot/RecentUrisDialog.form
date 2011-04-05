@@ -112,13 +112,18 @@
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
         <Property name="text" type="java.lang.String" value="Filter:"/>
+        <Property name="toolTipText" type="java.lang.String" value="Filter URIs with free text, as in &apos;vap+cdf:&apos;"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="filterTextField">
+      <Properties>
+        <Property name="toolTipText" type="java.lang.String" value="Filter URIs with free text, as in &apos;vap+cdf:&apos;"/>
+      </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="updateButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Update"/>
+        <Property name="toolTipText" type="java.lang.String" value="Apply filter to list of URIs"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="updateButtonActionPerformed"/>

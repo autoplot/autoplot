@@ -106,8 +106,12 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         });
 
         jLabel1.setText("Filter:");
+        jLabel1.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
+
+        filterTextField.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
 
         updateButton.setText("Update");
+        updateButton.setToolTipText("Apply filter to list of URIs");
         updateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 updateButtonActionPerformed(evt);
