@@ -35,11 +35,13 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.TimeParser;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.AutoplotSettings;
 
 /**
@@ -128,6 +130,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                     try {
                         if ( !ss[1].equals(lastURI) ) {
                             uris.put(tp.parse(ss[0]).getTimeDatum(), ss);
+                            lastURI= ss[1];
                         }
                     } catch (ParseException ex) {
                         Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
