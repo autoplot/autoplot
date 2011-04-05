@@ -72,6 +72,16 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         }
     }
 
+    private String filter;
+    void setFilter(String filter) {
+        this.filter= filter;
+        update();
+    }
+
+    private void update() {
+        jTree1.setModel( new MyTreeModel() );
+    }
+
     class MyCellRenderer extends DefaultTreeCellRenderer {
 
         @Override
@@ -116,12 +126,18 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
                 String lastURI= null;
 
+                String filt= RecentUrisGUI.this.filter;
+                if ( filt!=null && filt.length()==0 ) filt=null;
+
                 final File f3 = new File(f2, "history.txt");
                 Scanner scan = new Scanner(f3);
                 while (scan.hasNextLine()) {
                     String line = scan.nextLine();
                     String[] ss= line.split("\\s+",2);
                     try {
+                        if ( filt!=null && !ss[1].contains(filt) ) {
+                            continue;
+                        }
                         if ( !ss[1].equals(lastURI) ) {
                             uris.put(tp.parse(ss[0]).getTimeDatum(), ss);
                             lastURI= ss[1];
