@@ -10,15 +10,18 @@
  */
 package org.virbo.autoplot;
 
+import java.awt.BorderLayout;
 import java.io.File;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
+import org.virbo.ascii.AsciiTableDataSourceFormatEditorPanel;
 import org.virbo.autoplot.dom.Application;
 import org.virbo.autoplot.dom.DataSourceController;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -67,6 +70,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
         jLabel3 = new javax.swing.JLabel();
         filenameTF = new javax.swing.JTextField();
         chooseFileB = new javax.swing.JButton();
+        additionalOptionsButton = new javax.swing.JButton();
 
         jLabel2.setText("Select Output Format:");
 
@@ -88,6 +92,16 @@ public class ExportDataPanel extends javax.swing.JPanel {
         });
 
         formatDL.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        formatDL.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                formatDLItemStateChanged(evt);
+            }
+        });
+        formatDL.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                formatDLActionPerformed(evt);
+            }
+        });
 
         jLabel1.setText("Select Data to Export:");
 
@@ -102,11 +116,17 @@ public class ExportDataPanel extends javax.swing.JPanel {
             }
         });
 
+        additionalOptionsButton.setText("Additional Options...");
+        additionalOptionsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                additionalOptionsButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 400, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel1)
@@ -124,14 +144,16 @@ public class ExportDataPanel extends javax.swing.JPanel {
                     .add(jLabel3)
                     .add(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(filenameTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+                        .add(filenameTF, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(chooseFileB)))
                 .add(22, 22, 22))
+            .add(layout.createSequentialGroup()
+                .add(additionalOptionsButton)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 300, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -148,7 +170,9 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(filenameTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(chooseFileB))
-                .addContainerGap(101, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(additionalOptionsButton)
+                .addContainerGap(78, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -216,11 +240,49 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 }
             }
             filenameTF.setText( s );
+            formatDL.setSelectedItem("."+ext);
+            
         }
     }//GEN-LAST:event_chooseFileBActionPerformed
 
+    private void formatDLActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_formatDLActionPerformed
+        String ff= filenameTF.getText();
+        if ( ! ff.endsWith( (String)formatDL.getSelectedItem() ) ) {
+            int ii2= ff.lastIndexOf("/");
+            if ( ii2==-1 ) ii2= 0;
+            int ii= ff.lastIndexOf(".");
+            if ( ii>-1 && ii>ii2 ) {
+                filenameTF.setText(ff.substring(0,ii) + formatDL.getSelectedItem() );
+            }
+        }
+    }//GEN-LAST:event_formatDLActionPerformed
+
+    private void formatDLItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_formatDLItemStateChanged
+        String ss=  (String) evt.getItem();
+
+        if ( ss.equals(".txt") || ss.equals(".dat") || ss.equals(".csv") ) {
+            editorPanel= new AsciiTableDataSourceFormatEditorPanel();
+            String t=  getFilenameTF().getText();
+            if ( t.contains("/" ) ) {
+                editorPanel.setURI( getFilenameTF().getText() );
+            }
+        } else {
+            editorPanel= null;
+        }
+
+        additionalOptionsButton.setEnabled(editorPanel!=null);
+
+    }//GEN-LAST:event_formatDLItemStateChanged
+
+    private void additionalOptionsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_additionalOptionsButtonActionPerformed
+        javax.swing.JPanel j= editorPanel.getPanel();
+        JOptionPane.showConfirmDialog( this, j );
+    }//GEN-LAST:event_additionalOptionsButtonActionPerformed
+
+    DataSourceFormatEditorPanel editorPanel=null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton additionalOptionsButton;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JButton chooseFileB;
     private javax.swing.JTextField filenameTF;
@@ -245,4 +307,17 @@ public class ExportDataPanel extends javax.swing.JPanel {
     public javax.swing.JComboBox getFormatDL() {
         return formatDL;
     }
+
+    DataSourceFormatEditorPanel getDataSourceFormatEditorPanel() {
+        return editorPanel;
+    }
+
+    void setFile(String currentFileString) {
+        this.filenameTF.setText(currentFileString);
+        formatDLActionPerformed(null);
+        if ( editorPanel!=null ) {
+            editorPanel.setURI(currentFileString);
+        }
+    }
+
 }
