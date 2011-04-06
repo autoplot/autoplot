@@ -12,6 +12,8 @@
 package org.virbo.autoplot;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  *
@@ -23,6 +25,20 @@ public class RecentUrisDialog extends javax.swing.JDialog {
     public RecentUrisDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+
+        recentUrisGUI1.getTree().addMouseListener( new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Object o= recentUrisGUI1.getTree().getSelectionPath().getLastPathComponent();
+                if ( !( o instanceof String[] ) ) {
+                    return;
+                }
+                if ( e.getClickCount()==2 ) {
+                    cancelled= false;
+                    setVisible(false);
+                }
+            }
+        } );
     }
 
     public void setFilter( String filter ) {
