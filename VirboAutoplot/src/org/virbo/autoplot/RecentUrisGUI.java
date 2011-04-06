@@ -12,6 +12,8 @@
 package org.virbo.autoplot;
 
 import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
@@ -60,7 +62,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 }
             }
         });
-        
+
     }
 
     public String getSelectedURI() {
@@ -221,6 +223,9 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
     }
 
+    protected JTree getTree() {
+        return this.jTree1;
+    }
 
 
     /** This method is called from within the constructor to
