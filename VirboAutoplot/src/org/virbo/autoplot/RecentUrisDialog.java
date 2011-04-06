@@ -35,6 +35,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
                 }
                 if ( e.getClickCount()==2 ) {
                     cancelled= false;
+                    RecentUrisDialog.this.setModifiers(e.getModifiers());
                     setVisible(false);
                 }
             }
