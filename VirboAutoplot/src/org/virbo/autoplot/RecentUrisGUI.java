@@ -154,6 +154,10 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                             continue;
                         }
                         if ( ss[0].compareTo( midnight )>0 || !scan.hasNextLine() ) {
+                            if ( !scan.hasNextLine() ) {
+                                daysURIs.remove( ss[1] );
+                                daysURIs.put( ss[1], ss[0] );
+                            }
                             Datum tlocal= null;
                             for ( Iterator<String> ii= daysURIs.keySet().iterator(); ii.hasNext(); ) {
                                 String uri= ii.next();
@@ -218,7 +222,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 DatumRange range = (DatumRange)parent;
                 SortedMap<Datum,String[]> submap = uris.subMap(range.min(), range.max());
                 Iterator i= submap.values().iterator();
-                for ( int j=0; j<index; j++ ) {
+                for ( int j=submap.size()-1; j>index; j-- ) {
                     i.next();
                 }
                 return i.next();
