@@ -17,7 +17,10 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -132,12 +135,17 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 uris= new TreeMap<Datum, String[]>();
                 TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z);
 
-                String lastURI= null;
+                LinkedHashMap<String,String> daysURIs= new LinkedHashMap<String,String>(); // things we've already displayed
+
                 String lastURIDate= "1970-01-01";
 
                 String filt= RecentUrisGUI.this.filter;
                 if ( filt!=null && filt.length()==0 ) filt=null;
 
+                long tzOffsetMs= Calendar.getInstance().getTimeZone().getRawOffset();
+
+                String midnight= tp.format( Units.t1970.createDatum(0).subtract( tzOffsetMs,Units.milliseconds ),
+                        null );
                 final File f3 = new File(f2, "history.txt");
                 Scanner scan = new Scanner(f3);
                 while (scan.hasNextLine()) {
@@ -147,11 +155,20 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                         if ( filt!=null && !ss[1].contains(filt) ) {
                             continue;
                         }
-                        if ( !( ss[1].equals(lastURI) && ss[0].startsWith(lastURIDate) ) ) {
-                            uris.put(tp.parse(ss[0]).getTimeDatum(), ss);
-                            lastURI= ss[1];
-                            lastURIDate= ss[0].substring(0,10);
+                        if ( ss[0].compareTo( midnight )>0 || !scan.hasNextLine() ) {
+                            Datum tlocal= null;
+                            for ( Iterator<String> ii= daysURIs.keySet().iterator(); ii.hasNext(); ) {
+                                String uri= ii.next();
+                                tlocal= tp.parse(daysURIs.get(uri)).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
+                                uris.put( tlocal, new String[] { tp.format(tlocal,null), uri } );
+                            }
+                            daysURIs= new LinkedHashMap<String,String>();
+                            if ( tlocal==null ) tlocal= tp.parse(ss[0]).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
+                            midnight= tp.format( TimeUtil.nextMidnight( tlocal ).subtract(tzOffsetMs,Units.milliseconds), null );
                         }
+                        daysURIs.remove( ss[1] );
+                        daysURIs.put( ss[1], ss[0] );
+
                     } catch (ParseException ex) {
                         Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
