@@ -29,7 +29,10 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         recentUrisGUI1.getTree().addMouseListener( new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Object o= recentUrisGUI1.getTree().getSelectionPath().getLastPathComponent();
+                Object o=null;
+                o= recentUrisGUI1.getTree().getSelectionPath();
+                if ( o==null ) return;
+                o= recentUrisGUI1.getTree().getSelectionPath().getLastPathComponent();
                 if ( !( o instanceof String[] ) ) {
                     return;
                 }
