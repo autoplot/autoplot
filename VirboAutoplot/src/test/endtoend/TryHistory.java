@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,8 +33,12 @@ public class TryHistory {
 
         File f= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/history.txt" );
 
+        File fout= new File( AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_AUTOPLOTDATA ) + "/bookmarks/tryhistory.log" );
+
         BufferedReader reader= new BufferedReader( new FileReader(f) );
         String s= reader.readLine();
+
+        PrintStream out= new PrintStream( fout );
 
         //count the number of lines
         int lineCount=1;
@@ -71,20 +76,20 @@ public class TryHistory {
             Integer count= plottedURIs.get(suri);
 
             if ( count==null || count==0 ) {
-                System.err.println("=== " + i + "/" + lineCount + " ===================================================");
-                System.err.println("readat: " + time);
-                System.err.println("uri:    " + suri );
+                out.println("=== " + i + "/" + lineCount + " ===================================================");
+                out.println("readat: " + time);
+                out.println("uri:    " + suri );
 
                 long t0= System.currentTimeMillis();
 
                 try {
                     QDataSet ds = org.virbo.jythonsupport.Util.getDataSet(suri, new NullProgressMonitor() );
-                    System.err.println( "result: " + ds);
+                    out.println( "result: " + ds);
                 } catch ( Exception ex ) {
                     String exs= ex.getMessage();
                     if ( exs==null ) exs= ex.toString();
                     if ( ! exs.equals( "Unsupported extension: vap") ) {
-                        System.err.println( "exception: " + ex );
+                        out.println( "exception: " + ex );
                         List<String> uris= exceptions.get( exs );
                         if ( uris==null ) {
                             uris= new ArrayList<String>();
@@ -92,11 +97,11 @@ public class TryHistory {
                         uris.add( suri );
                         exceptions.put(exs,uris);
                     } else {
-                        System.err.println( "ignoring vap files for now" );
+                        out.println( "ignoring vap files for now" );
                     }
                 }
-                System.err.println( "readtm: " + String.format(Locale.US, "%9.2f", (System.currentTimeMillis()-t0)/1000. ).trim() + " sec");
-                System.err.println( "tottim: " + String.format(Locale.US, "%9.2f", (System.currentTimeMillis() - t00) / 1000.0 /60 ).trim() + " min");
+                out.println( "readtm: " + String.format(Locale.US, "%9.2f", (System.currentTimeMillis()-t0)/1000. ).trim() + " sec");
+                out.println( "tottim: " + String.format(Locale.US, "%9.2f", (System.currentTimeMillis() - t00) / 1000.0 /60 ).trim() + " min");
 
                 count=1;
                 plottedURIs.put( suri, count );
@@ -112,23 +117,23 @@ public class TryHistory {
         }
         reader.close();
 
-        System.err.println( "\n===== Summary =================================================");
+        out.println( "\n===== Summary =================================================");
         DatumRange dr= new DatumRange( TimeUtil.prevMidnight(firstTime), TimeUtil.nextMidnight(lastTime) );
-        System.err.println( "interval of history: " + dr );
+        out.println( "interval of history: " + dr );
         final double totSec = (System.currentTimeMillis() - t00) / 1000.0;
-        System.err.println( "total time to read: " + String.format( Locale.US, "%9.2f", totSec/60 ).trim() + " min");
-        System.err.println( "total URIs read: "+ plottedURIs.size() );
-        System.err.println( "URIs/sec: "+ String.format( Locale.US, "%9.2f", 1.*plottedURIs.size()/totSec ) );
-        System.err.println( "Exceptions encountered: "+ exceptions.size() );
+        out.println( "total time to read: " + String.format( Locale.US, "%9.2f", totSec/60 ).trim() + " min");
+        out.println( "total URIs read: "+ plottedURIs.size() );
+        out.println( "URIs/sec: "+ String.format( Locale.US, "%9.2f", 1.*plottedURIs.size()/totSec ) );
+        out.println( "Exceptions encountered: "+ exceptions.size() );
 
-        System.err.println( "\n=== Exceptions ==============================================");
+        out.println( "\n=== Exceptions ==============================================");
         for ( Entry<String,List<String>> en: exceptions.entrySet() ) {
             List<String> uris= exceptions.get(en.getKey());
-            System.err.println( en.getKey() );
+            out.println( en.getKey() );
             for ( String uri: uris ) {
-                System.err.println( "  " + uri );
+                out.println( "  " + uri );
             }
-            System.err.println("");
+            out.println("");
         }
 
     }
