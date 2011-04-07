@@ -104,19 +104,19 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         }
     }
     
-    class MyTreeModel implements TreeModel {
+    final class MyTreeModel implements TreeModel {
 
         private final Object root= new Object();
 
         private TreeMap<Datum,String[]> uris;
 
         private DatumRange[] list;
-        int listlen=8;
+        private boolean[] skip;
 
         MyTreeModel() {
             try {
                 Datum now = TimeUtil.now();
-                list = new DatumRange[listlen];
+                list = new DatumRange[8];
                 list[0] = new DatumRange(TimeUtil.prevMidnight(now), TimeUtil.nextMidnight(now));
                 list[1] = list[0].previous();
                 list[2] = new DatumRange(TimeUtil.prevWeek(list[1].min()), list[1].min());
@@ -136,8 +136,6 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z);
 
                 LinkedHashMap<String,String> daysURIs= new LinkedHashMap<String,String>(); // things we've already displayed
-
-                String lastURIDate= "1970-01-01";
 
                 String filt= RecentUrisGUI.this.filter;
                 if ( filt!=null && filt.length()==0 ) filt=null;
@@ -173,6 +171,34 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                         Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+
+                skip= new boolean[8];
+
+                // remove empty elements.
+                int newListLen= list.length;
+                for ( int i=0; i<list.length; i++ ) {
+                    if ( getChildCount(list[i])==0 ) {
+                        skip[i]=true;
+                        newListLen--;
+                    } else {
+                        skip[i]= false;
+                    }
+                }
+
+                if ( newListLen==0 ) {
+                    newListLen= 1;
+                    skip[0] = false;
+                }
+                DatumRange[] newlist = new DatumRange[newListLen];
+                int j=0;
+                for ( int i=0; i<list.length; i++ ) {
+                    if ( !skip[i] ) {
+                        newlist[j]= list[i];
+                        j++;
+                    }
+                }
+                list= newlist;
+                
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,7 +240,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         }
 
         public boolean isLeaf(Object node) {
-            return node instanceof String[];
+            return ( node instanceof String[] ) || getChildCount(node)==0;
         }
 
         public void valueForPathChanged(TreePath path, Object newValue) {
