@@ -52,11 +52,18 @@ public class DataSourceUtil {
 
     /**
      * remove escape sequences like %20 to create a human-editable string
+     * This contains a kludge that looks for single spaces that are the result of
+     * cut-n-pasting on Linux.  If there is a space and a "%3A", then single spaces
+     * are removed.
      * @param s
      * @return
      */
     public static String unescape(String s) {
         try {
+            if ( s.contains(" ") && s.contains("%3A") ) {
+                //copy and paste on linux sometimes inserts a space, so take these out.
+                s= s.replaceAll(" ", "");
+            }
             s = URLDecoder.decode(s, "UTF-8");
             return s;
         } catch (UnsupportedEncodingException ex) {

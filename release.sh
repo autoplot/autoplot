@@ -8,13 +8,13 @@ ant do-tag
 cd ../VirboAutoplot
 ant do-tag
 
-export AP_VERSION=20110329x
+export AP_VERSION=20110407
 
 ant jar -Ddefault_release_tag=$AP_VERSION
-#ant jnlp-release -Ddefault_release_tag=$AP_VERSION
+ant jnlp-release -Ddefault_release_tag=$AP_VERSION
 
 sh ./jumbojar.sh  
-#mv dist/autoplot.jar dist/jnlp/
+mv dist/autoplot.jar dist/jnlp/
 #rsync -e ssh -av dist/jnlp/ root@aurora.gmu.edu:/var/www/autoplot/jnlp/$AP_VERSION/
 
 echo "If this is to be a new production version, then update the latest link in /var/www/autoplot/jnlp/"

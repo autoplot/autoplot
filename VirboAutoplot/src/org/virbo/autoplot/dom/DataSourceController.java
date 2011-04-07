@@ -49,7 +49,7 @@ import org.virbo.metatree.MetadataUtil;
  */
 public class DataSourceController extends DomNodeController {
 
-    Logger logger = Logger.getLogger("vap.dataSourceController");
+    static final Logger logger = Logger.getLogger("vap.dataSourceController");
     DataSourceFilter dsf;
     private ApplicationModel model;
     private Application dom;
@@ -60,6 +60,7 @@ public class DataSourceController extends DomNodeController {
     private ProgressMonitor mon;
     private PropertyChangeListener updateSlicePropertyChangeListener = new PropertyChangeListener() {
 
+        @Override
         public String toString() {
             return "" + dsf + " controller updateSlicePropertyChangeListener";
         }
@@ -77,6 +78,7 @@ public class DataSourceController extends DomNodeController {
     };
     private PropertyChangeListener updateMePropertyChangeListener = new PropertyChangeListener() {
 
+        @Override
         public String toString() {
             return "" + dsf + " controller updateMePropertyChangeListener";
         }
@@ -92,12 +94,13 @@ public class DataSourceController extends DomNodeController {
     //TODO: This is the only thing listening to the dsf.uri.  
     private PropertyChangeListener resetMePropertyChangeListener = new PropertyChangeListener() {
 
+        @Override
         public String toString() {
             return "" + dsf + " controller resetMePropertyChangeListener";
         }
 
         public void propertyChange(PropertyChangeEvent e) {
-            logger.fine( "resetMe: "+e.getPropertyName()+ " "+e.getOldValue()+"->"+e.getNewValue());
+            logger.log( Level.FINE, "resetMe: {0} {1}->{2}", new Object[]{e.getPropertyName(), e.getOldValue(), e.getNewValue()});
             if (e.getNewValue() == null && e.getOldValue() == null) {
                 return;
             } else {
@@ -205,7 +208,7 @@ public class DataSourceController extends DomNodeController {
             }
         }
 
-        logger.fine("dep names: " + Arrays.asList(depNames));
+        logger.log(Level.FINE, "dep names: {0}", Arrays.asList(depNames));
 
         setDepnames(Arrays.asList(depNames));
 
@@ -346,7 +349,7 @@ public class DataSourceController extends DomNodeController {
             StringBuffer message = new StringBuffer("data set is invalid:\n");
             new Exception("data set is invalid").printStackTrace();
             for (String s : problems) {
-                message.append(s + "\n");
+                message.append(s).append("\n");
             }
             if (dom.controller.isHeadless()) {
                 throw new IllegalArgumentException(message.toString());
@@ -457,7 +460,7 @@ public class DataSourceController extends DomNodeController {
                 dsf.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
                 parentSources[i] = dsf;
             }else {
-                logger.warning("unable to find parent "+ss[i]);
+                logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
                 parentSources[i] = null;
             }
         }
@@ -575,14 +578,14 @@ public class DataSourceController extends DomNodeController {
      *   properties is set.
      */
     private void extractProperties() {
-        Map<String, Object> properties; // QDataSet properties.
+        Map<String, Object> props; // QDataSet properties.
 
-        properties = AutoplotUtil.extractProperties(getDataSet());
+        props = AutoplotUtil.extractProperties(getDataSet());
         if (getDataSource() != null) {
-            properties = AutoplotUtil.mergeProperties(getDataSource().getProperties(), properties);
+            props = AutoplotUtil.mergeProperties(getDataSource().getProperties(), props);
         }
 
-        setProperties(properties);
+        setProperties(props);
 
     }
 
@@ -595,14 +598,14 @@ public class DataSourceController extends DomNodeController {
         Object v;
 
 
-        Map<String, Object> properties = getProperties();
+        Map<String, Object> props = getProperties();
 
-        if ((v = properties.get(QDataSet.FILL_VALUE)) != null) {
+        if ((v = props.get(QDataSet.FILL_VALUE)) != null) {
             dsf.setFill(String.valueOf(v));
         }
 
-        Number vmin = (Number) properties.get(QDataSet.VALID_MIN);
-        Number vmax = (Number) properties.get(QDataSet.VALID_MAX);
+        Number vmin = (Number) props.get(QDataSet.VALID_MIN);
+        Number vmax = (Number) props.get(QDataSet.VALID_MAX);
         if (vmin != null || vmax != null) {
             if (vmin == null) {
                 vmin = -1e38;
@@ -794,9 +797,9 @@ public class DataSourceController extends DomNodeController {
         try {
             if (getDataSource() != null) {
                 setStatus("busy: loading dataset");
-                logger.fine("loading dataset "+getDataSource() );
+                logger.log(Level.FINE, "loading dataset {0}", getDataSource());
                 if ( tsb!=null ) {
-                    logger.fine("   tsb= "+ tsb.getURI() );
+                    logger.log(Level.FINE, "   tsb= {0}", tsb.getURI());
                 }
                 loadDataSet();
                 if ( dataSet!=null ) {
@@ -1174,7 +1177,7 @@ public class DataSourceController extends DomNodeController {
      *   if this is headless, then the dataset has been loaded sychronously.
      */
     private void resolveDataSource( boolean valueWasAdjusting, ProgressMonitor mon ) {
-        Caching caching = getCaching();
+        Caching cache1 = getCaching();
 
         String surl = dsf.getUri();
         if (surl == null) {
@@ -1189,9 +1192,9 @@ public class DataSourceController extends DomNodeController {
                 mon.started();
                 mon.setProgressMessage("getting " + surl);
 
-                if (caching != null) {
-                    if (caching.satisfies(surl)) {
-                        caching.resetURI(surl);
+                if (cache1 != null) {
+                    if (cache1.satisfies(surl)) {
+                        cache1.resetURI(surl);
                         //trigger autorange
                         propertyChangeSupport.firePropertyChange(PROP_DATASOURCE, null, dataSource);
                         update(true, true);
@@ -1333,6 +1336,7 @@ public class DataSourceController extends DomNodeController {
         dom.controller.setStatus(string);
     }
 
+    @Override
     public String toString() {
         return this.dsf + " controller";
     }

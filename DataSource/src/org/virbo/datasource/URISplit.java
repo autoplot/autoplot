@@ -460,7 +460,11 @@ public class URISplit {
         } else {
             if ( ieq>-1 ) {
                 iquery = 0;
-                params= rsurl;
+                if ( rsurl.startsWith("file:///") ) { // old code used to insert file://, so we check for it here in case of old URIs.
+                    params= rsurl.substring(8);
+                } else {
+                    params= rsurl;
+                }
             } else {
                 iquery = rsurl.length();
                 fileEnd = rsurl.length();

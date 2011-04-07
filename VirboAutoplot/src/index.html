@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Das2 now have controls to have the ticks control tick length and direction, and the legend can now be outside the plot. 
+        <p><small>Recent entries submenu is replaced with a history dialog that has all URIs ever entered on a machine, and filtering.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -23,41 +23,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         
         <p>Bugfixes:</p>
         <ul>
+            <li>Minor bugfixes from production version</li>
+            <li>Feedback improvements from the production version</li>
             <li>"Enter data set..." message reimplemented using custom component to fix various problems associated with it.
-            <li>other small bugs
-            <li>bugfixes from production branch include improvements to Java CDF reader, supporting stride.
-<li>check for node SPASE/... in XML files instead of null pointer exception.
-        <ul>
-            <li>bugfix: c:/foo/xyz.dat would not parse properly due to recent change</li>
-            <li>bugfix 3158113: internationalization problem pointed out by RTE </li>
-            <li>bugfix 3075919: spectrogram not properly bound to colorbar after moving</li>
-            <li>bugfix 3075644:	Null pointer exception with URI found by Bob.</li>
-            <li>bugfix: uniqValues rename from uniq, because unlike the IDL function, this returns the values not the indeces.</li>
-            <li>bugfix: Java CDF reader updated to handle same as C CDF reader.</li>
-            <li>bugfix 3235447:	dropped VALID_MIN VALID_MAX in cdf reader</li>
-            <li>bugfix 3179062: aggregation drops valid_min and valid_max properties
-            <li>bugfix 3232976:	Themis spectrograms fail <li>
-            <li>bugfix: slice label would not be indicated when slice was bundle.</li>
-            <li>bugfix 3219772:	strange null pointer exception with aggr in v2010_5<li>
-            <li>bugfix 3201828: File->New Window would cause script context to plot to new window, should be left alone.
-            <li>bugfix 3158110: QDataSet das2 fails to plot H0_SOPA_ESP (RTE report)
-            <li>RuntimeExceptions resulting from file not found handled with a friendlier dialog.</li>
-        </ul>
-        <p>Less recent bugfixes:</p>
-        <ul>
-            <li>bugfix: vap+inline:ripples(30,30) would insert "file:///" when parsing and formatting URI.  This is cleaned up.
-            <li>update to the newest version of the Java CDF library, which fixes support for INT1 and INT2.
-            <li>stride properly supported in the Java CDF library.
-            <li>rank 4 variables supported in Java CDF library.
-            <li>column-major CDF files properly supported in Java CDF library.
-            <li>interpmeta=false will throw out DEPEND_1, DEPEND_2, and DEPEND_3 (twins imager files).
-            <li>set timeout on remote bookmarks.  A down server would hang Autoplot.
-            <li>links on help pages fixed to go to anchors on http://autoplot.org/help .
-            <li>Rank 2 Y tags supported in spectrogram (e.g. fa_k0_ees_19980111_v01.cdf).
-            <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3180942&group_id=199733&atid=970682">3180942</a> look and feel is native by default, --nativeLAF=false will disable
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Recent entries submenu replaced with history dialog.</li> 
             <li>Allow ticks to go inward and labels to be outside of plot box.  (This is not yet in the DOM, so won't be saved.)
             <li>AutoplotDataServer serves URIs as das2streams and QStreams
             <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3169744&group_id=199733&atid=970685">3169744</a> aggregation/TimeSeriesBrowse of data without time axes

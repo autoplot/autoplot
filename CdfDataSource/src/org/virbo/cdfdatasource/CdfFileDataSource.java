@@ -470,6 +470,8 @@ public class CdfFileDataSource extends AbstractDataSource {
             uc= UnitsConverter.IDENTITY;
         } else if ( u==Units.cdfEpoch ) {
             uc= UnitsConverter.IDENTITY;
+        } else if ( pu==Units.microseconds && u==Units.us2000 ) { // epoch16
+            uc= UnitsConverter.IDENTITY;
         } else {
             uc= UnitsConverter.getConverter( pu, u );
         }

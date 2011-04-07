@@ -62,15 +62,20 @@ public class DateTimeDatumFormatter extends DatumFormatter {
         
         // calculate the scale between successive datums.
         int scale;
-        double width= datums.get(1).subtract(datums.get(0)).doubleValue(Units.microseconds);
-        if ( width>=60e6 ) {
-            scale= TimeUtil.MINUTE;
-        } else if ( width>=1e6 ) {
-            scale= TimeUtil.SECOND;
-        } else if ( width>=1e3 ) {
-            scale= TimeUtil.MILLI;
-        } else {
+        double width;
+        if ( datums.getLength()<2 ) {
             scale= TimeUtil.MICRO;
+        } else {
+            width= datums.get(1).subtract(datums.get(0)).doubleValue(Units.microseconds);
+            if ( width>=60e6 ) {
+                scale= TimeUtil.MINUTE;
+            } else if ( width>=1e6 ) {
+                scale= TimeUtil.SECOND;
+            } else if ( width>=1e3 ) {
+                scale= TimeUtil.MILLI;
+            } else {
+                scale= TimeUtil.MICRO;
+            }
         }
         
         TimeDatumFormatter delegate= TimeDatumFormatter.formatterForScale(scale, context);
