@@ -48,6 +48,7 @@ import org.virbo.datasource.AutoplotSettings;
 public class RecentUrisGUI extends javax.swing.JPanel {
 
     String selectedURI=null;
+    boolean empty= false;
 
     /** Creates new form RecentUrisGUI */
     public RecentUrisGUI() {
@@ -145,37 +146,39 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                 String midnight= tp.format( Units.t1970.createDatum(0).subtract( tzOffsetMs,Units.milliseconds ),
                         null );
                 final File f3 = new File(f2, "history.txt");
-                Scanner scan = new Scanner(f3);
-                while (scan.hasNextLine()) {
-                    String line = scan.nextLine();
-                    String[] ss= line.split("\\s+",2);
-                    try {
-                        if ( filt!=null && !ss[1].contains(filt) ) {
-                            continue;
-                        }
-                        if ( ss[0].compareTo( midnight )>0 || !scan.hasNextLine() ) {
-                            if ( !scan.hasNextLine() ) {
-                                daysURIs.remove( ss[1] );
-                                daysURIs.put( ss[1], ss[0] );
+                if ( f3.exists()&&f3.canRead() ) {
+                    Scanner scan = new Scanner(f3);
+                    while (scan.hasNextLine()) {
+                        String line = scan.nextLine();
+                        String[] ss= line.split("\\s+",2);
+                        try {
+                            if ( filt!=null && !ss[1].contains(filt) ) {
+                                continue;
                             }
-                            Datum tlocal= null;
-                            for ( Iterator<String> ii= daysURIs.keySet().iterator(); ii.hasNext(); ) {
-                                String uri= ii.next();
-                                tlocal= tp.parse(daysURIs.get(uri)).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
-                                uris.put( tlocal, new String[] { tp.format(tlocal,null), uri } );
+                            if ( ss[0].compareTo( midnight )>0 || !scan.hasNextLine() ) {
+                                if ( !scan.hasNextLine() ) {
+                                    daysURIs.remove( ss[1] );
+                                    daysURIs.put( ss[1], ss[0] );
+                                }
+                                Datum tlocal= null;
+                                for ( Iterator<String> ii= daysURIs.keySet().iterator(); ii.hasNext(); ) {
+                                    String uri= ii.next();
+                                    tlocal= tp.parse(daysURIs.get(uri)).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
+                                    uris.put( tlocal, new String[] { tp.format(tlocal,null), uri } );
+                                }
+                                daysURIs= new LinkedHashMap<String,String>();
+                                if ( tlocal==null ) tlocal= tp.parse(ss[0]).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
+                                midnight= tp.format( TimeUtil.nextMidnight( tlocal ).subtract(tzOffsetMs,Units.milliseconds), null );
                             }
-                            daysURIs= new LinkedHashMap<String,String>();
-                            if ( tlocal==null ) tlocal= tp.parse(ss[0]).getTimeDatum().add(tzOffsetMs,Units.milliseconds);
-                            midnight= tp.format( TimeUtil.nextMidnight( tlocal ).subtract(tzOffsetMs,Units.milliseconds), null );
-                        }
-                        daysURIs.remove( ss[1] );
-                        daysURIs.put( ss[1], ss[0] );
+                            daysURIs.remove( ss[1] );
+                            daysURIs.put( ss[1], ss[0] );
 
-                    } catch (ParseException ex) {
-                        Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ParseException ex) {
+                            Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
                 }
-
+                
                 skip= new boolean[8];
 
                 // remove empty elements.
@@ -188,11 +191,13 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                         skip[i]= false;
                     }
                 }
-
+                
                 if ( newListLen==0 ) {
+                    empty= true; // we'll print a nice message
                     newListLen= 1;
-                    skip[0] = false;
+                    skip[0]= false;
                 }
+
                 DatumRange[] newlist = new DatumRange[newListLen];
                 int j=0;
                 for ( int i=0; i<list.length; i++ ) {
@@ -202,7 +207,7 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                     }
                 }
                 list= newlist;
-                
+
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(RecentUrisGUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -217,7 +222,11 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
         public Object getChild( Object parent, int index ) {
             if ( parent==root ) {
-                return list[index];
+                if ( empty ) {
+                    return "no items in history";
+                } else {
+                    return list[index];
+                }
             }else if (parent instanceof DatumRange) {
                 DatumRange range = (DatumRange)parent;
                 SortedMap<Datum,String[]> submap = uris.subMap(range.min(), range.max());
