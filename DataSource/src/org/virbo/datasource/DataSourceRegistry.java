@@ -447,7 +447,7 @@ public class DataSourceRegistry {
                     DataSourceFactory dsf=  getSource(".cdfj");
                     if ( dsf!=null ) {
                         dataSourcesByExt.put( extension, dsf ); //TODO: kludge for CDF
-                        dataSourceEditorByExt.remove( extension );
+                        dataSourceEditorByExt.put( extension, getDataSourceEditorByExt(".cdfj") );
                         dataSourceFormatByExt.remove( extension );
                         return dsf;
                     } else {
