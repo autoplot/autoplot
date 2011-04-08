@@ -460,6 +460,9 @@ public class CdfUtil {
         } catch (Exception e) {
         }
 
+        if ( aAttr!=null ) {
+            System.err.println("herehere");
+        }
         for (int i = 0; i < v.length; i++) {
             Variable var = cdf.getVariable(v[i]);
 
@@ -601,13 +604,15 @@ public class CdfUtil {
                 }
 
                 if (deep) {
-                    if (catDesc != null) {
-                        logger.fine("get attribute " + catDesc.getName() + " entry for " + var.getName());
-                        scatDesc = String.valueOf(catDesc.toString());
+                    Object o= (Object) getAttribute( cdf, var.getName(), "CATDESC" );
+                    if ( o != null && o instanceof String ) {
+                        logger.fine("get attribute CATDESC entry for " + var.getName());
+                        scatDesc = (String)o ;
                     }
-                    if (varNotes!=null ) {
-                        logger.fine("get attribute " + varNotes.getName() + " entry for " + var.getName());
-                        svarNotes = String.valueOf(varNotes.toString());
+                    o=  getAttribute( cdf, var.getName(), "VAR_NOTES" );
+                    if ( o!=null  && o instanceof String ) {
+                        logger.fine("get attribute VAR_NOTES entry for " + var.getName());
+                        svarNotes = (String)o ;
                     }
                 }
 
