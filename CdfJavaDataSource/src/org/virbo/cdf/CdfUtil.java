@@ -460,9 +460,6 @@ public class CdfUtil {
         } catch (Exception e) {
         }
 
-        if ( aAttr!=null ) {
-            System.err.println("herehere");
-        }
         for (int i = 0; i < v.length; i++) {
             Variable var = cdf.getVariable(v[i]);
 
