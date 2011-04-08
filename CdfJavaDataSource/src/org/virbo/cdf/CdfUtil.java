@@ -18,9 +18,7 @@ import org.das2.datum.Units;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +31,6 @@ import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
-import org.virbo.dataset.WritableDataSet;
 import org.virbo.datasource.DataSourceUtil;
 
 /**
@@ -558,7 +555,7 @@ public class CdfUtil {
                             logger.fine("get attribute DEPEND_1 entry for " + var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             yMaxRec = yDependVariable.getNumberOfValues();
-                            if (yMaxRec == 0) {
+                            if (yMaxRec == 1) {
                                 yMaxRec = yDependVariable.getDimensions()[0] - 1;  //TODO: check
                             }
                             if ( dims.length>0 && (yMaxRec+1)!=dims[0] ) {
@@ -578,7 +575,7 @@ public class CdfUtil {
                             logger.fine("get attribute DEPEND_2 entry for " + var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             zMaxRec = zDependVariable.getNumberOfValues();
-                            if (zMaxRec == 0) {
+                            if (zMaxRec == 1) {
                                 zMaxRec = zDependVariable.getDimensions()[0] - 1; //TODO: check
                             }
                         }
@@ -594,7 +591,7 @@ public class CdfUtil {
                             logger.fine("get attribute DEPEND_3 entry for " + var.getName());
                             z1DependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             z1MaxRec = z1DependVariable.getNumberOfValues();
-                            if (z1MaxRec == 0) {
+                            if (z1MaxRec == 1) {
                                 z1MaxRec = z1DependVariable.getDimensions()[0] - 1; //TODO: check
                             }
                         }
@@ -603,23 +600,17 @@ public class CdfUtil {
                     //e.printStackTrace();
                 }
 
-                /*if (deep) {
-                    try {
-                        if (catDesc != null) {
-                            logger.fine("get attribute " + catDesc.getName() + " entry for " + var.getName());
-                            Entry entry = catDesc.getEntry(var);
-                            scatDesc = String.valueOf(entry.getData());
-                        }
-                        if (varNotes!=null ) {
-                            logger.fine("get attribute " + varNotes.getName() + " entry for " + var.getName());
-                            Entry entry = varNotes.getEntry(var);
-                            svarNotes = String.valueOf(entry.getData());
-                        }
-                    } catch (CDFException e) {
-                        //e.printStackTrace();
+                if (deep) {
+                    if (catDesc != null) {
+                        logger.fine("get attribute " + catDesc.getName() + " entry for " + var.getName());
+                        scatDesc = String.valueOf(catDesc.toString());
+                    }
+                    if (varNotes!=null ) {
+                        logger.fine("get attribute " + varNotes.getName() + " entry for " + var.getName());
+                        svarNotes = String.valueOf(varNotes.toString());
                     }
                 }
-                */
+
                 String desc = "" + var.getName();
                 if (xDependVariable != null) {
                     desc += "(" + xDependVariable.getName() + "=" + (xMaxRec + 1);
@@ -638,10 +629,10 @@ public class CdfUtil {
                 }
 
                 if (deep) {
-                    /*StringBuffer descbuf = new StringBuffer("<html><b>" + desc + "</b><br>");
+                    StringBuffer descbuf = new StringBuffer("<html><b>" + desc + "</b><br>");
 
                     StringBuffer sdims= new StringBuffer();
-                    String recDesc= CDFUtils.getStringDataType(var);
+                    String recDesc= ""+var.getType();
                     if ( dims!=null ) {
                         recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
                     }
@@ -662,7 +653,7 @@ public class CdfUtil {
                         dependent.put(var.getName(), descbuf.toString());
                     } else {
                         result.put(var.getName(), descbuf.toString());
-                    }*/
+                    }
                 } else {
                     if ( xDependVariable!=null ) {
                         dependent.put(var.getName(), desc);
