@@ -441,6 +441,21 @@ public class DataSourceRegistry {
                 throw new RuntimeException(ex);
             } catch (IllegalAccessException ex) {
                 throw new RuntimeException(ex);
+            } catch ( UnsatisfiedLinkError ex ) { // kludge in support to fall back to Java reader if the C-based one is not found.
+                if ( extension.equals(".cdf") ) {
+                    System.err.println("attempting to use java based reader to handle cdf.");
+                    DataSourceFactory dsf=  getSource(".cdfj");
+                    if ( dsf!=null ) {
+                        dataSourcesByExt.put( extension, dsf ); //TODO: kludge for CDF
+                        dataSourceEditorByExt.remove( extension );
+                        dataSourceFormatByExt.remove( extension );
+                        return dsf;
+                    } else {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    throw new RuntimeException(ex);
+                }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
