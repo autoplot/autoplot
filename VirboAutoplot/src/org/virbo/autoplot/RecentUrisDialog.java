@@ -92,6 +92,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         plotButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Recent History");
 
         jLabel1.setText("Filter:");
         jLabel1.setToolTipText("Filter URIs with free text, as in 'vap+cdf:'");
