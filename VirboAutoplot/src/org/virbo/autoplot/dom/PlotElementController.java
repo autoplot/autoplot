@@ -1420,6 +1420,9 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
             }
 
+        } else if ( spec==RenderType.digital ) {  // rank
+            return;
+
         } else {
 
             QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
@@ -1622,7 +1625,9 @@ public class PlotElementController extends DomNodeController {
                 yunits = SemanticOps.getUnits( fillDs );
                 depend0= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             }
- 
+
+            if ( fillDs.rank()==0 ) return true;
+
             QDataSet xds= depend0;
             if (xds == null) {
                 xds = DataSetUtil.indexGenDataSet(fillDs.length());
