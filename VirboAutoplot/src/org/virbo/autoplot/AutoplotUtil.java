@@ -67,6 +67,7 @@ import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.dataset.RankZeroDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 import org.virbo.dsutil.AutoHistogram;
 import org.w3c.dom.Document;
@@ -1066,6 +1067,9 @@ public class AutoplotUtil {
             } else {
                 spec = RenderType.spectrogram;
             }
+        } else if ( fillds.rank()==0 || fillds.rank()==1 && SemanticOps.isBundle(fillds) ) {
+            spec= RenderType.digital;
+
         } else {
             if (fillds.length() > 80000) {
                 spec = RenderType.hugeScatter;
