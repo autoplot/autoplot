@@ -56,7 +56,17 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         jTree1.setModel(new MyTreeModel());
         jTree1.setCellRenderer( new MyCellRenderer() );
         Object r= jTree1.getModel().getRoot();
-        jTree1.expandPath( new TreePath( new Object[] { r, jTree1.getModel().getChild( r,0 ) } ) );
+
+        // show >30 URIs if possible
+        int c=0; //URIS
+        int i=0; //index
+        final int SHOW_URIS=30;
+        TreeModel jt= jTree1.getModel();
+        while ( i<jt.getChildCount(jt.getRoot()) && c<SHOW_URIS ) {
+            jTree1.expandPath( new TreePath( new Object[] { r, jt.getChild( r,i ) } ) );
+            c+= jt.getChildCount(i);
+            i++;
+        }
         jTree1.addTreeSelectionListener( new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                 Object o= e.getPath().getLastPathComponent();
