@@ -18,7 +18,11 @@ import java.util.regex.Pattern;
  * = well-formed URIs =
  *   <vapScheme>:<fileResource>?<params>
  *   <vapScheme>:[<identifier>?]<params>
+ *   <vapScheme>:<params>
  *   * they are valid URIs: they contain no spaces, etc.
+ * == params ==
+ *   ampersand-delimited (&) list of name=value pairs, or just value.
+ *   vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01
  * = colloquial URIs =
  *   * these are Strings that can be converted into URIs.
  *   * spaces in file names are converted into %20. 
@@ -70,17 +74,17 @@ public class URISplit {
     public String params;
 
     /**
-     * contains the part indicating additional processing to be done on the dataset.  (Not implemented, but it's coming.
+     * additional processes to be applied to the URI.  For example, slice0(0) means slice the dataset at this point.
      */
-    public String process;
+    public String sprocess;
 
     /**
-     * position of the carot after modifications to the surl are made.  This
+     * position of the caret after modifications to the surl are made.  This
      * is with respect to surl, the URI for the datasource, without the "vap" scheme.
      */
     public int resourceUriCarotPos;
     /**
-     * position of the carot after modifications to the surl are made.  This
+     * position of the caret after modifications to the surl are made.  This
      * is with respect to formatted URI, which probably includes the explicit "vap:" scheme.
      */
     public int formatCarotPos;
@@ -95,20 +99,20 @@ public class URISplit {
      * add "file:/" to a resource string that appears to reference the local filesystem.
      * return the parsed string, or null if the string doesn't appear to be from a file.
      * @param surl
-     * @param carotPos
+     * @param caretPos
      * @return null or the URISplit
      */
-    public static URISplit maybeAddFile(String surl, int carotPos) {
+    public static URISplit maybeAddFile(String surl, int caretPos) {
         URISplit result = new URISplit();
 
         if (surl.length() == 0) {
             surl = "file:///";
-            carotPos = surl.length();
+            caretPos = surl.length();
             result.surl = surl;
             result.vapScheme = "vap";
             result.implicitVap= true;
-            result.resourceUriCarotPos = carotPos;
-            result.formatCarotPos = carotPos + 4;
+            result.resourceUriCarotPos = caretPos;
+            result.formatCarotPos = caretPos + 4;
         }
 
         String scheme;  // identify a scheme, if any.  This might be vap+foo:, or http:
@@ -127,21 +131,21 @@ public class URISplit {
             if (scheme.equals("vap+internal")) { // leave the resourcePart alone. TODO: jdbc and other non-file URIs.
                 result.surl= resourcePart;
             } else {
-                URISplit resourceSplit = maybeAddFile(resourcePart, carotPos - (i0 + 1));  //TODO: jdbc and vap+inline
+                URISplit resourceSplit = maybeAddFile(resourcePart, caretPos - (i0 + 1));  //TODO: jdbc and vap+inline
                 if ( resourceSplit==null ) {
                     result.surl= resourcePart;
                     result.file= "";
-                    result.formatCarotPos= carotPos;
+                    result.formatCarotPos= caretPos;
                 } else {
                     result.surl = resourceSplit.surl;
-                    result.formatCarotPos = (carotPos > i0) ? resourceSplit.resourceUriCarotPos + (i0 + 1) : carotPos;
+                    result.formatCarotPos = (caretPos > i0) ? resourceSplit.resourceUriCarotPos + (i0 + 1) : caretPos;
                     result.resourceUriCarotPos = result.formatCarotPos - (scheme.length() + 1); // with respect to resource part.
                 }
             }
 
         } else {
             result.surl = surl;
-            result.resourceUriCarotPos = carotPos;
+            result.resourceUriCarotPos = caretPos;
         }
 
         if (scheme.equals("")) {
@@ -366,7 +370,7 @@ public class URISplit {
     }
 
     /**
-     * split the url string into components, keeping track of the carot position
+     * split the url string into components, keeping track of the caret position
      * when characters are inserted.  This does not try to identify
      * the vap scheme, since that might require interaction with the server to
      * get mime type.  This inserts the scheme "file://" when the scheme is 
@@ -380,25 +384,25 @@ public class URISplit {
      *   ext, the extenion, .nc
      *   params, myVariable or null
      * @param surl  the string to parse
-     * @param resourceUriCarotPos the position of the carot, the relative position will be preserved through normalization in formatCarotPos
+     * @param resourceUriCarotPos the position of the caret, the relative position will be preserved through normalization in formatCaretPos
      * @param normalize normalize the surl by adding implicit "vap", etc.
      */
-    public static URISplit parse( String surl, int carotPos , boolean normalize) {
+    public static URISplit parse( String surl, int caretPos , boolean normalize) {
 
-        Logger.getLogger("virbo.dataset").log( Level.FINE, "URISplit.parse(\"$0\",$1,$2)", new Object[] { surl, ""+carotPos, ""+normalize } );
+        Logger.getLogger("virbo.dataset").log( Level.FINE, "URISplit.parse(\"$0\",$1,$2)", new Object[] { surl, ""+caretPos, ""+normalize } );
 
-        if ( surl.startsWith("file:/") && surl.endsWith(":") && surl.length()<11 && surl.charAt(surl.length()-3)=='/' ) { // kludge for file:///c:<CAROT> on Windows.
-            if ( carotPos==surl.length() ) carotPos++;
+        if ( surl.startsWith("file:/") && surl.endsWith(":") && surl.length()<11 && surl.charAt(surl.length()-3)=='/' ) { // kludge for file:///c:<CARET> on Windows.
+            if ( caretPos==surl.length() ) caretPos++;
             surl= surl+"/";
         }
 
-        URISplit result = maybeAddFile(surl, carotPos);
+        URISplit result = maybeAddFile(surl, caretPos);
 
         if ( result==null ) {
             result= new URISplit();
             result.surl= surl;
             result.vapScheme= "";
-            result.formatCarotPos= carotPos;
+            result.formatCarotPos= caretPos;
             return result;
         }
         if ( "vap+internal".equals(result.vapScheme) ) result.file=""; // non-files will get "" for the file, and this should too.
@@ -679,6 +683,6 @@ public class URISplit {
     }
 
     public String toString() {
-        return "\nvapScheme: " + vapScheme + "\nscheme: " + scheme + "\nresourceUri: " + resourceUri + "\npath: " + path + "\nfile: " + file + "\next: " + ext + "\nparams: " + params + "\nsurl: " + surl + "\ncarotPos: " + resourceUriCarotPos + "\nformatCarotPos: " + formatCarotPos;
+        return "\nvapScheme: " + vapScheme + "\nscheme: " + scheme + "\nresourceUri: " + resourceUri + "\npath: " + path + "\nfile: " + file + "\next: " + ext + "\nparams: " + params + "\nsurl: " + surl + "\ncaretPos: " + resourceUriCarotPos + "\nformatCarotPos: " + formatCarotPos;
     }
 }

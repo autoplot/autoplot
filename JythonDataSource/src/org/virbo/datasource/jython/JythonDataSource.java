@@ -103,7 +103,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         QDataSet res;
 
         if (result instanceof PyList) {
-            res = JythonOps.coerce((PyList) result);
+            res = JythonOps.coerceToDs((PyList) result);
         } else {
             res = (QDataSet) result.__tojava__(QDataSet.class);
         }
@@ -255,7 +255,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
             QDataSet res;
             if (result instanceof PyList) {
-                res = JythonOps.coerce((PyList) result);
+                res = JythonOps.coerceToDs((PyList) result);
             } else {
                 res = (QDataSet) result.__tojava__(QDataSet.class);
             }

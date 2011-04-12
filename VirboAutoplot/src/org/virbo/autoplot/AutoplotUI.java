@@ -1192,7 +1192,6 @@ public class AutoplotUI extends javax.swing.JFrame {
         statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()-2f));
         statusLabel.setText("starting...");
         statusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 statusLabelMouseClicked(evt);
             }
@@ -1208,7 +1207,6 @@ public class AutoplotUI extends javax.swing.JFrame {
         bindingGroup.addBinding(binding);
 
         statusTextField.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 statusTextFieldMouseClicked(evt);
             }
@@ -1564,6 +1562,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
 
         CSH.setHelpIDString(autoplotHelpMenuItem, "aphelp_main");
+        autoplotHelpMenuItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
         autoplotHelpMenuItem.setText("Help Contents...");
         autoplotHelpMenuItem.setToolTipText("Start up help system");
         autoplotHelpMenuItem.addActionListener(new java.awt.event.ActionListener() {

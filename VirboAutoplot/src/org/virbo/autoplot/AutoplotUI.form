@@ -427,6 +427,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="autoplotHelpMenuItem">
               <Properties>
+                <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
+                  <KeyStroke key="F1"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Help Contents..."/>
                 <Property name="toolTipText" type="java.lang.String" value="Start up help system"/>
               </Properties>
