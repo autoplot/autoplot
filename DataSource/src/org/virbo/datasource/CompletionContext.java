@@ -164,7 +164,15 @@ public class CompletionContext {
         } else if ( context==CONTEXT_PARAMETER_NAME || context==CONTEXT_PARAMETER_VALUE ) {
             int i0= cc.surl.lastIndexOf('&',cc.surlpos-1);
             int i1= cc.surl.lastIndexOf('?',cc.surlpos);
-            i0= Math.max( i0,i1 );
+            if ( i0==-1 && i1==-1 ) {
+                // handle URIs that don't have file component like "vap+cdaweb:ds=a<C>"
+                int i3= cc.surl.indexOf(":",4);
+                if ( cc.surl.startsWith("vap") && i3>0 ) {
+                    i0= i3;
+                }
+            } else {
+                i0= Math.max( i0,i1 );
+            }
             if ( i0==-1 ) return null;
             i1= cc.surl.indexOf('&',i0+1);
             if ( i1==-1 ) i1= cc.surl.length();
@@ -208,7 +216,15 @@ public class CompletionContext {
             
             int i0= cc.surl.lastIndexOf('&',cc.surlpos-1);
             int i1= cc.surl.lastIndexOf('?',cc.surlpos-1);
-            i0= Math.max( i0,i1 );
+            if ( i0==-1 && i1==-1 ) {
+                // handle URIs that don't have file component like "vap+cdaweb:ds=a<C>"
+                int i3= cc.surl.indexOf(":",4);
+                if ( cc.surl.startsWith("vap") && i3>0 ) {
+                    i0= i3;
+                }
+            } else {
+                i0= Math.max( i0,i1 );
+            }
             if ( i0==-1 ) return null;
             i1= cc.surl.indexOf('&',i0+1);
             if ( i1==-1 ) i1= cc.surl.length();

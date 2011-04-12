@@ -592,25 +592,18 @@ public class DataSetSelector extends javax.swing.JPanel {
 
             public void run() {
 
-                List<CompletionContext> exts= DataSourceRegistry.getPlugins();
-
-                List<CompletionResult> completions = new ArrayList();
-
-                String prefix= surl.substring(0,carotpos);
-                String suffix = "";
-                if ( surl.startsWith("vap:") ) {
-                    suffix= surl.substring( 4 );
-                }
-
-                for ( CompletionContext cc: exts ) {
-                    if ( cc.completable.startsWith(prefix) ) {
-                        completions.add( new CompletionResult( cc.completable + suffix, cc.completable, null, cc.completable, false ) );
-                    }
-                }
-
                 String labelPrefix= "";
+                List<CompletionResult> completions;
+                try {
+                    completions = DataSetURI.getTypesCompletions(surl, carotpos, getMonitor());
+                    showCompletionsGui( labelPrefix, completions );
+                } catch (Exception ex) {
+                    Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
 
-                showCompletionsGui( labelPrefix, completions );
+                
             }
         } );
 
@@ -633,7 +626,9 @@ public class DataSetSelector extends javax.swing.JPanel {
                 URISplit split = URISplit.parse(surl);
                 String surlDir = split.path;
 
-                final String labelPrefix = surlDir;
+                boolean hasScheme= split.scheme!=null;
+
+                final String labelPrefix = ( surlDir == null ? "" : surlDir );
 
                 try {
                     completions = DataSetURI.getHostCompletions(surl, carotpos, mon);
@@ -644,8 +639,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                 }
 
                 String doHost= surl.substring(0,carotpos);
-                if ( doHost.endsWith(".gov") || doHost.endsWith(".edu")
-                        || doHost.endsWith(".com") || doHost.endsWith(".net") ) {
+                if ( hasScheme && ( doHost.endsWith(".gov") || doHost.endsWith(".edu")
+                        || doHost.endsWith(".com") || doHost.endsWith(".net") ) ) {
                     CompletionResult extra= new CompletionResult(doHost+"/", "explore this host");
                     boolean haveIt= false;
                     for ( int i=0; i<completions.size(); i++ ) {

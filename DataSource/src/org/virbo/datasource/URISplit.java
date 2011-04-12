@@ -131,6 +131,7 @@ public class URISplit {
                 if ( resourceSplit==null ) {
                     result.surl= resourcePart;
                     result.file= "";
+                    result.formatCarotPos= carotPos;
                 } else {
                     result.surl = resourceSplit.surl;
                     result.formatCarotPos = (carotPos > i0) ? resourceSplit.resourceUriCarotPos + (i0 + 1) : carotPos;

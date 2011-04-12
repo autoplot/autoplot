@@ -715,7 +715,23 @@ public class DataSetURI {
         }
     }
 
+    /**
+     * this is never used in the application code.  It must be left over from an earlier system.
+     * @param surl
+     * @param carotpos
+     * @param mon
+     * @return
+     * @throws Exception
+     */
     public static List<CompletionResult> getCompletions(final String surl, final int carotpos, ProgressMonitor mon) throws Exception {
+        if ( carotpos==0 || (
+                !surl.substring(0,carotpos).contains(":")
+                && ( carotpos<4 && surl.substring(0, carotpos).equals( "vap".substring(0,carotpos ) )
+                || ( surl.length()>3 && surl.substring(0, 3).equals( "vap" ) ) ) ) ) {
+            return getTypesCompletions( surl, carotpos, mon );
+        }
+
+
         URISplit split = URISplit.parse(surl, carotpos, true);
         if (split.file == null || (split.resourceUriCarotPos > split.file.length()) && DataSourceRegistry.getInstance().hasSourceByExt(DataSetURI.getExt(surl))) {
             return getFactoryCompletions(URISplit.format(split), split.formatCarotPos, mon);
@@ -745,10 +761,21 @@ public class DataSetURI {
 
         mon.setLabel("getting list of cache hosts");
 
+        String[] s;
+
+        if ( split.scheme==null ) {
+            List<DataSetURI.CompletionResult> completions = new ArrayList<DataSetURI.CompletionResult>();
+            s= new String[] { "ftp://", "http://", "https://", "file:///", "sftp://",  };
+            for (int j = 0; j < s.length; j++) {
+                completions.add(new DataSetURI.CompletionResult( s[j] + surl + "/", s[j] + surl + "/" ) );
+            }
+            return completions;
+        }
+            
         File cacheF = new File(FileSystem.settings().getLocalCacheDir(), split.scheme);
 
         if (!cacheF.exists()) return Collections.emptyList();
-        String[] s = cacheF.list();
+        s = cacheF.list();
 
         boolean foldCase = true;
         if (foldCase) {
@@ -1009,13 +1036,41 @@ public class DataSetURI {
         return completions;
     }
 
+    public static List<CompletionResult> getTypesCompletions( String surl, int carotpos, ProgressMonitor mon) throws Exception {
+
+        List<CompletionContext> exts= DataSourceRegistry.getPlugins();
+
+        List<CompletionResult> completions = new ArrayList();
+
+        String prefix= surl.substring(0,carotpos);
+        String suffix = "";
+        if ( surl.startsWith("vap:") ) {
+            suffix= surl.substring( 4 );
+        }
+
+        for ( CompletionContext cc: exts ) {
+            if ( cc.completable.startsWith(prefix) ) {
+                completions.add( new CompletionResult( cc.completable + suffix, cc.completable, null, cc.completable, false ) );
+            }
+        }
+
+        String labelPrefix= "";
+
+        return completions;
+    }
+
     public static List<CompletionResult> getFactoryCompletions(String surl1, int carotPos, ProgressMonitor mon) throws Exception {
         CompletionContext cc = new CompletionContext();
+
+        URISplit split = URISplit.parse(surl1);
+
         int qpos = surl1.lastIndexOf('?', carotPos);
         if ( qpos==-1 && surl1.contains(":") && ( surl1.endsWith(":") || surl1.contains("&") ) ) {
             qpos= surl1.indexOf(":");
         }
-
+        if ( qpos==-1  && surl1.contains(":") && split.file==null ) {
+            qpos= surl1.indexOf(":");
+        }
         cc.surl = surl1;
         cc.surlpos = carotPos; //resourceUriCarotPos
 
@@ -1042,6 +1097,7 @@ public class DataSetURI {
                 cc.completablepos = carotPos - (amppos + 1);
                 if (surl1.length() > carotPos && surl1.charAt(carotPos) != '&') {  // insert implicit "&"
                     surl1 = surl1.substring(0, carotPos) + '&' + surl1.substring(carotPos);
+                    split = URISplit.parse(surl1);
                 }
 
             }
@@ -1057,8 +1113,6 @@ public class DataSetURI {
             cc.completablepos = carotPos;
         }
 
-        URISplit split = URISplit.parse(surl1);
-
         if (cc.context == CompletionContext.CONTEXT_PARAMETER_NAME) {
 
             DataSourceFactory factory = getDataSourceFactory(getURIValid(surl1), new NullProgressMonitor());
@@ -1066,7 +1120,11 @@ public class DataSetURI {
                 throw new IllegalArgumentException("unable to find data source factory");
             }
 
-            URI uri = DataSetURI.getURIValid(CompletionContext.get(CompletionContext.CONTEXT_FILE, cc));
+            String suri= CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
+            if ( suri==null ) {
+                suri= cc.surl;
+            }
+            URI uri = DataSetURI.getURIValid(suri);
 
             cc.resourceURI= DataSetURI.getResourceURI(uri);
             cc.params = split.params;
@@ -1158,6 +1216,9 @@ public class DataSetURI {
                 mon.setProgressMessage("listing directory");
                 mon.started();
                 String surl = CompletionContext.get(CompletionContext.CONTEXT_FILE, cc);
+                if ( surl==null ) {
+                    throw new MalformedURLException("unable to process");
+                }
                 int surlPos= cc.surl.indexOf(surl);
                 if ( surlPos==-1 ) surlPos= 0;
                 int newCarotPos= carotPos - surlPos;

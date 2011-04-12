@@ -2,14 +2,16 @@ package org.autoplot.help;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.help.CSH;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.SwingHelpUtilities;
@@ -27,7 +29,7 @@ public class AutoplotHelpSystem {
     //This is the pathname used for all help EXCEPT main autplot help:
     private HelpSet mainHS;
     private HelpBroker broker;
-    private CSH.DisplayHelpFromSource helper;
+    //private CSH.DisplayHelpFromSource helper;
     
     private AutoplotHelpSystem(Component uiBase) {
         // custom viewer supports external web links
@@ -89,15 +91,15 @@ public class AutoplotHelpSystem {
             }
 
         }
-        broker = mainHS.createHelpBroker();
+    //    broker = mainHS.createHelpBroker();
 
         // Bind the F1 help key. The keystroke will percolate up the component hierarchy
         // until it reaches one that has had a helpID defined, allowing context sensitivity.
         // If it reaches root pane, dispaly default help.
-        broker.enableHelpKey(uiBase, "aphelp_main", mainHS);
+     //broker.enableHelpKey(uiBase, "aphelp_main", mainHS);
 
         // This is the actionListener used by displayHelpFromEvent
-        helper = new CSH.DisplayHelpFromSource(broker);
+        //helper = new CSH.DisplayHelpFromSource(broker);
         
     }
     
@@ -124,8 +126,37 @@ public class AutoplotHelpSystem {
      * @param c
      * @param helpID
      */
-    public void registerHelpID(Component c, String helpID) {
-       broker.enableHelp(c, helpID, mainHS);
+    public void registerHelpID( final Component c, final String helpID) {
+     //  broker.enableHelp(c, helpID, mainHS);
+
+        c.setFocusable(true);
+        
+       c.addKeyListener( new KeyListener() {
+
+            public void keyTyped(KeyEvent e) {
+            }
+
+            public void keyPressed(KeyEvent e) {
+            }
+
+            public void keyReleased(KeyEvent e) {
+                if ( e.getKeyCode()==KeyEvent.VK_F1 ) {
+                    Util.openBrowser( "http://autoplot.org/help#"+helpID );
+                    e.consume();
+                }
+            }
+        } );
+
+        c.addMouseListener( new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.err.println(e);
+                super.mouseClicked(e);
+                c.requestFocus();
+            }
+
+        });
     }
 
     /** A component action listener can pass the event here and the
@@ -133,13 +164,15 @@ public class AutoplotHelpSystem {
      * appropriate call has been made to <code>registerHelpID</code>.
      */
     public void displayHelpFromEvent(ActionEvent e) {
-        helper.actionPerformed(e);
+        //helper.actionPerformed(e);
+        Util.openBrowser( "http://autoplot.org/help" );
     }
 
     /** Display the help window with default page displayed */
     public void displayDefaultHelp() {
-        broker.setCurrentID("aphelp_main");
-        broker.setDisplayed(true);
+        //broker.setCurrentID("aphelp_main");
+        //broker.setDisplayed(true);
+        Util.openBrowser( "http://autoplot.org/help" );
     }
 
     /** Request another helpset be merged with the main help. This way, plugin
