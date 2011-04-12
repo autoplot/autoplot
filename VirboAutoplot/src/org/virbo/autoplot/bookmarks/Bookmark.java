@@ -177,7 +177,11 @@ public abstract class Bookmark {
             if ( remoteUrl!=null ) book.setRemoteUrl(remoteUrl);
 
             book.getBookmarks().addAll(contents);
+            for ( int i=0; i<contents.size(); i++ ) {
+                contents.get(i).setParent(book);
+            }
             return book;
+            
         } else {
             return null;
 
@@ -352,6 +356,19 @@ public abstract class Bookmark {
         propertyChangeSupport.firePropertyChange(PROP_ICON, oldIcon, icon);
     }
 
+    public static final String PROP_PARENT= "parent";
+    private Bookmark.Folder parent= null;
+
+    public Bookmark.Folder getParent() {
+        return parent;
+    }
+
+    public void setParent( Bookmark.Folder parent ) {
+        Bookmark.Folder old= this.parent;
+        this.parent= parent;
+        propertyChangeSupport.firePropertyChange( PROP_PARENT, old, parent );
+    }
+
     public abstract Bookmark copy();
 
     public static class Folder extends Bookmark {
@@ -400,7 +417,9 @@ public abstract class Bookmark {
 
         public boolean equals(Object obj) {
             if (obj instanceof Bookmark.Folder) {
-                return ((Bookmark.Folder) obj).bookmarks.equals(this.bookmarks);
+                Bookmark.Folder that= (Bookmark.Folder) obj;
+                return that.bookmarks.equals(this.bookmarks)
+                        && ( that.getParent()==null || that.getParent().equals(this.getParent()) );
             } else {
                 return false;
             }
@@ -450,7 +469,9 @@ public abstract class Bookmark {
 
         public boolean equals(Object obj) {
             if (obj instanceof Bookmark.Item) {
-                return ((Bookmark.Item) obj).url.equals(this.url);
+                Bookmark.Item that= (Bookmark.Item)obj;
+                return that.url.equals(this.url)
+                        && (that.getParent()==null || that.getParent().equals(this.getParent()) );
             } else {
                 return false;
             }

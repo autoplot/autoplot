@@ -134,10 +134,10 @@ try:
 except NameError:
    params=None
 
-if ( params==None ):
+if ( params==None or len(params)==0 ):
    params= showPngWalkInfoDialog()
 
-if ( params!=None ):
+if ( params!=None or len(params)==0 ):
 
    from org.das2.components import DasProgressPanel
 

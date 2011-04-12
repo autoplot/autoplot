@@ -6,6 +6,11 @@ package test.endtoend;
 
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.List;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.URISplit;
 
 /**
@@ -41,8 +46,23 @@ public class Test027 {
         out.println(split);
 
         out.close();
+
     }
-    
+
+    private static void doTestComp( int id, String uri ) throws Exception {
+        // test completions
+        for ( int i=0; i<uri.length(); i++ ) {
+            try {
+                System.err.print( uri.substring(0,i)+"<C>...");
+                List<CompletionResult> result= DataSetURI.getCompletions(uri.substring(0,i), i, new NullProgressMonitor() );
+                System.err.println( result.size() );
+            } catch ( Exception e ) {
+                System.err.println( e.getMessage() );
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static void main(String[] args)  {
         try {
 
@@ -64,6 +84,10 @@ public class Test027 {
             doTest( 13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_hyd/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09" );
             doTest( 14, "c:/Users/sarah/Desktop/x.vap" );
             
+            doTestComp( 100, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
+            doTestComp( 101, "Enter Data Set" );
+            doTestComp( 103, "papco@mrfrench.lanl.gov/" );
+
             System.exit(0);  // TODO: something is firing up the event thread
         } catch (Exception ex) {
             ex.printStackTrace();

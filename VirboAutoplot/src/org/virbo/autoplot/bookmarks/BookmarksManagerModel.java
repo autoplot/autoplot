@@ -295,6 +295,38 @@ public class BookmarksManagerModel {
         return null;
     }
 
+    Bookmark.Folder removeBookmarks( Bookmark.Folder folder, Bookmark book ) {
+        ArrayList<Bookmark> newList = new ArrayList<Bookmark>( folder.getBookmarks().size() );
+        for (Bookmark b : folder.getBookmarks() ) {
+            newList.add( (Bookmark) b.copy() );
+        }
+        for ( int i=0; i<newList.size(); i++  ) {
+            Bookmark bookmark= newList.get(i);
+            if ( bookmark.getTitle().contains("foo") ) {
+                System.err.println("jhere");
+            }
+            if ( bookmark instanceof Bookmark.Folder ) {
+                if ( bookmark.equals(book) ) {
+                    newList.set( i, null );
+                } else {
+//                    if ( book.getParent()==folder ) {
+                        bookmark= removeBookmarks( (Bookmark.Folder)bookmark, book );
+                        newList.set( i, bookmark );
+//                    }
+                }
+            } else {
+                if ( bookmark.equals(book) ) {
+                    newList.set( i, null );
+                }
+            }
+        }
+        newList.removeAll( Collections.singleton(null) );
+        Bookmark.Folder result= new Bookmark.Folder(folder.getTitle());
+        result.bookmarks= newList;
+
+        return result;
+    }
+
     void removeBookmarks(List<Bookmark> bookmarks) {
         ArrayList<Bookmark> newList = new ArrayList<Bookmark>(this.list.size());
         for (Bookmark b : this.list) {
@@ -304,16 +336,19 @@ public class BookmarksManagerModel {
             if (newList.contains(bookmark)) {
                 newList.remove(bookmark);
             } else {
-                for (Bookmark b : newList) {
-                    if (b instanceof Bookmark.Folder) {
-                        List<Bookmark> bs = ((Bookmark.Folder) b).getBookmarks();
-                        if (bs.contains(bookmark)) {
-                            bs.remove(bookmark);
-                        }
+                int i=0;
+                for (Bookmark b2 : newList) {
+                    if (b2 instanceof Bookmark.Folder) {
+                        b2= removeBookmarks( (Bookmark.Folder) b2, bookmark );
+                        newList.set( i, b2 );
+                    } else {
+                        newList.set( i, null );
                     }
+                    i++;
                 }
             }
         }
+        newList.removeAll( Collections.singleton(null) );
         setList(newList);
     }
 
