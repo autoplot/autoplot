@@ -80,7 +80,7 @@ public class InlineDataSource extends AbstractDataSource {
         PythonInterpreter interp = JythonUtil.createInterpreter(false);
 
         try {
-            PyObject result= interp.eval( linkCommand );
+            PyObject result= interp.eval( linkCommand ); //wha?
             QDataSet res = (QDataSet) result.__tojava__(QDataSet.class);
             return DataSetOps.makePropertiesMutable(res);
         } catch ( RuntimeException ex ) {
@@ -105,6 +105,7 @@ public class InlineDataSource extends AbstractDataSource {
                 }
                 bds.bundle(result);
             }
+            bds.putProperty( QDataSet.BUNDLE_1, null );
             return bds;
         } else {
            String[] ss2= ss[0].split(",");
