@@ -173,27 +173,22 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String df= getParam( "format", "" );
         int jj=0; // index into rank2 array
         for ( int i=0; i<bundleDesc.length(); i++ ) {
-            int nelements= 1;
-            for ( int k=0; k<bundleDesc.length(i); k++ ) {
-                nelements*= bundleDesc.value(i,k);
-            }
-            for ( int k=0; k<nelements; k++ ) {
-                uu[jj] = (Units) bundleDesc.property(QDataSet.UNITS,i);
-                if (uu[jj] == null) uu[jj] = Units.dimensionless;
-                if ( !( uu[jj] instanceof EnumerationUnits ) ) {
-                    if ( df.equals("") ) {
-                        formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
-                    } else {
-                        formats[jj]= getDataFormatter( df, uu[jj] );
-                    }
-                } else {
+            jj= i;
+            uu[jj] = (Units) bundleDesc.property(QDataSet.UNITS,i);
+            if (uu[jj] == null) uu[jj] = Units.dimensionless;
+            if ( !( uu[jj] instanceof EnumerationUnits ) ) {
+                if ( df.equals("") ) {
                     formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
+                } else {
+                    formats[jj]= getDataFormatter( df, uu[jj] );
                 }
-                if ( formats[jj] instanceof EnumerationDatumFormatter ) {
-                    //((EnumerationDatumFormatter)formats[i]).setAddQuotes(true);
-                }
-                jj++;
+            } else {
+                formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
             }
+            if ( formats[jj] instanceof EnumerationDatumFormatter ) {
+                //((EnumerationDatumFormatter)formats[i]).setAddQuotes(true);
+            }
+            jj++;
         }
 
         DatumFormatter tf= getTimeFormatter( getParam( "timeformat", "ISO8601" ) );
