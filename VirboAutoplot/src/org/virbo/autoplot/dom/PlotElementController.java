@@ -567,7 +567,7 @@ public class PlotElementController extends DomNodeController {
                     try {
                         QDataSet fillDs2 = fillDs;
                         String comp= plotElement.getComponent();
-                        if ( comp.length()>0 ) processDataSet( plotElement.getComponent(), fillDs2 );
+                        if ( comp.length()>0 ) fillDs2= processDataSet( comp, fillDs2 );
                         RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                         resetPlotElement(fillDs2, renderType);
@@ -792,7 +792,7 @@ public class PlotElementController extends DomNodeController {
             //boolean lastDimBundle= isLastDimBundle( fillDs );
             //boolean joinOfBundle= fillDs.property(QDataSet.JOIN_0)!=null && lastDimBundle;
             int ndim= Ops.dimensionCount(fillDs);
-            boolean shouldSlice= ndim>3 && plotElement.isAutoComponent();
+            boolean shouldSlice= ( fillDs.rank()>2 && ndim>3 && plotElement.isAutoComponent() );
 
             boolean shouldHaveChildren= fillDs.rank() == 2
                     &&  ( renderType != RenderType.spectrogram 
