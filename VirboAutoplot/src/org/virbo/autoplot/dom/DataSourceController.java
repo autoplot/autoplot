@@ -6,6 +6,7 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.text.ParseException;
@@ -1102,7 +1103,7 @@ public class DataSourceController extends DomNodeController {
             setDataSet(null);
             setStatus("operation cancelled");
         } catch (IOException e ) {
-            if ( e.getMessage().contains("No such file") || e.getMessage().contains("timed out") ) {
+            if ( e instanceof FileNotFoundException || e.getMessage().contains("No such file") || e.getMessage().contains("timed out") ) {
                 String message= e.getMessage();
                 if ( message.startsWith("550 ") ) {
                     message= message.substring(4);
