@@ -456,10 +456,10 @@ public class PlotElementController extends DomNodeController {
             return;
         }
 
-        String c= plotElement.getComponent();
+        String comp= plotElement.getComponent();
         try {
             if ( fillDs!=null ) {
-                fillDs = processDataSet(c, fillDs );
+                if ( comp.length()>0 ) fillDs = processDataSet(comp, fillDs );
                 if ( checkUnits && doUnitsCheck( fillDs ) ) { // bug 3104572: slicing would drop units, so old vaps wouldn't work
                     Plot plot= this.dom.getController().getPlotFor(plotElement);
                     PlotController pc= plot.getController();
@@ -565,7 +565,9 @@ public class PlotElementController extends DomNodeController {
                     setResetPlotElement(false);
                 } else if ( plotElement.getComponent().startsWith("|") ) {
                     try {
-                        QDataSet fillDs2 = processDataSet( plotElement.getComponent(), fillDs );
+                        QDataSet fillDs2 = fillDs;
+                        String comp= plotElement.getComponent();
+                        if ( comp.length()>0 ) processDataSet( plotElement.getComponent(), fillDs2 );
                         RenderType renderType = AutoplotUtil.guessRenderType(fillDs2);
                         plotElement.renderType = renderType; // setRenderTypeAutomatically.  We don't want to fire off event here.
                         resetPlotElement(fillDs2, renderType);
@@ -1090,8 +1092,13 @@ public class PlotElementController extends DomNodeController {
 
         DataSourceController dsc= getDataSourceFilter().getController();
 
-        QDataSet fillDs = processDataSet( plotElement.getComponent(), getDataSourceFilter().controller.getFillDataSet() );
-        Map props= processProperties( plotElement.getComponent(), dsc.getFillProperties() ); //TODO: support components
+        QDataSet fillDs = getDataSourceFilter().controller.getFillDataSet();
+        Map props= dsc.getFillProperties();
+        String comp= plotElement.getComponent();
+        if ( comp.length()>0 ) {
+            fillDs = processDataSet( comp, fillDs );
+            props= processProperties( comp, props ); //TODO: support components
+        }
 
         if ( props==null ) {
             System.err.println("null properties in doResetRanges");
