@@ -121,6 +121,8 @@ public class PlotElement extends DomNode {
      * component names come from the dataset labels.  Canonical names are 
      * X, Y, Z, MAGNITUDE.  A use case to consider is automatic coordinate frame 
      * conversions.
+     * If this starts with a pipe (|), then this is an "sprocess" string to run on
+     * the data, such as "|slice0(0)" or "|histogram()"
      */
     protected String component="";
     public static final String PROP_COMPONENT = "component";
