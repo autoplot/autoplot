@@ -1065,7 +1065,11 @@ public class AutoplotUtil {
                     }
                 }
             } else {
-                spec = RenderType.spectrogram;
+                if ( dep1==null && fillds.rank()==2 && fillds.length()>3 && fillds.length(0)<4 ) { // Vector quantities without labels. [3x3] is a left a matrix.
+                    spec = RenderType.series;
+                } else {
+                    spec = RenderType.spectrogram;
+                }
             }
         } else if ( fillds.rank()==0 || fillds.rank()==1 && SemanticOps.isBundle(fillds) ) {
             spec= RenderType.digital;
