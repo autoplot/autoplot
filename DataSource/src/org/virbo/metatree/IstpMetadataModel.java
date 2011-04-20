@@ -195,9 +195,13 @@ public class IstpMetadataModel extends MetadataModel {
             // we need to distinguish between ms and epoch times.
             boolean isMillis=false;
             Object ovalidMax= meta.get("VALIDMAX");
-            if ( ovalidMax!=null && ovalidMax instanceof Number && units!=null && units==Units.milliseconds ) {
+            Object ovalidMin= meta.get("VALIDMIN");
+            if ( ovalidMax!=null && ovalidMin!=null 
+                    && ovalidMax instanceof Number && ovalidMin instanceof Number
+                    && units==Units.milliseconds ) {
                 double validMax= ((Number)ovalidMax).doubleValue();
-                isMillis= validMax < 1e12 ; 
+                double validMin= ((Number)ovalidMin).doubleValue();
+                isMillis= validMin<validMax && validMax < 1e12 ; // java cdf would get zeros for these  rbsp-b_HFR-waveform_emfisis-L1_20110405154808_v1.1.1.cdf?HFRsamples
             }
 
             boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
