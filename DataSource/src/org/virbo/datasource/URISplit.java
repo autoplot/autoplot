@@ -396,6 +396,14 @@ public class URISplit {
             surl= surl+"/";
         }
 
+        String[] popFront= new String[] { "http://autoplot.org/jnlp.cgi?", "http://autoplot.org/autoplot.jnlp?" };
+        for ( String s: popFront ) {
+            if ( surl.startsWith(s) ) {
+                surl= surl.substring(s.length());
+                caretPos= ( caretPos<s.length() ? 0 : caretPos-s.length() );
+            }
+        }
+
         URISplit result = maybeAddFile(surl, caretPos);
 
         if ( result==null ) {
