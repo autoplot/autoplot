@@ -1133,6 +1133,15 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
                 label = "x"; // hopefully transient
             }
             jTable1.getColumnModel().getColumn(i).setHeaderValue(label);
+
+            int nrow= jTable1.getRowCount();
+            Object o= jTable1.getValueAt(nrow-1,i);
+            String s= String.valueOf(o);
+            if ( s.length()>16 ) { // times
+                jTable1.getColumnModel().getColumn(i).setPreferredWidth(150);
+            } else if ( s.length()<5 ) {
+                jTable1.getColumnModel().getColumn(i).setPreferredWidth(50);
+            }
         }
         jTable1.getTableHeader().repaint();
 
