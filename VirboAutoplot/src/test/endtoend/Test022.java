@@ -5,6 +5,7 @@
 
 package test.endtoend;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,7 +69,8 @@ public class Test022 {
                     JoinDataSet ds= new JoinDataSet(2);
                     for ( int i=0; i<fillDs.length(); i++ ) {
                         QDataSet qds= fillDs.slice(i);
-                        ScriptContext.formatDataSet( fillDs, "/home/jbf/foo.qds" );
+                        String f= new File("foo.qds").getAbsolutePath().toString();
+                        ScriptContext.formatDataSet( fillDs, f );
                         ds.join((QDataSet)fillDs.property(QDataSet.DEPEND_1,i));
                     }
                     yds = ds;
