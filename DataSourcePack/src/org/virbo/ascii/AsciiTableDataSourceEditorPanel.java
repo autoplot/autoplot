@@ -890,10 +890,10 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
     public Map<Integer, String> getColumnNames() throws IOException {
 
-        String[] columns = parser.getFieldNames();
+        String[] lcolumns = parser.getFieldNames();
         Map<Integer, String> result = new LinkedHashMap<Integer, String>();
-        for (int i = 0; i < columns.length; i++) {
-            result.put(i, columns[i]);
+        for (int i = 0; i < lcolumns.length; i++) {
+            result.put(i, lcolumns[i]);
         }
         return result;
     }
