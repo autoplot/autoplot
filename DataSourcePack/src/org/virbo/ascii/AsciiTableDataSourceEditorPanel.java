@@ -453,6 +453,7 @@ public class AsciiTableDataSourceEditorPanel extends javax.swing.JPanel implemen
         jLabel4.setText("Depends On:");
         jLabel4.setToolTipText("Select the variable that is the independent parameter that Columns depends on.  Note ISO8601 times are handled, or use the \"times\" tab to specify a time format.\n");
 
+        dep0Columns.setEditable(true);
         dep0Columns.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         dep0Columns.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -1157,6 +1158,13 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
             
             model.setRecParser(p);
             columns = getColumnNames();
+
+            Map<String,String> xx= parser.getRichFields();
+            int ij= columns.size();
+            for ( Entry<String,String> s: xx.entrySet() ) {
+                columns.put( ij, s.getKey() );
+                ij= ij+1;
+            }
 
             updateColumns();
 
