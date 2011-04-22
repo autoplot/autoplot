@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -466,6 +467,61 @@ public class ApplicationModel {
         return bookmarks;
     }
 
+    /**
+     * record exceptions the same way we would record successful plots.
+     * Right now this only records exceptions for user=jbf...
+     * 
+     * @param surl the URI we were trying to plot.
+     * @param exx the exception we got instead.
+     */
+
+    public void addException( String surl, Exception exx ) {
+        try {
+            if ( !DasApplication.hasAllPermission() ) {
+                return;
+            }
+
+            if ( !( "jbf".equals( System.getProperty("user.name") ) ) ) {
+                return;
+            }
+
+            File f2= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "bookmarks/" );
+            if ( !f2.exists() ) {
+                boolean ok= f2.mkdirs();
+                if ( !ok ) {
+                    throw new RuntimeException("unable to create folder "+ f2 );
+                }
+            }
+
+            final File f3 = new File( f2, "exceptions.txt" );
+            FileWriter out3=null;
+            try {
+                out3 = new FileWriter( f3, true );
+                TimeParser tp= TimeParser.create( TimeParser.TIMEFORMAT_Z );
+                Datum now= Units.t1970.createDatum( System.currentTimeMillis()/1000. );
+                out3.append( "=== " + tp.format( now, null) + " ===\n" );
+                out3.append( surl + "\n" );
+                StringWriter sw= new StringWriter();
+                PrintWriter pw= new PrintWriter( sw );
+                exx.printStackTrace(pw);
+                out3.append( sw.toString() );
+                out3.append("\n");
+                out3.close();
+
+            } catch ( IOException ex ) {
+                ex.printStackTrace();
+                if ( out3!=null ) try {
+                    out3.close();
+                } catch (IOException ex1) {
+                    Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex1);
+                }
+            }
+        } catch ( Exception ex ) {
+            ex.printStackTrace(); // we really don't want to have another exception here...
+
+        }
+    }
+    
     public void addRecent(String surl) {
 
         if ( !DasApplication.hasAllPermission() ) {
