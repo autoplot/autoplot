@@ -5,6 +5,8 @@
 
 package test.endtoend;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Random;
 import java.util.logging.Level;
@@ -75,5 +77,90 @@ public class TestSupport {
         jds.join( qds );
         
         return jds;
+    }
+
+
+    /**
+     * run all tests.  This was introduced to allow running of all the tests so we could
+     * try to exercise as much code as possible without committing new changes.
+     */
+    public static void runAllTests() {
+        String[] args= new String[0];
+
+        try {
+            Method[] tests= new Method[] {
+                Test001.class.getMethod( "main",args.getClass()),
+                Test002.class.getMethod( "main",args.getClass()),
+                Test003.class.getMethod( "main",args.getClass()),
+                Test004.class.getMethod( "main",args.getClass()),
+                Test005.class.getMethod( "main",args.getClass()),
+                Test006.class.getMethod( "main",args.getClass()),
+                Test007.class.getMethod( "main",args.getClass()),
+                Test008.class.getMethod( "main",args.getClass()),
+                Test009.class.getMethod( "main",args.getClass()),
+                Test010.class.getMethod( "main",args.getClass()),
+                Test011.class.getMethod( "main",args.getClass()),
+                Test012.class.getMethod( "main",args.getClass()),
+                Test013.class.getMethod( "main",args.getClass()),
+                Test014.class.getMethod( "main",args.getClass()),
+                Test015.class.getMethod( "main",args.getClass()),
+                Test016.class.getMethod( "main",args.getClass()),
+                Test017.class.getMethod( "main",args.getClass()),
+                Test018.class.getMethod( "main",args.getClass()),
+                Test019.class.getMethod( "main",args.getClass()),
+                Test020.class.getMethod( "main",args.getClass()),
+                Test021.class.getMethod( "main",args.getClass()),
+                Test022.class.getMethod( "main",args.getClass()),
+                Test023.class.getMethod( "main",args.getClass()),
+                Test024.class.getMethod( "main",args.getClass()),
+                Test025.class.getMethod( "main",args.getClass()),
+                Test026.class.getMethod( "main",args.getClass()),
+                Test027.class.getMethod( "main",args.getClass()),
+                Test028.class.getMethod( "main",args.getClass()),
+                Test029.class.getMethod( "main",args.getClass()),
+                Test030.class.getMethod( "main",args.getClass()),
+                Test031.class.getMethod( "main",args.getClass()),
+                Test032.class.getMethod( "main",args.getClass()),
+            };
+
+            final SecurityManager securityManager = new SecurityManager() {
+                public void checkPermission(java.security.Permission permission) {
+                    if (permission.getName().startsWith("exitVM")) {
+                        throw new SecurityException(
+                                "System.exit calls not allowed: exit level "+permission.getName() );
+                    }
+                }
+            };
+            System.setSecurityManager(securityManager);
+
+            for ( int i=0; i<tests.length; i++ ) {                
+                Method m= tests[i];
+                long t0= System.currentTimeMillis();
+                System.err.println("running test "+i +" "+ m);
+                try {
+                    m.invoke( null, (Object) args );
+                } catch ( SecurityException ex ) {
+                    //expected to come here because we disable System.exit.
+                } catch (IllegalAccessException ex) {
+                    //Logger.getLogger(TestSupport.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalArgumentException ex) {
+                    //Logger.getLogger(TestSupport.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    
+                }
+
+                System.err.println("Okay: "+i + "  "+(System.currentTimeMillis()-t0)+" millis" );
+            }
+        } catch ( Exception ex ) {
+            throw new RuntimeException(ex);
+        }
+
+
+
+    }
+
+    public static void main( String[] args ) {
+        System.err.println("Run all tests...");
+        runAllTests();
     }
 }
