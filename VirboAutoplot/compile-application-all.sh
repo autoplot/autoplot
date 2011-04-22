@@ -153,6 +153,7 @@ if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 or
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/JythonMain.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/help/AutoplotHelpViewer.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotServer.java; then hasErrors=1; fi
+if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotDataServer.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/PngWalkTool1.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/ImageResize.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/autoplot/pngwalk/QualityControlPanel.java; then hasErrors=1; fi
@@ -160,6 +161,7 @@ if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 or
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/util/awt/*.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/endtoend/*.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/virbo/idlsupport/*.java; then hasErrors=1; fi
+#if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 test/util/filesystem/*.java; then hasErrors=1; fi
 if ! $JAVAC -target 1.5 -cp ../temp-classes:. -d ../temp-classes -Xmaxerrs 10 org/das2/system/NullPreferencesFactory.java; then hasErrors=1; fi
 
 cat ../temp-classes/META-INF/org.virbo.datasource.DataSourceFactory.extensions | cut -d' ' -f1
