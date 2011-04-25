@@ -69,6 +69,21 @@ public class Test030 {
 
     }
 
+    /**
+     * we had a bug caused by the * in L*.
+     * @throws Exception
+     */
+    private static void unbundleBug001() throws Exception {
+        System.err.println("=======================");
+        QDataSet ds2= Util.getDataSet( TestSupport.TEST_DATA + "dat/headers/CRRES_mod.txt?column=Lstar" );
+        System.err.println("=======================");
+        QDataSet ds1= Util.getDataSet( TestSupport.TEST_DATA + "dat/headers/CRRES_mod.txt?column=L" );
+        System.err.println("=======================");
+        System.err.println( ds1 );
+        System.err.println( ds2 );
+
+    }
+
     public static void main(String[] args) throws Exception  {
         try {
             doTestBundle( 0, TestSupport.TEST_DATA + "dat/headers/proton_density.dat?rank2" );
@@ -77,6 +92,8 @@ public class Test030 {
             doTest( 1, TestSupport.TEST_DATA + "dat/headers/proton_density.dat?column=Proton_Density" );
 
             doTestBundle( 2, TestSupport.TEST_DATA + "dat/headers/CRRES_mod.txt?rank2" );
+
+            unbundleBug001();
             
         } catch ( Exception ex ) {
             ex.printStackTrace();
