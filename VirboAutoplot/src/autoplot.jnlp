@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <!DOCTYPE jnlp PUBLIC "-//Sun Microsystems, Inc//DTD JNLP Discriptor 1.1//EN"
-"http://www.cottagesystems.com/lib/dtd/jnlp-1.5.dtd">
+"http://java.sun.com/dtd/JNLP-1.5.dtd">
 <jnlp 
     spec="1.0+" 
     codebase="http://autoplot.org/jnlp/#{tag}/"
     href="autoplot.jnlp">
-    
+   
     <information> 
         <title>Autoplot(#{tag})</title> 
         <vendor>http://virbo.org/</vendor>
