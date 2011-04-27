@@ -393,6 +393,32 @@ public class CdfUtil {
     }
 
     /**
+     * return the data type for the encoding.  From
+     * ftp://cdaweb.gsfc.nasa.gov/pub/cdf/doc/cdf33/cdf33ifd.pdf  page 33.
+     * @param type integer type, such as 44 for CDF_FLOAT
+     * @return string like "CDF_FLOAT"
+     */
+    public static String getStringDataType( int type ) {
+        switch ( type ) {
+            case 1: return "CDF_INT1";
+            case 2: return "CDF_INT2";
+            case 4: return "CDF_INT4";
+            case 11: return "CDF_UINT1";
+            case 12: return "CDF_UINT2";
+            case 14: return "CDF_UINT4";
+            case 41: return "CDF_BYTE";
+            case 21:return "CDF_REAL4";
+            case 22:return "CDF_REAL8";
+            case 44:return "CDF_FLOAT";
+            case 45:return "CDF_DOUBLE";
+            case 31:return "CDF_EPOCH";
+            case 32 :return "CDF_EPOCH16";
+            case 51 :return "CDF_CHAR";
+            default: return String.valueOf(type);
+        }
+    }
+
+    /**
      * returns null or the attribute.
      * @param cdf
      * @param var
@@ -538,7 +564,7 @@ public class CdfUtil {
                             xMaxRec = xDependVariable.getNumberOfValues();
                             if ( xMaxRec!=maxRec ) {
                                 if ( maxRec==-1 ) maxRec+=1; //why?
-                                warn.add("depend0 length is inconsistent with length ("+maxRec+")" );
+                                warn.add("depend0 length is inconsistent with length ("+(maxRec-1)+")" );
                                 //TODO: warnings are incorrect for Themis data.
                             }
                         }
@@ -615,7 +641,7 @@ public class CdfUtil {
 
                 String desc = "" + var.getName();
                 if (xDependVariable != null) {
-                    desc += "(" + xDependVariable.getName() + "=" + (xMaxRec + 1);
+                    desc += "(" + xDependVariable.getName() + "=" + (xMaxRec);
                     if (yDependVariable != null) {
                         desc += "," + yDependVariable.getName() + "=" + (yMaxRec + 1);
                         if (zDependVariable != null) {
@@ -634,12 +660,12 @@ public class CdfUtil {
                     StringBuffer descbuf = new StringBuffer("<html><b>" + desc + "</b><br>");
 
                     StringBuffer sdims= new StringBuffer();
-                    String recDesc= ""+var.getType();
+                    String recDesc= ""+ CdfUtil.getStringDataType(var.getType());
                     if ( dims!=null ) {
                         recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
                     }
                     if (maxRec != xMaxRec)
-                        descbuf.append("" + (maxRec + 1) + " records of "+recDesc+"<br>");
+                        descbuf.append("" + (maxRec) + " records of "+recDesc+"<br>");
                     if (scatDesc != null)
                         descbuf.append("" + scatDesc + "<br>");
                     if (svarNotes !=null ) {
