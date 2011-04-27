@@ -220,9 +220,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 boolean isDep= p.matcher(vv[i]).matches() & depth == 0;
                 if ( ipass==0 && isDep ) {
                     String name = (String) ((Vector)attrv).get(0);
-                    Map<String, Object> newVal = readAttributes(cdf, cdf.getVariable(name), depth + 1);
-                    newVal.put("NAME", name); // tuck it away, we'll need it later.
-                    props.put(vv[i], newVal);
+                    if ( cdf.getVariable(name)!=null ) {
+                        Map<String, Object> newVal = readAttributes(cdf, cdf.getVariable(name), depth + 1);
+                        newVal.put("NAME", name); // tuck it away, we'll need it later.
+                        props.put(vv[i], newVal);
+                    } else {
+                        System.err.println( "No such variable: "+ name + " in CDF " );
+                    }
 
                 } else if ( ipass==1 && !isDep ) {
                     Object val= ((Vector)attrv).get(0);
