@@ -56,6 +56,7 @@
         <jar href="http://autoplot.org/jnlp-lib/resourcesOptional.jar" />
         <jar href="http://autoplot.org/jnlp-lib/swing-layout-1.0.3.jar" />
         <jar href="http://autoplot.org/jnlp-lib/jython.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar" />
         <jar href="http://autoplot.org/jnlp-lib/jfits-0.93.jar" />
         <jar href="http://autoplot.org/jnlp-lib/beansbinding-1.2.1.jar"/>
         <jar href="http://autoplot.org/jnlp-lib/metadata-extractor-2.1.0.jar" />
