@@ -111,6 +111,9 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             ExcelSpreadsheetDataSet depend0 = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );
             if ( d.length()>1 ) depend0.putProperty( QDataSet.NAME, d );        
             data.putProperty(QDataSet.DEPEND_0, depend0);
+            if ( data.getFirstRow()!=depend0.getFirstRow() ) {
+                throw new IllegalArgumentException("rows must not contain empty cells in the first row");
+            }
         }
 
         d = (String) params.get("plane0");
@@ -120,7 +123,12 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             ExcelSpreadsheetDataSet p0 = new ExcelSpreadsheetDataSet((short) spec[0], spec[1], spec[2], labels );
             if ( d.length()>1 ) p0.putProperty( QDataSet.NAME, d );        
             data.putProperty(QDataSet.PLANE_0, p0);
+            if ( data.getFirstRow()!=p0.getFirstRow() ) {
+                throw new IllegalArgumentException("rows must not contain empty cells in the first row");
+            }
         }
+
+
         return data;
     }
 
@@ -217,17 +225,25 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             if ( firstRowIsLabels ) {
                 firstRow= findFirstRow(sheet, firstRow);
             }
-            
+
             this.columnNumber = columnNumber;
             this.firstRow = firstRow;
             this.length = lastRow - firstRow;
             HSSFRow row= sheet.getRow(this.firstRow);
+            HSSFCell cell = row.getCell(columnNumber);
+            if ( cell==null ) {
+                row= null;
+            }
             while ( row==null && firstRow<lastRow ) {
                 firstRow++;
                 row= sheet.getRow(firstRow);
+                cell = row.getCell(columnNumber);
+                if ( cell==null ) {
+                    row= null;
+                }
             }
             this.firstRow= firstRow;
-            HSSFCell cell = row.getCell(columnNumber);
+            cell = row.getCell(columnNumber);
             units= Units.dimensionless;
             if ( cell.getCellType()!=HSSFCell.CELL_TYPE_STRING ) {
                 isDate = HSSFDateUtil.isCellDateFormatted(cell);
@@ -247,6 +263,10 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
             }
         }
 
+        public int getFirstRow() {
+            return firstRow;
+        }
+        
         public int rank() {
             return 1;
         }
@@ -261,7 +281,9 @@ public class ExcelSpreadsheetDataSource extends AbstractDataSource {
                     Date d = cell.getDateCellValue();
                     return d.getTime() / 1000;
                 } else {
-                    if ( cell.getCellType()==HSSFCell.CELL_TYPE_NUMERIC ) {
+                    if ( cell==null ) {
+                        return Double.NaN;
+                    } else if ( cell.getCellType()==HSSFCell.CELL_TYPE_NUMERIC ) {
                         double d = cell.getNumericCellValue();
                         return d;
                     } else if ( cell.getCellType()==HSSFCell.CELL_TYPE_STRING ) {
