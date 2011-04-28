@@ -346,7 +346,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     public boolean reject(String uri) throws Exception {
         URISplit split= URISplit.parse(uri);
-        if ( split.file==null || split.file.length()==0 ) {
+        if ( split.file==null || split.file.length()==0 || split.file.equals("file:///") ) {
             return true;
         } else {
             return false;
