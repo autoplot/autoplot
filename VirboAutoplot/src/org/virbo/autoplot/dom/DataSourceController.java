@@ -1098,10 +1098,12 @@ public class DataSourceController extends DomNodeController {
             setException(ex);
             setDataSet(null);
             setStatus("interrupted");
+            if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), ex );
         } catch (CancelledOperationException ex) {
             setException(ex);
             setDataSet(null);
             setStatus("operation cancelled");
+            if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), ex );
         } catch (IOException e ) {
             if ( e instanceof FileNotFoundException || e.getMessage().contains("No such file") || e.getMessage().contains("timed out") ) {
                 String message= e.getMessage();
@@ -1125,11 +1127,13 @@ public class DataSourceController extends DomNodeController {
                 setStatus("error: " + e.getMessage());
                 handleException(e);
             }
+            if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), e );
         } catch (Exception e) {
             setException(e);
             setDataSet(null);
             setStatus("error: " + e.getMessage());
             handleException(e);
+            if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), e );
         } finally {
             // don't trust the data sources to call finished when an exception occurs.
             mymon.finished();
