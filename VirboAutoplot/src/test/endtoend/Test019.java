@@ -5,9 +5,16 @@
 
 package test.endtoend;
 
+import java.io.File;
+import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.DatumUtil;
+import org.das2.datum.Units;
+import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.filesystem.FileSystem;
 
 /**
  * tests of das2 internals
@@ -58,7 +65,59 @@ public class Test019 {
 
     }
 
+    public static void testRestrictedFileSystemAccess() throws Exception {
+        
+        String uri;
+        FileStorageModelNew fsm;
+        File[] ff;
+
+        uri= "http://autoplot.org/data/pngwalk/";
+        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+               "product_$Y$m$d.png" );
+        ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2008-003" ) );
+        if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
+
+
+
+        uri= "http://demo:demo@www-pw.physics.uiowa.edu/~jbf/data/restrict/";
+        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+               "data_$Y_$m_$d_v$v.qds" );
+        ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2010-03-02" ) );
+        if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
+
+        
+        uri= "http://demo@host:demo@www-pw.physics.uiowa.edu/~jbf/data/restrictAt/";
+        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+               "data_$Y_$m_$d_v$v.qds" );
+        ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2010-03-02" ) );
+        if ( ff.length==1 ) System.err.println(ff[0]); else throw new IllegalStateException("no files found");
+
+        //Leave these commented out, since we don't want to bother their server.
+//        uri= "http://sy%40space.physics.uiowa.edu:password@mapsview.engin.umich.edu/data/MAG/KSM/";
+//        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+//               "MAG__KSM__$Y$j_$v.TAB" );
+//        ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2003-196" ) );
+//        if ( ff.length==1 ) System.err.println(ff[0]);
+//
+//
+//        uri= "http://sy@space.physics.uiowa.edu:password@mapsview.engin.umich.edu/data/MAG/KSM/";
+//        fsm= FileStorageModelNew.create(FileSystem.create( new URI( uri ) ),
+//               "MAG__KSM__$Y$j_$v.TAB" );
+//        ff= fsm.getBestFilesFor( DatumRangeUtil.parseTimeRange( "2003-196" ) );
+//        if ( ff.length==1 ) {
+//            System.err.println(ff[0]);
+//        }
+    }
+    
     public static void main( String[] args ) {
-        testTimeRangeFormatParse();
+        try {
+            testTimeRangeFormatParse();
+            testRestrictedFileSystemAccess();
+        } catch (Exception ex) {
+            Logger.getLogger( Test019.class.getName()).log( Level.SEVERE, "error in test019", ex );
+            ex.printStackTrace();
+            System.exit(1);
+        }
+        System.exit(0);
     }
 }

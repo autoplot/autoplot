@@ -6,7 +6,6 @@ package org.autoplot.pngwalk;
 
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -39,11 +38,11 @@ public class CreatePngWalk {
 
     public static class Params {
 
-        String outputFolder;
-        String timeRangeStr;
-        String product;
-        String timeFormat;
-        boolean createThumbs;
+        public String outputFolder;
+        public String timeRangeStr;
+        public String product;
+        public String timeFormat;
+        public boolean createThumbs;
     }
 
     private static BufferedImage myWriteToPng(String filename, ApplicationModel appmodel, Application ldom, int width, int height) throws InterruptedException, FileNotFoundException, IOException {
@@ -64,11 +63,31 @@ public class CreatePngWalk {
     }
 
     public static void doBatch(String[] times, Application dom, Params params, ProgressMonitor mon) throws IOException, InterruptedException {
-        if ( !( new java.io.File(params.outputFolder).mkdirs() ) ) {
-            throw new IOException( "failed mkdirs: "+params.outputFolder);
+
+        if ( !( params.outputFolder.endsWith("/") || params.outputFolder.endsWith("\\") ) ) {
+            params.outputFolder= params.outputFolder + "/";
         }
-        if ( !( new java.io.File(params.outputFolder + "thumbs400/").mkdirs() ) ) {
-            throw new IOException( "failed mkdirs: "+params.outputFolder+"thums400/");
+        File outputFolder=  new java.io.File(params.outputFolder);
+        if ( !outputFolder.exists() && !outputFolder.mkdirs() ) {
+            throw new IOException( "failed mkdirs: "+outputFolder);
+        }
+        if ( !outputFolder.canWrite() ) {
+            throw new IOException( "unable to write to folder "+outputFolder );
+        }
+
+        if (params.createThumbs) {
+            File thumbsFolder= new java.io.File(params.outputFolder,"thumbs400/" );
+            if ( !thumbsFolder.exists() && !( thumbsFolder.mkdirs() ) ) {
+                throw new IOException( "failed mkdirs: "+thumbsFolder );
+            }
+            if ( !thumbsFolder.canWrite() ) {
+                throw new IOException( "unable to write to folder "+thumbsFolder );
+            }
+        } else {
+            File thumbsFolder= new java.io.File(params.outputFolder,"thumbs400/" );
+            if ( thumbsFolder.exists() ) {
+                System.err.println("warning: thumbs folder already exists!");
+            }
         }
 
         int n = times.length;
@@ -105,9 +124,9 @@ public class CreatePngWalk {
         }
 
 
-        StatePersistence.saveState(new java.io.File(params.outputFolder + params.product + ".vap"), dom2);
+        StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2);
 
-        PrintWriter ff= new PrintWriter( new FileWriter( params.outputFolder + params.product + ".pngwalk" ) );
+        PrintWriter ff= new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) );
         ff.println( "product=" + params.product );
         ff.println( "timeFormat=" + params.timeFormat );
         ff.close();
@@ -192,6 +211,18 @@ public class CreatePngWalk {
                     }
                 }
             }
+
+        } else {
+            String[] times = ScriptContext.generateTimeRanges(params.timeFormat, params.timeRangeStr);
+
+            ProgressMonitor mon;
+            if (ScriptContext.getViewWindow() == null) {
+                mon = new org.das2.util.monitor.NullProgressMonitor();
+            } else {
+                mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
+            }
+
+            doBatch(times, dom, params, mon);
 
         }
 

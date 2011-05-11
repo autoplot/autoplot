@@ -94,9 +94,20 @@ public class MultiFieldTimeParser implements AsciiParser.FieldParser {
         this.units= units;
     }
 
+    /**
+     * Either the field is accumulated in a string, and the entire string is parsed for the last field.
+     * @param field  the contents of the field.
+     * @param columnIndex  the index of the column in the table.
+     * @return 0 or the value for the time unit if it's the last field.
+     * @throws ParseException
+     */
     public double parseField(String field, int columnIndex) throws ParseException {
+        double d= -1e31;
         if ( isNumber[columnIndex-firstColumn] ) {
-            Double.parseDouble(field); // attempt to parse the number
+            d= Double.parseDouble(field); // attempt to parse the number
+            if ( d-(int)d == 0 ) { //TODO: this needs more thorough testing, to see what happens with time fields, etc.
+                field= ""+ (int)d; // http://vho.nasa.gov/mission/helios2/H276_021.dat contains float years "1976.0000" that don't parse.
+            }
         }
         if ( columnIndex==firstColumn ) {
             agg= new StringBuilder(field);

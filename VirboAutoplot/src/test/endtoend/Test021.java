@@ -81,6 +81,8 @@ public class Test021 {
         "045 file:///home/jbf/ct/hudson/data.backup/dat/test021/A1050402.TXT",
         //[edit] 14 VAPs in the wild
 
+        "050 file:///home/jbf/ct/hudson/data.backup/dat/vho.nasa.gov/mission/helios2/H276_021.dat?timeFormat=$Y+$j+$H&column=bn&time=year",
+
     };
 
     public static void xxx(String id) {

@@ -1770,6 +1770,7 @@ public class AutoplotUI extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, pane);
 
         } catch (IOException ex) {
+            ex.printStackTrace();
         }
 
     }//GEN-LAST:event_aboutAutoplotMenuItemActionPerformed
@@ -1890,8 +1891,15 @@ private void createPngWalkMenuItemActionPerformed(java.awt.event.ActionEvent evt
         public void run() {
             try {
                 CreatePngWalk.doIt( applicationModel.dom, null );
+            } catch ( IOException ex ) {
+                setStatus( AutoplotUI.ERROR_ICON,"Unable to create PNG Walk: " + ex.getMessage() );
+                applicationModel.showMessage( "<html>Unable to create PNG Walk:<br>"+ex.getMessage(), "PNG Walk Error", JOptionPane.WARNING_MESSAGE );
+                ex.printStackTrace();
+                return;
             } catch ( Exception ex) {
                 Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                ex.printStackTrace();
+                throw new RuntimeException(ex);
                 // this mimics the jython behavior
             }
         }
@@ -2074,6 +2082,7 @@ private void updateFrameTitle() {
             if ( tag!=null ) welcome+=" ("+tag+")";
         } catch (IOException ex) {
             Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
 
         System.err.println(welcome);
@@ -2383,6 +2392,7 @@ private void updateFrameTitle() {
                     }
                     reader.close();
                 } catch (IOException iOException) {
+                    iOException.printStackTrace();
                 }
                 book.setTitle(toolLabel);
                 tools.add(book);
