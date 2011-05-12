@@ -101,7 +101,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         validRangeLabel = new javax.swing.JLabel();
 
         jComboBox1.setEditable(true);
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", "" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "http://www-pw.physics.uiowa.edu/das/das2Server", "http://cassini.physics.uiowa.edu/das/das2Server" }));
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jComboBox1ActionPerformed(evt);
@@ -364,7 +364,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     }//GEN-LAST:event_viewDsdfButtonActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        serverURL= jComboBox1.getSelectedItem().toString();
+        setServerURL( String.valueOf( jComboBox1.getSelectedItem() ) );
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
 
@@ -398,6 +398,7 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     public void setServerURL(String serverURL) {
         String oldServerURL = this.serverURL;
         this.serverURL = serverURL;
+        new Thread( getDataSetsRunnable() ).start();
         firePropertyChange(PROP_SERVERURL, oldServerURL, serverURL);
     }
 
