@@ -172,7 +172,20 @@ public class AutoplotHelpSystem {
                     }
                 });
             }
-
+            Component[] cc= jPanel1.getComponents();
+            for ( Component child: cc ) {
+                if ( child instanceof JPanel ) {
+                    JPanel jPanel2= (JPanel)child;
+                    b= jPanel2.getBorder();
+                    if ( ( b instanceof TitledBorder ) ) {
+                        TitledBorderDecorator.makeLink( jPanel2, new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                Util.openBrowser( "http://autoplot.org/help#"+helpID );
+                            }
+                        });
+                    }
+                }
+            }
         }
     }
 
