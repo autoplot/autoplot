@@ -459,6 +459,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         List<URI> servers= new ArrayList();
         servers.add(home);
+        try {
+            servers.add(new URI("http://cassini.physics.uiowa.edu/das/das2Server"));
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
         if ( !split.resourceUri.equals( home ) ) {
             servers.add( split.resourceUri );
         }
