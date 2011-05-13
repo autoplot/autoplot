@@ -8,18 +8,18 @@ package org.autoplot.help;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.MouseInputAdapter;
 
 /**
  * Makes titled border into link to documentation
  * @author jbf
  */
 public class TitledBorderDecorator {
-    
+
     public static void makeLink( final JPanel jPanel1, final ActionListener al ) {
 
         Border b= jPanel1.getBorder();
@@ -29,7 +29,7 @@ public class TitledBorderDecorator {
         final TitledBorder tb= (TitledBorder) jPanel1.getBorder();
         final Color c0= tb.getTitleColor();
 
-        MouseAdapter ma= new MouseAdapter() {
+        final MouseInputAdapter ma= new MouseInputAdapter() {
             boolean within0= false;
 
             boolean isWithin( MouseEvent e ) {
@@ -53,6 +53,12 @@ public class TitledBorderDecorator {
                 }
             }
 
+            public void mouseExited(MouseEvent e) {
+                tb.setTitleColor(c0);
+                jPanel1.repaint();
+                within0= false;
+            }
+
             public void mouseMoved(MouseEvent e) {
                 boolean within= isWithin(e);
                 if ( within!=within0 ) {
@@ -65,14 +71,6 @@ public class TitledBorderDecorator {
                     within0= within;
                 }
             }
-
-            public void mouseExited(MouseEvent e) {
-                tb.setTitleColor(c0);
-                jPanel1.repaint();
-                within0= false;
-            }
-
-
 
         };
 
