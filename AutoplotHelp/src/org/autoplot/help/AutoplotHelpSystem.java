@@ -2,6 +2,7 @@ package org.autoplot.help;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -15,6 +16,9 @@ import java.util.logging.Logger;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
 import javax.help.SwingHelpUtilities;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 /**
  * Encapsulates JavaHelp functionality for convenient access by components.
@@ -157,6 +161,19 @@ public class AutoplotHelpSystem {
             }
 
         });
+
+        if ( c instanceof JPanel ) {
+            JPanel jPanel1= (JPanel)c;
+            Border b= jPanel1.getBorder();
+            if ( ( b instanceof TitledBorder ) ) {
+                TitledBorderDecorator.makeLink( jPanel1, new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        Util.openBrowser( "http://autoplot.org/help#"+helpID );
+                    }
+                });
+            }
+
+        }
     }
 
     /** A component action listener can pass the event here and the
