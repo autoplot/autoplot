@@ -36,8 +36,6 @@ public class TitledBorderDecorator {
                 int y= e.getY() ;
                 int x= e.getX() ;
 
-                System.err.println( x + "  " + y );
-
                 boolean within;
                 if ( y>0 && y<16 && x>4 && x<jPanel1.getWidth() ) {
                     within= true;
