@@ -36,6 +36,7 @@ public class TitledBorderDecorator {
                 int y= e.getY() ;
                 int x= e.getX() ;
 
+                System.err.println("mouse x pos="+x);
                 boolean within;
                 if ( y>0 && y<16 && x>4 && x<jPanel1.getWidth() ) {
                     within= true;
@@ -52,7 +53,6 @@ public class TitledBorderDecorator {
                 }
             }
 
-            @Override
             public void mouseMoved(MouseEvent e) {
                 boolean within= isWithin(e);
                 if ( within!=within0 ) {
@@ -65,6 +65,14 @@ public class TitledBorderDecorator {
                     within0= within;
                 }
             }
+
+            public void mouseExited(MouseEvent e) {
+                tb.setTitleColor(c0);
+                jPanel1.repaint();
+                within0= false;
+            }
+
+
 
         };
 
