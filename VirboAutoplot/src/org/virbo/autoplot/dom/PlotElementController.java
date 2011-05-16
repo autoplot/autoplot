@@ -26,6 +26,7 @@ import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
+import org.das2.graph.DigitalRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
@@ -1427,8 +1428,14 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
             }
 
-        } else if ( spec==RenderType.digital ) {  // rank
-            return;
+        } else if ( spec==RenderType.digital ) {
+            QDataSet qube= DigitalRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+            }
 
         } else {
 
