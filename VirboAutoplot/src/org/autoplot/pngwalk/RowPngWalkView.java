@@ -33,7 +33,7 @@ import javax.swing.event.ChangeListener;
  */
 public class RowPngWalkView extends PngWalkView {
 
-    public static final int DEFAULT_CELL_SIZE = 200;
+    public static final int DEFAULT_CELL_SIZE = 100;
     public static final int MINIMUM_CELL_SIZE = 20;
     private int cellSize = DEFAULT_CELL_SIZE;
     protected JScrollPane scrollPane;

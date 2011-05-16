@@ -111,6 +111,7 @@ public class DataSetURI {
      */
     public static String getExplicitExt(String surl) {
         URISplit split = URISplit.parse(surl);
+        if ( split.vapScheme==null ) return null;
         int i = split.vapScheme.indexOf("+");
         if (i != -1) {
             return split.vapScheme.substring(i + 1);
@@ -662,6 +663,9 @@ public class DataSetURI {
             surl = split.vapScheme + ":" + surl;
         }
         surl = URISplit.format(URISplit.parse(surl)); // add "vap:" if it's not there
+        if ( !( surl.startsWith("vap") ) ) {
+            surl= "vap:"+surl;
+        }
         URI result = new URI(surl); //bug 3055130 okay
         return result;
     }

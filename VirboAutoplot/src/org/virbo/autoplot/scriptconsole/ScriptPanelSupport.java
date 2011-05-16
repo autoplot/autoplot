@@ -103,7 +103,9 @@ public class ScriptPanelSupport {
                 if (result == JOptionPane.OK_CANCEL_OPTION) {
                     return false;
                 }
-                saveAs();
+                if ( saveAs()==JOptionPane.CANCEL_OPTION ) {
+                    return false;
+                }
             }
             file = DataSetURI.getFile(DataSetURI.getURL(sfile), new NullProgressMonitor());
             loadFile(file);

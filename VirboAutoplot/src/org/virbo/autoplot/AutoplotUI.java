@@ -1216,7 +1216,6 @@ public class AutoplotUI extends javax.swing.JFrame {
         jMenuBar1.add(fileMenu);
 
         editMenu.setText("Edit");
-        editMenu.setToolTipText("Edit the DOM, which is the internal application state.\n");
 
         undoMenuItem.setAction(undoRedoSupport.getUndoAction());
         undoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask())

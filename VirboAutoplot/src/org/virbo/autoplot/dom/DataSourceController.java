@@ -1207,7 +1207,7 @@ public class DataSourceController extends DomNodeController {
                     }
                 }
 
-                if (split.vapScheme.equals("vap+internal")) {
+                if ( split.vapScheme!=null && split.vapScheme.equals("vap+internal")) {
                     boolean ok= doInternal(split.path);
                     String msg=null;
                     if ( !ok )  msg= dom.controller.getStatus();

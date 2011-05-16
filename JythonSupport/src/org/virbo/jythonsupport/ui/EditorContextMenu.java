@@ -64,6 +64,27 @@ public class EditorContextMenu {
         this.dataSetSelector= sel;
     }
 
+    /**
+     * create a menu item with a tool tip preview.
+     * @param text
+     * @return
+     */
+    private JMenuItem createInsertMenuItem( String label, final String text ) {
+        JMenuItem result= new JMenuItem( new AbstractAction( label ) {
+            public void actionPerformed(ActionEvent e) {
+                insertCode( text );
+            }
+        } );
+        String htmlText= text;
+        htmlText= htmlText.replaceAll("<", "&lt;") ;
+        htmlText= htmlText.replaceAll(">", "&gt;") ;
+        htmlText= htmlText.replaceAll("\n", "<br>");
+        htmlText= htmlText.replaceAll(" ", "&nbsp;") ;
+        result.setToolTipText( "<html><tt>" + htmlText + "</tt></html>" );
+        return result;
+
+    }
+
     private synchronized void maybeCreateMenu() {
         if ( menu==null ) {
             menu= new JPopupMenu();
@@ -74,36 +95,51 @@ public class EditorContextMenu {
                     insertCode( "getDataSet('"+surl+"')\n");
                 }
             });
+            JMenu fragmentsMenu= new JMenu("Code Fragments");
+            fragmentsMenu.add( createInsertMenuItem( "procedure", "def myproc(x,y):\n  z=x+y\n  return z\n" ) );
+
+            fragmentsMenu.add( createInsertMenuItem( "if block", "x=0\nif (x<0):\n  print 'x<0'\nelif (x==0):\n  print 'x==0'\nelse:\n  print 'x>0'\n" ) );
+
+            fragmentsMenu.add( createInsertMenuItem( "for loop with index", "a= sin( linspace(0,PI,100) )\nfor i in xrange(len(a)):\n  print i, a[i]\n" ) );
+
+            fragmentsMenu.add( createInsertMenuItem( "for loop over dataset", "a= sin( linspace(0,PI,100) )\nfor i in a:\n  print i\n" ) );
+            
+            insertCodeMenu.add(fragmentsMenu);
+
             menu.add( insertCodeMenu );
             JMenu submenu= new JMenu("Example Scripts");
             examplesMenu= submenu;
             menu.add( submenu );
             JMenu actionsMenu= new JMenu("Actions");
-            actionsMenu.add( new AbstractAction("plot") {
+            JMenuItem mi= new JMenuItem( new AbstractAction("plot") {
                 public void actionPerformed(ActionEvent e) {
                     String doThis= editor.getSelectedText();
                     if ( doThis==null ) return;
                     editor.plot(doThis);
                 }
             } );
+            mi.setToolTipText("Plot dataset reference in a second Autoplot with server port open");
+            actionsMenu.add( mi );
             menu.add( actionsMenu );
             JMenu settingsMenu= new JMenu("Settings");
-            settingsMenu.add( new AbstractAction("Edit Settings") {
+            mi= new JMenuItem( new AbstractAction("Edit Settings") {
                 public void actionPerformed(ActionEvent e) {
                     CompletionSettings settings= JythonCompletionProvider.getInstance().settings();
                     PropertyEditor p= new PropertyEditor(settings);
                     p.showModalDialog(editor);
                 }
-            });
+            } );
+            mi.setToolTipText( "Settings for the editor" );
+            settingsMenu.add( mi );
             menu.add( settingsMenu );
 
-			menu.addSeparator();
-			JMenuItem cutItem = menu.add(new DefaultEditorKit.CutAction());
-			cutItem.setText("Cut");
-			JMenuItem copyItem = menu.add(new DefaultEditorKit.CopyAction());
-			copyItem.setText("Copy");
-			JMenuItem pasteItem = menu.add(new DefaultEditorKit.PasteAction());
-			pasteItem.setText("Paste");
+            menu.addSeparator();
+            JMenuItem cutItem = menu.add(new DefaultEditorKit.CutAction());
+            cutItem.setText("Cut");
+            JMenuItem copyItem = menu.add(new DefaultEditorKit.CopyAction());
+            copyItem.setText("Copy");
+            JMenuItem pasteItem = menu.add(new DefaultEditorKit.PasteAction());
+            pasteItem.setText("Paste");
 
         }
     }

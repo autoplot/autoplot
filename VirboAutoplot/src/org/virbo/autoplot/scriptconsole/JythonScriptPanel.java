@@ -20,6 +20,7 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
@@ -162,11 +163,18 @@ public class JythonScriptPanel extends javax.swing.JPanel {
 
     }
 
-    private void loadExample( String code ) {
+    /**
+     * load in an example, replacing the current editor text.
+     * @param resourceFile the name of a file loaded with
+     *    EditorContextMenu.class.getResource(resourceFile);
+     */
+    private void loadExample( String resourceFile ) {
         try {
-            URL url = EditorContextMenu.class.getResource(code);
+            URL url = EditorContextMenu.class.getResource(resourceFile);
             if (this.isDirty()) {
-                this.support.saveAs();
+                if ( this.support.saveAs()==JOptionPane.CANCEL_OPTION ) {
+                    return;
+                }
             }
             this.support.loadInputStream(url.openStream());
         } catch (IOException ex) {

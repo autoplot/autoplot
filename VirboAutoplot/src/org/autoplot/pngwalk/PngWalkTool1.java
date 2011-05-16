@@ -226,9 +226,12 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                         try {
                             ScriptContext.createGui();
                             ScriptContext.plot(suri);
+                            Window apWindow= ScriptContext.getViewWindow();
                             if ( parent==null ) {
-                                ((JFrame)ScriptContext.getViewWindow()).setVisible(true);
+                                apWindow.setVisible(true);
                             }
+                            apWindow.toFront();
+                            apWindow.repaint();
                         } catch (InterruptedException ex) {
                             Logger.getLogger(DemoPngWalk.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -595,7 +598,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         return seq.getTemplate();
     }
 
-    protected int thumbnailSize = 200;
+    protected int thumbnailSize = 100;
     public static final String PROP_THUMBNAILSIZE = "thumbnailSize";
 
     public int getThumbnailSize() {

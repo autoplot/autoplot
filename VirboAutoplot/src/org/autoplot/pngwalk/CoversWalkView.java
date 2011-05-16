@@ -34,7 +34,7 @@ import javax.swing.event.ChangeListener;
 public class CoversWalkView extends PngWalkView  {
 
     private static final int HEIGHT_WIDTH_RATIO = 10;
-    int cellSize = 200;
+    int cellSize = 100;
     int cellWidth= cellSize / HEIGHT_WIDTH_RATIO;
     int MINIMUM_CELL_SIZE = 50;
     int DEFAULT_CELL_SIZE = 100;

@@ -109,7 +109,7 @@ public abstract class PngWalkView extends JPanel implements PropertyChangeListen
     }
 
 
-    protected int thumbnailSize = 200;
+    protected int thumbnailSize = 100;
     public static final String PROP_THUMBNAILSIZE = "thumbnailSize";
 
     public int getThumbnailSize() {

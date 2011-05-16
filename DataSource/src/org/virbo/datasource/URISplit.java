@@ -109,10 +109,10 @@ public class URISplit {
             surl = "file:///";
             caretPos = surl.length();
             result.surl = surl;
-            result.vapScheme = "vap";
+            result.vapScheme = null;
             result.implicitVap= true;
             result.resourceUriCarotPos = caretPos;
-            result.formatCarotPos = caretPos + 4;
+            result.formatCarotPos = caretPos;
         }
 
         String scheme;  // identify a scheme, if any.  This might be vap+foo:, or http:
@@ -351,9 +351,8 @@ public class URISplit {
                 }
             } else {
                 if (result.vapScheme == null && normalize ) {
-                    result.vapScheme = "vap";
                     result.implicitVap= true;
-                    result.formatCarotPos = result.resourceUriCarotPos + 4;
+                    result.formatCarotPos = result.resourceUriCarotPos;
                 }
                 result.surl = surl;
                 result.scheme = magikPop(result.surl, "([a-zA-Z\\+]+)\\:.*");
@@ -601,7 +600,7 @@ public class URISplit {
 
     public static String format(URISplit split) {
         String result = "";
-        if ( split.vapScheme!=null && split.vapScheme.length()>0 ) result= result + split.vapScheme + ":";
+        if ( split.vapScheme!=null && split.vapScheme.length()>0 && !split.vapScheme.equals("vap") ) result= result + split.vapScheme + ":";
         if ( split.file==null && split.params!=null ) {
             result= result + split.params;
         } else if ( split.file!=null ) {

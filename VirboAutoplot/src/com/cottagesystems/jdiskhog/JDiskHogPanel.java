@@ -5,6 +5,7 @@
  */
 package com.cottagesystems.jdiskhog;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -24,6 +26,7 @@ import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
+import org.virbo.datasource.AutoplotSettings;
 
 /**
  *
@@ -93,12 +96,36 @@ public class JDiskHogPanel extends javax.swing.JPanel {
 
                 TreePath[] paths = jtree.getSelectionPaths();
 
-
                 if (paths.length == 0) return;
 
                 File f = model.getFile(paths[0]);
-                app.plotUri(f.toString());
 
+                String sf= f.toString();
+                String cache= AutoplotSettings.settings().resolveProperty( AutoplotSettings.PROP_FSCACHE);
+
+                boolean acceptOutside= false;
+                String outsideName= sf.substring( cache.length() );
+
+                if ( sf.startsWith( cache ) ) {    
+                    String[] protos= new String[] { "ftp", "http", "https" };
+                    for ( int i=0; i<protos.length; i++ ) {
+                        if ( outsideName.startsWith("/"+protos[i]+"/") ) {
+                            outsideName= protos[i]+"://"+outsideName.substring(protos[i].length()+2);
+                            acceptOutside= true;
+                        }
+                    }   
+                }
+
+                if ( acceptOutside ) {
+                    app.plotUri(outsideName);
+                } else {
+                    app.plotUri(f.toString());
+                }
+
+                Component p= JDiskHogPanel.this.getTopLevelAncestor();
+                if ( p instanceof JDialog ) {
+                    p.setVisible(false); // it's confusing to have this modal dialog still going after this operation.
+                }
             }
         };
     }
