@@ -177,7 +177,7 @@ public class CdfUtil {
             }
         }
 
-        if ( ( odata==null && buf==null ) && varType != CDFConstants.CDF_CHAR ) {
+        if ( ( odata==null && buf==null ) && ( varType != CDFConstants.CDF_CHAR && varType!=CDFConstants.CDF_UCHAR ) ) {
             System.err.println("something went wrong");
             throw new NullPointerException("something went wrong");
         }
@@ -278,7 +278,7 @@ public class CdfUtil {
             }
         }
 
-        if ( varType == CDFConstants.CDF_CHAR ) {
+        if ( varType == CDFConstants.CDF_CHAR || varType==CDFConstants.CDF_UCHAR ) {
             EnumerationUnits units = EnumerationUnits.create(variable.getName());
             Object o;
             try {
@@ -489,7 +489,7 @@ public class CdfUtil {
         for (int i = 0; i < v.length; i++) {
             Variable var = cdf.getVariable(v[i]);
 
-            if (var.getType() == CDFConstants.CDF_CHAR) {
+            if (var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) {
                 continue;
             }
 

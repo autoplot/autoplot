@@ -208,6 +208,8 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
                     PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
                     interp.set("dom", model.getDocumentModel() );
+                    interp.set("params", new PyDictionary());
+                    interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
                     return interp;
                 }
             });

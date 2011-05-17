@@ -27,7 +27,7 @@ import org.virbo.datasource.DataSourceUtil;
  */
 public class JythonUtil {
     /**
-     * create an interpretter object configured for Autoplot contexts:
+     * create an interpreter object configured for Autoplot contexts:
      *   * QDataSets are wrapped so that operators are overloaded.
      *   * a standard set of names are imported.
      *   
@@ -39,6 +39,7 @@ public class JythonUtil {
     public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox ) throws IOException {
         InteractiveInterpreter interp= org.virbo.jythonsupport.JythonUtil.createInterpreter(sandbox);
         if ( appContext ) interp.execfile( JythonUtil.class.getResource("appContextImports.py").openStream(), "appContextImports.py" );
+        interp.set( "monitor", new NullProgressMonitor() );
         interp.set( "plotx", new PlotCommand() );
         return interp;
     }
@@ -46,7 +47,7 @@ public class JythonUtil {
     public static InteractiveInterpreter createInterpreter( boolean appContext, boolean sandbox, Application dom, ProgressMonitor mon ) throws IOException {
         InteractiveInterpreter interp= createInterpreter(appContext, sandbox);
         if ( dom!=null ) interp.set("dom", dom );
-        if ( mon!=null ) interp.set("monitor", mon );
+        if ( mon!=null ) interp.set("monitor", mon ); else interp.set( "monitor", new NullProgressMonitor() );
         interp.set( "plotx", new PlotCommand() );
         return interp;
     }

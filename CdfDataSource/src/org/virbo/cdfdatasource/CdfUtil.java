@@ -251,7 +251,7 @@ public class CdfUtil {
             flatten(data, back, 0, nx, ny);
             result = BDataSet.wrap(back, nx, ny);
 
-        } else if (varType == Variable.CDF_CHAR) {
+        } else if (varType == Variable.CDF_CHAR || varType==Variable.CDF_UCHAR ) {
             EnumerationUnits units = EnumerationUnits.create(variable.getName());
             String[] sdata = (String[]) odata;
             double[] back = new double[sdata.length];
@@ -449,7 +449,7 @@ public class CdfUtil {
 
         } else if (o instanceof Number) {
             result = DDataSet.wrap(new double[]{((Number) o).doubleValue()});
-        } else if (varType == Variable.CDF_CHAR) {
+        } else if (varType == Variable.CDF_CHAR || varType==Variable.CDF_UCHAR) {
             EnumerationUnits units = EnumerationUnits.create(name);
             String sdata = (String) o;
             double[] back = new double[1];
@@ -607,7 +607,7 @@ public class CdfUtil {
         } else if (varType == Variable.CDF_INT1 || varType == Variable.CDF_BYTE) {
             result = BDataSet.wrap((byte[]) odata, qube);
 
-        } else if (varType == Variable.CDF_CHAR) {
+        } else if (varType == Variable.CDF_CHAR || varType == Variable.CDF_UCHAR ) {
             EnumerationUnits units = EnumerationUnits.create(variable.getName());
             String[] sdata = (String[]) odata;
             double[] back = new double[sdata.length];
@@ -751,7 +751,7 @@ public class CdfUtil {
             } else if (varType == CDFConstants.CDF_INT1 || varType == CDFConstants.CDF_BYTE) {
                 result = BDataSet.wrap((byte[]) odata);
 
-            } else if (varType == CDFConstants.CDF_CHAR) {
+            } else if (varType == CDFConstants.CDF_CHAR || varType == CDFConstants.CDF_UCHAR ) {
                 EnumerationUnits units = EnumerationUnits.create(variable.getName());
                 String[] sdata = (String[]) odata;
                 double[] back = new double[sdata.length];
@@ -863,7 +863,7 @@ public class CdfUtil {
 
         for (int i = 0; i < v.size(); i++) {
             Variable var = (Variable) v.get(i);
-            if (var.getDataType() == Variable.CDF_CHAR) {
+            if (var.getDataType() == Variable.CDF_CHAR || var.getDataType()==Variable.CDF_UCHAR ) {
                 continue;
             }
 

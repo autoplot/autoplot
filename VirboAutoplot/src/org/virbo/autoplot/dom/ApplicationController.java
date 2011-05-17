@@ -276,7 +276,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             super.focusGained(e);
 
             if ( e.getComponent() instanceof ColumnColumnConnector ) {
-                System.err.println( "focus on column column connector");
+                //System.err.println( "focus on column column connector");
 
             }
             Plot domPlot = getPlotFor(e.getComponent());
@@ -308,7 +308,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                 setFocusUri( getFocusUriFor( p ) );
                 setPlotElement(p);
                 setStatus("" + domPlot + ", " + p + " selected");
-                canvas.controller.indicateSelection( Arrays.asList(domPlot,p) );
+                if ( ApplicationController.this.getApplication().getPlotElements().length>1 ) {  // don't flash single plot.
+                    canvas.controller.indicateSelection( Arrays.asList(domPlot,p) );
+                }
             }
 
         }
@@ -1764,7 +1766,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             setStatus("no plot element selected");
         } else {
             setStatus(plotElement + " selected");
-            getCanvas().controller.indicateSelection( Collections.singletonList((DomNode)plotElement) );
+            if ( application.getPlotElements().length>1 || ( plotElement!=oldPlotElement ) ) {
+                getCanvas().controller.indicateSelection( Collections.singletonList((DomNode)plotElement) );
+            }
             if ( plotElement!=oldPlotElement ) {
                 Plot lplot= getPlotFor(plotElement);
                 if ( lplot!=null && lplot.getController()!=null ) {

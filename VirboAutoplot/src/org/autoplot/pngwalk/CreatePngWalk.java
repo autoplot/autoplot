@@ -194,6 +194,12 @@ public class CreatePngWalk {
                     mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
                 }
 
+                TimeParser tp= TimeParser.create(params.timeFormat);
+                if ( !tp.isNested() ) {
+                    JOptionPane.showMessageDialog( ScriptContext.getViewWindow(), "<html>Time spec must have fields nested: $Y,$m,$d, etc,<br>not "+params.timeFormat + " ." );
+                    return;
+                }
+
                 String[] times = ScriptContext.generateTimeRanges(params.timeFormat, params.timeRangeStr);
 
                 doBatch(times, dom, params, mon);
