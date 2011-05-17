@@ -443,6 +443,8 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             }
         } else if (data.rank() == 1) {
             formatRank1(out, data, mon);
+        } else {
+            throw new IllegalArgumentException("only rank 1 and rank 2 data are supported");
         }
         out.close();
     }
