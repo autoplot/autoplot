@@ -37,8 +37,10 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -2396,6 +2398,11 @@ private void updateFrameTitle() {
                 book.setTitle(toolLabel);
                 tools.add(book);
             }
+        } else {
+            toolsDir.mkdirs();
+            //File f= new File( toolsDir, "README.txt" );
+            //BufferedWriter fw= new BufferedWriter( new FileWriter(f) );
+            //fw.write("Scripts in this directory will appear under the tools menu.\n",0);
         }
         return tools;
     }
