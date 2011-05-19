@@ -197,28 +197,28 @@ public class Util {
         QDataSet ds= getDataSet(virtUrl,mon);
         return ds;
     }
-
-    /**
-     *
-     * @param surl
-     * @return
-     * @throws IOException
-     * @throws URISyntaxException
-     * @deprecated use listDirectory instead
-     */
-    public static String[] list( String surl ) throws IOException, URISyntaxException {
-        System.err.println("======================================================");
-        System.err.println("list( String ) command that lists files is deprecated--use listDirectory( String ) instead.");
-        System.err.println("native python list command will be available soon.  Contact faden @ cottagesystems.com if you need assistance.");
-        System.err.println("  sleeping for 3 seconds.");
-        System.err.println("======================================================");
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return listDirectory( surl );
-    }
+//
+//    /**
+//     *
+//     * @param surl
+//     * @return
+//     * @throws IOException
+//     * @throws URISyntaxException
+//     * @deprecated use listDirectory instead
+//     */
+//    public static String[] list( String surl ) throws IOException, URISyntaxException {
+//        System.err.println("======================================================");
+//        System.err.println("list( String ) command that lists files is deprecated--use listDirectory( String ) instead.");
+//        System.err.println("native python list command will be available soon.  Contact faden @ cottagesystems.com if you need assistance.");
+//        System.err.println("  sleeping for 3 seconds.");
+//        System.err.println("======================================================");
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return listDirectory( surl );
+//    }
 
     /**
      * returns a list of the files in the local or remote filesystem pointed to by surl.
