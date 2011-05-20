@@ -489,7 +489,14 @@ public class DataSourceController extends DomNodeController {
             if ( parentSources[2]==null ) return "third parent is null";
             z = parentSources[2].controller.getFillDataSet();
         }
-        if (parentSources.length == 2) {
+        if ( parentSources.length==1 ) {
+            if (x == null ) {
+                return "parent dataset is null";
+            }
+            if ( DataSetUtil.validate(x, null ) ) {
+                setDataSetInternal(x);
+            }
+        } else if (parentSources.length == 2) {
             System.err.println("creating dataset by making Y depend on X");
             if (x == null || y == null) {
                 return "first or second dataset is null";
@@ -815,6 +822,11 @@ public class DataSourceController extends DomNodeController {
             } else {
                 if ( !(this.parentSources!=null) ) {
                     setDataSetInternal(null);
+                } else {
+                    String prob= checkParents();
+                    if ( prob!=null ) {
+                        System.err.println(prob);
+                    }
                 }
             }
             if ( dataSet!=null ) setStatus("ready");
