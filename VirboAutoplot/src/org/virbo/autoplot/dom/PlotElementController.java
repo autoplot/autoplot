@@ -512,7 +512,7 @@ public class PlotElementController extends DomNodeController {
         this.dataSet = dataSet;
         this.processDataSet= null;
         this.procressStr= null;
-        if ( plotElement.getLegendLabel().contains("%{") && renderer!=null ) {
+        if ( ( plotElement.getLegendLabel().contains("%{") || plotElement.getLegendLabel().contains("$(") ) && renderer!=null ) {
             String s= (String)getLabelConverter().convertForward(plotElement.getLegendLabel());
             renderer.setLegendLabel(s);
         }
