@@ -52,6 +52,7 @@ import org.das2.graph.DasPlot;
 import org.das2.graph.DasRow;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
+import org.das2.graph.EventsRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PitchAngleDistributionRenderer;
 import org.das2.graph.PsymConnector;
@@ -1147,6 +1148,14 @@ public class AutoplotUtil {
                 return recyclable;
             } else {
                 Renderer result = new DigitalRenderer();
+                result.setDataSetLoader(null);
+                return result;
+            }
+        } else if ( renderType==RenderType.eventsBar ) {
+            if (recyclable != null && recyclable instanceof EventsRenderer ) {
+                return recyclable;
+            } else {
+                Renderer result = new EventsRenderer();
                 result.setDataSetLoader(null);
                 return result;
             }
