@@ -35,6 +35,51 @@ public class DomNodeController {
     }
 
     /**
+     * replace %{LABEL} or $(LABEL) with value.
+     * @param title
+     * @param label
+     * @param value
+     * @return
+     */
+    protected static String insertString( String title, String label, String value ) {
+        String search;
+        search= "%{"+label+"}";
+        if ( title.contains( search ) ) {
+            title= title.replace( search, value );
+        }
+        search= "$("+label+")";
+        if ( title.contains( search ) ) {
+            title= title.replace( search, value );
+        }
+        return title;
+    }
+
+    /**
+     * return true if %{LABEL} or $(LABEL) is found.
+     * @param ptitle
+     * @param label
+     * @return
+     */
+    protected static boolean containsString( String ptitle, String label, String value ) {
+        String search;
+        String[] ss=null;
+        search= "%{"+label+"}";
+        if ( ptitle.contains( search ) ) {
+            ss= ptitle.split("%\\{"+label+"\\}",-2);
+        } else {
+            search= "$("+label+")";
+            if ( ptitle.contains( search ) ) {
+                ss= ptitle.split("\\$\\("+label+"\\)",-2);
+            }
+        }
+        if ( ss!=null && value.startsWith(ss[0]) && value.endsWith(ss[1]) ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * return the controller for the node, if it exists, through introspection.
      * @param n
      * @return the controller or null.
