@@ -419,19 +419,16 @@ public class PlotController extends DomNodeController {
                 contextStr= "";
                 shortContextStr= "";
             }
-            if ( plot.getTitle().contains("%{CONTEXT}" ) ) {
-                String title= plot.getTitle();
-                title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
+            if ( plot.getTitle().contains("CONTEXT" ) ) {
+                String title= insertString( plot.getTitle(), "CONTEXT", contextStr );
                 dasPlot.setTitle(title);
             }
-            if ( plot.getYaxis().getLabel().contains("%{CONTEXT}") ) {
-                String title= plot.getYaxis().getLabel();
-                title= title.replaceAll("%\\{CONTEXT\\}", shortContextStr );
+            if ( plot.getYaxis().getLabel().contains("CONTEXT") ) {
+                String title= insertString( plot.getYaxis().getLabel(), "CONTEXT", shortContextStr );
                 dasPlot.getYAxis().setLabel(title);
             }
-            if ( plot.getXaxis().getLabel().contains("%{CONTEXT}") ) {
-                String title= plot.getXaxis().getLabel();
-                title= title.replaceAll("%\\{CONTEXT\\}", shortContextStr );
+            if ( plot.getXaxis().getLabel().contains("CONTEXT") ) {
+                String title= insertString( plot.getXaxis().getLabel(), "CONTEXT", shortContextStr );
                 dasPlot.getXAxis().setLabel(title);
             }
         }
