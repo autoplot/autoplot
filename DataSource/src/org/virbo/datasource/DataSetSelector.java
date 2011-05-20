@@ -8,6 +8,7 @@ package org.virbo.datasource;
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
 import java.awt.Dialog;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
@@ -732,6 +733,17 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     }
 
+    private int stepForSize( int size ) {
+        int step;
+        if ( size<20 ) {
+            step=1;
+        } else if ( size<40 ) {
+            step=2;
+        } else {
+            step=4;
+        }
+        return step;
+    }
     /**
      * THIS MUST BE CALLED AFTER THE COMPONENT IS ADDED.  
      * This is so ENTER works properly.
@@ -757,6 +769,31 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
 
+
+        map.put("biggerFont", new AbstractAction("biggerFont") {
+            public void actionPerformed(ActionEvent ev) {
+                Font f= getEditor().getFont();
+                int size= f.getSize()+stepForSize(f.getSize());
+                if ( size>4 && size<18 ) {
+                    Font nf= f.deriveFont( (float)size );
+                    //getEditor().setFont(nf);
+                    dataSetSelector.setFont(nf);
+                }
+            }
+        });
+
+        map.put("smallerFont", new AbstractAction("smallerFont") {
+            public void actionPerformed(ActionEvent ev) {
+                Font f= getEditor().getFont();
+                int size= f.getSize()-stepForSize(f.getSize());
+                if ( size>4 && size<18 ) {
+                    Font nf= f.deriveFont( (float)size );
+                    //getEditor().setFont(nf);
+                    dataSetSelector.setFont(nf);
+                }
+            }
+        });
+
         dataSetSelector.setActionMap(map);
         final JTextField tf = (JTextField) dataSetSelector.getEditor().getEditorComponent();
         tf.addActionListener(new ActionListener() {
@@ -777,6 +814,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0 ), "complete");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), "plot");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_MASK), "plot");
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_MASK), "smallerFont");
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_MASK), "biggerFont");
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_MASK), "biggerFont");
         needToAddKeys = false;
     }
     private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
