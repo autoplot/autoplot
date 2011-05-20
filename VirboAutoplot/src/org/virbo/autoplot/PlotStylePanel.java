@@ -69,6 +69,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
         };
         run.run();
         //RequestProcessor.invokeLater(run);
+        AutoplotHelpSystem.getHelpSystem().registerHelpID( plotPanel, "stylePanel");
+
     }
 
     private synchronized void doOptionsBindings( ) {
