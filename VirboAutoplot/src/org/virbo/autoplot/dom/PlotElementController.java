@@ -27,6 +27,7 @@ import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
 import org.das2.graph.DefaultPlotSymbol;
 import org.das2.graph.DigitalRenderer;
+import org.das2.graph.EventsRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PsymConnector;
 import org.das2.graph.Renderer;
@@ -799,6 +800,7 @@ public class PlotElementController extends DomNodeController {
                     &&  ( renderType != RenderType.spectrogram 
                     && renderType != RenderType.nnSpectrogram
                     && renderType != RenderType.digital
+                    && renderType != RenderType.eventsBar
                     && renderType != RenderType.pitchAngleDistribution )
                     &&  fillDs.length(0) < QDataSet.MAX_UNIT_BUNDLE_COUNT;
             //if ( joinOfBundle ) shouldHaveChildren= true;
@@ -1437,6 +1439,14 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
             }
 
+        } else if ( spec==RenderType.eventsBar ) {
+            QDataSet qube= EventsRenderer.doAutorange( fillDs );
+            if ( qube==null ) {
+                // nothing
+            } else {
+                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
+                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
+            }
         } else {
 
             QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();

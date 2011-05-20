@@ -1,8 +1,8 @@
 dom= getDocumentModel()
 
 canvas= dom.controller.canvas
-w= canvas.size.width
-h= canvas.size.height
+w= canvas.width
+h= canvas.height
 
 if ( canvas.fitted==False ): print "canvas must be fitted"
 
