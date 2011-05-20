@@ -1870,6 +1870,51 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
+     * replace %{LABEL} or $(LABEL) with value.
+     * @param title
+     * @param label
+     * @param value
+     * @return
+     */
+    private static String insertString( String title, String label, String value ) {
+        String search;
+        search= "%{"+label+"}";
+        if ( title.contains( search ) ) {
+            title= title.replace( search, value );
+        }
+        search= "$("+label+")";
+        if ( title.contains( search ) ) {
+            title= title.replace( search, value );
+        }
+        return title;
+    }
+
+    /**
+     * return true if %{LABEL} or $(LABEL) is found.
+     * @param ptitle
+     * @param label
+     * @return
+     */
+    private static boolean containsString( String ptitle, String label, String value ) {
+        String search;
+        String[] ss=null;
+        search= "%{"+label+"}";
+        if ( ptitle.contains( search ) ) {
+            ss= ptitle.split("%\\{"+label+"\\}",-2);
+        } else {
+            search= "$("+label+")";
+            if ( ptitle.contains( search ) ) {
+                ss= ptitle.split("\\$\\("+label+"\\)",-2);
+            }
+        }
+        if ( ss!=null && value.startsWith(ss[0]) && value.endsWith(ss[1]) ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * special converter that fills in %{CONTEXT} macro, or inserts it when label is consistent with macro.
      * @return
      */
@@ -1878,22 +1923,24 @@ public class PlotElementController extends DomNodeController {
             @Override
             public Object convertForward(Object value) {
                 String title= (String)value;
-                if ( title.contains("%{CONTEXT}" ) ) {
+                if ( title.contains("CONTEXT" ) ) {
                     String contextStr="";
                     if ( plotElement!=null ) {
                         if ( dataSet!=null ) {
                             contextStr= DataSetUtil.contextAsString(dataSet);
+                            title= insertString( title, "CONTEXT", contextStr );
                         }
                     }
-                    title= title.replaceAll("%\\{CONTEXT\\}", contextStr );
-                } else if ( title.contains("%{TIMERANGE}") ) {
+                }
+                if ( title.contains("TIMERANGE") ) {
                     DatumRange tr= PlotElementControllerUtil.getTimeRange( dom, plotElement );
                     if ( tr==null ) {
-                        title= title.replaceAll("\\%\\{TIMERANGE\\}","(no timerange)");
+                        title= insertString( title, "TIMERANGE", "(no timerange)" );
                     } else {
-                        title= title.replaceAll("\\%\\{TIMERANGE\\}",tr.toString());
+                        title= insertString( title, "TIMERANGE",tr.toString() );
                     }
                 }
+                System.err.println("<--"+value + "-->"+title );
                 //see convertReverse, which must be done as well.
                 return title;
             }
@@ -1902,17 +1949,12 @@ public class PlotElementController extends DomNodeController {
             public Object convertReverse(Object value) {
                 String title= (String)value;
                 String ptitle=  plotElement.getLegendLabel();
-                if (ptitle.contains("%{CONTEXT}") ) {
-                    String[] ss= ptitle.split("%\\{CONTEXT\\}",-2);
-                    if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
-                        return ptitle;
-                    }
-                } else if ( ptitle.contains("%{TIMERANGE}") ) {
-                    String[] ss= ptitle.split("%\\{TIMERANGE\\}",-2);
-                    if ( title.startsWith(ss[0]) && title.endsWith(ss[1]) ) {
-                        return ptitle;
-                    }
+                if ( containsString( ptitle, "CONTEXT", title) ) {
+                    title= ptitle;
+                } else if ( containsString( ptitle, "TIMERANGE", title ) ) {
+                    title= ptitle;
                 }
+                System.err.println("-->"+value + "-->"+title );
                 return title;
             }
         };
