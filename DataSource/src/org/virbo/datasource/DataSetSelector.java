@@ -11,8 +11,16 @@ import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
+import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseEvent;
 import org.das2.DasApplication;
 import java.util.logging.Level;
 import javax.swing.text.BadLocationException;
@@ -23,6 +31,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -107,6 +116,25 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
         maybePlotTimer.setRepeats(false);
+
+        editor.addMouseListener( new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if ( e.isPopupTrigger() ) showPopup(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if ( e.isPopupTrigger() ) showPopup(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if ( e.isPopupTrigger() ) showPopup(e);
+            }
+
+        });
     }
     
     boolean needToAddKeys = true;
@@ -769,31 +797,6 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
 
-
-        map.put("biggerFont", new AbstractAction("biggerFont") {
-            public void actionPerformed(ActionEvent ev) {
-                Font f= getEditor().getFont();
-                int size= f.getSize()+stepForSize(f.getSize());
-                if ( size>4 && size<18 ) {
-                    Font nf= f.deriveFont( (float)size );
-                    //getEditor().setFont(nf);
-                    dataSetSelector.setFont(nf);
-                }
-            }
-        });
-
-        map.put("smallerFont", new AbstractAction("smallerFont") {
-            public void actionPerformed(ActionEvent ev) {
-                Font f= getEditor().getFont();
-                int size= f.getSize()-stepForSize(f.getSize());
-                if ( size>4 && size<18 ) {
-                    Font nf= f.deriveFont( (float)size );
-                    //getEditor().setFont(nf);
-                    dataSetSelector.setFont(nf);
-                }
-            }
-        });
-
         dataSetSelector.setActionMap(map);
         final JTextField tf = (JTextField) dataSetSelector.getEditor().getEditorComponent();
         tf.addActionListener(new ActionListener() {
@@ -814,9 +817,9 @@ public class DataSetSelector extends javax.swing.JPanel {
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0 ), "complete");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_MASK), "plot");
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_MASK), "plot");
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_MASK), "smallerFont");
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_MASK), "biggerFont");
-        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_MASK), "biggerFont");
+        //imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_MASK), "smallerFont");
+        //imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_MASK), "biggerFont");
+        //imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_MASK), "biggerFont");
         needToAddKeys = false;
     }
     private Action ABOUT_PLUGINS_ACTION = new AbstractAction("About Plugins") {
@@ -1359,6 +1362,88 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         return ((PromptTextField)getEditor()).getPromptText();
     }
 
+    private void showPopup( MouseEvent e ) {
+        getPopupMenu().show( editor, e.getX(), e.getY() );
+    }
+
+    private JPopupMenu getPopupMenu() {
+        JPopupMenu result= new JPopupMenu();
+        result.add( new AbstractAction("Copy") {
+            public void actionPerformed(ActionEvent e) {
+                StringSelection stringSelection = new StringSelection( editor.getText() );
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(stringSelection, new ClipboardOwner() {
+                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+                    }
+                });
+            }
+        } );
+        result.add( new AbstractAction("Paste") {
+            public void actionPerformed(ActionEvent e) {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                Transferable contents = clipboard.getContents(null);
+                boolean hasTransferableText =
+                        (contents != null) &&
+                        contents.isDataFlavorSupported(DataFlavor.stringFlavor);
+                String result = null;
+                if (hasTransferableText) {
+                    try {
+                        result = (String) contents.getTransferData(DataFlavor.stringFlavor);
+                    } catch (UnsupportedFlavorException ex) {
+                        //highly unlikely since we are using a standard DataFlavor
+                        System.out.println(ex);
+                        ex.printStackTrace();
+                    } catch (IOException ex) {
+                        System.out.println(ex);
+                        ex.printStackTrace();
+                    }
+                }
+                if (result != null) {
+                    editor.setText(result);
+                }
+            }
+        } );
+        JMenu fontMenu= new JMenu( "Font Size" );
+
+        fontMenu.add( new AbstractAction( "Big" ) {
+            public void actionPerformed(ActionEvent ev) {
+                Font f= getEditor().getFont();
+                int size= 16;
+                if ( size>4 && size<18 ) {
+                    Font nf= f.deriveFont( (float)size );
+                    dataSetSelector.setFont(nf);
+                }
+            }
+        });
+
+        fontMenu.add( new AbstractAction( "Normal" ) {
+            public void actionPerformed(ActionEvent ev) {
+                Font f= getEditor().getFont();
+                int size= getParent().getFont().getSize();
+                if ( size>4 && size<18 ) {
+                    Font nf= f.deriveFont( (float)size );
+                    dataSetSelector.setFont(nf);
+                }
+            }
+        });
+
+        fontMenu.add( new AbstractAction( "Small" ) {
+            public void actionPerformed(ActionEvent ev) {
+                Font f= getEditor().getFont();
+                int size= 7;
+                if ( size>4 && size<18 ) {
+                    Font nf= f.deriveFont( (float)size );
+                    dataSetSelector.setFont(nf);
+                }
+            }
+        });
+
+        result.add(fontMenu);
+
+
+        return result;
+
+    }
     public static void main( String[] args ) {
         DataSetSelectorDemo.main(args);
     }
