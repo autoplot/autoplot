@@ -90,8 +90,8 @@ public class URISplit {
     public int formatCarotPos;
 
     /**
-     * if true, then "vap:" for the vapScheme was implicitly added.  We always
-     * format with the "vap:" added.
+     * if true, then "vap:" for the vapScheme was implicitly added.
+     * This is not used any more and should always be false, since we should never add imformationless "vap:" prefix.
      */
     public boolean implicitVap= false;
 
@@ -110,7 +110,6 @@ public class URISplit {
             caretPos = surl.length();
             result.surl = surl;
             result.vapScheme = null;
-            result.implicitVap= true;
             result.resourceUriCarotPos = caretPos;
             result.formatCarotPos = caretPos;
         }
@@ -127,7 +126,9 @@ public class URISplit {
 
         if (scheme.startsWith("vap")) {
             String resourcePart = surl.substring(i0 + 1);
-            result.vapScheme = scheme;
+            if ( !scheme.equals("vap") ) { // legacy URIs would often have informationless "vap:" prefix.  We remove this now.
+                result.vapScheme = scheme;
+            }
             if (scheme.equals("vap+internal")) { // leave the resourcePart alone. TODO: jdbc and other non-file URIs.
                 result.surl= resourcePart;
             } else {
@@ -244,6 +245,24 @@ public class URISplit {
     }
 
     /**
+     * return the vap scheme in split.vapScheme or the one inferred by the 
+     * extension.  Returns an empty string (not "vap") if one cannot be inferred.
+     * e.g:
+     *    /home/jbf/myfile.jyds --> vap+jyds
+     *    vap+txt:/home/jbf/myfile.csv --> vap+txt
+     * This was introduced as part of the effort to get rid of extraneous "vap:"s
+     * that would be added to URIs.
+     *
+     * @param split
+     * @return the vap scheme or empty string.
+     */
+    public static String implicitVapScheme( URISplit split ) {
+        if ( split.vapScheme!=null ) return split.vapScheme;
+        if ( split.ext!=null && split.ext.length()>1 ) return "vap+"+split.ext.substring(1);
+        return "";
+    }
+
+    /**
      * convenient method to remove a parameter (or parameters) from the list of parameters
      * @param surl
      * @param parm
@@ -257,8 +276,8 @@ public class URISplit {
         }
         split.params= URISplit.formatParams(params);
         if ( params.size()==0 ) split.params=null;
-        if ( !surl.startsWith(split.vapScheme) ) split.vapScheme=null;
-        return split.format(split);
+        if ( split.vapScheme!=null && !surl.startsWith(split.vapScheme) ) split.vapScheme=null;
+        return URISplit.format(split);
     }
 
 
@@ -274,7 +293,7 @@ public class URISplit {
         Map <String,String> params= URISplit.parseParams( split.params );
         params.put( name, value );
         split.params= URISplit.formatParams(params);
-        if ( !surl.startsWith(split.vapScheme) ) split.vapScheme=null;
+        if ( split.vapScheme!=null && !surl.startsWith(split.vapScheme) ) split.vapScheme=null;
         return split.format(split);
     }
 
@@ -351,7 +370,6 @@ public class URISplit {
                 }
             } else {
                 if (result.vapScheme == null && normalize ) {
-                    result.implicitVap= true;
                     result.formatCarotPos = result.resourceUriCarotPos;
                 }
                 result.surl = surl;
@@ -408,11 +426,11 @@ public class URISplit {
         if ( result==null ) {
             result= new URISplit();
             result.surl= surl;
-            result.vapScheme= "";
+            result.vapScheme= null;
             result.formatCarotPos= caretPos;
             return result;
         }
-        if ( "vap+internal".equals(result.vapScheme) ) result.file=""; // non-files will get "" for the file, and this should too.
+        if ( result.vapScheme!=null && "vap+internal".equals(result.vapScheme) ) result.file=""; // non-files will get "" for the file, and this should too.
         try {
             if ( result.vapScheme==null || result.file==null ) {
                 parseScheme(result, normalize);

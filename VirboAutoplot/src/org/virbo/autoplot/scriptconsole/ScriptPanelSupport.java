@@ -94,7 +94,7 @@ public class ScriptPanelSupport {
                 return false;
             }
             split = URISplit.parse(sfile);
-            if (!( split.vapScheme.endsWith("jyds") || ( split.file!=null && split.file.endsWith(".jyds") ) ) ) {
+            if (!( URISplit.implicitVapScheme(split).endsWith("jyds") ) ) {
                 return false;
             }
             if (panel.isDirty()) {

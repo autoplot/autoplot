@@ -162,7 +162,7 @@ public class DataSetURLDemo {
     }
 
     private static void maybeClearVap( URISplit split ) {
-        if ( split.vapScheme!=null && split.vapScheme.equals("vap") ) {
+        if ( split.vapScheme!=null && split.vapScheme.equals("vap") ) { //bug 3298675 okay
             split.vapScheme=null;
             split.formatCarotPos-=4;
         }
@@ -220,7 +220,7 @@ public class DataSetURLDemo {
                 return r;
             }
             if (true) {
-                split.formatCarotPos = split.formatCarotPos - split.vapScheme.length() - 1;
+                split.formatCarotPos = split.formatCarotPos - ( split.vapScheme==null ? 0 : split.vapScheme.length() - 1 );
                 split.vapScheme = null;
             }
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();

@@ -664,7 +664,9 @@ public class DataSetURI {
         }
         surl = URISplit.format(URISplit.parse(surl)); // add "vap:" if it's not there
         if ( !( surl.startsWith("vap") ) ) {
-            surl= "vap:"+surl;
+            URISplit split2= URISplit.parse(surl);
+            String vapScheme= URISplit.implicitVapScheme(split2);
+            surl= vapScheme + ":" + surl;
         }
         URI result = new URI(surl); //bug 3055130 okay
         return result;
@@ -889,12 +891,10 @@ public class DataSetURI {
         FileSystem fs = null;
         String[] s;
 
-        boolean hasVap= surl.startsWith("vap");
-
         if ( surlDir.equals("file:" ) || surlDir.equals("file://" ) ) {  //TODO: could go ahead and list
             surlDir="file:///";
             CompletionResult t0;
-            if ( hasVap ) {
+            if ( split.vapScheme!=null ) {
                 t0= new CompletionResult( split.vapScheme + ":" + "file:///","need three slashes");
             } else {
                 t0= new CompletionResult("file:///","need three slashes");
@@ -1174,7 +1174,7 @@ public class DataSetURI {
                         paramsCopy.put(cc1.completable, null);
                     }
 
-                    String ss= ( split.implicitVap ? "" : (split.vapScheme + ":" ) ) + split.file + "?" + URISplit.formatParams(paramsCopy);
+                    String ss= ( split.vapScheme==null ? "" : (split.vapScheme + ":" ) ) + split.file + "?" + URISplit.formatParams(paramsCopy);
 
                     if (dontYetHave == false) {
                         continue;  // skip it
@@ -1206,7 +1206,7 @@ public class DataSetURI {
             for (CompletionContext cc1 : completions) {
                 if ( cc1.completable.startsWith(cc.completable)) {
                     String ss= CompletionContext.insert(cc, cc1);
-                    if ( !ss.startsWith( split.vapScheme ) ) ss = split.vapScheme + ":" + ss;
+                    if ( split.vapScheme!=null && !ss.startsWith( split.vapScheme ) ) ss = split.vapScheme + ":" + ss;
                     result.add(new CompletionResult(ss, cc1.label, cc1.doc, surl1.substring(0, carotPos), cc1.maybePlot));
                     i = i + 1;
                 }

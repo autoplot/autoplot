@@ -44,7 +44,7 @@ public class TestURLSplit {
             char c1= split.surl.length()>split.resourceUriCarotPos ? split.surl.charAt(split.resourceUriCarotPos) : 0;
             System.out.println(""+c+"(@"+carotpos+") == "+c1 +"(@"+split.resourceUriCarotPos+"):  "+(c==c1) );
         }
-        System.out.println( "carotPosAssert="+ ( split.formatCarotPos-split.resourceUriCarotPos == split.vapScheme.length()+1 ) ) ;
+        System.out.println( "carotPosAssert="+ ( split.formatCarotPos-split.resourceUriCarotPos == ( split.vapScheme==null ? 0 : split.vapScheme.length()+1 ) ) ) ;
     }
     
     private static void testComplete( int id, String string, int carotpos ) throws Exception {

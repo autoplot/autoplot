@@ -7,7 +7,6 @@ package test.endtoend;
 import java.io.PrintWriter;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
-import org.virbo.datasource.URISplit;
 import org.virbo.dsops.Ops;
 import org.virbo.jythonsupport.Util;
 import static org.virbo.autoplot.ScriptContext.*;

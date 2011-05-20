@@ -197,7 +197,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
         String delegateSurl = getDelegateDataSourceFactoryUri(surl);
         URISplit split= URISplit.parse(surl);
         URISplit delegateSplit= URISplit.parse(delegateSurl);
-        delegateSplit.vapScheme= split.vapScheme;
+        delegateSplit.vapScheme= split.vapScheme; // TODO: verify this
         URI uri= DataSetURI.toUri( URISplit.format(delegateSplit) );
         return DataSetURI.getDataSourceFactory( uri, new NullProgressMonitor());
     }

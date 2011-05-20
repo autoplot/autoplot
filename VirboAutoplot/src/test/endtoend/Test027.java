@@ -41,6 +41,7 @@ public class Test027 {
         out.println( URISplit.format(split) );
 
         out.println( spaces.substring(0,split.formatCarotPos) + "^" );
+        out.println( URISplit.implicitVapScheme(split) );
         out.println("===");
         
         out.println(split);
@@ -68,6 +69,7 @@ public class Test027 {
 
             URISplit split;
 
+            doTest( 13, "vap:file:///home/jbf/ct/hudson/data.backup/cdf/po_hyd/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=2000-01-09" );
             doTest( 0, "vap+cdaweb:ds=ac_k0_epm&H_lo&timerange=2010-01" );
             doTest( 1, "vap+inline:rand(200)" );
             doTest( 2, "vap+inline:accum(randomn(0,1000))&DEPEND_0=accum(randomn(1,1000))" );

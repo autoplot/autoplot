@@ -512,7 +512,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                 return;
             }
             if ( !enableDataSource ) {
-                split.formatCarotPos= split.formatCarotPos - split.vapScheme.length() - 1;
+                split.formatCarotPos= split.formatCarotPos - ( split.vapScheme==null ? 0 : split.vapScheme.length() - 1 );
                 split.vapScheme=null;
             }
             int firstSlashAfterHost = split.authority == null ? 0 : split.authority.length();
