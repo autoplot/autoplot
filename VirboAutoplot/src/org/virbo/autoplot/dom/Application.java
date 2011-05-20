@@ -140,6 +140,9 @@ public class Application extends DomNode {
     }
 
     public void setTimeRange(DatumRange timeRange) {
+        if ( timeRange==null ) {
+            throw new IllegalArgumentException("timeRange set to null");
+        }
         DatumRange oldTimeRange = this.timeRange;
         this.timeRange = timeRange;
         propertyChangeSupport.firePropertyChange(PROP_TIMERANGE, oldTimeRange, timeRange);
