@@ -8,7 +8,7 @@ ant do-tag
 cd ../VirboAutoplot
 ant do-tag
 
-export AP_VERSION=20110521
+export AP_VERSION=20110521 
 
 ant jar -Ddefault_release_tag=$AP_VERSION
 ant jnlp-release -Ddefault_release_tag=$AP_VERSION
