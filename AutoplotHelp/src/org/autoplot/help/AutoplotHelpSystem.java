@@ -127,6 +127,9 @@ public class AutoplotHelpSystem {
      * system will use this ID string as a hash key to find the correct HTML file
      * to display for context-sensitive help.
      *
+     * TitledBorder panels and children that are TitledBorders will have their
+     * title behave like a link into the documentation.
+     *
      * @param c
      * @param helpID
      */
