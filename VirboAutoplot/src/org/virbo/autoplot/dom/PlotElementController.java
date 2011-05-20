@@ -1940,7 +1940,7 @@ public class PlotElementController extends DomNodeController {
                         title= insertString( title, "TIMERANGE",tr.toString() );
                     }
                 }
-                System.err.println("<--"+value + "-->"+title );
+                //System.err.println("<--"+value + "-->"+title );
                 //see convertReverse, which must be done as well.
                 return title;
             }
@@ -1954,7 +1954,7 @@ public class PlotElementController extends DomNodeController {
                 } else if ( containsString( ptitle, "TIMERANGE", title ) ) {
                     title= ptitle;
                 }
-                System.err.println("-->"+value + "-->"+title );
+                //System.err.println("-->"+value + "-->"+title );
                 return title;
             }
         };
