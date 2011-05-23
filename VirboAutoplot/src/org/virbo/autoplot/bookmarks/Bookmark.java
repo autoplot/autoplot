@@ -12,16 +12,21 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,6 +42,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.das2.util.Base64;
+import org.das2.util.monitor.NullProgressMonitor;
+import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSourceUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -50,6 +58,9 @@ import org.xml.sax.SAXException;
  * @author jbf
  */
 public abstract class Bookmark {
+
+    public static final String MSG_NO_REMOTE= "(remote not available)";
+    public static final String MSG_REMOTE= "(remote)";
 
     public static List<Bookmark> parseBookmarks(String data) throws SAXException, IOException {
         try {
@@ -124,17 +135,33 @@ public abstract class Bookmark {
             String remoteUrl= null;
             if ( remoteUrlNode!=null ) { // 2984078
                 remoteUrl= URLDecoder.decode( remoteUrlNode.getNodeValue(), "US-ASCII" );
+                InputStream in=null;
                 try {
                     System.err.println("opening "+remoteUrl+"...");
                     URL rurl= new URL(remoteUrl);
                     URLConnection connect= rurl.openConnection();
                     connect.setConnectTimeout(1000);
                     connect.setReadTimeout(1000);
-                    InputStream inn = connect.getInputStream();
-                    Reader in = new InputStreamReader( inn );
+
+                    // copy remote file to local string, so we can check content type.  Autoplot.org always returns 200 okay, even if file doesn't exist.
+                    in = DataSetURI.getInputStream( rurl.toURI(), new NullProgressMonitor() );
+                    ByteArrayOutputStream boas=new ByteArrayOutputStream();
+                    WritableByteChannel dest = Channels.newChannel(boas);
+                    ReadableByteChannel src = Channels.newChannel(in);
+                    DataSourceUtil.transfer(src, dest);
+                    in.close();
+                    in= null; // don't close it again.
+
+                    String sin= new String( boas.toByteArray() );
+
+                    if ( !sin.startsWith("<book") && !sin.startsWith("<?xml") ) {
+                        System.err.println("not a bookmark xml file: "+rurl );
+                        throw new IllegalArgumentException("not a bookmark xml file: "+rurl );
+                    }
+                    
                     DocumentBuilder builder;
                     builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                    InputSource source = new InputSource(in);
+                    InputSource source = new InputSource( new StringReader(sin) );
                     Document document = builder.parse(source);
 
                     XPathFactory factory= XPathFactory.newInstance();
@@ -145,7 +172,9 @@ public abstract class Bookmark {
                     //nl = ((Element) document.getDocumentElement()).getElementsByTagName("bookmark-list");
                     Element flist = (Element) nl.item(0);
                     contents = parseBookmarks(flist);
-                    in.close();
+
+                } catch (URISyntaxException ex ) {
+                    ex.printStackTrace();
                 } catch (XPathExpressionException ex) {
                     Logger.getLogger(Bookmark.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (SAXException ex) {
@@ -156,11 +185,25 @@ public abstract class Bookmark {
                     ex.printStackTrace();
                 } catch ( IllegalArgumentException ex ) {
                     ex.printStackTrace();
+                } catch ( FileNotFoundException ex ) {
+                    ex.printStackTrace();
+                } catch ( IOException ex ) {
+                    ex.printStackTrace();
+                } finally {
+                    if ( in!=null ) {
+                        try {
+                            in.close();
+                        } catch ( IOException ex ) {
+                            ex.printStackTrace();
+                        }
+                    }
                 }
                 if ( contents==null || contents.size()==0 ) {
                     System.err.println("unable to parse bookmarks at "+remoteUrl);
+                    System.err.println("Maybe using local copy");
+                    title= title + " "+MSG_NO_REMOTE;
                 } else {
-                    title= title + " (remote)";
+                    title= title + " "+MSG_REMOTE;
                 }
             } else {
 
@@ -262,7 +305,8 @@ public abstract class Bookmark {
                 Bookmark.Folder f = (Bookmark.Folder) bookmark;
                 String title= f.getTitle();
                 if ( f.getRemoteUrl()!=null ) {
-                    if ( title.endsWith(" (remote)") ) title= title.substring(0,title.length()-" (remote)".length());
+                    if ( title.endsWith(" " + MSG_REMOTE) ) title= title.substring(0,title.length()-(1+MSG_REMOTE.length()));
+                    if ( title.endsWith(" " + MSG_NO_REMOTE ) ) title= title.substring(0,title.length()-(1+MSG_NO_REMOTE.length()));
                     buf.append("  <bookmark-folder remoteUrl=\"" +URLEncoder.encode(f.getRemoteUrl(), "UTF-8")  +"\">\n");
                 } else {
                     buf.append("  <bookmark-folder>\n");

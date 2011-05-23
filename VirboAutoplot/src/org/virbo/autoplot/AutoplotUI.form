@@ -407,7 +407,7 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="exceptionReport">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Provide Feedback"/>
+                <Property name="text" type="java.lang.String" value="Provide Feedback..."/>
                 <Property name="toolTipText" type="java.lang.String" value="Send feedback to application support"/>
               </Properties>
               <Events>

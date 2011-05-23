@@ -467,7 +467,7 @@ public class BookmarksManagerModel {
                 Bookmark m=  importBook.get(i);
                 if ( m instanceof Bookmark.Folder ) {
                     ((Bookmark.Folder)m).setRemoteUrl( surl );
-                    ((Bookmark.Folder)m).setTitle( m.getTitle() + " (remote)");
+                    ((Bookmark.Folder)m).setTitle( m.getTitle() + " "+Bookmark.MSG_REMOTE );
                     copy.add( m );
                 }
             }

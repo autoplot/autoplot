@@ -389,11 +389,12 @@ public class AutoplotUI extends javax.swing.JFrame {
         }
 
         //since bookmarks can contain remote folder, get these after making the gui.
-        SwingUtilities.invokeLater( new Runnable() {
+        Runnable run= new Runnable() {
             public void run() {
                 updateBookmarks();
             }
-        });
+        };
+        RequestProcessor.invokeLater(run);
 
         addTools();
 
@@ -1544,7 +1545,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
         toolsMenu.add(decodeURLItem);
 
-        exceptionReport.setText("Provide Feedback");
+        exceptionReport.setText("Provide Feedback...");
         exceptionReport.setToolTipText("Send feedback to application support");
         exceptionReport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
