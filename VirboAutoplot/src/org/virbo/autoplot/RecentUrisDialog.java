@@ -16,7 +16,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- *
+ * Present GUI showing history of plotted URIs with buttons for
+ * ok, plotting below, as an overplot, or editing.  The getModifiers()
+ * method is called to see which action was pressed:
+ *   0                    replace plot
+ *   KeyEvent.CTRL_MASK   plot below
+ *   KeyEvent.SHIFT_MASK  overplot
+ *   KeyEvent.ALT_MASK    edit this URI.
  * @author jbf
  */
 public class RecentUrisDialog extends javax.swing.JDialog {
@@ -90,6 +96,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         overplotButton = new javax.swing.JButton();
         plotBelowButton = new javax.swing.JButton();
         plotButton = new javax.swing.JButton();
+        editUriButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Recent History");
@@ -144,15 +151,26 @@ public class RecentUrisDialog extends javax.swing.JDialog {
             }
         });
 
+        editUriButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/file.png"))); // NOI18N
+        editUriButton.setText("Edit");
+        editUriButton.setToolTipText("Inspect this resource.  If an editor panel is available, this will enter the editor panel before plotting.  Otherwise the\nURI is copied to the address bar for editing with completions.");
+        editUriButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editUriButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(412, Short.MAX_VALUE)
+                .addContainerGap(345, Short.MAX_VALUE)
                 .add(cancelButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(overplotButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(editUriButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 61, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotBelowButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -183,7 +201,8 @@ public class RecentUrisDialog extends javax.swing.JDialog {
                     .add(plotButton)
                     .add(plotBelowButton)
                     .add(cancelButton)
-                    .add(overplotButton))
+                    .add(overplotButton)
+                    .add(editUriButton))
                 .addContainerGap())
         );
 
@@ -220,6 +239,12 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         setFilter( filterTextField.getText() );
     }//GEN-LAST:event_filterTextFieldActionPerformed
 
+    private void editUriButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editUriButtonActionPerformed
+        cancelled= false;
+        setModifiers( KeyEvent.ALT_MASK );
+        setVisible(false);
+    }//GEN-LAST:event_editUriButtonActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -239,6 +264,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
+    private javax.swing.JButton editUriButton;
     private javax.swing.JTextField filterTextField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton overplotButton;
