@@ -316,12 +316,16 @@ public class DataSetSelector extends javax.swing.JPanel {
      *   0                    replace plot
      *   KeyEvent.CTRL_MASK   plot below
      *   KeyEvent.SHIFT_MASK  overplot
-     *   KeyEvent.ALT_MASK    edit this URI.  (Only with recent history for now)
+     *   KeyEvent.ALT_MASK    edit this URI.  (Only with recent history uses this for now)
      * @param keyModifiers
      */
     public void maybePlot(int keyModifiers) {
         this.keyModifiers= keyModifiers;
-        maybePlot(true);
+        if ( (keyModifiers&KeyEvent.ALT_MASK ) == KeyEvent.ALT_MASK ) {
+            browseSourceType();
+        } else {
+            maybePlot(true);
+        }
     }
 
     private void firePlotDataSetURL() {
