@@ -312,7 +312,11 @@ public class DataSetSelector extends javax.swing.JPanel {
     }
 
     /**
-     * trigger a plot, allowing modifiers such as ctrl (plot below) and shift (overplot)
+     * trigger a plot, allowing modifiers such as:
+     *   0                    replace plot
+     *   KeyEvent.CTRL_MASK   plot below
+     *   KeyEvent.SHIFT_MASK  overplot
+     *   KeyEvent.ALT_MASK    edit this URI.  (Only with recent history for now)
      * @param keyModifiers
      */
     public void maybePlot(int keyModifiers) {
