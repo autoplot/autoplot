@@ -774,6 +774,28 @@ public class PlotElementController extends DomNodeController {
     }
 
     /**
+     * listen for changes in the parent's component property and propagate changes
+     * to children.
+     * @param plotElement
+     * @param ele
+     */
+    private void addParentComponentListener( PlotElement plotElement, final PlotElement ele ) {
+        plotElement.addPropertyChangeListener( new PropertyChangeListener() { // need to listen for component changes for |slice1(x)|unbundle('A')
+            public void propertyChange(PropertyChangeEvent evt) {
+                if ( evt.getPropertyName().equals(PlotElement.PROP_COMPONENT) ) {
+                    Object v= evt.getNewValue();
+                    int i= ele.getComponent().indexOf("|unbundle");
+                    if ( i!=-1 ) {
+                        String sv= (String)v;
+                        if ( sv.length()>=i ) {
+                            ele.setComponent( sv.substring(0,i)+ele.getComponent().substring(i) );
+                        }
+                    }
+                }
+            }
+        } );
+    }
+    /**
      * preconditions:
      *   the new renderType has been identified.
      *   The dataset to be rendered has been identified.
@@ -878,12 +900,13 @@ public class PlotElementController extends DomNodeController {
                             s= labels[i];
                         } else {
                             s= s+"|unbundle('"+labels[i]+"')";
+                            //addParentComponentListener(plotElement,ele);
                         }
                         ele.setComponentAutomatically(s);
                         ele.setDisplayLegend(true);
                         if ( ele.isAutoLabel() ) ele.setLegendLabelAutomatically(s.trim());
                         ele.setRenderTypeAutomatically(plotElement.getRenderType()); // this creates the das2 SeriesRenderer.
-                        ele.controller.setDataSet(fillDs, false);
+                        //ele.controller.setDataSet(fillDs, false);
                     }
                     for ( PlotElement ele: cp ) {
                         ele.controller.getRenderer().setActive(true);
@@ -1881,7 +1904,9 @@ public class PlotElementController extends DomNodeController {
 
 
     /**
-     * special converter that fills in %{CONTEXT} macro, or inserts it when label is consistent with macro.
+     * special converter that fills in %{CONTEXT} macro, or inserts it when 
+     * label is consistent with macro.  Also now does %{COMPONENT}.  Note
+     * this won't do both right now.
      * @return
      */
     private Converter getLabelConverter() {
@@ -1908,6 +1933,13 @@ public class PlotElementController extends DomNodeController {
                 }
                 //System.err.println("<--"+value + "-->"+title );
                 //see convertReverse, which must be done as well.
+                if ( title.contains("COMPONENT") ) {
+                    String ss="";
+                    if ( plotElement!=null ) {
+                        ss= plotElement.getComponent();
+                    }
+                    title= insertString( title, "COMPONENT", ss );
+                }
                 return title;
             }
 
@@ -1919,8 +1951,9 @@ public class PlotElementController extends DomNodeController {
                     title= ptitle;
                 } else if ( containsString( ptitle, "TIMERANGE", title ) ) {
                     title= ptitle;
+                } else if ( containsString( ptitle, "COMPONENT", title ) ) {
+                    title= ptitle;
                 }
-                //System.err.println("-->"+value + "-->"+title );
                 return title;
             }
         };

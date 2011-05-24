@@ -27,6 +27,7 @@ import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.das2.datum.UnitsConverter;
+import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DataSetOps;
@@ -179,7 +180,13 @@ public class CdfJavaDataSource extends AbstractDataSource {
         } else if ( pu==Units.microseconds && u==Units.us2000 ) { // epoch16
             uc= UnitsConverter.IDENTITY;
         } else {
-            uc= UnitsConverter.getConverter( pu, u );
+            if ( pu==u ) {
+                uc= UnitsConverter.IDENTITY;
+            } else if ( UnitsUtil.isOrdinalMeasurement(u) || UnitsUtil.isOrdinalMeasurement(pu) ) {
+                return;
+            } else {
+                uc= UnitsConverter.getConverter( pu, u );
+            }
         }
 
         double dmin=Double.NEGATIVE_INFINITY;
