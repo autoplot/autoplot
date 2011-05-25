@@ -185,6 +185,7 @@
             <fileset file="${jnlp.dir}/lib/jfits-0.93.jar" />
             <fileset file="${jnlp.dir}/lib/jpeg2000.jar" />
             <fileset file="${jnlp.dir}/lib/jython.jar" />
+            <fileset file="${jnlp.dir}/lib/jython-lib-2.2.1.jar" />
             <fileset file="${jnlp.dir}/lib/metadata-extractor-2.1.0.jar" />
             <fileset file="${jnlp.dir}/lib/netcdf-4.1.jar" />
             <fileset file="${jnlp.dir}/lib/nlog4j-1.2.21.jar" />
