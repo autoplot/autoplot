@@ -1,0 +1,47 @@
+# demo events bar
+
+from org.virbo.dsutil import DataSetBuilder
+from org.das2.datum import EnumerationUnits
+
+dsb= DataSetBuilder(2,100,3)
+
+print dsb
+
+tu= Units.t2000
+dtu= Units.seconds
+evu= EnumerationUnits.create('S/C Events')
+
+dsb.putValue( -1, 0, tu.parse('2003-05-10T05:00').doubleValue(tu) )
+dsb.putValue( -1, 1, dtu.parse('100 s' ).doubleValue(dtu) )
+dsb.putValue( -1, 2, evu.createDatum('test EFA').doubleValue(evu) )
+dsb.nextRecord()
+
+dsb.putValue( -1, 0, tu.parse('2003-05-10T05:20').doubleValue(tu) )
+dsb.putValue( -1, 1, dtu.parse('100 s' ).doubleValue(dtu) )
+dsb.putValue( -1, 2, evu.createDatum('test EFA-2').doubleValue(evu) )
+dsb.nextRecord()
+
+dsb.putValue( -1, 0, tu.parse('2003-05-10T05:50').doubleValue(tu) )
+dsb.putValue( -1, 1, dtu.parse('300 s' ).doubleValue(dtu) )
+dsb.putValue( -1, 2, evu.createDatum('test AEFA').doubleValue(evu) )
+dsb.nextRecord()
+
+ds= dsb.getDataSet()
+
+from org.virbo.dataset import DDataSet
+
+bds= DDataSet.createRank2( 3, 0 )
+bds.putProperty( 'NAME__0', 'Time' )
+bds.putProperty( 'UNITS__0', tu )
+bds.putProperty( 'NAME__1', 'Duration' )
+bds.putProperty( 'UNITS__1', dtu )
+bds.putProperty( 'NAME__2', 'Event' )
+bds.putProperty( 'UNITS__2', evu )
+
+ds.putProperty( QDataSet.BUNDLE_1, bds )
+
+plot( ds )
+
+
+
+
