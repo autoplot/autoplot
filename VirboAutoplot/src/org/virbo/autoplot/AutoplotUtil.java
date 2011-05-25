@@ -1063,6 +1063,15 @@ public class AutoplotUtil {
                 if ( bundle1!=null ) {
                     if ( bundle1.length()==3 && bundle1.property(QDataSet.DEPEND_0,2)!=null ) { // bad kludge
                         spec= RenderType.colorScatter;
+                    } else if ( bundle1.length()==3 || bundle1.length()==4 ) {
+                        Units u0= (Units) bundle1.property(QDataSet.UNITS,0);
+                        if ( u0==null ) u0= Units.dimensionless;
+                        Units u1= (Units) bundle1.property(QDataSet.UNITS,1);
+                        if ( u1==null ) u1= Units.dimensionless;
+                        Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
+                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) && u0.getOffsetUnits().isConvertableTo(u1) ) {
+                            spec= RenderType.eventsBar;
+                        }
                     }
                 }
             } else {
