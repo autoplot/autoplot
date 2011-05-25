@@ -6,7 +6,10 @@ package org.virbo.jythonsupport;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import org.python.core.Py;
+import org.python.core.PyObject;
+import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
 import org.python.util.PythonInterpreter;
@@ -30,7 +33,26 @@ public class JythonUtil {
         if ( PySystemState.cachedir==null ) {
             System.setProperty( "python.cachedir", System.getProperty("user.home")+"/autoplot_data/pycache" );
         }
-        InteractiveInterpreter interp = new InteractiveInterpreter();
+        
+        //r.
+        ///  http://www.gossamer-threads.com/lists/python/python/697524
+        org.python.core.PySystemState pySys = new org.python.core.PySystemState();
+        URL jarUrl= Class.class.getResource("/glob.py");
+        if ( jarUrl!=null ) {
+            String jarFile= jarUrl.toString();
+
+            if ( jarFile.startsWith("jar:") && jarFile.contains("!") ) {
+                int i= jarFile.indexOf("!");
+                String jar= jarFile.substring(9,i);
+                pySys.path.insert(0, new PyString(jar));
+            }
+            
+        } else {
+            System.err.println("Not adding Lib stuff!!!  See https://sourceforge.net/tracker/index.php?func=detail&aid=3134982&group_id=199733&atid=970682");
+        }
+
+        InteractiveInterpreter interp = new InteractiveInterpreter( null, pySys );
+        
         Py.getAdapter().addPostClass(new PyQDataSetAdapter());
         URL imports= JythonOps.class.getResource("imports.py");
         if ( imports==null ) {
