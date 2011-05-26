@@ -56,6 +56,7 @@ import org.das2.graph.EventsRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PitchAngleDistributionRenderer;
 import org.das2.graph.PsymConnector;
+import org.das2.graph.RGBImageRenderer;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
@@ -1157,6 +1158,14 @@ public class AutoplotUtil {
                 return recyclable;
             } else {
                 Renderer result = new DigitalRenderer();
+                result.setDataSetLoader(null);
+                return result;
+            }
+        } else if ( renderType==RenderType.image ) {
+            if (recyclable != null && recyclable instanceof RGBImageRenderer ) {
+                return recyclable;
+            } else {
+                Renderer result = new RGBImageRenderer();
                 result.setDataSetLoader(null);
                 return result;
             }
