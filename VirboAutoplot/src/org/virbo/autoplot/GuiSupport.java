@@ -557,6 +557,14 @@ public class GuiSupport {
             }
         }));
 
+        result.add(new JMenuItem(new AbstractAction("Image") {
+
+            public void actionPerformed(ActionEvent e) {
+                PlotElement pe = plot.getController().getApplication().getController().getPlotElement();
+                pe.setRenderType(RenderType.image);
+            }
+        }));
+
         result.add(new JMenuItem(new AbstractAction("Pitch Angle Distribution") {
 
             public void actionPerformed(ActionEvent e) {
