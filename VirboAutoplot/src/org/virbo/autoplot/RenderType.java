@@ -10,6 +10,7 @@ public enum RenderType {
     stairSteps,
     fillToZero,
     digital,
+    image,
     pitchAngleDistribution,
     eventsBar,
 }
