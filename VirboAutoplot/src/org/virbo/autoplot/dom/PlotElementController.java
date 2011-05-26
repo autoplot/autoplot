@@ -817,7 +817,10 @@ public class PlotElementController extends DomNodeController {
             //boolean joinOfBundle= fillDs.property(QDataSet.JOIN_0)!=null && lastDimBundle;
             int ndim= Ops.dimensionCount(fillDs);
             boolean shouldSlice= ( fillDs.rank()>2 && ndim>3 && plotElement.isAutoComponent() );
-
+            if ( renderType==RenderType.image && fillDs.rank()==3 ) {
+                shouldSlice= false; //TODO: some how render types should indicate they can handle a slice.
+            }
+                    
             boolean shouldHaveChildren= fillDs.rank() == 2
                     &&  ( renderType != RenderType.spectrogram 
                     && renderType != RenderType.nnSpectrogram
