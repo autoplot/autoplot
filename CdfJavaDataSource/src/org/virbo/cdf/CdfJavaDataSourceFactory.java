@@ -78,8 +78,9 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 ccresult.add(cc1);
             }
 
-            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "interpMeta=", "suppress interpretation of metadata"));
-            
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "interpMeta=", "control interpretation of metadata"));
+            ccresult.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, "doDep=", "control dependencies between variables"));
+
             return ccresult;
             
         } else if ( cc.context==CompletionContext.CONTEXT_PARAMETER_VALUE ) {
@@ -109,8 +110,12 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 return ccresult;
             } else if ( parmname.equals("interpMeta") ) {
                 return Arrays.asList(
-                        new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "yes", "use metadata" ),
+                        new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "yes", "use metadata (default)" ),
                         new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "no", "inhibit use of metadata" ) );
+            } else if ( parmname.equals("doDep") ) {
+                return Arrays.asList(
+                        new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "yes", "use dependency tags (default)" ),
+                        new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, "no", "inhibit use of dependency tags" ) );
             } else {
                 return Collections.emptyList();
             }

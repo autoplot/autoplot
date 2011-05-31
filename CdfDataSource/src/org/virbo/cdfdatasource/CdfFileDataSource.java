@@ -117,6 +117,18 @@ public class CdfFileDataSource extends AbstractDataSource {
 
             cdf.close();
 
+            boolean doDep= !"no".equals( map.get("doDep") );
+            if ( !doDep ) {
+                result.putProperty( QDataSet.DEPEND_0, null );
+                result.putProperty( QDataSet.DEPEND_1, null );
+                result.putProperty( QDataSet.DEPEND_2, null );
+                result.putProperty( QDataSet.DEPEND_3, null );
+                attributes.remove( "DEPEND_0" );
+                attributes.remove( "DEPEND_1" );
+                attributes.remove( "DEPEND_2" );
+                attributes.remove( "DEPEND_3" );
+            }
+
             if (!"no".equals(interpMeta)) {
                 MetadataModel model = new IstpMetadataModel();
 
@@ -308,13 +320,13 @@ public class CdfFileDataSource extends AbstractDataSource {
                         if (DataSetUtil.isMonotonic(depDs)) {
                             depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
                         } else {
-                            if (sidep == 0) {
-                                logger.info("sorting dep0 to make depend0 monotonic");
-                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
-                                result = DataSetOps.applyIndex(result, idep, sort, false);
-                                depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
-                                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
-                            }
+//                            if (sidep == 0) {
+//                                logger.info("sorting dep0 to make depend0 monotonic");
+//                                QDataSet sort = org.virbo.dataset.DataSetOps.sort(depDs);
+//                                result = DataSetOps.applyIndex(result, idep, sort, false);
+//                                depDs = DataSetOps.applyIndex(depDs, 0, sort, false);
+//                                depDs.putProperty(QDataSet.MONOTONIC, Boolean.TRUE);
+//                            }
                         }
 
                         if ( "Data_No".equals( dep.get("NAME") ) ) {
@@ -532,6 +544,11 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
                 if (svariable == null) {
                     throw new IllegalArgumentException("variable not specified");
+                }
+                int i = svariable.indexOf("[");
+                if (i != -1) {
+                    //constraint = svariable.substring(i);
+                    svariable = svariable.substring(0, i);
                 }
                 Variable variable = cdf.getVariable(svariable);
                 attributes= readAttributes(cdf, variable, 0);

@@ -43,7 +43,7 @@ bds.putProperty( 'UNITS__3', evu )
 
 ds.putProperty( QDataSet.BUNDLE_1, bds )
 
-plot( ds )
+plot( 1, ds )
 
 
 
