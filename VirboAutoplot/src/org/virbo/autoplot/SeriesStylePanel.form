@@ -30,7 +30,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Symbol Line"/>
+            <TitledBorder title="Series"/>
           </Border>
         </Property>
       </Properties>
@@ -77,7 +77,7 @@
                           <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace pref="28" max="32767" attributes="0"/>
+                  <EmptySpace pref="22" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -131,13 +131,13 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel3">
           <Properties>
-            <Property name="text" type="java.lang.String" value="line thickness:"/>
+            <Property name="text" type="java.lang.String" value="Line Thickness:"/>
             <Property name="toolTipText" type="java.lang.String" value="thickness of the plot trace"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel2">
           <Properties>
-            <Property name="text" type="java.lang.String" value="symbol size:"/>
+            <Property name="text" type="java.lang.String" value="Symbol Size:"/>
             <Property name="toolTipText" type="java.lang.String" value="size of the plot symbols"/>
           </Properties>
         </Component>
@@ -157,13 +157,13 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel6">
           <Properties>
-            <Property name="text" type="java.lang.String" value="color:"/>
+            <Property name="text" type="java.lang.String" value="Color:"/>
             <Property name="toolTipText" type="java.lang.String" value="color of the line and plot symbols"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel7">
           <Properties>
-            <Property name="text" type="java.lang.String" value="fill color:"/>
+            <Property name="text" type="java.lang.String" value="Fill Color:"/>
             <Property name="toolTipText" type="java.lang.String" value="Fill with this color"/>
           </Properties>
         </Component>
@@ -176,7 +176,7 @@
         </Container>
         <Component class="javax.swing.JCheckBox" name="fillToReferenceCheckBox">
           <Properties>
-            <Property name="text" type="java.lang.String" value="fill to reference"/>
+            <Property name="text" type="java.lang.String" value="Fill To Reference"/>
             <Property name="toolTipText" type="java.lang.String" value="Fill from the plot trace to a reference value"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -187,7 +187,7 @@
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel8">
           <Properties>
-            <Property name="text" type="java.lang.String" value="reference value:"/>
+            <Property name="text" type="java.lang.String" value="Reference Value:"/>
             <Property name="toolTipText" type="java.lang.String" value="Fill to this value"/>
           </Properties>
         </Component>
@@ -203,7 +203,7 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel9">
           <Properties>
-            <Property name="text" type="java.lang.String" value="plot symbol:"/>
+            <Property name="text" type="java.lang.String" value="Plot Symbol:"/>
             <Property name="toolTipText" type="java.lang.String" value="type of symbol, or none."/>
           </Properties>
         </Component>
@@ -213,7 +213,7 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel10">
           <Properties>
-            <Property name="text" type="java.lang.String" value="line style:"/>
+            <Property name="text" type="java.lang.String" value="Line Style:"/>
             <Property name="toolTipText" type="java.lang.String" value="style of the plot trace, or none"/>
           </Properties>
         </Component>

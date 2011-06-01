@@ -85,7 +85,7 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
 
         colorPanel.setLayout(new java.awt.BorderLayout());
 
-        jLabel6.setText("color:");
+        jLabel6.setText("Color:");
         jLabel6.setToolTipText("color of the line and plot symbols");
 
         lineStylePanel.setLayout(new java.awt.BorderLayout());

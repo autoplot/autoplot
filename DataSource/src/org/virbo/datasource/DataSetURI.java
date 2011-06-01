@@ -666,6 +666,10 @@ public class DataSetURI {
         if ( !( surl.startsWith("vap") ) ) {
             URISplit split2= URISplit.parse(surl);
             String vapScheme= URISplit.implicitVapScheme(split2);
+            if ( vapScheme.equals("") ) {
+                //one last hangout for generic "vap" type.  Better hope they don't use it...  Call it vap+X so it's easier to debug.
+                vapScheme="vap+X";
+            }
             surl= vapScheme + ":" + surl;
         }
         URI result = new URI(surl); //bug 3055130 okay

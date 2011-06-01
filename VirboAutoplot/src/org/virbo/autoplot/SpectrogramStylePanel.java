@@ -90,10 +90,10 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
         colortableTypePanel.setToolTipText("colortable for spectrograms\n");
         colortableTypePanel.setLayout(new java.awt.BorderLayout());
 
-        jLabel4.setText("colortable:");
+        jLabel4.setText("Colortable:");
         jLabel4.setToolTipText("colortable for spectrograms");
 
-        jLabel5.setText("rebin:");
+        jLabel5.setText("Rebin:");
         jLabel5.setToolTipText("method for binning to pixel resolution");
 
         rebinPanel.setToolTipText("algorythm for binning to pixel resolution");
@@ -112,7 +112,7 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(rebinPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 142, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(colortableTypePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 141, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -138,7 +138,7 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 349, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 

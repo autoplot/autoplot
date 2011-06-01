@@ -473,7 +473,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         bindingActionsMenu.add(deleteBindingsMenuItem);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plots"));
-        jPanel1.setToolTipText("Plot layout on the canvas");
+        jPanel1.setToolTipText("Layout of plots on the canvas");
 
         canvasLayoutPanel1.setText("canvasLayoutPanel1");
 
@@ -489,7 +489,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot Elements"));
-        jPanel2.setToolTipText("Plot elements draw data onto plots.");
+        jPanel2.setToolTipText("List of plot elements (renderings of data) on the canvas");
 
         panelListComponent.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -510,7 +510,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Bindings"));
-        jPanel3.setToolTipText("Property bindings connect DOM properties");
+        jPanel3.setToolTipText("List of connections between DOM properties");
 
         bindingListComponent.setModel(new javax.swing.AbstractListModel() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };

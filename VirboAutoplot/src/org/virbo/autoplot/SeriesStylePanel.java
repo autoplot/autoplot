@@ -141,12 +141,12 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         jLabel10 = new javax.swing.JLabel();
         lineStylePanel = new javax.swing.JPanel();
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Symbol Line"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Series"));
 
-        jLabel3.setText("line thickness:");
+        jLabel3.setText("Line Thickness:");
         jLabel3.setToolTipText("thickness of the plot trace");
 
-        jLabel2.setText("symbol size:");
+        jLabel2.setText("Symbol Size:");
         jLabel2.setToolTipText("size of the plot symbols");
 
         lineThickSpinner.setToolTipText("thickness of the plot trace");
@@ -155,31 +155,31 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
 
         colorPanel.setLayout(new java.awt.BorderLayout());
 
-        jLabel6.setText("color:");
+        jLabel6.setText("Color:");
         jLabel6.setToolTipText("color of the line and plot symbols");
 
-        jLabel7.setText("fill color:");
+        jLabel7.setText("Fill Color:");
         jLabel7.setToolTipText("Fill with this color");
 
         fillColorPanel.setToolTipText("fill with this color");
         fillColorPanel.setLayout(new java.awt.BorderLayout());
 
-        fillToReferenceCheckBox.setText("fill to reference");
+        fillToReferenceCheckBox.setText("Fill To Reference");
         fillToReferenceCheckBox.setToolTipText("Fill from the plot trace to a reference value");
         fillToReferenceCheckBox.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-        jLabel8.setText("reference value:");
+        jLabel8.setText("Reference Value:");
         jLabel8.setToolTipText("Fill to this value");
 
         referenceValuePanel.setToolTipText("fill to this value");
         referenceValuePanel.setLayout(new java.awt.BorderLayout());
 
-        jLabel9.setText("plot symbol:");
+        jLabel9.setText("Plot Symbol:");
         jLabel9.setToolTipText("type of symbol, or none.");
 
         psymPanel.setLayout(new java.awt.BorderLayout());
 
-        jLabel10.setText("line style:");
+        jLabel10.setText("Line Style:");
         jLabel10.setToolTipText("style of the plot trace, or none");
 
         lineStylePanel.setLayout(new java.awt.BorderLayout());
@@ -218,7 +218,7 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
                     .add(jPanel2Layout.createSequentialGroup()
                         .add(24, 24, 24)
                         .add(jLabel8)))
-                .addContainerGap(28, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         jPanel2Layout.linkSize(new java.awt.Component[] {colorPanel, lineStylePanel, psymPanel}, org.jdesktop.layout.GroupLayout.HORIZONTAL);

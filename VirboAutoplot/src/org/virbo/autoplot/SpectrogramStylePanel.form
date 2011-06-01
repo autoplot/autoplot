@@ -21,7 +21,7 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" alignment="0" max="32767" attributes="1"/>
+          <Component id="jPanel1" alignment="0" pref="349" max="32767" attributes="1"/>
       </Group>
     </DimensionLayout>
   </Layout>
@@ -49,7 +49,7 @@
                       <Component id="rebinPanel" alignment="0" min="-2" pref="142" max="-2" attributes="0"/>
                       <Component id="colortableTypePanel" alignment="0" min="-2" pref="141" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="24" max="32767" attributes="0"/>
+                  <EmptySpace pref="22" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -81,13 +81,13 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel4">
           <Properties>
-            <Property name="text" type="java.lang.String" value="colortable:"/>
+            <Property name="text" type="java.lang.String" value="Colortable:"/>
             <Property name="toolTipText" type="java.lang.String" value="colortable for spectrograms"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel5">
           <Properties>
-            <Property name="text" type="java.lang.String" value="rebin:"/>
+            <Property name="text" type="java.lang.String" value="Rebin:"/>
             <Property name="toolTipText" type="java.lang.String" value="method for binning to pixel resolution"/>
           </Properties>
         </Component>

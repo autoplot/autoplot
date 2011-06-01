@@ -86,7 +86,7 @@
       <SubComponents>
         <Component class="javax.swing.JCheckBox" name="xLog">
           <Properties>
-            <Property name="text" type="java.lang.String" value="log"/>
+            <Property name="text" type="java.lang.String" value="Log"/>
             <Property name="toolTipText" type="java.lang.String" value="X axis logarithmic scale"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -153,7 +153,7 @@
       <SubComponents>
         <Component class="javax.swing.JCheckBox" name="zLog">
           <Properties>
-            <Property name="text" type="java.lang.String" value="log"/>
+            <Property name="text" type="java.lang.String" value="Log"/>
             <Property name="toolTipText" type="java.lang.String" value="colorbar logarithmic scale"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -174,7 +174,7 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="cbVisibleCB">
           <Properties>
-            <Property name="text" type="java.lang.String" value="visible"/>
+            <Property name="text" type="java.lang.String" value="Visible"/>
             <Property name="toolTipText" type="java.lang.String" value="hide/show colorbar"/>
           </Properties>
         </Component>
@@ -226,7 +226,7 @@
         </Container>
         <Component class="javax.swing.JCheckBox" name="yLog">
           <Properties>
-            <Property name="text" type="java.lang.String" value="log"/>
+            <Property name="text" type="java.lang.String" value="Log"/>
             <Property name="toolTipText" type="java.lang.String" value="Y axis logarithmic scale"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">

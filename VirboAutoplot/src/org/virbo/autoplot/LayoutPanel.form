@@ -142,7 +142,7 @@
             <TitledBorder title="Plots"/>
           </Border>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Plot layout on the canvas"/>
+        <Property name="toolTipText" type="java.lang.String" value="Layout of plots on the canvas"/>
       </Properties>
 
       <Layout>
@@ -172,7 +172,7 @@
             <TitledBorder title="Plot Elements"/>
           </Border>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Plot elements draw data onto plots."/>
+        <Property name="toolTipText" type="java.lang.String" value="List of plot elements (renderings of data) on the canvas"/>
       </Properties>
 
       <Layout>
@@ -216,7 +216,7 @@
             <TitledBorder title="Bindings"/>
           </Border>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="Property bindings connect DOM properties"/>
+        <Property name="toolTipText" type="java.lang.String" value="List of connections between DOM properties"/>
       </Properties>
 
       <Layout>

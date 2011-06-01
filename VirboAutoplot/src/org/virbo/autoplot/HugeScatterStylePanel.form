@@ -71,7 +71,7 @@
         </Container>
         <Component class="javax.swing.JLabel" name="jLabel6">
           <Properties>
-            <Property name="text" type="java.lang.String" value="color:"/>
+            <Property name="text" type="java.lang.String" value="Color:"/>
             <Property name="toolTipText" type="java.lang.String" value="color of the line and plot symbols"/>
           </Properties>
         </Component>

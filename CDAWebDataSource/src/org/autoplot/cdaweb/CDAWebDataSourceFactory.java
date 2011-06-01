@@ -8,6 +8,7 @@ package org.autoplot.cdaweb;
 import gsfc.nssdc.cdf.CDF;
 import java.io.File;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +143,20 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
     public boolean reject(String surl, ProgressMonitor mon) {
         URISplit split= URISplit.parse(surl);
         Map<String,String> params= URISplit.parseParams(split.params);
-        return !( params.containsKey("ds") && params.containsKey("id") && params.containsKey("timerange") );
+
+        if ( !( params.containsKey("ds") && params.containsKey("id" )&& params.containsKey("timerange") ) ) return true;
+
+        String tr= params.get("timerange");
+        try {
+            DatumRangeUtil.parseTimeRange(tr);
+        } catch ( ParseException ex ) {
+            return true;
+        }
+
+        if ( params.get("id").equals("") ) return true;
+        if ( params.get("ds").equals("") ) return true;
+
+        return false;
     }
 
 }

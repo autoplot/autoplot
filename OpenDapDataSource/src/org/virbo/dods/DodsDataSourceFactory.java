@@ -11,7 +11,10 @@ package org.virbo.dods;
 
 import dods.dap.DDSException;
 import dods.dap.parser.ParseException;
+import dods.dap.parser.TokenMgrError;
 import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.virbo.metatree.IstpMetadataModel;
 import java.io.IOException;
 import java.net.URI;
@@ -19,6 +22,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
@@ -37,7 +41,11 @@ public class DodsDataSourceFactory implements DataSourceFactory {
     }
     
     public DataSource getDataSource(URI uri) throws IOException {
-        return new DodsDataSource( uri );
+        try {
+            return new DodsDataSource( uri );
+        } catch ( NoSuchElementException ex ) {
+            throw new RuntimeException( "Does not appear to be a DDS: "+uri, ex );
+        }
     }
     
     public List<CompletionContext> getCompletions(CompletionContext cc,org.das2.util.monitor.ProgressMonitor mon) throws Exception {
@@ -66,8 +74,9 @@ public class DodsDataSourceFactory implements DataSourceFactory {
                 URISplit split= URISplit.parse(surl);
                 List<CompletionContext> cc = getVars(split.file);
                 return cc.size() > 1;
-            } catch ( Exception ex ) {
-                return false; // let someone else indicate the error.
+            } catch ( Throwable ex ) {
+                ex.printStackTrace();
+                return true; // let someone else indicate the error.
             }
         }
         
@@ -83,7 +92,13 @@ public class DodsDataSourceFactory implements DataSourceFactory {
         url = new URL(sMyUrl + ".dds");
 
         MyDDSParser parser = new MyDDSParser();
-        parser.parse(url.openStream());
+        try {
+            parser.parse(url.openStream());
+        } catch ( TokenMgrError ex  ) {
+            throw new ParseException("Does not appear to be a DDS: "+url);
+        } catch (RuntimeException ex ) {
+            throw new ParseException("Does not appear to be a DDS: "+url);
+        }
 
         String[] vars = parser.getVariableNames();
         for (int j = 0; j < vars.length; j++) {

@@ -186,7 +186,7 @@ public class AxisPanel extends javax.swing.JPanel {
         PlotElement p = applicationController.getPlotElement();
         panel= p;
         
-        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("legendLabel"), legendTextField, BeanProperty.create("text")));
+        bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE,p, BeanProperty.create("legendLabel"), legendTextField, BeanProperty.create("text_ON_ACTION_OR_FOCUS_LOST")));
         bc.addBinding(Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, p, BeanProperty.create("displayLegend"), legendEnableCheckbox, BeanProperty.create("selected")));
         
         panelBindingGroup = bc;
@@ -226,7 +226,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis"));
 
-        xLog.setText("log");
+        xLog.setText("Log");
         xLog.setToolTipText("X axis logarithmic scale");
         xLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
@@ -260,7 +260,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Colorbar"));
 
-        zLog.setText("log");
+        zLog.setText("Log");
         zLog.setToolTipText("colorbar logarithmic scale");
         zLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
@@ -269,7 +269,7 @@ public class AxisPanel extends javax.swing.JPanel {
         zTitleTextField.setText("jTextField1");
         zTitleTextField.setToolTipText("Colorbar title");
 
-        cbVisibleCB.setText("visible");
+        cbVisibleCB.setText("Visible");
         cbVisibleCB.setToolTipText("hide/show colorbar");
 
         org.jdesktop.layout.GroupLayout zAxisPanelLayout = new org.jdesktop.layout.GroupLayout(zAxisPanel);
@@ -304,7 +304,7 @@ public class AxisPanel extends javax.swing.JPanel {
 
         yAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
-        yLog.setText("log");
+        yLog.setText("Log");
         yLog.setToolTipText("Y axis logarithmic scale");
         yLog.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
