@@ -27,6 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.util.DasExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -47,6 +48,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     /** Creates new form AggregatingDataSourceEditorPanel */
     public CdfDataSourceEditorPanel() {
         initComponents();
+        AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "cdf_main");
         parameterList.addListSelectionListener( new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 if ( e.getValueIsAdjusting() ) return;
