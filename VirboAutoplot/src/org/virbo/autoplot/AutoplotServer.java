@@ -40,6 +40,7 @@ public class AutoplotServer {
         alm.addOptionalSwitchArgument("canvas.aspect", "a", "canvas.aspect", "", "aspect ratio" );
         alm.addOptionalSwitchArgument("format", "f", "format", "png", "output format png or pdf (dflt=png)");
         alm.addOptionalSwitchArgument("outfile", "o", "outfile", "-", "output filename or -");
+        alm.addBooleanSwitchArgument( "noexit", "z", "noexit", "don't exit after running, for use with scripts." );
         alm.requireOneOf( new String[] { "uri", "vap" } );
         alm.process(args);
 
@@ -108,7 +109,9 @@ public class AutoplotServer {
             }
         }
 
-        System.exit(0);
+        if ( !alm.getBooleanValue("noexit") ) {
+            System.exit(0);
+        }
 
     }
 }
