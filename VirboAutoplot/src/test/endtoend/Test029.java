@@ -39,7 +39,8 @@ public class Test029 {
      * @throws IOException
      */
     private static int testJythonLib() throws IOException {
-        // see if "Lib/glob.py" is on path.  As of 20110525, this shows it is on the path.
+        // see if "/glob.py" is on path.  We used to put it in /Lib/glob.py, but
+        //this caused problems and we need to put it in the root.
         java.net.URL s= Test029.class.getResource("/glob.py");
         InputStream in= s.openStream();
 
