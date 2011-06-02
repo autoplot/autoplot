@@ -854,8 +854,12 @@ public class DataSourceController extends DomNodeController {
         }
     };
 
+    /**
+     * cancel the loading process. 
+     */
     public void cancel() {
-        if (getDataSource() != null && getDataSource().asynchronousLoad() && !dom.controller.isHeadless()) {
+        DataSource dss= this.dataSource;  // Note not getDataSource, which is synchronized.
+        if ( dss != null && dss.asynchronousLoad() && !dom.controller.isHeadless()) {
             ProgressMonitor monitor= mon;
             if (monitor != null) {
                 logger.info("cancel running request");

@@ -4,13 +4,11 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.logging.Logger;
-import javax.swing.Timer;
+import org.virbo.autoplot.util.TickleTimer;
 import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
@@ -40,17 +38,17 @@ public class TimeSeriesBrowseController {
     private static final String PENDING_TIMERANGE_DIRTY= "tsbTimerangeDirty";
 
     private static final Logger logger = Logger.getLogger("ap.tsb");
-    Timer updateTsbTimer;
+    TickleTimer updateTsbTimer;
     PropertyChangeListener timeSeriesBrowseListener;
 
     TimeSeriesBrowseController( DataSourceController dataSourceController, PlotElement p ) {
 
         this.changesSupport= new ChangesSupport(this.propertyChangeSupport,this);
         
-        updateTsbTimer = new Timer(100, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        updateTsbTimer = new TickleTimer(100, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
                 if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) {
-                    updateTsbTimer.restart();
+                    updateTsbTimer.tickle();
                     return;
                 } else {
                     updateTsb(false);
@@ -59,7 +57,6 @@ public class TimeSeriesBrowseController {
             }
         });
         
-        updateTsbTimer.setRepeats(false);
         this.p = p;
         this.domPlot= p.getController().getApplication().getController().getPlotFor(p);
         this.panelController = p.getController();
@@ -91,7 +88,7 @@ public class TimeSeriesBrowseController {
                     changesSupport.registerPendingChange( this, PENDING_TIMERANGE_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
                     setTimeRange( UnitsUtil.isTimeLocation(dr.getUnits()) ? dr : null );
-                    updateTsbTimer.restart();
+                    updateTsbTimer.tickle();
                 }
             }
         };
@@ -123,6 +120,7 @@ public class TimeSeriesBrowseController {
         }
 
         timeSeriesBrowseListener = new PropertyChangeListener() {
+            @Override
             public String toString() {
                return ""+TimeSeriesBrowseController.this;
             }
@@ -134,7 +132,7 @@ public class TimeSeriesBrowseController {
                     changesSupport.registerPendingChange( this, PENDING_AXIS_DIRTY );
                     DatumRange dr=(DatumRange)e.getNewValue();
                     setTimeRange( UnitsUtil.isTimeLocation(dr.getUnits()) ? dr : null );
-                    updateTsbTimer.restart();
+                    updateTsbTimer.tickle();
                 }
             }
         };
@@ -280,6 +278,7 @@ public class TimeSeriesBrowseController {
         propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
+    @Override
     public String toString() {
         return this.dsf + " timeSeriesBrowse controller";
     }

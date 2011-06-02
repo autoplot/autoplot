@@ -174,6 +174,7 @@ public class AggregatingDataSource extends AbstractDataSource {
             if (ss.length > 1) {
                 mon.setProgressMessage("getting " + ss[i]);
                 mon1 = SubTaskMonitor.create(mon, i * 10, 10 * (i + 1));
+                if ( mon1.isCancelled() ) break;
                 mon1.setTaskProgress(0); // cause it to paint
             } else {
                 mon1 = mon;
