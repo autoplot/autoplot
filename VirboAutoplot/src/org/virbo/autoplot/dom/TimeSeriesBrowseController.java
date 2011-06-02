@@ -101,7 +101,7 @@ public class TimeSeriesBrowseController {
             try {
                 DatumRange tr = dataSourceController.getTsb().getTimeRange();
                 this.setTimeRange( tr );
-                if ( this.domPlot.getXaxis().isAutoRange() ) {
+                if ( this.domPlot.getXaxis().isAutoRange() && !valueWasAdjusting ) {
                     BindingModel[] bms= this.panelController.getApplication().getBindings();
                     DatumRange appRange= this.panelController.getApplication().getTimeRange();
                     if ( appRange.getUnits().isConvertableTo( tr.getUnits() )
