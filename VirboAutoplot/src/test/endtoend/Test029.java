@@ -40,17 +40,22 @@ public class Test029 {
      */
     private static int testJythonLib() throws IOException {
         // see if "Lib/glob.py" is on path.  As of 20110525, this shows it is on the path.
-        java.net.URL s= Test029.class.getResource("/Lib/glob.py");
+        java.net.URL s= Test029.class.getResource("/glob.py");
         InputStream in= s.openStream();
 
         int c;
-        while ( (c=in.read())!=-1 ) System.err.print( (char)c );
+        int count=0;
+        while ( (c=in.read())!=-1 ) {
+            if ( c=='\n' ) count++;
+        }
         in.close();
+        System.err.printf("glob.py is approx %d lines long.\n",count);
 
         InteractiveInterpreter interp = JythonUtil.createInterpreter(false);
         interp.exec("import glob\n");
-        PyObject res= interp.eval("print glob.glob('*')\n");
+        PyObject res= interp.eval("glob.glob('*')\n");
         System.err.println(res);
+
         return 0;
     }
 
