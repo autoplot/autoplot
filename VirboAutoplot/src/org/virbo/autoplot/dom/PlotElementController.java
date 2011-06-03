@@ -827,7 +827,7 @@ public class PlotElementController extends DomNodeController {
                     && renderType != RenderType.digital
                     && renderType != RenderType.eventsBar
                     && renderType != RenderType.pitchAngleDistribution )
-                    &&  fillDs.length(0) < QDataSet.MAX_UNIT_BUNDLE_COUNT;
+                    &&  fillDs.length(0) <= QDataSet.MAX_UNIT_BUNDLE_COUNT;
             //if ( joinOfBundle ) shouldHaveChildren= true;
 
             if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) {
