@@ -12,6 +12,7 @@ import java.io.InterruptedIOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -467,7 +468,12 @@ public class DataSourceController extends DomNodeController {
         }
         //System.err.println( Arrays.asList(parentSources));
     }
-    
+
+    private static Map maybeCopy( Map m ) {
+        if ( m==null ) return new HashMap();
+        return new HashMap(m);
+    }
+
     /**
      * check to see if all the parent sources have updated and have
      * datasets that are compatible, so a new dataset can be created.
@@ -478,23 +484,27 @@ public class DataSourceController extends DomNodeController {
         QDataSet x;
         QDataSet y = null;
         QDataSet z = null;
+        Map<String,Object> xprops=null,yprops=null,zprops=null;
         if ( parentSources==null ) return "no parent sources";
         if ( parentSources[0]==null ) return "first parent is null";
         x = parentSources[0].controller.getFillDataSet();
+        xprops= maybeCopy( parentSources[0].controller.getFillProperties() );
         if (parentSources.length > 1) {
             if ( parentSources[1]==null ) return "second parent is null";
             y = parentSources[1].controller.getFillDataSet();
+            yprops= maybeCopy( parentSources[1].controller.getFillProperties() );
         }
         if (parentSources.length > 2) {
             if ( parentSources[2]==null ) return "third parent is null";
             z = parentSources[2].controller.getFillDataSet();
+            zprops= maybeCopy( parentSources[2].controller.getFillProperties() );
         }
         if ( parentSources.length==1 ) {
             if (x == null ) {
                 return "parent dataset is null";
             }
             if ( DataSetUtil.validate(x, null ) ) {
-                setDataSetInternal(x);
+                setDataSetInternal(x,xprops,this.dom.controller.isValueAdjusting());
             }
         } else if (parentSources.length == 2) {
             System.err.println("creating dataset by making Y depend on X");
@@ -505,8 +515,9 @@ public class DataSourceController extends DomNodeController {
             if (x != null) {
                 yds.putProperty(QDataSet.DEPEND_0, x);
             }
+            yprops.put(QDataSet.DEPEND_0, xprops);
             if ( DataSetUtil.validate(yds, null ) ) {
-                setDataSetInternal(yds);
+                setDataSetInternal(yds,yprops,this.dom.controller.isValueAdjusting());
             }
         } else if (parentSources.length == 3) {
             if (x == null || y == null || z == null) {
@@ -516,8 +527,10 @@ public class DataSourceController extends DomNodeController {
                 ArrayDataSet yds = ArrayDataSet.copy(y);
                 yds.putProperty(QDataSet.DEPEND_0, x);
                 yds.putProperty(QDataSet.PLANE_0, z);
+                yprops.put(QDataSet.DEPEND_0, xprops );
+                yprops.put(QDataSet.PLANE_0,zprops);
                 if ( DataSetUtil.validate(yds, null ) ) {
-                    setDataSetInternal(yds);
+                    setDataSetInternal(yds,yprops,this.dom.controller.isValueAdjusting());
                 }
             } else {
                 ArrayDataSet zds = ArrayDataSet.copy(z);
@@ -527,8 +540,10 @@ public class DataSourceController extends DomNodeController {
                 if (y != null) {
                     zds.putProperty(QDataSet.DEPEND_1, y);
                 }
+                zprops.put(QDataSet.DEPEND_0,xprops);
+                zprops.put(QDataSet.DEPEND_1,yprops);
                 if ( DataSetUtil.validate(zds, null ) ) {
-                    setDataSetInternal(zds);
+                    setDataSetInternal(zds,zprops,this.dom.controller.isValueAdjusting());
                 }
             }
         }
