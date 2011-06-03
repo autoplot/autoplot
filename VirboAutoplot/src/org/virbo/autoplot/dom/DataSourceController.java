@@ -507,7 +507,6 @@ public class DataSourceController extends DomNodeController {
                 setDataSetInternal(x,xprops,this.dom.controller.isValueAdjusting());
             }
         } else if (parentSources.length == 2) {
-            System.err.println("creating dataset by making Y depend on X");
             if (x == null || y == null) {
                 return "first or second dataset is null";
             }
