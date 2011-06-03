@@ -604,7 +604,11 @@ public class ApplicationController extends DomNodeController implements RunLater
     public void deleteConnector(Connector connector) {
         logger.fine( "deleteConnector("+connector+")" );
         ColumnColumnConnector impl = connectorImpls.get(connector);
-        getDasCanvas().remove(impl);
+        if ( impl!=null ) {
+            getDasCanvas().remove(impl);
+        } else {
+            // JUNO nightly build...test this.
+        }
 
         List<Connector> connectors = DomUtil.asArrayList(application.getConnectors());
         connectors.remove(connector);
