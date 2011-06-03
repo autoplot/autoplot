@@ -171,7 +171,11 @@ public class TimeSeriesBrowseController {
             CacheTag testCacheTag = null; // sloppy one
             if ( xAxis!=null ) {
                 visibleRange= xAxis.getDatumRange();
-                newResolution = visibleRange.width().divide(xAxis.getDLength());
+                if ( xAxis.getDLength()>2 ) {
+                    newResolution = visibleRange.width().divide(xAxis.getDLength());
+                } else {
+                    System.err.println("WARNING: xaxis isn't sized, loading data at full resolution!"); //TODO: check into this
+                }
                 // don't waste time by chasing after 1.0% of a dataset.
                 DatumRange newRange = visibleRange;
                 testCacheTag = new CacheTag( DatumRangeUtil.rescale(newRange, 0.01, 0.99), newResolution );
@@ -189,9 +193,11 @@ public class TimeSeriesBrowseController {
                     }
                     dataSourceController.getTsb().setTimeRange(trange);
                     dataSourceController.getTsb().setTimeResolution(newResolution);
+                    System.err.println( "updateTsb: " + trange + " " + newResolution );
                 } else {
                     dataSourceController.getTsb().setTimeRange(trange);
                     dataSourceController.getTsb().setTimeResolution(null);
+                    System.err.println( "updateTsb: " + trange + " " + null );
                 }
 
                 String surl;
