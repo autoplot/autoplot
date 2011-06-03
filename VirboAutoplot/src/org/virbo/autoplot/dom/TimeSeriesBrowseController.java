@@ -172,7 +172,7 @@ public class TimeSeriesBrowseController {
             if ( xAxis!=null ) {
                 visibleRange= xAxis.getDatumRange();
                 newResolution = visibleRange.width().divide(xAxis.getDLength());
-                // don't waste time by chasing after 10% of a dataset.
+                // don't waste time by chasing after 1.0% of a dataset.
                 DatumRange newRange = visibleRange;
                 testCacheTag = new CacheTag( DatumRangeUtil.rescale(newRange, 0.01, 0.99), newResolution );
                 newCacheTag = new CacheTag(newRange, newResolution);

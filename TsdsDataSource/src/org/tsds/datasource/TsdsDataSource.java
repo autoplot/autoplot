@@ -14,6 +14,7 @@ import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.TimeDatumFormatter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
@@ -42,6 +43,7 @@ import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
@@ -71,7 +73,7 @@ class TsdsDataSource extends AbstractDataSource {
             ProgressMonitor mon = new NullProgressMonitor();
 
             URL url0 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params));
-            logger.fine("tsds url= " + url0);
+            logger.log(Level.FINE, "tsds url= {0}", url0);
 
             if (params.get("out") == null) {
                 exceptionFromConstruct = new IllegalArgumentException("url must contain out=");
@@ -89,7 +91,7 @@ class TsdsDataSource extends AbstractDataSource {
 
             logit("post first request in construct TsdsDataSource", t0);
             URL url3 = new URL("" + this.resourceURI + "?" + sparams);
-            logger.fine("opening " + url3);
+            logger.log(Level.FINE, "opening {0}", url3);
             initialTsml(url3.openStream());
 
             logit("read initial tsml", t0);
@@ -185,7 +187,7 @@ class TsdsDataSource extends AbstractDataSource {
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
         logit("enter getDataSet", t0);
         if (inRequest) {
-            System.err.println("came back again");
+            logger.fine("came back again");
 
         } else {
             inRequest = true;
@@ -234,7 +236,7 @@ class TsdsDataSource extends AbstractDataSource {
             params3.remove("ppd");
             params3.put("out", "tsml");
             URL url3 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params3));
-            logger.fine("opening " + url3);
+            logger.log(Level.FINE, "opening {0}", url3);
             initialTsml(url3.openStream());
             haveInitialTsml = true;
             logit("got initial tsml", t0);
@@ -255,7 +257,7 @@ class TsdsDataSource extends AbstractDataSource {
         int size = points * SIZE_DOUBLE;
 
         logit("making url2 connection", t0);
-        logger.fine("" + url2);
+        logger.log(Level.FINE, "{0}", url2);
         HttpURLConnection connect = (HttpURLConnection) url2.openConnection();
         connect.connect();
         String type = connect.getContentType();
@@ -336,7 +338,7 @@ class TsdsDataSource extends AbstractDataSource {
 
         InputStream in = connection.getInputStream();
         String encoding = connection.getContentEncoding();
-        logger.finer("downloading "+connection.getURL());
+        logger.log(Level.FINER, "downloading {0}", connection.getURL());
         if ( encoding!=null && encoding.equalsIgnoreCase("gzip")) {
             logger.finer("got gzip encoding");
             in = new GZIPInputStream(in);
@@ -358,7 +360,7 @@ class TsdsDataSource extends AbstractDataSource {
             totalBytesRead += bytesRead;
             bytesRead = bin.read(bbuf);
             if (mon.isCancelled()) {
-                break;
+                throw new InterruptedIOException("cancel read in TSDS");
             }
             mon.setTaskProgress(totalBytesRead);
         }
@@ -386,15 +388,15 @@ class TsdsDataSource extends AbstractDataSource {
         Datum cadence = Units.days.createDatum(1).divide(ppd);
         Datum startTime = TimeUtil.createValid(sStartTime);
         Datum endTime = startTime.add(Units.days.createDatum((1. * points) / ppd));
-        Datum t0 = startTime;
+        Datum t0_1 = startTime;
         if (sTimePos.equals("center")) {
-            t0 = t0.add(cadence.divide(2));
+            t0_1 = t0_1.add(cadence.divide(2));
         }
 
         try {
-            DDataSet result = (DDataSet) ArrayDataSet.copy( double.class, Ops.timegen(String.valueOf(t0), String.valueOf(cadence), points));
-            DatumRange timeRange = new DatumRange(startTime, endTime);
-            result.putProperty(QDataSet.CACHE_TAG, new CacheTag(timeRange, cadence));
+            DDataSet result = (DDataSet) ArrayDataSet.copy( double.class, Ops.timegen(String.valueOf(t0_1), String.valueOf(cadence), points));
+            DatumRange timeRange_1 = new DatumRange(startTime, endTime);
+            result.putProperty(QDataSet.CACHE_TAG, new CacheTag(timeRange_1, cadence));
             return result;
         } catch (ParseException ex) {
             throw new RuntimeException(ex);
@@ -545,7 +547,7 @@ class TsdsDataSource extends AbstractDataSource {
                 URL dataUrl = new URL(surl4);
                 HttpURLConnection connect = (HttpURLConnection) dataUrl.openConnection();
                 connect.setRequestProperty("Accept-Encoding", "gzip, deflate");
-                logger.fine("loading " + surl4);
+                logger.log(Level.FINE, "loading {0}", surl4);
                 org.virbo.binarydatasource.Double data3 = (org.virbo.binarydatasource.Double)dataUrl(connect, 3*size, 3*points, -1, mon);
                 logit("done loading mean", t0);
 
@@ -562,7 +564,7 @@ class TsdsDataSource extends AbstractDataSource {
                 URL dataUrl = new URL(surl);
                 HttpURLConnection connect = (HttpURLConnection) dataUrl.openConnection();
                 connect.setRequestProperty("Accept-Encoding", "gzip, deflate"); 
-                logger.fine("loading " + dataUrl);
+                logger.log(Level.FINE, "loading {0}", dataUrl);
                 data = dataUrl(connect, size, points,-1, mon);
                 logit("done loading mean", t0);
             }
@@ -570,7 +572,7 @@ class TsdsDataSource extends AbstractDataSource {
             if ( !useFilter4 && minMax && surl.contains("-filter_0-")) {
                 HttpURLConnection connect;
                 String sDataMax = surl.replace("-filter_0-", "-filter_2-");
-                logger.fine("loading " + sDataMax);
+                logger.log(Level.FINE, "loading {0}", sDataMax);
                 mon.setProgressMessage("loading max");
                 URL maxUrl = new URL(sDataMax);
                 connect = (HttpURLConnection) maxUrl.openConnection();
@@ -579,7 +581,7 @@ class TsdsDataSource extends AbstractDataSource {
                 logit("done loading max", t0);
                 dataMax.putProperty(QDataSet.NAME, "binmax");
                 String sDataMin = surl.replace("-filter_0-", "-filter_3-");
-                logger.fine("loading " + sDataMin);
+                logger.log(Level.FINE, "loading {0}", sDataMin);
                 mon.setProgressMessage("loading min");
                 URL minUrl = new URL(sDataMin);
                 connect = (HttpURLConnection) minUrl.openConnection();
@@ -591,7 +593,7 @@ class TsdsDataSource extends AbstractDataSource {
                 data.putProperty(QDataSet.DELTA_MINUS, Ops.subtract(data, dataMin));
             }
 
-            data.putProperty(QDataSet.UNITS, MetadataUtil.lookupUnits(sunits));
+            data.putProperty(QDataSet.UNITS, SemanticOps.lookupUnits(sunits));
             data.putProperty(QDataSet.DEPEND_0, ttags);
             data.putProperty(QDataSet.NAME, name);
             data.putProperty(QDataSet.TITLE, title);

@@ -174,14 +174,17 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         return rank;
     }
 
+    @Override
     public int length() {
         return len0;
     }
 
+    @Override
     public int length(int i) {
         return len1;
     }
 
+    @Override
     public int length(int i0, int i1) {
         return len2;
     }
@@ -271,6 +274,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
      * provide a subset of the dataset.  Note that writes to the result dataset
      * will affect the original dataset.  TODO: correct this since it's a WriteableDataSet.
      */
+    @Override
     public QDataSet trim( int ist, int ien ) {
         return makeDataSet( rank, reclen, offset(ist), ien-ist, len1, len2, back, type );
     }

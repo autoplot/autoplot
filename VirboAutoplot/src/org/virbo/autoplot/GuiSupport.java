@@ -257,6 +257,11 @@ public class GuiSupport {
                 String dsid= dom.getController().getPlotElement().getDataSourceFilterId();
                 QDataSet ds= dom.getController().getDataSourceFilterFor( dom.getController().getPlotElement() ).getController().getDataSet();
 
+                if (ds == null) {
+                    JOptionPane.showMessageDialog(parent, "No Data to Export.");
+                    return;
+                }
+//TODO: check extension.
                 List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
                 edp.getFormatDL().setModel( new DefaultComboBoxModel(exts.toArray()) );
                 Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
