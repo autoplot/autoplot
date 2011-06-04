@@ -24,6 +24,7 @@ import org.das2.util.ArgumentList;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -37,10 +38,8 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -107,6 +106,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.SourceTypesBrowser;
+import org.virbo.datasource.TimeRangeEditor;
 import org.virbo.datasource.URISplit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -165,6 +165,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     public static final Icon BUSY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"spinner.gif") );
     public static final Icon READY_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"indProgress0.png") );
     public static final Icon IDLE_ICON= new ImageIcon( AutoplotUI.class.getResource(RESOURCES+"idle-icon.png") );
+    private TimeRangeEditor timeRangeEditor;
         
     
     /** Creates new form AutoPlotMatisse */
@@ -219,6 +220,9 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
         
         initComponents();
+        timeRangeEditor = new TimeRangeEditor();
+        timeRangePanel.add( timeRangeEditor, "card1" );
+        
         this.statusTextField.setBackground( new Color(0.f,0.f,0.f,0.f) );
         this.statusTextField.setOpaque(false);
 
@@ -611,6 +615,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         bind( bc, dom.getOptions(), Options.PROP_DATAVISIBLE, dataPanelCheckBoxMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_LAYOUTVISIBLE, layoutPanelCheckBoxMenuItem, "selected" );
         bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
+        bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
         bc.bind();
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
@@ -1116,10 +1121,12 @@ public class AutoplotUI extends javax.swing.JFrame {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         persistentStateSupport1 = new org.das2.dasml.PersistentStateSupport();
-        dataSetSelector = new org.virbo.datasource.DataSetSelector();
+        addressBarButtonGroup = new javax.swing.ButtonGroup();
         statusLabel = new javax.swing.JLabel();
         tabbedPanelContainer = new javax.swing.JPanel();
         statusTextField = new javax.swing.JTextField();
+        timeRangePanel = new javax.swing.JPanel();
+        dataSetSelector = new org.virbo.datasource.DataSetSelector();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenu = new javax.swing.JMenu();
         editMenu = new javax.swing.JMenu();
@@ -1156,6 +1163,9 @@ public class AutoplotUI extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        jRadioButtonMenuItem1 = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
         jMenu4 = new javax.swing.JMenu();
         autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
@@ -1185,13 +1195,6 @@ public class AutoplotUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Autoplot");
 
-        dataSetSelector.setPromptText("Enter data location or select a bookmark");
-        dataSetSelector.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                dataSetSelectorActionPerformed(evt);
-            }
-        });
-
         statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getSize()-2f));
         statusLabel.setText("starting...");
         statusLabel.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1214,6 +1217,18 @@ public class AutoplotUI extends javax.swing.JFrame {
                 statusTextFieldMouseClicked(evt);
             }
         });
+
+        timeRangePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        timeRangePanel.setLayout(new java.awt.CardLayout());
+
+        dataSetSelector.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        dataSetSelector.setPromptText("Enter data location or select a bookmark");
+        dataSetSelector.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dataSetSelectorActionPerformed(evt);
+            }
+        });
+        timeRangePanel.add(dataSetSelector, "card2");
 
         fileMenu.setText("File");
         jMenuBar1.add(fileMenu);
@@ -1444,6 +1459,29 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         optionsMenu.add(jMenu2);
 
+        jMenu5.setText("Address Bar");
+
+        addressBarButtonGroup.add(jRadioButtonMenuItem1);
+        jRadioButtonMenuItem1.setSelected(true);
+        jRadioButtonMenuItem1.setText("Data Set Selector");
+        jRadioButtonMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jRadioButtonMenuItem1);
+
+        addressBarButtonGroup.add(jRadioButtonMenuItem2);
+        jRadioButtonMenuItem2.setText("Time Range Selector");
+        jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu5.add(jRadioButtonMenuItem2);
+
+        optionsMenu.add(jMenu5);
+
         jMenu4.setText("Auto");
 
         autoRangingCheckBoxMenuItem.setSelected(true);
@@ -1630,29 +1668,29 @@ public class AutoplotUI extends javax.swing.JFrame {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(dataSetSelector, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 669, Short.MAX_VALUE))
+                        .add(12, 12, 12)
+                        .add(timeRangePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 692, Short.MAX_VALUE))
                     .add(layout.createSequentialGroup()
                         .add(statusLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 16, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(4, 4, 4)
-                        .add(statusTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 661, Short.MAX_VALUE)))
+                        .add(statusTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)))
                 .addContainerGap())
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE))
+                .add(org.jdesktop.layout.GroupLayout.TRAILING, tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 716, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .add(dataSetSelector, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 574, Short.MAX_VALUE)
+                .add(timeRangePanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 31, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 570, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(statusLabel)
                     .add(statusTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                 .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                    .add(46, 46, 46)
-                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                    .addContainerGap(48, Short.MAX_VALUE)
+                    .add(tabbedPanelContainer, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 561, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(20, 20, 20)))
         );
 
@@ -1982,6 +2020,18 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
     }
 }//GEN-LAST:event_canvasSizeMenuItemActionPerformed
 
+private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
+    if ( jRadioButtonMenuItem1.isSelected() ) {
+        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, "card2" );
+    }
+}//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
+
+private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
+    if ( jRadioButtonMenuItem2.isSelected() ) {
+        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, "card1" );
+    }
+}//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
+
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
@@ -2283,6 +2333,7 @@ private void updateFrameTitle() {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem aboutAutoplotMenuItem;
     private javax.swing.JMenuItem aboutDas2MenuItem;
+    private javax.swing.ButtonGroup addressBarButtonGroup;
     private javax.swing.JMenuItem aggregateMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLabellingCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem autoLayoutCheckBoxMenuItem;
@@ -2310,6 +2361,7 @@ private void updateFrameTitle() {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -2318,6 +2370,8 @@ private void updateFrameTitle() {
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
@@ -2341,6 +2395,7 @@ private void updateFrameTitle() {
     private javax.swing.JTextField statusTextField;
     private javax.swing.JPanel tabbedPanelContainer;
     private javax.swing.JCheckBoxMenuItem textAntiAlias;
+    private javax.swing.JPanel timeRangePanel;
     private javax.swing.JMenu toolsMenu;
     private javax.swing.JMenuItem undoMenuItem;
     private javax.swing.JMenu undoMultipleMenu;
