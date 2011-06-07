@@ -165,16 +165,16 @@ public class RecentUrisDialog extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(345, Short.MAX_VALUE)
+                .addContainerGap(322, Short.MAX_VALUE)
                 .add(cancelButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(overplotButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(editUriButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 61, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(editUriButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 70, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(plotBelowButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(plotButton)
+                .add(plotButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 65, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
             .add(layout.createSequentialGroup()
                 .addContainerGap()
@@ -186,6 +186,9 @@ public class RecentUrisDialog extends javax.swing.JDialog {
                 .addContainerGap(381, Short.MAX_VALUE))
             .add(org.jdesktop.layout.GroupLayout.TRAILING, recentUrisGUI1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
         );
+
+        layout.linkSize(new java.awt.Component[] {editUriButton, plotButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
