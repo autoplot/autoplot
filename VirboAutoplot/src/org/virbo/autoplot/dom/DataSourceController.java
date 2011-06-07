@@ -809,12 +809,11 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
-     * do update on this thread, ensuring that only one data load is occuring at a
+     * do update on this thread, ensuring that only one data load is occurring at a
      * time.  Note if a dataSource doesn't check mon.isCancelled(), then processing
      * will block until the old load is done.
      */
     private synchronized void updateImmediately() {
-        /*** here is the data load ***/
         
         try {
             if (getDataSource() != null) {
@@ -823,7 +822,10 @@ public class DataSourceController extends DomNodeController {
                 if ( tsb!=null ) {
                     logger.log(Level.FINE, "   tsb= {0}", tsb.getURI());
                 }
+
+                /*** here is the data load ***/
                 loadDataSet();
+
                 if ( dataSet!=null ) {
                     setStatus("done loading dataset");
                     if ( dsf.getUri()==null ) {
