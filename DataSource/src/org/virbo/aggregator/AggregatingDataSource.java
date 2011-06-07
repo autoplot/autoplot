@@ -103,39 +103,45 @@ public class AggregatingDataSource extends AbstractDataSource {
         viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
     }
 
+
     private TimeSeriesBrowse createTimeSeriesBrowse() {
-        return new TimeSeriesBrowse() {
+        return new AggTimeSeriesBrowse();
+    }
 
-            public void setTimeRange(DatumRange dr) {
-                viewRange = quantize(dr);
-                Logger.getLogger("virbo.datasource.agg").fine("set timerange=" + viewRange);
-            }
+    public class AggTimeSeriesBrowse implements TimeSeriesBrowse {
 
-            public void setTimeResolution(Datum d) {
-            }
+        public void setTimeRange(DatumRange dr) {
+            viewRange = quantize(dr);
+            Logger.getLogger("virbo.datasource.agg").fine("set timerange=" + viewRange);
+        }
 
-            public String getURI() {
-                String surl = DataSetURI.fromUri( AggregatingDataSource.this.resourceURI ) + "?" ;
-                if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
-                surl += "timerange=" + String.valueOf(viewRange);
+        public void setTimeResolution(Datum d) {
+            resolution= d;
+            Logger.getLogger("virbo.datasource.agg").fine("set resolution=" + d );
+        }
 
-                URISplit split = URISplit.parse(surl);
-                Map<String,String> mparams = URISplit.parseParams(split.params);
-                String stimeRange = viewRange.toString();
-                mparams.put("timerange", stimeRange);
-                split.params = URISplit.formatParams(mparams);
+        public String getURI() {
+            String surl = DataSetURI.fromUri( AggregatingDataSource.this.resourceURI ) + "?" ;
+            if (sparams != null && !sparams.equals("") ) surl += sparams + "&";
+            surl += "timerange=" + String.valueOf(viewRange);
 
-                return URISplit.format(split);
-            }
+            URISplit split = URISplit.parse(surl);
+            Map<String,String> mparams = URISplit.parseParams(split.params);
+            String stimeRange = viewRange.toString();
+            mparams.put("timerange", stimeRange);
+            split.params = URISplit.formatParams(mparams);
 
-            public DatumRange getTimeRange() {
-                return viewRange;
-            }
+            return URISplit.format(split);
+        }
 
-            public Datum getTimeResolution() {
-                return null;
-            }
-        };        
+        public DatumRange getTimeRange() {
+            return viewRange;
+        }
+
+        public Datum getTimeResolution() {
+            return resolution;
+        }
+
     }
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
@@ -168,6 +174,16 @@ public class AggregatingDataSource extends AbstractDataSource {
             URI delegateUri= DataSetURI.getURIValid(scompUrl);
 
             DataSource delegateDataSource = delegateDataSourceFactory.getDataSource(delegateUri);
+
+            if ( delegateDataSource.getCapability( TimeSeriesBrowse.class )!=null ) {
+                TimeSeriesBrowse delegateTsb= delegateDataSource.getCapability( TimeSeriesBrowse.class );
+                delegateTsb.setTimeRange(viewRange);
+                delegateTsb.setTimeResolution(resolution);
+                setResolution( delegateTsb.getTimeResolution() );
+            } else {
+                resolution= null;
+            }
+            
             metadataModel = delegateDataSource.getMetadataModel();
 
             ProgressMonitor mon1;
@@ -300,6 +316,24 @@ public class AggregatingDataSource extends AbstractDataSource {
      * Holds value of property viewRange.
      */
     private DatumRange viewRange = DatumRangeUtil.parseTimeRangeValid("2006-07-03 to 2006-07-05");
+
+    /**
+     * resolution.  Only used if the delegates have a TimeSeriesBrowse.
+     */
+    private Datum resolution= null;
+
+    public Datum getResolution() {
+        return resolution;
+    }
+
+    public void setResolution(Datum resolution) {
+        Datum old = this.resolution;
+        this.resolution = resolution;
+        propertyChangeSupport.firePropertyChange("resolution", old, resolution);
+    }
+
+
+
     /**
      * this is the range of files that was loaded, based on the granularity of the
      * delegate.  This is used to calculate the new URL.
