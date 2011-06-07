@@ -23,6 +23,7 @@ import org.das2.util.DasPNGConstants;
 import org.das2.util.DasPNGEncoder;
 import org.das2.datum.TimeParser;
 import org.das2.util.FileUtil;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.ScriptContext;
@@ -45,8 +46,9 @@ public class CreatePngWalk {
         public boolean createThumbs;
     }
 
+    private static final Logger logger= Logger.getLogger("vap.createPngWalk");
+
     private static BufferedImage myWriteToPng(String filename, ApplicationModel appmodel, Application ldom, int width, int height) throws InterruptedException, FileNotFoundException, IOException {
-        appmodel.waitUntilIdle(false);
         OutputStream out=null;
         BufferedImage image=null;
         try {
@@ -104,10 +106,10 @@ public class CreatePngWalk {
         mon.setProgressMessage("synchronize to this application");
 
         dom2.syncTo(dom, java.util.Arrays.asList("id"));
-        for (PlotElement p : dom2.getPlotElements()) {     // kludge for bug 2985891 since bug after cleanup.
-            p.getController().doResetRenderType(p.getRenderType());
-        }
-        dom2.syncTo(dom, java.util.Arrays.asList("id"));
+        //for (PlotElement p : dom2.getPlotElements()) {     // kludge for bug 2985891 since bug after cleanup.
+        //    p.getController().doResetRenderType(p.getRenderType());
+        //}
+        //dom2.syncTo(dom, java.util.Arrays.asList("id"));
 
         mon.setProgressMessage("write " + params.product + ".vap");
 
@@ -152,6 +154,9 @@ public class CreatePngWalk {
                 Logger.getLogger(CreatePngWalk.class.getName()).log(Level.SEVERE, null, ex);
             }
             mon.setProgressMessage(String.format("write " + params.product + "_%s.png", i));
+            logger.log( Level.INFO, "write {0}_%s.png", params.product);
+
+            appmodel.waitUntilIdle(false);
             BufferedImage image = myWriteToPng(String.format("%s%s_%s.png", params.outputFolder, params.product, i), appmodel, dom2, w0, h0);
             if (params.createThumbs) {
                 BufferedImage thumb400 = ImageResize.getScaledInstance(image, thumbW, thumbH, RenderingHints.VALUE_INTERPOLATION_BILINEAR, true);
@@ -190,6 +195,7 @@ public class CreatePngWalk {
                 ProgressMonitor mon;
                 if (ScriptContext.getViewWindow() == null) {
                     mon = new org.das2.util.monitor.NullProgressMonitor();
+                    System.err.println("ScriptContext.getViewWindow is null, running quietly in the background.");
                 } else {
                     mon = DasProgressPanel.createFramed(ScriptContext.getViewWindow(), "running batch");
                 }
