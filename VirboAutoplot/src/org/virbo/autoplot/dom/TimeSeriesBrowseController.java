@@ -13,6 +13,7 @@ import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
@@ -181,6 +182,11 @@ public class TimeSeriesBrowseController {
                 testCacheTag = new CacheTag( DatumRangeUtil.rescale(newRange, 0.01, 0.99), newResolution );
                 newCacheTag = new CacheTag(newRange, newResolution);
                 trange= newRange;
+                if ( !UnitsUtil.isTimeLocation( visibleRange.getUnits() ) ) {
+                   System.err.println("x-axis for TSB not time location units: " + visibleRange );
+                   System.err.println("  returning" );
+                   return;
+                }
             } else {
                 newCacheTag = new CacheTag(trange,null);
                 testCacheTag= newCacheTag;
