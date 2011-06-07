@@ -27,6 +27,8 @@ public class MakePngWalk {
 
 
     /**
+     * TODO: update this to use Java version of png walk.
+     * 
      * run the png walk by reading in the python script indicated by value.
      * @param value a python script URI defining "vap" and "params".
      */
