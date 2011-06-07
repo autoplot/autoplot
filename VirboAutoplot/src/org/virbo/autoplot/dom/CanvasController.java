@@ -111,13 +111,13 @@ public class CanvasController extends DomNodeController {
         this.canvas.addPropertyChangeListener(Canvas.PROP_WIDTH, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                dasCanvas.setPreferredWidth(CanvasController.this.canvas.getWidth());
+                dasCanvas.setPreferredWidth( Math.min( 4000, CanvasController.this.canvas.getWidth()) );
             }
         });
         this.canvas.addPropertyChangeListener(Canvas.PROP_HEIGHT, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent evt) {
-                dasCanvas.setPreferredHeight(CanvasController.this.canvas.getHeight());
+                dasCanvas.setPreferredHeight( Math.min( 4000, CanvasController.this.canvas.getHeight()) );
             }
         });
         ac.bind(this.canvas, Canvas.PROP_FITTED, dasCanvas, "fitted");
