@@ -54,6 +54,7 @@ public class TimeSeriesBrowseController {
                 } else {
                     updateTsb(false);
                     changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
+                    changesSupport.changePerformed( this, PENDING_TIMERANGE_DIRTY ); // little sloppy, since only one or the other is set.
                 }
             }
         });
@@ -115,6 +116,7 @@ public class TimeSeriesBrowseController {
                     this.domPlot.getXaxis().setAutoRange(true); // need to turn it back on because resetRange
                 }
                 updateTsb(true);
+                changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
             } catch ( RuntimeException e ) {
                 throw e;
             }
@@ -184,8 +186,20 @@ public class TimeSeriesBrowseController {
                 trange= newRange;
                 if ( !UnitsUtil.isTimeLocation( visibleRange.getUnits() ) ) {
                    System.err.println("x-axis for TSB not time location units: " + visibleRange );
-                   System.err.println("  returning" );
-                   return;
+
+                   trange= this.domPlot.getController().getApplication().getTimeRange();
+                   if ( UnitsUtil.isTimeLocation( trange.getUnits() ) ) {
+                        System.err.println("  rebinding application timeRange" );
+                        this.release();
+                        //Axis xaxis= null;
+                        //dom.getController().unbind( dom, Application.PROP_TIMERANGE, xaxis, Axis.PROP_RANGE );
+                        //dom.setTimeRange( this.timeSeriesBrowseController.getTimeRange() );//TODO: think about if this is really correct
+                        this.setupGen( this.domPlot.getController().getApplication(), Application.PROP_TIMERANGE );
+                    } else {
+                        System.err.println("  unable to bind to application timeRange because of units." );
+                        return;
+                    }
+
                 }
             } else {
                 newCacheTag = new CacheTag(trange,null);
@@ -237,7 +251,11 @@ public class TimeSeriesBrowseController {
     }
 
     public boolean isPendingChanges() {
-        return changesSupport.isPendingChanges();
+        if (  changesSupport.isPendingChanges() ) {
+            return true;
+        } else {
+            return changesSupport.isPendingChanges();
+        }
     }
 
     void release() {
