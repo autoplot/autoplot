@@ -54,7 +54,7 @@ public class TimeSeriesBrowseController {
                 } else {
                     updateTsb(false);
                     changesSupport.changePerformed( this, PENDING_AXIS_DIRTY );
-                    changesSupport.changePerformed( this, PENDING_TIMERANGE_DIRTY ); // little sloppy, since only one or the other is set.
+                    changesSupport.changePerformed( this, PENDING_TIMERANGE_DIRTY ); // little sloppy, since only one or the other is set. 
                 }
             }
         });
