@@ -213,11 +213,11 @@ public class TimeSeriesBrowseController {
                     }
                     dataSourceController.getTsb().setTimeRange(trange);
                     dataSourceController.getTsb().setTimeResolution(newResolution);
-                    System.err.println( "updateTsb: " + trange + " " + newResolution );
+                    System.err.println( "updateTsb: " + trange + " (@" + newResolution+")" );
                 } else {
                     dataSourceController.getTsb().setTimeRange(trange);
                     dataSourceController.getTsb().setTimeResolution(null);
-                    System.err.println( "updateTsb: " + trange + " " + null );
+                    System.err.println( "updateTsb: " + trange + " (@ intrinsic)" );
                 }
 
                 String surl;
@@ -225,6 +225,14 @@ public class TimeSeriesBrowseController {
                 // check the registry for URLs, compare to surl, append prefix if necessary.
                 if (!autorange && surl.equals( dataSourceController.getTsbSuri())) {
                     logger.fine("we do no better with tsb");
+                    if ( xAxis==null ) {
+                        // We really want this to clip off the data that we can't see.  This is a fairly impactive
+                        // change and we will need to keep track of the original and the clipped dataset,  Further,
+                        // this will also need to consider:
+                        //  * not possible because there are no timetags.  We have to use the TimeSeriesBrowse time and all data returned
+                        //  * TimeSeriesBrowse does the filtering.  This should already work, if it's URIs are correct.
+                        //  * We do the filtering.
+                    }
                 } else {
                     dataSourceController.cancel();
                     dataSourceController.update(autorange, autorange);
