@@ -1865,9 +1865,9 @@ public class ApplicationController extends DomNodeController implements RunLater
 
             if ( !exclude.contains("canvases") ) syncSupport.syncToCanvases(that.getCanvases(),nameMap);
 
-            if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
-
             if ( !exclude.contains("plots") ) syncSupport.syncToPlots( that.getPlots(),nameMap );
+
+            if ( !exclude.contains("dataSourceFilters") ) syncSupport.syncToDataSourceFilters(that.getDataSourceFilters(), nameMap);
 
             if ( !exclude.contains("plotElements") )  syncSupport.syncToPlotElements(that.getPlotElements(), nameMap);
 
