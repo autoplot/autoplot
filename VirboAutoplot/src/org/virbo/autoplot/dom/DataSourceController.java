@@ -1121,6 +1121,7 @@ public class DataSourceController extends DomNodeController {
         try {
             result = getDataSource().getDataSet(mymon);
             if ( dsf.getUri()!=null ) this.model.addRecent(dsf.getUri());
+            logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
             Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
             setDataSetInternal(result,props,dom.controller.isValueAdjusting());
         //embedDsDirty = true;
