@@ -997,11 +997,21 @@ public class DataSetURI {
             }
 
             for ( String sagg: saggs ) {
-                sagg= URISplit.removeParam( sagg, "timerange" );
+                URISplit split2= URISplit.parse(sagg);
+                Map <String,String> params2= URISplit.parseParams( split2.params );
+                String tr= params2.remove("timerange");
+                if ( params2.size()==0 ) {
+                    split2.params=null;
+                } else {
+                    split2.params= URISplit.formatParams(params2);
+                }
+                if ( split2.vapScheme!=null && !sagg.startsWith(split2.vapScheme) ) split2.vapScheme=null;
+                sagg= URISplit.format(split2);
+                //sagg= URISplit.removeParam( sagg, "timerange" );
                 String scomp = foldCase ? sagg.toLowerCase() : sagg;
                 scomp= scomp.substring(surlDir.length());
                 if ( scomp.startsWith(prefix) ) {
-                    completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation", true ) );
+                    completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation ("+tr+" available)", true ) );
                 }
             }
         }
