@@ -14,11 +14,18 @@ import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.python.core.Py;
@@ -33,6 +40,7 @@ import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
+import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.jythonsupport.JythonOps;
 import org.virbo.jythonsupport.JythonUtil;
 
@@ -46,6 +54,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private Map<String, Object> metadata;
     private final static String PARAM_SCRIPT= "script";
     private static Logger logger= Logger.getLogger("vap.jythondatasource");
+    private boolean notCheckedTsb= true;
 
     public JythonDataSource(URI uri, JythonDataSourceFactory factory) {
         super(uri);
@@ -118,7 +127,14 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         File jythonScript;   // script to run.
         String resourceURI;  // optional resource URI that is argument to script, excluding script argument.
 
-        URISplit split= URISplit.parse(uri);
+        String suri= DataSetURI.fromUri(uri);
+        if ( tsb!=null ) {
+            suri= tsb.getURI();
+        }
+
+        URISplit split= URISplit.parse(suri);
+        Map<String,String> paramsl= URISplit.parseParams(split.params); // abstract datasource params don't update.
+
         if ( split.scheme.equals("inline") ) { // note this is handled elsewhere, in InlineDataSource
             return getInlineDataSet(new URI(uri.getRawSchemeSpecificPart()));
         }
@@ -136,7 +152,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
         
         PyException causedBy = null;
         try {
-            if (interp == null) { // caching.
+            if ( interp == null ) { // caching might leave the interpretter open.  This needs to be tweaked--the TSB could set interp to null for example.
                 mon.started();
                 mon.setProgressMessage( "initialize Jython interpreter...");
                 interp = JythonUtil.createInterpreter(false);
@@ -144,15 +160,12 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 interp.set("monitor", mon);
 
                 interp.exec("params=dict()");
-                for (String s : params.keySet()) {
+                for (String s : paramsl.keySet()) {
                     if (!s.equals("arg_0") && !s.equals("script") ) {
-                        String sval= params.get(s);
-                        if ( sval.length()>0 && !Character.isDigit(sval.charAt(0)) && !sval.equals("True") && !sval.equals("False") ) {
-                            if ( !( sval.startsWith("'") && sval.endsWith("'") ) ) {
-                                sval= String.format( "'%s'", sval );
-                            }
-                        }
-                        logger.fine("params['" + s + "']=" + sval);
+                        String sval= paramsl.get(s);
+                        
+                        sval= maybeQuoteString( sval );
+                        logger.log(Level.FINE, "params[''{0}'']={1}", new Object[]{s, sval});
                         interp.exec("params['" + s + "']=" + sval);
                     }
                 }
@@ -160,7 +173,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 //interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
                 
                 interp.set("resourceURI", resourceURI);
-                
+
                 mon.setProgressMessage( "executing script");
                 
                 LineNumberReader reader=null;
@@ -266,11 +279,25 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 }
             }
 
+
+            if ( notCheckedTsb ) {
+                PyObject tr= interp.eval("getParam(\'timerange\','x')");
+                TimeSeriesBrowse tsb1= checkForTimeSeriesBrowse( uri.toString(), jythonScript );
+                if ( tsb1!=null ) {
+                    if ( !(tr.toString().equals("x")) ) {
+                        tsb1.setTimeRange( DatumRangeUtil.parseTimeRange(tr.toString()) );
+                    }
+                    addCability( TimeSeriesBrowse.class, tsb1 );
+                    tsb= tsb1;
+                }
+                notCheckedTsb= false;
+            }
+
             if (causedBy != null) {
                 interp = null;
                 cacheUrl = null;
                 cacheDate = null;
-                Logger.getLogger("virbo.jythonDataSouce").warning("exception in processing: " + causedBy);
+                Logger.getLogger("virbo.jythonDataSouce").log(Level.WARNING, "exception in processing: {0}", causedBy);
             }
 
             mon.finished();
@@ -299,12 +326,13 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     
     
     PythonInterpreter interp = null;
+    TimeSeriesBrowse tsb= null; // if the script has getParam('timerange','2011-001')
 
     private String cacheUrl(URI uri) {
         URISplit split = URISplit.parse(uri);
-        Map<String, String> params = URISplit.parseParams(split.params);
-        params.remove("arg_0");
-        split.params = URISplit.formatParams(params);
+        Map<String, String> params2 = URISplit.parseParams(split.params);
+        params2.remove("arg_0");
+        split.params = URISplit.formatParams(params2);
         return URISplit.format(split);
     }
 
@@ -344,6 +372,88 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             throw new RuntimeException(ex);
         }
 
+
+    }
+
+    private String maybeQuoteString(String sval) {
+        boolean isNumber= false;
+        try {
+            double d=Double.parseDouble(sval);
+        } catch ( NumberFormatException ex ) {
+            isNumber= false;
+        }
+
+        if ( sval.length()>0 && !isNumber && !sval.equals("True") && !sval.equals("False") ) {
+            if ( !( sval.startsWith("'") && sval.endsWith("'") ) ) {
+                sval= String.format( "'%s'", sval );
+            }
+        }
+        return sval;
+
+    }
+
+    public class JythonDataSourceTimeSeriesBrowse implements TimeSeriesBrowse {
+
+        DatumRange timeRange;
+        String uri;
+
+        JythonDataSourceTimeSeriesBrowse( String uri ) {
+            this.uri= uri;
+        }
+
+        public void setTimeRange(DatumRange dr) {
+            if ( this.timeRange==null || !(this.timeRange.equals(dr)) ) {
+                interp= null; // no caching...  TODO: this probably needs work.  For example, if we zoom in.
+            }
+            this.timeRange= dr;
+            URISplit split= URISplit.parse(uri);
+            Map<String,String> params= URISplit.parseParams(split.params);
+            params.put( "timerange", dr.toString() );
+            split.params= URISplit.formatParams(params);
+            this.uri= URISplit.format(split);
+        }
+
+        public DatumRange getTimeRange() {
+            return this.timeRange;
+        }
+
+        public void setTimeResolution(Datum d) {
+            // do nothing.
+        }
+
+        public Datum getTimeResolution() {
+            return null;
+        }
+
+        public String getURI() {
+            return uri;
+        }
+
+    }
+
+    /**
+     * allow scripts to implement TimeSeriesBrowse if they check for the parameter "timerange"
+     * @param jythonScript
+     */
+    private TimeSeriesBrowse checkForTimeSeriesBrowse( String uri, File jythonScript ) throws IOException, ParseException {
+        BufferedReader reader = new LineNumberReader( new FileReader( jythonScript ) );
+
+        String line= "tr= getParam( 'timerange', '2010-001' )"; //TODO!
+        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s\\'*(\\S+)\\'\\s*\\).*");  //TODO: default time strings must not contain whitespace.
+        while ( line!=null ) {
+            Matcher m= s.matcher(line);
+            if ( m.matches() ) {
+                TimeSeriesBrowse tsb1= new JythonDataSourceTimeSeriesBrowse(uri);
+                String str= m.group(1);
+                DatumRange tr= DatumRangeUtil.parseTimeRange(str);
+                tsb1.setTimeRange(tr);
+                reader.close();
+                return tsb1;
+            }
+            line= reader.readLine();
+        }
+        reader.close();
+        return null;
 
     }
 }
