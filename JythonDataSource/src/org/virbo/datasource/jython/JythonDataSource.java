@@ -225,15 +225,6 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             PyObject result;
 
             String label= null;
-
-            if ( causedBy!=null ) {
-
-                interp = null;
-                cacheUrl = null;
-                cacheDate = null;
-
-                throw causedBy;
-            }
             
             if (expr == null) {
                 try {
@@ -307,6 +298,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
                 cacheUrl = null;
                 cacheDate = null;
                 Logger.getLogger("virbo.jythonDataSouce").log(Level.WARNING, "exception in processing: {0}", causedBy);
+                throw causedBy;
             }
 
             mon.finished();
