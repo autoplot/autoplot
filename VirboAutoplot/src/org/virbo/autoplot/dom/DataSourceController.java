@@ -19,6 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.CancelledOperationException;
+import org.das2.datum.Datum;
+import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasPlot;
@@ -447,6 +449,55 @@ public class DataSourceController extends DomNodeController {
         this.parentSources= null; //TODO: are there listeners to dispose of?
     }
 
+    /**
+     * Introduced to support children that are TSBs.  All are assumed to be the same, the first is used for the getter.
+     */
+    class AggTimeSeriesBrowse implements TimeSeriesBrowse {
+
+        String uri;
+
+        private AggTimeSeriesBrowse( String uri ) {
+            this.uri= uri; // "vap+internal:data_1,data_2"
+        }
+
+        List<TimeSeriesBrowse> parentTsbs= new ArrayList<TimeSeriesBrowse>();
+
+        public void addTimeSeriesBrowse( TimeSeriesBrowse tsb ) {
+            parentTsbs.add(tsb);
+            if ( parentTsbs.size()==1 ) {
+                setTimeRange( tsb.getTimeRange() );
+                setTimeResolution( tsb.getTimeResolution() );
+            }
+        }
+
+        public void setTimeRange(DatumRange dr) {
+            for ( TimeSeriesBrowse tsb: parentTsbs ) {
+                tsb.setTimeRange(dr);
+            }
+        }
+
+        public DatumRange getTimeRange() {
+            return parentTsbs.get(0).getTimeRange(); // TODO: this should probably be the union
+        }
+
+        public void setTimeResolution(Datum d) {
+            for ( TimeSeriesBrowse tsb: parentTsbs ) {
+                tsb.setTimeResolution(d);
+            }
+        }
+
+        public Datum getTimeResolution() {
+            return parentTsbs.get(0).getTimeResolution(); //TODO: this should probably be the coursest.
+        }
+
+        public String getURI() {
+            Datum res= getTimeResolution();
+            return this.uri + "?range="+getTimeRange() + ( res==null ? "" : "&resolution="+res );
+        }
+
+        
+    }
+
     private synchronized void resolveParents() {
         if ( dsf.getUri()==null ) return; //TODO: remove
         URISplit split= URISplit.parse(dsf.getUri());
@@ -456,11 +507,20 @@ public class DataSourceController extends DomNodeController {
             return;
         }
         String[] ss = split.surl.split(",", -2);
+        this.tsb= null; //TODO: who is listening?
         for (int i = 0; i < ss.length; i++) {
             DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
             if ( dsf!=null ) {
                 dsf.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
                 parentSources[i] = dsf;
+                TimeSeriesBrowse parentTsb= dsf.controller.getTsb();
+                if ( parentTsb!=null ) {
+                    if ( this.tsb==null ) {
+                        AggTimeSeriesBrowse aggTsb= new AggTimeSeriesBrowse(dsf.getUri());
+                        this.tsb= aggTsb;
+                    }
+                    ((AggTimeSeriesBrowse)tsb).addTimeSeriesBrowse(parentTsb);
+                }
             }else {
                 logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
                 parentSources[i] = null;
@@ -1126,6 +1186,16 @@ public class DataSourceController extends DomNodeController {
             logger.log( Level.FINE, "{0} read dataset: {1}", new Object[]{this.getDataSource(), result});
             Map<String,Object> props= getDataSource().getMetadata(new NullProgressMonitor());
             setDataSetInternal(result,props,dom.controller.isValueAdjusting());
+            // look again to see if it has timeSeriesBrowse now--JythonDataSource
+            if ( getTsb()==null && getDataSource().getCapability( TimeSeriesBrowse.class ) !=null ) {
+                TimeSeriesBrowse tsb= getDataSource().getCapability( TimeSeriesBrowse.class );
+                PlotElement pe= getPlotElement();
+                if ( pe!=null && this.doesPlotElementSupportTsb( pe ) ) {  //TODO: less flakey
+                    setTsb(tsb);
+                    timeSeriesBrowseController = new TimeSeriesBrowseController(this,pe);
+                    timeSeriesBrowseController.setup(false);
+                }
+            }
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
             setException(ex);
