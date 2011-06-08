@@ -58,7 +58,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
     public JythonDataSource(URI uri, JythonDataSourceFactory factory) {
         super(uri);
-        addCability(Caching.class, this);
+        addCability(Caching.class, this); //TODO: check for parameter inputs!
         this.listener = factory.listener;
 
     }
@@ -225,6 +225,15 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             PyObject result;
 
             String label= null;
+
+            if ( causedBy!=null ) {
+
+                interp = null;
+                cacheUrl = null;
+                cacheDate = null;
+
+                throw causedBy;
+            }
             
             if (expr == null) {
                 try {
@@ -438,8 +447,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private TimeSeriesBrowse checkForTimeSeriesBrowse( String uri, File jythonScript ) throws IOException, ParseException {
         BufferedReader reader = new LineNumberReader( new FileReader( jythonScript ) );
 
-        String line= "tr= getParam( 'timerange', '2010-001' )"; //TODO!
-        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s\\'*(\\S+)\\'\\s*\\).*");  //TODO: default time strings must not contain whitespace.
+        String line= ""; //TODO!
+        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s\\'*(\\S+)\\'\\s*(,'.*')?\\).*");  //TODO: default time strings must not contain whitespace.
         while ( line!=null ) {
             Matcher m= s.matcher(line);
             if ( m.matches() ) {
