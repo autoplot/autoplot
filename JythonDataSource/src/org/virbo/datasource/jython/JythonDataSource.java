@@ -404,7 +404,9 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
 
         public void setTimeRange(DatumRange dr) {
             if ( this.timeRange==null || !(this.timeRange.equals(dr)) ) {
-                interp= null; // no caching...  TODO: this probably needs work.  For example, if we zoom in.
+                synchronized ( JythonDataSource.this ) {
+                    interp= null; // no caching...  TODO: this probably needs work.  For example, if we zoom in.
+                }
             }
             this.timeRange= dr;
             URISplit split= URISplit.parse(uri);
@@ -439,8 +441,8 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
     private TimeSeriesBrowse checkForTimeSeriesBrowse( String uri, File jythonScript ) throws IOException, ParseException {
         BufferedReader reader = new LineNumberReader( new FileReader( jythonScript ) );
 
-        String line= ""; //TODO!
-        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s\\'*(\\S+)\\'\\s*(,'.*')?\\).*");  //TODO: default time strings must not contain whitespace.
+        String line= reader.readLine();
+        Pattern s= Pattern.compile(".*getParam\\(\\s*\\'timerange\\',\\s*\\'([-0-9a-z]+)\\'\\s*(,\\s*\\'.*\\')?\\s*\\).*");  //TODO: default time strings must not contain whitespace.
         while ( line!=null ) {
             Matcher m= s.matcher(line);
             if ( m.matches() ) {
