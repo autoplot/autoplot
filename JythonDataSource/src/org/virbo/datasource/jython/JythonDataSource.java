@@ -314,7 +314,7 @@ public class JythonDataSource extends AbstractDataSource implements Caching {
             cacheUrl = null;
             cacheDate = null;
 
-            throw new RuntimeException(msg);
+            throw ex;
         } finally {
             mon.finished();
         }
