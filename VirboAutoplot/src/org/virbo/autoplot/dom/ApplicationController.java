@@ -898,6 +898,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     /**
      * find the plotElement using this renderer.
      * @param rend
+     * @throw IllegalArgumentException if the plot element cannot be found.
      * @return 
      */
     protected PlotElement findPlotElement(Renderer rend) {
