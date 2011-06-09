@@ -85,7 +85,7 @@ public class SpectrogramStylePanel extends javax.swing.JPanel implements PlotSty
         jLabel5 = new javax.swing.JLabel();
         rebinPanel = new javax.swing.JPanel();
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Spectrogram"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Spectrogram [?]"));
 
         colortableTypePanel.setToolTipText("colortable for spectrograms\n");
         colortableTypePanel.setLayout(new java.awt.BorderLayout());

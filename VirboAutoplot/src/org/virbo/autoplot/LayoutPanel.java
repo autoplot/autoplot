@@ -472,7 +472,7 @@ public class LayoutPanel extends javax.swing.JPanel {
         });
         bindingActionsMenu.add(deleteBindingsMenuItem);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plots"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plots [?]"));
         jPanel1.setToolTipText("Layout of plots on the canvas");
 
         canvasLayoutPanel1.setText("canvasLayoutPanel1");
@@ -488,7 +488,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, canvasLayoutPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
         );
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot Elements"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot Elements [?]"));
         jPanel2.setToolTipText("List of plot elements (renderings of data) on the canvas");
 
         panelListComponent.setModel(new javax.swing.AbstractListModel() {
@@ -509,7 +509,7 @@ public class LayoutPanel extends javax.swing.JPanel {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Bindings"));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Bindings [?]"));
         jPanel3.setToolTipText("List of connections between DOM properties");
 
         bindingListComponent.setModel(new javax.swing.AbstractListModel() {

@@ -200,7 +200,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
         stylePanel.setLayout(new java.awt.BorderLayout());
         jSplitPane2.setLeftComponent(stylePanel);
 
-        plotPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Canvas"));
+        plotPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Canvas [?]"));
 
         majorTicksCheckBox.setText("major ticks");
         majorTicksCheckBox.setToolTipText("Draw grid lines at major ticks ");

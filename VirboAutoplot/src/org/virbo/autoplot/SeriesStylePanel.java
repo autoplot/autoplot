@@ -141,7 +141,7 @@ public class SeriesStylePanel extends javax.swing.JPanel implements PlotStylePan
         jLabel10 = new javax.swing.JLabel();
         lineStylePanel = new javax.swing.JPanel();
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Series"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Series [?]"));
 
         jLabel3.setText("Line Thickness:");
         jLabel3.setToolTipText("thickness of the plot trace");

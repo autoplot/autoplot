@@ -150,7 +150,7 @@ public class ColorScatterStylePanel extends javax.swing.JPanel implements PlotSt
         jLabel4 = new javax.swing.JLabel();
         colortableTypePanel = new javax.swing.JPanel();
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Color Scatter"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Color Scatter [?]"));
 
         jLabel3.setText("line thickness:");
         jLabel3.setToolTipText("thickness of the plot trace");

@@ -139,7 +139,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Plots"/>
+            <TitledBorder title="Plots [?]"/>
           </Border>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Layout of plots on the canvas"/>
@@ -169,7 +169,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Plot Elements"/>
+            <TitledBorder title="Plot Elements [?]"/>
           </Border>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="List of plot elements (renderings of data) on the canvas"/>
@@ -213,7 +213,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Bindings"/>
+            <TitledBorder title="Bindings [?]"/>
           </Border>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="List of connections between DOM properties"/>

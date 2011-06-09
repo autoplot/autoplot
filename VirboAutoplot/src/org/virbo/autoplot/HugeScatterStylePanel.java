@@ -81,7 +81,7 @@ public class HugeScatterStylePanel extends javax.swing.JPanel implements PlotSty
         jLabel6 = new javax.swing.JLabel();
         lineStylePanel = new javax.swing.JPanel();
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Huge Scatter"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Huge Scatter [?]"));
 
         colorPanel.setLayout(new java.awt.BorderLayout());
 

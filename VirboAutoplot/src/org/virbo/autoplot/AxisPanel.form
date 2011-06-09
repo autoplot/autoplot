@@ -51,9 +51,10 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="X Axis"/>
+            <TitledBorder title="X Axis [?]"/>
           </Border>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="click title for help"/>
       </Properties>
 
       <Layout>
@@ -111,9 +112,10 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Colorbar"/>
+            <TitledBorder title="Colorbar [?]"/>
           </Border>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="click title for help"/>
       </Properties>
 
       <Layout>
@@ -184,9 +186,10 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Y Axis"/>
+            <TitledBorder title="Y Axis [?]"/>
           </Border>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="click title for help"/>
       </Properties>
 
       <Layout>
@@ -258,9 +261,10 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Plot"/>
+            <TitledBorder title="Plot [?]"/>
           </Border>
         </Property>
+        <Property name="toolTipText" type="java.lang.String" value="click title for help"/>
       </Properties>
 
       <Layout>

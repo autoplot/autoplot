@@ -224,7 +224,8 @@ public class AxisPanel extends javax.swing.JPanel {
         legendEnableCheckbox = new javax.swing.JCheckBox();
         legendTextField = new javax.swing.JTextField();
 
-        xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis"));
+        xAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("X Axis [?]"));
+        xAxisPanel.setToolTipText("click title for help");
 
         xLog.setText("Log");
         xLog.setToolTipText("X axis logarithmic scale");
@@ -258,7 +259,8 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Colorbar"));
+        zAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Colorbar [?]"));
+        zAxisPanel.setToolTipText("click title for help");
 
         zLog.setText("Log");
         zLog.setToolTipText("colorbar logarithmic scale");
@@ -300,7 +302,8 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap(22, Short.MAX_VALUE))
         );
 
-        yAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Y Axis"));
+        yAxisPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Y Axis [?]"));
+        yAxisPanel.setToolTipText("click title for help");
 
         yAxisRangePanel.setLayout(new java.awt.BorderLayout());
 
@@ -341,7 +344,8 @@ public class AxisPanel extends javax.swing.JPanel {
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot [?]"));
+        jPanel1.setToolTipText("click title for help");
 
         titleTextField.setText("title will go here");
         titleTextField.setToolTipText("title for the selected plot.\n");
