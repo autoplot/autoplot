@@ -916,7 +916,12 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
     public static final String PROP_COLUMN = "column";
 
     public String getColumn() {
-        return column;
+        int i= column.indexOf(": "); // allow field1:field5 but not "L: field4-field18"
+        if ( i>-1 ) {
+            return column.substring(0,i);
+        } else {
+            return column;
+        }
     }
 
     public void setColumn(String column) {
