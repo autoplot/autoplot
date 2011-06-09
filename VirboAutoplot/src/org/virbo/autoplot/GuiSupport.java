@@ -85,6 +85,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 import org.xml.sax.SAXException;
 
@@ -251,11 +252,11 @@ public class GuiSupport {
     Action getDumpDataAction2( final Application dom ) {
         return new AbstractAction("Export Data 2...") {
             public void actionPerformed( ActionEvent e ) {
-                ExportDataPanel edp= new ExportDataPanel();
+                final ExportDataPanel edp= new ExportDataPanel();
                 edp.setDataSet(dom);
 
-                String dsid= dom.getController().getPlotElement().getDataSourceFilterId();
-                QDataSet ds= dom.getController().getDataSourceFilterFor( dom.getController().getPlotElement() ).getController().getDataSet();
+                final DataSourceFilter dsf= dom.getController().getDataSourceFilterFor( dom.getController().getPlotElement() );
+                QDataSet ds= dsf.getController().getDataSet();
 
                 if (ds == null) {
                     JOptionPane.showMessageDialog(parent, "No Data to Export.");
@@ -275,8 +276,12 @@ public class GuiSupport {
                     edp.getFormatDL().setSelectedItem( "." + DataSetURI.getExt(currentFileString.toLowerCase()) );
                     edp.setFile( currentFileString );
                 }
+
+                if ( dsf.getController().getTsb()!=null ) {
+                    edp.setTsb(true);
+                }
                 
-                if ( JOptionPane.showConfirmDialog( parent, edp )==JOptionPane.OK_OPTION ) {
+                if ( JOptionPane.showConfirmDialog( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                      try {
                         String name= edp.getFilenameTF().getText();
                         prefs.put("DumpDataCurrentFile", name );
@@ -288,7 +293,7 @@ public class GuiSupport {
                             ext = "";
                         }
 
-                        DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext);
+                        final DataSourceFormat format = DataSourceRegistry.getInstance().getFormatByExt(ext);
                         if (format == null) {
                             JOptionPane.showMessageDialog(parent, "No formatter for extension: " + ext);
                             return;
@@ -296,18 +301,52 @@ public class GuiSupport {
 
                         DataSourceFormatEditorPanel opts= edp.getDataSourceFormatEditorPanel();
                         if ( opts!=null ) {
-                            s= opts.getURI();
+                            URISplit splitopts= URISplit.parse(opts.getURI());
+                            URISplit splits= URISplit.parse(s);
+                            splitopts.file= splits.file;
+                            s= URISplit.format(splitopts); //TODO: this probably needs a lookin at.
                         }
 
-                        if ( edp.isFormatPlotElement() ) {
-                            format.formatData( s, ds, new DasProgressPanel("formatting data"));
-                        } else {
-                            format.formatData( s, ds, new DasProgressPanel("formatting data"));
-                        }
-                        parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(s) );
+                        final QDataSet fds= ds;
+                        final String uriOut= s;
 
-                    } catch ( IOException ex ) {
-                        parent.applicationModel.getExceptionHandler().handle(ex);
+                        Runnable run= new Runnable() {
+                            public void run() {
+                                try {
+
+                                    QDataSet ds= fds;
+
+                                    if ( dsf.getController().getTsb()!=null ) {
+                                        dsf.getController().getTsb().setTimeResolution(null);
+                                        ProgressMonitor mon= DasProgressPanel.createFramed(parent, "reloading timeseries at native resolution");
+                                        ds= dsf.getController().getDataSource().getDataSet( mon );
+                                        if ( mon.isCancelled() ) {
+                                            parent.setStatus( "export data cancelled" );
+                                            return;
+                                        }
+                                    }
+
+                                    if ( edp.isFormatPlotElement() ) {
+                                        format.formatData( uriOut, ds, new DasProgressPanel("formatting data"));
+                                    } else {
+                                        format.formatData( uriOut, ds, new DasProgressPanel("formatting data"));
+                                    }
+                                    parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
+                                } catch ( IOException ex ) {
+                                    parent.applicationModel.getExceptionHandler().handle(ex);
+                                } catch ( IllegalArgumentException ex ) {
+                                    parent.applicationModel.getExceptionHandler().handle(ex);
+                                } catch (RuntimeException ex ) {
+                                    parent.applicationModel.getExceptionHandler().handleUncaught(ex);
+                                } catch (Exception ex) {
+                                    parent.applicationModel.getExceptionHandler().handle(ex);
+                                }
+
+                            }
+                        };
+
+                        new Thread( run ).start();
+
                     } catch ( IllegalArgumentException ex ) {
                         parent.applicationModel.getExceptionHandler().handle(ex);
                     } catch (RuntimeException ex ) {
