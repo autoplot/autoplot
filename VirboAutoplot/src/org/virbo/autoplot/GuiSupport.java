@@ -1141,6 +1141,16 @@ public class GuiSupport {
         });
         panelMenu.add(item);
 
+        item=  new JMenuItem(new AbstractAction("Move Plot Element Below Others") {
+
+            public void actionPerformed(ActionEvent e) {
+                PlotElement pelement = controller.getPlotElement();
+                Plot p= pelement.getController().getApplication().getController().getPlotFor(pelement);
+                p.getController().toBottom(pelement);
+            }
+        });
+        panelMenu.add(item);
+
         JMenuItem editDataMenu = new JMenuItem(new AbstractAction("Edit Data Source") {
             public void actionPerformed(ActionEvent e) {
                 GuiSupport.editPlotElement( controller.getApplicationModel(), plot );
