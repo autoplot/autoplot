@@ -452,11 +452,11 @@ public class DataSourceController extends DomNodeController {
     /**
      * Introduced to support children that are TSBs.  All are assumed to be the same, the first is used for the getter.
      */
-    class AggTimeSeriesBrowse implements TimeSeriesBrowse {
+    class InternalTimeSeriesBrowse implements TimeSeriesBrowse {
 
         String uri;
 
-        private AggTimeSeriesBrowse( String uri ) {
+        private InternalTimeSeriesBrowse( String uri ) {
             this.uri= uri; // "vap+internal:data_1,data_2"
         }
 
@@ -516,10 +516,10 @@ public class DataSourceController extends DomNodeController {
                 TimeSeriesBrowse parentTsb= dsf.controller.getTsb();
                 if ( parentTsb!=null ) {
                     if ( this.tsb==null ) {
-                        AggTimeSeriesBrowse aggTsb= new AggTimeSeriesBrowse(dsf.getUri());
-                        this.tsb= aggTsb;
+                        InternalTimeSeriesBrowse intTsb= new InternalTimeSeriesBrowse(dsf.getUri());
+                        this.tsb= intTsb;
                     }
-                    ((AggTimeSeriesBrowse)tsb).addTimeSeriesBrowse(parentTsb);
+                    ((InternalTimeSeriesBrowse)tsb).addTimeSeriesBrowse(parentTsb);
                 }
             }else {
                 logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
