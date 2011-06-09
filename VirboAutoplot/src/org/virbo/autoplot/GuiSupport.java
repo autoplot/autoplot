@@ -747,8 +747,12 @@ public class GuiSupport {
     private static void mergeVap( Application dom, Plot plot, PlotElement pelement, String vap ) {
         try {
             ImportVapDialog d = new ImportVapDialog();
+            if ( vap.indexOf("?")!=-1 ) {
+                int i= vap.indexOf("?");
+                vap= vap.substring(0,i);
+            }
             d.setVap(vap);
-            if ( d.showDialog()==JOptionPane.OK_OPTION ) {
+            if ( d.showDialog( SwingUtilities.getWindowAncestor( dom.getController().getDasCanvas() ) )==JOptionPane.OK_OPTION ) {
                 String lock= "merging vaps";
                 dom.getController().registerPendingChange( d,lock );
                 dom.getController().performingChange( d, lock );
