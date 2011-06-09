@@ -71,6 +71,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
         filenameTF = new javax.swing.JTextField();
         chooseFileB = new javax.swing.JButton();
         additionalOptionsButton = new javax.swing.JButton();
+        warningMessageLabel = new javax.swing.JLabel();
 
         jLabel2.setText("Select Output Format:");
 
@@ -151,6 +152,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .add(additionalOptionsButton)
                 .addContainerGap())
+            .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -160,7 +162,9 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 .add(originalDataB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(processedDataB)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(warningMessageLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(formatDL, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -172,7 +176,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
                     .add(chooseFileB))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(additionalOptionsButton)
-                .addContainerGap(78, Short.MAX_VALUE))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -292,6 +296,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JRadioButton originalDataB;
     private javax.swing.JRadioButton processedDataB;
+    private javax.swing.JLabel warningMessageLabel;
     // End of variables declaration//GEN-END:variables
 
     /**
@@ -318,6 +323,13 @@ public class ExportDataPanel extends javax.swing.JPanel {
         if ( editorPanel!=null ) {
             editorPanel.setURI(currentFileString);
         }
+    }
+
+    void setTsb(boolean b) {
+        if ( b ) {
+            warningMessageLabel.setText("Exporting data at native resolution.");
+            warningMessageLabel.setToolTipText("<html>This data comes from a reader that can return data at multiple resolutions.  Data will be reread at native resolution before writing output.</html>");
+        } 
     }
 
 }
