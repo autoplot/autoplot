@@ -900,7 +900,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param rend
      * @return 
      */
-    private PlotElement findPlotElement(Renderer rend) {
+    protected PlotElement findPlotElement(Renderer rend) {
         for (PlotElement p : application.getPlotElements()) {
             PlotElementController pc = p.controller;
             if (pc.getRenderer() == rend) {
