@@ -6,8 +6,10 @@ package org.virbo.autoplot.dom;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
@@ -22,7 +24,6 @@ import org.das2.event.MouseModule;
 import org.das2.event.ZoomPanMouseModule;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasCanvas;
-import org.das2.graph.DasCanvasComponent;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasColumn;
 import org.das2.graph.DasPlot;
@@ -454,6 +455,110 @@ public class PlotController extends DomNodeController {
         addPlotElement(p,true);
     }
 
+    synchronized List<Integer> indecesOfPlotElements( ) {
+        List<Integer> indeces= new ArrayList<Integer>(dom.plotElements.size());
+        for ( int i=0; i<dom.plotElements.size(); i++ ) {
+            if ( dom.getPlotElements(i).getPlotId().equals(this.plot.getId()) ) {
+                indeces.add(i);
+            }
+        }
+        return indeces;
+    }
+
+    synchronized void moveToStackBottom( PlotElement p ) {
+        final Lock lock= dom.getController().mutatorLock();
+        lock.lock();
+        try {
+            if (!p.getPlotId().equals(this.plot.getId())) {
+                throw new IllegalArgumentException("this is not my plot");
+            }
+            PlotElement[] newPes= dom.getPlotElements(); // verified this makes a copy.
+
+            // find the bottom most element of plot.
+            int bottom;
+            for ( bottom=0; bottom<newPes.length; bottom++ ) {
+                if ( newPes[bottom].getPlotId().equals(p.getPlotId()) ) break;
+            }
+
+            int ploc;
+            for ( ploc=0; ploc<newPes.length; ploc++ ) {
+                if ( newPes[ploc]==p ) break;
+            }
+
+            if ( ploc>bottom ) {
+                for ( int i=ploc; i>bottom; i-- ) {
+                    newPes[i]= newPes[i-1];
+                }
+                newPes[bottom]= p;
+            }
+
+            for ( int i=0; i<newPes.length; i++ ) {
+                System.err.println( dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
+            }
+            dom.setPlotElements(newPes);
+
+        } finally {
+            lock.unlock();
+        }
+
+    }
+
+    /**
+     * move the plot element to the bottom.
+     * @param p
+     */
+    public void toBottom( PlotElement p ) {
+        moveToStackBottom(p);
+        DasPlot pp= p.getController().getDasPlot();
+        Renderer r= p.getController().getRenderer();
+        pp.removeRenderer(r);
+        pp.addRenderer(0,r);
+    }
+    
+    /**
+     * move the plot element to the top of the stack, or the highest index in the dom.
+     * This does not affect the View (das2), only the model!
+     * @param p
+     */
+    synchronized void moveToStackTop( PlotElement p ) {
+        final Lock lock= dom.getController().mutatorLock();
+        lock.lock();
+        try {
+            if (!p.getPlotId().equals(this.plot.getId())) {
+                throw new IllegalArgumentException("this is not my plot");
+            }
+            PlotElement[] newPes= dom.getPlotElements(); // verified this makes a copy.
+
+            // find the topmost element of plot.
+            int top;
+            for ( top=newPes.length-1; top>=0; top-- ) {
+                if ( newPes[top].getPlotId().equals(p.getPlotId()) ) break;
+            }
+
+            int ploc;
+            for ( ploc=0; ploc<newPes.length; ploc++ ) {
+                if ( newPes[ploc]==p ) break;
+            }
+
+            if ( ploc<top ) {
+                for ( int i=ploc; i<top; i++ ) {
+                    newPes[i]= newPes[i+1];
+                }
+                newPes[top]= p;
+            }
+
+            for ( int i=0; i<newPes.length; i++ ) {
+                System.err.println( dom.getPlotElements(i) + "(" + dom.getPlotElements(i).getPlotId() + ")" + " " + newPes[i] +  "(" + newPes[i].getPlotId()+ ")"  );
+            }
+            dom.setPlotElements(newPes);
+
+        } finally {
+            lock.unlock();
+        }
+
+    }
+
+
     synchronized void addPlotElement(PlotElement p,boolean reset) {
         Renderer rr= p.controller.getRenderer();
 
@@ -463,15 +568,17 @@ public class PlotController extends DomNodeController {
             ((SeriesRenderer)rr).setColorBar( getDasColorBar() );
         }
 
+        boolean toTop= rr!=null && !( rr instanceof SpectrogramRenderer );
         if ( rr!=null ) {
-            if ( rr instanceof SpectrogramRenderer ) { // kludge to put on the bottom
+            if ( !toTop ) { // kludge to put on the bottom
                 dasPlot.addRenderer(0,rr);
             } else {
                 dasPlot.addRenderer(rr);
             }
         }
         RenderType rt = p.getRenderType();
-        p.setPlotId(plot.getId());
+        //p.setPlotId(plot.getId());
+        p.plotId= plot.getId();
         if ( reset ) p.controller.doResetRenderType(rt);
         doPlotElementDefaultsChange(p);
         if ( !pdListen.contains(p) ) {
@@ -481,6 +588,11 @@ public class PlotController extends DomNodeController {
         }
         p.setPlotId(plot.getId());
         checkRenderType();
+
+        if ( rr!=null && toTop ) {
+            moveToStackTop(p);
+        }
+
 //        DasPlot pl= p.controller.getDasPlot();
 //        if ( pl!=null ) {
 //            DasCanvas c= pl.getCanvas();
