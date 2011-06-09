@@ -324,6 +324,15 @@ public class PlotController extends DomNodeController {
     }
 
     /**
+     * set log to false if the axis contains 0 or negative min.
+     * @param a
+     */
+    private static void logCheck( Axis a ) {
+        if ( a.isLog() && a.getRange().min().doubleValue( a.getRange().getUnits() ) <= 0 ) {
+            a.setLog(false);
+        }
+    }
+    /**
      * set the zoom so that all of the plotElements' data is visible.  Thie means finding
      * the "union" of each plotElements' plotDefault ranges.  If any plotElement's default log
      * is false, then the new setting will be false.
@@ -360,16 +369,19 @@ public class PlotController extends DomNodeController {
         }
 
         if ( x ) {
+            logCheck(newSettings.getXaxis());
             plot.getXaxis().setLog( newSettings.getXaxis().isLog() );
             plot.getXaxis().setRange(newSettings.getXaxis().getRange());
             plot.getXaxis().setAutoRange(true);
         }
         if ( y ) {
+            logCheck(newSettings.getYaxis());
             plot.getYaxis().setLog( newSettings.getYaxis().isLog() );
             plot.getYaxis().setRange(newSettings.getYaxis().getRange());
             plot.getYaxis().setAutoRange(true);
         }
         if ( z ) {
+            logCheck(newSettings.getZaxis());
             plot.getZaxis().setLog( newSettings.getZaxis().isLog() );
             plot.getZaxis().setRange(newSettings.getZaxis().getRange());
             plot.getZaxis().setAutoRange(true);
