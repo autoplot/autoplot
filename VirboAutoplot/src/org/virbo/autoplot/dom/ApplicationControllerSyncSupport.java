@@ -226,7 +226,7 @@ public class ApplicationControllerSyncSupport {
         }
         for (int i = 0; i < dataSourceFilters.length; i++) {
             application.dataSourceFilters.get(i).syncTo(dataSourceFilters[i]);
-            nameMap.put(dataSourceFilters[i].getId(), application.dataSourceFilters.get(i).getId());
+            nameMap.put(dataSourceFilters[i].getId(), application.dataSourceFilters.get(i).getId()); // Note this is always data_i->data_i.  It must be like this or a bug will occur.
         }
     }
 
