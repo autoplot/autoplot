@@ -10,6 +10,7 @@
  */
 
 package org.virbo.autoplot;
+import java.awt.Component;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,8 +43,8 @@ public class ImportVapDialog extends javax.swing.JPanel {
      * returns JOptionPane.OKAY_OPTION or JOptionPane.CANCEL_OPTION
      * @return
      */
-    public int showDialog() {
-        return JOptionPane.showConfirmDialog(null, sels.toArray(), "Import URIs", JOptionPane.OK_CANCEL_OPTION );
+    public int showDialog( Component parent ) {
+        return JOptionPane.showConfirmDialog( parent, sels.toArray(), "Import URIs", JOptionPane.OK_CANCEL_OPTION );
     }
 
     public void setVap( String vap ) throws IOException {
