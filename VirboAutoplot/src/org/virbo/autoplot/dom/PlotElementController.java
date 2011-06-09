@@ -1820,11 +1820,42 @@ public class PlotElementController extends DomNodeController {
                 if ( oldRenderer!=newRenderer ) plot.removeRenderer(oldRenderer);
             }
             if ( oldPlot==null || oldRenderer!=newRenderer ) {
-                if ( newRenderer instanceof SpectrogramRenderer ) {
-                    plot.addRenderer(0,newRenderer);
-                } else {
-                    plot.addRenderer(newRenderer);
+                synchronized ( dom ) {
+                    if ( newRenderer instanceof SpectrogramRenderer ) {
+                        plot.addRenderer(0,newRenderer);
+                    } else {
+                        Renderer[] rends= plot.getRenderers();
+                        PlotElement[] pe= new PlotElement[rends.length];
+                        for ( int i=0; i<rends.length; i++ ) {
+                            PlotElement pe1= dom.controller.findPlotElement(rends[i]);
+                            pe[i]= pe1;
+                        }
+                        int best=-1;
+                        int myPos= -1;
+                        for ( int i=0; i<dom.getPlotElements().length; i++ ) {
+                            if ( dom.getPlotElements(i)==plotElement ) myPos= i;
+                        }
+
+                        List<Renderer> arends= Arrays.asList(rends);
+
+                        Renderer lastRend= null;
+                        int i;
+                        for ( i=0; i<myPos; i++ ) {
+                            if ( i>best && i<myPos 
+                                    && dom.getPlotElements(i).getPlotId().equals(plotElement.getPlotId())
+                                    && arends.contains( dom.getPlotElements(i).getController().getRenderer() ) ) lastRend= dom.getPlotElements(i).getController().getRenderer();
+                        }
+
+                        // find the index of the renderer that is just underneath this one.
+                        int indexUnder= -1;
+                        for ( int j=0; j<rends.length; j++ ) {
+                            if ( rends[j]==lastRend ) indexUnder= j;
+                        }
+
+                        plot.addRenderer(indexUnder+1,newRenderer);
+                    }
                 }
+
             }
 
             logger.log(Level.FINEST, "plot.addRenderer {0} {1}", new Object[]{plot, newRenderer});
