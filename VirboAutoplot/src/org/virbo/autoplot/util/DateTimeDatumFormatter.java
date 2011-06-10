@@ -20,6 +20,26 @@ import org.das2.datum.format.TimeDatumFormatter;
  */
 public class DateTimeDatumFormatter extends DatumFormatter {
 
+    boolean dayOfYear= false;
+
+    public boolean isDayOfYear() {
+        return dayOfYear;
+    }
+
+    public void setDayOfYear(boolean dayOfYear) {
+        this.dayOfYear = dayOfYear;
+    }
+
+    public static final int OPT_DOY= 1;
+
+    public DateTimeDatumFormatter( int opts ) {
+        setDayOfYear( (opts|OPT_DOY)==OPT_DOY );
+    }
+
+    public DateTimeDatumFormatter() {
+        this(0);
+    }
+    
     @Override
     public String format(Datum datum) {
         if ( !datum.getUnits().isConvertableTo(Units.us2000 ) ) {
@@ -29,7 +49,11 @@ public class DateTimeDatumFormatter extends DatumFormatter {
         String date= null;
         String time= TimeDatumFormatter.MINUTES.format(datum);
         if ( ssm==0 ) {
-            date= TimeDatumFormatter.DAYS.format(datum);
+            if ( dayOfYear ) {
+                date= TimeDatumFormatter.DAY_OF_YEAR.format(datum);
+            } else {
+                date= TimeDatumFormatter.DAYS.format(datum);
+            }
         }
         return date==null ? time : date + " " + time;
     }
@@ -40,7 +64,11 @@ public class DateTimeDatumFormatter extends DatumFormatter {
         String date= null;
         String time= TimeDatumFormatter.MINUTES.format(datum);
         if ( ssm==0 ) {
-            date= TimeDatumFormatter.DAYS.format(datum);
+            if ( dayOfYear ) {
+                date= TimeDatumFormatter.DAY_OF_YEAR.format(datum);
+            } else {
+                date= TimeDatumFormatter.DAYS.format(datum);
+            }
         }
         return date==null ? time : time + "!c" + date;
     }
@@ -89,7 +117,11 @@ public class DateTimeDatumFormatter extends DatumFormatter {
                 if ( firstIndex==-1 ) firstIndex= i;
                 double ssm= TimeUtil.getSecondsSinceMidnight(datum);
                 if ( ssm==0 ) {
-                    date= TimeDatumFormatter.DAYS.format(datum);
+                    if ( dayOfYear ) {
+                       date= TimeDatumFormatter.DAY_OF_YEAR.format(datum);
+                    } else {
+                       date= TimeDatumFormatter.DAYS.format(datum);
+                    }
                     haveMidnight= true;
                     result[i]= result[i] + "!c" + date;
                 } else {
@@ -101,13 +133,23 @@ public class DateTimeDatumFormatter extends DatumFormatter {
         if ( haveNonMidnight ) {            
             if ( !haveMidnight && firstIndex>-1 ) {
                 Datum datum= datums.get(firstIndex);
-                String date= TimeDatumFormatter.DAYS.format(datum);
+                String date;
+                if ( dayOfYear ) {
+                    date= TimeDatumFormatter.DAY_OF_YEAR.format(datum);
+                } else {
+                    date= TimeDatumFormatter.DAYS.format(datum);
+                }
                 result[firstIndex]= result[firstIndex] + "!c" + date;
             }
         } else {
             for ( int i=0; i<datums.getLength(); i++ ) {
                 Datum datum= datums.get(i);
-                String date= TimeDatumFormatter.DAYS.format(datum);
+                String date;
+                if ( dayOfYear ) {
+                    date= TimeDatumFormatter.DAY_OF_YEAR.format(datum);
+                } else {
+                    date= TimeDatumFormatter.DAYS.format(datum);
+                }
                 result[i]= date;
             }
         }            
