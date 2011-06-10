@@ -103,7 +103,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         });
 
         browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/file.png"))); // NOI18N
-        browseButton.setToolTipText("Edit Data Source");
+        browseButton.setToolTipText("Edit data source");
         browseButton.setEnabled(false);
         browseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -206,5 +206,13 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     private javax.swing.JButton prevButton;
     private javax.swing.JTextField timeRangeTextField;
     // End of variables declaration//GEN-END:variables
+
+    public PropertyChangeListener getUriFocusListener() {
+        return new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                browseButton.setToolTipText( "<html>Edit data source<br>"+evt.getNewValue().toString()+"</html>" );
+            }
+        };
+    }
 
 }
