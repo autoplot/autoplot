@@ -32,8 +32,12 @@ public class DateTimeDatumFormatter extends DatumFormatter {
 
     public static final int OPT_DOY= 1;
 
+    /**
+     * create a formatter with the given options.  Options should be or'd together a|b.
+     * @param opts
+     */
     public DateTimeDatumFormatter( int opts ) {
-        setDayOfYear( (opts|OPT_DOY)==OPT_DOY );
+        setDayOfYear( (opts&OPT_DOY)==OPT_DOY );
     }
 
     public DateTimeDatumFormatter() {
