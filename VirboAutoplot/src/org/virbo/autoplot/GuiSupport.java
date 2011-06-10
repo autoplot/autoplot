@@ -342,10 +342,11 @@ public class GuiSupport {
                                         }
                                     }
 
+                                    ProgressMonitor mon= DasProgressPanel.createFramed( parent, "formatting data" );
                                     if ( edp.isFormatPlotElement() ) {
-                                        format.formatData( uriOut, ds, new DasProgressPanel("formatting data"));
+                                        format.formatData( uriOut, ds, mon );
                                     } else {
-                                        format.formatData( uriOut, ds, new DasProgressPanel("formatting data"));
+                                        format.formatData( uriOut, ds, mon );
                                     }
                                     parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
                                 } catch ( IOException ex ) {
