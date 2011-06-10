@@ -445,7 +445,8 @@ public class PlotStylePanel extends javax.swing.JPanel {
     private void pickFontButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pickFontButtonActionPerformed
         JFontChooser chooser = new JFontChooser((JFrame) SwingUtilities.getWindowAncestor(this) );
         String sci= "2 \u00d7 10E7";
-        chooser.setExampleText("Electron Differential Energy Flux\n12:00\n2001-01-10\n"+sci+"\n");
+        String greek= "Greek: \u03C0 \u03F4 \u0394";
+        chooser.setExampleText("Electron Differential Energy Flux\n12:00\n2001-01-10\n"+sci+"\n"+greek);
         chooser.setFont( Font.decode( dom.getOptions().getCanvasFont() ) );
         if (chooser.showDialog() == JFontChooser.OK_OPTION) {
             dom.getController().getDasCanvas().setBaseFont(chooser.getFont());

@@ -154,11 +154,27 @@ public class GuiSupport {
         new Thread(run, "CopyDataSetToClipboardThread").start();
     }
 
+    /**
+     * attempt to get the Frame for the component, which may already be a Frame.
+     * @param parent
+     * @return
+     */
+    public static Frame getFrameForComponent( Component parent ) { 
+        if ( !( parent instanceof Frame ) ) {
+            parent= SwingUtilities.getWindowAncestor(parent);
+        }
+        if ( parent instanceof Frame ) {
+            return (Frame)parent;
+        } else {
+            return null;
+        }
+    }
+
     public static void editPlotElement( ApplicationModel applicationModel, Component parent ) {
         
         Application dom = applicationModel.dom;
 
-        AddPlotElementDialog dia = new AddPlotElementDialog( (Frame)SwingUtilities.getWindowAncestor(parent), true);
+        AddPlotElementDialog dia = new AddPlotElementDialog( getFrameForComponent(parent), true);
         dia.getPrimaryDataSetSelector().setTimeRange(dom.getTimeRange());
         dia.getSecondaryDataSetSelector().setTimeRange(dom.getTimeRange());
         dia.getTertiaryDataSetSelector().setTimeRange(dom.getTimeRange());

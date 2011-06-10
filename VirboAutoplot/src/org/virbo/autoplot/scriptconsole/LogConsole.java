@@ -54,6 +54,7 @@ import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.system.RequestProcessor;
 import org.python.core.PyException;
 import org.python.util.PythonInterpreter;
+import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.JythonUtil;
 import org.xml.sax.SAXException;
 
@@ -213,7 +214,7 @@ public class LogConsole extends javax.swing.JPanel {
 
     private synchronized LogConsoleSettingsDialog getSettingsDialog() {
         if (this.settingsDialog == null) {
-            settingsDialog = new LogConsoleSettingsDialog((JFrame) SwingUtilities.getWindowAncestor(this), false, this);
+            settingsDialog = new LogConsoleSettingsDialog( GuiSupport.getFrameForComponent(this), false, this);
         }
         return settingsDialog;
     }
