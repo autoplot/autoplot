@@ -34,7 +34,9 @@ public class ExportDataPanel extends javax.swing.JPanel {
     /** Creates new form ExportDataPanel */
     public ExportDataPanel() {
         initComponents();
-
+        this.originalDataB.setVisible(false);
+        this.processedDataB.setVisible(false);
+        this.jLabel1.setVisible(false);
     }
 
     public void setDataSet(Application model) {
@@ -76,7 +78,6 @@ public class ExportDataPanel extends javax.swing.JPanel {
         jLabel2.setText("Select Output Format:");
 
         buttonGroup1.add(processedDataB);
-        processedDataB.setSelected(true);
         processedDataB.setText("Processed Data or Component");
         processedDataB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -85,6 +86,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
         });
 
         buttonGroup1.add(originalDataB);
+        originalDataB.setSelected(true);
         originalDataB.setText("Original Data");
         originalDataB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
