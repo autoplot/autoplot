@@ -169,13 +169,13 @@ public class PlotController extends DomNodeController {
         //yaxis.setUseDomainDivider(true);
 
         if (UnitsUtil.isTimeLocation(xaxis.getUnits())) {
-            xaxis.setUserDatumFormatter(new DateTimeDatumFormatter()); //See kludge in TimeSeriesBrowseController
+            xaxis.setUserDatumFormatter(new DateTimeDatumFormatter(dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); //See kludge in TimeSeriesBrowseController
         } else {
             xaxis.setUserDatumFormatter(null);
         }
         
         if (UnitsUtil.isTimeLocation(yaxis.getUnits())) {
-            yaxis.setUserDatumFormatter(new DateTimeDatumFormatter());
+            yaxis.setUserDatumFormatter(new DateTimeDatumFormatter(dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
         } else {
             yaxis.setUserDatumFormatter(null);
         }
@@ -285,7 +285,7 @@ public class PlotController extends DomNodeController {
                         || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE )
                         || e.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
                     if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
-                        axis.setUserDatumFormatter(new DateTimeDatumFormatter());
+                        axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
                     } else {
                         axis.setUserDatumFormatter(null);
                     }
