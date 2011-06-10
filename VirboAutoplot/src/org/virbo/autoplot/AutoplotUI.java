@@ -747,11 +747,12 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         fileMenu.addSeparator();
 
-        mi= new JMenuItem( support.getDumpDataAction() );
-        mi.setToolTipText("Export the data that has the focus");
-        fileMenu.add( mi );
+        //mi= new JMenuItem( support.getDumpDataAction() );
+        //mi.setToolTipText("Export the data that has the focus");
+        //fileMenu.add( mi );
 
         item = new JMenuItem( support.getDumpDataAction2( dom ) );
+        mi.setToolTipText("Export the data that has the focus");
         fileMenu.add( item );
 
         //fileMenu.add( new )
