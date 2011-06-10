@@ -43,8 +43,10 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
+import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
@@ -752,6 +754,26 @@ public class ScriptContext extends PyJavaInstance {
         model.doSave( new File( f ) );
     }
 
+    /**
+     * return a list of completions.  I was talking to Tom N. who was looking for this 
+     * to get a list of CDF variables, and realized this would be useful in the IDL context
+     * as well as python scripts.  This will perform the completion for where the carot is
+     * at the end of the string.
+     * @param file, for example http://autoplot.org/data/somedata.cdf?
+     * @return list of completions, containing the entire URI.
+     */
+    public static String[] getCompletions( String file ) throws Exception {
+        List<CompletionResult> cc= DataSetURI.getCompletions( file, file.length(), new NullProgressMonitor() );
+
+        String[] result= new String[cc.size()];
+        for ( int i=0; i<cc.size(); i++ ) {
+            result[i]= cc.get(i).completion;
+        }
+
+        return result;
+    }
+
+    
     /**
      * load the vap file.  This is implemented by calling plot on the URI.
      * @param filename
