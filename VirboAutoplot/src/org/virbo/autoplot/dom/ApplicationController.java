@@ -311,6 +311,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                 if ( ApplicationController.this.getApplication().getPlotElements().length>1 ) {  // don't flash single plot.
                     canvas.controller.indicateSelection( Arrays.asList(domPlot,p) );
                 }
+            } else {
+                setStatus("" + domPlot + " selected");
             }
 
         }
