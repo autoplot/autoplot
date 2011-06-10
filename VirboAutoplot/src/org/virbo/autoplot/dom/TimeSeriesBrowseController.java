@@ -58,15 +58,21 @@ public class TimeSeriesBrowseController {
                 }
             }
         });
-        
-        this.p = p;
-        this.domPlot= p.getController().getApplication().getController().getPlotFor(p);
-        this.panelController = p.getController();
+
+        if ( p!=null ) {
+            this.p = p;
+            this.domPlot= p.getController().getApplication().getController().getPlotFor(p);
+            this.panelController = p.getController();
+        } else {
+            System.err.println("no plotElement provided, better come back to set up from timerange.");
+        }
         this.dsf= dataSourceController.dsf;
         this.dataSourceController= dataSourceController;
 
-        this.plot = panelController.getDasPlot();
-        this.xAxis = panelController.getDasPlot().getXAxis();
+        if ( p!=null ) {
+            this.plot = panelController.getDasPlot();
+            this.xAxis = panelController.getDasPlot().getXAxis();
+        }
     }
 
     private boolean isBoundTimeRange( BindingModel[] bms, String dstId ) {
