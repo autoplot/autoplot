@@ -508,6 +508,7 @@ public class DataSourceController extends DomNodeController {
         }
         String[] ss = split.surl.split(",", -2);
         this.tsb= null; //TODO: who is listening?
+        InternalTimeSeriesBrowse intTsb=null;
         for (int i = 0; i < ss.length; i++) {
             DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
             if ( dsf!=null ) {
@@ -515,17 +516,17 @@ public class DataSourceController extends DomNodeController {
                 parentSources[i] = dsf;
                 TimeSeriesBrowse parentTsb= dsf.controller.getTsb();
                 if ( parentTsb!=null ) {
-                    if ( this.tsb==null ) {
-                        InternalTimeSeriesBrowse intTsb= new InternalTimeSeriesBrowse(dsf.getUri());
-                        this.tsb= intTsb;
+                    if ( intTsb==null ) {
+                        intTsb= new InternalTimeSeriesBrowse(DataSourceController.this.dsf.getUri());
                     }
-                    ((InternalTimeSeriesBrowse)tsb).addTimeSeriesBrowse(parentTsb);
+                    intTsb.addTimeSeriesBrowse(parentTsb);
                 }
             }else {
                 logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
                 parentSources[i] = null;
             }
         }
+        if ( intTsb!=null ) this.setTsb(intTsb);
         //System.err.println( Arrays.asList(parentSources));
     }
 
@@ -1311,10 +1312,11 @@ public class DataSourceController extends DomNodeController {
                 }
 
                 if ( URISplit.implicitVapScheme(split).equals("vap+internal")) {
+                    resetDataSource(valueWasAdjusting,null);
                     boolean ok= doInternal(split.path);
                     String msg=null;
                     if ( !ok )  msg= dom.controller.getStatus();
-                    resetDataSource(valueWasAdjusting,null);
+                    //resetDataSource(valueWasAdjusting,null);
                     if ( !ok )  dom.controller.setStatus(msg);
                 } else {
                     DataSource source = DataSetURI.getDataSource(surl);
