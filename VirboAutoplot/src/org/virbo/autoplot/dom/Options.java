@@ -7,8 +7,6 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
-import org.das2.system.NullPreferences;
 
 /**
  * Bean for holding AP configuration options
@@ -316,6 +314,35 @@ public class Options extends DomNode {
         this.autolayout = autolayout;
         propertyChangeSupport.firePropertyChange(PROP_AUTOLAYOUT, oldAutolayout, autolayout);
     }
+
+
+    protected boolean dayOfYear= false;
+    public static final String PROP_DAYOFYEAR = "dayOfYear";
+
+    public boolean isDayOfYear() {
+        return dayOfYear;
+    }
+
+    public void setDayOfYear(boolean dayOfYear) {
+        boolean old= this.dayOfYear;
+
+        this.dayOfYear = dayOfYear;
+        propertyChangeSupport.firePropertyChange(PROP_DAYOFYEAR, old, dayOfYear );
+    }
+
+    protected boolean nearestNeighbor= false;
+    public static final String PROP_NEARESTNEIGHBOR = "nearestNeighbor";
+
+    public boolean isNearestNeighbor() {
+        return nearestNeighbor;
+    }
+
+    public void setNearestNeighbor(boolean nearestNeighbor) {
+        boolean old= this.nearestNeighbor;
+        this.nearestNeighbor = nearestNeighbor;
+        propertyChangeSupport.firePropertyChange(PROP_NEARESTNEIGHBOR, old, nearestNeighbor );
+    }
+
 
 
     public void syncTo( DomNode n,List<String> exclude ) {
