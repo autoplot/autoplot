@@ -61,6 +61,8 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.virbo.autoplot.bookmarks.Bookmark;
+import org.virbo.autoplot.dom.Options;
+import org.virbo.autoplot.dom.OptionsPrefsController;
 import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.QDataSet;
@@ -1014,6 +1016,13 @@ public class AutoplotUtil {
     public static RenderType guessRenderType(QDataSet fillds) {
         RenderType spec;
 
+        RenderType specPref= RenderType.spectrogram;
+        Options o= new Options();
+        new OptionsPrefsController(o).loadPreferences();
+        if ( o.isNearestNeighbor() ) {
+            specPref = RenderType.nnSpectrogram;
+        }
+
         String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
         if ( srenderType!=null ) {
             if ( srenderType.equals("time_series") ) {
@@ -1031,7 +1040,13 @@ public class AutoplotUtil {
                 int i= srenderType.indexOf(">");
                 if ( i>-1 ) {
                     try {
-                        spec = RenderType.valueOf(srenderType.substring(0,i));
+                        srenderType= srenderType.substring(0,i);
+                        if ( srenderType.equals("spectrogram") ) {
+                            // allow user preference here.
+                            spec= specPref;
+                        } else {
+                            spec = RenderType.valueOf(srenderType.substring(0,i));
+                        }
                         return spec;
                     } catch (IllegalArgumentException e2) {
                         System.err.println("unable to resolve render type for: "+srenderType + " in " +fillds );
@@ -1079,7 +1094,7 @@ public class AutoplotUtil {
                 if ( dep1==null && fillds.rank()==2 && fillds.length()>3 && fillds.length(0)<4 ) { // Vector quantities without labels. [3x3] is a left a matrix.
                     spec = RenderType.series;
                 } else {
-                    spec = RenderType.spectrogram;
+                    spec = specPref;
                 }
             }
         } else if ( fillds.rank()==0 || fillds.rank()==1 && SemanticOps.isBundle(fillds) ) {
