@@ -14,8 +14,12 @@ package org.autoplot.pngwalk;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -33,6 +37,7 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultFocusManager;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -415,7 +420,32 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             });
         }
 
-        if (isQualityControlEnabled()) {
+//    KeyEventDispatcher myKeyEventDispatcher = new DefaultFocusManager() {
+//
+//            @Override
+//            public boolean dispatchKeyEvent(KeyEvent e) {
+//                Window source= SwingUtilities.getWindowAncestor( e.getComponent() );
+//                Window me= SwingUtilities.getWindowAncestor(PngWalkTool1.this);
+//                if ( source!=me ) {
+//                    return false;
+//                }
+//                if ( e.getKeyCode()==KeyEvent.VK_LEFT ) {
+//                    seq.skipBy(-1);
+//                    e.consume();
+//                    return true;
+//                } else if ( e.getKeyCode()==KeyEvent.VK_RIGHT ) {
+//                    seq.skipBy(1);
+//                    e.consume();
+//                    return true;
+//                } else {
+//                    return false;
+//                }
+//            }
+//
+//    };
+//    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(myKeyEventDispatcher);
+
+    if (isQualityControlEnabled()) {
             qcPanel = new QualityControlPanel();
             JSplitPane qcPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabs, qcPanel);
             qcPane.setResizeWeight(1.0);
