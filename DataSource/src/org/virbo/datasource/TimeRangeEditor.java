@@ -14,8 +14,12 @@ package org.virbo.datasource;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 
@@ -70,6 +74,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         prevButton = new javax.swing.JButton();
         nextButton = new javax.swing.JButton();
         timeRangeTextField = new javax.swing.JTextField();
+        browseButton = new javax.swing.JButton();
 
         prevButton.setText("<<");
         prevButton.addActionListener(new java.awt.event.ActionListener() {
@@ -97,6 +102,15 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
+        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/file.png"))); // NOI18N
+        browseButton.setToolTipText("Edit Data Source");
+        browseButton.setEnabled(false);
+        browseButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                browseButtonActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -104,16 +118,19 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .add(prevButton)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE)
+                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(nextButton))
+                .add(nextButton)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                 .add(prevButton, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(nextButton)
-                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 27, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(nextButton))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -133,6 +150,40 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         parseRange();
     }//GEN-LAST:event_timeRangeTextFieldActionPerformed
 
+    DataSetSelector peer;
+
+    public void setDataSetSelectorPeer( DataSetSelector peer ) {
+        this.peer= peer;
+        browseButton.setEnabled(true);
+    }
+
+    private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
+        if ( peer!=null ) {
+            String surl = ((String) peer.getEditor().getText()).trim();//TODO:check
+
+            boolean wasRejected= false;
+            DataSourceEditorPanel edit = null;
+            try {
+                edit = DataSourceEditorPanelUtil.getDataSourceEditorPanel(DataSetURI.getURIValid(surl));
+                if ( edit!=null && edit.reject(surl) ) {
+                    edit= null;
+                    wasRejected= true;
+                }
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                edit= null;
+            } catch ( Exception ex ) {
+                Logger.getLogger(DataSetSelector.class.getName()).log(Level.SEVERE, null, ex);
+                edit= null;
+            }
+            if ( edit==null ) {
+                JOptionPane.showMessageDialog( prevButton, "this type has no editor", "no editor", JOptionPane.OK_OPTION );
+            } else {
+                peer.browseSourceType();
+            }
+        }
+    }//GEN-LAST:event_browseButtonActionPerformed
+
     public static void main( String[] args ) {
         TimeRangeEditor p= new TimeRangeEditor();
         p.addPropertyChangeListener( "range", new PropertyChangeListener() {
@@ -150,6 +201,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton browseButton;
     private javax.swing.JButton nextButton;
     private javax.swing.JButton prevButton;
     private javax.swing.JTextField timeRangeTextField;
