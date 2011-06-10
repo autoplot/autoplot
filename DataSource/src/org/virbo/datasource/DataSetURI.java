@@ -727,6 +727,7 @@ public class DataSetURI {
 
     /**
      * this is never used in the application code.  It must be left over from an earlier system.
+     * This is used in Test005, some scripts, and IDL codes, so don't delete it!
      * @param surl
      * @param carotpos
      * @param mon
