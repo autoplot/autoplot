@@ -89,6 +89,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         jPanel1 = new javax.swing.JPanel();
         textArea = new org.virbo.jythonsupport.ui.EditorTextPane();
         paramsPanel = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
 
         variableComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(running script)" }));
 
@@ -107,15 +108,15 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         scriptPanelLayout.setHorizontalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
+                .add(fileNameLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(caretPositionLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 56, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 475, Short.MAX_VALUE)
         );
         scriptPanelLayout.setVerticalGroup(
             scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, scriptPanelLayout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(scriptPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(fileNameLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -127,6 +128,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         paramsPanel.setLayout(new javax.swing.BoxLayout(paramsPanel, javax.swing.BoxLayout.Y_AXIS));
         tearoffTabbedPane1.addTab("params", paramsPanel);
 
+        jLabel2.setText("Select from the variables calculated by the script, 'data' is used by default:");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -135,14 +138,19 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(variableComboBox, 0, 257, Short.MAX_VALUE)
+                .add(variableComboBox, 0, 344, Short.MAX_VALUE)
                 .addContainerGap())
-            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(jLabel2)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 267, Short.MAX_VALUE)
+                .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 277, Short.MAX_VALUE)
+                .add(2, 2, 2)
+                .add(jLabel2)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
@@ -155,6 +163,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     private javax.swing.JLabel caretPositionLabel;
     protected javax.swing.JLabel fileNameLabel;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPanel paramsPanel;
@@ -187,6 +196,8 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             Pattern p= Pattern.compile( vnarg+"=\\s*getParam\\("+sarg+"\\,"+aarg+"(\\,"+aarg + ")?\\).*" );
             Pattern fp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+farg+"(\\,"+aarg + ")?\\).*" );
             Pattern sp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+sarg+"(\\,"+aarg + ")?\\).*" );
+
+            paramsPanel.add( new JLabel("<html>This script has the input parameters:<br><br></html>") );
 
             String line= reader.readLine();
             while ( line!=null ) {

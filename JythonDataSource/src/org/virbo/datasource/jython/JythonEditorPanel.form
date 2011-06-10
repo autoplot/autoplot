@@ -20,16 +20,22 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="variableComboBox" pref="257" max="32767" attributes="0"/>
+              <Component id="variableComboBox" pref="344" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="tearoffTabbedPane1" alignment="0" pref="400" max="32767" attributes="0"/>
+          <Component id="tearoffTabbedPane1" alignment="0" pref="487" max="32767" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
-              <Component id="tearoffTabbedPane1" pref="267" max="32767" attributes="0"/>
+              <Component id="tearoffTabbedPane1" pref="277" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+              <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -72,17 +78,17 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="fileNameLabel" pref="330" max="32767" attributes="0"/>
+                      <Component id="fileNameLabel" pref="413" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="caretPositionLabel" min="-2" pref="56" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" alignment="0" pref="392" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" alignment="0" pref="475" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="jScrollPane1" pref="204" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="208" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="fileNameLabel" alignment="1" min="-2" pref="20" max="-2" attributes="0"/>
@@ -139,5 +145,10 @@
         </Container>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JLabel" name="jLabel2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Select from the variables calculated by the script, &apos;data&apos; is used by default:"/>
+      </Properties>
+    </Component>
   </SubComponents>
 </Form>
