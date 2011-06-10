@@ -185,6 +185,18 @@
                     <Property name="toolTipText" type="java.lang.String" value="Draw gridlines at major ticks"/>
                   </Properties>
                 </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="doyCB">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Day of Year Labels"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Use Day of Year instead of Year-Month-Day for labels"/>
+                  </Properties>
+                </MenuItem>
+                <MenuItem class="javax.swing.JCheckBoxMenuItem" name="nnCb">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Nearest Neighbor Spectrograms"/>
+                    <Property name="toolTipText" type="java.lang.String" value="Use Nearest Neighbor rebinning for new spectrograms"/>
+                  </Properties>
+                </MenuItem>
               </SubComponents>
             </Menu>
             <Menu class="javax.swing.JMenu" name="plotStyleMenu">

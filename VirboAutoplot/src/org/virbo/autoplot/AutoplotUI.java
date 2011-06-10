@@ -616,8 +616,11 @@ public class AutoplotUI extends javax.swing.JFrame {
         bind( bc, dom.getOptions(), Options.PROP_AUTORANGING, autoRangingCheckBoxMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_DATAVISIBLE, dataPanelCheckBoxMenuItem, "selected" );
         bind( bc, dom.getOptions(), Options.PROP_LAYOUTVISIBLE, layoutPanelCheckBoxMenuItem, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_DAYOFYEAR, doyCB, "selected" );
+        bind( bc, dom.getOptions(), Options.PROP_NEARESTNEIGHBOR, nnCb, "selected" );
         bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
         bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
+
         bc.bind();
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
@@ -1154,6 +1157,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         specialEffectsMenuItem = new javax.swing.JCheckBoxMenuItem();
         overRenderingMenuItem = new javax.swing.JCheckBoxMenuItem();
         drawGridCheckBox = new javax.swing.JCheckBoxMenuItem();
+        doyCB = new javax.swing.JCheckBoxMenuItem();
+        nnCb = new javax.swing.JCheckBoxMenuItem();
         plotStyleMenu = new javax.swing.JMenu();
         fontsAndColorsMenuItem = new javax.swing.JMenuItem();
         canvasSizeMenuItem = new javax.swing.JMenuItem();
@@ -1374,6 +1379,14 @@ public class AutoplotUI extends javax.swing.JFrame {
         drawGridCheckBox.setText("Draw Grid");
         drawGridCheckBox.setToolTipText("Draw gridlines at major ticks");
         renderingOptionsMenu.add(drawGridCheckBox);
+
+        doyCB.setText("Day of Year Labels");
+        doyCB.setToolTipText("Use Day of Year instead of Year-Month-Day for labels");
+        renderingOptionsMenu.add(doyCB);
+
+        nnCb.setText("Nearest Neighbor Spectrograms");
+        nnCb.setToolTipText("Use Nearest Neighbor rebinning for new spectrograms");
+        renderingOptionsMenu.add(nnCb);
 
         optionsMenu.add(renderingOptionsMenu);
 
@@ -2351,6 +2364,7 @@ private void updateFrameTitle() {
     private javax.swing.JCheckBoxMenuItem dataPanelCheckBoxMenuItem;
     protected org.virbo.datasource.DataSetSelector dataSetSelector;
     private javax.swing.JMenuItem decodeURLItem;
+    private javax.swing.JCheckBoxMenuItem doyCB;
     private javax.swing.JCheckBoxMenuItem drawAntiAliasMenuItem;
     private javax.swing.JCheckBoxMenuItem drawGridCheckBox;
     private javax.swing.JMenuItem editDomMenuItem;
@@ -2382,6 +2396,7 @@ private void updateFrameTitle() {
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JCheckBoxMenuItem layoutPanelCheckBoxMenuItem;
     private javax.swing.JCheckBoxMenuItem logConsoleMenuItem;
+    private javax.swing.JCheckBoxMenuItem nnCb;
     private javax.swing.JMenu optionsMenu;
     private javax.swing.JCheckBoxMenuItem overRenderingMenuItem;
     private javax.swing.JMenuItem pasteDataSetURLMenuItem;
