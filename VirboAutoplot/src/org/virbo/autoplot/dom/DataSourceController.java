@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.das2.CancelledOperationException;
+import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.Units;
@@ -894,7 +895,7 @@ public class DataSourceController extends DomNodeController {
                         return;
                     }
                 } else {
-                    setStatus("no data returned");
+                    if ( !dom.controller.getStatus().startsWith("warning:") ) setStatus("no data returned");
                 }
             } else {
                 if ( !(this.parentSources!=null) ) {
@@ -1208,6 +1209,18 @@ public class DataSourceController extends DomNodeController {
             setDataSet(null);
             setStatus("operation cancelled");
             if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), ex );
+        } catch (NoDataInIntervalException e) {
+            setException(e);
+            setDataSet(null);
+            setStatus("warning: "+ e.getMessage());
+
+            if ( dsf.getController().getTsb()==null ) {
+                String title= "no data in interval";
+                model.showMessage( "warning: "+ e.getMessage(), title, JOptionPane.WARNING_MESSAGE );
+            } else {
+                // do nothing.
+            }
+
         } catch (IOException e ) {
             if ( e instanceof FileNotFoundException || e.getMessage().contains("No such file") || e.getMessage().contains("timed out") ) {
                 String message= e.getMessage();
