@@ -222,6 +222,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         initComponents();
         timeRangeEditor = new TimeRangeEditor();
         timeRangePanel.add( timeRangeEditor, "card1" );
+        timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
         
         this.statusTextField.setBackground( new Color(0.f,0.f,0.f,0.f) );
         this.statusTextField.setOpaque(false);
