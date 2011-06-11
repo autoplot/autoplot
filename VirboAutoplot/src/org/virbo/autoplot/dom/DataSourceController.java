@@ -278,7 +278,12 @@ public class DataSourceController extends DomNodeController {
             if ( pe!=null && this.doesPlotElementSupportTsb( pe ) ) {  //TODO: less flakey
                 setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
             } else {
-                setTsb(null);
+                //it might have an internal source listening to it.
+                if ( pe==null ) {
+                    setTsb(dataSource.getCapability(TimeSeriesBrowse.class));
+                } else {
+                    setTsb(null);
+                }
             }
             if ( dsf.getUri()==null ) {
                 dsf.setUri( dataSource.getURI() );
@@ -298,12 +303,32 @@ public class DataSourceController extends DomNodeController {
         }
 
         if (oldSource == null || !oldSource.equals(dataSource)) {
-            if (getTsb() != null) {
+            List<PlotElement> ps = dom.controller.getPlotElementsFor(dsf);
+            if ( getTsb() != null && ps.size()>0 ) {
                 setDataSet(null);
-                List<PlotElement> ps = dom.controller.getPlotElementsFor(dsf);
                 if (ps.size() > 0) {
                     timeSeriesBrowseController = new TimeSeriesBrowseController(this,ps.get(0));
                     timeSeriesBrowseController.setup(valueWasAdjusting);
+                }
+            } else if ( getTsb()!=null && ps.size()==0 ) {
+                timeSeriesBrowseController = new TimeSeriesBrowseController(this,null);
+
+                if ( !UnitsUtil.isTimeLocation( this.dom.getTimeRange().getUnits() ) ) {
+                    List<BindingModel> bms= this.dom.getController().findBindings( this.dom, Application.PROP_TIMERANGE, null, null );
+                    if ( bms==null || bms.size()==0 ) {
+                        System.err.println("claiming dom timerange for TSB: "+this.dsf.getUri() );
+                        this.dom.setTimeRange( getTsb().getTimeRange() );
+                        System.err.println("about to setup Gen for "+this);
+                        timeSeriesBrowseController.setupGen(this.dom,Application.PROP_TIMERANGE);  
+                        update(!valueWasAdjusting, !valueWasAdjusting );
+                    } else {
+                        System.err.println("unable to use timerange as guide");
+                        update(!valueWasAdjusting, !valueWasAdjusting );
+                    }
+                } else {
+                    System.err.println("using dom timerange for TSB: "+this.dsf.getUri() );
+                    timeSeriesBrowseController.setupGen(this.dom,Application.PROP_TIMERANGE);
+                    update(!valueWasAdjusting, !valueWasAdjusting );
                 }
 
             } else {
@@ -1398,6 +1423,10 @@ public class DataSourceController extends DomNodeController {
         boolean oldResetDimensions = this.resetDimensions;
         this.resetDimensions = resetDimensions;
         propertyChangeSupport.firePropertyChange(PROP_RESETDIMENSIONS, oldResetDimensions, resetDimensions);
+    }
+
+    public Application getApplication() {
+        return this.dom;
     }
 
     public TimeSeriesBrowseController getTimeSeriesBrowseController() {
