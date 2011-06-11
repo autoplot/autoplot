@@ -54,6 +54,7 @@ import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.system.RequestProcessor;
 import org.python.core.PyException;
 import org.python.core.PyJavaInstance;
+import org.python.core.PyNone;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.GuiSupport;
@@ -100,7 +101,7 @@ public class LogConsole extends javax.swing.JPanel {
                             maybeInitializeInterpreter();
                             try {
                                 PyObject po= interp.eval(s);
-                                interp.exec("print " + s ); // Ed West will know a better way to do this.
+                                if ( !( po instanceof PyNone ) ) interp.exec("print " + s ); // Ed West will know a better way to do this.
                             } catch (PyException ex ) {
                                 interp.exec(s);
                             }
