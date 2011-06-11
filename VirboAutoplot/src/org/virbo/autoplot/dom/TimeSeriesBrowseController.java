@@ -40,6 +40,8 @@ public class TimeSeriesBrowseController {
     private static final Logger logger = Logger.getLogger("ap.tsb");
     TickleTimer updateTsbTimer;
     PropertyChangeListener timeSeriesBrowseListener;
+    private DomNode listenNode=null;
+    private String listenProp=null;
 
     TimeSeriesBrowseController( DataSourceController dataSourceController, PlotElement p ) {
 
@@ -103,6 +105,8 @@ public class TimeSeriesBrowseController {
             throw new IllegalArgumentException("node "+node+" doesn't have property: "+property );
         }
         node.addPropertyChangeListener( property, timeSeriesBrowseListener );
+        listenNode= node;
+        listenProp= property;
     }
 
     protected void setup( boolean valueWasAdjusting ) {
@@ -276,8 +280,14 @@ public class TimeSeriesBrowseController {
     }
 
     void release() {
-        this.plot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
-        this.xAxis= null;
+        if (  isListeningToAxis() ) {
+            this.plot.getXAxis().removePropertyChangeListener(DasAxis.PROPERTY_DATUMRANGE,timeSeriesBrowseListener);
+            this.xAxis= null;
+        } else {
+            if ( listenNode!=null ) {
+                listenNode.removePropertyChangeListener( listenProp, timeSeriesBrowseListener );
+            }
+        }
         timeSeriesBrowseListener = null;
     }
     
