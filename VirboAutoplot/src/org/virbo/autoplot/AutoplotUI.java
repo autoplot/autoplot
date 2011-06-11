@@ -620,6 +620,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         bind( bc, dom.getOptions(), Options.PROP_NEARESTNEIGHBOR, nnCb, "selected" );
         bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
         bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
+        bind( bc, dom.getOptions(), Options.PROP_DAYOFYEAR, timeRangeEditor, "useDoy" );
 
         bc.bind();
 
