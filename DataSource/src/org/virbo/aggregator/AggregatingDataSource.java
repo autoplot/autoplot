@@ -197,11 +197,13 @@ public class AggregatingDataSource extends AbstractDataSource {
                 mon1 = SubTaskMonitor.create(mon, i * 10, 10 * (i + 1));
                 if ( mon1.isCancelled() ) break;
                 mon1.setTaskProgress(0); // cause it to paint
-            } else {
+            } else if ( ss.length==1 ) {
                 mon1 = mon;
-                mon1.setLabel("loading one delegate");
+                mon1.setLabel("loading " + ss[0] );
                 mon1.started();
                 mon1.setTaskProgress(0);
+            } else {
+                mon1= mon;
             }
 
             try {
