@@ -58,6 +58,8 @@ public class TimeSeriesBrowseController {
             }
         });
 
+        this.dsf= dataSourceController.dsf;
+        this.dataSourceController= dataSourceController;
         if ( p!=null ) {
             this.p = p;
             this.domPlot= dsf.getController().getApplication().getController().getPlotFor(p);
@@ -65,8 +67,6 @@ public class TimeSeriesBrowseController {
         } else {
             System.err.println("no plotElement provided, better come back to set up from timerange.");
         }
-        this.dsf= dataSourceController.dsf;
-        this.dataSourceController= dataSourceController;
 
         if ( p!=null ) {
             this.plot = panelController.getDasPlot();
