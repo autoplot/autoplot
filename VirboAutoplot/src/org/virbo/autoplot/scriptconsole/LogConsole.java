@@ -53,6 +53,8 @@ import org.das2.jythoncompletion.JythonInterpreterProvider;
 import org.das2.jythoncompletion.ui.CompletionImpl;
 import org.das2.system.RequestProcessor;
 import org.python.core.PyException;
+import org.python.core.PyJavaInstance;
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.GuiSupport;
 import org.virbo.autoplot.JythonUtil;
@@ -96,7 +98,12 @@ public class LogConsole extends javax.swing.JPanel {
                         try {
                             System.out.println("AP> " + s);
                             maybeInitializeInterpreter();
-                            interp.exec(s);
+                            try {
+                                PyObject po= interp.eval(s);
+                                interp.exec("print " + s ); // Ed West will know a better way to do this.
+                            } catch (PyException ex ) {
+                                interp.exec(s);
+                            }
                             commandLineTextPane1.setText("");
                         } catch (IOException ex) {
                             Logger.getLogger(LogConsole.class.getName()).log(Level.SEVERE, null, ex);
@@ -156,6 +163,7 @@ public class LogConsole extends javax.swing.JPanel {
     private void maybeInitializeInterpreter( ) throws IOException {
         if (interp == null) {
             String s = commandLineTextPane1.getText();
+            int ipos= commandLineTextPane1.getCaretPosition();
             commandLineTextPane1.setText("initializing interpretter...");
             interp = JythonUtil.createInterpreter(true, false);
             if ( scriptContext!=null ) {
@@ -164,6 +172,7 @@ public class LogConsole extends javax.swing.JPanel {
                 }
             }
             commandLineTextPane1.setText(s);
+            commandLineTextPane1.setCaretPosition(ipos);
         }
     }
     
