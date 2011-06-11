@@ -36,6 +36,22 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     DatumRange range= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
 
+    /**
+     * use DOY instead of Y-M-D
+     */
+    boolean useDoy=false;
+
+    public boolean isUseDoy() {
+        return useDoy;
+    }
+
+    public void setUseDoy(boolean useDoy) {
+        boolean old= this.useDoy;
+        this.useDoy = useDoy;
+        DatumRangeUtil.useDoy= useDoy;
+        firePropertyChange("useDoy",old,useDoy);
+    }
+
     public DatumRange getRange() {
         return range;
     }
