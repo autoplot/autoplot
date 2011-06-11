@@ -142,6 +142,11 @@ public class AggregatingDataSource extends AbstractDataSource {
             return resolution;
         }
 
+        @Override
+        public String toString() {
+            return "aggtsb: " + viewRange + "@" + ( resolution==null ? "intrinsic" : resolution );
+        }
+
     }
     
     public QDataSet getDataSet(ProgressMonitor mon) throws Exception {
@@ -194,6 +199,9 @@ public class AggregatingDataSource extends AbstractDataSource {
                 mon1.setTaskProgress(0); // cause it to paint
             } else {
                 mon1 = mon;
+                mon1.setLabel("loading one delegate");
+                mon1.started();
+                mon1.setTaskProgress(0);
             }
 
             try {
@@ -259,9 +267,9 @@ public class AggregatingDataSource extends AbstractDataSource {
         }
         cacheRange = cacheRange1;
 
-        if (ss.length > 1) {
+        //if (ss.length > 1) {
             mon.finished();
-        }
+        //}
 
         if ( altResult!=null ) {
             ArrayDataSet dep0 = altResult == null ? null : (ArrayDataSet) altResult.property(DDataSet.DEPEND_0);
