@@ -13,7 +13,6 @@ import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
-import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasAxis;
 import org.das2.graph.DasPlot;
@@ -48,7 +47,7 @@ public class TimeSeriesBrowseController {
         
         updateTsbTimer = new TickleTimer(100, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
-                if ( domPlot.getController().getApplication().getController().isValueAdjusting() ) {
+                if ( dsf.getController().getApplication().getController().isValueAdjusting() ) {
                     updateTsbTimer.tickle();
                     return;
                 } else {
@@ -61,7 +60,7 @@ public class TimeSeriesBrowseController {
 
         if ( p!=null ) {
             this.p = p;
-            this.domPlot= p.getController().getApplication().getController().getPlotFor(p);
+            this.domPlot= dsf.getController().getApplication().getController().getPlotFor(p);
             this.panelController = p.getController();
         } else {
             System.err.println("no plotElement provided, better come back to set up from timerange.");
@@ -100,6 +99,9 @@ public class TimeSeriesBrowseController {
                 }
             }
         };
+        if ( !DomUtil.nodeHasProperty( node, property ) ) {
+            throw new IllegalArgumentException("node "+node+" doesn't have property: "+property );
+        }
         node.addPropertyChangeListener( property, timeSeriesBrowseListener );
     }
 
@@ -110,15 +112,15 @@ public class TimeSeriesBrowseController {
                 DatumRange tr = dataSourceController.getTsb().getTimeRange();
                 this.setTimeRange( tr );
                 if ( this.domPlot.getXaxis().isAutoRange() && !valueWasAdjusting ) {
-                    BindingModel[] bms= this.panelController.getApplication().getBindings();
-                    DatumRange appRange= this.panelController.getApplication().getTimeRange();
+                    BindingModel[] bms= dsf.getController().getApplication().getBindings();
+                    DatumRange appRange= dsf.getController().getApplication().getTimeRange();
                     if ( appRange.getUnits().isConvertableTo( tr.getUnits() )
                             && isBoundTimeRange( bms, this.domPlot.getXaxis().getId() ) ) { // check to see if the dom has a compatible timerange.
                         this.plot.getXAxis().resetRange(appRange);
                     } else {
                         this.plot.getXAxis().resetRange(tr);
                     }
-                    this.plot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter( domPlot.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); // See PlotController.createDasPeer and listener that doesn't get event
+                    this.plot.getXAxis().setUserDatumFormatter(new DateTimeDatumFormatter( dsf.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 )); // See PlotController.createDasPeer and listener that doesn't get event
                     this.domPlot.getXaxis().setAutoRange(true); // need to turn it back on because resetRange
                 }
                 updateTsb(true);
@@ -152,7 +154,8 @@ public class TimeSeriesBrowseController {
 
     public void updateTsb(boolean autorange) {
 
-        if ( p.getController().getDataSourceFilter().getController().getTsb() == null) {
+        if ( p!=null && p.getController().getDataSourceFilter().getController().getTsb() == null) {
+            System.err.println("entering that strange branch that probably isn't needed ");
             return;
         }
 
@@ -193,14 +196,14 @@ public class TimeSeriesBrowseController {
                 if ( !UnitsUtil.isTimeLocation( visibleRange.getUnits() ) ) {
                    System.err.println("x-axis for TSB not time location units: " + visibleRange );
 
-                   trange= this.domPlot.getController().getApplication().getTimeRange();
+                   trange= dsf.getController().getApplication().getTimeRange();
                    if ( UnitsUtil.isTimeLocation( trange.getUnits() ) ) {
                         System.err.println("  rebinding application timeRange" );
                         this.release();
                         //Axis xaxis= null;
                         //dom.getController().unbind( dom, Application.PROP_TIMERANGE, xaxis, Axis.PROP_RANGE );
                         //dom.setTimeRange( this.timeSeriesBrowseController.getTimeRange() );//TODO: think about if this is really correct
-                        this.setupGen( this.domPlot.getController().getApplication(), Application.PROP_TIMERANGE );
+                        this.setupGen( dsf.getController().getApplication(), Application.PROP_TIMERANGE );
                     } else {
                         System.err.println("  unable to bind to application timeRange because of units." );
                         return;
