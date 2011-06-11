@@ -134,6 +134,12 @@ public class DataSourceController extends DomNodeController {
         }
     };
     private TimeSeriesBrowseController timeSeriesBrowseController;
+
+    /**
+     * true if we have vap+internal and we have already checked for parent TSBs.
+     */
+    private boolean haveCheckedInternalTsb= false;
+
     private static final String PENDING_DATA_SOURCE = "dataSource";
     private static final String PENDING_RESOLVE_DATA_SOURCE = "resolveDataSource";
     private static final String PENDING_SET_DATA_SOURCE = "setDataSource"; //we are setting the datasource, so don't try to resolve, etc.
@@ -263,6 +269,10 @@ public class DataSourceController extends DomNodeController {
         
         DataSource oldSource = getDataSource();
 
+        if ( haveCheckedInternalTsb ) {
+            haveCheckedInternalTsb= false;
+        }
+        
         if (dataSource == null) {
             setCaching(null);
             setTsb(null);
@@ -476,6 +486,56 @@ public class DataSourceController extends DomNodeController {
     }
 
     /**
+     * if the internal dataset points to DSF's with TimeSeriesBrowse, then add our
+     * own TSB.
+     */
+    private synchronized void maybeAddInternalTimeSeriesBrowse() {
+
+        if ( this.haveCheckedInternalTsb ) {
+            return;
+        }
+
+        String uri= dsf.getUri();
+        if ( uri==null ) {
+            return; // when does this happen?  reset?
+        }
+        URISplit split= URISplit.parse(uri);
+
+        String[] ss = split.surl.split(",", -2);
+        this.tsb= null; //TODO: who is listening?
+
+        InternalTimeSeriesBrowse intTsb = null;
+        for (int i = 0; i < ss.length; i++) {
+            DataSourceFilter parentDsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
+            if (parentDsf != null) {
+                parentDsf.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET, parentListener);
+                parentSources[i] = parentDsf;
+                TimeSeriesBrowse parentTsb = parentDsf.controller.getTsb();
+                if (parentTsb != null) {
+                    // TODO: parents haven't been resolved yet!
+                    if (intTsb == null) {
+                        intTsb = new InternalTimeSeriesBrowse(DataSourceController.this.dsf.getUri());
+                    }
+                    System.err.println( "adding to internal tsb: "+ parentTsb );
+                    intTsb.addTimeSeriesBrowse(parentTsb);
+                }
+            } else {
+                logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
+                if ( parentSources==null ) {
+                    System.err.println("string case where parent sources is not resolved.");
+                    return;
+                }
+                parentSources[i] = null;
+            }
+        }
+        if (intTsb != null) {
+            this.setTsb(intTsb);
+            this.timeSeriesBrowseController= new TimeSeriesBrowseController( this, null );
+        }
+        haveCheckedInternalTsb= true;
+    }
+
+    /**
      * Introduced to support children that are TSBs.  All are assumed to be the same, the first is used for the getter.
      */
     class InternalTimeSeriesBrowse implements TimeSeriesBrowse {
@@ -521,39 +581,32 @@ public class DataSourceController extends DomNodeController {
             return this.uri + "?range="+getTimeRange() + ( res==null ? "" : "&resolution="+res );
         }
 
+        public String toString() {
+            Datum res= getTimeResolution();
+            return "inttsb: "+getTimeRange()+" " +( res==null ? "" : "&resolution="+res );
+        }
         
     }
 
     private synchronized void resolveParents() {
         if ( dsf.getUri()==null ) return; //TODO: remove
-        URISplit split= URISplit.parse(dsf.getUri());
+        URISplit split= URISplit.parse(dsf.getUri()); 
         if ( !dsf.getUri().startsWith("vap+internal:") ) {
             System.err.println("unbinding because this doesn't have parents.");
             unbind();
             return;
         }
-        String[] ss = split.surl.split(",", -2);
-        this.tsb= null; //TODO: who is listening?
-        InternalTimeSeriesBrowse intTsb=null;
-        for (int i = 0; i < ss.length; i++) {
+ 	String[] ss = split.surl.split(",", -2);
+ 	for (int i = 0; i < ss.length; i++) {
             DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
             if ( dsf!=null ) {
                 dsf.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
                 parentSources[i] = dsf;
-                TimeSeriesBrowse parentTsb= dsf.controller.getTsb();
-                if ( parentTsb!=null ) {
-                    if ( intTsb==null ) {
-                        intTsb= new InternalTimeSeriesBrowse(DataSourceController.this.dsf.getUri());
-                    }
-                    intTsb.addTimeSeriesBrowse(parentTsb);
-                }
             }else {
                 logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
                 parentSources[i] = null;
             }
-        }
-        if ( intTsb!=null ) this.setTsb(intTsb);
-        //System.err.println( Arrays.asList(parentSources));
+ 	}
     }
 
     private static Map maybeCopy( Map m ) {
@@ -642,6 +695,7 @@ public class DataSourceController extends DomNodeController {
             if ( prob!=null ) {
                setStatus("warning: "+prob );
             }
+            maybeAddInternalTimeSeriesBrowse();
         }
     };
 
@@ -1328,6 +1382,7 @@ public class DataSourceController extends DomNodeController {
 
         String surl = dsf.getUri();
         if (surl == null) {
+            clearParentSources();
             resetDataSource(valueWasAdjusting,null);
             setUriNeedsResolution(false);
             setDataSetNeedsLoading(false);
@@ -1350,6 +1405,7 @@ public class DataSourceController extends DomNodeController {
                 }
 
                 if ( URISplit.implicitVapScheme(split).equals("vap+internal")) {
+                    clearParentSources();
                     resetDataSource(valueWasAdjusting,null);
                     boolean ok= doInternal(split.path);
                     String msg=null;
