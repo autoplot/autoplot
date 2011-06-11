@@ -4,10 +4,16 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.das2.beans.BeansUtil;
 import org.virbo.autoplot.util.TickleTimer;
 import org.das2.dataset.CacheTag;
 import org.das2.datum.Datum;
@@ -104,7 +110,26 @@ public class TimeSeriesBrowseController {
         if ( !DomUtil.nodeHasProperty( node, property ) ) {
             throw new IllegalArgumentException("node "+node+" doesn't have property: "+property );
         }
-        node.addPropertyChangeListener( property, timeSeriesBrowseListener );
+
+        try {
+            Class c = node.getClass();
+            PropertyDescriptor pd = new PropertyDescriptor(property, c);
+            Method getter = pd.getReadMethod();
+
+            setTimeRange( (DatumRange) getter.invoke( node ));
+            dsf.getController().getTsb().setTimeRange( getTimeRange() );
+
+            //dsf.getController().getApplication().getController().bind( node, property, this, PROP_TIMERANGE ); // use node's property value.
+            node.addPropertyChangeListener( property, timeSeriesBrowseListener );
+        } catch (IntrospectionException ex) {
+            Logger.getLogger(TimeSeriesBrowseController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(TimeSeriesBrowseController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(TimeSeriesBrowseController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(TimeSeriesBrowseController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         listenNode= node;
         listenProp= property;
     }
