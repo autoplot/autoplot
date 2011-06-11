@@ -653,4 +653,21 @@ public class DomUtil {
         }
         return result;
     }
+
+    /**
+     * allow verification that the node has a property.  I killed an hour with a 
+     * bug where I was using "timerange" instead of "timeRange"...
+     * Always use the constants: Application.PROP_TIMERANGE
+     * @param node1
+     * @param property
+     * @return
+     */
+    public static boolean nodeHasProperty(DomNode node1, String property) {
+        String[] props = BeansUtil.getPropertyNames(node1.getClass());
+        PropertyDescriptor[] pds = BeansUtil.getPropertyDescriptors(node1.getClass());
+        for ( int i=0; i<props.length; i++ ) {
+            if ( props[i].equals(property) ) return true;
+        }
+        return false;
+    }
 }
