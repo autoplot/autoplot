@@ -1184,8 +1184,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         // look for orphaned parents
         List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
         for (DataSourceFilter pdf : parents) {
-            String plotId = pdf.getId();
-            List<DomNode> usages = DomUtil.dataSourceUsages(application, plotId);
+            String dsfId = pdf.getId();
+            List<DomNode> usages = DomUtil.dataSourceUsages(application, dsfId);
             usages.remove(dsf);
             if (usages.size() == 0) {
                 alsoRemove.add(pdf);
@@ -1204,6 +1204,13 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         }
         application.setDataSourceFilters(dsfs.toArray(new DataSourceFilter[dsfs.size()]));
+
+        TimeSeriesBrowseController tsbc= dsf.getController().getTimeSeriesBrowseController();
+        if ( tsbc!=null ) tsbc.release();
+        for ( int i=0; i<alsoRemove.size(); i++ ) {
+            tsbc= alsoRemove.get(i).controller.getTimeSeriesBrowseController();
+            if ( tsbc!=null ) tsbc.release();
+        }
 
     }
 
