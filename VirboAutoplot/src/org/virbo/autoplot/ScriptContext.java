@@ -44,6 +44,8 @@ import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.autoplot.dom.Plot;
+import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
@@ -152,6 +154,28 @@ public class ScriptContext extends PyJavaInstance {
             DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
             dsf.setUri(null);
             dsf.setUri(surl);
+        }
+        model.waitUntilIdle(false);
+    }
+
+    /**
+     * plot one URI against another.  No synchronization is done, so beware.
+     * Introduced for testing non-time axis TSBs.
+     * @param surl1 the independent dataset (generally used for X)
+     * @param surl2 the dependent dataset (generally used for Y, but can be rank 2).
+     * @throws java.lang.InterruptedException
+     */
+    public static void plot(String surl1, String surl2) throws InterruptedException {
+        maybeInitModel();
+        if ( surl1.endsWith(".vap") || surl1.contains(".vap?")  ) {
+            throw new IllegalArgumentException("cannot load vap here in two-argument plot");
+        } else {
+            DataSourceFilter dsf= model.getDocumentModel().getDataSourceFilters(0);
+            List<PlotElement> pes= dom.getController().getPlotElementsFor(dsf);
+            PlotElement pe;
+            if ( pes.size()>0 ) pe= pes.get(0); else pe=null;
+            Plot p= dom.getController().getPlotFor(pe);
+            dom.getController().doplot( p, pe, surl1, surl2 );
         }
         model.waitUntilIdle(false);
     }
