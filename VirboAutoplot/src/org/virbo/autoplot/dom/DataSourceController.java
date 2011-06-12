@@ -661,12 +661,14 @@ public class DataSourceController extends DomNodeController {
                 return "first or second dataset is null";
             }
             ArrayDataSet yds = ArrayDataSet.copy(y);
-            if (x != null) {
+            if ( DataSetUtil.validate(x,yds,null) ) {
                 yds.putProperty(QDataSet.DEPEND_0, x);
-            }
-            yprops.put(QDataSet.DEPEND_0, xprops);
-            if ( DataSetUtil.validate(yds, null ) ) {
-                setDataSetInternal(yds,yprops,this.dom.controller.isValueAdjusting());
+                yprops.put(QDataSet.DEPEND_0, xprops);
+                if ( DataSetUtil.validate(yds, null ) ) {
+                    setDataSetInternal(yds,yprops,this.dom.controller.isValueAdjusting());
+                }
+            } else {
+                logger.fine("intermediate state where y and x have different lengths");
             }
         } else if (parentSources.length == 3) {
             if (x == null || y == null || z == null) {
@@ -678,7 +680,7 @@ public class DataSourceController extends DomNodeController {
                 yds.putProperty(QDataSet.PLANE_0, z);
                 yprops.put(QDataSet.DEPEND_0, xprops );
                 yprops.put(QDataSet.PLANE_0,zprops);
-                if ( DataSetUtil.validate(yds, null ) ) {
+                if ( DataSetUtil.validate(yds, null ) ) { //TODO: link should and probably does work here
                     setDataSetInternal(yds,yprops,this.dom.controller.isValueAdjusting());
                 }
             } else {
@@ -689,9 +691,9 @@ public class DataSourceController extends DomNodeController {
                 if (y != null) {
                     zds.putProperty(QDataSet.DEPEND_1, y);
                 }
-                zprops.put(QDataSet.DEPEND_0,xprops);
-                zprops.put(QDataSet.DEPEND_1,yprops);
-                if ( DataSetUtil.validate(zds, null ) ) {
+                if ( DataSetUtil.validate( x, y, z, null ) ) {
+                    zprops.put(QDataSet.DEPEND_0,xprops);
+                    zprops.put(QDataSet.DEPEND_1,yprops);
                     setDataSetInternal(zds,zprops,this.dom.controller.isValueAdjusting());
                 }
             }
