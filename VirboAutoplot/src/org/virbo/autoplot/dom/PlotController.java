@@ -615,6 +615,25 @@ public class PlotController extends DomNodeController {
 //        }
     }
 
+    /**
+     * add a context overview.  This uses controllers, and should be rewritten
+     * so that it doesn't.
+     * @param domPlot
+     * @returns the new plot which is the overview.
+     */
+    public Plot contextOverview( ) {
+        Plot domPlot= this.plot;
+        ApplicationController controller= dom.getController();
+        Plot that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
+        that.setTitle( "" );
+        controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
+        controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
+        controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
+        controller.addConnector(domPlot, that);
+        that.getController().resetZoom(true, true, false);
+        return that;
+    }
+
     synchronized void removePlotElement(PlotElement p) {
         Renderer rr= p.controller.getRenderer();
         if ( rr!=null ) dasPlot.removeRenderer(rr);
