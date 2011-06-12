@@ -481,8 +481,18 @@ public class DataSourceController extends DomNodeController {
         }
     }
 
+    /**
+     * removes the parentSources link, and listeners to the parents.  The
+     * parents are left in the DOM and will be removed later.
+     */
     private synchronized void clearParentSources() {
-        this.parentSources= null; //TODO: are there listeners to dispose of?
+        if ( this.parentSources!=null ) {
+            for ( DataSourceFilter parentDsf: parentSources ) {
+                parentDsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, parentListener);
+            }
+        }
+        this.parentSources= null; 
+
     }
 
     /**
@@ -522,7 +532,7 @@ public class DataSourceController extends DomNodeController {
             } else {
                 logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
                 if ( parentSources==null ) {
-                    System.err.println("string case where parent sources is not resolved.");
+                    System.err.println("strange case where parent sources is not resolved.");
                     return;
                 }
                 parentSources[i] = null;
@@ -1382,10 +1392,12 @@ public class DataSourceController extends DomNodeController {
 
         String surl = dsf.getUri();
         if (surl == null) {
+            getApplication().getController().deleteParentsOfDataSourceFilter(dsf);
             clearParentSources();
             resetDataSource(valueWasAdjusting,null);
             setUriNeedsResolution(false);
             setDataSetNeedsLoading(false);
+
         } else {
             URISplit split = URISplit.parse(surl);
             surl = URISplit.format(split);
