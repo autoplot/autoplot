@@ -1114,13 +1114,7 @@ public class GuiSupport {
             public void actionPerformed(ActionEvent e) {
                 Runnable run= new Runnable() {
                     public void run() {
-                        Plot that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
-                        that.setTitle( "" );
-                        controller.bind(domPlot.getZaxis(), Axis.PROP_RANGE, that.getZaxis(), Axis.PROP_RANGE);
-                        controller.bind(domPlot.getZaxis(), Axis.PROP_LOG, that.getZaxis(), Axis.PROP_LOG);
-                        controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
-                        controller.addConnector(domPlot, that);
-                        that.getController().resetZoom(true, true, false);
+                        domPlot.getController().contextOverview();
                     }
                 };
                 RequestProcessor.invokeLater(run);
