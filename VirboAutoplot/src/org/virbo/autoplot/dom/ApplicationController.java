@@ -1162,6 +1162,42 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     }
 
+    /**
+     * delete the parents of this DSF node, if they are no longer used.
+     * Do not delete the node itself.  Do not fix focus.
+     * @param dsf
+     */
+    protected synchronized void deleteParentsOfDataSourceFilter(DataSourceFilter dsf) {
+        DataSourceFilter[] parents = dsf.controller.getParentSources();
+        // look for orphaned parents
+        List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
+        for (DataSourceFilter pdf : parents) {
+            String dsfId = pdf.getId();
+            List<DomNode> usages = DomUtil.dataSourceUsages(application, dsfId);
+            usages.remove(dsf);
+            if (usages.size() == 0) {
+                alsoRemove.add(pdf);
+            }
+        }
+
+        if ( alsoRemove.size()>0 ) {
+            List<DataSourceFilter> dsfs = new ArrayList<DataSourceFilter>(Arrays.asList(application.getDataSourceFilters()));
+            dsfs.removeAll(alsoRemove);
+            application.setDataSourceFilters(dsfs.toArray(new DataSourceFilter[dsfs.size()]));
+
+            TimeSeriesBrowseController tsbc;
+            for ( int i=0; i<alsoRemove.size(); i++ ) {
+                tsbc= alsoRemove.get(i).controller.getTimeSeriesBrowseController();
+                if ( tsbc!=null ) tsbc.release();
+            }
+        }
+        
+    }
+
+    /**
+     * delete the dsf and any parents that deleting it leaves orphaned. (??? maybe they should be called children...)
+     * @param dsf
+     */
     public synchronized void deleteDataSourceFilter(DataSourceFilter dsf) {
         if (!application.dataSourceFilters.contains(dsf)) {
             logger.fine("dsf wasn't part of the application");
