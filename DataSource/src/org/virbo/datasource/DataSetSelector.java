@@ -241,7 +241,19 @@ public class DataSetSelector extends javax.swing.JPanel {
                     }
                     DataSourceFactory f = DataSetURI.getDataSourceFactory(uri, getMonitor());
                     if (f == null) {
-                        throw new RuntimeException("unable to identify data source for URI, try \"about:plugins\"");
+                        SourceTypesBrowser browser= new SourceTypesBrowser();
+                        browser.getDataSetSelector().setValue(DataSetURI.fromUri(DataSetURI.getResourceURI(surl)));
+                        int r= JOptionPane.showConfirmDialog(this, browser,"Select Data Source Type",JOptionPane.OK_CANCEL_OPTION);
+                        if ( r==JOptionPane.OK_OPTION ) {
+                            surl= browser.getUri();
+                            getEditor().setText(surl);
+                            setValue(surl);
+                            maybePlot(true);
+                            return;
+                        } else {
+                            throw new RuntimeException("unable to identify data source for URI, try \"about:plugins\"");
+                        }
+                        
                     }
                     setMessage("busy: checking to see if uri looks acceptable");
                     String surl1 = surl;
