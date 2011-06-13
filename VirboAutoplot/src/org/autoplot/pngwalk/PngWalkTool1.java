@@ -48,6 +48,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import org.das2.components.TearoffTabbedPane;
 import org.das2.datum.DatumRange;
@@ -267,25 +268,6 @@ public class PngWalkTool1 extends javax.swing.JPanel {
     private static JMenuBar createMenuBar( final PngWalkTool1 tool, final JFrame f ) {
         JMenuBar result= new JMenuBar();
         JMenu fileMenu= new JMenu("File");
-        fileMenu.add( new AbstractAction( "Go To Date..." ) {
-            public void actionPerformed(ActionEvent e) {
-                String str= JOptionPane.showInputDialog(tool,"Select date to display");
-                if ( str!=null ) {
-                    try {
-                        DatumRange ds = DatumRangeUtil.parseTimeRange(str);
-                        tool.seq.gotoSubrange(ds);
-                    } catch (ParseException ex) {
-                        JOptionPane.showMessageDialog( tool, "parse error: "+ex );
-                        return;
-                    } catch (RuntimeException ex ) {
-                        tool.setStatus( "warning: "+ex.toString() );
-                    }
-                }
-
-            }
-        } );
-
-        fileMenu.add( new javax.swing.JSeparator() );
 
         fileMenu.add( new AbstractAction( "Close" ) {
             public void actionPerformed(ActionEvent e) {
@@ -303,6 +285,40 @@ public class PngWalkTool1 extends javax.swing.JPanel {
 
         BindingGroup bg= new BindingGroup();
 
+        JMenu navMenu= new JMenu("Navigate");
+        navMenu.add( new AbstractAction( "Go To Date..." ) {
+            public void actionPerformed(ActionEvent e) {
+                String str= JOptionPane.showInputDialog(tool,"Select date to display");
+                if ( str!=null ) {
+                    try {
+                        DatumRange ds = DatumRangeUtil.parseTimeRange(str);
+                        tool.seq.gotoSubrange(ds);
+                    } catch (ParseException ex) {
+                        JOptionPane.showMessageDialog( tool, "parse error: "+ex );
+                        return;
+                    } catch (RuntimeException ex ) {
+                        tool.setStatus( "warning: "+ex.toString() );
+                    }
+                }
+
+            }
+        } );
+
+        navMenu.add( new AbstractAction( "Previous Item" ) {
+            public void actionPerformed( ActionEvent e ) {
+               tool.seq.skipBy( -1 );
+            }
+        } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_LEFT, 0 ));
+
+
+        navMenu.add( new AbstractAction( "Next Item" ) {
+            public void actionPerformed( ActionEvent e ) {
+               tool.seq.skipBy( 1 );
+            }
+        } ).setAccelerator( KeyStroke.getKeyStroke( KeyEvent.VK_RIGHT, 0 ));
+
+        result.add( navMenu );
+        
         final JMenu optionsMenu= new JMenu( "Options" );
         JCheckBoxMenuItem persMi= new JCheckBoxMenuItem("Use Perspective");
         bg.addBinding( Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, tool.views[4], BeanProperty.create("perspective"), persMi, BeanProperty.create("selected") ) );
@@ -420,30 +436,7 @@ public class PngWalkTool1 extends javax.swing.JPanel {
             });
         }
 
-//    KeyEventDispatcher myKeyEventDispatcher = new DefaultFocusManager() {
-//
-//            @Override
-//            public boolean dispatchKeyEvent(KeyEvent e) {
-//                Window source= SwingUtilities.getWindowAncestor( e.getComponent() );
-//                Window me= SwingUtilities.getWindowAncestor(PngWalkTool1.this);
-//                if ( source!=me ) {
-//                    return false;
-//                }
-//                if ( e.getKeyCode()==KeyEvent.VK_LEFT ) {
-//                    seq.skipBy(-1);
-//                    e.consume();
-//                    return true;
-//                } else if ( e.getKeyCode()==KeyEvent.VK_RIGHT ) {
-//                    seq.skipBy(1);
-//                    e.consume();
-//                    return true;
-//                } else {
-//                    return false;
-//                }
-//            }
-//
-//    };
-//    KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(myKeyEventDispatcher);
+        nextButton.requestFocus();
 
     if (isQualityControlEnabled()) {
             qcPanel = new QualityControlPanel();
