@@ -415,7 +415,7 @@ public class JythonCompletionTask implements CompletionTask {
     }
 
     /**
-     * return an interpretter to match the one the user's code lives in.
+     * return an interpreter to match the one the user's code lives in.
      * @return
      */
     private PythonInterpreter getInterpreter() {
@@ -423,6 +423,10 @@ public class JythonCompletionTask implements CompletionTask {
         try {
             if (jythonInterpreterProvider != null) {
                 interp = jythonInterpreterProvider.createInterpreter();
+
+                URL imports = JythonOps.class.getResource("imports.py");
+                interp.execfile(imports.openStream());
+
             } else {
                 interp = new PythonInterpreter();
 
