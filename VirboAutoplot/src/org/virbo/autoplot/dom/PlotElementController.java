@@ -1904,7 +1904,8 @@ public class PlotElementController extends DomNodeController {
         Renderer oldRenderer= getRenderer();
         maybeCreateDasPeer();
         if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
-            QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
+            //QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
+            QDataSet oldDs= getDataSet();  // TODO: what about sprocess?
             getRenderer().setDataSet(oldDs);
         }
     }
