@@ -63,8 +63,9 @@ public class RecentUrisGUI extends javax.swing.JPanel {
         final int SHOW_URIS=30;
         TreeModel jt= jTree1.getModel();
         while ( i<jt.getChildCount(jt.getRoot()) && c<SHOW_URIS ) {
-            jTree1.expandPath( new TreePath( new Object[] { r, jt.getChild( r,i ) } ) );
-            c+= jt.getChildCount(i);
+            Object child= jt.getChild( r,i );
+            jTree1.expandPath( new TreePath( new Object[] { r, child  } ) );
+            c+= jt.getChildCount(child);
             i++;
         }
         jTree1.addTreeSelectionListener( new TreeSelectionListener() {
@@ -99,6 +100,20 @@ public class RecentUrisGUI extends javax.swing.JPanel {
 
     private void update() {
         jTree1.setModel( new MyTreeModel() );
+
+        Object r= jTree1.getModel().getRoot();
+
+        // show >30 URIs if possible
+        int c=0; //URIS
+        int i=0; //index
+        final int SHOW_URIS=30;
+        TreeModel jt= jTree1.getModel();
+        while ( i<jt.getChildCount(jt.getRoot()) && c<SHOW_URIS ) {
+            Object child= jt.getChild( r,i );
+            jTree1.expandPath( new TreePath( new Object[] { r, child  } ) );
+            c+= jt.getChildCount(child);
+            i++;
+        }        
     }
 
     class MyCellRenderer extends DefaultTreeCellRenderer {
@@ -206,6 +221,8 @@ public class RecentUrisGUI extends javax.swing.JPanel {
                     empty= true; // we'll print a nice message
                     newListLen= 1;
                     skip[0]= false;
+                } else {
+                    empty= false;
                 }
 
                 DatumRange[] newlist = new DatumRange[newListLen];
