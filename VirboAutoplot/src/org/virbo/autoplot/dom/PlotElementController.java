@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.JMenuItem;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
@@ -830,7 +831,7 @@ public class PlotElementController extends DomNodeController {
                     &&  fillDs.length(0) <= QDataSet.MAX_UNIT_BUNDLE_COUNT;
             //if ( joinOfBundle ) shouldHaveChildren= true;
 
-            if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) {
+            if ( fillDs.rank()==2 && SemanticOps.isBundle(fillDs) ) { //TODO: LANL has datasets with both BUNDLE_1 and DEPEND_1 set, so the user can pick.
                 QDataSet bdesc= (QDataSet) fillDs.property(QDataSet.BUNDLE_1);
                 if ( null!=bdesc.property(QDataSet.CONTEXT_0,bdesc.length()-1) ) {
                     shouldHaveChildren= false;
@@ -1416,7 +1417,12 @@ public class PlotElementController extends DomNodeController {
                 }
             }
 
-            QDataSet zds= SemanticOps.getDependentDataSet(fillDs);
+            QDataSet zds;
+            if ( yds.length()==fillDs.length(0) && yds.length()>3 ) { // Dataset might have bundle, we need to ignore at the right time.  If fillDs.length(0)==3 avoid a bug.
+                zds= fillDs;
+            } else {
+                zds= SemanticOps.getDependentDataSet(fillDs);
+            }
 
             Units xunits= SemanticOps.getUnits(xds); 
             Units yunits= SemanticOps.getUnits(yds);
@@ -1476,7 +1482,7 @@ public class PlotElementController extends DomNodeController {
         } else {
 
             QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
-            AutoplotUtil.AutoRangeDescriptor ydesc;
+            AutoplotUtil.AutoRangeDescriptor ydesc; //TODO: QDataSet can model AutoRangeDescriptors, it should be used instead.
             
             QDataSet depend0;
 
@@ -1486,11 +1492,15 @@ public class PlotElementController extends DomNodeController {
             } else {
                 if ( SemanticOps.isBundle(fillDs) ) {
                     depend0= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-                    if ( depend0==null ) {
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props );
+                    if ( depend0==null ) { //this code is a strange mix schemes.  This seems to identify the scheme.
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props ); //TODO: possibly unbundleDefaultDataSet?
                         depend0= DataSetOps.unbundle(fillDs,0);
                     } else {
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 0 ), props ); //TODO: why just the first?
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 0 ), props ); 
+                        for ( int i=1; i<fillDs.length(0); i++ ) {
+                            AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props );
+                            ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
+                        }
                     }
                 } else {
                     ydesc = AutoplotUtil.autoRange( fillDs, props );
