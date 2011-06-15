@@ -35,6 +35,7 @@ import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
 import org.das2.system.RequestProcessor;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
@@ -905,15 +906,21 @@ public class PlotElementController extends DomNodeController {
                         ele.getStyle().setColor(deriveColor(c, i));
                         ele.getStyle().setFillColor( deriveColor(fc,i).brighter() );
                         String s= plotElement.getComponent();
+                        String label1= labels[i];
                         if ( s.equals("") ) {
                             s= labels[i];
+                            QDataSet ds1= DataSetOps.unbundle(fillDs,i);
+                            String l1= (String) ds1.property(QDataSet.LABEL);
+                            if ( l1!=null ) {
+                                label1= l1;
+                            }
                         } else {
                             s= s+"|unbundle('"+labels[i]+"')";
                             //addParentComponentListener(plotElement,ele);
                         }
                         ele.setComponentAutomatically(s);
                         ele.setDisplayLegend(true);
-                        if ( ele.isAutoLabel() ) ele.setLegendLabelAutomatically(s.trim());
+                        if ( ele.isAutoLabel() ) ele.setLegendLabelAutomatically(label1);
                         ele.setRenderTypeAutomatically(plotElement.getRenderType()); // this creates the das2 SeriesRenderer.
                         //ele.controller.setDataSet(fillDs, false);
                     }
@@ -1795,7 +1802,7 @@ public class PlotElementController extends DomNodeController {
         } else if ( ele.getRenderType()==RenderType.fillToZero ) {
             s.setSymbolConnector(PsymConnector.SOLID);
             s.setFillToReference(true);
-        } else if ( ele.getRenderType()==RenderType.nnSpectrogram ) {
+        } else if ( ele.getRenderType()==RenderType.nnSpectrogram ) {//TODO: check nnSpectrogram preference.
             s.setRebinMethod( SpectrogramRenderer.RebinnerEnum.nearestNeighbor );
         } else if ( ele.getRenderType()==RenderType.spectrogram ) {
             s.setRebinMethod( SpectrogramRenderer.RebinnerEnum.binAverage );
