@@ -20,8 +20,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import org.das2.DasApplication;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.UnitsUtil;
 
 /**
  *
@@ -67,15 +69,54 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
     private void parseRange() {
         DatumRange dr;
+        DatumRange value= this.range;
+
+        String text= timeRangeTextField.getText();
         try {
-            String rangeString= timeRangeTextField.getText();
+            String rangeString= text;
             dr= DatumRangeUtil.parseTimeRange(rangeString);
             setRange(dr);
         } catch ( ParseException e ) {
             timeRangeTextField.setText( range.toString() );
+            if ( UnitsUtil.isTimeLocation(value.getUnits()) ) { // go ahead and handle non-times.
+                showErrorUsage( text, "unable to parse time range" );
+            } else {
+                //showErrorUsage( text, "unable to parse range" );
+            }
+        } catch ( IllegalArgumentException e ) {
+            if ( value!=null ) {
+                setRange( value ); // cause reformat of old Datum
+                if ( e.getMessage().contains("min > max") ) {
+                    showErrorUsage( text, "min cannot be greater than max" );
+                } else {
+                    showErrorUsage( text, e.getMessage() );
+                }
+            }
         }
 
         return;
+    }
+
+    /**
+     * prevent displaying same message so many times...
+     */
+    private String lastErrorText= null;
+    private long lastErrorTime= 0;
+
+    private void showErrorUsage( String text, String why ) {
+        if ( !DasApplication.getDefaultApplication().isHeadless() ) {
+            if ( text!=null && text.equals(lastErrorText)
+                    && (System.currentTimeMillis()-lastErrorTime)<5000 ) {
+                return;
+            }
+            if ( why!=null ) {
+                JOptionPane.showMessageDialog( this, "<html>Unable to accept \""+text+"\"<br>"+why+"<html>" );
+            } else {
+                JOptionPane.showMessageDialog( this, "<html>Unable to accept \""+text+"\"</html>" );
+            }
+            lastErrorText= text;
+            lastErrorTime= System.currentTimeMillis();
+        }
     }
 
     /** This method is called from within the constructor to
