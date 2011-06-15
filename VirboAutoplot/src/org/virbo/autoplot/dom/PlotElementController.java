@@ -1299,12 +1299,20 @@ public class PlotElementController extends DomNodeController {
 
             QDataSet bundle1= (QDataSet) properties.get(QDataSet.BUNDLE_1);
             if ( bundle1!=null ) {
-                prop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, bundle1.length()-1 ) );
-                xprop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 0 ) );
-                yprop=  DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 1 ) ); // may be the same as prop.
+                xprop= (Map<String, Object>) properties.get( QDataSet.DEPEND_0 );
+                if ( xprop==null ) {
+                    xprop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 0 ) );
+                }
+                if ( true ) {  // why would you ever want to use second case?  the nightly tests will tell for sure...
+                    prop= properties;
+                    yprop= properties;
+                } else {
+                    prop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, bundle1.length()-1 ) );
+                    yprop=  DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 1 ) ); // may be the same as prop.
+                }
             } else {
                 prop= properties;
-                xprop= (Map<String, Object>) properties.get( QDataSet.DEPEND_0 );
+                
                 yprop= properties;
                 v = properties.get(QDataSet.PLANE_0);
                 if ( v!=null ) {
