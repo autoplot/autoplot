@@ -196,7 +196,12 @@ public class PlotElementController extends DomNodeController {
                         setResetPlotElement(true);
                         setResetRanges(true);
                     }
-                    updateDataSet();
+                    if ( evt.getNewValue().equals("") ) {
+                        //updateDataSet();
+                        if ( getRenderer()!=null ) getRenderer().setDataSet(null); // transitional state associated with undo.  https://sourceforge.net/tracker/?func=detail&aid=3316754&group_id=199733&atid=970682
+                    } else {
+                        updateDataSet();
+                    }
                 }
             } else if ( evt.getPropertyName().equals( PlotElement.PROP_COMPONENT ) ) {
                 String newv= (String)evt.getNewValue();
@@ -1821,6 +1826,9 @@ public class PlotElementController extends DomNodeController {
             if ( plot==null ) {
                 System.err.println("brace yourself for crash...");
                 plot = getDasPlot(); // for debugging  Spectrogram->Series
+                if ( oldRenderer==null && dom.controller.isValueAdjusting() ) { // I think this is an undo, and the plot has already been deleted.
+
+                }
             }
 
             DasPlot oldPlot=null;
@@ -1834,6 +1842,9 @@ public class PlotElementController extends DomNodeController {
                     if ( newRenderer instanceof SpectrogramRenderer ) {
                         plot.addRenderer(0,newRenderer);
                     } else {
+                        if ( plot==null ) {
+                            System.err.println("here");
+                        }
                         Renderer[] rends= plot.getRenderers();
                         PlotElement[] pe= new PlotElement[rends.length];
                         for ( int i=0; i<rends.length; i++ ) {
