@@ -1303,7 +1303,7 @@ public class PlotElementController extends DomNodeController {
                 if ( xprop==null ) {
                     xprop= DataSetUtil.getProperties( DataSetOps.slice0( bundle1, 0 ) );
                 }
-                if ( true ) {  // why would you ever want to use second case?  the nightly tests will tell for sure...
+                if ( !(spec==RenderType.colorScatter ) ) {  // why would you ever want to use second case?  the nightly tests will tell for sure...
                     prop= properties;
                     yprop= properties;
                 } else {
@@ -1511,15 +1511,14 @@ public class PlotElementController extends DomNodeController {
                 depend0 = (QDataSet) fillDs.property(QDataSet.DEPEND_0);
             } else {
                 if ( SemanticOps.isBundle(fillDs) ) {
-                    depend0= (QDataSet) fillDs.property(QDataSet.DEPEND_0);
-                    if ( depend0==null ) { //this code is a strange mix schemes.  This seems to identify the scheme.
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props ); //TODO: possibly unbundleDefaultDataSet?
-                        depend0= DataSetOps.unbundle(fillDs,0);
+                    depend0= SemanticOps.xtagsDataSet(fillDs);
+                    if ( spec==RenderType.colorScatter ) {
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 1 ), props ); 
                     } else {
-                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 0 ), props ); 
+                        ydesc= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs, 0 ), props ); // small problem that we don't support colorScatter here
                         for ( int i=1; i<fillDs.length(0); i++ ) {
-                            AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props );
-                            ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
+                           AutoplotUtil.AutoRangeDescriptor ydesc1= AutoplotUtil.autoRange( DataSetOps.unbundle(fillDs,i ), props );
+                           ydesc.range= DatumRangeUtil.union( ydesc.range, ydesc1.range );
                         }
                     }
                 } else {
@@ -1562,7 +1561,7 @@ public class PlotElementController extends DomNodeController {
             if (spec == RenderType.colorScatter) {
                 AutoplotUtil.AutoRangeDescriptor zdesc;
                 if ( fillDs.property(QDataSet.BUNDLE_1)!=null ) {
-                    zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, 2 ),null);
+                    zdesc= AutoplotUtil.autoRange((QDataSet) DataSetOps.unbundle( fillDs, fillDs.length(0)-1 ),null);
                 } else {
                     QDataSet plane0= (QDataSet) fillDs.property(QDataSet.PLANE_0);
                     if ( plane0!=null ) {
