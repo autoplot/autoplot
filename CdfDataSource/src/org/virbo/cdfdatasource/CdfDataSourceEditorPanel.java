@@ -72,7 +72,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         jPanel3 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         subsetComboBox = new javax.swing.JComboBox();
-        jLabel2 = new javax.swing.JLabel();
+        interpretMetadataLabel = new javax.swing.JLabel();
         noInterpMeta = new javax.swing.JCheckBox();
         noDep = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
@@ -104,7 +104,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         subsetComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "::10", "0:100", "-100:", "0:10000:5" }));
         subsetComboBox.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
 
-        jLabel2.setText("Interpret Metadata:");
+        interpretMetadataLabel.setText("Interpret Metadata:");
 
         noInterpMeta.setText("no ISTP");
         noInterpMeta.setToolTipText("Don't interpret metadata to get titles and units.");
@@ -119,7 +119,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             .add(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel2)
+                    .add(interpretMetadataLabel)
                     .add(jPanel3Layout.createSequentialGroup()
                         .add(12, 12, 12)
                         .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -138,7 +138,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel2)
+                .add(interpretMetadataLabel)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(noInterpMeta)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -215,8 +215,8 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel interpretMetadataLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -261,6 +261,16 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     long subsetMaxRec=-1;
 
     File cdfFile;
+
+    /**
+     * allow more abstract sources, namely cdaweb, to turn off these controls.
+     * @param v
+     */
+    public void setShowAdvancedSubpanel( boolean v ) {
+        interpretMetadataLabel.setVisible(v);
+        noDep.setVisible(v);
+        noInterpMeta.setVisible(v);
+    }
 
     public boolean reject( String url ) throws IOException, URISyntaxException {
         split = URISplit.parse(url);

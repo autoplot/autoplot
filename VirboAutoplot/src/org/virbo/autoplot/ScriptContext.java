@@ -779,7 +779,7 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * return a list of completions.  I was talking to Tom N. who was looking for this 
+     * return a list of completions.  I was talking to Tom N. who was looking for this
      * to get a list of CDF variables, and realized this would be useful in the IDL context
      * as well as python scripts.  This will perform the completion for where the carot is
      * at the end of the string.
@@ -797,7 +797,7 @@ public class ScriptContext extends PyJavaInstance {
         return result;
     }
 
-    
+
     /**
      * load the vap file.  This is implemented by calling plot on the URI.
      * @param filename

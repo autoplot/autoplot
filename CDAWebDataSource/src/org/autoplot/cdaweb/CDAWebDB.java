@@ -5,12 +5,15 @@
 
 package org.autoplot.cdaweb;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -54,6 +57,8 @@ public class CDAWebDB {
     private Document document; // should consume ~ 2 MB
     private Map<String,String> ids;  // serviceproviderId,Id
     private long refreshTime=0;
+    private Map<String,String> bases= new HashMap();
+    private Map<String,String> tmpls= new HashMap();
 
     public static synchronized CDAWebDB getInstance() {
         if ( instance==null ) {
@@ -102,7 +107,21 @@ public class CDAWebDB {
             mon.setTaskProgress(2);
             mon.setProgressMessage("reading IDs");
 
-            refreshServiceProviderIds();;
+            BufferedReader rr= new BufferedReader( new InputStreamReader( CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ) );
+            String ss= rr.readLine();
+            while ( ss!=null ) {
+                int i= ss.indexOf("#");
+                if ( i>-1 ) ss= ss.substring(0,i);
+                if ( ss.trim().length()>0 ) {
+                    String[] sss= ss.split("\\s+");
+                    bases.put( sss[0], sss[1] );
+                    tmpls.put( sss[0], sss[2] );
+                }
+                ss= rr.readLine();
+            }
+            rr.close();
+
+            refreshServiceProviderIds();
             mon.setTaskProgress(3);
 
             mon.finished();
@@ -124,6 +143,9 @@ public class CDAWebDB {
     public String getNaming( String spid ) throws IOException {
         try {
             spid= spid.toUpperCase();
+            if ( tmpls.containsKey(spid) ) {
+                return tmpls.get(spid);
+            }
             XPath xp = XPathFactory.newInstance().newXPath();
             Node node = (Node) xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access", spid), document, XPathConstants.NODE );
             NamedNodeMap attrs= node.getAttributes();
@@ -144,6 +166,9 @@ public class CDAWebDB {
     public String getBaseUrl( String spid ) throws IOException {
         try {
             spid= spid.toUpperCase();
+            if ( bases.containsKey(spid) ) {
+                return bases.get(spid);
+            }
             XPath xp = XPathFactory.newInstance().newXPath();
             String url= (String)xp.evaluate( String.format( "/sites/datasite/dataset[@serviceprovider_ID='%s']/access/URL/text()", spid), document, XPathConstants.STRING );
             url= url.trim();

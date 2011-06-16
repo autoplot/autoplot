@@ -24,15 +24,18 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <p>Bugfixes:</p>
         <ul>
             <li>Minor bugfixes from production version</li>
+            <li>TimeSeriesBrowse when there is not a timeaxis, now works with vap+internal:data_1,data_2.</li>
+            <li>3310573: TimeSeriesBrowse use of Event thread, cancel progress
             <li>Jython coerceToDs function renamed dataset, to be more consistent with other operators in language</li>
             <li>Improve support for URIs like "vap+internal:data_0" so two plots can use the same data source</li>
-            <li>Frame labels (e.g. "X Axis") link over to help</li>
+            <li>Frame labels (e.g. "X Axis [?]") link over to help</li>
             <li>Yellow flashes to show selection is disabled when there is just one plot</li>
         </ul>
         <p>Features:</p>
         <ul>
+            <li>day-of-year labels, and nearest neighbor binning option.  
             <li>50 is new limit of stack of line plots in ascii parsing.
-            <li>timerange controller more accessible on GUI (Options->Address Bar->Time Range Selector
+            <li>timerange controller more accessible on GUI (Options->Address Bar->Time Range Selector)
             <li>Add |smooth(int) to operations</li>
             <li>Frame labels (e.g. "X Axis") link over to help</li>
             <li>First coding of events bar support.  See https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/VirboAutoplot/src/scripts/demoEventsBar.jy</li>
@@ -40,32 +43,13 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>Copy/Paste on address bar, font size control</li>
             <li>Rich Ascii supported in Ascii GUI editor.</li>
             <li>bundles and rich ascii support rank 2 datasets</li>
-            <li>Recent entries submenu replaced with history dialog.</li> 
-            <li>digital renderer used to render rank 0 data</li>
-            <li>Allow ticks to go inward and labels to be outside of plot box.  (This is not yet in the DOM, so won't be saved.)
-            <li>AutoplotDataServer serves URIs as das2streams and QStreams
-            <li><a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3169744&group_id=199733&atid=970685">3169744</a> aggregation/TimeSeriesBrowse of data without time axes
-            <li>minor features from production branch, such as CDAWeb stuff
-            <li>test.endtoend.TryHistory reloads every URI found in the bookmarks/history.txt file, printing exceptions on stats.
-        </ul>
-        <p>Less recent features:</p>
-        <ul>
-            <li>Ascii JSON headers, which if used allow for more abstract data to be encoded.
-            <li>Options->Plot Style->Canvas Size dialog added.
-            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3103682&group_id=199733&atid=970685">3103682</a>  nested bookmarks
-            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3154241&group_id=199733&atid=970685">3154241</a>  add template command line switch to pngwalk
-            <li>das2server can send QStreams instead of das2Streams.
-            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=2984078&group_id=199733&atid=970685">2984078</a>  remote bookmarks folder
-            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3134977&group_id=199733&atid=970685">3134977</a>  pngwalk as URI.
-            <li><a href="http://sourceforge.net/tracker/index.php?func=detail&aid=3115957&group_id=199733&atid=970685">3115957</a>  File -> New Window
-            <li>CDAWeb plugin has discovery: File->Add Plot->CDAWeb...</li>
         </ul>
 
 <p>Known issues:</p>
 <ul>
 <li> <a href="https://sourceforge.net/tracker/?func=browse&group_id=199733&atid=970682">see Source Forge</a>
 </ul>
-<p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
+<p>This is the development branch.  Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
 	<p>data is input from:
 	<li>ASCII files (.dat,.txt)</li>

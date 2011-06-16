@@ -1,0 +1,155 @@
+# this is the original file from my script.  This contains exceptions as well.
+AC_H3_CRIS ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/cris_h3 %Y/ac_h3_cris_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-12-31
+AC_OR_SSC ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/or_ssc ac_or_ssc_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-01-10
+APOLLO12_SWS_1HR ftp://cdaweb.gsfc.nasa.gov/pub/istp/apollo/apollo12/sws_1hr apollo12_sws_1hr_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1976-03-25
+APOLLO15_SWS_1HR ftp://cdaweb.gsfc.nasa.gov/pub/istp/apollo/apollo15/sws_1hr apollo15_sws_1hr_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1972-06-30
+APOLLO15_SWS_28S ftp://cdaweb.gsfc.nasa.gov/pub/istp/apollo/apollo15/sws_28s %Y/apollo15_sws_28s_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1972-06-30
+C1_CP_FGM_SPIN ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c1/cp %Y/c1_cp_fgm_spin_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-01-01
+C2_CP_FGM_SPIN ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c2/cp %Y/c2_cp_fgm_spin_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-01-01
+C3_CP_FGM_SPIN ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c3/cp %Y/c3_cp_fgm_spin_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-01-01
+C4_CP_FGM_SPIN ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c4/cp %Y/c4_cp_fgm_spin_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-01-01
+C1_UP_FGM ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c1/up/fgm %Y/c1_up_fgm_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-10-31
+C2_UP_FGM ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c2/up/fgm %Y/c2_up_fgm_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-10-31
+C3_UP_FGM ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c3/up/fgm %Y/c3_up_fgm_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-10-31
+C4_PP_EDI ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c4/pp/edi %Y/c4_pp_edi_%Y%m%d_?%v.cdf
+ERROR: /tower3/private/cdaw_data/cluster_private/st/edi
+CL_SP_ASP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/cl/sp/asp %Y/cl_sp_asp_%Y%m%d_?%v.cdf
+ERROR: /tower3/private/cdaw_data/cluster_private/st/aux
+CL_JP_PGP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/cl/jp/pgp %Y/cl_jp_pgp_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+C1_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c1/jp/pmp %Y/c1_jp_pmp_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+C2_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c2/jp/pmp %Y/c2_jp_pmp_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+C3_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c3/jp/pmp %Y/c3_jp_pmp_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+C4_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c4/jp/pmp %Y/c4_jp_pmp_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+C1_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c1/jp/pse %Y/c1_jp_pse_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+C2_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c2/jp/pse %Y/c2_jp_pse_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+C3_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c3/jp/pse %Y/c3_jp_pse_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+C4_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c4/jp/pse %Y/c4_jp_pse_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+CT_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/ct/jp/pse %Y/ct_jp_pse_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2014-12-31
+CL_JP_PCY ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/cl/jp/pcy %Y/cl_jp_pcy_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2015-02-01
+CRRES_H0_MEA ftp://cdaweb.gsfc.nasa.gov/pub/istp/crres/mea %Y/crres_h0_mea_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1991-10-12
+DN_K0_SASK ftp://cdaweb.gsfc.nasa.gov/pub/istp/darn/sask %Y/dn_k0_sask_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1999-11-04
+GENESIS_3DL2_GIM ftp://cdaweb.gsfc.nasa.gov/pub/istp/genesis/3dl2_gim %Y/genesis_3dl2_gim_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2004-04-30
+HELIOS1_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/helios/helios1/coho1hr_magplasma %Y/helios1_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1981-06-14
+HELIOS2_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/helios/helios2/coho1hr_magplasma %Y/helios2_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1980-03-04
+ISS_DOSANL_TEPC ftp://cdaweb.gsfc.nasa.gov/pub/istp/iss/dos_tepc %Y/iss_dosanl_tepc_%Y%m%d%H%M_?%v.cdf
+FILE NOT FOUND: 2010-04-29
+I2_NEPROF_TOPS ftp://cdaweb.gsfc.nasa.gov/pub/istp/isis2/neprof %Y/i2_neprof_tops_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1979-08-27
+I2_NEPROF_TOPIST ftp://cdaweb.gsfc.nasa.gov/pub/istp/isis2/neprof_topist %Y/i2_neprof_topist_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1984-01-04
+I8_OR_SSC ftp://cdaweb.gsfc.nasa.gov/pub/istp/imp8/or_ssc i8_or_ssc_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2004-06-30
+I8_H0_GME ftp://cdaweb.gsfc.nasa.gov/pub/istp/imp8/gme_h0 %Y/i8_h0_gme_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2001-10-26
+IA_K0_ENF ftp://cdaweb.gsfc.nasa.gov/pub/istp/interball/aurora/enf %Y/ia_k0_enf_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1997-03-28
+IA_K0_ICD ftp://cdaweb.gsfc.nasa.gov/pub/istp/interball/aurora/icd %Y/ia_k0_icd_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1998-05-01
+IA_OR_DEF ftp://cdaweb.gsfc.nasa.gov/pub/istp/interball/aurora/orbit %Y/ia_or_def_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1997-06-04
+IM_ELECTRON_DENSITY_RPI ftp://cdaweb.gsfc.nasa.gov/pub/istp/image/rpi_electron_density %Y/im_electron_density_rpi_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2005-12-18
+OMNI_HRO_1MIN ftp://cdaweb.gsfc.nasa.gov/pub/istp/omni/hro_1min %Y/omni_hro_1min_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-01-21
+OMNI_HRO_5MIN ftp://cdaweb.gsfc.nasa.gov/pub/istp/omni/hro_5min %Y/omni_hro_5min_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-01-21
+OMNI2_H0_MRG1HR ftp://cdaweb.gsfc.nasa.gov/pub/istp/omni2 %Y/omni2_h0_mrg1hr_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-01-21
+OMNI_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/omni/coho1hr_magplasma %Y/omni_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-01-13
+PIONEER10_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/pioneer/pioneer10/coho1hr_magplasma %Y/pioneer10_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1995-12-31
+PIONEERVENUS_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/pioneer/pioneervenus/coho1hr_magplasma %Y/pioneervenus_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 1992-12-31
+PO_6SECEDSC_EFI ftp://cdaweb.gsfc.nasa.gov/pub/istp/polar/efi_6secedsc %Y/po_6secEdsc_efi_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2008-04-12
+SO_OR_PRE ftp://cdaweb.gsfc.nasa.gov/pub/istp/soho/pre_or %Y/so_or_pre_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2002-10-29
+SO_AT_DEF ftp://cdaweb.gsfc.nasa.gov/pub/istp/soho/def_at %Y/so_at_def_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2002-09-22
+STA_L1_LET ftp://cdaweb.gsfc.nasa.gov/pub/istp/stereo/ahead/l1/impact/let %Y/sta_l1_let_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-10-01
+STA_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/stereo/ahead/coho1hr_magplasma %Y/sta_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-11-30
+STB_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/stereo/behind/coho1hr_magplasma %Y/stb_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2010-11-30
+SX_K0_POF ftp://cdaweb.gsfc.nasa.gov/pub/istp/sampex/pof %Y/sx_k0_pof_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2004-06-30
+THA_L2_FFT ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/l2/fft %Y/tha_l2_fft_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-02-08
+THE_L2_FFT ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/the/l2/fft %Y/the_l2_fft_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-02-10
+THA_OR_SSC ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/tha/ssc %Y/tha_or_ssc_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-02-08
+THB_OR_SSC ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/thb/ssc %Y/thb_or_ssc_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-02-08
+THC_OR_SSC ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/thc/ssc %Y/thc_or_ssc_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-02-08
+THD_OR_SSC ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/thd/ssc %Y/thd_or_ssc_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-02-08
+THE_OR_SSC ftp://cdaweb.gsfc.nasa.gov/pub/istp/themis/the/ssc %Y/the_or_ssc_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-02-08
+TIMED_L3A_SEE ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/see/l3a %Y/%m/timed_l3a_see_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-02-08
+TIMED_WINDVECTORSNCAR_TIDI ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/tidi/windvectors_ncar %Y/%m/timed_windvectorsncar_tidi_%Y%m%d%H%M_?%v.cdf
+ERROR: ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/saber/l1b
+          /tower3/public/pub/istp/timed/saber/l1bv7
+TIMED_L1CDISK_GUVI ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/guvi/l1cdisk %Y/%m/timed_L1Cdisk_guvi_%Y%m%d%H%M%S_?%v.cdf
+ERROR: ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+ERROR: ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+ERROR: ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+ERROR: ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+ERROR: ftp://cdaweb.gsfc.nasa.gov/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+          /tower3/public/pub/istp/timed/guvi/l1cdisk_movies
+VOYAGER1_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/voyager/voyager1/coho1hr_magplasma %Y/voyager1_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2009-12-31
+VOYAGER2_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/voyager/voyager2/coho1hr_magplasma %Y/voyager2_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2011-01-26
+UY_COHO1HR_MERGED_MAG_PLASMA ftp://cdaweb.gsfc.nasa.gov/pub/istp/ulysses/coho1hr_magplasma %Y/uy_coho1hr_merged_mag_plasma_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2009-09-30
+UY_1MIN_VHM ftp://cdaweb.gsfc.nasa.gov/pub/istp/ulysses/vhm_1min %Y/uy_1min_vhm_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2009-06-30
+WI_H1_SWE ftp://cdaweb.gsfc.nasa.gov/pub/istp/wind/swe_h1 %Y/wi_h1_swe_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2004-11-15
+WI_H4_SWE ftp://cdaweb.gsfc.nasa.gov/pub/istp/wind/swe_h4 %Y/wi_h4_swe_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2001-07-10
+WI_M2_SWE ftp://cdaweb.gsfc.nasa.gov/pub/istp/wind/swe_m2 %Y/wi_m2_swe_%Y%m%d_?%v.cdf
+FILE NOT FOUND: 2001-07-10
+

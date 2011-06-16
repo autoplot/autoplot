@@ -151,6 +151,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         if ( messageComponent!=null ) parameterPanel.remove(messageComponent);
                         parameterPanel.add( panel, BorderLayout.CENTER );
 
+                        if ( panel instanceof CdfDataSourceEditorPanel ) {
+                            ((CdfDataSourceEditorPanel)panel).setShowAdvancedSubpanel(false);
+                        }
                         paramEditor= panel;
                         parameterPanel.revalidate();
 //System.err.println( " after count=" + parameterPanel.getComponentCount() );

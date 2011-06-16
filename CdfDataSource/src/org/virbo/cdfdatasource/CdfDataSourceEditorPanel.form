@@ -118,7 +118,7 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                          <Component id="interpretMetadataLabel" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <EmptySpace min="12" pref="12" max="12" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -143,7 +143,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="subsetComboBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                      <Component id="interpretMetadataLabel" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="noInterpMeta" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -175,7 +175,7 @@
                 <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Load a subset of the data records, for example:&lt;br&gt;[0:100]  first 100 records&lt;br&gt; [-100:] last 100 records&lt;br&gt; [::10] every tenth record&lt;br&gt; &lt;/html&gt;"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JLabel" name="jLabel2">
+            <Component class="javax.swing.JLabel" name="interpretMetadataLabel">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Interpret Metadata:"/>
               </Properties>
