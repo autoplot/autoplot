@@ -1,0 +1,11 @@
+# demos TCA
+
+plot( 'http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109')
+
+c= 'class:org.autoplot.tca.UriTcaSource:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hydra/2001/po_k0_hyd_$Y$m$d_v$v.cdf?SC_pos_gsm&timerange=20000109'
+
+dom.plots[0].xaxis.controller.getDasAxis().dataPath= c
+dom.plots[0].xaxis.controller.getDasAxis().showTca= True
+
+
+
