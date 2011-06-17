@@ -217,7 +217,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         
         try {
 
-            if (surl.endsWith("/") || surl.contains("/?") || surl.endsWith(".zip") || surl.contains(".zip?")) { //TODO:vap+jyds:file:/media/mini/nbprojects/autoplot2010/JythonDataSource/src/hudson.jyds?dir=/home/jbf/Linux/autoplot_data/fscache/zip/home/jbf/Linux/autoplot_data/fscache/http/sarahandjeremy.net/~jbf/foo/
+            if (surl.endsWith("/") || surl.contains("/?") || ( surl.endsWith(".zip") || surl.contains(".zip?") || surl.endsWith(".ZIP") || surl.contains(".ZIP?") ) ) { //TODO:vap+jyds:file:/media/mini/nbprojects/autoplot2010/JythonDataSource/src/hudson.jyds?dir=/home/jbf/Linux/autoplot_data/fscache/zip/home/jbf/Linux/autoplot_data/fscache/http/sarahandjeremy.net/~jbf/foo/
                 //TODO: vap+cdaweb:file:///?ds=APOLLO12_SWS_1HR&id=NSpectra_1  should not reject if empty file?
                 int carotpos = editor.getCaretPosition();
                 setMessage("busy: getting filesystem completions.");

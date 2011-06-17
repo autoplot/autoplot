@@ -63,7 +63,7 @@ public class DataSetSelectorSupport {
                 try {
                     String ext = DataSetURI.getExt(t);
                     if ( ext!=null ) ext= "."+ext;
-                    return t.endsWith(".vap") || t.endsWith(".zip") || (ext != null && exts.containsKey(ext));
+                    return t.endsWith(".vap") || ( t.endsWith(".zip") || t.endsWith(".ZIP") ) || (ext != null && exts.containsKey(ext));
                 } catch ( NullPointerException ex ) {
                     ex.printStackTrace();
                     return false;
