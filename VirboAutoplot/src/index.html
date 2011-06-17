@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Prototype time range control is accessible via Options->Address Bar->Time Range Selector
+        <p><small>Day of Year labels now available in Options->Rendering Options. A new plot needs to be created before the preference is visible. 
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -21,16 +21,18 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
         
-        <p>Bugfixes:</p>
+	<p>Bugfixes:</p>
+
         <ul>
             <li>Minor bugfixes from production version</li>
+            <li>CDAWeb 27 sources use alternate FSMs.</li>
+            <li>.ZIP supported as well as .zip</li>
             <li>TimeSeriesBrowse when there is not a timeaxis, now works with vap+internal:data_1,data_2.</li>
-            <li>3310573: TimeSeriesBrowse use of Event thread, cancel progress
+            <li>3310573: TimeSeriesBrowse use of Event thread, cancel progress</li>
             <li>Jython coerceToDs function renamed dataset, to be more consistent with other operators in language</li>
             <li>Improve support for URIs like "vap+internal:data_0" so two plots can use the same data source</li>
             <li>Frame labels (e.g. "X Axis [?]") link over to help</li>
             <li>Yellow flashes to show selection is disabled when there is just one plot</li>
-        </ul>
         <p>Features:</p>
         <ul>
             <li>day-of-year labels, and nearest neighbor binning option.  
