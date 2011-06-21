@@ -23,6 +23,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
@@ -315,12 +316,13 @@ public class ExportDataPanel extends javax.swing.JPanel {
         return formatDL;
     }
 
-    DataSourceFormatEditorPanel getDataSourceFormatEditorPanel() {
+    public DataSourceFormatEditorPanel getDataSourceFormatEditorPanel() {
         return editorPanel;
     }
 
     void setFile(String currentFileString) {
-        this.filenameTF.setText(currentFileString);
+        URISplit split= URISplit.parse(currentFileString);
+        this.filenameTF.setText(split.file);
         formatDLActionPerformed(null);
         if ( editorPanel!=null ) {
             editorPanel.setURI(currentFileString);
