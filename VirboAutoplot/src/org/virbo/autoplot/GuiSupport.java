@@ -333,7 +333,7 @@ public class GuiSupport {
                             URISplit splits= URISplit.parse(s);
                             splitopts.file= splits.file;
                             s= URISplit.format(splitopts); //TODO: this probably needs a lookin at.
-                            name= s;
+                            name= DataSourceUtil.unescape(s);
                         }
 
                         prefs.put("ExportDataCurrentFile", name );
