@@ -300,11 +300,15 @@ public class GuiSupport {
                 if ( JOptionPane.showConfirmDialog( parent, edp, "Export Data", JOptionPane.OK_CANCEL_OPTION )==JOptionPane.OK_OPTION ) {
                      try {
                         String name= edp.getFilenameTF().getText();
-                        prefs.put("DumpDataCurrentFile", name );
-                        prefs.put("DumpDataCurrentExt", "." + DataSetURI.getExt(name.toLowerCase()) );
-                        String s = new URI( edp.getFilenameTF().getText() ).toString();
-
                         String ext = (String)edp.getFormatDL().getSelectedItem();
+                        prefs.put("DumpDataCurrentFile", name );
+                        prefs.put("DumpDataCurrentExt", ext );
+                        String s=  edp.getFilenameTF().getText();
+                        if ( !s.endsWith(ext) ) {
+                            s= s+ext;
+                        }
+                        s = new File( s ).toURI().toString();
+
                         if (ext == null) {
                             ext = "";
                         }
