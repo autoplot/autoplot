@@ -282,15 +282,21 @@ public class GuiSupport {
                 List<String> exts = DataSourceRegistry.getInstance().getFormatterExtensions();
                 edp.getFormatDL().setModel( new DefaultComboBoxModel(exts.toArray()) );
                 Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
-                String currentFileString = prefs.get("DumpDataCurrentFile", "");
-                String currentExtString = prefs.get("DumpDataCurrentExt", "");
+                String currentFileString = prefs.get("ExportDataCurrentFile", "");
+                String currentExtString = prefs.get("ExportDataCurrentExt", "");
                 if ( !currentExtString.equals("") ) {
                     edp.getFormatDL().setSelectedItem(currentExtString);
                 }
                 if ( !currentFileString.equals("") ) {
-                    edp.getFilenameTF().setText(currentFileString);
-                    edp.getFormatDL().setSelectedItem( "." + DataSetURI.getExt(currentFileString.toLowerCase()) );
-                    edp.setFile( currentFileString );
+                    URISplit split= URISplit.parse(currentFileString);
+                    edp.getFilenameTF().setText(split.file);
+                    edp.getFormatDL().setSelectedItem( "." + split.ext );
+                    if ( currentFileString.contains("/") ) {
+                        edp.setFile( currentFileString );
+                        if ( split.params!=null ) {
+                            edp.getDataSourceFormatEditorPanel().setURI(currentFileString);
+                        }
+                    }
                 }
 
                 if ( dsf.getController().getTsb()!=null ) {
@@ -301,13 +307,15 @@ public class GuiSupport {
                      try {
                         String name= edp.getFilenameTF().getText();
                         String ext = (String)edp.getFormatDL().getSelectedItem();
-                        prefs.put("DumpDataCurrentFile", name );
-                        prefs.put("DumpDataCurrentExt", ext );
+
                         String s=  edp.getFilenameTF().getText();
                         if ( !s.endsWith(ext) ) {
                             s= s+ext;
                         }
-                        s = new File( s ).toURI().toString();
+                        URISplit split= URISplit.parse(s);
+
+                        String s1 = new File( split.file.substring(split.scheme.length()+1) ).toURI().toString();
+                        s= s1;
 
                         if (ext == null) {
                             ext = "";
@@ -325,7 +333,11 @@ public class GuiSupport {
                             URISplit splits= URISplit.parse(s);
                             splitopts.file= splits.file;
                             s= URISplit.format(splitopts); //TODO: this probably needs a lookin at.
+                            name= s;
                         }
+
+                        prefs.put("ExportDataCurrentFile", name );
+                        prefs.put("ExportDataCurrentExt", ext );
 
                         final QDataSet fds= ds;
                         final String uriOut= s;
