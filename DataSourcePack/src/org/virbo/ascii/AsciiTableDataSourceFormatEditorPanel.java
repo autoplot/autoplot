@@ -60,6 +60,7 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         jLabel2.setText("Time Resolution:");
 
         timesFormatTF.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Day", "Minute", "Second", "Millisecond", "Microsecond", " " }));
+        timesFormatTF.setSelectedIndex(3);
 
         richHeadersCB.setText("Rich Headers");
         richHeadersCB.setToolTipText("<html>Add additional information about the dataset, <br>\nsuch as titles and valid ranges, in a comment block <br>\nat the top of the ascii output.</html>");
@@ -134,10 +135,12 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         s= args.get("format");
         if ( s!=null ) {
             numberFormatSpecifierTF.setText( args.get("format") );
+            useFormatSpecCB.setSelected(true);
         }
         s= args.get("tformat");
         if ( s!=null ) {
             timesFormatTF.setSelectedItem(s);
+            useFormatSpecCB.setSelected(true);
         }
         s= args.get("header");
         if ( "rich".equals(s) ) {
@@ -163,6 +166,7 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         }
 
         String params= URISplit.formatParams(args);
+        if ( result==null ) result= "file:///";
         URISplit ss= URISplit.parse(result);
 
         if ( params.length()>0 ) {
