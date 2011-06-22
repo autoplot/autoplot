@@ -706,6 +706,55 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     }
 
+    /**
+     * Wrap DataSetURI.getFileSystemCompletions for action triggers.
+     * @param suggestFsAgg include aggregations it sees.  These are a guess.
+     * @param suggestFiles include files as well as aggregations.
+     * @param acceptRegex if non-null, filenames must match this regex.  See Pattern.compile
+     */
+    public void showFileSystemCompletions(  final boolean suggestFsAgg, final boolean suggestFiles, final String acceptRegex ) {
+        final String surl= this.editor.getText();
+        final int carotpos= this.editor.getCaretPosition();
+        
+        calcAndShowCompletions( new Runnable() {
+
+            public void run() {
+                ProgressMonitor mon = getMonitor();
+
+                List<CompletionResult> completions = null;
+
+                String labelPrefix = surl.substring(0, carotpos);
+
+                try {
+                    completions = DataSetURI.getFileSystemCompletions( surl, carotpos, suggestFsAgg, suggestFiles, acceptRegex, mon);
+                } catch (UnknownHostException ex ) {
+                    ex.printStackTrace();
+                    setMessage("Unknown host: "+ex.getLocalizedMessage());
+                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>Unknown host:<br>" + ex.getLocalizedMessage() + "</html>", "Unknown Host Exception", JOptionPane.WARNING_MESSAGE);
+                    return;
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    setMessage(ex.toString());
+                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>I/O Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
+                    return;
+                } catch (URISyntaxException ex) {
+                    ex.printStackTrace();
+                    setMessage(ex.toString());
+                    JOptionPane.showMessageDialog(DataSetSelector.this, "<html>URI Syntax Exception occurred:<br>" + ex.getLocalizedMessage() + "</html>", "I/O Exception", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                int i2= labelPrefix.lastIndexOf("/");
+                if ( i2!=-1 ) {
+                    labelPrefix= labelPrefix.substring(0,i2+1);
+                }
+
+                showCompletionsGui( labelPrefix, completions );
+
+            }
+        } );
+    }
+
     private void showFileSystemCompletions(final String surl, final int carotpos) {
 
         calcAndShowCompletions( new Runnable() {
@@ -804,6 +853,19 @@ public class DataSetSelector extends javax.swing.JPanel {
         map.put("complete", new AbstractAction("completionsPopup") {
 
             public void actionPerformed(ActionEvent ev) {
+                String context = (String) dataSetSelector.getSelectedItem();  // This is repeated code.  See browseButtonActionPerformed.
+                if ( context==null ) context= "";
+
+                // hooks for browsing, such as "vap+internal"
+                for (String browseTriggerRegex : browseTriggers.keySet()) {
+                    if (Pattern.matches(browseTriggerRegex, context)) {
+                        logger.finest("matches browse trigger");
+                        Action action = browseTriggers.get(browseTriggerRegex);
+                        action.actionPerformed( new ActionEvent(DataSetSelector.this, 123, "dataSetSelect") );
+                        return;
+                    }
+                }
+
                 showCompletions();
             }
         });
