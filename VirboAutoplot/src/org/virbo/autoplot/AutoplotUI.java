@@ -295,7 +295,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                         }
                         RunScriptPanel.runScript( applicationModel, ff, new NullProgressMonitor() );
                     }
-                    applicationModel.addRecent(dataSetSelector.getValue());
+                    applicationModel.addRecent(dataSetSelector.getValue()); 
                 } catch (URISyntaxException ex) {
                     Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IOException ex) {
