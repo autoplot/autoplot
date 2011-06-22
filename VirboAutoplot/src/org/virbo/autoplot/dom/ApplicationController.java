@@ -1353,6 +1353,36 @@ public class ApplicationController extends DomNodeController implements RunLater
                 dsf.getController().fillDataSet=null;
                 dsf.getController().histogram=null;
             }
+
+            //go ahead and check for leftover das2 plots and renderers that might have been left from a bug.  rfe3324592
+            DasCanvasComponent[] dccs= canvas.controller.getDasCanvas().getCanvasComponents();
+            for ( int i=0; i<dccs.length; i++ ) {
+                if ( dccs[i] instanceof DasPlot ) {
+                    DasPlot p= (DasPlot)dccs[i];
+                    boolean okay=false;
+                    for ( Plot pp: application.getPlots() ) {
+                        if ( pp.getController().getDasPlot()==p ) okay=true;
+                    }
+                    if ( !okay ) {
+                        canvas.controller.getDasCanvas().remove(p);
+                    } else {
+                        Renderer[] rr= p.getRenderers();
+                        for ( int j=0; j<rr.length; j++ ) {
+                            okay= false;
+                            for ( PlotElement pes: application.getPlotElements() ) {
+                               if ( pes.getController().getRenderer()==rr[j] ) okay=true;
+                            }
+                            if ( !okay ) {
+                                p.removeRenderer(rr[j]);
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+
         } finally {
             canvasLock.unlock();
             lock.unlock();
