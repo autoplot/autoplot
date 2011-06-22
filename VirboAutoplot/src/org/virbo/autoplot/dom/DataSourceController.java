@@ -488,7 +488,7 @@ public class DataSourceController extends DomNodeController {
     private synchronized void clearParentSources() {
         if ( this.parentSources!=null ) {
             for ( DataSourceFilter parentDsf: parentSources ) {
-                parentDsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, parentListener);
+                if ( parentDsf!=null ) parentDsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, parentListener);
             }
         }
         this.parentSources= null; 
