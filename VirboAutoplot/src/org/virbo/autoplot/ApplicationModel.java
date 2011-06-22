@@ -521,7 +521,13 @@ public class ApplicationModel {
 
         }
     }
-    
+
+    /**
+     * add the URI to the recently used list, and to the user's
+     * autoplot_data/bookmarks/history.txt.  No interpretation is done
+     * as of June 2011, and pngwalk: and script: uris are acceptable.
+     * @param surl
+     */
     public void addRecent(String surl) {
 
         if ( !DasApplication.hasAllPermission() ) {
