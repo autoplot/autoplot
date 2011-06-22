@@ -10,9 +10,13 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
@@ -22,8 +26,12 @@ import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.undo.UndoManager;
+import org.das2.components.DasProgressPanel;
 import org.python.core.PyObject;
+import org.virbo.datasource.DataSetURI;
 import org.virbo.jythonsupport.PyQDataSet;
 import org.virbo.qstream.StreamException;
 
@@ -126,6 +134,27 @@ public class EditorTextPane extends JTextPane {
 
         } else {
             JOptionPane.showMessageDialog(this,"Selected item is not a dataset");
+        }
+    }
+
+    public void loadFile( File f ) throws FileNotFoundException, IOException {
+        BufferedReader r = null;
+        try {
+            StringBuffer buf = new StringBuffer();
+            r = new BufferedReader( new InputStreamReader( new FileInputStream(f) ));
+            String s = r.readLine();
+            while (s != null) {
+                buf.append(s + "\n");
+                s = r.readLine();
+            }
+            Document d = this.getDocument();
+            d.remove(0, d.getLength());
+            d.insertString(0, buf.toString(), null);
+            //setDirty(false);
+        } catch (BadLocationException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            if ( r!=null ) r.close();
         }
     }
 }
