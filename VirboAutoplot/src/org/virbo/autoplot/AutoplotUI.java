@@ -26,6 +26,7 @@ import org.das2.util.monitor.NullProgressMonitor;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GraphicsConfiguration;
@@ -39,6 +40,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -46,6 +48,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,6 +56,7 @@ import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import javax.help.CSH;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -78,6 +82,7 @@ import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
+import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -242,24 +247,70 @@ public class AutoplotUI extends javax.swing.JFrame {
             public void actionPerformed( ActionEvent ev ) {
                 String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
                 support.importBookmarks( bookmarksFile );
+                applicationModel.addRecent(dataSetSelector.getValue());
             }
         });
         dataSetSelector.registerBrowseTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
             public void actionPerformed( ActionEvent ev ) {
-                //do nothing
+                DataSetSelector source= (DataSetSelector)ev.getSource();
+                source.showFileSystemCompletions( false, true, "[^\\s]+\\.xml" );
             }
         });
         dataSetSelector.registerActionTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
-            public void actionPerformed( ActionEvent ev ) {
+            public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
                 String pngwalk= dataSetSelector.getValue().substring("pngwalk:".length());
-                PngWalkTool1.start( pngwalk, AutoplotUI.this);
+                    PngWalkTool1.start( pngwalk, AutoplotUI.this);
+                    applicationModel.addRecent(dataSetSelector.getValue());
             }
         });
         dataSetSelector.registerBrowseTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
             public void actionPerformed( ActionEvent ev ) {
+                DataSetSelector source= (DataSetSelector)ev.getSource();
+                source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(jpg|png|gif))$" );
                 //do nothing
             }
         });
+        dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( "script") {
+            public void actionPerformed( ActionEvent ev ) {
+                try {
+                    String script = dataSetSelector.getValue().substring("script:".length());
+                    File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
+                    RunScriptPanel pp = new RunScriptPanel();
+                    pp.loadFile(ff);
+                    int r = JOptionPane.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
+                    if ( r==JOptionPane.OK_OPTION ) {
+                        if ( pp.getToolsCB().isSelected() ) {
+                            File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
+                            File cpTo= new File( tools,ff.getName() );
+                            if ( !ff.equals(cpTo ) ) {
+                                if ( !Util.copyFile( ff, cpTo ) ) {
+                                    setStatus("warning: unable to copy file");
+                                } else {
+                                    setStatus("copied file to "+cpTo );
+                                    reloadTools();
+                                }
+                            } else {
+                                setStatus("warning: file is already in tools");
+                            }
+                        }
+                        RunScriptPanel.runScript( applicationModel, ff, new NullProgressMonitor() );
+                    }
+                    applicationModel.addRecent(dataSetSelector.getValue());
+                } catch (URISyntaxException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        dataSetSelector.registerBrowseTrigger( "script:(.*)", new AbstractAction( "script") {
+            public void actionPerformed( ActionEvent ev ) {
+                DataSetSelector source= (DataSetSelector)ev.getSource();
+                source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
+                //do nothing
+            }
+        });
+        URISplit.setOtherSchemes( Arrays.asList( "script", "pngwalk", "bookmarks" ) );
 
         final ApplicationController appController= applicationModel.getDocumentModel().getController();
 
@@ -2425,22 +2476,54 @@ private void updateFrameTitle() {
     // End of variables declaration//GEN-END:variables
 
     private void addTools() {
-        List<Bookmark> tools= loadTools();
-        if ( tools.size()>0 ) {
-            toolsMenu.add( new JSeparator() );
+        reloadTools();
+    }
+
+    public void reloadTools() {
+
+        int isep=-1;
+        // remove existing menu items for user tools.
+        for ( int i=0; i<toolsMenu.getMenuComponentCount(); i++ ) {
+            Component c= toolsMenu.getMenuComponent(i);
+            if ( c instanceof JSeparator && "userSep".equals(c.getName()) ) {
+                isep=i;
+                break;
+            }
         }
+
+        if ( isep>-1 ) {
+            for ( int i=toolsMenu.getMenuComponentCount()-1; i>isep; i-- ) {
+                toolsMenu.remove( toolsMenu.getMenuComponent(i) );
+            }
+        }
+
+        List<Bookmark> tools= loadTools();
+        if ( tools.size()>0 && isep==-1 ) {
+            JSeparator userSep= new JSeparator();
+            userSep.setName("userSep"); // so we can find it later
+            toolsMenu.add( userSep );
+            isep= toolsMenu.getMenuComponentCount();
+        }
+
         for ( Bookmark t: tools ) {
             final Bookmark tt= t;
-            toolsMenu.add( new AbstractAction(t.getTitle()) {
+            final String surl = ((Bookmark.Item) tt).getUrl();
+            Action a= new AbstractAction(t.getTitle()) {
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        String surl = ((Bookmark.Item) tt).getUrl();
-                        JythonUtil.invokeScriptSoon(DataSetURI.getURL(surl),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
+                        if ( e.getModifiers()==0 ) {
+                            JythonUtil.invokeScriptSoon(DataSetURI.getURL(surl),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
+                        } else {
+                            plotUri("script:"+ ((Bookmark.Item) tt).getUrl() );
+                        }
                     } catch (MalformedURLException ex) {
                         Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-            } );
+            };
+            JMenuItem ji= new JMenuItem(a);
+            ji.setToolTipText( "<html>"+ surl + "<br>press ctrl to inspect" );
+            toolsMenu.add( ji );
         }
     }
 
