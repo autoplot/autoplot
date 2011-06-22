@@ -2,8 +2,10 @@ package org.virbo.datasource;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,6 +97,16 @@ public class URISplit {
      */
     public boolean implicitVap= false;
 
+    static List<String> otherSchemes= Collections.emptyList();
+
+    /**
+     * allow parsing of script:, bookmarks:, pngwalk:, etc
+     * @param otherSchemes
+     */
+    public static void setOtherSchemes( List<String> otherSchemes ) {
+        URISplit.otherSchemes= otherSchemes;
+    }
+
     /**
      * add "file:/" to a resource string that appears to reference the local filesystem.
      * return the parsed string, or null if the string doesn't appear to be from a file.
@@ -124,7 +136,7 @@ public class URISplit {
             scheme = surl.substring(0, i0);
         }
 
-        if (scheme.startsWith("vap")) {
+        if ( scheme.startsWith("vap") || otherSchemes.contains(scheme) ) {
             String resourcePart = surl.substring(i0 + 1);
             if ( !scheme.equals("vap") ) { // legacy URIs would often have informationless "vap:" prefix.  We remove this now.
                 result.vapScheme = scheme;
