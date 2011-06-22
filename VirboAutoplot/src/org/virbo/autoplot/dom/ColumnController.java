@@ -10,6 +10,7 @@ import java.beans.PropertyChangeListener;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColumn;
@@ -57,7 +58,7 @@ public class ColumnController extends DomNodeController {
                     }
                     //DasDevicePosition.parseLayoutStr( dasColumn, column.getLeft() + "," + column.getRight() );
                 } catch (ParseException ex) {
-                    Logger.getLogger(ColumnController.class.getName()).warning("parse exception: "+ex);
+                    Logger.getLogger(ColumnController.class.getName()).log(Level.WARNING, "parse exception: {0}", ex);
                     column.setLeft( DasDevicePosition.formatLayoutStr(dasColumn, true) );
                     column.setRight( DasDevicePosition.formatLayoutStr(dasColumn, false ) );
                 }

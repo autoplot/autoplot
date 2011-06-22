@@ -4,7 +4,6 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,6 +53,7 @@ public class PropertyChangeDiff implements Diff {
         return propertyName;
     }
 
+    @Override
     public String toString() {
         String s = this.propertyName + " " + oldVal + " to " + newVal;
         if (s.length() > 30) {

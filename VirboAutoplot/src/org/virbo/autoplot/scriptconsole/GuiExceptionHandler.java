@@ -42,6 +42,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -383,6 +384,14 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         formatSysProp( buf, "os.name" );
         formatSysProp( buf, "os.arch" );
         formatSysProp( buf, "os.version" );
+        DecimalFormat nf = new DecimalFormat("0.0");
+        String mem = nf.format(Runtime.getRuntime().maxMemory() / (1024 * 1024));
+        String tmem= nf.format(Runtime.getRuntime().totalMemory() / (1024 * 1024));
+        String fmem= nf.format(Runtime.getRuntime().freeMemory() / (1024 * 1024));
+        buf.append("     <property name=\"").append("runtime.maxMemory").append("\" value=\"").append(mem).append(" Mb\" />\n");
+        buf.append("     <property name=\"").append("runtime.totalMemory").append("\" value=\"").append(tmem).append(" Mb\" />\n");
+        buf.append("     <property name=\"").append("runtime.freeMemory").append("\" value=\"").append(fmem).append(" Mb\" />\n");
+
         buf.append("  </platform>\n");
     }
     

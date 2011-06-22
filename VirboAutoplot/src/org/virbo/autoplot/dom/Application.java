@@ -226,9 +226,7 @@ public class Application extends DomNode {
         result.setPlotElements( peleCopy );
 
         Connector[] connectorsCopy= this.getConnectors();
-        for ( int i=0; i<connectorsCopy.length; i++ ) {
-            connectorsCopy[i]=  connectorsCopy[i]; // connectors are really immutable.
-        }
+        System.arraycopy(connectorsCopy, 0, connectorsCopy, 0, connectorsCopy.length);
         result.setConnectors( connectorsCopy );
         
         Canvas[] canvasesCopy= this.getCanvases();
@@ -252,10 +250,12 @@ public class Application extends DomNode {
         return result;
     }
     
+    @Override
     public void syncTo(DomNode n) {
         syncTo(n,new ArrayList<String>() );
     }
 
+    @Override
     public void syncTo(DomNode n,List<String> exclude) {
         super.syncTo(n,exclude);
         if ( this.controller!=null ) {
@@ -281,6 +281,7 @@ public class Application extends DomNode {
         }
     }
             
+    @Override
     public List<Diff> diffs(DomNode node) {
 
         Application that = (Application) node;

@@ -345,6 +345,7 @@ public class Options extends DomNode {
 
 
 
+    @Override
     public void syncTo( DomNode n,List<String> exclude ) {
         super.syncTo(n,exclude);
         Options that = (Options) n;
@@ -355,10 +356,12 @@ public class Options extends DomNode {
         if ( !exclude.contains(PROP_CANVASFONT) )this.setCanvasFont(that.getCanvasFont());
     }
 
+    @Override
     public void syncTo(DomNode n) {
         this.syncTo(n, new ArrayList<String>() );
     }
 
+    @Override
     public List<Diff> diffs(DomNode node) {
         Options that = (Options) node;
 

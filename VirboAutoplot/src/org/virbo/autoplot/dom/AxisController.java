@@ -115,7 +115,7 @@ public class AxisController extends DomNodeController {
         axis.setAutoLabel(true);
     }
 
-    public synchronized void bindTo(DasAxis p) {
+    public final synchronized void bindTo(DasAxis p) {
         ApplicationController ac = dom.controller;
         ac.bind(axis, "range", p, "datumRange");
         ac.bind(axis, "log", p, "log");

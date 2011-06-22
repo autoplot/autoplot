@@ -42,6 +42,7 @@ public class Connector  {
         return plotA.hashCode() + plotB.hashCode();
     }
 
+    @Override
     public String toString() {
         return plotA + " to " + plotB;
     }

@@ -182,10 +182,12 @@ public class PlotElementStyle extends DomNode {
     
     /*  DomNode Stuff ******************/
 
+    @Override
     public void syncTo( DomNode node ) {
         syncTo(node,new ArrayList<String>());
     }
 
+    @Override
     public void syncTo( DomNode node, List<String> exclude ) {
         super.syncTo(node,exclude);
         PlotElementStyle that= ( PlotElementStyle )node;
@@ -200,6 +202,7 @@ public class PlotElementStyle extends DomNode {
         if ( !exclude.contains(PROP_SYMBOL_CONNECTOR ) )this.setSymbolConnector( that.getSymbolConnector() );
     }
 
+    @Override
     public List<Diff> diffs(DomNode node) {
         PlotElementStyle that= (PlotElementStyle)node;
 

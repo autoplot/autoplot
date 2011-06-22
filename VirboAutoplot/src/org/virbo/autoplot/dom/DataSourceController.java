@@ -608,10 +608,10 @@ public class DataSourceController extends DomNodeController {
         }
  	String[] ss = split.surl.split(",", -2);
  	for (int i = 0; i < ss.length; i++) {
-            DataSourceFilter dsf = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
-            if ( dsf!=null ) {
-                dsf.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
-                parentSources[i] = dsf;
+            DataSourceFilter dsf1 = (DataSourceFilter) DomUtil.getElementById(dom, ss[i]);
+            if ( dsf1!=null ) {
+                dsf1.controller.addPropertyChangeListener(DataSourceController.PROP_FILLDATASET,parentListener);
+                parentSources[i] = dsf1;
             }else {
                 logger.log(Level.WARNING, "unable to find parent {0}", ss[i]);
                 parentSources[i] = null;

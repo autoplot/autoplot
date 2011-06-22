@@ -331,11 +331,13 @@ public class PlotElement extends DomNode {
         return result;
     }
 
+    @Override
     public void syncTo(DomNode n) {
         super.syncTo(n);
         syncTo( n, new ArrayList<String>() );
     }
     
+    @Override
     public void syncTo( DomNode n, List<String> exclude ) {
         super.syncTo(n,exclude);
         PlotElement that = (PlotElement) n;
@@ -356,7 +358,7 @@ public class PlotElement extends DomNode {
 
     @Override
     public String toString() {
-        StringBuffer parenthetical= new StringBuffer( getLegendLabel()==null ? "" : getLegendLabel() );
+        StringBuilder parenthetical= new StringBuilder( getLegendLabel()==null ? "" : getLegendLabel() );
         if ( !this.active ) {
             parenthetical.append( parenthetical.length()==0 ? "inactive" : ", inactive" );
         }

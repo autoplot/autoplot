@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.virbo.autoplot.util.TransparentLogger;
 
@@ -108,7 +109,7 @@ public final class ChangesSupport {
         if ( c==null || c!=client ) {
             registerPendingChange( client, lockObject );
         }
-        logger.fine( "performingChange "+lockObject+" by "+client + "  in "+parent );
+        logger.log( Level.FINE, "performingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
     }
 
     /**
@@ -117,7 +118,7 @@ public final class ChangesSupport {
      * @param lockObject
      */
     synchronized void changePerformed( Object client, Object lockObject ) {
-        logger.fine( "clearPendingChange "+lockObject+" by "+client + "  in "+parent);
+        logger.log( Level.FINE, "clearPendingChange {0} by {1}  in {2}", new Object[]{lockObject, client, parent});
         if ( changesPending.get(lockObject)==null ) {
            // throw new IllegalStateException( "no such lock object: "+lockObject );  //TODO: handle multiple registrations by the same client
         }
@@ -146,6 +147,7 @@ public final class ChangesSupport {
     private boolean valueIsAdjusting = false;
 
     private Lock mutatorLock = new ReentrantLock() {
+            @Override
             public void lock() {
                 super.lock();
                 if (valueIsAdjusting) {
@@ -156,6 +158,7 @@ public final class ChangesSupport {
                 }
             }
 
+            @Override
             public void unlock() {
                 super.unlock();
                 if ( !super.isLocked() ) {
@@ -190,6 +193,7 @@ public final class ChangesSupport {
         propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
+    @Override
     public String toString() {
         return "changeSupport: "+ changesPending;
     }

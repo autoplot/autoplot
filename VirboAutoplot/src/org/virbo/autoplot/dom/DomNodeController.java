@@ -5,7 +5,6 @@
 
 package org.virbo.autoplot.dom;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.das2.system.MutatorLock;
 
 /**
  * Base class for controller objects that are responsible for managing a node.

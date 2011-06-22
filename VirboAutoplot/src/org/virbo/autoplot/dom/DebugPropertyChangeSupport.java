@@ -33,13 +33,13 @@ public class DebugPropertyChangeSupport extends PropertyChangeSupport {
     @Override
     public String toString() {
         PropertyChangeListener[] listeners= getPropertyChangeListeners();
-        StringBuffer result= new StringBuffer(super.toString());
+        StringBuilder result= new StringBuilder(super.toString());
         for ( int i=0; i<listeners.length; i++ ) {
             if ( listeners[i] instanceof PropertyChangeListenerProxy ) {
                 PropertyChangeListenerProxy proxy= (PropertyChangeListenerProxy)listeners[i];
-                result.append("\n"+proxy.getListener() + " (property " + proxy.getPropertyName() + ")" );
+                result.append("\n").append(proxy.getListener()).append(" (property ").append(proxy.getPropertyName()).append(")");
             } else {
-                result.append("\n"+listeners[i] );
+                result.append("\n").append(listeners[i]);
             }
         }
         return result.toString();

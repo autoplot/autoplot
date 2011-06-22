@@ -31,6 +31,7 @@ public class Template extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_CONTROLLER, oldController, controller);
     }
 
+    @Override
     public DomNode copy() {
         Template result= (Template)super.copy();
         result.controller= null;  // CanvasController
@@ -38,14 +39,17 @@ public class Template extends DomNode {
         return result;
     }
 
+    @Override
     public void syncTo(DomNode n) {
         syncTo(n,new ArrayList<String>());
     }
 
+    @Override
     public void syncTo(DomNode n,List<String> exclude ) {
         super.syncTo(n,exclude);
     }
 
+    @Override
     public List<Diff> diffs(DomNode node) {
         return new ArrayList<Diff>();
     }

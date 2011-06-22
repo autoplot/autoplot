@@ -186,10 +186,12 @@ public class Plot extends DomNode {
         return result;
     }
 
+    @Override
     public void syncTo(DomNode n) {
         syncTo( n, new ArrayList<String>() );
     }
 
+    @Override
     public void syncTo(DomNode n, List<String> exclude) {
         super.syncTo(n,exclude);
         Plot that = (Plot) n;
@@ -215,6 +217,7 @@ public class Plot extends DomNode {
         return result;
     }
 
+    @Override
     public List<Diff> diffs(DomNode node) {
 
         Plot that = (Plot) node;

@@ -144,6 +144,7 @@ public class Axis extends DomNode {
         return controller;
     }
 
+    @Override
     public void syncTo(DomNode n) {
         super.syncTo(n);
         if ( controller!=null ) {
@@ -153,6 +154,7 @@ public class Axis extends DomNode {
         }
     }
 
+    @Override
     public void syncTo(DomNode n, List<String> exclude ) {
         super.syncTo(n,exclude);
         if ( controller!=null ) {
@@ -178,6 +180,7 @@ public class Axis extends DomNode {
 
 
 
+    @Override
     public List<Diff> diffs(DomNode node) {
         Axis that = (Axis) node;
         List<Diff> result = new ArrayList<Diff>();

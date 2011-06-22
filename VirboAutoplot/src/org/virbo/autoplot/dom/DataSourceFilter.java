@@ -133,6 +133,7 @@ public class DataSourceFilter extends DomNode {
     /**  dom node stuff ******************/
     
 
+    @Override
     public void syncTo(DomNode n) {
         super.syncTo(n);
         DataSourceFilter that= (DataSourceFilter)n;
@@ -146,6 +147,7 @@ public class DataSourceFilter extends DomNode {
         this.setUri(that.getUri());
     }
 
+    @Override
     public void syncTo(DomNode n, List<String> exclude ) {
         super.syncTo(n,exclude);
         DataSourceFilter that= (DataSourceFilter)n;
@@ -159,6 +161,7 @@ public class DataSourceFilter extends DomNode {
         if ( !exclude.contains("uri" ) ) this.setUri(that.getUri());
     }
 
+    @Override
     public List<Diff> diffs(DomNode node) {
         DataSourceFilter that= (DataSourceFilter)node;
         
@@ -166,7 +169,7 @@ public class DataSourceFilter extends DomNode {
         
         boolean b;
         
-        b = (that.uri == this.uri || (that.uri != null && that.uri.equals(this.uri))); // null==null 
+        b = that.uri == null ? this.uri == null : that.uri.equals(this.uri);
         if (!b) result.add( new PropertyChangeDiff( "uri", that.uri, this.uri ) );
         
         b = that.validRange.equals(this.validRange);

@@ -23,8 +23,6 @@ import org.das2.datum.DatumUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.system.MutatorLock;
-import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Converter;
 
 /**

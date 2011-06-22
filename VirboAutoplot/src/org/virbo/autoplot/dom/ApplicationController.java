@@ -174,7 +174,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     PropertyChangeListener controllerListener= new PropertyChangeListener() {
 
         public void propertyChange(PropertyChangeEvent evt) {
-            logger.finest("controller change: " + evt.getSource() + "." + evt.getPropertyName() + " (" + evt.getOldValue() + "->" + evt.getNewValue() +")");
+            logger.log(Level.FINEST, "controller change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
             //if( evt.getPropertyName().equals("resetDimensions") && evt.getNewValue().equals(Boolean.TRUE) ) {
             //    System.err.println("here here here");
             //}
@@ -186,7 +186,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
         public void propertyChange(PropertyChangeEvent evt) {
 
-            logger.finest("dom change: " + evt.getSource() + "." + evt.getPropertyName() + " (" + evt.getOldValue() + "->" + evt.getNewValue() +")");
+            logger.log(Level.FINEST, "dom change: {0}.{1} ({2}->{3})", new Object[]{evt.getSource(), evt.getPropertyName(), evt.getOldValue(), evt.getNewValue()});
 
             Object src = evt.getSource();
             if ( src instanceof DomNode ) {
@@ -304,7 +304,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             setPlot(domPlot);
 
             if (p != null) {
-                logger.fine("focus due to plot getting focus: " + p);
+                logger.log(Level.FINE, "focus due to plot getting focus: {0}", p);
                 setFocusUri( getFocusUriFor( p ) );
                 setPlotElement(p);
                 setStatus("" + domPlot + ", " + p + " selected");
@@ -370,19 +370,19 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public Plot getPlotFor(Component c) {
-        Plot plot = null;
+        Plot plot1 = null;
         for (Plot p : application.getPlots()) {
             DasPlot p1 = p.controller.getDasPlot();
             if (p1 == c || p1.getXAxis() == c || p1.getYAxis() == c) {
-                plot = p;
+                plot1 = p;
                 break;
             }
             if (p.controller.getDasColorBar() == c) {
-                plot = p;
+                plot1 = p;
                 break;
             }
         }
-        return plot;
+        return plot1;
     }
 
     public void doplot(Plot plot, PlotElement pele, String secondaryUri, String teriaryUri, String primaryUri) {
@@ -426,6 +426,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     private void addListeners() {
         this.addPropertyChangeListener(ApplicationController.PROP_PLOT_ELEMENT, new PropertyChangeListener() {
 
+            @Override
             public String toString() {
                 return "" + ApplicationController.this;
             }
@@ -508,7 +509,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param pelement
      */
     public void deletePlotElement(PlotElement pelement) {
-        logger.fine("deletePlotElement("+pelement+")");
+        logger.log(Level.FINE, "deletePlotElement({0})", pelement);
         int currentIdx = application.plotElements.indexOf(pelement);
         if (currentIdx == -1) {
             throw new IllegalArgumentException("deletePlotElement but plot element isn't part of application");
@@ -572,7 +573,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param domPlot
      */
     public void addConnector(Plot domPlot, Plot that) {
-        logger.fine( "addConnector("+domPlot+","+that+")" );
+        logger.log( Level.FINE, "addConnector({0},{1})", new Object[]{domPlot, that});
         List<Connector> connectors = new ArrayList<Connector>(Arrays.asList(application.getConnectors()));
         final Connector connector = new Connector(domPlot.getId(), that.getId());
         connectors.add(connector);
@@ -604,7 +605,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     public void deleteConnector(Connector connector) {
-        logger.fine( "deleteConnector("+connector+")" );
+        logger.log( Level.FINE, "deleteConnector({0})", connector);
         ColumnColumnConnector impl = connectorImpls.get(connector);
         if ( impl!=null ) {
             getDasCanvas().remove(impl);
@@ -633,6 +634,7 @@ public class ApplicationController extends DomNodeController implements RunLater
     
     PropertyChangeListener plotIdListener = new PropertyChangeListener() {
 
+        @Override
         public String toString() {
             return "" + ApplicationController.this;
         }
@@ -685,7 +687,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     public PlotElement addPlotElement(Plot domPlot, DataSourceFilter dsf) {
-        logger.fine("enter addPlotElement("+domPlot+","+dsf+")");
+        logger.log(Level.FINE, "enter addPlotElement({0},{1})", new Object[]{domPlot, dsf});
 
         final PlotElement pele1 = new PlotElement();
 
@@ -733,6 +735,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     PropertyChangeListener rendererFocusListener = new PropertyChangeListener() {
 
+        @Override
         public String toString() {
             return "" + ApplicationController.this;
         }
@@ -1014,7 +1017,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return
      */
     protected PlotElement copyPlotElement(PlotElement srcElement, Plot domPlot, DataSourceFilter dsf) {
-        logger.finer( "copyPlotElement("+srcElement+","+domPlot+","+dsf+")");
+        logger.log( Level.FINER, "copyPlotElement({0},{1},{2})", new Object[]{srcElement, domPlot, dsf});
         PlotElement newp = addPlotElement(domPlot, dsf);
         newp.getController().setResetPlotElement(false);// don't add children, trigger autoRange, etc.
         newp.getController().setDsfReset(false); // dont' reset when the dataset changes
@@ -1414,7 +1417,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public void bind(DomNode src, String srcProp, Object dst, String dstProp, Converter converter ) {
         
-        logger.finer( "bind "+ src+"."+ srcProp +" to "+ dst + "."+ dstProp );
+        logger.log( Level.FINER, "bind {0}.{1} to {2}.{3}", new Object[]{src, srcProp, dst, dstProp});
         
         String srcId = src.getId();
 
@@ -1624,7 +1627,7 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param status
      */
     public void setStatus(String status) {
-        logger.fine(status+" (status message)");
+        logger.log(Level.FINE, "{0} (status message)", status);
         String oldStatus = this.status;
         this.status = status;
         propertyChangeSupport.firePropertyChange(PROP_STATUS, oldStatus, status);

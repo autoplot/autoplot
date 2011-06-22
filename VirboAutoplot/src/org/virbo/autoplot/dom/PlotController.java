@@ -55,7 +55,7 @@ public class PlotController extends DomNodeController {
      */
     public List<PlotElement> pdListen= new LinkedList();
 
-    private static Logger logger= Logger.getLogger( PlotController.class.getName() );
+    private static final Logger logger= Logger.getLogger( PlotController.class.getName() );
 
     public PlotController(Application dom, Plot domPlot, DasPlot dasPlot, DasColorBar colorbar) {
         this( dom, domPlot );
@@ -240,7 +240,7 @@ public class PlotController extends DomNodeController {
 
         bindTo(dasPlot1);
         
-        logger.fine("add focus listener to " + dasPlot1);
+        logger.log(Level.FINE, "add focus listener to {0}", dasPlot1);
         dasPlot1.addFocusListener(ac.focusAdapter);
         dasPlot1.getXAxis().addFocusListener(ac.focusAdapter);
         dasPlot1.getYAxis().addFocusListener(ac.focusAdapter);
@@ -274,6 +274,7 @@ public class PlotController extends DomNodeController {
 
 
     private PropertyChangeListener listener = new PropertyChangeListener() {
+        @Override
         public String toString() {
             return ""+PlotController.this;
         }
@@ -673,7 +674,7 @@ public class PlotController extends DomNodeController {
                 p = p.getController().getParentPlotElement();
             }
             if ( !p.getParent().equals("") && p.getController().getParentPlotElement()==null ) {
-                logger.warning("reference to non-existent parent in "+p);
+                logger.log(Level.WARNING, "reference to non-existent parent in {0}", p);
             }
             if ( this.plotElement!=null ) {
                 this.plotElement.getController().removePropertyChangeListener( PlotElementController.PROP_DATASET, plotElementDataSetListener );
@@ -797,7 +798,7 @@ public class PlotController extends DomNodeController {
         }
 
         if ( shouldBindX && !plot.getColumnId().equals( dom.getCanvases(0).getMarginColumn().getId() ) ) {
-            logger.finer("not binding because plot is not attached to marginRow: "+ plot.getXaxis() );
+            logger.log(Level.FINER, "not binding because plot is not attached to marginRow: {0}", plot.getXaxis());
             //TODO: Reiner has a two-column canvas that has each plot bound.  It might be
             //  nice to support this.
             shouldBindX= false;
@@ -805,7 +806,7 @@ public class PlotController extends DomNodeController {
         }
         
         if ( bm==null && shouldBindX ) {
-            logger.finer("add binding because ranges overlap: "+ plot.getXaxis());
+            logger.log(Level.FINER, "add binding because ranges overlap: {0}", plot.getXaxis());
             plot.getXaxis().setLog(false);
             dom.getController().bind( dom, Application.PROP_TIMERANGE, plot.getXaxis(), Axis.PROP_RANGE );
             //if ( !CanvasUtil.getMostBottomPlot(dom.getController().getCanvasFor(plot))==plot ) {
@@ -813,7 +814,7 @@ public class PlotController extends DomNodeController {
             //} //TODO: could disable tick label drawing automatically.
 
         } else if ( bm!=null && !shouldBindX ) {
-            logger.finer("remove binding: "+bm);
+            logger.log(Level.FINER, "remove binding: {0}", bm);
             dom.getController().deleteBinding(bm);
         }
 
@@ -966,6 +967,7 @@ public class PlotController extends DomNodeController {
     public Application getApplication() {
         return dom;
     }
+    @Override
     public String toString() {
         return this.plot + " controller";
     }

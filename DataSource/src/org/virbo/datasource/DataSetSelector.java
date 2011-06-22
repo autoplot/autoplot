@@ -253,7 +253,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                         } else {
                             throw new RuntimeException("unable to identify data source for URI, try \"about:plugins\"");
                         }
-                        
+
                     }
                     setMessage("busy: checking to see if uri looks acceptable");
                     String surl1 = surl;
