@@ -870,8 +870,8 @@ public class DataSetURI {
      *
      * @param surl
      * @param carotpos
-     * @param inclAgg
-     * @param inclFiles
+     * @param inclAgg include aggregations it sees.  These are a guess.
+     * @param inclFiles include files as well as aggregations.
      * @param acceptPattern  if non-null, files and aggregations much match this.
      * @param mon
      * @return
@@ -1007,9 +1007,10 @@ public class DataSetURI {
                     split2.params= URISplit.formatParams(params2);
                 }
                 if ( split2.vapScheme!=null && !sagg.startsWith(split2.vapScheme) ) split2.vapScheme=null;
+                String scomp= URISplit.format(split2);
+                if ( split2.vapScheme==null && split.vapScheme!=null ) split2.vapScheme= split.vapScheme;
                 sagg= URISplit.format(split2);
                 //sagg= URISplit.removeParam( sagg, "timerange" );
-                String scomp = foldCase ? sagg.toLowerCase() : sagg;
                 scomp= scomp.substring(surlDir.length());
                 if ( scomp.startsWith(prefix) ) {
                     completions.add( new DataSetURI.CompletionResult( sagg, "Use aggregation ("+tr+" available)", true ) );
