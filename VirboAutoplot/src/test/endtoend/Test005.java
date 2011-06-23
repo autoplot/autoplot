@@ -13,6 +13,7 @@ import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.Axis;
+import org.virbo.cdfdatasource.CdfFileDataSourceFactory;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 
@@ -31,6 +32,8 @@ public class Test005 {
 
     public static void main(String[] args)  {
         try {
+            CdfFileDataSourceFactory.loadCdfLibraries();
+
             setCanvasSize(800, 600);
             getDocumentModel().getOptions().setAutolayout(false);
             getDocumentModel().getCanvases(0).getMarginColumn().setRight("100%-10em");
@@ -44,7 +47,7 @@ public class Test005 {
             xxx("demo1");
 
             {
-                plot("vap+cdfj:http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109");
+                plot("http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX&timerange=20000109");
                 Axis axis = getDocumentModel().getPlots(0).getXaxis();
                 axis.setRange(DatumRangeUtil.rescale(axis.getRange(), -1, 2));
                 writeToPng("test005_demo2.png");
@@ -53,7 +56,7 @@ public class Test005 {
             xxx("demo2");
 
             {
-                String suri = "vap+cdfj:ftp://ftp.virbo.org/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?";
+                String suri = "ftp://ftp.virbo.org/LANL/LANL1991/SOPA+ESP/H0/LANL_1991_080_H0_SOPA_ESP_19920308_V01.cdf?";
                 List<CompletionResult> completionResult = DataSetURI.getCompletions(suri, suri.length(), new NullProgressMonitor());
                 PrintWriter out = new PrintWriter("test005_demo3.txt");
                 for (CompletionResult l : completionResult) {
@@ -70,7 +73,7 @@ public class Test005 {
             plot("http://autoplot.org/data/autoplot.xls?column=A");
             writeToPng("test005_demo4.png");
             xxx("demo4");
-            plot("vap+cdfj:http://autoplot.org/data/autoplot.cdf?BGSM");
+            plot("http://autoplot.org/data/autoplot.cdf?BGSM");
             writeToPng("test005_demo5.png");
             xxx("demo5");
             plot("http://autoplot.org/data/autoplot.xls?column=A");   // must delete extra plot elements from BGSM
