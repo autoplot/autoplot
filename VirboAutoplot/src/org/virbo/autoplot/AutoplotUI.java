@@ -246,8 +246,13 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
             public void actionPerformed( ActionEvent ev ) {
                 String bookmarksFile= dataSetSelector.getValue().substring("bookmarks:".length());
-                support.importBookmarks( bookmarksFile );
-                applicationModel.addRecent(dataSetSelector.getValue());
+                if ( bookmarksFile.endsWith("/") || bookmarksFile.endsWith(".")) { // normally reject method would trigger another completion
+                    DataSetSelector source= (DataSetSelector)ev.getSource();
+                    source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(xml))$" );
+                } else {
+                    support.importBookmarks( bookmarksFile );
+                    applicationModel.addRecent(dataSetSelector.getValue());
+                }
             }
         });
         dataSetSelector.registerBrowseTrigger( "bookmarks:(.*)", new AbstractAction( "bookmarks") {
@@ -259,8 +264,13 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.registerActionTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
             public void actionPerformed( ActionEvent ev ) { // TODO: underimplemented
                 String pngwalk= dataSetSelector.getValue().substring("pngwalk:".length());
+                if ( pngwalk.endsWith("/") || pngwalk.endsWith(".")) { // normally reject method would trigger another completion
+                    DataSetSelector source= (DataSetSelector)ev.getSource();
+                    source.showFileSystemCompletions( true, false, "[^\\s]+(\\.(?i)(jpg|png|gif))$" );
+                } else {
                     PngWalkTool1.start( pngwalk, AutoplotUI.this);
                     applicationModel.addRecent(dataSetSelector.getValue());
+                }
             }
         });
         dataSetSelector.registerBrowseTrigger( "pngwalk:(.*)", new AbstractAction( "pngwalk") {
@@ -272,34 +282,39 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
         dataSetSelector.registerActionTrigger( "script:(.*)", new AbstractAction( "script") {
             public void actionPerformed( ActionEvent ev ) {
-                try {
-                    String script = dataSetSelector.getValue().substring("script:".length());
-                    File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
-                    RunScriptPanel pp = new RunScriptPanel();
-                    pp.loadFile(ff);
-                    int r = JOptionPane.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
-                    if ( r==JOptionPane.OK_OPTION ) {
-                        if ( pp.getToolsCB().isSelected() ) {
-                            File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
-                            File cpTo= new File( tools,ff.getName() );
-                            if ( !ff.equals(cpTo ) ) {
-                                if ( !Util.copyFile( ff, cpTo ) ) {
-                                    setStatus("warning: unable to copy file");
+                String script = dataSetSelector.getValue().substring("script:".length());
+                if ( !( script.endsWith(".jy") || script.endsWith(".JY") ) ) {
+                    DataSetSelector source= (DataSetSelector)ev.getSource();
+                    source.showFileSystemCompletions( false, true, "[^\\s]+\\.jy" );
+                } else {
+                    try {
+                        File ff = DataSetURI.getFile(DataSetURI.getURI(script), new DasProgressPanel("downloading script"));
+                        RunScriptPanel pp = new RunScriptPanel();
+                        pp.loadFile(ff);
+                        int r = JOptionPane.showConfirmDialog(AutoplotUI.this, pp, "Load script", JOptionPane.OK_CANCEL_OPTION);
+                        if ( r==JOptionPane.OK_OPTION ) {
+                            if ( pp.getToolsCB().isSelected() ) {
+                                File tools= new File( AutoplotSettings.settings().resolveProperty(AutoplotSettings.PROP_AUTOPLOTDATA), "tools" );
+                                File cpTo= new File( tools,ff.getName() );
+                                if ( !ff.equals(cpTo ) ) {
+                                    if ( !Util.copyFile( ff, cpTo ) ) {
+                                        setStatus("warning: unable to copy file");
+                                    } else {
+                                        setStatus("copied file to "+cpTo );
+                                        reloadTools();
+                                    }
                                 } else {
-                                    setStatus("copied file to "+cpTo );
-                                    reloadTools();
+                                    setStatus("warning: file is already in tools");
                                 }
-                            } else {
-                                setStatus("warning: file is already in tools");
                             }
+                            RunScriptPanel.runScript( applicationModel, ff, new NullProgressMonitor() );
                         }
-                        RunScriptPanel.runScript( applicationModel, ff, new NullProgressMonitor() );
+                        applicationModel.addRecent(dataSetSelector.getValue());
+                    } catch (URISyntaxException ex) {
+                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    applicationModel.addRecent(dataSetSelector.getValue()); 
-                } catch (URISyntaxException ex) {
-                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
