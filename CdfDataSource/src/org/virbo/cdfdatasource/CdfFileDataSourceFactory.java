@@ -44,7 +44,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
 	
     }
     
-    private static void loadCdfLibraries() {
+    public static void loadCdfLibraries() {
         // CDF native library names ID'd by system property, set in the jnlp
         // Bernie Harris states in an email:
         // "The reason for this is that CDF is actually two native libraries.  The original
