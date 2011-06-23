@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.TimeParser;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystem.FileSystemOfflineException;
@@ -91,11 +92,11 @@ public class WalkUtil {
         FileSystem fs = FileSystem.create( DataSetURI.getResourceURI(sansArgs.substring(0, i+1)) );
         String spec= sansArgs.substring(i+1).replaceAll("\\$", "%");
 
-        spec= spec.replaceAll("\\*", ".*");
+        spec= spec.replaceAll("\\*", ".*"); //GRR.  What if I put .* in there knowing it was a regex.
         spec= spec.replaceAll("\\?", ".");
         
         FileStorageModelNew fsm=null;
-        if ( spec.contains("%Y")||spec.contains("%y") ) fsm= FileStorageModelNew.create( fs, spec );
+        if ( TimeParser.isSpec(spec) ) fsm= FileStorageModelNew.create( fs, spec );
 
         String[] ss;
         if ( fsm!=null ) {
