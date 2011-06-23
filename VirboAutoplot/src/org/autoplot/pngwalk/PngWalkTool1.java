@@ -592,18 +592,22 @@ public class PngWalkTool1 extends javax.swing.JPanel {
                     for (PngWalkView v : views) {
                         v.setSequence(seq);
                     }
-                    indexListener.propertyChange( null );
-                    if (qcPanel != null ) {
-                        qcPanel.setWalkImageSequece(seq);
-                        if ( seq.getIndex()<seq.size() ) {
-                            if ( seq.getQualityControlSequence()!=null ) {
-                                QualityControlRecord rec= seq.getQualityControlSequence().getQualityControlRecord(seq.getIndex());
-                                qcPanel.displayRecord(rec);
-                                int n[] = seq.getQualityControlSequence().getQCTotals();
-                                qcPanel.setStatus(n[0], n[1], n[2], n[3]);
+                    if ( seq.size()==0 ) {
+                        setStatus("warning: Done listing "+seq.getTemplate()+", and no files were found");
+                    } else {
+                        indexListener.propertyChange( null );
+                        if (qcPanel != null ) {
+                            qcPanel.setWalkImageSequece(seq);
+                            if ( seq.getIndex()<seq.size() ) {
+                                if ( seq.getQualityControlSequence()!=null ) {
+                                    QualityControlRecord rec= seq.getQualityControlSequence().getQualityControlRecord(seq.getIndex());
+                                    qcPanel.displayRecord(rec);
+                                    int n[] = seq.getQualityControlSequence().getQCTotals();
+                                    qcPanel.setStatus(n[0], n[1], n[2], n[3]);
+                                }
+                            } else {
+                                qcPanel.setStatus(0,0,0,0);
                             }
-                        } else {
-                            qcPanel.setStatus(0,0,0,0);
                         }
                     }
                 } catch (java.io.IOException e) {
