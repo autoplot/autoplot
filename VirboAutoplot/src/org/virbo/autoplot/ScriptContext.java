@@ -744,9 +744,16 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * Export the data into a format implied by the filename extension.  
+     * See the export data dialog for additional parameters available for formatting.
+     *
+     * For example:
+     * <p><blockquote><pre>
+     * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
+     * formatDataSet( ds, 'vap+dat:file:/home/jbf/temp/foo.dat?tformat=minutes&format=6.2f')
+     * </pre></blockquote></p>
      * 
      * @param ds
-     * @param file
+     * @param file local file name that is the target
      * @throws java.lang.Exception
      */
     public static void formatDataSet(QDataSet ds, String file) throws Exception {
