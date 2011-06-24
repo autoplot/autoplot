@@ -125,7 +125,7 @@ class Das2ServerDataSource extends AbstractDataSource {
         
         params2.put("dataset", URLEncoder.encode(dataset) );
         if ( dsParams.length()>0 ) {
-            params2.put("params", URLEncoder.encode(dsParams.replaceAll("\\+", " " )) );
+            params2.put("params", URLEncoder.encode(dsParams) );
         }
         URL url2 = new URL("" + this.resourceURI + "?" + URISplit.formatParams(params2));
 
