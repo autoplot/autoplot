@@ -4,6 +4,8 @@
  */
 package org.virbo.autoplot;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.dataset.DataSet;
 import org.das2.dataset.TableDataSet;
 import org.das2.dataset.VectorDataSet;
@@ -43,7 +45,6 @@ import org.virbo.autoplot.dom.DataSourceFilter;
 import org.virbo.autoplot.scriptconsole.ExitExceptionHandler;
 import org.virbo.dataset.ArrayDataSet;
 import org.das2.dataset.DataSetAdapter;
-import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.QDataSet;
@@ -51,6 +52,9 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.qstream.SimpleStreamFormatter;
+import org.virbo.qstream.StreamException;
+import org.virbo.qstream.StreamTool;
 
 /**
  *
@@ -116,8 +120,8 @@ public class ScriptContext extends PyJavaInstance {
      * set the size of the canvas.  This is only used when the GUI is not used, and in
      * headless mode, otherwise the GUI controls the size of the canvas.
      * 
-     * @param width
-     * @param height
+     * @param width the width of the canvas
+     * @param height the height of the canvas
      */
     public static void setCanvasSize(int width, int height) throws InterruptedException {
         maybeInitModel();
@@ -132,6 +136,7 @@ public class ScriptContext extends PyJavaInstance {
      * and writeToPng and writeToSvg can be used in headless mode.
      * @param surl
      * @throws java.lang.InterruptedException
+     * @Deprecated use plot instead;
      */
     public static void setDataSourceURL(String surl) throws InterruptedException {
         model.setDataSourceURL(surl);
@@ -140,7 +145,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * bring up the autoplot with the specified URL.
-     * @param surl
+     * @param surl a URI or vap file
      * @throws java.lang.InterruptedException
      */
     public static void plot(String surl) throws InterruptedException {
@@ -161,8 +166,8 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * plot one URI against another.  No synchronization is done, so beware.
      * Introduced for testing non-time axis TSBs.
-     * @param surl1 the independent dataset (generally used for X)
-     * @param surl2 the dependent dataset (generally used for Y, but can be rank 2).
+     * @param surl1 the independent variable dataset (generally used for X)
+     * @param surl2 the dependent variable dataset (generally used for Y, but can be rank 2).
      * @throws java.lang.InterruptedException
      */
     public static void plot(String surl1, String surl2) throws InterruptedException {
@@ -183,7 +188,7 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * bring up the autoplot with the specified URL.
      * @param chNum the data source number to reset the URI.
-     * @param surl
+     * @param surl a URI to use
      * @throws java.lang.InterruptedException
      */
     public static void plot(int chNum, String surl) throws InterruptedException {
@@ -195,7 +200,8 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * bring up the autoplot with the specified URL.
      * @param chNum the data source number to reset the URI.
-     * @param surl
+     * @param label for the plot.
+     * @param surl a URI to use
      * @throws java.lang.InterruptedException
      */
     public static void plot(int chNum, String label, String surl) throws InterruptedException {
@@ -206,7 +212,7 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the first dataSource node.
-     * @param ds
+     * @param ds QDataSet to plot
      * @throws java.lang.InterruptedException
      */
     public static void plot(QDataSet ds) throws InterruptedException {
@@ -215,7 +221,8 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the first dataSource node.
-     * @param ds
+     * @param x QDataSet for the independent parameter
+     * @param y QDataSet for the dependent parameter
      * @throws java.lang.InterruptedException
      */
     public static void plot( QDataSet x, QDataSet y ) throws InterruptedException {
@@ -224,7 +231,9 @@ public class ScriptContext extends PyJavaInstance {
     
     /**
      * plot the dataset in the first dataSource node.
-     * @param ds
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
+     * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      * @throws java.lang.InterruptedException
      */
     public static void plot( QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
@@ -233,7 +242,8 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified dataSource node.
-     * @param ds
+     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param ds dataset to plot.
      * @throws java.lang.InterruptedException
      */
     public static void plot( int chNum, QDataSet ds) throws InterruptedException {
@@ -242,7 +252,9 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified  dataSource node.
-     * @param ds
+     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
      * @throws java.lang.InterruptedException
      */
     public static void plot( int chNum, QDataSet x, QDataSet y ) throws InterruptedException {
@@ -251,15 +263,21 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * plot the dataset in the specified  dataSource node.
-     * @param ds
+     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
+     * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
      * @throws java.lang.InterruptedException
      */
     public static void plot( int chNum, QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
         plot( chNum, (String)null, x, y, z );
     }
+
     /**
-     * plot the dataset in the chNum dataSource node.
-     * @param ds
+     * bring up the autoplot with the dataset
+     * @param chNum the data source number to reset the URI.
+     * @param label for the plot.
+     * @param ds the dataset to use.
      * @throws java.lang.InterruptedException
      */
     public static void plot( int chNum, String label, QDataSet ds) throws InterruptedException {
@@ -268,6 +286,13 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
     }
 
+    /**
+     * plot the dataset in the specified  dataSource node.
+     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
+     * @throws java.lang.InterruptedException
+     */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y ) throws InterruptedException {
         maybeInitModel();
         ArrayDataSet yds= ArrayDataSet.copy(y);
@@ -276,6 +301,15 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
     }
 
+    /**
+     * plot the dataset in the specified  dataSource node.
+     * @chNum the plot to use.  Plots and plot elements are added as necessary to plot the data.
+     * @param label the label for the dependent parameter
+     * @param x QDataSet for the independent parameter for the X values
+     * @param y QDataSet for the independent parameter for the Y values
+     * @param z Rank 1 or Rank 2 QDataSet for the dependent parameter
+     * @throws java.lang.InterruptedException
+     */
     public static void plot( int chNum, String label, QDataSet x, QDataSet y, QDataSet z ) throws InterruptedException {
         maybeInitModel();
         if ( z.rank()==1 ) {
@@ -293,86 +327,11 @@ public class ScriptContext extends PyJavaInstance {
     }
 
 
-//    /**
-//     * plot the dataset in the first dataSource node.
-//     * @param ds
-//     * @throws java.lang.InterruptedException
-//     */
-//    public static void plot(double[] ds) throws InterruptedException {
-//        plot( 0, (String)null, DDataSet.wrap(ds) );
-//    }
-//
-//    /**
-//     * plot the dataset in the first dataSource node.
-//     * @param ds
-//     * @throws java.lang.InterruptedException
-//     */
-//    public static void plot( double[] x, double[] y ) throws InterruptedException {
-//        plot( 0, (String)null, DDataSet.wrap(x), DDataSet.wrap(y) );
-//    }
-//
-//    /**
-//     * plot the dataset in the first dataSource node.
-//     * @param ds
-//     * @throws java.lang.InterruptedException
-//     */
-//    public static void plot( double[] x, double[] y, double[] z ) throws InterruptedException {
-//        plot( 0, (String)null, DDataSet.wrap(x), DDataSet.wrap(y), DDataSet.wrap(z) );
-//    }
-//
-//    /**
-//     * plot the dataset in the specified dataSource node.
-//     * @param ds
-//     * @throws java.lang.InterruptedException
-//     */
-//    public static void plot( int chNum, double[] ds) throws InterruptedException {
-//        plot( chNum, (String)null, DDataSet.wrap(ds) );
-//    }
-//
-//    /**
-//     * plot the dataset in the specified  dataSource node.
-//     * @param ds
-//     * @throws java.lang.InterruptedException
-//     */
-//    public static void plot( int chNum, double[] x, double[] y ) throws InterruptedException {
-//        plot( chNum, (String)null, x, y );
-//    }
-//
-//    /**
-//     * plot the dataset in the specified  dataSource node.
-//     * @param ds
-//     * @throws java.lang.InterruptedException
-//     */
-//    public static void plot( int chNum, double[] x, double[] y, double[] z ) throws InterruptedException {
-//        plot( chNum, (String)null, x, y, z );
-//    }
-//    /**
-//     * plot the dataset in the chNum dataSource node.
-//     * @param ds
-//     * @throws java.lang.InterruptedException
-//     */
-//    public static void plot( int chNum, String label, double[] ds) throws InterruptedException {
-//        maybeInitModel();
-//        model.setDataSet( chNum, label, DDataSet.wrap(ds) );
-//        model.waitUntilIdle(false);
-//    }
-//
-//    public static void plot( int chNum, String label, double[] x, double[] y ) throws InterruptedException {
-//        maybeInitModel();
-//        DDataSet yds= DDataSet.copy(DDataSet.wrap(y));
-//        if ( x!=null ) yds.putProperty( QDataSet.DEPEND_0, DDataSet.wrap(x) );
-//        model.setDataSet( chNum, label, yds);
-//        model.waitUntilIdle(false);
-//    }
-//
-//    public static void plot( int chNum, String label, double[] x, double[] y, double[] z ) throws InterruptedException {
-//        maybeInitModel();
-//        DDataSet yds= DDataSet.wrap(y);
-//        yds.putProperty( QDataSet.DEPEND_0, DDataSet.wrap(x) );
-//        yds.putProperty( QDataSet.PLANE_0, DDataSet.wrap(z) );
-//        model.setDataSet(chNum, label, yds);
-//        model.waitUntilIdle(false);
-//    }
+    /**
+     * commented codes removed that would plot(double[],double[])...  These
+     * were commented out for a while, because there are better ways to do this
+     * better.
+     */
 
     /**
      * set the autoplot status bar string.  Use the prefixes "busy:", "warning:"
@@ -384,9 +343,10 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * add a tab to the running application
-     * @param label
-     * @param c
+     * add a tab to the running application.  A new tab will be added with the
+     * label.
+     * @param label the label for the component.
+     * @param c the component to add.
      */
     public static void addTab( String label, JComponent c  ) {
         maybeInitView();
@@ -403,20 +363,21 @@ public class ScriptContext extends PyJavaInstance {
     
     /**
      * Set the style used to render the data using a string identifier:
-     *   spectrogram, series, scatter, histogram, fill_to_zero
+     *   spectrogram, series, scatter, histogram, fill_to_zero, digital
      * @param name string name of the plot style.
      */
     public static void setRenderStyle( String name ) {
         dom.getController().getPlotElement().setRenderType( RenderType.valueOf(name) );
     }
+
     /**
      * write out the current canvas to a png file.
      * TODO: bug 3113441: this has issues with the size.  It's coded to get the size from
      *  the DOM, but if it is fitted and has a container it must get size from
-     *  the container.  User writeToPng( filename, width, height ) instead for now.
+     *  the container.  Use writeToPng( filename, width, height ) instead for now.
      *  See writeToPdf(String filename), which appears to have a fix for this that
      *  would affect how this is resolved.
-     * @param filename
+     * @param filename The name of a local file
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
@@ -432,23 +393,36 @@ public class ScriptContext extends PyJavaInstance {
         setStatus("wrote to "+filename);
     }
 
+    /**
+     * write out the current canvas to a png file.
+     * TODO: bug 3113441: this has issues with the size.  It's coded to get the size from
+     *  the DOM, but if it is fitted and has a container it must get size from
+     *  the container.  User writeToPng( filename, width, height ) instead for now.
+     *  See writeToPdf(String filename), which appears to have a fix for this that
+     *  would affect how this is resolved.
+     * @param filename The name of a local file
+     * @param width the width in pixels of the png
+     * @param height the height in pixels of the png
+     * @throws java.lang.InterruptedException
+     * @throws java.io.IOException
+     */
     public static void writeToPng( String filename, int width, int height ) throws InterruptedException, IOException {
         if ( !( filename.endsWith(".png") || filename.endsWith(".PNG") ) ) {
             filename= filename + ".png";
         }
         
-        final FileOutputStream out = new FileOutputStream(filename);
+        final FileOutputStream out1 = new FileOutputStream(filename);
 
         Image image = model.canvas.getImage( width, height );
 
         DasPNGEncoder encoder = new DasPNGEncoder();
         encoder.addText(DasPNGConstants.KEYWORD_CREATION_TIME, new Date().toString());
         try {
-            encoder.write((BufferedImage) image, out);
+            encoder.write((BufferedImage) image, out1);
         } catch (IOException ioe) {
         } finally {
             try {
-                out.close();
+                out1.close();
             } catch (IOException ioe) {
                 throw new RuntimeException(ioe);
             }
@@ -460,7 +434,7 @@ public class ScriptContext extends PyJavaInstance {
      * a breakpoint at the out.write statement, and then call peekAt from
      * the script.
      *
-     * @param o
+     * @param o any object we want to look at.
      * @throws java.io.IOException
      */
     public static void peekAt(Object o) throws IOException {
@@ -471,7 +445,7 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * write out the current canvas to stdout.  This is introduced to support servers.
      * TODO: this has issues with the size.  See writeToPng(filename).
-     * @param OutputStream out 
+     * @param OutputStream out
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
@@ -495,7 +469,7 @@ public class ScriptContext extends PyJavaInstance {
      * write out the current canvas to a pdf file.
      * TODO: this has issues with the size.  See writeToPng(filename).  It looks
      *   like this might be handled here
-     * @param filename
+     * @param filename the local file to write the file.
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
@@ -514,10 +488,11 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * write out the current canvas to a pdf file.
+     * write out the current canvas to a pdf to the output stream.  This is to
+     * support servers.
      * TODO: this has issues with the size.  See writeToPng(filename).  It looks
      *   like this might be handled here
-     * @param filename
+     * @param out the OutputStream
      * @throws java.lang.InterruptedException
      * @throws java.io.IOException
      */
@@ -533,8 +508,8 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * creates an image from the provided DOM.  This blocks until the image is
-     * ready.
+     * creates a BufferedImage from the provided DOM.  This blocks until the
+     * image is ready.
      * TODO: this has issues with the size.  See writeToPng(filename).  It looks
      *   like this might be handled here
      * @param applicationIn
@@ -555,8 +530,15 @@ public class ScriptContext extends PyJavaInstance {
 
     /**
      * return an array of URLs that match the spec for the time range provided.
-     * 
-     * @param surl an autoplot url with an aggregation specifier.
+     * For example,
+     * <p><blockquote><pre>
+     *  uri= 'http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/$Y/po_h0_hyd_$Y$m$d_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX'
+     *  xx= getTimeRangesFor( uri, '2000-jan', '$Y-$d-$m' )
+     *  for x in xx:
+     *    print x
+     * </pre></blockquote><p>
+     *
+     * @param surl an Autoplot uri with an aggregation specifier.
      * @param timeRange a string that is parsed to a time range, such as "2001"
      * @param format format for the result, such as "%Y-%m-%d"
      * @return a list of URLs without the aggregation specifier.
@@ -582,8 +564,8 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * Given a spec to format timeranges and a range to contain each timerange,
      * produce a list of all timeranges covering the range formatted with the
-     * spec.  For example ( "%Y%m%d", "Jun 2009" ) would result in
-     * 20090601, 20090602, ..., 20090630.
+     * spec.  For example, <code>generateTimeRanges( "%Y-%m-%d", "Jun 2009" )</code> would result in
+     * 2009-06-01, 2009-06-02, ..., 2009-06-30.
      * @param spec such as "%Y-%m".  Note specs like "%Y%m" will not be parsable.
      * @param srange range limiting the list, such as "2009"
      * @return a string array of formatted time ranges, such as [ "2009-01", "2009-02", ..., "2009-12" ]
@@ -626,6 +608,8 @@ public class ScriptContext extends PyJavaInstance {
     /**
      * returns the internal application model (the object that does all the 
      * business).  This provides access to the internal model for power users.
+     * Note the applicationModel provides limited access, and the DOM now
+     * provides full access to the application.
      * @return ApplicationModel object
      */
     public static ApplicationModel getApplicationModel() {
@@ -666,13 +650,43 @@ public class ScriptContext extends PyJavaInstance {
     }
 
 
+
+    /**
+     * serializes the dataset to a QStream, a self-documenting, streaming format
+     * useful for moving datasets.
+     *
+     * <p><blockquote><pre>
+     * ds= getDataSet('http://autoplot.org/data/somedata.cdf?BGSEc')
+     * from java.lang import System
+     * dumpToQStream( ds, System.out, True )
+     * </pre></blockquote></p>
+     *
+     * @param ds The dataset to stream.  Note all schemes should be streamable, but
+     *   some bugs exist that may prevent this.
+     * @param output stream, such as "System.out"
+     * @param ascii use ascii transfer types, otherwise binary are used.
+     */
+    public static void dumpToQStream( QDataSet ds, OutputStream out, boolean ascii ) throws IOException {
+        try {
+            SimpleStreamFormatter f= new SimpleStreamFormatter();
+            f.format( ds, out, ascii );
+        } catch (StreamException ex) {
+            Logger.getLogger(ScriptContext.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+
     /**
      * serializes the dataset to a das2stream, a well-documented, open, streaming
-     * data format. (that's a joke.)  
+     * data format. (that's a joke.)  Das2Streams are the legacy stream format used
+     * by the Plasma Wave Groups's server, and can serialize a limited set of
+     * QDataSets.  QStreams were introduced to allow streaming of any QDataSet, see
+     * dumpToQStream.
      * Currently, to keep the channel open, the stream is created in a buffer and 
-     * then the buffer is sent.  TODO: write a stream-producing code that doesn't
-     * close the output stream.
+     * then the buffer is sent.
+     * TODO: write a stream-producing code that doesn't close the output stream.  (TODO: does it still do this?)
      * @param ds
+     * @param ascii use ascii transfer types, otherwise binary are used.
      */
     public static void dumpToDas2Stream(QDataSet ds, boolean ascii) {
         try {
@@ -704,6 +718,8 @@ public class ScriptContext extends PyJavaInstance {
      * then the buffer is sent.  TODO: write a stream-producing code that doesn't
      * close the output stream.
      * @param ds
+     * @param file the file target for the stream.
+     * @param ascii use ascii transfer types.
      */
     public static void dumpToDas2Stream(QDataSet ds, String file, boolean ascii) throws IOException {
         if (file.startsWith("file:/")) {
@@ -760,7 +776,7 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
-     * save the current state as a vap file
+     * save the current state as a .vap file
      * @param filename
      */
     public static void save( String filename ) throws IOException {
@@ -799,7 +815,7 @@ public class ScriptContext extends PyJavaInstance {
 
 
     /**
-     * load the vap file.  This is implemented by calling plot on the URI.
+     * load the .vap file.  This is implemented by calling plot on the URI.
      * @param filename
      * @throws java.io.IOException
      */
