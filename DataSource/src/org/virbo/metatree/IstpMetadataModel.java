@@ -201,7 +201,7 @@ public class IstpMetadataModel extends MetadataModel {
                     && units==Units.milliseconds ) {
                 double validMax= ((Number)ovalidMax).doubleValue();
                 double validMin= ((Number)ovalidMin).doubleValue();
-                isMillis= validMin<validMax && validMax < 1e12 ; // java cdf would get zeros for these  rbsp-b_HFR-waveform_emfisis-L1_20110405154808_v1.1.1.cdf?HFRsamples
+                isMillis= validMin<validMax && validMin < 1e8 && validMax < 1e12 ; // java cdf would get zeros for these  rbsp-b_HFR-waveform_emfisis-L1_20110405154808_v1.1.1.cdf?HFRsamples
             }
 
             boolean isEpoch = ( units == Units.milliseconds && !isMillis ) || "Epoch".equals(attrs.get(QDataSet.NAME)) || "Epoch".equalsIgnoreCase(DataSourceUtil.unquote((String) attrs.get("LABLAXIS")));
