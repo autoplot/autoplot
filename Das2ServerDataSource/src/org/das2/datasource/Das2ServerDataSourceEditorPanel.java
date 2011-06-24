@@ -493,7 +493,11 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         StringBuffer paramsStr= new StringBuffer();
         for ( Entry<String,String> e: params.entrySet() ) {
-            paramsStr.append(e.getKey()+"="+e.getValue()+"\n");
+            if ( e.getKey().startsWith("arg_") ) {
+                paramsStr.append(e.getValue()+"\n");
+            } else {
+                paramsStr.append(e.getKey()+"="+e.getValue()+"\n");
+            }
         }
         ReaderParamsTextArea.setText(paramsStr.toString());
 
@@ -569,12 +573,14 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         LinkedHashMap<String,String> map= new LinkedHashMap();
         String readerParams= ReaderParamsTextArea.getText();
         String[] ss= readerParams.split("\n");
+        int iargc=0;
         for ( int i=0; i<ss.length; i++ ) {
             String s= ss[i].trim();
             if ( s.length()==0 ) continue;
             String[] ss2= s.split("=",-2);
             if ( ss2.length==1 ) {
-                map.put( ss2[0],"" );
+                map.put( "arg_"+iargc,ss2[0] );
+                iargc++;
             } else {
                 map.put( ss2[0], ss2[1] );
             }
