@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Day of Year labels now available in Options->Rendering Options. A new plot needs to be created before the preference is visible. 
+        <p><small>The address bar has a new hook for launching scripts, to make it easier to communicate with collegues and students. 
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -25,6 +25,14 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 
         <ul>
             <li>Minor bugfixes from production version</li>
+            <li>Bugfixes in Das2ServerDataSource when positional parameters are used</li>
+            <li>bugfixes to improve feedback for misformatted QStreams (Chris)</li>
+            <li>bugfixes for completion on pngwalk: and script:</li>
+            <li>Allow for pngwalk:file:///home/jbf/fun/camE/2011/06/23/10$(M;Y=2011;m=06;d=23;H=10)$S.jpg, check for ";Y=" as well as "$Y"</li>
+            <li>bugfixes in AsciiTableDataSourceFormat dialog.  Keep track of the arguments in preferences.</li>
+        </ul>
+        <p>Less Recent Bugfixes:</p>
+        <ul>
             <li>CDAWeb 27 sources use alternate FSMs.</li>
             <li>.ZIP supported as well as .zip</li>
             <li>TimeSeriesBrowse when there is not a timeaxis, now works with vap+internal:data_1,data_2.</li>
@@ -33,14 +41,22 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>Improve support for URIs like "vap+internal:data_0" so two plots can use the same data source</li>
             <li>Frame labels (e.g. "X Axis [?]") link over to help</li>
             <li>Yellow flashes to show selection is disabled when there is just one plot</li>
+        </ul>
         <p>Features:</p>
         <ul>
-            <li>day-of-year labels, and nearest neighbor binning option.  
-            <li>50 is new limit of stack of line plots in ascii parsing.
-            <li>timerange controller more accessible on GUI (Options->Address Bar->Time Range Selector)
+            <li>Add hook to launch scripts like "script:http://autoplot.org/script/ReplaceFile.jy"</li>
+            <li>"script:" and "pngwalk:" uris are put into the history.</li>
+            <li>jython scripting gets dumpToQStream to replace dumpToDas2Stream.</li>
+            <li>improve formatting in tree view of dataset to support enumerated data and formatted data, using getStringValue.</li>
+        </ul>
+        <p>Less Recent Features:</p>
+        <ul>
+            <li>day-of-year labels, and nearest neighbor binning option.  </li>
+            <li>50 is new limit of stack of line plots in ascii parsing. </li>
+            <li>timerange controller more accessible on GUI (Options->Address Bar->Time Range Selector) </li>
             <li>Add |smooth(int) to operations</li>
             <li>Frame labels (e.g. "X Axis") link over to help</li>
-            <li>First coding of events bar support.  See https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/VirboAutoplot/src/scripts/demoEventsBar.jy</li>
+            <li>First coding of events bar support.  See <a href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/VirboAutoplot/src/scripts/demoEventsBar.jy">scripts/demoEventsBar.jy</a></li>
             <li>"Edit" action in history</li>
             <li>Copy/Paste on address bar, font size control</li>
             <li>Rich Ascii supported in Ascii GUI editor.</li>
