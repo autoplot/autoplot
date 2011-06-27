@@ -176,6 +176,8 @@ public class AutoplotUI extends javax.swing.JFrame {
     /** Creates new form AutoPlotMatisse */
     public AutoplotUI(ApplicationModel model) {
 
+        APSplash.checkTime("init");
+
         // Initialize help system now so it's ready for components to register IDs with
         AutoplotHelpSystem.initialize(getRootPane());
         helpSystem = AutoplotHelpSystem.getHelpSystem();
@@ -192,6 +194,8 @@ public class AutoplotUI extends javax.swing.JFrame {
             ScriptContext.setApplicationModel(model);
             ScriptContext.setView(this);
         }
+
+        APSplash.checkTime("init 10");
 
         this.dom= model.getDocumentModel();
         
@@ -218,6 +222,8 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         } );
 
+        APSplash.checkTime("init 20");
+
         FileSystem.settings().addPropertyChangeListener( FileSystemSettings.PROP_OFFLINE, new PropertyChangeListener() {
             public void propertyChange(PropertyChangeEvent evt) {
                 updateFrameTitle();
@@ -235,6 +241,8 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         statusLabel.setIcon(IDLE_ICON);
         support.addKeyBindings((JPanel) getContentPane());
+
+        APSplash.checkTime("init 30");
 
         dataSetSelector.setMonitorFactory( dom.getController().getMonitorFactory() );
         dataSetSelector.registerBrowseTrigger( "vap\\+internal:(.*)", new AbstractAction("internal") {
@@ -327,6 +335,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
         URISplit.setOtherSchemes( Arrays.asList( "script", "pngwalk", "bookmarks" ) );
 
+        APSplash.checkTime("init 40");
+
         final ApplicationController appController= applicationModel.getDocumentModel().getController();
 
         appController.addDas2PeerChangeListener( new PropertyChangeListener() {
@@ -365,11 +375,14 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
 
+        APSplash.checkTime("init 50");
+
         setIconImage( AutoplotUtil.getAutoplotIcon() );
 
         stateSupport = getPersistentStateSupport(this, applicationModel);
 
         fillFileMenu();
+        APSplash.checkTime("init 53");
 
         AppManager.getInstance().addApplication(this);
         this.addWindowListener( AppManager.getInstance().getWindowListener(this,new AbstractAction("close") {
@@ -401,8 +414,10 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
 
         autoLayout = new LayoutListener(model);
+        APSplash.checkTime("init 55");
 
         addBindings();
+        APSplash.checkTime("init 60");
 
         dataSetSelector.addPropertyChangeListener(DataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
 
@@ -431,6 +446,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         //dataSetSelector.doShowMessage();
         tabs.requestFocus();
+        APSplash.checkTime("init 70");
         
         final ApplicationModel fmodel= model;
 
@@ -449,6 +465,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         List<String> urls = new ArrayList<String>();
         List<Bookmark> recent = applicationModel.getRecent();
+        APSplash.checkTime("init 80");
 
         for (Bookmark b : recent) {
             urls.add(((Bookmark.Item) b).getUrl());
@@ -467,16 +484,21 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         };
         RequestProcessor.invokeLater(run);
+        APSplash.checkTime("init 90");
 
         addTools();
 
         pack();
 
         dom.getOptions().addPropertyChangeListener(optionsListener);
+
+        APSplash.checkTime("init 100");
         
         applicationModel.getCanvas().resizeAllComponents();
         applicationModel.getCanvas().repaint();
         applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
+
+        APSplash.checkTime("init 110");
 
     }
 
@@ -712,32 +734,51 @@ public class AutoplotUI extends javax.swing.JFrame {
         };
     }
 
-    private JMenu getAddDataFromMenu( ) {
+    JMenu addDataFromMenu= null;
+
+    private synchronized JMenu getAddDataFromMenu( ) {
         JMenu result= new JMenu( "Add Plot From" );
-        List<String> exts= DataSourceEditorPanelUtil.getDiscoverableExtensions();
-        for ( String ext: exts ) {
-            if ( ext.startsWith(".") ) ext= ext.substring(1);
-            final String fext= ext;
-            Action a= new AbstractAction( ext ) {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        String uri = "vap+" + fext + ":";
-                        String refuri= dataSetSelector.getValue();
-                        if ( refuri.startsWith(uri) ) {
-                            dataSetSelector.browseSourceType();
-                        } else {
-                            dataSetSelector.setValue(uri);
-                            dataSetSelector.maybePlot( true );
-                        }
-                    } catch (Exception ex) {
-                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            };
-            JMenuItem item= new JMenuItem( a );
-            result.add(item);
-        }
+        result.add( new JMenuItem("looking up discoverable sources...") );
+        addDataFromMenu= result;
+        RequestProcessor.invokeLater( new Runnable() {
+            public void run() {
+                fillAddDataFromMenu();
+            }
+        });
         return result;
+    }
+
+    private void fillAddDataFromMenu() {
+        final List<String> exts= DataSourceEditorPanelUtil.getDiscoverableExtensions();
+        Runnable run= new Runnable() {
+            public void run() {
+                addDataFromMenu.removeAll();
+                for ( String ext: exts ) {
+                    if ( ext.startsWith(".") ) ext= ext.substring(1);
+                    final String fext= ext;
+                    Action a= new AbstractAction( ext ) {
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                String uri = "vap+" + fext + ":";
+                                String refuri= dataSetSelector.getValue();
+                                if ( refuri.startsWith(uri) ) {
+                                    dataSetSelector.browseSourceType();
+                                } else {
+                                    dataSetSelector.setValue(uri);
+                                    dataSetSelector.maybePlot( true );
+                                }
+                            } catch (Exception ex) {
+                                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    };
+                    JMenuItem item= new JMenuItem( a );
+                    addDataFromMenu.add(item);
+                }
+
+            }
+        };
+        SwingUtilities.invokeLater(run);
     }
 
     private void fillFileMenu() {
@@ -750,9 +791,9 @@ public class AutoplotUI extends javax.swing.JFrame {
         fileMenu.add(mi);
 
         fileMenu.add( new JSeparator() );
-
+APSplash.checkTime("init 51");
         fileMenu.add( getAddDataFromMenu() );
-
+APSplash.checkTime("init 52");
         mi= new JMenuItem(getAddPanelAction() );
         mi.setToolTipText("Add a new plot or overplot to the application");
         fileMenu.add(mi);
@@ -2319,7 +2360,8 @@ private void updateFrameTitle() {
                     logger.fine("UI.setVisible(true)");
                     app.setVisible(true);
                     logger.fine("UI is visible");
-                    APSplash.getInstance().setVisible(false);
+                    //APSplash.getInstance().setVisible(false);
+                    APSplash.hideSplash();
                 }
                 
                 if ( !headless && initialURL != null) {
