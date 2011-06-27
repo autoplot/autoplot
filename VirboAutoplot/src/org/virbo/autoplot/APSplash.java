@@ -48,6 +48,7 @@ public class APSplash extends JFrame {
 
     private Handler handler;
     private JLabel messageLabel;
+    private long t0; // time of application start
 
     public static String getVersion() {
         try {
@@ -87,6 +88,7 @@ public class APSplash extends JFrame {
     public synchronized static APSplash getInstance() {
         if ( instance==null ) {
             instance= new APSplash();
+            instance.t0= System.currentTimeMillis();
         }
         return instance;
     }
@@ -95,11 +97,17 @@ public class APSplash extends JFrame {
         getInstance();
         instance.setVisible(true);
         instance.paint( instance.getGraphics() );
+        instance.checkTime("showSplash");
+    }
+
+    public static void checkTime( String msg ) {
+        System.err.println( "checkTime " + msg.replaceAll(" ","_").replaceFirst("_", " ")+ " @ "+(System.currentTimeMillis()-instance.t0) +" ms ");
     }
 
     public static void hideSplash() {
         getInstance();
         instance.setVisible(false);
+        checkTime("hideSplash");
     }
 
     /** Creates a new instance of Splash */
