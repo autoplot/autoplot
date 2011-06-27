@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.GraphUtil;
+import org.das2.system.RequestProcessor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -97,8 +98,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 foreBackColorsList.setSelectedIndex(index);
             }
         };
-        run.run();
-        //RequestProcessor.invokeLater(run);
+        RequestProcessor.invokeLater(run);
         AutoplotHelpSystem.getHelpSystem().registerHelpID( plotPanel, "stylePanel");
 
     }
