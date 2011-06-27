@@ -176,7 +176,7 @@ public class AutoplotUI extends javax.swing.JFrame {
     /** Creates new form AutoPlotMatisse */
     public AutoplotUI(ApplicationModel model) {
 
-        APSplash.checkTime("init");
+        APSplash.checkTime("init 0");
 
         // Initialize help system now so it's ready for components to register IDs with
         AutoplotHelpSystem.initialize(getRootPane());
@@ -231,6 +231,9 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
         
         initComponents();
+
+        APSplash.checkTime("init 25");
+
         timeRangeEditor = new TimeRangeEditor();
         timeRangePanel.add( timeRangeEditor, "card1" );
         timeRangeEditor.setDataSetSelectorPeer(dataSetSelector);
@@ -415,8 +418,6 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         autoLayout = new LayoutListener(model);
         APSplash.checkTime("init 55");
-
-        addBindings();
         APSplash.checkTime("init 60");
 
         dataSetSelector.addPropertyChangeListener(DataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
@@ -505,11 +506,31 @@ public class AutoplotUI extends javax.swing.JFrame {
     private Runnable addAxes() {
         return new Runnable() {
             public void run() {
-                JComponent c= new AxisPanel(applicationModel);
-                JScrollPane sp= new JScrollPane();
-                sp.setViewportView(c);
+                final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
+                SwingUtilities.invokeLater( new Runnable() { 
+                    public void run() {
+                        JComponent c= new AxisPanel(applicationModel);
+                        sp.setViewportView(c);        
+                    }
+                });
+            }
+        };
+    }
+
+    private Runnable addStyle() {
+        return new Runnable() {
+            public void run() {
+                final JScrollPane sp= new JScrollPane();
+                tabs.insertTab("style", null, sp,
+                        String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
+                SwingUtilities.invokeLater( new Runnable() {
+                    public void run() {
+                        JComponent c= new PlotStylePanel(applicationModel);
+                        sp.setViewportView(c);
+                    }
+                } );
             }
         };
     }
@@ -534,14 +555,6 @@ public class AutoplotUI extends javax.swing.JFrame {
         }
     }
 
-    private Runnable addStyle() {
-        return new Runnable() {
-            public void run() {
-                tabs.insertTab("style", null, new PlotStylePanel(applicationModel),
-                        String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
-            }
-        };
-    }
 
     private void addFeatures( ApplicationModel model ) {
         if (model.getDocumentModel().getOptions().isLayoutVisible() ) {
@@ -2321,12 +2334,14 @@ private void updateFrameTitle() {
                 } else {
                     System.err.println("this is autoplot "+APSplash.getVersion());
                 }
-
+APSplash.checkTime("init -100");
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferences();
-                
-                model.addDasPeersToApp();
+APSplash.checkTime("init -90");
+                APSplash.showSplash();
 
+                model.addDasPeersToApp();
+APSplash.checkTime("init -80");
                 // display the splash again, in case it didn't paint the first time
                 if ( !headless ) {
                     APSplash.showSplash();
@@ -2538,9 +2553,16 @@ private void updateFrameTitle() {
     // End of variables declaration//GEN-END:variables
 
     private void addTools() {
-        reloadTools();
+        RequestProcessor.invokeLater( new Runnable() {
+            public void run() {
+                reloadTools();
+            }
+        });
     }
 
+    /**
+     * looks for and adds tools on a new thread.
+     */
     public void reloadTools() {
 
         int isep=-1;
@@ -2559,7 +2581,7 @@ private void updateFrameTitle() {
             }
         }
 
-        List<Bookmark> tools= loadTools();
+        final List<Bookmark> tools= loadTools();
         if ( tools.size()>0 && isep==-1 ) {
             JSeparator userSep= new JSeparator();
             userSep.setName("userSep"); // so we can find it later
@@ -2567,26 +2589,30 @@ private void updateFrameTitle() {
             isep= toolsMenu.getMenuComponentCount();
         }
 
-        for ( Bookmark t: tools ) {
-            final Bookmark tt= t;
-            final String surl = ((Bookmark.Item) tt).getUrl();
-            Action a= new AbstractAction(t.getTitle()) {
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        if ( e.getModifiers()==0 ) {
-                            JythonUtil.invokeScriptSoon(DataSetURI.getURL(surl),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
-                        } else {
-                            plotUri("script:"+ ((Bookmark.Item) tt).getUrl() );
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                for ( Bookmark t: tools ) {
+                    final Bookmark tt= t;
+                    final String surl = ((Bookmark.Item) tt).getUrl();
+                    Action a= new AbstractAction(t.getTitle()) {
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                if ( !( ( e.getModifiers() & ActionEvent.CTRL_MASK ) == ActionEvent.CTRL_MASK ) ) {
+                                    JythonUtil.invokeScriptSoon(DataSetURI.getURL(surl),applicationModel.getDocumentModel(),getStatusBarProgressMonitor("done running script") );
+                                } else {
+                                    plotUri("script:"+ ((Bookmark.Item) tt).getUrl() );
+                                }
+                            } catch (MalformedURLException ex) {
+                                Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
-                    } catch (MalformedURLException ex) {
-                        Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    };
+                    JMenuItem ji= new JMenuItem(a);
+                    ji.setToolTipText( "<html>"+ surl + "<br>press ctrl to inspect" );
+                    toolsMenu.add( ji );
                 }
-            };
-            JMenuItem ji= new JMenuItem(a);
-            ji.setToolTipText( "<html>"+ surl + "<br>press ctrl to inspect" );
-            toolsMenu.add( ji );
-        }
+            }
+        } );
     }
 
     private List<Bookmark> loadTools() {
