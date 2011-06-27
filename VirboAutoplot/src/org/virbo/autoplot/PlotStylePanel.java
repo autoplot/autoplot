@@ -98,7 +98,7 @@ public class PlotStylePanel extends javax.swing.JPanel {
                 foreBackColorsList.setSelectedIndex(index);
             }
         };
-        RequestProcessor.invokeLater(run);
+        SwingUtilities.invokeLater(run);
         AutoplotHelpSystem.getHelpSystem().registerHelpID( plotPanel, "stylePanel");
 
     }
