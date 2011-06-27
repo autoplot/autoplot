@@ -12,6 +12,7 @@ import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Logger;
+import javax.swing.SwingUtilities;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
@@ -114,7 +115,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 doApplicationBindings();
             }
         };
-        RequestProcessor.invokeLater(run);
+        SwingUtilities.invokeLater(run);
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axisPanel");
 
