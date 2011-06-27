@@ -69,9 +69,6 @@ public class DataPanel extends javax.swing.JPanel {
                 doDataSourceFilterBindings();
             }
         });
-        doElementBindings();
-        doDataSourceFilterBindings();
-        componentChanged(); // force update
         
         if ( sliceIndexListener==null ) {
             sliceIndexListener= new MouseWheelListener() {
@@ -134,6 +131,12 @@ public class DataPanel extends javax.swing.JPanel {
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
     }
 
+    public void doBindings() {
+        doElementBindings();
+        doDataSourceFilterBindings();
+        componentChanged(); // force update
+    }
+    
     private String doAdjust( String s, int cp, int add ) {
         int i0= cp;
         while ( i0>=0 && !Character.isDigit(s.charAt(i0) ) ) i0--;
