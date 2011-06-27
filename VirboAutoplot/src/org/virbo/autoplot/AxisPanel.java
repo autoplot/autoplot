@@ -17,6 +17,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
 import org.das2.graph.DasColorBar;
 import org.das2.graph.DasPlot;
+import org.das2.system.RequestProcessor;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -113,8 +114,7 @@ public class AxisPanel extends javax.swing.JPanel {
                 doApplicationBindings();
             }
         };
-        run.run();
-        //RequestProcessor.invokeLater(run);
+        RequestProcessor.invokeLater(run);
 
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this, "axisPanel");
 
