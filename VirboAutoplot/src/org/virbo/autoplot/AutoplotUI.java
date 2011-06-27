@@ -557,12 +557,17 @@ public class AutoplotUI extends javax.swing.JFrame {
 
 
     private void addFeatures( ApplicationModel model ) {
+        final LayoutPanel flui;
+        final DataPanel fdp;
+
         if (model.getDocumentModel().getOptions().isLayoutVisible() ) {
             LayoutPanel lui= new LayoutPanel();
-            lui.setApplication(dom);
             layoutPanel= lui;
             tabs.insertTab("layout",null, lui,
                     String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP), tabs.getTabCount() );
+            flui= lui;
+        } else {
+            flui= null;
         }
 
         if (model.getDocumentModel().getOptions().isDataVisible()) {
@@ -570,13 +575,29 @@ public class AutoplotUI extends javax.swing.JFrame {
             dataPanel= dp;
             tabs.insertTab("data", null, dp,
                     String.format(  TAB_TOOLTIP_DATA, TABS_TOOLTIP), tabs.getTabCount() );
+            fdp= dp;
+        } else {
+            fdp= null;
         }
 
-        final MetadataPanel mdp = new MetadataPanel(applicationModel);
-        JScrollPane sp= new JScrollPane();
-        sp.setViewportView(mdp);
+        final JScrollPane sp= new JScrollPane();
         tabs.insertTab("metadata", null, sp, 
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
+        SwingUtilities.invokeLater( 
+            new Runnable() {
+                public void run() {
+                    final MetadataPanel mdp = new MetadataPanel(applicationModel);
+                    sp.setViewportView(mdp);    
+                }
+            } 
+        );
+
+        SwingUtilities.invokeLater( new Runnable() {
+            public void run() {
+                if ( flui!=null ) flui.setApplication(dom);
+                if ( fdp!=null ) fdp.doBindings();
+            }
+        });
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
             tabs.addTab( "script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector),
