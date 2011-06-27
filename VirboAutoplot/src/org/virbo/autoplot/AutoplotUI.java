@@ -748,6 +748,11 @@ public class AutoplotUI extends javax.swing.JFrame {
         return result;
     }
 
+    /**
+     * look up the discoverable extensions--the sources that can be added with
+     * just "vap+<ext>:" because we can enter a GUI right away.  This should be
+     * called off the event thread, and will fill the addDataFromMenu.
+     */
     private void fillAddDataFromMenu() {
         final List<String> exts= DataSourceEditorPanelUtil.getDiscoverableExtensions();
         Runnable run= new Runnable() {
