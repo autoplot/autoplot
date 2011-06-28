@@ -97,7 +97,7 @@ public class APSplash extends JFrame {
         getInstance();
         instance.setVisible(true);
         instance.paint( instance.getGraphics() );
-        instance.checkTime("showSplash");
+        checkTime("showSplash");
     }
 
     public static void checkTime( String msg ) {
