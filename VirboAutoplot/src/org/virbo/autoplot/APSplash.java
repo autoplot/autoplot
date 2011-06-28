@@ -101,7 +101,7 @@ public class APSplash extends JFrame {
     }
 
     public static void checkTime( String msg ) {
-        System.err.println( "checkTime " + msg.replaceAll(" ","_").replaceFirst("_", " ")+ " @ "+(System.currentTimeMillis()-instance.t0) +" ms ");
+        //System.err.println( "checkTime " + msg.replaceAll(" ","_").replaceFirst("_", " ")+ " @ "+(System.currentTimeMillis()-instance.t0) +" ms ");
     }
 
     public static void hideSplash() {
