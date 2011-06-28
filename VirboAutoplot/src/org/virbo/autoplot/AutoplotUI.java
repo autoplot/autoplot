@@ -2571,7 +2571,7 @@ APSplash.checkTime("init -80");
             if ( SwingUtilities.isEventDispatchThread() ) {
                 throw new IllegalArgumentException("delay on event thread");
             }
-            if ( millis==-1 ) millis= 5000;
+            if ( millis==-1 ) millis= 500;
             Thread.sleep(millis);
         } catch (InterruptedException ex) {
             Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
