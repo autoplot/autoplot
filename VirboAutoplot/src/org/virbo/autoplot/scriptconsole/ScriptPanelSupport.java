@@ -301,8 +301,8 @@ public class ScriptPanelSupport {
                         try {
                             if (file != null && ( file.exists() && file.canWrite() || file.getParentFile().canWrite() ) ) {
                                 save();
+                                applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
                             }
-                            applicationController.getApplicationModel().addRecent("script:"+file.toURI().toString());
                             ProgressMonitor mon= DasProgressPanel.createComponentPanel(model.getCanvas(),"running script");
                             InteractiveInterpreter interp = null;
                             try {
