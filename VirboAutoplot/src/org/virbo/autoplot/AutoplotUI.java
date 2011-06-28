@@ -423,14 +423,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         dataSetSelector.addPropertyChangeListener(DataSetSelector.PROPERTY_MESSAGE, new PropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent e) {
-                Runnable run = new Runnable() {
-
-                    public void run() {
-                        setStatus(dataSetSelector.getMessage());
-                    }
-                };
-                //SwingUtilities.invokeLater(run);
-                run.run();
+                setStatus(dataSetSelector.getMessage());
             }
         });
 
@@ -445,7 +438,6 @@ public class AutoplotUI extends javax.swing.JFrame {
         
         tabbedPanelContainer.add(tabs, BorderLayout.CENTER);
 
-        //dataSetSelector.doShowMessage();
         tabs.requestFocus();
         APSplash.checkTime("init 70");
         
@@ -484,7 +476,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 updateBookmarks();
             }
         };
-        RequestProcessor.invokeLater(run);
+        invokeLater( -1, false, run );
         APSplash.checkTime("init 90");
 
         addTools();
@@ -510,7 +502,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("axes", null, sp,
                         String.format(  TAB_TOOLTIP_AXES, TABS_TOOLTIP), 1);
-                SwingUtilities.invokeLater( new Runnable() { 
+                invokeLater( -1, true, new Runnable() {
                     public void run() {
                         JComponent c= new AxisPanel(applicationModel);
                         sp.setViewportView(c);        
@@ -526,7 +518,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 final JScrollPane sp= new JScrollPane();
                 tabs.insertTab("style", null, sp,
                         String.format(  TAB_TOOLTIP_STYLE, TABS_TOOLTIP), 2);
-                SwingUtilities.invokeLater( new Runnable() {
+                invokeLater( -1, true, new Runnable() {
                     public void run() {
                         JComponent c= new PlotStylePanel(applicationModel);
                         sp.setViewportView(c);
@@ -581,22 +573,16 @@ public class AutoplotUI extends javax.swing.JFrame {
             fdp= null;
         }
 
-        final JScrollPane sp= new JScrollPane();
-        tabs.insertTab("metadata", null, sp, 
+        final JScrollPane metadataPane= new JScrollPane();
+        tabs.insertTab("metadata", null, metadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
-        SwingUtilities.invokeLater( 
-            new Runnable() {
-                public void run() {
-                    final MetadataPanel mdp = new MetadataPanel(applicationModel);
-                    sp.setViewportView(mdp);    
-                }
-            } 
-        );
 
-        SwingUtilities.invokeLater( new Runnable() {
+        invokeLater( -1, true, new Runnable() {
             public void run() {
                 if ( flui!=null ) flui.setApplication(dom);
                 if ( fdp!=null ) fdp.doBindings();
+                MetadataPanel mdp = new MetadataPanel(applicationModel);
+                metadataPane.setViewportView(mdp);
             }
         });
 
@@ -751,7 +737,7 @@ public class AutoplotUI extends javax.swing.JFrame {
 
             }
         };
-        SwingUtilities.invokeLater(run);
+        invokeLater(-1,true,run);
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
             public void propertyChange(PropertyChangeEvent evt) {
@@ -2579,9 +2565,44 @@ APSplash.checkTime("init -80");
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
+    private void sleep( int millis ) {
+        if ( millis==0 ) return;
+        try {
+            if ( SwingUtilities.isEventDispatchThread() ) {
+                throw new IllegalArgumentException("delay on event thread");
+            }
+            if ( millis==-1 ) millis= 5000;
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * invoke the runnable after at least delayMillis.  If evt is true, then
+     * put the runnable on the event thread after.
+     * @param delayMillis -1 for default delay, 0 for none, or the positive number of milliseconds
+     * @param evt true means run on the event thread.
+     * @param run
+     */
+    private void invokeLater( final int delayMillis, final boolean evt, final Runnable run ) {
+        Runnable sleepRun= new Runnable() {
+            public void run() {
+                sleep(delayMillis);
+                if ( evt ) {
+                    SwingUtilities.invokeLater(run);
+                } else {
+                    run.run();
+                }
+            }
+        };
+        RequestProcessor.invokeLater(sleepRun);
+    }
+
     private void addTools() {
         RequestProcessor.invokeLater( new Runnable() {
             public void run() {
+                sleep(-1);
                 reloadTools();
             }
         });
