@@ -488,6 +488,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         APSplash.checkTime("init 90");
 
         addTools();
+        addBindings();
 
         pack();
 
@@ -727,31 +728,36 @@ public class AutoplotUI extends javax.swing.JFrame {
 
     private void addBindings() {
 
-        BindingGroup bc = new BindingGroup();
-        bind( bc, dom.getOptions(), Options.PROP_DRAWANTIALIAS, drawAntiAliasMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_TEXTANTIALIAS, textAntiAlias, "selected") ;
-        bind( bc, dom.getOptions(), Options.PROP_SPECIALEFFECTS, specialEffectsMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_OVERRENDERING, overRenderingMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_DRAWGRID, drawGridCheckBox, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_AUTOLABELLING, autoLabellingCheckBoxMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_AUTOLAYOUT, autoLayoutCheckBoxMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_AUTORANGING, autoRangingCheckBoxMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_DATAVISIBLE, dataPanelCheckBoxMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_LAYOUTVISIBLE, layoutPanelCheckBoxMenuItem, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_DAYOFYEAR, doyCB, "selected" );
-        bind( bc, dom.getOptions(), Options.PROP_NEARESTNEIGHBOR, nnCb, "selected" );
-        bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
-        bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
-        bind( bc, dom.getOptions(), Options.PROP_DAYOFYEAR, timeRangeEditor, "useDoy" );
+        Runnable run= new Runnable() {
+            public void run() {
+                BindingGroup bc = new BindingGroup();
+                bind( bc, dom.getOptions(), Options.PROP_DRAWANTIALIAS, drawAntiAliasMenuItem, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_TEXTANTIALIAS, textAntiAlias, "selected") ;
+                bind( bc, dom.getOptions(), Options.PROP_SPECIALEFFECTS, specialEffectsMenuItem, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_OVERRENDERING, overRenderingMenuItem, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_DRAWGRID, drawGridCheckBox, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_AUTOLABELLING, autoLabellingCheckBoxMenuItem, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_AUTOLAYOUT, autoLayoutCheckBoxMenuItem, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_AUTORANGING, autoRangingCheckBoxMenuItem, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_DATAVISIBLE, dataPanelCheckBoxMenuItem, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_LAYOUTVISIBLE, layoutPanelCheckBoxMenuItem, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_DAYOFYEAR, doyCB, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_NEARESTNEIGHBOR, nnCb, "selected" );
+                bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
+                bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
+                bind( bc, dom.getOptions(), Options.PROP_DAYOFYEAR, timeRangeEditor, "useDoy" );
 
-        bc.bind();
+                bc.bind();
+
+            }
+        };
+        SwingUtilities.invokeLater(run);
 
         this.dataSetSelector.addPropertyChangeListener("value", new PropertyChangeListener() { //one-way binding
             public void propertyChange(PropertyChangeEvent evt) {
                     applicationModel.setDataSourceURL(dataSetSelector.getValue());
             }
         });
-
     }
 
     public void plotUri( String uri ) {
