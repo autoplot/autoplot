@@ -8,7 +8,11 @@ package org.virbo.autoplot.dom;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import org.virbo.autoplot.util.TickleTimer;
 
 /**
  * listen to an Options class and keep prefs up to date.
@@ -18,6 +22,16 @@ public class OptionsPrefsController {
 
     Preferences prefs;
     Options options;
+
+    TickleTimer flushTimer= new TickleTimer( 100, new PropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent evt) {
+            try {
+                prefs.flush();
+            } catch (BackingStoreException ex) {
+                ex.printStackTrace();
+            }
+        }
+    });
 
     PropertyChangeListener listener= new PropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent evt) {
@@ -30,6 +44,7 @@ public class OptionsPrefsController {
             } else {
                 throw new RuntimeException("unsupported property type needs to be implemented: "+evt.getPropertyName() + "  " + evt.getNewValue().getClass() );
             }
+            flushTimer.tickle();
         }
     };
 
