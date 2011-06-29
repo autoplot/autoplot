@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -430,13 +432,17 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
         }
         URL url= new URL(s+"?server=logo");
         URLConnection connect= url.openConnection();
-        InputStream in= connect.getInputStream();
-        if ( connect.getContentType().startsWith("image") ) {
-            in.close();
-            return false;
-        } else {
-            in.close();
-            return true;
+        try {
+            InputStream in= connect.getInputStream();
+            if ( connect.getContentType().startsWith("image") ) {
+                in.close();
+                return false;
+            } else {
+                in.close();
+                return true;
+            }
+        } catch ( IOException ex ) {
+            return false; // we'll tell them later
         }
     }
 
@@ -511,16 +517,20 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
     Runnable getDataSetsRunnable() {
         Runnable run= new Runnable() {
             public void run() {
+                String ss= jComboBox1.getSelectedItem().toString();
                 try {
-                    String ss= jComboBox1.getSelectedItem().toString();
 
                     DasServer server= DasServer.create( new URL( ss ) );
                     TreeModel model= server.getDataSetList();
                     jTree1.setModel(model);
                     if ( dataSetId!=null ) selectDataSetId();
                 } catch (DasException ex) {
+
                     Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-                    DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
+
+                    javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("Error connecting to " + ss + ", \n" + ex );
+                    jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(Das2ServerDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
                     DasApplication.getDefaultApplication().getExceptionHandler().handle(ex);
