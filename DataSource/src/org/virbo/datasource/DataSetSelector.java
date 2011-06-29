@@ -173,6 +173,18 @@ public class DataSetSelector extends javax.swing.JPanel {
         this.monitorFactory = factory;
     }
 
+    private void showPluginsScreen() {
+        String msg= "<html>Unable to use the address <br><br>"+ getValue() + "<br><br>Qualify the address by adding a supported plugin id (e.g. vap+dat:)<br>" +
+                "or use an address that matches one of these triggers:<br><br>";
+        for ( String at: actionTriggers.keySet() ) {
+            msg+= at + "<br>";
+        }
+        msg+= "</html>";
+
+        JOptionPane.showMessageDialog( this, msg, "Unrecognized address", JOptionPane.OK_OPTION );
+
+    }
+
     /**
      * See if we can resolve a plottable URI from the selector by identifying
      * the data source type and calling its reject method, or identifying the
@@ -251,7 +263,8 @@ public class DataSetSelector extends javax.swing.JPanel {
                             maybePlot(true);
                             return;
                         } else {
-                            throw new RuntimeException("unable to identify data source for URI, try \"about:plugins\"");
+                            showPluginsScreen();
+                            return;
                         }
 
                     }

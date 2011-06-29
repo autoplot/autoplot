@@ -261,7 +261,7 @@ public class StatePersistence {
             } else {
 
                 domVersion= document.getDocumentElement().getAttribute("domVersion");
-                String currentVersion= "1.06";
+                String currentVersion= "1.07";
 
                 if ( ! domVersion.equals(currentVersion) ) {
 

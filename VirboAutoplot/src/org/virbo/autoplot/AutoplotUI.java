@@ -2348,6 +2348,7 @@ private void updateFrameTitle() {
                     System.err.println("this is autoplot "+APSplash.getVersion());
                 }
 APSplash.checkTime("init -100");
+APSplash.checkTime("init -100");
                 OptionsPrefsController opc= new OptionsPrefsController( model.dom.getOptions() );
                 opc.loadPreferences();
 APSplash.checkTime("init -90");
@@ -2359,7 +2360,7 @@ APSplash.checkTime("init -80");
                 if ( !headless ) {
                     APSplash.showSplash();
                 }
-                
+APSplash.checkTime("init -80");
                 final AutoplotUI app;
                 if ( !headless ) {
                     app= new AutoplotUI(model);
