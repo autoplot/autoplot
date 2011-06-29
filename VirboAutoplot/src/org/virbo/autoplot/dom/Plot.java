@@ -6,6 +6,7 @@ package org.virbo.autoplot.dom;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.das2.datum.DatumRange;
 import org.das2.graph.DasColorBar;
 
 /**
@@ -170,6 +171,20 @@ public class Plot extends DomNode {
         this.columnId = columnId;
         propertyChangeSupport.firePropertyChange(PROP_COLUMNID, oldColumnId, columnId);
     }
+
+    private DatumRange context= Axis.DEFAULT_RANGE;
+    public static final String PROP_CONTEXT= "context";
+
+    public DatumRange getContext() {
+        return context;
+    }
+
+    public void setContext(DatumRange context) {
+        DatumRange old= this.context;
+        this.context = context;
+        propertyChangeSupport.firePropertyChange(PROP_CONTEXT, old, context );
+    }
+
     protected PlotController controller;
 
     public PlotController getController() {
@@ -205,6 +220,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_YAXIS)) this.yaxis.syncTo(that.getYaxis(),exclude);
         if (!exclude.contains(PROP_ZAXIS)) this.zaxis.syncTo(that.getZaxis(),exclude);
         if (!exclude.contains(PROP_VISIBLE)) this.setVisible(that.isVisible());
+        if (!exclude.contains(PROP_CONTEXT)) this.setContext(that.getContext());
     }
 
     @Override
@@ -230,7 +246,7 @@ public class Plot extends DomNode {
         b = that.isotropic == this.isotropic;
         if (!b) result.add(new PropertyChangeDiff(PROP_ISOTROPIC, that.isotropic, this.isotropic));
         b=  that.colortable.equals(this.colortable) ;
-        if ( !b ) result.add( new PropertyChangeDiff( "colortable", that.colortable , this.colortable ) );
+        if ( !b ) result.add( new PropertyChangeDiff( PROP_COLORTABLE, that.colortable , this.colortable ) );
         b = that.autoLabel == this.autoLabel;
         if (!b) result.add(new PropertyChangeDiff(PROP_AUTOLABEL, that.autoLabel, this.autoLabel));
         b = that.autoBinding == this.autoBinding;
@@ -241,6 +257,12 @@ public class Plot extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_COLUMNID, that.columnId, this.columnId));
         b = that.visible == this.visible;
         if (!b) result.add(new PropertyChangeDiff(PROP_VISIBLE, that.visible, this.visible));
+        if ( that.context==this.context ) {
+            b= true;
+        } else {
+            b = that.context!=null && that.context.equals(this.context);
+        }
+        if (!b) result.add(new PropertyChangeDiff(PROP_CONTEXT, that.context, this.context));
         result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));
         result.addAll(DomUtil.childDiffs( PROP_YAXIS, this.getYaxis().diffs(that.getYaxis())));
         result.addAll(DomUtil.childDiffs( PROP_ZAXIS, this.getZaxis().diffs(that.getZaxis())));
