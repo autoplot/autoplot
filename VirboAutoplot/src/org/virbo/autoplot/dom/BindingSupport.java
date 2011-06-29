@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import org.jdesktop.beansbinding.Converter;
 
 /**
- * It is appearent that the overhead of BeansBinding is so great that a lightweight
+ * It is apparent that the overhead of BeansBinding is so great that a lightweight
  * binding engine would dramatically improve performance.  This encapsulates.
  * 
  * @author jbf
@@ -52,6 +52,9 @@ public class BindingSupport {
                 try {
                     if (c == null) {
                         Object oldValue= getter.invoke( p );
+                        if ( oldValue==null ) {
+                            System.err.println("oldValue is null!!!");
+                        }
                         if ( oldValue.equals(evt.getNewValue() ) ) return;
                         setter.invoke(p, evt.getNewValue());
                         if ( new Exception().getStackTrace().length > 300 ) {
