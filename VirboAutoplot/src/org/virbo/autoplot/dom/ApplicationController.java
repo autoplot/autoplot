@@ -413,7 +413,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     protected synchronized DataSourceFilter addDataSourceFilter() {
         DataSourceFilter dsf = new DataSourceFilter();
-        new DataSourceController(this.model, dsf);
+        DataSourceController dsfc= new DataSourceController(this.model, dsf);
+        dsf.controller = dsfc;
         assignId(dsf);
         List<DataSourceFilter> dataSourceFilters = new ArrayList<DataSourceFilter>(Arrays.asList(this.application.getDataSourceFilters()));
         dataSourceFilters.add(dsf);
