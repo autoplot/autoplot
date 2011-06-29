@@ -95,10 +95,8 @@
           <ComponentRef name="buttonGroup1"/>
         </Property>
         <Property name="text" type="java.lang.String" value="Processed Data or Component"/>
+        <Property name="toolTipText" type="java.lang.String" value="Data as displayed, including slice and other operations"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="processedDataBActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JRadioButton" name="originalDataB">
       <Properties>
@@ -107,10 +105,8 @@
         </Property>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="Original Data"/>
+        <Property name="toolTipText" type="java.lang.String" value="Data read in from data source"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="originalDataBActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="formatDL">
       <Properties>

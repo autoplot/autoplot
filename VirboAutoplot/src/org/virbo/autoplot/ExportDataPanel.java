@@ -35,9 +35,6 @@ public class ExportDataPanel extends javax.swing.JPanel {
     /** Creates new form ExportDataPanel */
     public ExportDataPanel() {
         initComponents();
-        this.originalDataB.setVisible(false);
-        this.processedDataB.setVisible(false);
-        this.jLabel1.setVisible(false);
     }
 
     public void setDataSet(Application model) {
@@ -80,20 +77,12 @@ public class ExportDataPanel extends javax.swing.JPanel {
 
         buttonGroup1.add(processedDataB);
         processedDataB.setText("Processed Data or Component");
-        processedDataB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                processedDataBActionPerformed(evt);
-            }
-        });
+        processedDataB.setToolTipText("Data as displayed, including slice and other operations");
 
         buttonGroup1.add(originalDataB);
         originalDataB.setSelected(true);
         originalDataB.setText("Original Data");
-        originalDataB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                originalDataBActionPerformed(evt);
-            }
-        });
+        originalDataB.setToolTipText("Data read in from data source");
 
         formatDL.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         formatDL.addItemListener(new java.awt.event.ItemListener() {
@@ -182,14 +171,6 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 .addContainerGap(55, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void processedDataBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_processedDataBActionPerformed
-        // TODO add your handling code here:
-}//GEN-LAST:event_processedDataBActionPerformed
-
-    private void originalDataBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_originalDataBActionPerformed
-        // TODO add your handling code here:
-}//GEN-LAST:event_originalDataBActionPerformed
 
     private void chooseFileBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseFileBActionPerformed
 
