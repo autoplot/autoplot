@@ -100,7 +100,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
 
         jLabel3.setText("Selection:");
 
-        filenameTF.setText("jTextField1");
+        filenameTF.setText("data");
 
         chooseFileB.setText("Select...");
         chooseFileB.addActionListener(new java.awt.event.ActionListener() {
@@ -204,7 +204,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
 
         int r = chooser.showSaveDialog(this);
         if (r == JFileChooser.APPROVE_OPTION) {
-            String s = chooser.getSelectedFile().toURI().toString();
+            String s = chooser.getSelectedFile().toString();
 
             String ext = DataSetURI.getExt(s);
             if (ext == null) {
