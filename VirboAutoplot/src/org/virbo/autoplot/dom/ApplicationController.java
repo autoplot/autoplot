@@ -494,13 +494,6 @@ public class ApplicationController extends DomNodeController implements RunLater
         return dasCanvas;
     }
 
-    /**
-     * @deprecated use deletePlotElement
-     * @param panel
-     */
-    public void deletePanel( PlotElement pele ) {
-        deletePlotElement( pele );
-    }
 
     /**
      * delete the plot element completely, or if it is the last, then empty the
@@ -671,15 +664,6 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
     };
 
-    /**
-     * @deprecated use addPlotElement instead.
-     * @param domPlot
-     * @param dsf
-     * @return
-     */
-    public PlotElement addPanel( Plot domPlot, DataSourceFilter dsf) {
-        return addPlotElement( domPlot,dsf );
-    }
 
     /**
      * add a plotElement to the application, attaching it to the given Plot and DataSourceFilter.
@@ -696,8 +680,9 @@ public class ApplicationController extends DomNodeController implements RunLater
             dsf = addDataSourceFilter();
         }
 
-        new PlotElementController(this.model, application, pele1);
-        
+        PlotElementController pec= new PlotElementController(this.model, application, pele1);
+        plotElement.controller = pec;
+
         if (domPlot == null) {
             domPlot = addPlot(LayoutConstants.BELOW);
         }
