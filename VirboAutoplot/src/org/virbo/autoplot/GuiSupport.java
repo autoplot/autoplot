@@ -267,7 +267,7 @@ public class GuiSupport {
     }
 
     Action getDumpDataAction2( final Application dom ) {
-        return new AbstractAction("Export Data 2...") {
+        return new AbstractAction("Export Data...") {
             public void actionPerformed( ActionEvent e ) {
                 final ExportDataPanel edp= new ExportDataPanel();
                 edp.setDataSet(dom);
