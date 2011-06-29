@@ -79,6 +79,7 @@ import org.virbo.autoplot.dom.PlotController;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.state.StatePersistence;
 import org.virbo.autoplot.transferrable.ImageSelection;
+import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
@@ -271,7 +272,8 @@ public class GuiSupport {
                 final ExportDataPanel edp= new ExportDataPanel();
                 edp.setDataSet(dom);
 
-                final DataSourceFilter dsf= dom.getController().getDataSourceFilterFor( dom.getController().getPlotElement() );
+                final PlotElement pe= dom.getController().getPlotElement();
+                final DataSourceFilter dsf= dom.getController().getDataSourceFilterFor( pe );
                 QDataSet ds= dsf.getController().getDataSet();
 
                 if (ds == null) {
@@ -360,7 +362,13 @@ public class GuiSupport {
 
                                     ProgressMonitor mon= DasProgressPanel.createFramed( parent, "formatting data" );
                                     if ( edp.isFormatPlotElement() ) {
-                                        format.formatData( uriOut, ds, mon );
+                                        QDataSet dsout=  pe.getController().getDataSet();
+                                        if ( dsf.getController().getTsb()!=null ) {
+                                            dsout= DataSetOps.sprocess( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
+                                            format.formatData( uriOut, dsout, mon );
+                                        } else {
+                                            format.formatData( uriOut, dsout, mon );
+                                        }
                                     } else {
                                         format.formatData( uriOut, ds, mon );
                                     }
