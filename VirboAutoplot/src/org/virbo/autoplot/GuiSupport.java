@@ -57,6 +57,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.dataset.DataSetUtil;
 import org.das2.datum.UnitsUtil;
 import org.das2.event.DasMouseInputAdapter;
 import org.das2.event.MouseModule;
@@ -310,14 +311,19 @@ public class GuiSupport {
                         String name= edp.getFilenameTF().getText();
                         String ext = (String)edp.getFormatDL().getSelectedItem();
 
-                        String s=  edp.getFilenameTF().getText();
+                        if ( name.startsWith("file:") ) {
+                            name= name.substring(5);
+                        }
+                        
+                        // mimic JChooser logic.
+                        File ff= new File(name);
+                        name= ff.getAbsolutePath();
+
+                        String s=  name;
+
                         if ( !s.endsWith(ext) ) {
                             s= s+ext;
                         }
-                        URISplit split= URISplit.parse(s);
-
-                        String s1 = new File( split.file.substring(split.scheme.length()+1) ).toURI().toString();
-                        s= s1;
 
                         if (ext == null) {
                             ext = "";
