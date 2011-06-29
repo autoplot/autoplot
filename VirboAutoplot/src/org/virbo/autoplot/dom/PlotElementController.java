@@ -67,7 +67,7 @@ public class PlotElementController extends DomNodeController {
     private static final String PENDING_COMPONENT_OP= "componentOp";
 
     static final Logger logger = Logger.getLogger("vap.plotElementController");
-    private Application dom;
+    final private Application dom;
     private PlotElement plotElement;
     private DataSourceFilter dsf; // This is the one we are listening to.
     /**
@@ -81,7 +81,6 @@ public class PlotElementController extends DomNodeController {
 
     public PlotElementController(final ApplicationModel model, final Application dom, final PlotElement plotElement) {
         super(plotElement);
-        plotElement.controller = this;
         this.dom = dom;
         this.plotElement = plotElement;
 
