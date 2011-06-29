@@ -1711,14 +1711,6 @@ public class ApplicationController extends DomNodeController implements RunLater
         return result;
     }
 
-    /**
-     * @deprecated use getPlotElementsFor instead
-     * @param plot
-     * @return
-     */
-    public List<PlotElement> getPanelsFor(Plot plot) {
-        return getPlotElementsFor(plot);
-    }
 
     public List<PlotElement> getPlotElementsFor(Plot plot) {
         return DomUtil.getPlotElementsFor( application, plot );
@@ -1726,6 +1718,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     /**
      * return the DataSourceFilter for the plotElement, or null if none exists.
+     * See also getFirstPlotFor
      * @param plotElement
      * @return
      */
@@ -1740,15 +1733,13 @@ public class ApplicationController extends DomNodeController implements RunLater
         return result;
     }
 
+
     /**
-     * @deprecated use getPlotElementsFor instead
+     * return the PlotElements using the DataSourceFilter.  This does not
+     * return indirect (via vap+internal) references.
      * @param plot
      * @return
      */
-    public List<PlotElement> getPanelsFor(DataSourceFilter plot) {
-        return getPlotElementsFor(plot);
-    }
-
     public List<PlotElement> getPlotElementsFor(DataSourceFilter plot) {
         String id = plot.getId();
         List<PlotElement> result = new ArrayList<PlotElement>();
@@ -1758,6 +1749,51 @@ public class ApplicationController extends DomNodeController implements RunLater
             }
         }
         return result;
+    }
+
+    /**
+     * find the first plot that is connected to this data, following vap+internal
+     * links.  This is used, for example, to get a timerange to control the 
+     * DSF.
+     * @param dsf
+     * @return
+     */
+    public Plot getFirstPlotFor( DataSourceFilter dsf ) {
+        String lookFor= dsf.getId();
+        PlotElement f= null;
+
+        List<DataSourceFilter> dsfs= new ArrayList();
+        dsfs.add(dsf);
+
+        for ( PlotElement pe : application.plotElements ) {
+            if ( pe.getDataSourceFilterId().equals(lookFor) ) {
+                f= pe;
+            }
+        }
+
+        Pattern p= Pattern.compile("vap\\+internal:([a-z][a-z_0-9]*)(,([a-z][a-z_0-9]*))*");
+        if ( f==null ) { // no one refers to dsf directly, look for vap+internal:
+            for ( DataSourceFilter dsf1: application.getDataSourceFilters() ) {
+                if ( dsf1.getUri()!=null ) {
+                    Matcher m= p.matcher(dsf1.getUri());
+                    if ( m.matches() ) {
+                        int n= m.groupCount()+1;
+                        for ( int i=1; i<n; i+=2 ) {
+                            if ( m.group(i).equals(dsf.getId()) ) {
+                                if ( Thread.currentThread().getStackTrace().length<100 ) { // TODO: remove once circular references are checked for elsewhere
+                                    return getFirstPlotFor( dsf1 );
+                                } else {
+                                    throw new IllegalArgumentException("circular references in dsfs");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        } else {
+            return getPlotFor(f);
+        }
     }
 
     /**
