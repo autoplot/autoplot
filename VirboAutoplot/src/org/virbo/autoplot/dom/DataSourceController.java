@@ -322,21 +322,38 @@ public class DataSourceController extends DomNodeController {
             } else if ( getTsb()!=null && ps.size()==0 ) {
                 timeSeriesBrowseController = new TimeSeriesBrowseController(this,null);
 
+                DomNode node;
+                String propertyName;
+
+                Plot p= dom.controller.getFirstPlotFor(dsf);
+                if ( p==null ) {
+                    node= dom;
+                    propertyName= Application.PROP_TIMERANGE;
+                } else {
+                    node= p;
+                    propertyName= Plot.PROP_CONTEXT;
+                }
+
                 if ( !UnitsUtil.isTimeLocation( this.dom.getTimeRange().getUnits() ) ) {
                     List<BindingModel> bms= this.dom.getController().findBindings( this.dom, Application.PROP_TIMERANGE, null, null );
                     if ( bms==null || bms.size()==0 ) {
                         System.err.println("claiming dom timerange for TSB: "+this.dsf.getUri() );
+                        p.setContext( getTsb().getTimeRange() );
                         this.dom.setTimeRange( getTsb().getTimeRange() );
                         System.err.println("about to setup Gen for "+this);
-                        timeSeriesBrowseController.setupGen(this.dom,Application.PROP_TIMERANGE);  
+                        timeSeriesBrowseController.setupGen( node, propertyName );
+                        if ( node!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
                         update(!valueWasAdjusting, !valueWasAdjusting );
                     } else {
                         System.err.println("unable to use timerange as guide");
+                        p.setContext( getTsb().getTimeRange() );
+                        timeSeriesBrowseController.setupGen( node, propertyName );
                         update(!valueWasAdjusting, !valueWasAdjusting );
                     }
                 } else {
-                    System.err.println("using dom timerange for TSB: "+this.dsf.getUri() );
-                    timeSeriesBrowseController.setupGen(this.dom,Application.PROP_TIMERANGE);
+                    System.err.println("using plot context for TSB: "+this.dsf.getUri() );
+                    timeSeriesBrowseController.setupGen( node, propertyName );
+                    if ( node!=dom ) dom.controller.bind( dom, Application.PROP_TIMERANGE, p, Plot.PROP_CONTEXT );
                     update(!valueWasAdjusting, !valueWasAdjusting );
                 }
 
@@ -1537,6 +1554,7 @@ public class DataSourceController extends DomNodeController {
     }
 
     private ProgressMonitor getMonitor(String label, String description) {
+
         PlotElement pele = getPlotElement();
         DasPlot p = null;
         if (pele != null) {
@@ -1544,7 +1562,13 @@ public class DataSourceController extends DomNodeController {
             if (plot != null) {
                 p = plot.controller.getDasPlot();
             }
+        } else {
+            Plot plot= dom.controller.getFirstPlotFor(this.dsf);
+            if ( plot!=null ) {
+                p= plot.controller.getDasPlot();
+            }
         }
+
         if (p != null) {
             return dom.controller.getMonitorFactory().getMonitor(p, label, description);
         } else {
