@@ -939,7 +939,8 @@ public class PlotController extends DomNodeController {
 
     private synchronized void bindTo(DasPlot p) {
         ApplicationController ac= dom.controller;
-        ac.bind( this.plot, "title", p, "title", contextConverter );
+        ac.bind( this.plot, Plot.PROP_TITLE, p, DasPlot.PROP_TITLE, contextConverter ); // %{CONTEXT} indicates the DataSet CONTEXT property, not the control.
+        ac.bind( this.plot, Plot.PROP_CONTEXT, p, DasPlot.PROP_CONTEXT );
     }
 
     public BindingModel[] getBindings() {
