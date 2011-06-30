@@ -681,7 +681,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         }
 
         PlotElementController pec= new PlotElementController(this.model, application, pele1);
-        plotElement.controller = pec;
+        pele1.controller = pec;
 
         if (domPlot == null) {
             domPlot = addPlot(LayoutConstants.BELOW);
