@@ -275,18 +275,25 @@ public class DataSetSelector extends javax.swing.JPanel {
                         if ( f instanceof AggregatingDataSourceFactory ) {
                             AggregatingDataSourceFactory aggf= (AggregatingDataSourceFactory) f;
                             if ( timeRange!=null && UnitsUtil.isTimeLocation( timeRange.getUnits() ) ) {
-                                String delegateUri= aggf.getDelegateDataSourceFactoryUri(surl);
-                                DataSourceFactory ddsf= aggf.getDelegateDataSourceFactory(surl);
-                                if ( !ddsf.reject( delegateUri, completionsMonitor) ) {
-                                    surl1= surl1+ ( surl1.endsWith("?") ? "" : "&" ) + "timerange="+timeRange;
-                                    if ( !f.reject(surl1, mon) ) {
-                                        setMessage("accepted aggregation after setting timerange");
-                                        int modifiers= this.keyModifiers;
-                                        setValue(surl1);
-                                        this.keyModifiers= modifiers;
-                                        firePlotDataSetURL();
-                                        return;
+                                try {
+                                    String delegateUri= aggf.getDelegateDataSourceFactoryUri(surl);
+                                    DataSourceFactory ddsf= aggf.getDelegateDataSourceFactory(surl);
+                                    if ( !ddsf.reject( delegateUri, completionsMonitor) ) {
+                                        surl1= surl1+ ( surl1.endsWith("?") ? "" : "&" ) + "timerange="+timeRange;
+                                        if ( !f.reject(surl1, mon) ) {
+                                            setMessage("accepted aggregation after setting timerange");
+                                            int modifiers= this.keyModifiers;
+                                            setValue(surl1);
+                                            this.keyModifiers= modifiers;
+                                            firePlotDataSetURL();
+                                            return;
+                                        }
                                     }
+                                } catch ( IllegalArgumentException ex ) {
+                                    JOptionPane.showMessageDialog( plotItButton, ex.getMessage() );
+                                    setMessage(ex.getMessage());  // $y$J would throw runtime exception.
+                                    ex.printStackTrace();
+                                    return;
                                 }
                             }
                         }
