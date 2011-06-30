@@ -98,7 +98,7 @@ public class StatePersistence {
             throw new RuntimeException(ex);
         }
 
-        VapScheme scheme= new Vap1_06Scheme();
+        VapScheme scheme= new Vap1_07Scheme();
         Element element = SerializeUtil.getDomElement( document, (DomNode)state, scheme );
 
         Element vap= document.createElement("vap");
