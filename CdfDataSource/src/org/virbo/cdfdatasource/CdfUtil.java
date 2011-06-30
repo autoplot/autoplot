@@ -821,6 +821,7 @@ public class CdfUtil {
         logger.log(Level.FINE, "got {0} variables", v.size());
 
         Attribute aAttr = null, bAttr = null, cAttr = null, dAttr = null;
+        Attribute blAttr = null, clAttr = null, dlAttr = null;
 
         Attribute catDesc = null;
         Attribute varNotes= null;
@@ -842,6 +843,18 @@ public class CdfUtil {
         }
         try {
             dAttr = cdf.getAttribute("DEPEND_3");  // check for too many dimensions
+        } catch (CDFException e) {
+        }
+        try {
+            blAttr = cdf.getAttribute("LABL_PTR_1");  
+        } catch (CDFException e) {
+        }
+        try {
+            clAttr = cdf.getAttribute("LABL_PTR_2");  // check for too many dimensions
+        } catch (CDFException e) {
+        }
+        try {
+            dlAttr = cdf.getAttribute("LABL_PTR_3");  // check for too many dimensions
         } catch (CDFException e) {
         }
         try {
@@ -978,6 +991,26 @@ public class CdfUtil {
                     //e.printStackTrace();
                 }
 
+                try {
+                    if ( yMaxRec==-1 && blAttr != null) {  // check for metadata for LABL_PTR_1
+                        logger.fine("get attribute " + blAttr.getName() + " entry for " + var.getName());
+                        Entry yEntry = blAttr.getEntry(var);
+                        yDependVariable = cdf.getVariable(String.valueOf(yEntry.getData()));
+                        yMaxRec = yDependVariable.getMaxWrittenRecord();
+                        if (yMaxRec == 0) {
+                            yMaxRec = yDependVariable.getDimSizes()[0] - 1;
+                        }
+                        if ( yDependVariable.getRecVariance() ) {
+                            //TODO: some sanity check here?
+                        } else {
+                            if ( dims.length>0 && (yMaxRec+1)!=dims[0] ) {
+                                warn.add("LABL_PTR_1 length is inconsistent with length ("+dims[0]+")" );
+                            }
+                        }
+                    }
+                } catch (CDFException e) {
+                    //e.printStackTrace();
+                }
 
                 try {
                     if (cAttr != null) { // check for existence of DEPEND_2, dimensionality too high
@@ -994,9 +1027,37 @@ public class CdfUtil {
                 }
 
                 try {
+                    if ( zMaxRec==-1 && clAttr != null) {  // check for metadata for LABL_PTR_1
+                        logger.fine("get attribute " + clAttr.getName() + " entry for " + var.getName());
+                        Entry zEntry = clAttr.getEntry(var);
+                        zDependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
+                        zMaxRec = zDependVariable.getMaxWrittenRecord();
+                        if (zMaxRec == 0) {
+                            zMaxRec = zDependVariable.getDimSizes()[0] - 1;
+                        }
+                    }
+                } catch (CDFException e) {
+                    //e.printStackTrace();
+                }
+
+                try {
                     if (dAttr != null) { // check for existence of DEPEND_2, dimensionality too high
                         logger.fine("get attribute " + dAttr.getName() + " entry for " + var.getName());
                         Entry zEntry = dAttr.getEntry(var);
+                        z1DependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
+                        z1MaxRec = z1DependVariable.getMaxWrittenRecord();
+                        if (z1MaxRec == 0) {
+                            z1MaxRec = z1DependVariable.getDimSizes()[0] - 1;
+                        }
+                    }
+                } catch (CDFException e) {
+                    //e.printStackTrace();
+                }
+
+                try {
+                    if ( z1MaxRec==-1 && dlAttr != null) {  // check for metadata for LABL_PTR_1
+                        logger.fine("get attribute " + dlAttr.getName() + " entry for " + var.getName());
+                        Entry zEntry = dlAttr.getEntry(var);
                         z1DependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
                         z1MaxRec = z1DependVariable.getMaxWrittenRecord();
                         if (z1MaxRec == 0) {
