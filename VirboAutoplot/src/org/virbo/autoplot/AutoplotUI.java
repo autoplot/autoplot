@@ -553,36 +553,44 @@ public class AutoplotUI extends javax.swing.JFrame {
         final LayoutPanel flui;
         final DataPanel fdp;
 
+        final JScrollPane flayoutPane;
         if (model.getDocumentModel().getOptions().isLayoutVisible() ) {
-            LayoutPanel lui= new LayoutPanel();
-            layoutPanel= lui;
-            tabs.insertTab("layout",null, lui,
+            flayoutPane= new JScrollPane();
+            tabs.insertTab("layout",null, flayoutPane,
                     String.format( TAB_TOOLTIP_LAYOUT, TABS_TOOLTIP), tabs.getTabCount() );
-            flui= lui;
         } else {
-            flui= null;
+            flayoutPane= null;
         }
 
+        final JScrollPane fdataPane;
         if (model.getDocumentModel().getOptions().isDataVisible()) {
-            final DataPanel dp= new DataPanel(dom);
-            dataPanel= dp;
-            tabs.insertTab("data", null, dp,
+            fdataPane= new JScrollPane();
+            tabs.insertTab("data", null, fdataPane,
                     String.format(  TAB_TOOLTIP_DATA, TABS_TOOLTIP), tabs.getTabCount() );
-            fdp= dp;
         } else {
-            fdp= null;
+            fdataPane= null;
         }
 
-        final JScrollPane metadataPane= new JScrollPane();
-        tabs.insertTab("metadata", null, metadataPane,
+        final JScrollPane fmetadataPane= new JScrollPane();
+        tabs.insertTab("metadata", null, fmetadataPane,
                 String.format(  TAB_TOOLTIP_METADATA, TABS_TOOLTIP), tabs.getTabCount() );
 
         invokeLater( -1, true, new Runnable() {
             public void run() {
-                if ( flui!=null ) flui.setApplication(dom);
-                if ( fdp!=null ) fdp.doBindings();
+                if ( flayoutPane!=null ) {
+                    LayoutPanel lui= new LayoutPanel();
+                    layoutPanel= lui;
+                    flayoutPane.setViewportView(lui);
+                    lui.setApplication(dom);
+                }
+                if ( fdataPane!=null ) {
+                    final DataPanel dp= new DataPanel(dom);
+                    dataPanel= dp;
+                    fdataPane.setViewportView(dp);
+                    dp.doBindings();
+                }
                 MetadataPanel mdp = new MetadataPanel(applicationModel);
-                metadataPane.setViewportView(mdp);
+                fmetadataPane.setViewportView(mdp);
             }
         });
 
