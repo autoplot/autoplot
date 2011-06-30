@@ -451,10 +451,12 @@ public class CdfUtil {
         logger.fine("got " + v.length + " variables");
 
         Attribute aAttr = null, bAttr = null, cAttr = null, dAttr = null;
+        Attribute blAttr = null, clAttr = null, dlAttr = null;
 
         Attribute catDesc = null;
         Attribute varNotes= null;
         Attribute virtual= null;
+        Attribute function= null;
 
         logger.fine("getting CDF attributes");
         try {
@@ -474,6 +476,18 @@ public class CdfUtil {
         } catch (Exception e) {
         }
         try {
+            blAttr = (Attribute) cdf.getAttribute("LABL_PTR_1");
+        } catch (Exception e) {
+        }
+        try {
+            clAttr = (Attribute) cdf.getAttribute("LABL_PTR_2");  // check for too many dimensions
+        } catch (Exception e) {
+        }
+        try {
+            dlAttr = (Attribute) cdf.getAttribute("LABL_PTR_3");  // check for too many dimensions
+        } catch (Exception e) {
+        }
+        try {
             catDesc = (Attribute) cdf.getAttribute("CATDESC");
         } catch (Exception e) {
         }
@@ -485,10 +499,13 @@ public class CdfUtil {
             virtual= (Attribute) cdf.getAttribute("VIRTUAL");
         } catch (Exception e) {
         }
+        try {
+            function= (Attribute) cdf.getAttribute("FUNCTION"); //TODO: need to support CDF Virtual vars
+        } catch (Exception e) {
+        }
 
         for (int i = 0; i < v.length; i++) {
             Variable var = cdf.getVariable(v[i]);
-
             if (var.getType() == CDFConstants.CDF_CHAR || var.getType()==CDFConstants.CDF_UCHAR ) {
                 continue;
             }
@@ -593,6 +610,24 @@ public class CdfUtil {
                     //e.printStackTrace();
                 }
 
+                try {
+                    if ( yMaxRec==-1 ) {  // check for metadata for LABL_PTR_1
+                        Object att= getAttribute( cdf, var.getName(), "LABL_PTR_1" );
+                        if ( att!=null ) {
+                            logger.fine("get attribute LABL_PTR_1 entry for " + var.getName());
+                            yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            yMaxRec = yDependVariable.getNumberOfValues();
+                            if (yMaxRec == 1) {
+                                yMaxRec = yDependVariable.getDimensions()[0] - 1;
+                            }
+                            if ( dims.length>0 && (yMaxRec+1)!=dims[0] ) {
+                                warn.add("LABL_PTR_1 length is inconsistent with length ("+dims[0]+")" );
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
 
                 try {
                     if ( true || cAttr != null) { 
@@ -611,6 +646,21 @@ public class CdfUtil {
                 }
 
                 try {
+                    if ( zMaxRec==-1 ) {  // check for metadata for LABL_PTR_1
+                        Object att= getAttribute( cdf, var.getName(), "LABL_PTR_2" );
+                        if ( att!=null ) {
+                            logger.fine("get attribute LABL_PTR_2 entry for " + var.getName());
+                            zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            zMaxRec = zDependVariable.getNumberOfValues();
+                            if (zMaxRec == 0) {
+                                zMaxRec = zDependVariable.getDimensions()[0] - 1;
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
+                try {
                     if ( true || dAttr != null) {
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_3" );
                         if ( att!=null ) {
@@ -619,6 +669,22 @@ public class CdfUtil {
                             z1MaxRec = z1DependVariable.getNumberOfValues();
                             if (z1MaxRec == 1) {
                                 z1MaxRec = z1DependVariable.getDimensions()[0] - 1; //TODO: check
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    //e.printStackTrace();
+                }
+
+                try {
+                    if ( z1MaxRec==-1 ) {  // check for metadata for LABL_PTR_1
+                        Object att= getAttribute( cdf, var.getName(), "LABL_PTR_3" );
+                        if ( att!=null ) {
+                            logger.fine("get attribute LABL_PTR_3 entry for " + var.getName());
+                            zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
+                            z1MaxRec = zDependVariable.getNumberOfValues();
+                            if (z1MaxRec == 0) {
+                                z1MaxRec = zDependVariable.getDimensions()[0] - 1;
                             }
                         }
                     }
