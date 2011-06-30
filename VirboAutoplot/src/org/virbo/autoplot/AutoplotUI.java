@@ -64,6 +64,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -482,15 +483,15 @@ public class AutoplotUI extends javax.swing.JFrame {
         addTools();
         addBindings();
 
-        pack();
+//        pack();
 
         dom.getOptions().addPropertyChangeListener(optionsListener);
 
         APSplash.checkTime("init 100");
         
-        applicationModel.getCanvas().resizeAllComponents();
-        applicationModel.getCanvas().repaint();
-        applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
+//        applicationModel.getCanvas().resizeAllComponents();
+//        applicationModel.getCanvas().repaint();
+//        applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
 
         APSplash.checkTime("init 110");
 
@@ -2400,7 +2401,14 @@ APSplash.checkTime("init -80");
 
                 if ( !headless ) {
                     logger.fine("UI.setVisible(true)");
-                    app.setVisible(true);
+                    SwingUtilities.invokeLater( new Runnable() {
+                        public void run() {
+                            System.err.println("here it does doesn't draw: "+app.tabbedPanelContainer.getWidth() );
+                            app.setVisible(true);
+                        }
+                    } );
+
+
                     logger.fine("UI is visible");
                     //APSplash.getInstance().setVisible(false);
                     APSplash.hideSplash();
