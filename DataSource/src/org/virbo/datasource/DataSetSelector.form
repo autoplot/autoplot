@@ -44,7 +44,7 @@
     <Component class="javax.swing.JButton" name="browseButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/org/virbo/datasource/file2.png"/>
+          <Image iconType="3" name="/org/virbo/datasource/fileMag.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Inspect this resource.&lt;br&gt;&#xa;For folder names, this enters the file system browser, or shows a list of remote folders.&lt;br&gt;&#xa;For files, this will enter an editor panel for the resource, or show a list of parameter options.&lt;br&gt;&#xa;&lt;/html&gt;&#xa;&#xa;"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">

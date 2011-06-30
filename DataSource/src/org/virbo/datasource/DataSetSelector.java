@@ -964,7 +964,7 @@ public class DataSetSelector extends javax.swing.JPanel {
         plotItButton = new javax.swing.JButton();
         dataSetSelector = new javax.swing.JComboBox();
 
-        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/file2.png"))); // NOI18N
+        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png"))); // NOI18N
         browseButton.setToolTipText("<html>Inspect this resource.<br>\nFor folder names, this enters the file system browser, or shows a list of remote folders.<br>\nFor files, this will enter an editor panel for the resource, or show a list of parameter options.<br>\n</html>\n\n");
         browseButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
         browseButton.addActionListener(new java.awt.event.ActionListener() {
