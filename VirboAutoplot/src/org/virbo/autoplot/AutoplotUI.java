@@ -40,7 +40,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -56,7 +55,6 @@ import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 import javax.help.CSH;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -64,7 +62,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -81,9 +78,9 @@ import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
+import org.das2.graph.TickVDescriptor;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
-import org.das2.util.FileUtil;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
@@ -506,7 +503,7 @@ public class AutoplotUI extends javax.swing.JFrame {
                 invokeLater( -1, true, new Runnable() {
                     public void run() {
                         JComponent c= new AxisPanel(applicationModel);
-                        sp.setViewportView(c);        
+                         sp.setViewportView(c);
                     }
                 });
             }
@@ -676,8 +673,6 @@ public class AutoplotUI extends javax.swing.JFrame {
                 }
             }
         });
-
-        tabbedPanelContainer.validate();
 
     }
 
@@ -2403,7 +2398,6 @@ APSplash.checkTime("init -80");
                     logger.fine("UI.setVisible(true)");
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
-                            System.err.println("here it does doesn't draw: "+app.tabbedPanelContainer.getWidth() );
                             app.setVisible(true);
                         }
                     } );
