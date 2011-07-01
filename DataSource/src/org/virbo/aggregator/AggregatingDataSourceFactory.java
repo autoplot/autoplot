@@ -67,7 +67,7 @@ public class AggregatingDataSourceFactory implements DataSourceFactory {
     }
 
     private static int splitIndex(String surl) {
-        int i0 = surl.indexOf("%Y");
+        int i0 = surl.indexOf("%Y");  //TODO: /tmp/data_$(m,Y=2011).dat
         if ( i0==-1 ) i0 = surl.indexOf("$Y");
         int i1;
         i1 = surl.indexOf("%y");
