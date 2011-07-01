@@ -56,12 +56,14 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.text.DefaultEditorKit;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.UnitsUtil;
@@ -1470,41 +1472,13 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
 
     private JPopupMenu getPopupMenu() {
         JPopupMenu result= new JPopupMenu();
-        result.add( new AbstractAction("Copy") {
-            public void actionPerformed(ActionEvent e) {
-                StringSelection stringSelection = new StringSelection( editor.getText() );
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                clipboard.setContents(stringSelection, new ClipboardOwner() {
-                    public void lostOwnership(Clipboard clipboard, Transferable contents) {
-                    }
-                });
-            }
-        } );
-        result.add( new AbstractAction("Paste") {
-            public void actionPerformed(ActionEvent e) {
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                Transferable contents = clipboard.getContents(null);
-                boolean hasTransferableText =
-                        (contents != null) &&
-                        contents.isDataFlavorSupported(DataFlavor.stringFlavor);
-                String result = null;
-                if (hasTransferableText) {
-                    try {
-                        result = (String) contents.getTransferData(DataFlavor.stringFlavor);
-                    } catch (UnsupportedFlavorException ex) {
-                        //highly unlikely since we are using a standard DataFlavor
-                        System.out.println(ex);
-                        ex.printStackTrace();
-                    } catch (IOException ex) {
-                        System.out.println(ex);
-                        ex.printStackTrace();
-                    }
-                }
-                if (result != null) {
-                    editor.setText(result);
-                }
-            }
-        } );
+        JMenuItem cutItem = result.add(new DefaultEditorKit.CutAction());
+        cutItem.setText("Cut");
+        JMenuItem copyItem = result.add(new DefaultEditorKit.CopyAction());
+        copyItem.setText("Copy");
+        JMenuItem pasteItem = result.add(new DefaultEditorKit.PasteAction());
+        pasteItem.setText("Paste");
+
         JMenu fontMenu= new JMenu( "Font Size" );
 
         fontMenu.add( new AbstractAction( "Big" ) {
