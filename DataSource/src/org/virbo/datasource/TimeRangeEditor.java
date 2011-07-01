@@ -159,7 +159,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
-        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/file.png"))); // NOI18N
+        browseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/fileMag.png"))); // NOI18N
         browseButton.setToolTipText("Edit data source");
         browseButton.setEnabled(false);
         browseButton.addActionListener(new java.awt.event.ActionListener() {
