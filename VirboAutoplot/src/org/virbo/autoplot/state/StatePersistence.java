@@ -269,30 +269,54 @@ public class StatePersistence {
                     double dstVersion= Double.parseDouble(currentVersion);
 
                     if (srcVersion > dstVersion) {
-                        throw new IOException("Cannot read .vap file version > " + currentVersion);
-                    }
+                        // downgrade future versions.  This is experimental, but slightly
+                        // better than not allowing use.  This is intended to smooth
+                        // transitions to new autoplot versions.  Future vap files
+                        // that use future features will not load properly.
+                        for ( double s=srcVersion; s>dstVersion; s=s-0.01 ) {
+                            Source src = new DOMSource( document );
 
-                    for ( double s=srcVersion; s<dstVersion; s=s+0.01 ) {
-                        Source src = new DOMSource( document );
+                            DOMResult res = new DOMResult( );
 
-                        DOMResult res = new DOMResult( );
+                            String fname= String.format( Locale.US, "Vap_%4.2f_to_%4.2f",
+                                    s, s-0.01 );
+                            fname= fname.replaceAll("\\.","_") + ".xsl";
 
-                        String fname= String.format( Locale.US, "Vap_%4.2f_to_%4.2f",
-                                s, s+0.01 );
-                        fname= fname.replaceAll("\\.","_") + ".xsl";
+                            InputStream xsl = StatePersistence.class.getResourceAsStream(fname);
+                            if ( xsl==null ) {
+                                throw new RuntimeException("Unable to find "+fname+".");
+                            }
+                            TransformerFactory factory = TransformerFactory.newInstance();
+                            Transformer tr = factory.newTransformer(new StreamSource(xsl));
 
-                        InputStream xsl = StatePersistence.class.getResourceAsStream(fname);
-                        if ( xsl==null ) {
-                            throw new RuntimeException("Unable to find "+fname+".");
+                            tr.transform(src, res);
+                            document= ((Document)res.getNode());
                         }
-                        TransformerFactory factory = TransformerFactory.newInstance();
-                        Transformer tr = factory.newTransformer(new StreamSource(xsl));
 
-                        tr.transform(src, res);
-                        document= ((Document)res.getNode());
+                    } else {
 
+                        // upgrade old vap file versions.
+                        for ( double s=srcVersion; s<dstVersion; s=s+0.01 ) {
+                            Source src = new DOMSource( document );
+
+                            DOMResult res = new DOMResult( );
+
+                            String fname= String.format( Locale.US, "Vap_%4.2f_to_%4.2f",
+                                    s, s+0.01 );
+                            fname= fname.replaceAll("\\.","_") + ".xsl";
+
+                            InputStream xsl = StatePersistence.class.getResourceAsStream(fname);
+                            if ( xsl==null ) {
+                                throw new RuntimeException("Unable to find "+fname+".");
+                            }
+                            TransformerFactory factory = TransformerFactory.newInstance();
+                            Transformer tr = factory.newTransformer(new StreamSource(xsl));
+
+                            tr.transform(src, res);
+                            document= ((Document)res.getNode());
+
+                        }
                     }
-
                 }
 
                 Element dom= getChildElement( document.getDocumentElement(), "Application" );
