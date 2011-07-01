@@ -1,6 +1,11 @@
 <?xml version="1.1" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <Properties>
+    <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+      <Dimension value="[384, 39]"/>
+    </Property>
+  </Properties>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -19,7 +24,7 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="prevButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="timeRangeTextField" pref="431" max="32767" attributes="0"/>
+              <Component id="timeRangeTextField" pref="322" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="nextButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -29,11 +34,14 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="103" alignment="0" groupAlignment="3" attributes="0">
-              <Component id="prevButton" alignment="3" max="32767" attributes="0"/>
-              <Component id="timeRangeTextField" alignment="3" min="-2" max="-2" attributes="0"/>
-              <Component id="browseButton" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
-              <Component id="nextButton" alignment="3" min="-2" max="-2" attributes="0"/>
+          <Group type="102" attributes="0">
+              <Group type="103" alignment="0" groupAlignment="3" max="-2" attributes="0">
+                  <Component id="prevButton" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="timeRangeTextField" linkSize="2" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Component id="browseButton" linkSize="2" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Component id="nextButton" linkSize="2" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace pref="13" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -42,6 +50,16 @@
     <Component class="javax.swing.JButton" name="prevButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
+        <Property name="toolTipText" type="java.lang.String" value="Scan to the previous interval"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[34, 20]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[34, 20]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[34, 20]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="prevButtonActionPerformed"/>
@@ -50,6 +68,16 @@
     <Component class="javax.swing.JButton" name="nextButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="&gt;&gt;"/>
+        <Property name="toolTipText" type="java.lang.String" value="Scan to the next interval"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[34, 24]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[34, 24]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[34, 24]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="nextButtonActionPerformed"/>
@@ -58,6 +86,7 @@
     <Component class="javax.swing.JTextField" name="timeRangeTextField">
       <Properties>
         <Property name="text" type="java.lang.String" value="2010-01-01"/>
+        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;Adjust Application Time Range&lt;br&gt;&#xa;For example:&lt;br&gt;&#xa;2010:  the year 2010.&lt;br&gt;&#xa;2010-01: the month 2010-Jan&lt;br&gt;&#xa;2010-001 or 2010-01-01: Jan 1, 2010&lt;br&gt;&#xa;2010-01-01 08:00 to 09:00&lt;br&gt;&#xa;&lt;/html&gt;"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="timeRangeTextFieldActionPerformed"/>
@@ -71,6 +100,18 @@
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="Edit data source"/>
         <Property name="enabled" type="boolean" value="false"/>
+        <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
+          <Insets value="[2, 2, 2, 2]"/>
+        </Property>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[20, 20]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[20, 20]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[20, 20]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="browseButtonActionPerformed"/>
