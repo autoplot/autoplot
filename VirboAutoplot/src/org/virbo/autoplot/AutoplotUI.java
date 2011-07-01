@@ -898,7 +898,7 @@ APSplash.checkTime("init 52");
         //fileMenu.add( mi );
 
         item = new JMenuItem( support.getDumpDataAction2( dom ) );
-        mi.setToolTipText("Export the data that has the focus");
+        item.setToolTipText("Export the data that has the focus");
         fileMenu.add( item );
 
         //fileMenu.add( new )
@@ -1321,12 +1321,12 @@ APSplash.checkTime("init 52");
         autoRangingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLabellingCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
         autoLayoutCheckBoxMenuItem = new javax.swing.JCheckBoxMenuItem();
-        jMenuItem7 = new javax.swing.JMenuItem();
         bookmarksMenu = new javax.swing.JMenu();
         toolsMenu = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
+        jMenuItem7 = new javax.swing.JMenuItem();
         jSeparator3 = new javax.swing.JSeparator();
         pngWalkMenuItem = new javax.swing.JMenuItem();
         createPngWalkMenuItem = new javax.swing.JMenuItem();
@@ -1620,6 +1620,7 @@ APSplash.checkTime("init 52");
 
         jMenu5.setText("Address Bar");
 
+        jRadioButtonMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_D, java.awt.event.InputEvent.CTRL_MASK));
         addressBarButtonGroup.add(jRadioButtonMenuItem1);
         jRadioButtonMenuItem1.setSelected(true);
         jRadioButtonMenuItem1.setText("Data Set Selector");
@@ -1630,6 +1631,7 @@ APSplash.checkTime("init 52");
         });
         jMenu5.add(jRadioButtonMenuItem1);
 
+        jRadioButtonMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_MASK));
         addressBarButtonGroup.add(jRadioButtonMenuItem2);
         jRadioButtonMenuItem2.setText("Time Range Selector");
         jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
@@ -1665,15 +1667,6 @@ APSplash.checkTime("init 52");
 
         optionsMenu.add(jMenu4);
 
-        jMenuItem7.setText("Move Cache...");
-        jMenuItem7.setToolTipText("Move file cache to new location");
-        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem7ActionPerformed(evt);
-            }
-        });
-        optionsMenu.add(jMenuItem7);
-
         jMenuBar1.add(optionsMenu);
 
         bookmarksMenu.setText("Bookmarks");
@@ -1700,6 +1693,15 @@ APSplash.checkTime("init 52");
             }
         });
         jMenu3.add(jMenuItem4);
+
+        jMenuItem7.setText("Move Cache...");
+        jMenuItem7.setToolTipText("Move file cache to new location");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem7);
 
         toolsMenu.add(jMenu3);
         toolsMenu.add(jSeparator3);
@@ -1964,6 +1966,7 @@ APSplash.checkTime("init 52");
 
             JLabel label= new JLabel(buffy.toString());
             JScrollPane pane= new JScrollPane(label,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
+            pane.getVerticalScrollBar().setUnitIncrement( 12 );
             pane.setPreferredSize(new java.awt.Dimension(label.getPreferredSize().width + 50,480));
 
             JOptionPane.showMessageDialog(this, pane);
