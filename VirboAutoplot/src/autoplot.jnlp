@@ -34,38 +34,12 @@
               href="http://java.sun.com/products/autodl/j2se" > 
         </j2se>
         
+        <property name="jnlp.packEnabled" value="true"/>
+
         <property name="autoplot.default.bookmarks" value="http://autoplot.org/data/demos.xml" />
         
-        <jar href="VirboAutoplot.jar" />
-        
-        <jar href="http://autoplot.org/jnlp-lib/batik-awt-util.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/batik-svggen.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/batik-util.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/commons-codec-1.3.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/commons-httpclient-3.0.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/commons-logging-1.0.4.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/dods-1.1.7.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/gnu-regexp-1.1.4.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/gnu-getopt-1.0.6.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/itext-1.2.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/jdom.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/netcdf-4.1.jar"/>
-        <jar href="http://autoplot.org/jnlp-lib/slf4j-jdk14.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/poi-3.1-FINAL-20080629.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/poi-contrib-3.1-FINAL-20080629.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/resourcesOptional.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/swing-layout-1.0.3.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/jython.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/jython-lib-2.2.1.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/jfits-0.93.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/beansbinding-1.2.1.jar"/>
-        <jar href="http://autoplot.org/jnlp-lib/metadata-extractor-2.1.0.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/jh.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/commons-net-2.0.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/commons-net-ftp-2.0.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/commons-vfs-1.0.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/jsch-20090723.jar" />
-        <jar href="http://autoplot.org/jnlp-lib/json-2011-01-27-gitrelease.jar" />
+        <jar href="AutoplotVolatile.jar" />
+        <jar href="http://autoplot.org/jnlp-lib/AutoplotStable.jar" />
         
         <!-- cdf -->
         <jar href="http://autoplot.org/jnlp-lib/cdfjava-hack.jar" /> <!-- rank 3 hack -->
@@ -76,31 +50,6 @@
         <!-- <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1-hack.jnlp" > -->
            <extension name="cdf" href="http://autoplot.org/cdf-jnlp/cdf-3.3.1.jnlp" >
         </extension>
-        
-        <jar href="lib/dasCore.jar" />
-        <jar href="lib/dasCoreUtil.jar" />
-        <jar href="lib/dasCoreDatum.jar" />
-        <jar href="lib/QDataSet.jar" />
-        <jar href="lib/AutoplotHelp.jar" />
-        <jar href="lib/QStream.jar" />
-        <jar href="lib/JythonSupport.jar" />
-        <jar href="lib/DataSource.jar" />
-        <jar href="lib/DataSourcePack.jar" />
-        <jar href="lib/JythonDataSource.jar" />
-        <jar href="lib/JFontChooser.jar" />
-        <jar href="lib/CdfDataSource.jar" />
-        <jar href="lib/CdfJavaDataSource.jar" />
-        <jar href="lib/CDAWebDataSource.jar" />
-        <jar href="lib/WavDataSource.jar" />
-        <jar href="lib/CefDataSource.jar" />
-        <jar href="lib/OpenDapDataSource.jar" />
-        <jar href="lib/NetCdfDataSource.jar" />
-        <jar href="lib/ExcelDataSource.jar" />
-        <jar href="lib/BinaryDataSource.jar" />
-        <jar href="lib/FitsDataSource.jar" />
-        <jar href="lib/ImageDataSource.jar" />
-        <jar href="lib/Das2ServerDataSource.jar" />
-        <jar href="lib/TsdsDataSource.jar" />
         
     </resources> 
     
