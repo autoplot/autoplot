@@ -712,19 +712,34 @@ public class PlotController extends DomNodeController {
         elerange= e.getPlotDefaults().getXaxis().getRange();
         range=  plot.getXaxis().getRange();
         if ( elerange.getUnits() != range.getUnits() && range.getUnits()==Units.dimensionless ) {
-            DatumRange dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+            DatumRange dr;
+            if ( UnitsUtil.isTimeLocation(elerange.getUnits()) ) {
+                dr= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+            } else {
+                dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+            }
             plot.getXaxis().setRange( dr );
         }
         elerange= e.getPlotDefaults().getYaxis().getRange();
         range=  plot.getYaxis().getRange();
-        if ( elerange.getUnits() != range.getUnits() && range.getUnits()==Units.dimensionless ) {
-            DatumRange dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+        if ( !UnitsUtil.isTimeLocation(elerange.getUnits()) && elerange.getUnits() != range.getUnits() && range.getUnits()==Units.dimensionless ) {
+            DatumRange dr;
+            if ( UnitsUtil.isTimeLocation(elerange.getUnits()) ) {
+                dr= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+            } else {
+                dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+            }
             plot.getYaxis().setRange( dr );
         }
         elerange= e.getPlotDefaults().getZaxis().getRange();
         range=  plot.getZaxis().getRange();
-        if ( elerange.getUnits() != range.getUnits() && range.getUnits()==Units.dimensionless  ) {
-            DatumRange dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+        if ( !UnitsUtil.isTimeLocation(elerange.getUnits()) && elerange.getUnits() != range.getUnits() && range.getUnits()==Units.dimensionless  ) {
+            DatumRange dr;
+            if ( UnitsUtil.isTimeLocation(elerange.getUnits()) ) {
+                dr= DatumRangeUtil.parseTimeRangeValid( "2010-01-01" );
+            } else {
+                dr= new DatumRange( range.min().doubleValue(Units.dimensionless), range.max().doubleValue(Units.dimensionless), elerange.getUnits() );
+            }
             plot.getZaxis().setRange( dr );
         }
 

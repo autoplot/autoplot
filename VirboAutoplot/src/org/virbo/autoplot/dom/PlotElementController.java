@@ -1732,15 +1732,15 @@ public class PlotElementController extends DomNodeController {
         }
 
         boolean change= false;
-        if ( xrange.getUnits()==Units.dimensionless && !xunits.isConvertableTo( xrange.getUnits() ) ) {
+        if ( xrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(xunits) && !xunits.isConvertableTo( xrange.getUnits() ) ) {
             plotElement.getPlotDefaults().getXaxis().setRange( new DatumRange( xrange.min().doubleValue(Units.dimensionless), xrange.max().doubleValue(Units.dimensionless), xunits ) );
             change= true;
         }
-        if ( yrange.getUnits()==Units.dimensionless && !yunits.isConvertableTo( yrange.getUnits() ) ) {
+        if ( yrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(yunits) && !yunits.isConvertableTo( yrange.getUnits() ) ) {
             plotElement.getPlotDefaults().getYaxis().setRange( new DatumRange( yrange.min().doubleValue(Units.dimensionless), yrange.max().doubleValue(Units.dimensionless), yunits ) );
             change= true;
         }
-        if ( zrange.getUnits()==Units.dimensionless && !zunits.isConvertableTo( zrange.getUnits() ) ) {
+        if ( zrange.getUnits()==Units.dimensionless && !UnitsUtil.isTimeLocation(zunits) && !zunits.isConvertableTo( zrange.getUnits() ) ) {
             plotElement.getPlotDefaults().getZaxis().setRange( new DatumRange( zrange.min().doubleValue(Units.dimensionless), zrange.max().doubleValue(Units.dimensionless), zunits ) );
             change= true;
         }
