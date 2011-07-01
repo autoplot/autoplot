@@ -151,7 +151,7 @@ public class RecentUrisDialog extends javax.swing.JDialog {
             }
         });
 
-        editUriButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/file.png"))); // NOI18N
+        editUriButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/autoplot/fileMag.png"))); // NOI18N
         editUriButton.setText("Edit");
         editUriButton.setToolTipText("Inspect this resource.  If an editor panel is available, this will enter the editor panel before plotting.  Otherwise the\nURI is copied to the address bar for editing with completions.");
         editUriButton.addActionListener(new java.awt.event.ActionListener() {
@@ -183,8 +183,8 @@ public class RecentUrisDialog extends javax.swing.JDialog {
                 .add(filterTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 191, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(updateButton)
-                .addContainerGap(381, Short.MAX_VALUE))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, recentUrisGUI1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
+                .addContainerGap(427, Short.MAX_VALUE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, recentUrisGUI1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 781, Short.MAX_VALUE)
         );
 
         layout.linkSize(new java.awt.Component[] {editUriButton, plotButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
