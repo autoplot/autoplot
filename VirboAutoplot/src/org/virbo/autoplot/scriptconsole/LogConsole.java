@@ -101,7 +101,7 @@ public class LogConsole extends javax.swing.JPanel {
                             maybeInitializeInterpreter();
                             try {
                                 PyObject po= interp.eval(s);
-                                if ( !( po instanceof PyNone ) ) interp.exec("print " + s ); // Ed West will know a better way to do this.
+                                if ( !( po instanceof PyNone ) ) interp.exec("print repr(" + s +")" ); 
                             } catch (PyException ex ) {
                                 interp.exec(s);
                             }
