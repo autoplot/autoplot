@@ -988,7 +988,7 @@ public class DataSetSelector extends javax.swing.JPanel {
 
         dataSetSelector.setEditable(true);
         dataSetSelector.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(application will put recent items here)" }));
-        dataSetSelector.setToolTipText("enter data source URL");
+        dataSetSelector.setToolTipText("Enter data source address");
         dataSetSelector.setMinimumSize(new java.awt.Dimension(20, 20));
         dataSetSelector.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
