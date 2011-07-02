@@ -492,6 +492,18 @@ public class AutoplotUI extends javax.swing.JFrame {
 
         APSplash.checkTime("init 110");
 
+
+        run= new Runnable() {
+            public void run() {
+                try {
+                    //initialize the python interpretter
+                    JythonUtil.createInterpreter(true, false);
+                } catch (IOException ex) {
+                    Logger.getLogger(AutoplotUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+        invokeLater( 1000, false, run );
     }
 
     private Runnable addAxes() {
