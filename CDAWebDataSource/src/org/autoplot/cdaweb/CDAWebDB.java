@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -107,7 +108,11 @@ public class CDAWebDB {
             mon.setTaskProgress(2);
             mon.setProgressMessage("reading IDs");
 
-            BufferedReader rr= new BufferedReader( new InputStreamReader( CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ) );
+            InputStream in= CDAWebDB.class.getResourceAsStream("/org/autoplot/cdaweb/filenames_alt.txt") ;
+            if ( in==null ) {
+                throw new RuntimeException("Unable to locate /org/autoplot/cdaweb/filenames_alt.txt");
+            }
+            BufferedReader rr= new BufferedReader( new InputStreamReader( in ) );
             String ss= rr.readLine();
             while ( ss!=null ) {
                 int i= ss.indexOf("#");
