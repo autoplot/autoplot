@@ -19,6 +19,7 @@ import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.das2.datum.EnumerationUnits;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.URISplit;
@@ -54,8 +55,12 @@ public class ExcelSpreadsheetDataSourceFormat implements DataSourceFormat {
                 cell= row.createCell(icell++);
                 
                 Datum d= u.createDatum(dep1.value(i));
-                
-                setCellValue( cell, d);
+
+                if ( u instanceof EnumerationUnits ) {
+                    cell.setCellValue( d.toString() );
+                } else {
+                    setCellValue( cell, d);
+                }
             }
         }
 
