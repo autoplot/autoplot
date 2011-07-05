@@ -480,7 +480,7 @@ public class AutoplotUI extends javax.swing.JFrame {
         addTools();
         addBindings();
 
-//        pack();
+        pack();
 
         dom.getOptions().addPropertyChangeListener(optionsListener);
 
