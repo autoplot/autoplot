@@ -15,6 +15,9 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -50,6 +53,11 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     /** Creates new form CDAWebEditorPanel */
     public CDAWebEditorPanel() {
         initComponents();
+        this.addComponentListener( new ComponentAdapter() {
+            public void componentShown(ComponentEvent e) {
+                refresh(getURI());
+            }
+        });
     }
 
     public static final String PARAM_FILTER= "filter"; // for convenience, carry filter around
@@ -172,6 +180,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         }
                         paramEditor= panel;
                         parameterPanel.revalidate();
+                        messageComponent= null;
 //System.err.println( " after count=" + parameterPanel.getComponentCount() );
                         refreshDataSet( panel, ds, args );
                     } catch ( Exception ex ) {
@@ -181,7 +190,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                 } else {
                     messageComponent= new JLabel(MSG_NO_DATASET);
                 }
-                if ( messageComponent!=null ) {
+                if ( messageComponent!=null ) { // show message if necessary
                     parameterPanel.removeAll();
                     parameterPanel.add( messageComponent, BorderLayout.NORTH );
                 }
@@ -384,12 +393,14 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         parameterPanel.add( messageComponent, BorderLayout.CENTER );
         parameterPanel.revalidate();
 
-        Runnable run= new Runnable() {
-            public void run() {
-                refresh(getURI());
-            }
-        };
-        new Thread(run).start();
+        if ( this.isShowing() ) {
+            Runnable run= new Runnable() {
+                public void run() {
+                    refresh(getURI());
+                }
+            };
+            new Thread(run).start();
+        }
     }//GEN-LAST:event_dsidComboBoxActionPerformed
 
 
