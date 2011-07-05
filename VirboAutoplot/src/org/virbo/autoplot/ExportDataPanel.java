@@ -98,7 +98,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
 
         jLabel1.setText("Select Data to Export:");
 
-        jLabel3.setText("Selection:");
+        jLabel3.setText("Filename:");
 
         filenameTF.setText("data");
 
@@ -109,7 +109,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
             }
         });
 
-        additionalOptionsButton.setText("Additional Options...");
+        additionalOptionsButton.setText("Additional options for output format...");
         additionalOptionsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 additionalOptionsButtonActionPerformed(evt);
