@@ -131,7 +131,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Selection:"/>
+        <Property name="text" type="java.lang.String" value="Filename:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="filenameTF">
@@ -149,7 +149,7 @@
     </Component>
     <Component class="javax.swing.JButton" name="additionalOptionsButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Additional Options..."/>
+        <Property name="text" type="java.lang.String" value="Additional options for output format..."/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="additionalOptionsButtonActionPerformed"/>
