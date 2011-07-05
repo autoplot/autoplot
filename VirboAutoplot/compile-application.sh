@@ -31,14 +31,14 @@ if [ "" = "$TAG" ]; then
     fi
 fi
 
-if [ "" = "$KEYPASS ]; then
+if [ "" = "$KEYPASS" ]; then
     echo "KEYPASS NEEDED!"
-    stop
+    KEYPASS=virbo1
 fi
 
-if [ "" = "$STOREPASS ]; then
+if [ "" = "$STOREPASS" ]; then
     echo "STOREPASS NEEDED!"
-    stop
+    STOREPASS=dolphin
 fi
 
 if [ "" = "$CODEBASE" ]; then
@@ -81,7 +81,7 @@ echo "done copy sources"
 
 # special handling of the META-INF stuff.
 
-echo "special handling of META-INF stuff..."
+echo "=== special handling of META-INF stuff..."
 mkdir temp-volatile-classes/META-INF
 
 file=org.virbo.datasource.DataSourceFactory.extensions
@@ -110,16 +110,20 @@ cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-volati
 # end, special handling of the META-INF stuff.
 echo "done special handling of META-INF stuff."
 
-echo "copy resources..."
+echo "=== copy resources..."
 cd temp-volatile-src
-for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' -o name '*.txt' ); do
+for i in $( find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.py' -o -name '*.jy' -o -name '*.xsl' -o -name '*.xsd' -o -name '*.CSV' ); do
+   mkdir -p $(dirname ../temp-volatile-classes/$i)
+   cp $i ../temp-volatile-classes/$i
+done
+for i in $( find * -name 'filenames_alt*.txt' ); do   # kludge support for CDAWeb, where *.txt is too inclusive
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
 cd ..
 echo "done copy resources."
 
-echo "copy help files..."
+echo "=== copy help files..."
 for i in \
   dasCore dasCoreUtil dasCoreDatum \
   QDataSet QStream DataSource \
@@ -145,7 +149,7 @@ echo "done copy help files."
 hasErrors=0
 
 # compile key java classes.
-echo "compile sources..."
+echo "=== compile sources..."
 cd temp-volatile-src
 echo `pwd`
 if ! ${JAVA5_HOME}bin/javac -target 1.5 -cp ../temp-volatile-classes:../AutoplotStable.jar:. -d ../temp-volatile-classes -Xmaxerrs 10 org/virbo/autoplot/AutoplotUI.java; then hasErrors=1; fi
@@ -189,7 +193,7 @@ if [ $hasErrors -eq 1 ]; then
   exit 1 
 fi
 
-echo "make jumbo jar files..."
+echo "=== make jumbo jar files..."
 mkdir -p dist/
 cd temp-volatile-classes
 ${JAVA5_HOME}bin/jar cmf ../temp-volatile-src/MANIFEST.MF ../dist/AutoplotVolatile.jar *
@@ -197,30 +201,26 @@ cd ..
 
 echo "done make jumbo jar files..."
 
-echo "normalize jar file before signing..."
+echo "=== normalize jar file before signing..."
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar
 echo "sign and pack the jar file..."
 echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
 ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
 ${JAVA5_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 
-echo "create jnlp file for build..."
+echo "=== create jnlp file for build..."
 cp src/autoplot.jnlp dist
 
-echo "copy branding for release, such as png icon images"
+echo "=== copy branding for release, such as png icon images"
 cp src/*.png dist
 cp src/index.html dist  #TODO: why?
 
-echo "modify jar files for this particular release"
+echo "=== modify jar files for this particular release"
 cd temp-volatile-src
 $JAVA5_HOME/bin/javac -target 1.5 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
 $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
 $JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
-
-#echo "proguard/pack200 stuff..."
-#$JAVA5_HOME/bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
-#echo "done proguard/pack200 stuff."
 
 mv AutoplotStable.jar.pack.gz dist/
 mv AutoplotStable.jar dist/
