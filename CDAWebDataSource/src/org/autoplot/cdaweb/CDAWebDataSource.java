@@ -101,7 +101,10 @@ public class CDAWebDataSource extends AbstractDataSource {
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws Exception {
 
         CDAWebDB db= CDAWebDB.getInstance();
-        db.maybeRefresh(mon);
+
+        mon.started();
+        mon.setProgressMessage("refreshing database");
+        db.maybeRefresh( new NullProgressMonitor() );
 
         String tmpl= db.getNaming(ds.toUpperCase());
         String base= db.getBaseUrl(ds.toUpperCase());
@@ -119,7 +122,10 @@ public class CDAWebDataSource extends AbstractDataSource {
         mon.started();
 
         //we need to look in the file to see if it is virtual
+        mon.setProgressMessage("get metadata");
         getMetadata(mon);
+        mon.started(); //kludge
+
         String virtual= (String) metadata.get( "VIRTUAL" );
 
         DatumRange range=null;
@@ -200,7 +206,7 @@ public class CDAWebDataSource extends AbstractDataSource {
 
             CDAWebDB db= CDAWebDB.getInstance();
 
-            String master= db.getMasterFile( ds.toLowerCase() );
+            String master= db.getMasterFile( ds.toLowerCase(), mon );
 
             DataSource cdf= getDelegateFactory().getDataSource( new URI(master+"?"+param) );
 

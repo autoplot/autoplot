@@ -118,7 +118,7 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
                 Map<String,String> params= URISplit.parseParams(split.params);
                 String ds= params.get("ds").toUpperCase();
                 if ( ds!=null ) {
-                    String master= CDAWebDB.getInstance().getMasterFile( ds.toLowerCase() );
+                    String master= CDAWebDB.getInstance().getMasterFile( ds.toLowerCase(), mon );
 
                     File f= FileSystemUtil.doDownload( master, mon );
 

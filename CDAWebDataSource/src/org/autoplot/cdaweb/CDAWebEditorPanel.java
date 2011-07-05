@@ -13,11 +13,13 @@ package org.autoplot.cdaweb;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
+import java.awt.Graphics;
 import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.text.ParseException;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -32,6 +34,7 @@ import javax.swing.SwingUtilities;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.cdfdatasource.CdfDataSourceEditorPanel;
 import org.virbo.datasource.AutoplotSettings;
@@ -118,17 +121,30 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     }
 
-    private void doRefreshDataSet( final String ds, final Map<String,String> args ) throws IOException, Exception {
+    /**
+     * Do not call from event thread.
+     * @param ds null, or the current dataset.
+     * @param args
+     * @throws IOException
+     * @throws Exception
+     */
+    private synchronized void doRefreshDataSet( final String ds, final Map<String,String> args ) throws IOException, Exception {
 
+        Window w= SwingUtilities.getWindowAncestor(this);
+        DasProgressPanel mon;
+        if ( w==null ) { 
+            mon= DasProgressPanel.createFramed("getting master CDF");
+        } else {
+            mon= DasProgressPanel.createFramed(w,"getting master CDF");
+        }
         currentDs= ds;
 
-        parameterPanel.removeAll();
-        //messageComponent= new JLabel("<html><em>Resetting...</em></html>"); // this causes problem when droplist is used.
-        //parameterPanel.add( messageComponent, BorderLayout.CENTER );
-        parameterPanel.revalidate();
-
+        final String fmaster;
         if ( ds!=null ) {
-            String master= CDAWebDB.getInstance().getMasterFile(ds); // do the download off the event thread.
+            String master= CDAWebDB.getInstance().getMasterFile(ds,mon); // do the download off the event thread.
+            fmaster= master;
+        } else {
+            fmaster= null;
         }
 
         Runnable run= new Runnable() {
@@ -137,7 +153,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                     try {
                         final CdfDataSourceEditorPanel panel= new CdfDataSourceEditorPanel();
 
-                        String master= CDAWebDB.getInstance().getMasterFile(ds);
+                        String master= fmaster;
 
                         String id= args.get("id");
                         if ( id!=null ) {
@@ -145,7 +161,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         }
 
                         boolean status;
-                        status= panel.prepare( master, SwingUtilities.getWindowAncestor(CDAWebEditorPanel.this), DasProgressPanel.createFramed("getting master CDF") );
+                        status= panel.prepare( master, SwingUtilities.getWindowAncestor(CDAWebEditorPanel.this), new NullProgressMonitor() );
                         panel.setURI( master );
 //System.err.println( "messageComponent="+messageComponent );
                         if ( messageComponent!=null ) parameterPanel.remove(messageComponent);
@@ -196,10 +212,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         messageComponent= null;
 
         try {
-            if ( ds!=currentDs ) {
+            if ( ds == null ? currentDs != null : !ds.equals(currentDs) ) {
                 doRefreshDataSet(ds,args);
-            } else {
-                //System.err.println("already refreshed for: "+ds );
             }
         } catch ( Exception ex ) {
             ex.printStackTrace();
@@ -365,6 +379,11 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     }//GEN-LAST:event_timeRangeTextFieldActionPerformed
 
     private void dsidComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dsidComboBoxActionPerformed
+        parameterPanel.removeAll();
+        messageComponent= new JLabel("<html><em>Resetting...</em></html>"); // this causes problem when droplist is used.
+        parameterPanel.add( messageComponent, BorderLayout.CENTER );
+        parameterPanel.revalidate();
+
         Runnable run= new Runnable() {
             public void run() {
                 refresh(getURI());
@@ -422,7 +441,10 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                             messageComponent= new JLabel(MSG_NO_DATASET);
                             parameterPanel.removeAll();
                             parameterPanel.add( messageComponent, BorderLayout.NORTH );
-                            pickDs();
+                            parameterPanel.revalidate();
+                            if ( !pickDs() ) {
+                                //System.err.println("no dataset picked.");
+                            }
                         }
                     } );
                 }

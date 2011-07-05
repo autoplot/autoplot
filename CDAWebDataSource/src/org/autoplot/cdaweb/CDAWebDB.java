@@ -74,7 +74,7 @@ public class CDAWebDB {
      * but we don't want to pound on the CDAWeb server needlessly.
      * @param mon
      */
-    public synchronized void maybeRefresh( ProgressMonitor mon ) {
+    public synchronized void maybeRefresh( ProgressMonitor mon ) throws IOException {
         long t= System.currentTimeMillis();
         if ( t - refreshTime > 600000 ) { // 10 minutes
             refresh(mon);
@@ -82,7 +82,7 @@ public class CDAWebDB {
         }
     }
 
-    public synchronized void refresh( ProgressMonitor mon ) {
+    public synchronized void refresh( ProgressMonitor mon ) throws IOException {
         try {
 
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -92,7 +92,11 @@ public class CDAWebDB {
             mon.setProgressMessage("downloading file "+dbloc );
 
             FileInputStream fin= new FileInputStream( DataSetURI.getFile( new URI(dbloc), SubTaskMonitor.create( mon, 0, 1 ) ) );
-            
+
+            if ( mon.isCancelled() ) {
+                return;
+            }
+
             InputSource source = new InputSource( fin );
 
             mon.setTaskProgress(1);
@@ -138,8 +142,6 @@ public class CDAWebDB {
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (URISyntaxException ex) {
-            Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
             Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -231,11 +233,12 @@ public class CDAWebDB {
         }
     }
 
-    public String getMasterFile( String ds ) throws IOException {
+    public String getMasterFile( String ds, ProgressMonitor p ) throws IOException {
         String master= "ftp://cdaweb.gsfc.nasa.gov/pub/CDAWlib/0MASTERS/"+ds.toLowerCase()+"_00000000_v01.cdf";
 
-        DasProgressPanel p= DasProgressPanel.createFramed("downloading master cdf");
-
+        //DasProgressPanel p= DasProgressPanel.createFramed("downloading master cdf");
+        p.setLabel("downloading master cdf");
+        
         try {
             try {
                 DataSetURI.getFile(new URI(master), p);

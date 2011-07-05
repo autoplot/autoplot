@@ -8,7 +8,7 @@ ant -quiet do-tag  #TODO: why must we still do this?
 cd ../VirboAutoplot
 ant -quiet do-tag
 
-export AP_VERSION=20110701
+export AP_VERSION=20110705
 
 # TODO: these are already in another script, but should probably clean this up.  Right now the keystore file is the security...
 export KEYPASS=virbo1
@@ -31,7 +31,7 @@ rm -r VirboAutoplot/dist/README.TXT
 rm -r VirboAutoplot/dist/AutoplotStable.jar
 rm -r VirboAutoplot/dist/AutoplotStable.jar.pack.gz
 
-#rsync -e ssh -av dist/jnlp/ root@aurora.gmu.edu:/var/www/autoplot/jnlp/$AP_VERSION/
+rsync -e ssh -av VirboAutoplot/dist/ root@aurora.gmu.edu:/var/www/autoplot/jnlp/$AP_VERSION/
 
 echo "If this is to be a new production version, then update the latest link in /var/www/autoplot/jnlp/"
 

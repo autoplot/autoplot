@@ -62,6 +62,10 @@ public class OptionsPrefsController {
         options.autolabelling = prefs.getBoolean(Options.PROP_AUTOLABELLING, options.autolabelling);
         options.autolayout = prefs.getBoolean(Options.PROP_AUTOLAYOUT, options.autolayout);
         options.autoranging = prefs.getBoolean(Options.PROP_AUTORANGING, options.autoranging);
+        if ( !options.autoranging ) {
+            System.err.println("Autorange default was false, enabling it now.");
+            options.autoranging= true;
+        }
         options.background = Color.decode(prefs.get(Options.PROP_BACKGROUND, DomUtil.encodeColor(options.background)));
         options.canvasFont = prefs.get(Options.PROP_CANVASFONT, options.canvasFont);
         options.color = Color.decode(prefs.get(Options.PROP_COLOR, DomUtil.encodeColor(options.color)));
