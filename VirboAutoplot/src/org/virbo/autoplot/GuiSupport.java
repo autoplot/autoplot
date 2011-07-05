@@ -267,6 +267,44 @@ public class GuiSupport {
 
     }
 
+    private void doDumpData( QDataSet fds, DataSourceFilter dsf, PlotElement pe, DataSourceFormat format, String uriOut, boolean formatPlotElement  ) throws IOException {
+
+        try {
+            QDataSet ds= fds;
+
+            if ( dsf.getController().getTsb()!=null ) {
+                dsf.getController().getTsb().setTimeResolution(null);
+                ProgressMonitor mon= DasProgressPanel.createFramed(parent, "reloading timeseries at native resolution");
+                ds= dsf.getController().getDataSource().getDataSet( mon );
+                if ( mon.isCancelled() ) {
+                    parent.setStatus( "export data cancelled" );
+                    return;
+                }
+                mon.finished(); //why?
+            }
+
+            ProgressMonitor mon= DasProgressPanel.createFramed( parent, "formatting data" );
+            if ( formatPlotElement ) {
+                QDataSet dsout=  pe.getController().getDataSet();
+                if ( dsf.getController().getTsb()!=null ) {
+                    dsout= DataSetOps.sprocess( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
+                    format.formatData( uriOut, dsout, mon );
+                } else {
+                    format.formatData( uriOut, dsout, mon );
+                }
+            } else {
+                format.formatData( uriOut, ds, mon );
+            }
+            parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
+        } catch ( IllegalArgumentException ex ) {
+            parent.applicationModel.getExceptionHandler().handle(ex);
+        } catch (RuntimeException ex ) {
+            parent.applicationModel.getExceptionHandler().handleUncaught(ex);
+        } catch (Exception ex) {
+            parent.applicationModel.getExceptionHandler().handle(ex);
+        }
+    }
+
     Action getDumpDataAction2( final Application dom ) {
         return new AbstractAction("Export Data...") {
             public void actionPerformed( ActionEvent e ) {
@@ -353,42 +391,10 @@ public class GuiSupport {
                         Runnable run= new Runnable() {
                             public void run() {
                                 try {
-
-                                    QDataSet ds= fds;
-
-                                    if ( dsf.getController().getTsb()!=null ) {
-                                        dsf.getController().getTsb().setTimeResolution(null);
-                                        ProgressMonitor mon= DasProgressPanel.createFramed(parent, "reloading timeseries at native resolution");
-                                        ds= dsf.getController().getDataSource().getDataSet( mon );
-                                        if ( mon.isCancelled() ) {
-                                            parent.setStatus( "export data cancelled" );
-                                            return;
-                                        }
-                                    }
-
-                                    ProgressMonitor mon= DasProgressPanel.createFramed( parent, "formatting data" );
-                                    if ( edp.isFormatPlotElement() ) {
-                                        QDataSet dsout=  pe.getController().getDataSet();
-                                        if ( dsf.getController().getTsb()!=null ) {
-                                            dsout= DataSetOps.sprocess( pe.getComponent(), dsout, DasProgressPanel.createFramed(parent, "process TSB timeseries at native resolution") );
-                                            format.formatData( uriOut, dsout, mon );
-                                        } else {
-                                            format.formatData( uriOut, dsout, mon );
-                                        }
-                                    } else {
-                                        format.formatData( uriOut, ds, mon );
-                                    }
-                                    parent.setStatus("Wrote " + org.virbo.datasource.DataSourceUtil.unescape(uriOut) );
+                                    doDumpData( fds,dsf,pe,format,uriOut,edp.isFormatPlotElement() );
                                 } catch ( IOException ex ) {
                                     parent.applicationModel.getExceptionHandler().handle(ex);
-                                } catch ( IllegalArgumentException ex ) {
-                                    parent.applicationModel.getExceptionHandler().handle(ex);
-                                } catch (RuntimeException ex ) {
-                                    parent.applicationModel.getExceptionHandler().handleUncaught(ex);
-                                } catch (Exception ex) {
-                                    parent.applicationModel.getExceptionHandler().handle(ex);
                                 }
-
                             }
                         };
 
