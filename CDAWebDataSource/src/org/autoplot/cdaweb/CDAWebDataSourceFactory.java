@@ -147,6 +147,11 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
         if ( !( params.containsKey("ds") && params.containsKey("id" )&& params.containsKey("timerange") ) ) return true;
 
         String tr= params.get("timerange");
+        if ( tr==null ) {
+            return true;
+        } else {
+            tr= tr.replaceAll("\\+", " ");
+        }
         try {
             DatumRangeUtil.parseTimeRange(tr);
         } catch ( ParseException ex ) {
