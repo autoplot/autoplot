@@ -42,25 +42,21 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        jLabel1 = new javax.swing.JLabel();
         useFormatSpecCB = new javax.swing.JCheckBox();
-        numberFormatSpecifierTF = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        timesFormatTF = new javax.swing.JComboBox();
         richHeadersCB = new javax.swing.JCheckBox();
-
-        jLabel1.setText("Numbers:");
+        explicitFormatSpecPanel = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        numberFormatSpecifierTF = new javax.swing.JTextField();
+        timesFormatTF = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
 
         useFormatSpecCB.setText("Explicit Format Specifiers");
         useFormatSpecCB.setToolTipText("Specify the format to for numbers and times.");
 
-        numberFormatSpecifierTF.setText("%5.2f");
-
-        jLabel2.setText("Time Resolution:");
-
-        timesFormatTF.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Day", "Minute", "Second", "Millisecond", "Microsecond", " " }));
-        timesFormatTF.setSelectedIndex(3);
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, explicitFormatSpecPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), useFormatSpecCB, org.jdesktop.beansbinding.BeanProperty.create("selected"));
+        bindingGroup.addBinding(binding);
 
         richHeadersCB.setText("Rich Headers");
         richHeadersCB.setToolTipText("<html>Add additional information about the dataset, <br>\nsuch as titles and valid ranges, in a comment block <br>\nat the top of the ascii output.</html>");
@@ -69,6 +65,54 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                 richHeadersCBActionPerformed(evt);
             }
         });
+
+        jLabel1.setText("Numbers:");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, explicitFormatSpecPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jLabel1, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        numberFormatSpecifierTF.setText("%5.2f");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, explicitFormatSpecPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), numberFormatSpecifierTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        timesFormatTF.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Day", "Minute", "Second", "Millisecond", "Microsecond", " " }));
+        timesFormatTF.setSelectedIndex(3);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, explicitFormatSpecPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), timesFormatTF, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        jLabel2.setText("Time Resolution:");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, explicitFormatSpecPanel, org.jdesktop.beansbinding.ELProperty.create("${enabled}"), jLabel2, org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        org.jdesktop.layout.GroupLayout explicitFormatSpecPanelLayout = new org.jdesktop.layout.GroupLayout(explicitFormatSpecPanel);
+        explicitFormatSpecPanel.setLayout(explicitFormatSpecPanelLayout);
+        explicitFormatSpecPanelLayout.setHorizontalGroup(
+            explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(explicitFormatSpecPanelLayout.createSequentialGroup()
+                .add(explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jLabel1)
+                    .add(jLabel2))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(numberFormatSpecifierTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(timesFormatTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        explicitFormatSpecPanelLayout.setVerticalGroup(
+            explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(explicitFormatSpecPanelLayout.createSequentialGroup()
+                .add(explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel1)
+                    .add(numberFormatSpecifierTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(explicitFormatSpecPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel2)
+                    .add(timesFormatTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -80,15 +124,9 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                     .add(useFormatSpecCB)
                     .add(layout.createSequentialGroup()
                         .add(12, 12, 12)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel1)
-                            .add(jLabel2))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(numberFormatSpecifierTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(timesFormatTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(richHeadersCB))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(112, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -98,15 +136,11 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
                 .add(8, 8, 8)
                 .add(useFormatSpecCB)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel1)
-                    .add(numberFormatSpecifierTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel2)
-                    .add(timesFormatTF, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(explicitFormatSpecPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
     private void richHeadersCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_richHeadersCBActionPerformed
@@ -115,12 +149,14 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel explicitFormatSpecPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField numberFormatSpecifierTF;
     private javax.swing.JCheckBox richHeadersCB;
     private javax.swing.JComboBox timesFormatTF;
     private javax.swing.JCheckBox useFormatSpecCB;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     public JPanel getPanel() {
@@ -158,7 +194,12 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
             } catch (UnsupportedEncodingException ex) {
                 Logger.getLogger(AsciiTableDataSourceFormatEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
             }
-            args.put( "tformat", String.valueOf( timesFormatTF.getSelectedItem() ) );
+            String ts= String.valueOf( timesFormatTF.getSelectedItem() );
+//            if ( includeZ.isSelected() ) {
+//                args.put( "tformat", ts );
+//            } else {
+//                args.put( "tformat", ts + "NoZ" );
+//            }
         }
 
         if ( richHeadersCB.isSelected() ) {
