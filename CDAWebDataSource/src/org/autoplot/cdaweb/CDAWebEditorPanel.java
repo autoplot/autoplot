@@ -424,7 +424,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         Map<String,String> args= URISplit.parseParams(split.params);
         this.dsidComboBox.setSelectedItem( args.get( CDAWebDataSource.PARAM_DS ) );
         String timeRange= args.get( CDAWebDataSource.PARAM_TIMERANGE );
-        if ( timeRange!=null ) this.timeRangeTextField.setText( timeRange );
+        if ( timeRange!=null ) this.timeRangeTextField.setText( timeRange.replaceAll("\\+", " " ) );
 
     }
 
