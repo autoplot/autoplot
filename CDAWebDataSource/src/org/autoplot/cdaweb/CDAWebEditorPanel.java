@@ -390,7 +390,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     private void dsidComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dsidComboBoxActionPerformed
         parameterPanel.removeAll();
         messageComponent= new JLabel("<html><em>Resetting...</em></html>"); // this causes problem when droplist is used.
-        parameterPanel.add( messageComponent, BorderLayout.CENTER );
+        parameterPanel.add( messageComponent, BorderLayout.NORTH );
         parameterPanel.revalidate();
 
         if ( this.isShowing() ) {
