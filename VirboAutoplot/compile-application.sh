@@ -210,6 +210,8 @@ ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar
 echo "sign and pack the jar file..."
 echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
 ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
+echo "  verify signed jar file..."
+${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar
 ${JAVA5_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 
 echo "=== create jnlp file for build..."
