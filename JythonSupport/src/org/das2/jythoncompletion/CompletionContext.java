@@ -29,5 +29,8 @@ public class CompletionContext {
         this.contextString= contextString;
         this.completable= completable;
     }
-    
+
+    public String toString() {
+        return "" + this.contextType + ": " + this.contextString + " " + this.completable;
+    }
 }
