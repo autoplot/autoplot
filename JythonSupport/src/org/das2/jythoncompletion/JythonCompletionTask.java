@@ -186,6 +186,8 @@ public class JythonCompletionTask implements CompletionTask {
                         if (propReadMethod != null) {
                             signature = methodSignature(propReadMethod);
                             args = "";
+                            String type= propReadMethod.getReturnType().getCanonicalName();
+                            label = ss + " <em>("+type+")</em>";
                         } else {
                             Field f = null;
                             try {

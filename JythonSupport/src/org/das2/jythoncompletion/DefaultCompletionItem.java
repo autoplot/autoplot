@@ -21,6 +21,7 @@ import javax.swing.text.Position;
 import org.das2.jythoncompletion.support.CompletionItem;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
+import org.das2.jythoncompletion.support.CompletionUtilities;
 
 /**
  *
@@ -113,7 +114,8 @@ public class DefaultCompletionItem implements CompletionItem  {
     
     public void render(Graphics graphics, Font font, Color color, Color color0, int i, int i0, boolean b) {
         //CompletionUtilities.renderHtml(null,label,null,graphics,font, color,i,i0,b);
-        graphics.drawString( text, 0, graphics.getFontMetrics().getHeight() );
+        CompletionUtilities.renderHtml(null,label,null,graphics,font, color,i,i0,b);
+        //graphics.drawString( label, 0, graphics.getFontMetrics().getHeight() );
     }
     
     public CompletionTask createDocumentationTask() {
@@ -153,10 +155,6 @@ public class DefaultCompletionItem implements CompletionItem  {
     
     public CharSequence getInsertPrefix() {
         return text.substring(0,offset);
-    }
-
-    public String getLabel() {
-        return complete;
     }
 
     
