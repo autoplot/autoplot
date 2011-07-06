@@ -3,10 +3,10 @@
 # release script for the Autoplot website
 export rpwd=`pwd`
 cd dasCore
-ant -quiet do-tag  #TODO: why must we still do this?
+ant -quiet do-tag | grep -v  "Trying to override old definition of task " #TODO: why must we still do this?
 
 cd ../VirboAutoplot
-ant -quiet do-tag
+ant -quiet do-tag | grep -v  "Trying to override old definition of task "
 
 export AP_VERSION=20110705b
 
@@ -28,9 +28,11 @@ rm -r VirboAutoplot/dist/lib
 rm -r VirboAutoplot/dist/VirboAutoplot.jar
 rm -r VirboAutoplot/dist/README.TXT
 
+# These we get from a production location so clients only load once.
 rm -r VirboAutoplot/dist/AutoplotStable.jar
 rm -r VirboAutoplot/dist/AutoplotStable.jar.pack.gz
 
+# pause the processing until we get back from getting more coffee.
 echo "enter y to rsync to root@aurora.gmu.edu:/var/www/autoplot/jnlp/$AP_VERSION/"
 read aline
 
