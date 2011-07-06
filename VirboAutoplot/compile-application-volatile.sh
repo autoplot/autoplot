@@ -102,7 +102,7 @@ for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.p
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
-for i in $(find * -name '*.txt' ); do
+for i in $(find * -name 'filenames_alt*.txt' ); do
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
