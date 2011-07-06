@@ -211,8 +211,11 @@ echo "sign and pack the jar file..."
 echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
 ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
 echo "  verify signed jar file..."
-${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar
+${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile.jar | head -16
 ${JAVA5_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
+${JAVA5_HOME}bin/unpack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile_pack_gz.jar
+echo "  verify signed and unpacked jar file..."
+${JAVA5_HOME}bin/jarsigner -verify -verbose dist/AutoplotVolatile_pack_gz.jar | head -16
 
 echo "=== create jnlp file for build..."
 cp src/autoplot.jnlp dist
