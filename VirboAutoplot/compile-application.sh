@@ -221,10 +221,10 @@ cp src/index.html dist  #TODO: why?
 
 echo "=== modify jar files for this particular release"
 cd temp-volatile-src
-$JAVA5_HOME/bin/javac -target 1.5 -d ../temp-volatile-classes external/FileSearchReplace.java
+${JAVA5_HOME}bin/javac -target 1.5 -d ../temp-volatile-classes external/FileSearchReplace.java
 cd ..
-$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
-$JAVA5_HOME/bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA5_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/autoplot.jnlp '#{tag}' $TAG '#{codebase}' $CODEBASE
+${JAVA5_HOME}bin/java -cp temp-volatile-classes external.FileSearchReplace dist/index.html '#{tag}' $TAG '#{codebase}' $CODEBASE
 
 mv AutoplotStable.jar.pack.gz dist/
 mv AutoplotStable.jar dist/
