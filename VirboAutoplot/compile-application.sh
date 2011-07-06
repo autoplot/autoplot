@@ -55,8 +55,9 @@ rm -r -f temp-volatile-classes/
 mkdir temp-volatile-classes
 
 echo "copy jar file classes..."
-wget -O AutoplotStable.jar http://autoplot.org/jnlp-lib/AutoplotStable.jar
-wget -O AutoplotStable.jar.pack.gz http://autoplot.org/jnlp-lib/AutoplotStable.jar.pack.gz
+export HUDSON_URL=http://autoplot.org:8080/hudson/
+wget -O AutoplotStable.jar ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar
+wget -O AutoplotStable.jar.pack.gz ${HUDSON_URL}/job/autoplot-jar-stable/lastSuccessfulBuild/artifact/autoplot/VirboAutoplot/dist/AutoplotStable.jar.pack.gz
 echo "done copy jar file classes."
 
 echo "copy sources..."
