@@ -102,9 +102,9 @@ sed -n p ../*/src/META-INF/$file > temp-volatile-classes/META-INF/$file
 echo "Main-Class: org.virbo.autoplot.AutoplotUI" > temp-volatile-src/MANIFEST.MF
 
 # remove signatures
-rm temp-volatile-classes/META-INF/*.RSA
-rm temp-volatile-classes/META-INF/*.DSA
-rm temp-volatile-classes/META-INF/*.SF
+rm -f temp-volatile-classes/META-INF/*.RSA
+rm -f temp-volatile-classes/META-INF/*.DSA
+rm -f temp-volatile-classes/META-INF/*.SF
 
 cat src/META-INF/build.txt | sed "s/build.tag\:/build.tag\: $TAG/" > temp-volatile-classes/META-INF/build.txt
 # end, special handling of the META-INF stuff.
@@ -120,7 +120,6 @@ for i in $( find * -name 'filenames_alt*.txt' ); do   # kludge support for CDAWe
    mkdir -p $(dirname ../temp-volatile-classes/$i)
    cp $i ../temp-volatile-classes/$i
 done
-
 cd ..
 echo "done copy resources."
 
@@ -205,6 +204,7 @@ echo "done make jumbo jar files..."
 echo "=== normalize jar file before signing..."
 ${JAVA5_HOME}bin/pack200 --repack dist/AutoplotVolatile.jar
 echo "sign and pack the jar file..."
+echo ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
 ${JAVA5_HOME}bin/jarsigner -keypass $KEYPASS -storepass $STOREPASS  dist/AutoplotVolatile.jar virbo
 ${JAVA5_HOME}bin/pack200 dist/AutoplotVolatile.jar.pack.gz dist/AutoplotVolatile.jar
 
