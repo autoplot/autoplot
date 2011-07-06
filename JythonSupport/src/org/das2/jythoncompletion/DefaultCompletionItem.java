@@ -109,7 +109,7 @@ public class DefaultCompletionItem implements CompletionItem  {
     }
     
     public int getPreferredWidth(Graphics graphics, Font font) {
-        return 210;
+        return CompletionUtilities.getPreferredWidth( label, null, graphics, font );
     }
     
     public void render(Graphics graphics, Font font, Color color, Color color0, int i, int i0, boolean b) {
