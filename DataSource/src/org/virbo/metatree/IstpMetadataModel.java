@@ -14,6 +14,8 @@ import java.text.ParseException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.das2.datum.DatumRangeUtil;
+import org.das2.datum.UnitsUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.MetadataModel;
@@ -97,10 +99,19 @@ public class IstpMetadataModel extends MetadataModel {
         }
     }
 
+    /**
+     * Return the range from VALIDMIN to VALIDMAX.
+     * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
+     */
     private DatumRange getValidRange(Map attrs, Units units) {
         double max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE );
         double min = doubleValue(attrs.get("VALIDMIN"), units, -1e29 ); //TODO: remove limitation
         if ( units.isFill(min) ) min= min / 100; // kludge because DatumRanges cannot contain fill.
+        if ( UnitsUtil.isTimeLocation(units) ) {
+            DatumRange vrange= new DatumRange( 3.15569952E13, 2.840126112E14, Units.cdfEpoch ); // approx 1000AD to 9000AD
+            if ( vrange.min().doubleValue(units)>min ) min= vrange.min().doubleValue(units);
+            if ( vrange.max().doubleValue(units)<max ) max= vrange.max().doubleValue(units);
+        }
         return DatumRange.newDatumRange(min, max, units);
     }
 
@@ -108,6 +119,7 @@ public class IstpMetadataModel extends MetadataModel {
      * returns the range of the data by looking for the SCALEMIN/SCALEMAX params,
      * or the required VALIDMIN/VALIDMAX parameters.  Checks for valid range when
      * SCALETYP=log.
+     * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
      */
     private DatumRange getRange(Map attrs, Units units) {
         DatumRange range;
@@ -132,6 +144,11 @@ public class IstpMetadataModel extends MetadataModel {
             min = max / 10000;
         }
         if ( units.isFill(min) ) min= min / 100 ;  // kludge because DatumRanges cannot contain -1e31
+        if ( UnitsUtil.isTimeLocation(units) ) {
+            DatumRange vrange= new DatumRange( 3.15569952E13, 2.840126112E14, Units.cdfEpoch ); // approx 1000AD to 9000AD
+            if ( vrange.min().doubleValue(units)>min ) min= vrange.min().doubleValue(units);
+            if ( vrange.max().doubleValue(units)<max ) max= vrange.max().doubleValue(units);
+        }
         range = new DatumRange(min, max, units);
         return range;
     }
