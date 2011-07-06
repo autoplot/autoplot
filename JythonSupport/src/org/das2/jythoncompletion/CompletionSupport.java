@@ -220,6 +220,10 @@ public class CompletionSupport {
                 // dom.plots[0].<COMP>
                 String contextString= exprBeforeDot(tokens, myTokenIndex);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, "" );
+            } else if ( myTokenIndex>2 && tokens.get(myTokenIndex).kind==PythonGrammarConstants.NAME && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.RBRACKET ) {
+                // dom.plots[0].c<COMP>
+                String contextString= exprBeforeDot(tokens, myTokenIndex-1);
+                return new CompletionContext( CompletionContext.METHOD_NAME, contextString, completable );
             } else if ( myTokenIndex>1 && tokens.get(myTokenIndex-1).kind==PythonGrammarConstants.DOT && tokens.get(myTokenIndex-2).kind==PythonGrammarConstants.NAME ) {
                 String contextString= exprBeforeDot(tokens, myTokenIndex-1);
                 return new CompletionContext( CompletionContext.METHOD_NAME, contextString, completable );
