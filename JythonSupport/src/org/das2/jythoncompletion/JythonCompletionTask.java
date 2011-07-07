@@ -38,6 +38,7 @@ import org.python.core.PyReflectedFunction;
 import org.python.core.PyReflectedFunctionPeeker;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
+import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 import org.virbo.jythonsupport.JythonOps;
 
@@ -335,12 +336,29 @@ public class JythonCompletionTask implements CompletionTask {
                     PyReflectedFunctionPeeker peek = new PyReflectedFunctionPeeker(prf);
                     signature = methodSignature(peek.getMethod(0));
                     args = methodArgs(peek.getMethod(0));
-                    peek.getName();
+                    int j= signature.indexOf("#");
+                    if ( j>-1 ) {
+                        label= signature.substring(j+1);
+                        label= label.replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                        Class ret= peek.getMethod(0).getReturnType();
+                        label= label + "->" + ret.getCanonicalName().replaceAll("org.virbo.dataset.QDataSet", "QDataSet").replaceAll("java.lang.String", "String");
+                    }
 
                 } else if (po.isCallable()) {
                     label = ss + "() ";
                 } else if (po.isNumberType()) {
-                    label = ss + " =" + po;
+                    if ( po.getType().getFullName().equals("javaclass")  ) {
+                        label = ss;
+                    } else if ( po.getType().getFullName().equals("javapackage")  ) {
+                        label = ss;
+                    } else { //TODO: check for PyFloat, etc.
+                        String sss= po.toString();
+                        if ( sss.contains("<") ) { // it's not what I think it is, a number
+                            label = ss;
+                        } else {
+                            label = ss + " = " + sss;
+                        }
+                    }
                 } else {
                     System.err.println("");
                 }
@@ -371,7 +389,7 @@ public class JythonCompletionTask implements CompletionTask {
 
             sargs.add(arg.getSimpleName());
         }
-        sig.append(join(sargs, "," + SPACE));
+        sig.append(join(sargs, "," ));
         sig.append(RPAREN);
         return sig.toString();
     }
@@ -393,7 +411,7 @@ public class JythonCompletionTask implements CompletionTask {
         for (Class arg : javaMethod.getParameterTypes()) {
             sargs.add(arg.getCanonicalName());
         }
-        sig.append(join(sargs, "," + SPACE));
+        sig.append(join(sargs, "," ));
         sig.append(RPAREN);
         return sig.toString();
     }
