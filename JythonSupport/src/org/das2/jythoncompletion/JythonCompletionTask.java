@@ -364,7 +364,9 @@ public class JythonCompletionTask implements CompletionTask {
                 }
                 String link = null;
                 if (signature != null) {
-                    link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
+                    String autoplotDoc= "http://autoplot.org/developer.scripting#";
+                    //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
+                    link = autoplotDoc + ss;
                 }
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
             }
