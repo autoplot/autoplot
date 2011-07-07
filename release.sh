@@ -8,7 +8,7 @@ ant -quiet do-tag | grep -v  "Trying to override old definition of task " #TODO:
 cd ../VirboAutoplot
 ant -quiet do-tag | grep -v  "Trying to override old definition of task "
 
-export AP_VERSION=20110705b
+export AP_VERSION=20110707  # Note this is not used in the Hudson task, $TAG sets the version.
 
 # TODO: these are already in another script, but should probably clean this up.  Right now the keystore file is the security...
 export KEYPASS=virbo1
