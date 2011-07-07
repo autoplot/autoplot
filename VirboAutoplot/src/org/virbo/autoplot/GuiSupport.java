@@ -326,7 +326,7 @@ public class GuiSupport {
                 edp.getFormatDL().setModel( new DefaultComboBoxModel(exts.toArray()) );
                 Preferences prefs= Preferences.userNodeForPackage(AutoplotUI.class);
                 String currentFileString = prefs.get("ExportDataCurrentFile", "");
-                String currentExtString = prefs.get("ExportDataCurrentExt", "");
+                String currentExtString = prefs.get("ExportDataCurrentExt", ".txt");
                 if ( !currentExtString.equals("") ) {
                     edp.getFormatDL().setSelectedItem(currentExtString);
                 }
