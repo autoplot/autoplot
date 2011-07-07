@@ -596,7 +596,21 @@ public class DataSetURI {
      * @throws IOException
      */
     public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
-        URISplit split = URISplit.parse( fromUri( uri ) );
+        String suri= fromUri( uri );
+        return getFile(suri,mon);
+    }
+
+    /**
+     * retrieve the file specified in the URI, possibly using the VFS library to
+     * download the resource to a local cache.  The URI should be a downloadable
+     * file, and not the vap scheme URI.
+     * @param uri resource to download, such as "sftp://user@host/file.dat."
+     * @param mon
+     * @return
+     * @throws IOException
+     */
+    public static File getFile( String suri, ProgressMonitor mon) throws IOException {
+        URISplit split = URISplit.parse( suri );
         try {
             FileSystem fs = FileSystem.create(toUri(split.path));
             String filename = split.file.substring(split.path.length());
@@ -610,7 +624,7 @@ public class DataSetURI {
             if ( ex.getMessage().startsWith("root does not exist") ) { // kludgy bugfix 3053225:  why can't FS throw IOException
                 throw new IOException(ex.getMessage());
             } else {
-                throw new IOException("Unsupported protocol: "+uri);
+                throw new IOException("Unsupported protocol: "+suri);
             }
         }
     }
