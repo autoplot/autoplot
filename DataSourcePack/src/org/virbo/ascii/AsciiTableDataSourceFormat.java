@@ -124,6 +124,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 name= "field"+i;
             }
             JSONObject jo1= new JSONObject();
+            jsonProp( jo1, bundleDesc, QDataSet.LABEL, i );
             jsonProp( jo1, bundleDesc, QDataSet.UNITS, i );
             jsonProp( jo1, bundleDesc, QDataSet.VALID_MIN, i );
             jsonProp( jo1, bundleDesc, QDataSet.VALID_MAX, i );
