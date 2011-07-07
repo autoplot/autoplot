@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.UnitsUtil;
 import org.das2.datum.format.DatumFormatter;
 import org.das2.datum.format.EnumerationDatumFormatter;
 import org.das2.datum.format.TimeDatumFormatter;
@@ -349,27 +350,24 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
 
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
         Units u0=null;
-        DatumFormatter dep0Format=null;
-
         Units u;
-        DatumFormatter format=null;
 
         List<QDataSet> planes= new ArrayList<QDataSet>();
         List<Units> planeUnits= new ArrayList<Units>();
         List<DatumFormatter> planeFormats= new ArrayList<DatumFormatter>();
 
-        StringBuffer buf= new StringBuffer();
+        StringBuilder buf= new StringBuilder();
 
         String l;
         if (dep0 != null) {
             l = dataSetLabel( dep0, "dep0" );
-            buf.append( ", " + l );
+            buf.append(", ").append( l);
             u0= (Units) dep0.property(QDataSet.UNITS);
             if ( u0==null ) u0= Units.dimensionless;
         }
 
         l = dataSetLabel( data, "data" );
-        buf.append( ", " + l );
+        buf.append(", ").append( l);
         u= (Units) data.property(QDataSet.UNITS);
         if ( u==null ) u= Units.dimensionless;
 
@@ -382,7 +380,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
                 planeUnits.add((Units)plane.property(QDataSet.UNITS));
                 if ( planeUnits.get(i)==null ) planeUnits.add(i, Units.dimensionless );
                 l= dataSetLabel( plane, "data"+i );
-                buf.append( ", " + l );
+                buf.append(", ").append( l);
             }
         }
 
@@ -392,8 +390,6 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         mon.started();
 
         if ( data.length()>0 ) {
-            dep0Format= dep0!=null ? u0.createDatum(dep0.value(0)).getFormatter() : null;
-            format= u.createDatum(data.value(0)).getFormatter();
             planeFormats= new ArrayList<DatumFormatter>(planes.size());
             for ( int i=0; i<planes.size(); i++ ) {
                 planeFormats.add(i, planeUnits.get(i).createDatum(planes.get(i).value(i)).getFormatter() );
@@ -406,17 +402,20 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String dfs= getParam( "format", "" );
         DatumFormatter df= dfs.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter( dfs, u );
 
+        DatumFormatter cf0= UnitsUtil.isTimeLocation(u0) ? tf : df;
+        DatumFormatter cf1= UnitsUtil.isTimeLocation(u) ? tf : df;
         for (int i = 0; i < data.length(); i++ ) {
             mon.setTaskProgress(i);
             if ( mon.isCancelled() ) break;
 
             if (dep0 != null) {
-                out.print("" + tf.format( u0.createDatum(dep0.value(i)),u0 ) + ", ");
+                out.print("" + cf0.format( u0.createDatum(dep0.value(i)),u0 ) + ", ");
             }
 
-            out.print( df.format(u.createDatum(data.value(i)), u) );
+            out.print( cf1.format(u.createDatum(data.value(i)), u) );
+
             for ( int j=0; j<planes.size(); j++) {
-                out.print( ", " + df.format( planeUnits.get(j).createDatum(planes.get(j).value(i)), planeUnits.get(j) ) );
+                out.print( ", " + cf1.format( planeUnits.get(j).createDatum(planes.get(j).value(i)), planeUnits.get(j) ) );
             }
             out.println();
         }
