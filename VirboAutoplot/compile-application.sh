@@ -30,6 +30,7 @@ if [ "" = "$TAG" ]; then
        TAG=$AP_VERSION
     fi
 fi
+echo "TAG=${TAG}"
 
 if [ "" = "$KEYPASS" ]; then
     echo "KEYPASS NEEDED!"
