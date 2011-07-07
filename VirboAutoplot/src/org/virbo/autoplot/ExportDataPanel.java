@@ -248,7 +248,7 @@ public class ExportDataPanel extends javax.swing.JPanel {
     private void formatDLItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_formatDLItemStateChanged
         String ss=  (String) evt.getItem();
 
-        if ( ss.equals(".txt") || ss.equals(".dat") || ss.equals(".csv") ) {
+        if ( ss.equals(".txt") || ss.equals(".dat") || ss.equals(".csv") ) { //TODO: hard coded for ASCII
             editorPanel= new AsciiTableDataSourceFormatEditorPanel();
             String t=  getFilenameTF().getText();
             if ( t.contains("/" ) ) {
