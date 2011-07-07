@@ -27,6 +27,8 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.datasource.AbstractDataSourceFormat;
 import org.das2.datum.format.FormatStringFormatter;
+import org.virbo.dataset.BundleDataSet;
+import org.virbo.dataset.DDataSet;
 
 /**
  * Format the QDataSet into Ascii tables.  
@@ -130,6 +132,8 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             jsonProp( jo1, bundleDesc, QDataSet.VALID_MAX, i );
             jsonProp( jo1, bundleDesc, QDataSet.FILL_VALUE, i );
             jsonProp( jo1, bundleDesc, QDataSet.DEPEND_0, i );
+            jsonProp( jo1, bundleDesc, QDataSet.START_INDEX, i );
+            jsonProp( jo1, bundleDesc, "DIMENSION", i );
             jo.put( name, jo1 );
         }
 
@@ -282,6 +286,26 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         
         DatumFormatter format=null;
 
+        String head= getParam( "header", "" ); // could be "rich"
+        if ( "rich".equals( head ) ) {
+            try {
+                BundleDataSet bds= BundleDataSet.createRank1Bundle();  //TODO: this is just so it does something.  Fill this out.
+                DDataSet ds= DDataSet.createRank1(1);
+                ds.putProperty( QDataSet.TITLE, data.property(QDataSet.TITLE) );
+                ds.putProperty( QDataSet.LABEL, data.property(QDataSet.LABEL) );
+                ds.putProperty( QDataSet.NAME, data.property(QDataSet.NAME) );
+                ds.putProperty( QDataSet.UNITS, data.property(QDataSet.UNITS) );
+                ds.putProperty( QDataSet.START_INDEX, 1 );
+                ds.putProperty( "DIMENSION", data.length(0) );
+                bds.bundle( ds );
+                formatBundleDesc( out, (QDataSet) bds.property(QDataSet.BUNDLE_1));
+            } catch ( JSONException ex ) {
+                ex.printStackTrace();
+            }
+        } else {
+            maybeOutputProperty(out, data, QDataSet.TITLE);
+        }
+
         Units u = (Units) data.property(QDataSet.UNITS);
         if (u == null) u = Units.dimensionless;
 
@@ -357,7 +381,6 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
     }
 
     private void formatRank1(PrintWriter out, QDataSet data, ProgressMonitor mon) {
-        maybeOutputProperty(out, data, QDataSet.TITLE);
 
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
         Units u0=null;
@@ -366,6 +389,24 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         List<QDataSet> planes= new ArrayList<QDataSet>();
         List<Units> planeUnits= new ArrayList<Units>();
         List<DatumFormatter> planeFormats= new ArrayList<DatumFormatter>();
+
+        String head= getParam( "header", "" ); // could be "rich"
+        if ( "rich".equals( head ) ) {
+            try {
+                BundleDataSet bds= BundleDataSet.createRank1Bundle();  //TODO: this is just so it does something.  Fill this out.
+                DDataSet ds= DDataSet.createRank1(1);
+                ds.putProperty( QDataSet.TITLE, data.property(QDataSet.TITLE) );
+                ds.putProperty( QDataSet.LABEL, data.property(QDataSet.LABEL) );
+                ds.putProperty( QDataSet.NAME, data.property(QDataSet.NAME) );
+                ds.putProperty( QDataSet.UNITS, data.property(QDataSet.UNITS) );
+                bds.bundle( ds );
+                formatBundleDesc( out, (QDataSet) bds.property(QDataSet.BUNDLE_1));
+            } catch ( JSONException ex ) {
+                ex.printStackTrace();
+            }
+        } else {
+            maybeOutputProperty(out, data, QDataSet.TITLE);
+        }
 
         StringBuilder buf= new StringBuilder();
 
@@ -382,6 +423,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         u= (Units) data.property(QDataSet.UNITS);
         if ( u==null ) u= Units.dimensionless;
 
+        maybeOutputProperty(out, data, QDataSet.TITLE);
         if ( u!=Units.dimensionless ) maybeOutputProperty( out, data, QDataSet.UNITS );
 
         for ( int i=0; i<QDataSet.MAX_PLANE_COUNT; i++ ) {
