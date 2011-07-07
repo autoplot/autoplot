@@ -269,12 +269,13 @@ public class GuiSupport {
 
     private void doDumpData( QDataSet fds, DataSourceFilter dsf, PlotElement pe, DataSourceFormat format, String uriOut, boolean formatPlotElement  ) throws IOException {
 
+        ProgressMonitor mon=null;
         try {
             QDataSet ds= fds;
 
             if ( dsf.getController().getTsb()!=null ) {
                 dsf.getController().getTsb().setTimeResolution(null);
-                ProgressMonitor mon= DasProgressPanel.createFramed(parent, "reloading timeseries at native resolution");
+                mon= DasProgressPanel.createFramed(parent, "reloading timeseries at native resolution");
                 ds= dsf.getController().getDataSource().getDataSet( mon );
                 if ( mon.isCancelled() ) {
                     parent.setStatus( "export data cancelled" );
@@ -283,7 +284,7 @@ public class GuiSupport {
                 mon.finished(); //why?
             }
 
-            ProgressMonitor mon= DasProgressPanel.createFramed( parent, "formatting data" );
+            mon= DasProgressPanel.createFramed( parent, "formatting data" );
             if ( formatPlotElement ) {
                 QDataSet dsout=  pe.getController().getDataSet();
                 if ( dsf.getController().getTsb()!=null ) {
@@ -303,6 +304,7 @@ public class GuiSupport {
         } catch (Exception ex) {
             parent.applicationModel.getExceptionHandler().handle(ex);
         }
+        if ( mon!=null ) mon.finished();
     }
 
     Action getDumpDataAction2( final Application dom ) {
