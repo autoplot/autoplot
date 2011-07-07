@@ -24,48 +24,40 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 	<p>Bugfixes:</p>
 
         <ul>
+            <li>bugfix file size incorrectly reported by FTP filesystem after automatic .gz support added</li>
+            <li>Clean up of CDAWeb plugin</li>
+            <li>Excel formatter checks for enumerations in DEPEND_1 (E.g. Bx, By, Bz)</li>
             <li>Tooltips and minor GUI bugs</li>
             <li>Minor bugfixes from production version</li>
             <li>Autorange=false property is no longer allowed to persist between sessions</li>
             <li>check on valid time location datum when it is created to catch errors more quickly</li>
+            <li>Python command line uses repr() instead of print to return results.</li>
+            <li>completion on dom.plots[0].c&lt;COMP&gt; fixed</li>
+            <li>dimensions with just labels wouldn't be reported in CDF editor.</li>
+        </ul>
+        <p>Less Recent Bugfixes:</p>
+        <ul>
             <li>Bugfixes in Das2ServerDataSource when positional parameters are used</li>
             <li>bugfixes to improve feedback for misformatted QStreams (Chris)</li>
             <li>bugfixes for completion on pngwalk: and script:</li>
             <li>Allow for pngwalk:file:///home/jbf/fun/camE/2011/06/23/10$(M;Y=2011;m=06;d=23;H=10)$S.jpg, check for ";Y=" as well as "$Y"</li>
             <li>bugfixes in AsciiTableDataSourceFormat dialog.  Keep track of the arguments in preferences.</li>
         </ul>
-        <p>Less Recent Bugfixes:</p>
-        <ul>
-            <li>CDAWeb 27 sources use alternate FSMs.</li>
-            <li>.ZIP supported as well as .zip</li>
-            <li>TimeSeriesBrowse when there is not a timeaxis, now works with vap+internal:data_1,data_2.</li>
-            <li>3310573: TimeSeriesBrowse use of Event thread, cancel progress</li>
-            <li>Jython coerceToDs function renamed dataset, to be more consistent with other operators in language</li>
-            <li>Improve support for URIs like "vap+internal:data_0" so two plots can use the same data source</li>
-            <li>Frame labels (e.g. "X Axis [?]") link over to help</li>
-            <li>Yellow flashes to show selection is disabled when there is just one plot</li>
-        </ul>
         <p>Features:</p>
-        <ul><li>New two-jar release method speeds up initial download</li>
-            <li>new inspect icon has magnifier as well as folder icon</li>
-            <li>initialize python immediately</li>
-            <li>Add hook to launch scripts like "script:http://autoplot.org/script/ReplaceFile.jy"</li>
-            <li>"script:" and "pngwalk:" uris are put into the history.</li>
-            <li>jython scripting gets dumpToQStream to replace dumpToDas2Stream.</li>
-            <li>improve formatting in tree view of dataset to support enumerated data and formatted data, using getStringValue.</li>
+        <ul><li>RFE 3347826: new folder icon has magnifying glass for inspect button</li>
+            <li>New two-jar release method speeds up initial download</li>
+            <li>ctrl-D and ctrl-T accelerators for time range selector switch.</li>
+            <li>Python editor completions use <em>fancier code</em> to render html</li>
+            <li>initialize Python immediately in background</li>
+            <li>v1.07 vap includes dom.plots[0].context property, which is essentially a fourth dimension for locating this plot on another.</li>
+            <li>Introduce code to experiment with forward compatibility, so v1.07 could be read into old Autoplot when patch is released.</li>
         </ul>
         <p>Less Recent Features:</p>
         <ul>
-            <li>day-of-year labels, and nearest neighbor binning option.  </li>
-            <li>50 is new limit of stack of line plots in ascii parsing. </li>
-            <li>timerange controller more accessible on GUI (Options->Address Bar->Time Range Selector) </li>
-            <li>Add |smooth(int) to operations</li>
-            <li>Frame labels (e.g. "X Axis") link over to help</li>
-            <li>First coding of events bar support.  See <a href="https://autoplot.svn.sourceforge.net/svnroot/autoplot/autoplot/trunk/VirboAutoplot/src/scripts/demoEventsBar.jy">scripts/demoEventsBar.jy</a></li>
-            <li>"Edit" action in history</li>
-            <li>Copy/Paste on address bar, font size control</li>
-            <li>Rich Ascii supported in Ascii GUI editor.</li>
-            <li>bundles and rich ascii support rank 2 datasets</li>
+            <li>Add hook to launch scripts like "script:http://autoplot.org/script/ReplaceFile.jy"</li>
+            <li>"script:&lt;url&gt;" and "pngwalk:&lt;url&gt;" logged to history and can be searched for and retrieved in history GUI</li>
+            <li>jython scripting gets dumpToQStream to replace dumpToDas2Stream.</li>
+            <li>improve formatting in tree view of dataset to support enumerated data and formatted data, using getStringValue.</li>
         </ul>
 
 <p>Known issues:</p>
