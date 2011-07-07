@@ -22,6 +22,7 @@ import org.das2.jythoncompletion.support.CompletionItem;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
 import org.das2.jythoncompletion.support.CompletionUtilities;
+import org.das2.jythoncompletion.ui.CompletionImpl;
 
 /**
  *
@@ -50,9 +51,6 @@ public class DefaultCompletionItem implements CompletionItem  {
         this.offset= offset;
         this.complete= complete;
         if ( label==null ) label= complete;
-        if ( label.contains("<") ) {
-            System.err.println(label);
-        }
         this.label= label;
         this.link= link;
         this.sortPriority= sortPriority;
@@ -74,7 +72,7 @@ public class DefaultCompletionItem implements CompletionItem  {
         } catch ( BadLocationException ex ) {
             throw new RuntimeException(ex);
         }
-        //Completion.get().hideCompletion();
+        CompletionImpl.get().hideCompletion();
     }
     
     protected void substituteText(JTextComponent c, int offset, int len, String toAdd) {
