@@ -348,10 +348,10 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         maybeOutputProperty(out, data, QDataSet.TITLE);
 
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
-        Units dep0Units=null;
+        Units u0=null;
         DatumFormatter dep0Format=null;
 
-        Units units;
+        Units u;
         DatumFormatter format=null;
 
         List<QDataSet> planes= new ArrayList<QDataSet>();
@@ -364,14 +364,16 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         if (dep0 != null) {
             l = dataSetLabel( dep0, "dep0" );
             buf.append( ", " + l );
-            dep0Units= (Units) dep0.property(QDataSet.UNITS);
-            if ( dep0Units==null ) dep0Units= Units.dimensionless;
+            u0= (Units) dep0.property(QDataSet.UNITS);
+            if ( u0==null ) u0= Units.dimensionless;
         }
 
         l = dataSetLabel( data, "data" );
         buf.append( ", " + l );
-        units= (Units) data.property(QDataSet.UNITS);
-        if ( units==null ) units= Units.dimensionless;
+        u= (Units) data.property(QDataSet.UNITS);
+        if ( u==null ) u= Units.dimensionless;
+
+        if ( u!=Units.dimensionless ) maybeOutputProperty( out, data, QDataSet.UNITS );
 
         for ( int i=0; i<QDataSet.MAX_PLANE_COUNT; i++ ) {
             QDataSet plane= (QDataSet) data.property( "PLANE_"+i );
@@ -390,30 +392,33 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         mon.started();
 
         if ( data.length()>0 ) {
-            dep0Format= dep0!=null ? dep0Units.createDatum(dep0.value(0)).getFormatter() : null;
-            format= units.createDatum(data.value(0)).getFormatter();
+            dep0Format= dep0!=null ? u0.createDatum(dep0.value(0)).getFormatter() : null;
+            format= u.createDatum(data.value(0)).getFormatter();
             planeFormats= new ArrayList<DatumFormatter>(planes.size());
             for ( int i=0; i<planes.size(); i++ ) {
                 planeFormats.add(i, planeUnits.get(i).createDatum(planes.get(i).value(i)).getFormatter() );
             }
         }
 
+        String ft= getParam( "tformat", "ISO8601" );
+        DatumFormatter tf= ft.equals("") ? Units.us2000.getDatumFormatterFactory().defaultFormatter() : getTimeFormatter(ft);
+
+        String dfs= getParam( "format", "" );
+        DatumFormatter df= dfs.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter( dfs, u );
+
         for (int i = 0; i < data.length(); i++ ) {
             mon.setTaskProgress(i);
             if ( mon.isCancelled() ) break;
 
-            buf= new StringBuffer();
             if (dep0 != null) {
-                buf.append( ", " + dep0Format.format(dep0Units.createDatum(dep0.value(i)), dep0Units ) );
+                out.print("" + tf.format( u0.createDatum(dep0.value(i)),u0 ) + ", ");
             }
 
-            buf.append( ", " + format.format( units.createDatum(data.value(i)), units) );
-
-            for ( int j=0; j<planes.size(); j++ ) {
-                buf.append( ", " + planeFormats.get(j).format( planeUnits.get(j).createDatum(planes.get(j).value(i)),
-                        planeUnits.get(j) ) );
+            out.print( df.format(u.createDatum(data.value(i)), u) );
+            for ( int j=0; j<planes.size(); j++) {
+                out.print( ", " + df.format( planeUnits.get(j).createDatum(planes.get(j).value(i)), planeUnits.get(j) ) );
             }
-            out.println( buf.substring(2) );
+            out.println();
         }
         
         mon.finished();
