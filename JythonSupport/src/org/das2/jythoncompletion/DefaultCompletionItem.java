@@ -43,13 +43,16 @@ public class DefaultCompletionItem implements CompletionItem  {
      * @param offset  number of chars already typed.
      * @param complete  complete.substring(offset) is inserted.
      * @param label  the human readable presentation of this, maybe with html.
-     * @param link  handed over to DefaultDocumentationItem, if non null.
+     * @param link  handed over to DefaultDocumentationItem, if non null. 
      */
     public DefaultCompletionItem( String text, int offset, String complete, String label, String link, int sortPriority ) {
         this.text= text;
         this.offset= offset;
         this.complete= complete;
         if ( label==null ) label= complete;
+        if ( label.contains("<") ) {
+            System.err.println(label);
+        }
         this.label= label;
         this.link= link;
         this.sortPriority= sortPriority;
@@ -109,13 +112,25 @@ public class DefaultCompletionItem implements CompletionItem  {
     }
     
     public int getPreferredWidth(Graphics graphics, Font font) {
-        return CompletionUtilities.getPreferredWidth( label, null, graphics, font );
+        String left= label;
+        String right= null;
+        int i2= label.indexOf("->");
+        if ( i2>-1 ) {
+            right= label.substring(i2+2);
+            left= label.substring(0,i2);
+        }
+        return CompletionUtilities.getPreferredWidth( left, right, graphics, font );
     }
     
     public void render(Graphics graphics, Font font, Color color, Color color0, int i, int i0, boolean b) {
-        //CompletionUtilities.renderHtml(null,label,null,graphics,font, color,i,i0,b);
-        CompletionUtilities.renderHtml(null,label,null,graphics,font, color,i,i0,b);
-        //graphics.drawString( label, 0, graphics.getFontMetrics().getHeight() );
+        String left= label;
+        String right= null;
+        int i2= label.indexOf("->");
+        if ( i2>-1 ) {
+            right= label.substring(i2+2);
+            left= label.substring(0,i2);
+        }
+        CompletionUtilities.renderHtml(null,left,right,graphics,font, color,i,i0,b);
     }
     
     public CompletionTask createDocumentationTask() {
