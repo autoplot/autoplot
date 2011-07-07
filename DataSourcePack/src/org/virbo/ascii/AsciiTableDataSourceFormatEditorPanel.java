@@ -168,6 +168,7 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
         file= split.file;
         Map<String,String> args= URISplit.parseParams(split.params);
         String s;
+        useFormatSpecCB.setSelected(false);
         s= args.get("format");
         if ( s!=null ) {
             numberFormatSpecifierTF.setText( args.get("format") );
