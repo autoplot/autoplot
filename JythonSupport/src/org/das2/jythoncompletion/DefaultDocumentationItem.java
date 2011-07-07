@@ -104,6 +104,7 @@ public class DefaultDocumentationItem implements CompletionDocumentation {
 
     public CompletionDocumentation resolveLink(String string) {
         try {
+            //TODO: make sure this works when the server is down.
             URL url = new URL(new URL(link), string);
             return new DefaultDocumentationItem(url.toString());
         } catch (MalformedURLException ex) {
