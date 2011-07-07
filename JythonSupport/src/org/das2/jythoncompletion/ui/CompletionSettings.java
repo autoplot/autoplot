@@ -87,11 +87,11 @@ public final class CompletionSettings  {
     }
     
     public Dimension completionPopupMaximumSize() {
-        return new Dimension( 400,400 );
+        return new Dimension( 600,600 );
     }
     
     public Dimension documentationPopupPreferredSize() {
-        return new Dimension( 400,400 );
+        return new Dimension( 600,400 );
     }
     
     public Color documentationBackgroundColor() {
