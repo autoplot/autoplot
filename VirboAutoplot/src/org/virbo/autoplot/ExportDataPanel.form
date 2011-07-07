@@ -52,7 +52,7 @@
               <Component id="additionalOptionsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="warningMessageLabel" alignment="0" pref="400" max="32767" attributes="0"/>
+          <Component id="warningMessageLabel" alignment="0" pref="404" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
