@@ -197,7 +197,7 @@ public class AsciiTableDataSourceFormatEditorPanel extends javax.swing.JPanel im
             }
             String ts= String.valueOf( timesFormatTF.getSelectedItem() );
 //            if ( includeZ.isSelected() ) {
-//                args.put( "tformat", ts );
+            args.put( "tformat", ts );
 //            } else {
 //                args.put( "tformat", ts + "NoZ" );
 //            }
