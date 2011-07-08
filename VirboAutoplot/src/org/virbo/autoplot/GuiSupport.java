@@ -223,6 +223,8 @@ public class GuiSupport {
                 DataSourceFilter dsf= (DataSourceFilter) DomUtil.getElementById( dom, m.group(groups[i]) );
                 if ( dsf==null ) {
                     selectors[i].setValue( m.group(groups[i]) );
+                } else if ( dsf.getUri()==null ) {
+                    selectors[i].setValue( m.group(groups[i]) ); //TODO: interesting branch that I hit on a telecon with Reiner.
                 } else if ( dsf.getUri().startsWith("vap+internal:")) {
                     selectors[i].setValue( m.group(groups[i]) ); //TODO: does this work, multiple levels?
                 } else {
