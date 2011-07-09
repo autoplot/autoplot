@@ -65,8 +65,12 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         parameterList = new javax.swing.JList();
-        jLabel3 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
         subsetComboBox = new javax.swing.JComboBox();
+        interpretMetadataLabel = new javax.swing.JLabel();
+        noInterpMeta = new javax.swing.JCheckBox();
+        noDep = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         paramInfo = new javax.swing.JLabel();
 
@@ -87,12 +91,56 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         });
         jScrollPane1.setViewportView(parameterList);
 
-        jLabel3.setText("Load subset of the data:");
-        jLabel3.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Advanced"));
+
+        jLabel4.setText("Load subset of the data:");
+        jLabel4.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
 
         subsetComboBox.setEditable(true);
         subsetComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "", "::10", "0:100", "-100:", "0:10000:5" }));
         subsetComboBox.setToolTipText("<html>Load a subset of the data records, for example:<br>[0:100]  first 100 records<br> [-100:] last 100 records<br> [::10] every tenth record<br> </html>");
+
+        interpretMetadataLabel.setText("Interpret Metadata:");
+
+        noInterpMeta.setText("no ISTP");
+        noInterpMeta.setToolTipText("Don't interpret metadata to get titles and units.");
+
+        noDep.setText("no dependencies");
+        noDep.setToolTipText("Ignore connections between variables like \"DEPEND_0\"\n");
+
+        org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(interpretMetadataLabel)
+                    .add(jPanel3Layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(noDep)
+                            .add(noInterpMeta)))
+                    .add(jLabel4)
+                    .add(jPanel3Layout.createSequentialGroup()
+                        .add(12, 12, 12)
+                        .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 160, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel3Layout.createSequentialGroup()
+                .add(jLabel4)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(interpretMetadataLabel)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(noInterpMeta)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(noDep)
+                .addContainerGap(43, Short.MAX_VALUE))
+        );
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -100,27 +148,27 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel1Layout.createSequentialGroup()
                 .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 193, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jPanel1Layout.createSequentialGroup()
+                        .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 193, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(190, 190, 190))
                     .add(jPanel1Layout.createSequentialGroup()
                         .add(6, 6, 6)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel3)
-                    .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(44, 44, 44))
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
+                .add(jPanel3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(jLabel1)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .add(jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(jPanel1Layout.createSequentialGroup()
-                        .add(jLabel3)
+                        .addContainerGap()
+                        .add(jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel1Layout.createSequentialGroup()
+                        .add(jLabel1)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(subsetComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE))
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -132,13 +180,13 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(paramInfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 545, Short.MAX_VALUE)
+            .add(paramInfo, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 603, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel2Layout.createSequentialGroup()
                 .add(paramInfo)
-                .addContainerGap(142, Short.MAX_VALUE))
+                .addContainerGap(111, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
@@ -168,11 +216,15 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel interpretMetadataLabel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JCheckBox noDep;
+    private javax.swing.JCheckBox noInterpMeta;
     private javax.swing.JLabel paramInfo;
     private javax.swing.JList parameterList;
     private javax.swing.JComboBox subsetComboBox;
@@ -211,6 +263,16 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
 
     File cdfFile;
 
+    /**
+     * allow more abstract sources, namely cdaweb, to turn off these controls.
+     * @param v
+     */
+    public void setShowAdvancedSubpanel( boolean v ) {
+        interpretMetadataLabel.setVisible(v);
+        noDep.setVisible(v);
+        noInterpMeta.setVisible(v);
+    }
+    
     public boolean reject( String url ) throws IOException, URISyntaxException {
         split = URISplit.parse(url);
         FileSystem fs = FileSystem.create( DataSetURI.getWebURL( DataSetURI.toUri(split.path) ).toURI() );
@@ -305,8 +367,24 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             slice= "["+slice+"]";
         }
         String p = parameter;
-        p= p.replaceAll("=", "%3D");
-        params.put( "arg_0", p + ( slice==null ? "" : slice ) );
+        if ( p!=null ) {
+            p= p.replaceAll("=", "%3D");
+            params.put( "arg_0", p + ( slice==null ? "" : slice ) );
+        } else {
+            System.err.println("param was null");
+        }
+
+        if ( noDep.isSelected() ) {
+            params.put("doDep","no");
+        } else {
+            params.remove("doDep");
+        }
+        if ( noInterpMeta.isSelected() ) {
+            params.put("interpMeta", "no");
+        } else {
+            params.remove("interpMeta");
+        }
+        
         split.params= URISplit.formatParams(params);
         return URISplit.format(split);
     }
