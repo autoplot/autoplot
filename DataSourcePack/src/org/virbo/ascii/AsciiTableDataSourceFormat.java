@@ -350,7 +350,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String dfs= getParam( "format", "" );
         DatumFormatter df= dfs.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter( dfs, u );
 
-        DatumFormatter cf0= UnitsUtil.isTimeLocation(u0) ? tf : df;
+        DatumFormatter cf0= dep0==null ? null : ( UnitsUtil.isTimeLocation(u0) ? tf : df );
         DatumFormatter cf1= UnitsUtil.isTimeLocation(u) ? tf : df;
 
         for (int i = 0; i < data.length(); i++) {
@@ -455,7 +455,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
         String dfs= getParam( "format", "" );
         DatumFormatter df= dfs.equals("") ? u.getDatumFormatterFactory().defaultFormatter() : getDataFormatter( dfs, u );
 
-        DatumFormatter cf0= UnitsUtil.isTimeLocation(u0) ? tf : df;
+        DatumFormatter cf0= dep0==null ? null : ( UnitsUtil.isTimeLocation(u0) ? tf : df );
         DatumFormatter cf1= UnitsUtil.isTimeLocation(u) ? tf : df;
         for (int i = 0; i < data.length(); i++ ) {
             mon.setTaskProgress(i);
