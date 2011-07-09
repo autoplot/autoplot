@@ -13,16 +13,13 @@ package org.autoplot.cdaweb;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.awt.Graphics;
 import java.awt.Window;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.text.ParseException;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -39,7 +36,7 @@ import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.cdfdatasource.CdfDataSourceEditorPanel;
+import org.virbo.cdf.CdfJavaDataSourceEditorPanel;
 import org.virbo.datasource.AutoplotSettings;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
@@ -54,6 +51,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
     public CDAWebEditorPanel() {
         initComponents();
         this.addComponentListener( new ComponentAdapter() {
+            @Override
             public void componentShown(ComponentEvent e) {
                 refresh(getURI());
             }
@@ -62,7 +60,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
 
     public static final String PARAM_FILTER= "filter"; // for convenience, carry filter around
 
-    CdfDataSourceEditorPanel paramEditor;
+    CdfJavaDataSourceEditorPanel paramEditor;
     JComponent messageComponent=null;
     boolean haveAddedRecent= false;
     private static final String MSG_NO_DATASET = "<html><em>No dataset selected, pick initial dataset...</em></html>";
@@ -106,7 +104,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
      * @param args
      * @throws Exception
      */
-    private void refreshDataSet( CdfDataSourceEditorPanel panel, String ds, Map<String,String> args ) throws Exception {
+    private void refreshDataSet( CdfJavaDataSourceEditorPanel panel, String ds, Map<String,String> args ) throws Exception {
 
 
         try {
@@ -159,7 +157,7 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
             public synchronized void run() {
                 if ( ds!=null ) {
                     try {
-                        final CdfDataSourceEditorPanel panel= new CdfDataSourceEditorPanel();
+                        final CdfJavaDataSourceEditorPanel panel= new CdfJavaDataSourceEditorPanel();
 
                         String master= fmaster;
 
@@ -175,8 +173,8 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
                         if ( messageComponent!=null ) parameterPanel.remove(messageComponent);
                         parameterPanel.add( panel, BorderLayout.CENTER );
 
-                        if ( panel instanceof CdfDataSourceEditorPanel ) {
-                            ((CdfDataSourceEditorPanel)panel).setShowAdvancedSubpanel(false);
+                        if ( panel instanceof CdfJavaDataSourceEditorPanel ) {
+                            ((CdfJavaDataSourceEditorPanel)panel).setShowAdvancedSubpanel(false);
                         }
                         paramEditor= panel;
                         parameterPanel.revalidate();
@@ -432,9 +430,9 @@ public class CDAWebEditorPanel extends javax.swing.JPanel implements DataSourceE
         initialize(uri);
         URISplit split= URISplit.parse(uri);
         Map<String,String> args= URISplit.parseParams(split.params);
-        String filter= args.get( CDAWebEditorPanel.PARAM_FILTER );
-        if ( filter!=null ) {
-            this.filter= filter;
+        String filter1= args.get( CDAWebEditorPanel.PARAM_FILTER );
+        if ( filter1!=null ) {
+            this.filter= filter1;
         }
         
         if ( args.get( CDAWebDataSource.PARAM_DS )==null ) {
