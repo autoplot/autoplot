@@ -5,7 +5,7 @@
 
 package org.autoplot.cdaweb;
 
-import gsfc.nssdc.cdf.CDF;
+import gov.nasa.gsfc.voyager.cdf.CDFFactory;
 import java.io.File;
 import java.net.URI;
 import java.text.ParseException;
@@ -17,7 +17,6 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.cdfdatasource.CdfUtil;
 import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
@@ -30,39 +29,39 @@ import org.virbo.datasource.URISplit;
  */
 public class CDAWebDataSourceFactory implements DataSourceFactory {
 
-    static {
-        loadCdfLibraries();
-    }
-
-    /** copied from CdfFileDataSourceFactory **/
-
-    private static void loadCdfLibraries() {
-        String cdfLib1 = System.getProperty("cdfLib1");
-        String cdfLib2 = System.getProperty("cdfLib2");
-
-        if ( cdfLib1==null && cdfLib2==null ) {
-            System.err.println("System properties for cdfLib not set, setting up for debugging");
-            String os= System.getProperty("os.name");
-            if ( os.startsWith("Windows") ) {
-                cdfLib1= "dllcdf";
-                cdfLib2= "cdfNativeLibrary";
-            } else {
-                System.err.println("no values set identifying cdf libraries, hope you're on a mac or linux!");
-                System.err.println( System.getProperty("java.library.path" ));
-                cdfLib2= "cdfNativeLibrary";
-            }
-        }
-
-        try {
-            // TODO: on Linux systems, may not be able to execute from plug-in media.
-            if (cdfLib1 != null) System.loadLibrary(cdfLib1);
-            if (cdfLib2 != null) System.loadLibrary(cdfLib2);
-        } catch ( UnsatisfiedLinkError ex ) {
-            ex.printStackTrace();
-            System.err.println( System.getProperty("java.library.path" ));
-            throw ex;
-        }
-    }
+//    static {
+//        loadCdfLibraries();
+//    }
+//
+//    /** copied from CdfFileDataSourceFactory **/
+//
+//    private static void loadCdfLibraries() {
+//        String cdfLib1 = System.getProperty("cdfLib1");
+//        String cdfLib2 = System.getProperty("cdfLib2");
+//
+//        if ( cdfLib1==null && cdfLib2==null ) {
+//            System.err.println("System properties for cdfLib not set, setting up for debugging");
+//            String os= System.getProperty("os.name");
+//            if ( os.startsWith("Windows") ) {
+//                cdfLib1= "dllcdf";
+//                cdfLib2= "cdfNativeLibrary";
+//            } else {
+//                System.err.println("no values set identifying cdf libraries, hope you're on a mac or linux!");
+//                System.err.println( System.getProperty("java.library.path" ));
+//                cdfLib2= "cdfNativeLibrary";
+//            }
+//        }
+//
+//        try {
+//            // TODO: on Linux systems, may not be able to execute from plug-in media.
+//            if (cdfLib1 != null) System.loadLibrary(cdfLib1);
+//            if (cdfLib2 != null) System.loadLibrary(cdfLib2);
+//        } catch ( UnsatisfiedLinkError ex ) {
+//            ex.printStackTrace();
+//            System.err.println( System.getProperty("java.library.path" ));
+//            throw ex;
+//        }
+//    }
 
     public DataSource getDataSource(URI uri) throws Exception {
         return new CDAWebDataSource(uri);
@@ -122,9 +121,23 @@ public class CDAWebDataSourceFactory implements DataSourceFactory {
 
                     File f= FileSystemUtil.doDownload( master, mon );
 
-                    CDF cdf= CDF.open( f.toString(), CDF.READONLYoff );
-                    Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4);
-                    cdf.close();
+                    Map<String,String> result;
+                    //boolean useNewLibrary= true; // Use Nand's Java library
+                    //if ( useNewLibrary ) {
+                        gov.nasa.gsfc.voyager.cdf.CDF cdf;
+                        try {
+                            cdf = CDFFactory.getCDF(f.toString());
+                        } catch (Throwable ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        result= org.virbo.cdf.CdfUtil.getPlottable( cdf, true, 4);
+                    //} else {
+                        // This code is for the C-based Java library
+                        //CDF cdf= CDF.open( f.toString(), CDF.READONLYoff );
+                        //result= CdfUtil.getPlottable( cdf, true, 4);
+                        //cdf.close();
+                    //}
+                    
 
                     List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                     for ( String key:result.keySet() ) {
