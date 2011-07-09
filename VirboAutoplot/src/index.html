@@ -24,6 +24,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 	<p>Bugfixes:</p>
 
         <ul>
+            <li>single-jar release works after new release method.</li>
             <li>bugfix file size incorrectly reported by FTP filesystem after automatic .gz support added</li>
             <li>Clean up of CDAWeb plugin</li>
             <li>Excel formatter checks for enumerations in DEPEND_1 (E.g. Bx, By, Bz)</li>
@@ -44,7 +45,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>bugfixes in AsciiTableDataSourceFormat dialog.  Keep track of the arguments in preferences.</li>
         </ul>
         <p>Features:</p>
-        <ul><li>RFE 3347826: new folder icon has magnifying glass for inspect button</li>
+        <ul>
+            <li>CDAWeb uses Java-based CDF reader to support single-jar mode</li>
+            <li>RFE 3347826: new folder icon has magnifying glass for inspect button</li>
             <li>New two-jar release method speeds up initial download</li>
             <li>All ascii types support rich headers in format to some degree</li>
             <li>.txt is default output format, not .png</li>
