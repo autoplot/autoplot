@@ -10,7 +10,6 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -24,7 +23,7 @@ import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
-import org.virbo.cdfdatasource.CdfVirtualVars;
+import org.virbo.cdf.CdfVirtualVars;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
@@ -45,23 +44,6 @@ public class CDAWebDataSource extends AbstractDataSource {
     public static final String PARAM_ID= "id";
     public static final String PARAM_DS= "ds";
     public static final String PARAM_TIMERANGE= "timerange";
-
-    /**
-     * return the named parameter, or the default.
-     * Note arg_0, arg_1, etc are for unnamed positional parameters.  It's recommended
-     * that there be only one positional parameter.
-     *
-     * TODO: why is Netbeans making me override this?
-     */
-    protected String getParam( String name, String dflt ) {
-        String result= params.get(name);
-        if (result!=null ) {
-            return result;
-        } else {
-            return dflt;
-        }
-    }
-
 
     public CDAWebDataSource( URI uri ) {
         super(uri);
@@ -86,9 +68,15 @@ public class CDAWebDataSource extends AbstractDataSource {
     String ds;
     String param;
 
+    /**
+     * return the DataSourceFactory that will read the CDF files.  This was once
+     * the binary cdf library, and now is the java one.  Either way, it must
+     * use the spec: <file>?<id>
+     * @return
+     */
     private DataSourceFactory getDelegateFactory() {
         //DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
-        DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdf");
+        DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
         //cdfFileDataSourceFactory=null;  //experiment with using java-based version instead
         //if ( cdfFileDataSourceFactory==null ) {
         //    cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
