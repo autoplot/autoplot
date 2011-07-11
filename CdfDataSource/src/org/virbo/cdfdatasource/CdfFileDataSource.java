@@ -46,10 +46,18 @@ import org.virbo.dsops.Ops;
 import org.virbo.metatree.MetadataUtil;
 
 /**
+ * CDF data source based on CDF group's C code that uses JNI to interface
+ * to the C library.  This is legacy, and there is a pure-java library
+ * that is replacing it.  CDF, or Common Data Format, is a NASA data format.
  *
  * @author jbf
  */
 public class CdfFileDataSource extends AbstractDataSource {
+
+    protected static final String PARAM_DODEP = "doDep";
+    protected static final String PARAM_INTERPMETA = "interpMeta";
+    protected static final String PARAM_ID = "id";
+    protected static final String PARAM_SLICE1 = "slice1";
 
     Map properties;
     Map<String, Object> attributes;
@@ -72,7 +80,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         Map map = getParams();
 
         CDF cdf = CDF.open(fileName, CDF.READONLYoff);
-        String svariable = (String) map.get("id");
+        String svariable = (String) map.get(PARAM_ID);
         if (svariable == null) {
             svariable = (String) map.get("arg_0");
         }
@@ -90,7 +98,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
         try {
             Variable variable = cdf.getVariable(svariable);
-            String interpMeta = (String) map.get("interpMeta");
+            String interpMeta = (String) map.get(PARAM_INTERPMETA);
             if (!"no".equals(interpMeta)) {
                 long numRec= variable.getNumWrittenRecords();
                 long[] recs= DataSourceUtil.parseConstraint( constraint, numRec );
@@ -117,7 +125,7 @@ public class CdfFileDataSource extends AbstractDataSource {
 
             cdf.close();
 
-            boolean doDep= !"no".equals( map.get("doDep") );
+            boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
             if ( !doDep ) {
                 result.putProperty( QDataSet.DEPEND_0, null );
                 result.putProperty( QDataSet.DEPEND_1, null );
@@ -170,6 +178,12 @@ public class CdfFileDataSource extends AbstractDataSource {
 
             result.putProperty( QDataSet.METADATA, attributes );
             result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
+
+            String os1= (String)map.get(PARAM_SLICE1);
+            if ( os1!=null && os1.equals("") && result.rank()>1 ) {
+                int is= Integer.parseInt(os1);
+                result= DataSetOps.slice1(result,is);
+            }
             
             return result;
         } catch (CDFException ex) {
