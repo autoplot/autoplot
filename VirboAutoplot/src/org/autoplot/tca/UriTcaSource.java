@@ -12,6 +12,7 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
+import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractQFunction;
 import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DDataSet;
@@ -29,6 +30,8 @@ import org.virbo.dsops.Ops;
 /**
  * Allow Autoplot URIs to supply data to label plots.
  *
+ *   class:org.autoplot.tca.AutoplotTCASource:vap+file:/tmp/foo.txt?rank2=field1-field4&depend0=field0
+ *   class:org.autoplot.tca.AutoplotTCASource:vap+dat:file:/home/jbf/project/autoplot/data/dat/rockets/21139_E_field.txt?skipLines=1&depend0=field0&rank2=field3-field4
  * @author jbf
  */
 public class UriTcaSource extends AbstractQFunction {
@@ -40,6 +43,7 @@ public class UriTcaSource extends AbstractQFunction {
     Exception ex;
     QDataSet error;
     QDataSet errorNoDs;
+    QDataSet nonValueDs;
 
     public UriTcaSource( String uri ) throws Exception {
         DataSource dss= DataSetURI.getDataSource(uri);
@@ -48,49 +52,62 @@ public class UriTcaSource extends AbstractQFunction {
         EnumerationUnits eu= new EnumerationUnits("UriTcaSource");
         error= DataSetUtil.asDataSet( eu.createDatum("Error") );
         errorNoDs= DataSetUtil.asDataSet( eu.createDatum("No Data") );
+        nonValueDs= DataSetUtil.asDataSet( eu.createDatum(" ") );
     }
+
+    private void doRead( ) throws Exception {
+        ds= dss.getDataSet( new NullProgressMonitor() );
+        bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
+        if ( bundleDs==null ) {
+            if ( ds.rank()==1 ) { // just a single param, go ahead and support this.
+                DDataSet bds1= DDataSet.createRank2(1,0);
+                String name= (String) ds.property(QDataSet.NAME);
+                String label= (String) ds.property(QDataSet.LABEL);
+                bds1.putProperty( QDataSet.NAME, 0, name==null ? "ds0" : name );
+                bds1.putProperty( QDataSet.LABEL, 0, label==null ? ( name==null ? "" : name ) : label );
+                bundleDs= bds1;
+            } else {
+                DDataSet bds1= DDataSet.createRank2(ds.length(0),0);
+                QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1);
+                Units u= dep1==null ? Units.dimensionless : SemanticOps.getUnits(dep1);
+                for ( int i=0; i<ds.length(0); i++ ) {
+                    String c= "";
+                    String name= ( dep1!=null ? u.createDatum(dep1.value(i)).toString() : (String)ds.property(QDataSet.NAME) );
+                    String label= (String) ds.property(QDataSet.LABEL);
+                    bds1.putProperty( QDataSet.NAME, i, "ds"+i );
+                    bds1.putProperty( QDataSet.LABEL, i, label==null ?  ( name==null ? "" : name ) : label );
+                }
+                bundleDs= bds1;
+            }
+        }
+
+    }
+
 
     public QDataSet value(QDataSet parm) {
         Datum d= DataSetUtil.asDatum( parm.slice(0) );
-        DatumRange dr= tsb.getTimeRange();
         boolean read= false;
-        if ( !dr.contains(d) ) {
-            while ( d.ge( dr.max() ) ) {
-                dr= dr.next();
-                read= true;
+        if ( tsb==null ) {
+            read= false;
+        } else {
+            DatumRange dr= tsb.getTimeRange();
+
+            if ( !dr.contains(d) ) {
+                while ( d.ge( dr.max() ) ) {
+                    dr= dr.next();
+                    read= true;
+                }
+                while ( d.lt( dr.min() ) ) {
+                    dr= dr.previous();
+                    read= true;
+                }
+                if ( read ) tsb.setTimeRange(dr);
             }
-            while ( d.lt( dr.min() ) ) {
-                dr= dr.previous();
-                read= true;
-            }
-            if ( read ) tsb.setTimeRange(dr);
         }
+        
         try {
             if ( read ) {
-                ds= dss.getDataSet( new NullProgressMonitor() );
-                bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
-                if ( bundleDs==null ) {
-                    if ( ds.rank()==1 ) { // just a single param, go ahead and support this.
-                        DDataSet bds1= DDataSet.createRank2(1,0);
-                        String name= (String) ds.property(QDataSet.NAME);
-                        String label= (String) ds.property(QDataSet.LABEL);
-                        bds1.putProperty( QDataSet.NAME, 0, name==null ? "ds0" : name );
-                        bds1.putProperty( QDataSet.LABEL, 0, label==null ? ( name==null ? "" : name ) : label );
-                        bundleDs= bds1;
-                    } else {
-                        DDataSet bds1= DDataSet.createRank2(ds.length(0),0);
-                        QDataSet dep1= (QDataSet) ds.property(QDataSet.DEPEND_1);
-                        Units u= dep1==null ? Units.dimensionless : SemanticOps.getUnits(dep1);
-                        for ( int i=0; i<ds.length(0); i++ ) {
-                            String c= "";
-                            String name= ( dep1!=null ? u.createDatum(dep1.value(i)).toString() : (String)ds.property(QDataSet.NAME) );
-                            String label= (String) ds.property(QDataSet.LABEL);
-                            bds1.putProperty( QDataSet.NAME, i, "ds"+i );
-                            bds1.putProperty( QDataSet.LABEL, i, label==null ?  ( name==null ? "" : name ) : label );
-                        }
-                        bundleDs= bds1;
-                    }
-                }
+                doRead();
                 read= false;
             }
             if ( ds==null ) {
@@ -109,8 +126,25 @@ public class UriTcaSource extends AbstractQFunction {
                 }
                 ((MutablePropertyDataSet)result).putProperty( QDataSet.BUNDLE_0, bundleDs );
                 return result;
+            } else if ( findex.value()>-1 && findex.value()<0 ) { // class:org.autoplot.tca.UriTcaSource:vap+dat:file:/home/jbf/project/autoplot/data/dat/rockets/21139_E_field.txt?skipLines=1&depend0=field0&rank2=field3-field4  at 190
+                findex= Ops.findex( dep0, d0 );
+                QDataSet result= ds.slice(0);
+                if ( result.rank()==0 ) {
+                    result= new JoinDataSet( result );
+                }
+                ((MutablePropertyDataSet)result).putProperty( QDataSet.BUNDLE_0, bundleDs );
+                return result;
+
             } else {
-                return new JoinDataSet( error );
+                if ( tsb==null ) {
+                    JoinDataSet result=  new JoinDataSet( nonValueDs );
+                    for ( int i=1; i<ds.length(0); i++ ) {
+                        result.join(nonValueDs);
+                    }
+                    return result;
+                } else {
+                    return new JoinDataSet( error );
+                }
             }
             //
 
@@ -122,11 +156,29 @@ public class UriTcaSource extends AbstractQFunction {
 
     public QDataSet exampleInput() {
 
-        Datum t0= this.tsb.getTimeRange().min();
+        Datum t0;
+        Units tu;
+        String label;
+        if ( this.tsb!=null ) {
+            t0= this.tsb.getTimeRange().min();
+            tu= t0.getUnits();
+            label= "Time";
+        } else {
+            try {
+                doRead();
+                QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                t0= DataSetUtil.asDatum( dep0.slice(0) );
+                tu= t0.getUnits();
+                label= "???";
+            } catch ( Exception ex ) {
+                throw new RuntimeException(ex);
+            }
+
+        }
 
         DDataSet inputDescriptor = DDataSet.createRank2(1,0);
-	inputDescriptor.putProperty(QDataSet.LABEL, 0, "Time");
-        inputDescriptor.putProperty(QDataSet.UNITS, 0, t0.getUnits() );
+	inputDescriptor.putProperty(QDataSet.LABEL, 0, label );
+        inputDescriptor.putProperty(QDataSet.UNITS, 0, tu );
 
         QDataSet q = DataSetUtil.asDataSet(t0);
 
