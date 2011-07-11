@@ -23,7 +23,7 @@ import org.virbo.binarydatasource.BufferDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceFormat;
 
 /**
  * Format data to binary file.
