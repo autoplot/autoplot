@@ -1329,7 +1329,7 @@ public class DataSourceController extends DomNodeController {
             }
 
         } catch (IOException e ) {
-            if ( e instanceof FileNotFoundException || e.getMessage().contains("No such file") || e.getMessage().contains("timed out") ) {
+            if ( e instanceof FileNotFoundException || ( e.getMessage()!=null && ( e.getMessage().contains("No such file") || e.getMessage().contains("timed out") ) ) ) {
                 String message= e.getMessage();
                 if ( message.startsWith("550 ") ) {
                     message= message.substring(4);
@@ -1339,12 +1339,18 @@ public class DataSourceController extends DomNodeController {
                 setStatus("warning: " + message);
                 String title= e.getMessage().contains("No such file") ? "File not found" : e.getMessage();
                 model.showMessage( message, title, JOptionPane.WARNING_MESSAGE );
-            } else if ( e.getMessage().contains("root does not exist") ) {  // bugfix 3053225
+            } else if ( e.getMessage()!=null && e.getMessage().contains("root does not exist") ) {  // bugfix 3053225
                 setException(e);
                 setDataSet(null);
                 setStatus("warning: " + e.getMessage() );
                 String title= e.getMessage().contains("No such file") ? "Root does not exist" : e.getMessage();
                 model.showMessage( e.getMessage(), title, JOptionPane.WARNING_MESSAGE );
+            } else if ( e.getMessage()==null  ) {
+                setException(e);
+                e.printStackTrace();
+                setDataSet(null);
+                setStatus("error: " + e.getClass() );
+                handleException(e);
             } else {
                 setException(e);
                 setDataSet(null);
