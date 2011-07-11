@@ -51,7 +51,7 @@ import org.virbo.metatree.MetadataUtil;
 public class CdfJavaDataSource extends AbstractDataSource {
 
     protected static final String PARAM_ID = "id";
-    public static final String PARAM_INTERPMETA = "interpMeta";
+    protected static final String PARAM_INTERPMETA = "interpMeta";
     protected static final String PARAM_DODEP = "doDep";
     protected static final String PARAM_SLICE1 = "slice1";
 
