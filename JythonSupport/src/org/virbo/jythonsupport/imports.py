@@ -19,11 +19,16 @@ import org
 
 params= dict()
 
+import operator.isNumberType
+
 def getParam( x, default, title='' ):
   if ( type(x).__name__=='int' ):
      x= 'arg_%d' % i
 
   if params.has_key(x):
-     return params[x]
+     if ( operator.isNumberType(default) ): #TODO: complex
+         return float(params[x])
+     else:
+         return str(params[x])
   else:
      return default
