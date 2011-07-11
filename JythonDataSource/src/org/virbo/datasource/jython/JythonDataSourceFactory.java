@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,6 +89,78 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
+    protected static class Param {
+        String name;
+        String label; // the label for the variable used in the script
+        Object deft;
+        String doc;
+        char type; // A (String) or F (Double)
+    }
+
+    protected static Map<String,Param> getParams( URI uri, ProgressMonitor mon ) throws IOException {
+        BufferedReader reader= null;
+        boolean hasVars= false;
+
+        File src = DataSetURI.getFile(uri, new NullProgressMonitor());
+
+        Map<String,Param> result= new LinkedHashMap();
+
+        try {
+            reader = new LineNumberReader( new BufferedReader( new FileReader(src)) );
+
+            String vnarg= "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
+            String sarg= "\\s*\\'([a-zA-Z_][a-zA-Z0-9_]*)\\'\\s*"; // any variable name  VERIFIED
+            String aarg= "\\s*(\\'[^\\']+\\')\\s*"; // any argument
+            String farg= "\\s*([0-9\\.\\+-eE]+)\\s*"; // any float variable name
+
+            Pattern p= Pattern.compile( vnarg+"=\\s*getParam\\("+sarg+"\\,"+aarg+"(\\,"+aarg + ")?\\).*" );
+            Pattern fp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+farg+"(\\,"+aarg + ")?\\).*" );
+            Pattern sp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+sarg+"(\\,"+aarg + ")?\\).*" );
+
+            String line= reader.readLine();
+            while ( line!=null ) {
+                Matcher m= p.matcher(line);
+                if ( !m.matches() ) {
+                    m= fp.matcher(line);
+                }
+
+                if ( m.matches() ) {
+                    Param parm= new Param();
+
+                    parm.name= m.group(2); // exists in the URI space
+
+                    parm.label= m.group(1);  // exists in the Script space.  Why different.  Shouldn't be allowed, but this is required.
+
+                    parm.doc= m.group(5); // might be null
+
+                    if ( m.group(3)==null ) {
+                        System.err.println("error handle");
+                    } else {
+                        parm.type= m.group(3).startsWith("'") ? 'A' : 'F';
+                        String val= parm.type=='A' ? m.group(3).substring(1,m.group(3).length()-1) : m.group(3);
+                        parm.deft= val;
+                    }
+
+                    hasVars= true;
+
+                    result.put( parm.name, parm );
+
+                }
+                line= reader.readLine();
+            }
+            reader.close();
+
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return result;
+
+    }
+
     @Override
     public List<CompletionContext> getCompletions(CompletionContext cc, ProgressMonitor mon) throws Exception {
         List<CompletionContext> result = new ArrayList<CompletionContext>();
@@ -95,11 +168,21 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             String ext= DataSetURI.fromUri(cc.resourceURI);
             int i= ext.lastIndexOf(".");
             if ( i!=-1 ) ext= ext.substring(i+1);
-            if ( ext.equals(".jyds" ) || ext.equals("jy") || ext.equals("py") ) {
+            if ( ext.equals("jyds" ) || ext.equals("jy") || ext.equals("py") ) {
                 Map<String, Object> po = getNames( cc.resourceURI, mon);
                 for (String n : po.keySet()) {
                     result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, n, this, "arg_0", null, null));
                 }
+                Map<String,Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
+                for ( String n: po2.keySet() ) {
+                    Param parm= po2.get(n);
+                    if ( parm.doc==null ) parm.doc="";
+                    if ( !parm.name.equals(parm.label) ) {
+                        parm.doc+= " (named "+parm.label+" in the script";
+                    }
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, n + "="+ po2.get(n).deft, po2.get(n).doc ) );
+                }
+
             } else {
                 result.add(new CompletionContext(CompletionContext.CONTEXT_PARAMETER_NAME, "script=", "the name of the python script to run"));
             }
@@ -147,53 +230,48 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
 
     }
 
-    protected static Map<String,String> getParameters( String surl, ProgressMonitor mon ) {
-        try {
-            File src = DataSetURI.getFile(DataSetURI.getURL(surl), new NullProgressMonitor());
-            BufferedReader reader = new BufferedReader(new FileReader(src));
-            String s = reader.readLine();
+    protected static Map<String,String> getParameters( String surl, ProgressMonitor mon ) throws IOException {
+        File src = DataSetURI.getFile(DataSetURI.getURL(surl), new NullProgressMonitor());
+        BufferedReader reader = new BufferedReader(new FileReader(src));
+        String s = reader.readLine();
 
-            Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
-            Pattern defPattern= Pattern.compile("def .*");
+        Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
+        Pattern defPattern= Pattern.compile("def .*");
 
-            boolean inDef= false;
+        boolean inDef= false;
 
-            Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
+        Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
 
-            boolean haveResult = false;
-            while (s != null) {
+        boolean haveResult = false;
+        while (s != null) {
 
-                if ( inDef==false ) {
+            if ( inDef==false ) {
+                Matcher defm= defPattern.matcher(s);
+                if ( defm.matches() ) {
+                    inDef= true;
+                }
+            } else {
+                if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
                     Matcher defm= defPattern.matcher(s);
-                    if ( defm.matches() ) {
-                        inDef= true;
-                    }
-                } else {
-                    if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
-                        Matcher defm= defPattern.matcher(s);
-                        inDef=  defm.matches();
-                    }
+                    inDef=  defm.matches();
                 }
-
-                if ( !inDef ) {
-                    Matcher m= assignPattern.matcher(s);
-                    if ( m.matches() ) {
-                        if ( m.group(3)!=null ) {
-                            result.put(m.group(1), m.group(3) );
-                        } else {
-                            result.put(m.group(1), s );
-                        }
-                    }
-                }
-
-                s = reader.readLine();
             }
-            reader.close();
-            return result;
-        } catch (IOException ex) {
-            Logger.getLogger(JythonDataSourceFactory.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException(ex);
+
+            if ( !inDef ) {
+                Matcher m= assignPattern.matcher(s);
+                if ( m.matches() ) {
+                    if ( m.group(3)!=null ) {
+                        result.put(m.group(1), m.group(3) );
+                    } else {
+                        result.put(m.group(1), s );
+                    }
+                }
+            }
+
+            s = reader.readLine();
         }
+        reader.close();
+        return result;
     }
     
     ExceptionListener listener;
