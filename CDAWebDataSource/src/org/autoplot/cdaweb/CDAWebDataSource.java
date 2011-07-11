@@ -32,10 +32,15 @@ import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.MetadataModel;
+import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.metatree.IstpMetadataModel;
 
 /**
+ * Special data source for reading time series from NASA Goddard's CDAWeb
+ * database.  This uses an XML file to locate data files (soon a web service), and
+ * delegates to the CDF file reader to read them.  This code handles the
+ * aggregation into a time series.
  *
  * @author jbf
  */
@@ -70,18 +75,12 @@ public class CDAWebDataSource extends AbstractDataSource {
 
     /**
      * return the DataSourceFactory that will read the CDF files.  This was once
-     * the binary cdf library, and now is the java one.  Either way, it must
+     * the binary CDF library, and now is the java one.  Either way, it must
      * use the spec: <file>?<id>
      * @return
      */
     private DataSourceFactory getDelegateFactory() {
-        //DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
         DataSourceFactory cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
-        //cdfFileDataSourceFactory=null;  //experiment with using java-based version instead
-        //if ( cdfFileDataSourceFactory==null ) {
-        //    cdfFileDataSourceFactory= DataSourceRegistry.getInstance().getSource("cdfj");
-        //}
-
         return cdfFileDataSourceFactory;
     }
 
@@ -144,7 +143,10 @@ public class CDAWebDataSource extends AbstractDataSource {
                     throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
                 }
             } else {
-                DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + param ) );
+                Map<String,String> fileParams= getParams();
+                fileParams.remove( PARAM_TIMERANGE );
+                fileParams.remove( PARAM_DS );
+                DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
                 ds1= dataSource.getDataSet( t1 );
             }
 
