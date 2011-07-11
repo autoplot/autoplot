@@ -1053,6 +1053,9 @@ APSplash.checkTime("init 52");
             }
             applicationModel.resetDataSetSourceURL(surl, mon );
             if ( split.file!=null && ( split.file.endsWith(".vap") || split.file.endsWith(".vapx" ) ) ) {
+                // reset canvas size to vap file pixel size
+                resizeForCanvasSize( dom.getCanvases(0).getWidth(), dom.getCanvases(0).getHeight() );
+
                 tickleTimer.tickle(); 
             }
         } catch (RuntimeException ex) {
