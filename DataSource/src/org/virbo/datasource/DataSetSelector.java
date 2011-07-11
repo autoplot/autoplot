@@ -1142,7 +1142,11 @@ private void dataSetSelectorItemStateChanged(java.awt.event.ItemEvent evt) {//GE
 
 private void dataSetSelectorPopupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_dataSetSelectorPopupMenuWillBecomeInvisible
     if (popupCancelled == false) {
-        maybePlot(true);
+        if ( (keyModifiers&KeyEvent.ALT_MASK ) == KeyEvent.ALT_MASK ) {
+            browseSourceType();
+        } else {
+            maybePlot(true);
+        }
     }
     popupCancelled = false;
 }//GEN-LAST:event_dataSetSelectorPopupMenuWillBecomeInvisible
