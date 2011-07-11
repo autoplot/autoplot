@@ -178,89 +178,74 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
     }
 
     private boolean doVariables( File f, Map<String,String> params ) {
-        BufferedReader reader= null;
+
+        Map<String,JythonDataSourceFactory.Param> parms;
+
         boolean hasVars= false;
         tflist= new ArrayList();
         paramsList= new ArrayList();
         deftsList= new ArrayList();
         typesList= new ArrayList();
-
+        
         try {
-            reader = new LineNumberReader(new BufferedReader(new FileReader(f)));
-
-            String vnarg= "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
-            String sarg= "\\s*\\'([a-zA-Z_][a-zA-Z0-9_]*)\\'\\s*"; // any variable name  VERIFIED
-            String aarg= "\\s*(\\'[^\\']+\\')\\s*"; // any argument
-            String farg= "\\s*([0-9\\.\\+-eE]+)\\s*"; // any float variable name
-
-            Pattern p= Pattern.compile( vnarg+"=\\s*getParam\\("+sarg+"\\,"+aarg+"(\\,"+aarg + ")?\\).*" );
-            Pattern fp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+farg+"(\\,"+aarg + ")?\\).*" );
-            Pattern sp= Pattern.compile(vnarg+"=\\s*getParam\\("+sarg+"\\,"+sarg+"(\\,"+aarg + ")?\\).*" );
+            parms= JythonDataSourceFactory.getParams( f.toURI(), new NullProgressMonitor() );
 
             paramsPanel.add( new JLabel("<html>This script has the input parameters:<br><br></html>") );
 
-            String line= reader.readLine();
-            while ( line!=null ) {
-                Matcher m= p.matcher(line);
-                if ( !m.matches() ) {
-                    m= fp.matcher(line);
-                } 
-                if ( m.matches() ) {
-                    String vname= m.group(2);
+            for ( String s: parms.keySet() ) {
+                JythonDataSourceFactory.Param parm= parms.get(s);
+                
+                String vname= parm.name;                
+                String label= parm.label;
 
-                    String label= m.group(1);
-                    if ( m.group(5)==null ) {
-                        label= m.group(1)+ ":";
-                    } else {
-                        String doc= m.group(5);
-                        doc= doc.substring(1,doc.length()-1);// pop off the quotes
-                        label= "<html>" + m.group(1) + ", <em>" + doc + "</em>:</html>";
-                    }
-                    JLabel l= new JLabel( label );
-                    l.setAlignmentX( JComponent.LEFT_ALIGNMENT );
-                    paramsPanel.add( l );
-                    JTextField tf= new JTextField(50);
-                    Dimension x= tf.getPreferredSize();
-                    x.width= Integer.MAX_VALUE;
-                    tf.setMaximumSize(x);
-                    tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                if ( parm.doc==null ) {
+                    label= vname+ ":";
+                } else {
+                    String doc= parm.doc;
+                    doc= doc.substring(1,doc.length()-1);// pop off the quotes
+                    label= "<html>" + parm.name + ", <em>" + doc + "</em>:</html>";
+                }      
+                
+                
+                JLabel l= new JLabel( label );
+                l.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                paramsPanel.add( l );
+                JTextField tf= new JTextField(50);
+                Dimension x= tf.getPreferredSize();
+                x.width= Integer.MAX_VALUE;
+                tf.setMaximumSize(x);
+                tf.setAlignmentX( JComponent.LEFT_ALIGNMENT );
 
-                    String val;
-                    if ( params.get(vname)!=null ) {
-                        val= params.get(vname);
-                        if ( val.startsWith("'") ) val= val.substring(1);
-                        if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
-                    } else {
-                        val= m.group(3);
-                    }
+                String val;
+                if ( params.get(vname)!=null ) {
+                    val= params.get(vname);
+                    if ( val.startsWith("'") ) val= val.substring(1);
+                    if ( val.endsWith("'") ) val= val.substring(0,val.length()-1);
+                } else {
+                    val= String.valueOf( parm.deft );
+                }
 
-                    tf.setText( val );
-                    paramsPanel.add( tf );
-                    tflist.add(tf);
-                    paramsList.add( m.group(2) );
-                    String pval= m.group(3);
-                    deftsList.add( pval );
-                    typesList.add( pval.startsWith("'") ? 'A' : 'F' );
+                tf.setText( val );
+                paramsPanel.add( tf );
+                tflist.add(tf);
+                    paramsList.add( parm.name );
+                    deftsList.add( String.valueOf( parm.deft ) );
+                    typesList.add( parm.type );
 
                     hasVars= true;
-                }
-                line= reader.readLine();
             }
+                
+            hasVars= parms.size()>0;
 
             if ( !hasVars ) {
                 paramsPanel.add( new JLabel("<html><em>no parameters</em></html>") );
+
             }
 
             paramsPanel.add( Box.createVerticalGlue() );
 
         } catch (IOException ex) {
             Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ex) {
-                Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
         return hasVars;
 
