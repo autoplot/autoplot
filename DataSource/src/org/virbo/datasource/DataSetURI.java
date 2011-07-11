@@ -39,7 +39,6 @@ import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.URIException;
 import org.das2.util.filesystem.VFSFileSystemFactory;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
-import org.virbo.datasource.datasource.DataSourceFormat;
 
 /**
  *
