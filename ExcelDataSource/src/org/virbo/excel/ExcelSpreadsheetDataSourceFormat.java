@@ -23,7 +23,7 @@ import org.das2.datum.EnumerationUnits;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceFormat;
 
 /**
  * Format the QDataSet into Ascii tables.  

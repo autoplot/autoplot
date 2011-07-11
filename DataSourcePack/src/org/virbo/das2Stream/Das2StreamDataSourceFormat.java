@@ -15,7 +15,7 @@ import org.virbo.dataset.QDataSet;
 import org.das2.dataset.TableDataSetAdapter;
 import org.das2.dataset.VectorDataSetAdapter;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceFormat;
 
 /**
  * Format the data into das2streams.

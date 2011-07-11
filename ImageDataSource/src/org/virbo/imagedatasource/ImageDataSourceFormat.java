@@ -16,7 +16,7 @@ import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceFormat;
 
 /**
  * formatter assumes data is (m,n,3) or (3,m,n) RGB.  
