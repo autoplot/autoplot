@@ -17,6 +17,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.virbo.dataset.QDataSet;
@@ -158,7 +159,7 @@ public abstract class AbstractDataSource implements DataSource {
      * return the parameters from the URL.
      */
     protected Map getParams() {
-        return params;
+        return new LinkedHashMap(params);
     }
 
     /**
