@@ -88,7 +88,7 @@ import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.DataSourceUtil;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceFormat;
 import org.xml.sax.SAXException;
 
 /**

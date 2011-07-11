@@ -51,7 +51,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceFormat;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
 import org.virbo.qstream.StreamTool;

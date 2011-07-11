@@ -24,7 +24,7 @@ import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.DataSourceRegistry;
 import org.virbo.datasource.URISplit;
-import org.virbo.datasource.datasource.DataSourceFormat;
+import org.virbo.datasource.DataSourceFormat;
 
 /**
  *
