@@ -341,7 +341,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      *   0                    replace plot
      *   KeyEvent.CTRL_MASK   plot below
      *   KeyEvent.SHIFT_MASK  overplot
-     *   KeyEvent.ALT_MASK    edit this URI.  (Only with recent history uses this for now)
+     *   KeyEvent.ALT_MASK    edit this URI.  (Only with recent history uses this for now, also bookmarks)
      * @param keyModifiers
      */
     public void maybePlot(int keyModifiers) {
