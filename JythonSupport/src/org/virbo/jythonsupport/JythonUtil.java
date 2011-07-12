@@ -38,7 +38,6 @@ public class JythonUtil {
         ///  http://www.gossamer-threads.com/lists/python/python/697524
         org.python.core.PySystemState pySys = new org.python.core.PySystemState();
         URL jarUrl= InteractiveInterpreter.class.getResource("/glob.py");
-        System.err.println("jarUrl="+jarUrl);
         if ( jarUrl!=null ) {
             String jarFile= jarUrl.toString();
 
