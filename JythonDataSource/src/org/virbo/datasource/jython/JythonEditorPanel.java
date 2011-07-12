@@ -11,8 +11,10 @@
 
 package org.virbo.datasource.jython;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -29,8 +31,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.AbstractAction;
 import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -138,7 +143,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 .addContainerGap()
                 .add(jLabel1)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(variableComboBox, 0, 344, Short.MAX_VALUE)
+                .add(variableComboBox, 0, 351, Short.MAX_VALUE)
                 .addContainerGap())
             .add(tearoffTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
@@ -190,7 +195,7 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
         try {
             parms= JythonDataSourceFactory.getParams( f.toURI(), new NullProgressMonitor() );
 
-            paramsPanel.add( new JLabel("<html>This script has the input parameters:<br><br></html>") );
+            paramsPanel.add( new JLabel("<html>This script has these input parameters.  Buttons on the right show default values.<br><br></html>") );
 
             for ( String s: parms.keySet() ) {
                 JythonDataSourceFactory.Param parm= parms.get(s);
@@ -213,6 +218,10 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 JLabel l= new JLabel( label );
                 l.setAlignmentX( JComponent.LEFT_ALIGNMENT );
                 paramsPanel.add( l );
+
+                JPanel valuePanel= new JPanel(  );
+                valuePanel.setLayout( new BoxLayout( valuePanel, BoxLayout.X_AXIS ) );
+
                 JTextField tf= new JTextField(50);
                 Dimension x= tf.getPreferredSize();
                 x.width= Integer.MAX_VALUE;
@@ -229,7 +238,20 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 }
 
                 tf.setText( val );
-                paramsPanel.add( tf );
+                valuePanel.add( tf );
+
+                final String fdeft= String.valueOf(parm.deft);
+                final JTextField ftf= tf;
+                JButton defaultButton= new JButton( new AbstractAction( fdeft ) {
+                    public void actionPerformed( ActionEvent e ) {
+                        ftf.setText(fdeft);
+                    }
+                });
+                defaultButton.setToolTipText("Click to reset to default");
+                valuePanel.add( defaultButton );
+                valuePanel.setAlignmentX( JComponent.LEFT_ALIGNMENT );
+                
+                paramsPanel.add( valuePanel );
                 tflist.add(tf);
                     paramsList.add( parm.name );
                     deftsList.add( String.valueOf( parm.deft ) );

@@ -20,7 +20,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="variableComboBox" pref="344" max="32767" attributes="0"/>
+              <Component id="variableComboBox" pref="351" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Component id="tearoffTabbedPane1" alignment="0" pref="487" max="32767" attributes="0"/>
