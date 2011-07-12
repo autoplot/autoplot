@@ -157,7 +157,7 @@ public class UriTcaSource extends AbstractQFunction {
 
     }
 
-    public QDataSet exampleInput() {
+    public synchronized QDataSet exampleInput() {
 
         Datum t0;
         Units tu;
@@ -168,7 +168,9 @@ public class UriTcaSource extends AbstractQFunction {
             label= "Time";
         } else {
             try {
-                doRead();
+                if ( ds==null ) {
+                    doRead();
+                }
                 QDataSet dep0= (QDataSet) ds.property(QDataSet.DEPEND_0);
                 t0= DataSetUtil.asDatum( dep0.slice(0) );
                 tu= t0.getUnits();
