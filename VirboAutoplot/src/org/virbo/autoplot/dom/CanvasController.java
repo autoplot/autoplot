@@ -127,6 +127,26 @@ public class CanvasController extends DomNodeController {
     }
 
     /**
+     * get the column to the left or right.
+     * @param r
+     * @param dir LayoutConstants.LEFT or LayoutConstants.RIGHT
+     * @return the column or null if no such column exists.
+     */
+    Column getColumn( Column r, Object dir ) {
+        int idx= canvas.columns.indexOf(r);
+        if ( idx==-1 ) throw new IllegalArgumentException("canvas doesn't contain this column");
+        if ( dir==LayoutConstants.LEFT ) {
+            if ( idx==0 ) return null;
+            return canvas.columns.get(idx-1);
+        } else if ( dir==LayoutConstants.RIGHT ){
+            if ( idx==canvas.columns.size()-1 ) return null;
+            return canvas.columns.get(idx+1);
+        } else {
+            throw new IllegalArgumentException("dir must be LEFT or RIGHT");
+        }
+    }
+
+    /**
      * get the row above or below.
      * @param r
      * @param dir LayoutConstants.ABOVE or LayoutConstants.BELOW
