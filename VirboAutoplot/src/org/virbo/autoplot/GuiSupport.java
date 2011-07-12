@@ -1062,6 +1062,30 @@ public class GuiSupport {
             }
         });
         bindingMenu.add(item);
+        item = new JMenuItem(new AbstractAction("Bind to Plot to the Right") {
+
+            public void actionPerformed(ActionEvent e) {
+                Plot dstPlot = controller.getNextPlotHoriz(plot,LayoutConstants.RIGHT);
+                if (dstPlot == null) {
+                    controller.setStatus("warning: no plot to the right");
+                } else {
+                    bindToPlotPeer(controller,dstPlot, plot, axis);
+                }
+            }
+        });
+        bindingMenu.add(item);
+        item = new JMenuItem(new AbstractAction("Bind to Plot to the Left") {
+
+            public void actionPerformed(ActionEvent e) {
+                Plot dstPlot = controller.getNextPlotHoriz(plot,LayoutConstants.LEFT);
+                if (dstPlot == null) {
+                    controller.setStatus("warning: no plot to the left");
+                } else {
+                    bindToPlotPeer(controller,dstPlot, plot, axis);
+                }
+            }
+        });
+        bindingMenu.add(item);
 
         JMenu connectorMenu = new JMenu("Add Connector");
 
