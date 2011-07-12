@@ -557,6 +557,13 @@ public class DataSourceController extends DomNodeController {
         if (intTsb != null) {
             this.setTsb(intTsb);
             this.timeSeriesBrowseController= new TimeSeriesBrowseController( this, null );
+            // find the plot that will control this.  Better not plot this twice!
+            Plot p= getApplication().getController().getFirstPlotFor(dsf);
+            if ( p!=null ) {
+                this.timeSeriesBrowseController.setupGen( p, Plot.PROP_CONTEXT );
+            } else {
+                System.err.println("check into this case, shouldn't happen");
+            }
         }
         haveCheckedInternalTsb= true;
     }
@@ -567,6 +574,7 @@ public class DataSourceController extends DomNodeController {
     class InternalTimeSeriesBrowse implements TimeSeriesBrowse {
 
         String uri;
+        DatumRange timerange;
 
         private InternalTimeSeriesBrowse( String uri ) {
             this.uri= uri; // "vap+internal:data_1,data_2"
@@ -586,10 +594,12 @@ public class DataSourceController extends DomNodeController {
             for ( TimeSeriesBrowse tsb: parentTsbs ) {
                 tsb.setTimeRange(dr);
             }
+            this.timerange= dr;
+            checkParents();
         }
 
         public DatumRange getTimeRange() {
-            return parentTsbs.get(0).getTimeRange(); // TODO: this should probably be the union
+            return timerange;
         }
 
         public void setTimeResolution(Datum d) {
@@ -643,6 +653,8 @@ public class DataSourceController extends DomNodeController {
     /**
      * check to see if all the parent sources have updated and have
      * datasets that are compatible, so a new dataset can be created.
+     * If there is a TimeSeriesBrowse on this, then attempt to trim the data
+     * to the TimeSeriesBrowse.getTimeRange().
      * @return null if everything is okay, error message otherwise
      */
     private synchronized String checkParents() {
@@ -651,6 +663,10 @@ public class DataSourceController extends DomNodeController {
         QDataSet y = null;
         QDataSet z = null;
         Map<String,Object> xprops=null,yprops=null,zprops=null;
+
+        QDataSet ds=null;
+        Map<String,Object> props=null;
+
         if ( parentSources==null ) return "no parent sources";
         if ( parentSources[0]==null ) return "first parent is null";
         x = parentSources[0].controller.getFillDataSet();
@@ -670,7 +686,8 @@ public class DataSourceController extends DomNodeController {
                 return "parent dataset is null";
             }
             if ( DataSetUtil.validate(x, null ) ) {
-                setDataSetInternal(x,xprops,this.dom.controller.isValueAdjusting());
+                ds= x;
+                props= xprops;
             }
         } else if (parentSources.length == 2) {
             if (x == null || y == null) {
@@ -681,7 +698,8 @@ public class DataSourceController extends DomNodeController {
                 yds.putProperty(QDataSet.DEPEND_0, x);
                 yprops.put(QDataSet.DEPEND_0, xprops);
                 if ( DataSetUtil.validate(yds, null ) ) {
-                    setDataSetInternal(yds,yprops,this.dom.controller.isValueAdjusting());
+                    ds= yds;
+                    props= yprops;
                 }
             } else {
                 logger.fine("intermediate state where y and x have different lengths");
@@ -697,7 +715,8 @@ public class DataSourceController extends DomNodeController {
                 yprops.put(QDataSet.DEPEND_0, xprops );
                 yprops.put(QDataSet.PLANE_0,zprops);
                 if ( DataSetUtil.validate(yds, null ) ) { //TODO: link should and probably does work here
-                    setDataSetInternal(yds,yprops,this.dom.controller.isValueAdjusting());
+                    ds= yds;
+                    props= yprops;
                 }
             } else {
                 ArrayDataSet zds = ArrayDataSet.copy(z);
@@ -710,9 +729,34 @@ public class DataSourceController extends DomNodeController {
                 if ( DataSetUtil.validate( x, y, z, null ) ) {
                     zprops.put(QDataSet.DEPEND_0,xprops);
                     zprops.put(QDataSet.DEPEND_1,yprops);
-                    setDataSetInternal(zds,zprops,this.dom.controller.isValueAdjusting());
+                    ds= zds;
+                    props= zprops;
                 }
             }
+        }
+        if ( ds!=null ) {
+            //TODO: TSB trim dataset.  It's not clear to me that this should be implemented here, but we will for now.
+            if ( this.tsb!=null && this.tsb instanceof InternalTimeSeriesBrowse ) {
+                QDataSet xds= (QDataSet) ds.property(QDataSet.DEPEND_0);
+                if ( xds!=null ) {
+                    QDataSet xxds= (QDataSet) xds.property(QDataSet.DEPEND_0);
+                    if ( xxds!=null && UnitsUtil.isTimeLocation( SemanticOps.getUnits( xxds ) ) && SemanticOps.isMonotonic( xxds ) ) { //okay we can trim
+                        DatumRange dr= this.tsb.getTimeRange();
+                        int idx0= DataSetUtil.getPreviousIndex( xxds, dr.min() );
+                        int idx1= DataSetUtil.getNextIndex( xxds, dr.max() );
+                        if ( idx0==idx1 ) {
+                            setDataSetInternal(null);
+                        } else if ( idx0>idx1 ) {
+                            System.err.println("non mono error?");
+                            setDataSetInternal(null);
+                        } else {
+                            QDataSet trim= ds.trim( idx0, idx1 );
+                            ds= trim;
+                        }
+                    }
+                }
+            }
+            setDataSetInternal(ds,props,this.dom.controller.isValueAdjusting());
         }
         return null;
     }
@@ -722,8 +766,11 @@ public class DataSourceController extends DomNodeController {
             String prob= checkParents();
             if ( prob!=null ) {
                setStatus("warning: "+prob );
+               setDataSetInternal(null,null,dom.controller.isValueAdjusting());
             }
-            maybeAddInternalTimeSeriesBrowse();
+            if ( DataSourceController.this.haveCheckedInternalTsb==false ) {
+                maybeAddInternalTimeSeriesBrowse();
+            }
         }
     };
 
