@@ -76,6 +76,7 @@ public class PlotController extends DomNodeController {
             }
         });
         this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
+        this.plot.addPropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
 
         plot.controller= this;
     }
@@ -150,6 +151,21 @@ public class PlotController extends DomNodeController {
          public void propertyChange(PropertyChangeEvent evt) {
             if ( evt.getPropertyName().equals(Plot.PROP_TITLE) ) {
                 plot.setAutoLabel(false);
+            }
+         }
+    };
+
+    private PropertyChangeListener ticksURIListener= new PropertyChangeListener() {
+         public void propertyChange(PropertyChangeEvent evt) {
+            if ( evt.getPropertyName().equals(Plot.PROP_TICKS_URI) ) {
+                if ( ((String)evt.getNewValue()).length()>0 ) {
+                    String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + evt.getNewValue();
+                    plot.getXaxis().getController().getDasAxis().setDataPath(dasAddress);
+                    plot.getXaxis().getController().getDasAxis().setDrawTca(true);
+                } else {
+                    plot.getXaxis().getController().getDasAxis().setDataPath("");
+                    plot.getXaxis().getController().getDasAxis().setDrawTca(false);
+                }
             }
          }
     };
