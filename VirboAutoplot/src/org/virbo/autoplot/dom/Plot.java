@@ -238,6 +238,7 @@ public class Plot extends DomNode {
         if (!exclude.contains(PROP_ZAXIS)) this.zaxis.syncTo(that.getZaxis(),exclude);
         if (!exclude.contains(PROP_VISIBLE)) this.setVisible(that.isVisible());
         if (!exclude.contains(PROP_CONTEXT)) this.setContext(that.getContext());
+        if (!exclude.contains(PROP_TICKS_URI)) this.setTicksURI(that.getTicksURI());
     }
 
     @Override
@@ -280,6 +281,8 @@ public class Plot extends DomNode {
             b = that.context!=null && that.context.equals(this.context);
         }
         if (!b) result.add(new PropertyChangeDiff(PROP_CONTEXT, that.context, this.context));
+        b= that.ticksURI.equals(this.ticksURI);
+        if (!b) result.add(new PropertyChangeDiff(PROP_TICKS_URI, that.ticksURI, this.ticksURI));
         result.addAll(DomUtil.childDiffs( PROP_XAXIS, this.getXaxis().diffs(that.getXaxis())));
         result.addAll(DomUtil.childDiffs( PROP_YAXIS, this.getYaxis().diffs(that.getYaxis())));
         result.addAll(DomUtil.childDiffs( PROP_ZAXIS, this.getZaxis().diffs(that.getZaxis())));
