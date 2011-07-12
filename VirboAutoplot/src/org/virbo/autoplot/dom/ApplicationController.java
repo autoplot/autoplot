@@ -1656,7 +1656,29 @@ public class ApplicationController extends DomNodeController implements RunLater
     public Plot getPlotBelow(Plot p) {
         return getPlot( p, LayoutConstants.BELOW );
     }
-    
+
+    public Plot getNextPlotHoriz( Plot p, Object dir ) {
+        Column r= getCanvas().getController().getColumnFor(p);
+        Column left= getCanvas().getController().getColumn(r,dir);
+
+        if ( left==null ) return null;
+        int n = application.getPlots().length;
+        Plot best= null;
+        for (int i = 0; i < n; i++) {
+            final Plot p1 = application.getPlots(i);
+            if (p1.getColumnId().equals( left.getId() ) ) {
+                if ( best==null ) {
+                    best= p1;
+                } else {
+                    if ( p1.rowId.equals( p.getRowId() ) ) {
+                        best= p1;
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
     public Plot getPlot( Plot p, Object dir ) {
         Row r= getCanvas().getController().getRowFor(p);
         Row above= getCanvas().getController().getRow(r,dir);
