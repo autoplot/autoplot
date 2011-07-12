@@ -6,6 +6,7 @@
 package org.autoplot.tca;
 
 import java.text.ParseException;
+import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
@@ -59,7 +60,8 @@ public class UriTcaSource extends AbstractQFunction {
     }
 
     private void doRead( ) throws Exception {
-        ds= dss.getDataSet( new NullProgressMonitor() );
+        ProgressMonitor mon= DasProgressPanel.createFramed("loading data");
+        ds= dss.getDataSet( mon );
         bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
         if ( bundleDs==null ) {
             if ( ds.rank()==1 ) { // just a single param, go ahead and support this.
