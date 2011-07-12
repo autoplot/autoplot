@@ -9,7 +9,9 @@ import org.virbo.autoplot.dom.DomNode;
 import org.w3c.dom.Element;
 
 /**
- *
+ * in vap1.07, we add the properties:
+ *    plots[:].context
+ *    plots[:].ticksURI
  * @author jbf
  */
 public class Vap1_07Scheme extends AbstractVapScheme {
