@@ -46,6 +46,9 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet nonValueDs;
 
     public UriTcaSource( String uri ) throws Exception {
+        if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
+            throw new IllegalArgumentException("pass a URI to this, not class:org.autoplot.tca.UriTcaSource");
+        }
         DataSource dss= DataSetURI.getDataSource(uri);
         this.tsb= dss.getCapability( TimeSeriesBrowse.class );
         this.dss= dss;
