@@ -378,7 +378,9 @@ public class DataSetSelector extends javax.swing.JPanel {
      * @return true if the exception was handled.
      */
     private boolean maybeHandleException(Exception ex) {
-        String msg= ex.getMessage().trim();
+        String msg= ex.getMessage();
+        if ( msg==null ) msg= ex.toString();
+        msg= msg.trim();
         if ( msg==null ) msg="";
         if ( ex instanceof FileNotFoundException && msg.length()==0 ) {
             msg= "File not found"; // this may never happen, but to be sure...
