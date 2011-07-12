@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Startup time of Autoplot is reduced significantly: initialization by about a second (from about 2.5 sec to 1.5 sec), and download reduced from 20+ Mb to about 7.5 Mb. 
+        <p><small>Time Series Browse when there is no timeaxis.  The plots on the left precisely trim the data to the application timerange. 
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -24,6 +24,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 	<p>Bugfixes:</p>
 
         <ul>
+            <li>bugfixes to the rich headers parsing</li>
             <li>single-jar release works after new release method.</li>
             <li>bugfix file size incorrectly reported by FTP filesystem after automatic .gz support added</li>
             <li>Clean up of CDAWeb plugin</li>
@@ -46,6 +47,9 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         </ul>
         <p>Features:</p>
         <ul>
+            <li>Improvements to Time Series Browse when timerange is not visible</li>
+            <li>slice1=n in CDF readers allow slice of rank 2 to be loaded</li>
+            <li>resize to the size indicated in the vap file</li>
             <li>minor improvements to JythonDataSource editor, and completions see getParam</li>
             <li>CDAWeb uses Java-based CDF reader to support single-jar mode</li>
             <li>RFE 3347826: new folder icon has magnifying glass for inspect button</li>
