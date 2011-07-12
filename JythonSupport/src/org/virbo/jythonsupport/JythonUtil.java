@@ -6,13 +6,10 @@ package org.virbo.jythonsupport;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import org.python.core.Py;
-import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
-import org.python.util.PythonInterpreter;
 
 /**
  *
