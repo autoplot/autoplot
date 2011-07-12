@@ -203,6 +203,9 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
                 } else {
                     String doc= parm.doc;
                     doc= doc.substring(1,doc.length()-1);// pop off the quotes
+                    if ( !parm.label.equals(parm.name) ) {
+                        doc= doc + " ("+parm.label+" internally)";
+                    }
                     label= "<html>" + parm.name + ", <em>" + doc + "</em>:</html>";
                 }      
                 
