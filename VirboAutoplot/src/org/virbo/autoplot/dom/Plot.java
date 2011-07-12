@@ -185,6 +185,23 @@ public class Plot extends DomNode {
         propertyChangeSupport.firePropertyChange(PROP_CONTEXT, old, context );
     }
 
+    /**
+     * The address of a dataset where additional labels for the x axis ticks can be
+     * found.  This should be the address of a bundle dataset.
+     */
+    private String ticksURI= "";
+    public static final String PROP_TICKS_URI= "ticksURI";
+
+    public String getTicksURI() {
+        return ticksURI;
+    }
+
+    public void setTicksURI( String ticksURI ) {
+        String old= this.ticksURI;
+        this.ticksURI = ticksURI;
+        propertyChangeSupport.firePropertyChange(PROP_TICKS_URI, old, ticksURI );
+    }
+
     protected PlotController controller;
 
     public PlotController getController() {
