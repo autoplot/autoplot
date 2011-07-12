@@ -178,9 +178,9 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
                     Param parm= po2.get(n);
                     if ( parm.doc==null ) parm.doc="";
                     if ( !parm.name.equals(parm.label) ) {
-                        parm.doc+= " (named "+parm.label+" in the script";
+                        parm.doc+= " (named "+parm.label+" in the script)";
                     }
-                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, n + "="+ po2.get(n).deft, po2.get(n).doc ) );
+                    result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_NAME, n+"=", n + " default is '"+ po2.get(n).deft + "'", po2.get(n).doc ) );
                 }
 
             } else {
@@ -190,6 +190,16 @@ public class JythonDataSourceFactory extends AbstractDataSourceFactory {
             String paramName = CompletionContext.get(CompletionContext.CONTEXT_PARAMETER_NAME, cc);
             if ( paramName.equals("script") ) {
                 //TODO: filesystem completions.
+            } else {
+                Map<String,Param> po2= getParams( cc.resourceURI, new NullProgressMonitor() );
+                Param pp= po2.get(paramName);
+                if ( pp!=null ) {
+                    if ( pp.deft instanceof Number ) {
+                        result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.valueOf(pp.deft), paramName + " default is '"+ pp.deft + "'", pp.doc ) );
+                    } else {
+                        result.add( new CompletionContext( CompletionContext.CONTEXT_PARAMETER_VALUE, String.format( "'%s'", pp.deft ), paramName + " default is '"+ pp.deft + "'", pp.doc ) );
+                    }
+                }
             }
         }
         return result;
