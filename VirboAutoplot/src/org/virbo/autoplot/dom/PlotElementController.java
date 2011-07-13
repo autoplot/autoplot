@@ -140,8 +140,7 @@ public class PlotElementController extends DomNodeController {
      * remove any bindings and listeners
      */
     void unbindDsf() {
-        dsf.removePropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
-        dsf.removePropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
+        dsf.removePropertyChangeListener(DataSourceFilter.PROP_FILTERS, dsfListener);
         dsf.controller.removePropertyChangeListener(DataSourceController.PROP_FILLDATASET, fillDataSetListener);
         dsf.controller.removePropertyChangeListener(DataSourceController.PROP_DATASOURCE, dataSourceDataSetListener);
     }
@@ -154,7 +153,7 @@ public class PlotElementController extends DomNodeController {
         }
 
         public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getPropertyName().equals(DataSourceFilter.PROP_SLICEDIMENSION) || evt.getPropertyName().equals(DataSourceFilter.PROP_TRANSPOSE)) {
+            if ( evt.getPropertyName().equals(DataSourceFilter.PROP_FILTERS) ) {
                 logger.log(Level.FINE, "property change in DSF means I need to autorange: {0}", evt.getPropertyName());
                 setResetRanges(true);
                 maybeSetPlotAutorange();
@@ -305,8 +304,7 @@ public class PlotElementController extends DomNodeController {
         if ( dsf==null ) {
             throw new NullPointerException("couldn't find the data for this plot element");
         } else {
-            dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, dsfListener);
-            dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, dsfListener);
+            dsf.addPropertyChangeListener( DataSourceFilter.PROP_FILTERS, dsfListener );
         }
         setDataSourceFilterController( dsf.controller );
     }
