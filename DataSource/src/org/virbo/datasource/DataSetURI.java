@@ -638,7 +638,7 @@ public class DataSetURI {
      * file in the directory, and the parameters are encoded in the name.
      * @param url the address to download.
      * @param mon a progress monitor.
-     * @return a File in the FileSystemCache
+     * @return a File in the FileSystemCache.  The file will have question marks and ampersands removed.
      * @throws IOException
      */
     public static File downloadResourceAsTempFile( URL url, ProgressMonitor mon ) throws IOException {
@@ -660,7 +660,7 @@ public class DataSetURI {
         String filename = new File( localCache, split.file.substring(split.path.length()) ).toString();
         
         if ( split.params.length()>0 ) {
-            filename= filename+"?"+split.params;
+            filename= filename+"__"+split.params.replaceAll("&", "_").replaceAll("=", "_");
         }
 
         InputStream in = new DasProgressMonitorInputStream( url.openStream(), mon );
