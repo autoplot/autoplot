@@ -460,7 +460,8 @@ public class DataSourceUtil {
     }
 
     /**
-     * transfers the data from one channel to another.
+     * transfers the data from one channel to another.  src and dest are
+     * closed after the operation is complete.
      * @param src
      * @param dest
      * @throws java.io.IOException
