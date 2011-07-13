@@ -688,7 +688,7 @@ public class ApplicationModel {
         setUseEmbeddedDataSet(false);
 
         setVapFile( f.toString() );
-
+        addRecent( f.toString() );
     }
 
     /**
