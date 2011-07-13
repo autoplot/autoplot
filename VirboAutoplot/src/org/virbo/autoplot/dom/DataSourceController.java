@@ -38,7 +38,6 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
-import org.virbo.dataset.TransposeRank2DataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.URISplit;
@@ -46,7 +45,6 @@ import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
 import org.virbo.datasource.capability.Updating;
 import org.virbo.dsutil.AutoHistogram;
-import org.virbo.metatree.MetadataUtil;
 
 /**
  *
@@ -71,10 +69,10 @@ public class DataSourceController extends DomNodeController {
         }
 
         public void propertyChange(PropertyChangeEvent e) {
-            if (dataSet != null && dataSet.rank() == 3) {
+            if ( dataSet != null ) {
                 logger.fine("updateSlice ->updateFillSoon()");
                 int delay=0;
-                if ( e.getPropertyName().equals( DataSourceFilter.PROP_SLICEDIMENSION ) ) { //kludge for 2795481: switch slice dimension can result in inconvertable units
+                if ( e.getPropertyName().equals( DataSourceFilter.PROP_FILTERS ) ) { //kludge for 2795481: switch slice dimension can result in inconvertable units
                     delay= 100;
                 }
                 updateFillSoon(delay);
@@ -154,9 +152,10 @@ public class DataSourceController extends DomNodeController {
         this.changesSupport = new ChangesSupport(this.propertyChangeSupport, this);
         this.dsf = dsf;
 
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, updateSlicePropertyChangeListener);
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEINDEX, updateSlicePropertyChangeListener);
-        dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, updateSlicePropertyChangeListener);
+        //dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEDIMENSION, updateSlicePropertyChangeListener);
+        //dsf.addPropertyChangeListener(DataSourceFilter.PROP_SLICEINDEX, updateSlicePropertyChangeListener);
+        //dsf.addPropertyChangeListener(DataSourceFilter.PROP_TRANSPOSE, updateSlicePropertyChangeListener);
+        dsf.addPropertyChangeListener( DataSourceFilter.PROP_FILTERS, updateSlicePropertyChangeListener );
 
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_FILL, updateMePropertyChangeListener);
         dsf.addPropertyChangeListener(DataSourceFilter.PROP_VALID_RANGE, updateMePropertyChangeListener);
@@ -929,48 +928,17 @@ public class DataSourceController extends DomNodeController {
 
         MutablePropertyDataSet fillDs;
 
-        int sliceDimension = dsf.getSliceDimension();
-        int sliceIndex = dsf.getSliceIndex();
+        String filters= dsf.getFilters();
 
-        boolean doSlice= ( sliceIndex>=0 && sliceDimension>=0  ); // kludge to support legacy datasets
+        boolean doSlice= filters.length()>0;
 
-        if ( doSlice && getDataSet().rank() == 3) { // plot element now does slicing
+        if ( doSlice ) { // plot element now does slicing, but we can do it here as well.
 
             QDataSet ds;
-            QDataSet dep;
+            ds= DataSetOps.sprocess( filters, getDataSet(), new NullProgressMonitor() );
 
-            if (sliceDimension == 2) {
-                int index = Math.min(getDataSet().length(0, 0) - 1, sliceIndex);
-                ds = DataSetOps.slice2(getDataSet(), index);
-                dep = (QDataSet) getDataSet().property(QDataSet.DEPEND_2);
-            } else if (sliceDimension == 1) {
-                int index = Math.min(getDataSet().length(0) - 1, sliceIndex);
-                ds = DataSetOps.slice1(getDataSet(), index);
-                dep = (QDataSet) getDataSet().property(QDataSet.DEPEND_1);
-            } else if (sliceDimension == 0) {
-                int index = Math.min(getDataSet().length() - 1, sliceIndex);
-                ds = DataSetOps.slice0(getDataSet(), index);
-                dep = (QDataSet) getDataSet().property(QDataSet.DEPEND_0);
-            } else {
-                throw new IllegalStateException("sliceDimension");
-            }
-
-            String reduceRankString;
-            List<String> names = getDepnames();
-            if (dep == null) {
-                reduceRankString = names.get(sliceDimension) + "=" + sliceIndex;
-            } else {
-                reduceRankString = PlotElementUtil.describe(names.get(sliceDimension), dep, sliceIndex);
-            }
-            setReduceDataSetString(reduceRankString);
-
-            props = MetadataUtil.sliceProperties(props, sliceDimension);
-
-            if (dsf.isTranspose()) {
-                ds = new TransposeRank2DataSet(ds);
-                props = MetadataUtil.transposeProperties(props);
-            }
-
+            setReduceDataSetString(filters);
+            //TODO: must we process the props as well?
             fillDs = DataSetOps.makePropertiesMutable(ds);
 
         } else {
