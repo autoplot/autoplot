@@ -1077,8 +1077,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 dsfnew.controller.setResetDimensions(false);
                 dsfnew.controller.setDataSetInternal(dsfsrc.controller.getDataSet(),dsfsrc.controller.getRawProperties(),isValueAdjusting()); // fire off data event.
                 dsfnew.controller.setProperties(dsfsrc.controller.getProperties());
-                dsfnew.setSliceDimension( dsfsrc.getSliceDimension() );
-                dsfnew.setSliceIndex( dsfsrc.getSliceIndex() );
+                dsfnew.setFilters( dsfsrc.getFilters() );
             }
         } finally {
             lock.unlock();
