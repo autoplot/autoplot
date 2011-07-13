@@ -221,15 +221,16 @@ public class JythonCompletionTask implements CompletionTask {
                     }
                 }
                 String link = null;
-                if ( false && signature != null) {
+                if ( signature != null) {
                     if ( signature.startsWith("javax") || signature.startsWith("java") ) {
-                        link= "http://java.sun.com/j2se/1.5.0/docs/api/" + signature;
+                        link= "http://java.sun.com/j2se/1.5.0/docs/api/" + signature.replaceAll(",", ", ");
                     } else if ( signature.startsWith("org/das2/")) {
                         link= "http://www-pw.physics.uiowa.edu/das2/javadoc/" + signature;
                     } else {
-                        String docHome= JythonCompletionProvider.getInstance().settings().getDocHome();
-                        docHome= docHome.replaceAll("AUTOPLOT_HOME", FileSystem.settings().getLocalCacheDir().toString() );
-                        link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
+                        //String docHome= JythonCompletionProvider.getInstance().settings().getDocHome();
+                        //docHome= docHome.replaceAll("AUTOPLOT_HOME", FileSystem.settings().getLocalCacheDir().toString() );
+                        //link = JythonCompletionProvider.getInstance().settings().getDocHome() + signature;
+                        link= null;
                     }
                 }
                 rs.addItem(new DefaultCompletionItem(ss, cc.completable.length(), ss + args, label, link));
