@@ -316,8 +316,11 @@ public class Options extends DomNode {
     }
 
 
+    /**
+     * Use Day of Year, rather than Y,M,D for labels.
+     */
     protected boolean dayOfYear= false;
-    public static final String PROP_DAYOFYEAR = "dayOfYear";
+    public static final String PROP_DAY_OF_YEAR = "dayOfYear";
 
     public boolean isDayOfYear() {
         return dayOfYear;
@@ -327,9 +330,31 @@ public class Options extends DomNode {
         boolean old= this.dayOfYear;
 
         this.dayOfYear = dayOfYear;
-        propertyChangeSupport.firePropertyChange(PROP_DAYOFYEAR, old, dayOfYear );
+        propertyChangeSupport.firePropertyChange(PROP_DAY_OF_YEAR, old, dayOfYear );
     }
 
+    /**
+     * Use time range editor instead of Data Set Selector.
+     */
+    public static final String PROP_USE_TIME_RANGE_EDITOR="useTimeRangeEditor";
+
+    protected boolean useTimeRangeEditor= false;
+
+    public boolean isUseTimeRangeEditor() {
+        return useTimeRangeEditor;
+    }
+
+    public void setUseTimeRangeEditor(boolean useTimeRangeEditor) {
+        boolean old= this.useTimeRangeEditor;
+
+        this.useTimeRangeEditor = useTimeRangeEditor;
+        propertyChangeSupport.firePropertyChange(PROP_USE_TIME_RANGE_EDITOR, old, useTimeRangeEditor );
+    }
+
+
+    /**
+     * Use Nearest neighbor rebinning for viewing spectrograms.
+     */
     protected boolean nearestNeighbor= false;
     public static final String PROP_NEARESTNEIGHBOR = "nearestNeighbor";
 
@@ -345,6 +370,10 @@ public class Options extends DomNode {
 
 
 
+    // Note these are weird: I'm not sure if I've just forgotten items or this was intensional.
+    // I suspect that it is intensional that a subset of the options are treated this way.  Seems like
+    // there was an issue with colors if I didn't do this.  Anyway, we sync useTimeRangeEditor because
+    // of the use case where a product is turned over to a person who doesn't want to see URIs.
     @Override
     public void syncTo( DomNode n,List<String> exclude ) {
         super.syncTo(n,exclude);
@@ -354,6 +383,7 @@ public class Options extends DomNode {
         if ( !exclude.contains(PROP_COLOR) )this.setColor(that.getColor());
         if ( !exclude.contains(PROP_FILLCOLOR) )this.setFillColor(that.getFillColor());
         if ( !exclude.contains(PROP_CANVASFONT) )this.setCanvasFont(that.getCanvasFont());
+        if ( !exclude.contains(PROP_USE_TIME_RANGE_EDITOR) ) this.setUseTimeRangeEditor(that.isUseTimeRangeEditor());
     }
 
     @Override
@@ -379,6 +409,8 @@ public class Options extends DomNode {
         if (!b) result.add(new PropertyChangeDiff(PROP_FILLCOLOR, that.getFillColor(), this.getFillColor()));
         b = that.getCanvasFont().equals(this.getCanvasFont());
         if (!b) result.add(new PropertyChangeDiff(PROP_CANVASFONT, that.getCanvasFont(), this.getCanvasFont()));
+        b = that.isUseTimeRangeEditor() == this.isUseTimeRangeEditor();
+        if (!b) result.add(new PropertyChangeDiff(PROP_USE_TIME_RANGE_EDITOR, that.isUseTimeRangeEditor(), this.isUseTimeRangeEditor()));
         return result;
     }
 
@@ -390,6 +422,7 @@ public class Options extends DomNode {
         that.setColor( this.getColor() );
         that.setFillColor( this.getFillColor() );
         that.setCanvasFont( this.getCanvasFont() );
+        that.setUseTimeRangeEditor( this.isUseTimeRangeEditor() );
         return that;
     }
 
