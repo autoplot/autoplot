@@ -130,6 +130,9 @@ public class AutoplotUI extends javax.swing.JFrame {
     final String TAB_TOOLTIP_SCRIPT = "<html>Editor panel for Jython scripts and data sources.<br>%s</html>";
     final String TABS_TOOLTIP = "Right-click or drag to undock.";
 
+    public static final String CARD_DATA_SET_SELECTOR = "card2";
+    public static final String CARD_TIME_RANGE_SELECTOR = "card1";
+
     TearoffTabbedPane tabs;
     ApplicationModel applicationModel;
     Application dom;
@@ -743,12 +746,11 @@ public class AutoplotUI extends javax.swing.JFrame {
                 bind( bc, dom.getOptions(), Options.PROP_AUTORANGING, autoRangingCheckBoxMenuItem, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_DATAVISIBLE, dataPanelCheckBoxMenuItem, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_LAYOUTVISIBLE, layoutPanelCheckBoxMenuItem, "selected" );
-                bind( bc, dom.getOptions(), Options.PROP_DAYOFYEAR, doyCB, "selected" );
+                bind( bc, dom.getOptions(), Options.PROP_DAY_OF_YEAR, doyCB, "selected" );
                 bind( bc, dom.getOptions(), Options.PROP_NEARESTNEIGHBOR, nnCb, "selected" );
                 bind( bc, dom, Application.PROP_TIMERANGE, dataSetSelector, DataSetSelector.PROP_TIMERANGE );
                 bind( bc, dom, Application.PROP_TIMERANGE, timeRangeEditor, "range" );
-                bind( bc, dom.getOptions(), Options.PROP_DAYOFYEAR, timeRangeEditor, "useDoy" );
-
+                bind( bc, dom.getOptions(), Options.PROP_DAY_OF_YEAR, timeRangeEditor, "useDoy" );
                 bc.bind();
 
             }
@@ -2199,20 +2201,22 @@ private void canvasSizeMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
 
 private void jRadioButtonMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem1ActionPerformed
     if ( jRadioButtonMenuItem1.isSelected() ) {
-        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, "card2" );
+        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR);
+        dom.getOptions().setUseTimeRangeEditor(false);
     }
 }//GEN-LAST:event_jRadioButtonMenuItem1ActionPerformed
 
 private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
     if ( jRadioButtonMenuItem2.isSelected() ) {
-        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, "card1" );
+        ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR);
+        dom.getOptions().setUseTimeRangeEditor(true);
     }
 }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
 
 private transient PropertyChangeListener optionsListener= new PropertyChangeListener() {
     public void propertyChange( PropertyChangeEvent ev ) {
         if ( ev.getPropertyName().equals(Options.PROP_LAYOUTVISIBLE) ) {
-            if ( Boolean.TRUE==ev.getNewValue() ) {
+            if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
                 if ( layoutPanel == null ) {
                     layoutPanel = new LayoutPanel();
                     layoutPanel.setApplication(dom);
@@ -2225,7 +2229,7 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                 if ( layoutPanel!=null ) tabs.remove(layoutPanel);
             }
         } else if ( ev.getPropertyName().equals(Options.PROP_DATAVISIBLE ) ) {
-            if ( Boolean.TRUE==ev.getNewValue() ) {
+            if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
                 if ( dataPanel == null ) {
                     dataPanel = new DataPanel(applicationModel.dom);
                 }
@@ -2235,6 +2239,12 @@ private transient PropertyChangeListener optionsListener= new PropertyChangeList
                         String.format( TAB_TOOLTIP_DATA, TABS_TOOLTIP ), idx );
             } else {
                 if ( dataPanel!=null ) tabs.remove(dataPanel);
+            }
+        } else if ( ev.getPropertyName().equals(Options.PROP_USE_TIME_RANGE_EDITOR ) ) {
+            if ( Boolean.TRUE.equals(ev.getNewValue()) ) {
+                ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_TIME_RANGE_SELECTOR );
+            } else {
+                ((CardLayout)timeRangePanel.getLayout()).show( timeRangePanel, CARD_DATA_SET_SELECTOR );
             }
         }
     }
