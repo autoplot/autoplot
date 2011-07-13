@@ -1198,6 +1198,7 @@ public class DataSourceController extends DomNodeController {
     public void setDataSet(QDataSet dataSet) {
         QDataSet oldDataSet = this.dataSet;
         this.dataSet = dataSet;
+        dsf.setFilters("");
         propertyChangeSupport.firePropertyChange(PROP_DATASET, oldDataSet, dataSet);
     }
     /**
