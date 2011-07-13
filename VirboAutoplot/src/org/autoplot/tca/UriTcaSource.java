@@ -5,19 +5,15 @@
 
 package org.autoplot.tca;
 
-import java.text.ParseException;
 import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
-import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.AbstractQFunction;
-import org.virbo.dataset.BundleDataSet.BundleDescriptor;
 import org.virbo.dataset.DDataSet;
-import org.virbo.dataset.DRank0DataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
@@ -60,7 +56,8 @@ public class UriTcaSource extends AbstractQFunction {
     }
 
     private void doRead( ) throws Exception {
-        ProgressMonitor mon= DasProgressPanel.createFramed("loading data");
+        ProgressMonitor mon= new NullProgressMonitor(); // DasProgressPanel.createFramed("loading data");
+        System.err.println("reading TCAs from "+dss );
         ds= dss.getDataSet( mon );
         bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
         if ( bundleDs==null ) {
