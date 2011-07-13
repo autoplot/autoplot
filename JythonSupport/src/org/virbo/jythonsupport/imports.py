@@ -13,6 +13,7 @@ from org.das2.datum import TimeParser
 #from org.das2.util.filesystem import FileSystem
 #from org.das2.fsm import FileStorageModel
 from org.virbo.datasource.DataSetURI import getFile
+from org.virbo.datasource.DataSetURI import downloadResourceAsTempFile
 import java
 import org
 # end, security concerns.
