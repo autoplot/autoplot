@@ -234,9 +234,6 @@ public class DataPanel extends javax.swing.JPanel {
         for (int i = 0; i < depNames.length; i++) {
             depNames1[i] = depNames[i] + " (" + dsf.getController().getMaxSliceIndex(i) + " bins)";
         }
-        if ( dsf.getSliceDimension()>=depNames.length ) {
-            dsf.setSliceDimension(0); // we used to not care, so old vap files were sloppy.
-        }
         if ( immediately ) {
             sliceTypeComboBox.setModel(new DefaultComboBoxModel(depNames1));
             if ( !componentTextField.getText().equals( element.getComponent() ) ) {
@@ -316,7 +313,8 @@ public class DataPanel extends javax.swing.JPanel {
         dataSourceFilterBindingGroup = bc;
 
         if ( newDsf!=null ) {
-            int max= newDsf.getController().getMaxSliceIndex(newDsf.getSliceDimension());
+            int sliceDimension= sliceTypeComboBox.getSelectedIndex();
+            int max= newDsf.getController().getMaxSliceIndex( sliceDimension );
             if ( max>0 ) sliceIndexSpinner.setModel( new SpinnerNumberModel( 0, 0, max-1, 1) );
         }
 
