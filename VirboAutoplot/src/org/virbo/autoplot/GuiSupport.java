@@ -364,7 +364,16 @@ public class GuiSupport {
                         String s=  name;
 
                         if ( !s.endsWith(ext) ) {
-                            s= s+ext;
+                            boolean addExt= true;
+                            for ( int i=0; i<exts.size(); i++  ) {
+                                if ( s.endsWith(exts.get(i)) ) {
+                                    addExt= false;
+                                    ext= exts.get(i);
+                                }
+                            }
+                            if ( addExt ) {
+                                s= s+ext;
+                            }
                         }
 
                         if (ext == null) {
