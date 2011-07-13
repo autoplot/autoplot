@@ -28,6 +28,20 @@ import org.python.util.PythonInterpreter;
  * @author jbf
  */
 public class EditorAnnotationsSupport {
+    /**
+     * error marked in the code
+     */
+    public static final String ANNO_ERROR = "error";
+
+    /**
+     * current interpreter position
+     */
+    public static final String ANNO_PROGRAM_COUNTER = "programCounter";
+    
+    /**
+     * warning in the code
+     */
+    public static final String ANNO_WARNING = "warning";
 
     private JTextPane editorPanel;
     PythonInterpreter interp;
@@ -53,10 +67,12 @@ public class EditorAnnotationsSupport {
 
     private synchronized void addStyles(StyledDocument doc) {
         Style def = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
-        Style s1 = doc.addStyle("error", def);
+        Style s1 = doc.addStyle( ANNO_ERROR, def);
         StyleConstants.setBackground(s1, Color.PINK);
-        Style s2 = doc.addStyle("programCounter", def);
+        Style s2 = doc.addStyle( ANNO_PROGRAM_COUNTER, def);
         StyleConstants.setBackground(s2, Color.GREEN.brighter().brighter() );
+        Style s3 = doc.addStyle( ANNO_WARNING, def);
+        StyleConstants.setBackground(s3, Color.YELLOW );
     }
 
     /**
