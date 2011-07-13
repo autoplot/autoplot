@@ -41,11 +41,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.text.BadLocationException;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
+import org.virbo.jythonsupport.JythonUtil;
+import org.virbo.jythonsupport.ui.EditorAnnotationsSupport;
 import org.virbo.jythonsupport.ui.ScriptPanelSupport;
 
 /**
@@ -313,6 +316,26 @@ public class JythonEditorPanel extends javax.swing.JPanel implements DataSourceE
             if ( hasVariables ) {
                 tearoffTabbedPane1.setSelectedIndex(1);
             }
+
+            List<String> errs= new ArrayList();
+            if ( JythonUtil.pythonLint( f.toURI(), errs) ) {
+                System.err.println(errs);
+                EditorAnnotationsSupport esa= textArea.getEditorAnnotationsSupport();
+                for ( String s: errs ) {
+                    String[] ss= s.split(":",2);
+                    try {
+                        String doc= ss[1];
+                        doc= doc.replaceAll("<", "&lt;");
+                        doc= doc.replaceAll(">", "&gt;");
+                        esa.annotateLine(Integer.parseInt(ss[0]), EditorAnnotationsSupport.ANNO_WARNING, "variable is defined before execution: " + doc);
+                    } catch (BadLocationException ex) {
+                        Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+            }
+
+
 
         } catch (IOException ex) {
             Logger.getLogger(JythonEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
