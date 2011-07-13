@@ -663,6 +663,7 @@ public class DataSetURI {
             filename= filename+"__"+split.params.replaceAll("&", "_").replaceAll("=", "_");
         }
 
+        System.err.println( "reading URL "+url );
         InputStream in = new DasProgressMonitorInputStream( url.openStream(), mon );
         OutputStream out= new FileOutputStream( new File(filename + "__") );
         DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
