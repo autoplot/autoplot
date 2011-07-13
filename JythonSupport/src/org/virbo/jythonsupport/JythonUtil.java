@@ -4,12 +4,29 @@
  */
 package org.virbo.jythonsupport;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
+import java.net.URI;
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.python.core.Py;
+import org.python.core.PyException;
+import org.python.core.PyNone;
+import org.python.core.PyObject;
 import org.python.core.PyString;
 import org.python.core.PySystemState;
 import org.python.util.InteractiveInterpreter;
+import org.virbo.datasource.DataSetURI;
 
 /**
  *
@@ -57,6 +74,53 @@ public class JythonUtil {
         }
         interp.execfile(imports.openStream(), "imports.py");
         return interp;
+
+    }
+
+    /**
+     * check the script that it doesn't redefine symbol names like "str"
+     * @param code
+     * @return true if an err is suspected.
+     */
+    public static boolean pythonLint( URI uri, List<String> errs ) throws IOException {
+        LineNumberReader reader= null;
+
+        File src = DataSetURI.getFile( uri, new NullProgressMonitor());
+
+        try {
+            reader = new LineNumberReader( new BufferedReader( new FileReader(src)) );
+
+            String vnarg= "\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*"; // any variable name  VERIFIED
+
+            Pattern assign= Pattern.compile( vnarg+"=.*" );
+
+            InteractiveInterpreter interp= createInterpreter(true);
+
+            String line= reader.readLine();
+            while ( line!=null ) {
+                Matcher m= assign.matcher(line);
+                if ( m.matches() ) {
+                    String vname= m.group(1);
+                    try {
+                        PyObject po= interp.eval(vname);
+                        errs.add( "" + reader.getLineNumber() + ": "+ vname + "=" + po.__repr__() );
+                    } catch ( PyException ex ) {
+                        // this is what we want
+                    }
+                }
+                line= reader.readLine();
+            }
+            reader.close();
+
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                Logger.getLogger(JythonUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return errs.size()>0;
+
 
     }
 }
