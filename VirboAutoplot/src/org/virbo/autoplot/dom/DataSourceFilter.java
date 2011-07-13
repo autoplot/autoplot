@@ -5,7 +5,6 @@
 
 package org.virbo.autoplot.dom;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.virbo.datasource.URISplit;
 
@@ -61,61 +60,24 @@ public class DataSourceFilter extends DomNode {
         this.fill = fill;
         propertyChangeSupport.firePropertyChange( PROP_FILL, oldFill, fill );
     }    
-    
-    
-    private int sliceDimension = 0;
-    public static final String PROP_SLICEDIMENSION = "sliceDimension";
 
-    public int getSliceDimension() {
-        return this.sliceDimension;
-    }
-
-    public void setSliceDimension(int newsliceDimension) {
-        if (newsliceDimension < 0 || newsliceDimension > 2) {
-            return;
-        }
-        int oldsliceDimension = sliceDimension;
-        if (oldsliceDimension != newsliceDimension) {
-            this.sliceIndex = 0;
-            this.sliceDimension = newsliceDimension;
-            propertyChangeSupport.firePropertyChange(PROP_SLICEDIMENSION, oldsliceDimension, newsliceDimension);
-        }
-    }
-
-    private int sliceIndex = -1;
     /**
-     * index to slice the dataset in the dataSourceFilter.  This is to support
-     * legacy behavior.  -1 now indicates that no slicing should be done, and
-     * this is the default.
+     * filters are the same as the component name of the PlotElement, a string of pipe-delimited commands that operate on the data.
      */
-    public static final String PROP_SLICEINDEX = "sliceIndex";
+    public static final String PROP_FILTERS= "filters";
 
+    private String filters= "";
 
-    public int getSliceIndex() {
-        return this.sliceIndex;
+    public String getFilters() {
+        return filters;
     }
 
-    public void setSliceIndex(int newsliceIndex) {
-        int oldsliceIndex = sliceIndex;
-        this.sliceIndex = newsliceIndex;
-        propertyChangeSupport.firePropertyChange(PROP_SLICEINDEX, oldsliceIndex, newsliceIndex);
+    public void setFilters(String filters) {
+        String old= this.filters;
+        this.filters = filters;
+        propertyChangeSupport.firePropertyChange( PROP_FILTERS, old, filters );
     }
-
-    private boolean transpose = false;
-    public static final String PROP_TRANSPOSE = "transpose";
-
-    public void setTranspose(boolean val) {
-        boolean oldVal = this.transpose;
-        this.transpose = val;
-        //updateFill(true, true);
-        propertyChangeSupport.firePropertyChange(PROP_TRANSPOSE, oldVal, val);
-    }
-
-    public boolean isTranspose() {
-        return this.transpose;
-    }
-    
-    
+        
     DataSourceController controller;
     
     public DataSourceController getController() {
@@ -139,11 +101,6 @@ public class DataSourceFilter extends DomNode {
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setValidRange(that.getValidRange());
-        if ( that.getSliceIndex()!=-1 ) {
-            this.setSliceDimension(that.getSliceDimension());
-        }
-        this.setSliceIndex(that.getSliceIndex());
-        this.setTranspose( that.isTranspose() );
         this.setUri(that.getUri());
     }
 
@@ -153,11 +110,6 @@ public class DataSourceFilter extends DomNode {
         DataSourceFilter that= (DataSourceFilter)n;
         this.setFill(that.getFill());
         this.setValidRange(that.getValidRange());        
-        if ( that.getSliceIndex()!=-1 ) {
-            this.setSliceDimension(that.getSliceDimension());
-        }
-        this.setSliceIndex(that.getSliceIndex());
-        this.setTranspose( that.isTranspose() );
         if ( !exclude.contains("uri" ) ) this.setUri(that.getUri());
     }
 
@@ -177,15 +129,6 @@ public class DataSourceFilter extends DomNode {
 
         b = that.fill.equals(this.fill);
         if (!b) result.add(new PropertyChangeDiff( "fill", that.fill , (this.fill)));
-        
-        b= that.sliceDimension==this.sliceDimension;
-        if ( !b ) result.add(new PropertyChangeDiff( "sliceDimension", that.sliceDimension ,this.sliceDimension ));
-
-        b= that.sliceIndex==this.sliceIndex;
-        if ( !b ) result.add(new PropertyChangeDiff( "sliceIndex", that.sliceIndex ,this.sliceIndex ));
-
-        b= that.transpose==this.transpose;
-        if ( !b ) result.add(new PropertyChangeDiff( "transpose", that.transpose ,this.transpose ));
         
         return result;
     }
