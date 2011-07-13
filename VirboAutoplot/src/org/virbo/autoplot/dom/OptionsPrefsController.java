@@ -82,7 +82,7 @@ public class OptionsPrefsController {
         options.serverEnabled = prefs.getBoolean(Options.PROP_SERVERENABLED, options.serverEnabled);
         options.specialEffects = prefs.getBoolean(Options.PROP_SPECIALEFFECTS, options.specialEffects);
         options.textAntiAlias = prefs.getBoolean(Options.PROP_TEXTANTIALIAS, options.textAntiAlias);
-        options.dayOfYear= prefs.getBoolean(Options.PROP_DAYOFYEAR,options.dayOfYear);
+        options.dayOfYear= prefs.getBoolean(Options.PROP_DAY_OF_YEAR,options.dayOfYear);
         options.nearestNeighbor= prefs.getBoolean(Options.PROP_NEARESTNEIGHBOR,options.nearestNeighbor);
     }
 }
