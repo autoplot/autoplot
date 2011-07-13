@@ -70,12 +70,7 @@ public class DataSourceController extends DomNodeController {
 
         public void propertyChange(PropertyChangeEvent e) {
             if ( dataSet != null ) {
-                logger.fine("updateSlice ->updateFillSoon()");
-                int delay=0;
-                if ( e.getPropertyName().equals( DataSourceFilter.PROP_FILTERS ) ) { //kludge for 2795481: switch slice dimension can result in inconvertable units
-                    delay= 100;
-                }
-                updateFillSoon(delay);
+                updateFill();// this should be done quickly.  Some filters (ffts) are sub-interactive and should not be done here.
             }
         }
     };
@@ -935,9 +930,15 @@ public class DataSourceController extends DomNodeController {
         if ( doSlice ) { // plot element now does slicing, but we can do it here as well.
 
             QDataSet ds;
-            ds= DataSetOps.sprocess( filters, getDataSet(), new NullProgressMonitor() );
+            if ( DataSetOps.isProcessAsync(filters) ) {
+                System.err.println("asynchronous processes not supported here");
+                setReduceDataSetString(null);
+                ds= getDataSet();
+            } else {
+                ds= DataSetOps.sprocess( filters, getDataSet(), new NullProgressMonitor() );
+                setReduceDataSetString(filters);
+            }
 
-            setReduceDataSetString(filters);
             //TODO: must we process the props as well?
             fillDs = DataSetOps.makePropertiesMutable(ds);
 
