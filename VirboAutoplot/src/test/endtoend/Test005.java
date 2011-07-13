@@ -109,7 +109,7 @@ public class Test005 {
             xxx("demo11");
             {
             plot("http://autoplot.org/data/hsi_qlimg_5050601_001.fits");
-            getDocumentModel().getDataSourceFilters(0).setSliceIndex(2);
+            getDocumentModel().getDataSourceFilters(0).setFilters("|slice2(2)");
             getDocumentModel().getPlotElements(0).setComponent("");
             getDocumentModel().getPlots(0).getZaxis().setRange(DatumRange.newDatumRange(-20e4, 20e4, Units.dimensionless));
             writeToPng("test005_demo12.png");
