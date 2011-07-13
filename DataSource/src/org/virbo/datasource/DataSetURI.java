@@ -15,13 +15,16 @@ import org.das2.util.filesystem.FileSystem;
 import ftpfs.FTPBeanFileSystemFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
+import java.nio.channels.Channels;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +37,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import org.das2.fsm.FileStorageModelNew;
+import org.das2.util.DasProgressMonitorInputStream;
 import org.das2.util.filesystem.FileSystemSettings;
 import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.URIException;
@@ -626,6 +630,48 @@ public class DataSetURI {
                 throw new IOException("Unsupported protocol: "+suri);
             }
         }
+    }
+
+    /**
+     * introduced when we needed access to a URL with arguments.  This allows us
+     * to download the file in a script and then read the file.  It will put the
+     * file in the directory, and the parameters are encoded in the name.
+     * @param url the address to download.
+     * @param mon a progress monitor.
+     * @return a File in the FileSystemCache
+     * @throws IOException
+     */
+    public static File downloadResourceAsTempFile( URL url, ProgressMonitor mon ) throws IOException {
+        URISplit split = URISplit.parse( url.toString() ); // get the folder to put the file.
+
+        File local= FileSystem.settings().getLocalCacheDir();
+        FileSystem fs = FileSystem.create( toUri(split.path) );
+
+        String id= fs.getLocalRoot().toString().substring(FileSystem.settings().getLocalCacheDir().toString().length());
+
+        File localCache= new File( local, "temp" );
+        localCache= new File( localCache, id );
+        if ( !localCache.exists() ) {
+            if ( !localCache.mkdirs() ) {
+                throw new IOException("unable to make directory: "+localCache);
+            }
+        }
+
+        String filename = new File( localCache, split.file.substring(split.path.length()) ).toString();
+        
+        if ( split.params.length()>0 ) {
+            filename= filename+"?"+split.params;
+        }
+
+        InputStream in = new DasProgressMonitorInputStream( url.openStream(), mon );
+        OutputStream out= new FileOutputStream( new File(filename + "__") );
+        DataSourceUtil.transfer( Channels.newChannel(in), Channels.newChannel(out) );
+
+        File result= new File(filename);
+        result.deleteOnExit();
+        
+        new File(filename + "__").renameTo( result );
+        return result;
     }
 
     /**
