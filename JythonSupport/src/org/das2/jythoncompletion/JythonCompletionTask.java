@@ -1,9 +1,8 @@
 package org.das2.jythoncompletion;
 
-import java.util.logging.Level;
-import javax.swing.text.Document;
 import org.python.core.PyClassPeeker;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -19,17 +18,15 @@ import javax.swing.text.Utilities;
  * This is the engine that does the Jython completions.  We figure out the
  * context and the completable, then query a interpreter.
  */
-import org.das2.jythoncompletion.support.AsyncCompletionQuery;
 import org.das2.jythoncompletion.support.CompletionResultSet;
 import org.das2.jythoncompletion.support.CompletionTask;
-import org.das2.util.filesystem.FileSystem;
-import org.das2.util.filesystem.FileSystemSettings;
 import org.python.core.PyClass;
 import org.python.core.PyException;
-import org.python.core.PyInstance;
 import org.python.core.PyJavaClass;
+import org.python.core.PyJavaClassPeeker;
 import org.python.core.PyJavaInstance;
 import org.python.core.PyJavaInstancePeeker;
+import org.python.core.PyJavaPackage;
 import org.python.core.PyList;
 import org.python.core.PyMethod;
 import org.python.core.PyMethodPeeker;
@@ -38,7 +35,6 @@ import org.python.core.PyReflectedFunction;
 import org.python.core.PyReflectedFunctionPeeker;
 import org.python.core.PyString;
 import org.python.core.PyStringMap;
-import org.python.core.PyType;
 import org.python.util.PythonInterpreter;
 import org.virbo.jythonsupport.JythonOps;
 
@@ -146,6 +142,9 @@ public class JythonCompletionTask implements CompletionTask {
                     System.err.println("PyException from \"" + ss + "\":");
                     e.printStackTrace();
                     continue;
+                } catch ( IllegalArgumentException e ) {
+                    e.printStackTrace();
+                    continue;
                 }
                 String label = ss;
                 String signature = null;
@@ -155,6 +154,23 @@ public class JythonCompletionTask implements CompletionTask {
                         Method m = new PyReflectedFunctionPeeker((PyReflectedFunction) po).getMethod(0);
                         signature = methodSignature(m);
                         args = methodArgs(m);
+                    }
+                } else if ( context instanceof PyJavaPackage ) {
+                    if (po instanceof PyJavaClass) {
+                        Class dc = new PyJavaClassPeeker((PyJavaClass)po).getProxyClass();
+                        if ( dc.getConstructors().length>0 ) {
+                            Constructor constructor= dc.getConstructors()[0];
+                            signature= constructorSignature( constructor );
+                            args= argsList( constructor.getParameterTypes() );
+                            signature= signature+args;
+                        }
+                        //Method m = new PyJavaClassPeeker((PyJavaClass)po).getMethod(0);
+                        //signature = methodSignature(m);
+                        //args = methodArgs(m);
+                    } else if ( po instanceof PyJavaPackage ) {
+                        //Method m = new PyJavaClassPeeker((PyJavaClass)po).getMethod(0);
+                        //signature = methodSignature(m);
+                        //args = methodArgs(m);
                     }
                 } else if (context instanceof PyClass) {
                     PyClassPeeker peek = new PyClassPeeker((PyClass) context);
@@ -375,8 +391,7 @@ public class JythonCompletionTask implements CompletionTask {
 
     }
 
-    private String methodArgs(Method javaMethod) {
-
+    private String argsList( Class[] classes ) {
         //String LPAREN="%28";
         String LPAREN = "(";
         //String RPAREN="%29";
@@ -388,8 +403,7 @@ public class JythonCompletionTask implements CompletionTask {
         sig.append(LPAREN);
         List<String> sargs = new ArrayList<String>();
 
-        for (Class arg : javaMethod.getParameterTypes()) {
-
+        for (Class arg : classes ) {
             sargs.add(arg.getSimpleName());
         }
         sig.append(join(sargs, "," ));
@@ -397,6 +411,10 @@ public class JythonCompletionTask implements CompletionTask {
         return sig.toString();
     }
 
+    private String methodArgs(Method javaMethod) {
+        return argsList( javaMethod.getParameterTypes());
+    }
+    
     private String methodSignature(Method javaMethod) {
         String javadocPath = join(javaMethod.getDeclaringClass().getCanonicalName().split("\\."), "/") + ".html";
 
@@ -427,6 +445,16 @@ public class JythonCompletionTask implements CompletionTask {
         sig.append("#" + f.getName());
         return sig.toString();
 
+    }
+
+    private String constructorSignature( Constructor f ) {
+        String javadocPath = join( f.getDeclaringClass().getCanonicalName().split("\\."), "/") + ".html";
+
+        StringBuffer sig = new StringBuffer(javadocPath);
+
+        int i= f.getName().lastIndexOf(".");
+        sig.append("#" + f.getName().substring(i+1));
+        return sig.toString();
     }
 
     private void queryStringLiteralArgument(CompletionContext cc, CompletionResultSet arg0) {
