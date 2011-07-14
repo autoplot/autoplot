@@ -45,6 +45,19 @@ public class ExportDataPanel extends javax.swing.JPanel {
             if (name != null) {
                 filenameTF.setText(name.toLowerCase());
             }
+            originalDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", originalDataB.getToolTipText(), dsc.getFillDataSet() ) );
+        }
+
+        QDataSet processedDataSet= model.getController().getPlotElement().getController().getDataSet();
+        if ( processedDataSet!=null ) {
+            if ( !processedDataSet.equals(dsc.getFillDataSet() ) ) {
+                processedDataB.setToolTipText( String.format( "<html>%s<br>%s</html>", processedDataB.getToolTipText(), processedDataSet ) );
+            } else {
+                processedDataB.setToolTipText( String.format( "<html>%s</html>", "No processing is done to the dataset before plotting" ) );
+                processedDataB.setEnabled(false);
+            }
+        } else {
+            processedDataB.setEnabled(false);
         }
     }
 
