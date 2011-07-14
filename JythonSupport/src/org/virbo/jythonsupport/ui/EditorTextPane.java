@@ -105,35 +105,39 @@ public class EditorTextPane extends JTextPane {
     }
 
     void plot(String doThis) {
-        System.err.println( "===============================" );
         if ( support.interp==null ) {
-            JOptionPane.showMessageDialog(this,"session is not running");
+            JOptionPane.showMessageDialog(this,"Session is not running.  There must be an active debugger to plot variables.");
             return;
         }
-        PyObject po= support.interp.eval(doThis);
-        if ( po instanceof PyQDataSet ) {
-            try {
-                PyQDataSet pds = (PyQDataSet) po;
-                File tmpDir= File.createTempFile( "autoplot", ".qds" ).getParentFile();
-                File tmpfile =  new File( tmpDir, "autoplot.qds" );
-                String cmd = "plot( 'file:" + tmpfile.toString() + "' );";
-                new org.virbo.qstream.SimpleStreamFormatter().format(pds.getQDataSet(), new FileOutputStream(tmpfile), true );
-                Socket s= new Socket("localhost",12345);
-                OutputStream out= s.getOutputStream();
-                out.write( ( cmd + "\n").getBytes() );
-                out.close();
-            } catch (StreamException ex) {
-                Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                if ( ex instanceof ConnectException ) {
-                    JOptionPane.showMessageDialog(this,"<html>Unable to connect to socket 12345.  Start a second Autoplot and enable the Server feature.</html>");
-                    return;
+        try {
+            PyObject po= support.interp.eval(doThis);
+            if ( po instanceof PyQDataSet ) {
+                try {
+                    PyQDataSet pds = (PyQDataSet) po;
+                    File tmpDir= File.createTempFile( "autoplot", ".qds" ).getParentFile();
+                    File tmpfile =  new File( tmpDir, "autoplot.qds" );
+                    String cmd = "plot( 'file:" + tmpfile.toString() + "' );";
+                    new org.virbo.qstream.SimpleStreamFormatter().format(pds.getQDataSet(), new FileOutputStream(tmpfile), true );
+                    Socket s= new Socket("localhost",12345);
+                    OutputStream out= s.getOutputStream();
+                    out.write( ( cmd + "\n").getBytes() );
+                    out.close();
+                } catch (StreamException ex) {
+                    Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    if ( ex instanceof ConnectException ) {
+                        JOptionPane.showMessageDialog(this,"<html>Unable to connect to socket 12345.  Start a second Autoplot and enable the Server feature.</html>");
+                        return;
+                    }
+                    Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                Logger.getLogger(EditorTextPane.class.getName()).log(Level.SEVERE, null, ex);
+
+            } else {
+                JOptionPane.showMessageDialog(this,"Selected item is not a dataset");
             }
 
-        } else {
-            JOptionPane.showMessageDialog(this,"Selected item is not a dataset");
+        } catch ( Exception e  ) {
+            JOptionPane.showMessageDialog(this,"Selected item caused exception: " + e.toString() );
         }
     }
 
