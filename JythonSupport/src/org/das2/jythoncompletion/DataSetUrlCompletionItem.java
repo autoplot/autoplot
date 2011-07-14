@@ -68,7 +68,14 @@ public class DataSetUrlCompletionItem implements CompletionItem {
     }
 
     public int getPreferredWidth(Graphics graphics, Font font) {
-        return 210;
+        int n= rs.label.length();
+        String label;
+        if ( n>80 ) {
+           label= rs.label.substring(n-80,n);
+        } else {
+            label= rs.label;
+        }
+        return graphics.getFontMetrics(font).stringWidth(label);
     }
 
     public int getSortPriority() {
@@ -90,8 +97,8 @@ public class DataSetUrlCompletionItem implements CompletionItem {
     public void render(Graphics graphics, Font font, Color color, Color color0, int i, int i0, boolean b) {
         int n= rs.label.length();
         String label;
-        if ( n>40 ) {
-           label= rs.label.substring(n-40,n);
+        if ( n>80 ) {
+           label= rs.label.substring(n-80,n);
         } else {
             label= rs.label;
         }
