@@ -894,14 +894,15 @@ public class PlotElementController extends DomNodeController {
                     Color fc= plotElement.getStyle().getFillColor();
                     Plot domPlot = dom.controller.getPlotFor(plotElement);
                     List<PlotElement> cp = new ArrayList<PlotElement>(fillDs.length(0));
+                    int nsubsample= 1 + ( fillDs.length(0)-1 ) / 12; // 1-12 no subsample, 13-24 1 subsample, 25-36 2 subsample, etc.
                     for (int i = 0; i < fillDs.length(0); i++) {
                         PlotElement ele = dom.controller.copyPlotElement(plotElement, domPlot, dsf);
                         ele.controller.getRenderer().setActive(false);
                         cp.add(ele);
                         ele.setParent( plotElement.getId() );
                         plotElement.getStyle().addPropertyChangeListener( ele.controller.parentStyleListener );
-                        ele.getStyle().setColor(deriveColor(c, i));
-                        ele.getStyle().setFillColor( deriveColor(fc,i).brighter() );
+                        ele.getStyle().setColor(deriveColor(c, i/nsubsample));
+                        ele.getStyle().setFillColor( deriveColor(fc,i/nsubsample).brighter() );
                         String s= plotElement.getComponent();
                         String label1= labels[i];
                         if ( s.equals("") ) {
@@ -921,8 +922,12 @@ public class PlotElementController extends DomNodeController {
                         ele.setRenderTypeAutomatically(plotElement.getRenderType()); // this creates the das2 SeriesRenderer.
                         //ele.controller.setDataSet(fillDs, false);
                     }
-                    for ( PlotElement ele: cp ) {
-                        ele.controller.getRenderer().setActive(true);
+                    for ( int i=0; i<fillDs.length(0); i++ ) {
+                        PlotElement ele= cp.get(i);
+                        if ( i % nsubsample == 0 ) {
+                            ele.setActive(true); //TODO: test load/save
+                            ele.controller.getRenderer().setActive(true);
+                        }
                     }
                     renderer.setActive(false);
                     setChildPlotElements(cp);
