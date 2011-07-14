@@ -1,7 +1,10 @@
 package org.das2.jythoncompletion;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import org.python.core.PyClassPeeker;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -9,6 +12,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
@@ -37,6 +41,7 @@ import org.python.core.PyString;
 import org.python.core.PyStringMap;
 import org.python.util.PythonInterpreter;
 import org.virbo.jythonsupport.JythonOps;
+import org.virbo.jythonsupport.JythonUtil;
 
 /**
  *
@@ -335,6 +340,17 @@ public class JythonCompletionTask implements CompletionTask {
         PythonInterpreter interp = getInterpreter();
 
         String eval = editor.getText(0, Utilities.getRowStart(editor, editor.getCaretPosition()));
+
+        try {
+            Map<String,String> locals= JythonUtil.getLocals( new BufferedReader( new StringReader( eval ) ) );
+        } catch ( IOException ex ) {
+        }
+
+        // reduce eval so it doesn't call procedures like "plot" and "plotx"
+        try {
+            eval = JythonUtil.removeSideEffects( new BufferedReader( new StringReader( eval ) ) );
+        } catch ( IOException ex ) {
+        }
 
         interp.exec(eval);
         PyStringMap locals = (PyStringMap) interp.getLocals();
