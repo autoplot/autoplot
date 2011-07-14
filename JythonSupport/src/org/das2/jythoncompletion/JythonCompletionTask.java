@@ -352,6 +352,10 @@ public class JythonCompletionTask implements CompletionTask {
         } catch ( IOException ex ) {
         }
 
+        String ss2= "def getDataSet( st, mon ):\n   return findgen(100)\n\ndef getDataSet( st ):\n   return findgen(100)\n\n";
+        System.err.println(ss2);
+        interp.exec( ss2  );
+        
         interp.exec(eval);
         PyStringMap locals = (PyStringMap) interp.getLocals();
         PyList po2 = locals.keys();
