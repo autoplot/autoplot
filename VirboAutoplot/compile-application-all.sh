@@ -119,6 +119,10 @@ for i in $(find * -name '*.png' -o -name '*.gif' -o -name '*.html' -o -name '*.p
    mkdir -p $(dirname ../temp-classes/$i)
    cp $i ../temp-classes/$i
 done
+for i in $( find * -name 'filenames_alt*.txt' ); do   # kludge support for CDAWeb, where *.txt is too inclusive
+   mkdir -p $(dirname ../temp-volatile-classes/$i)
+   cp $i ../temp-volatile-classes/$i
+done
 cd ..
 echo "done copy resources."
 
