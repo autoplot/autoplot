@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.net.URI;
 import java.net.URL;
@@ -122,5 +124,107 @@ public class JythonUtil {
         return errs.size()>0;
 
 
+    }
+
+    /**
+     * scrape script for local variables, looking for assignments.
+     * @param script
+     * @return
+     */
+    public static Map getLocals( BufferedReader reader ) throws IOException {
+        
+        String s = reader.readLine();
+
+        Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
+        Pattern defPattern= Pattern.compile("def .*");
+
+        boolean inDef= false;
+
+        Map<String,String> result= new LinkedHashMap<String, String>(); // from ID to description
+
+        boolean haveResult = false;
+        while (s != null) {
+
+            if ( inDef==false ) {
+                Matcher defm= defPattern.matcher(s);
+                if ( defm.matches() ) {
+                    inDef= true;
+                }
+            } else {
+                if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+                    Matcher defm= defPattern.matcher(s);
+                    inDef=  defm.matches();
+                }
+            }
+
+            if ( !inDef ) {
+                Matcher m= assignPattern.matcher(s);
+                if ( m.matches() ) {
+                    if ( m.group(3)!=null ) {
+                        result.put(m.group(1), m.group(3) );
+                    } else {
+                        result.put(m.group(1), s );
+                    }
+                }
+            }
+
+            s = reader.readLine();
+        }
+        reader.close();
+        return result;
+
+    }
+
+    /**
+     * return python code that is equivalent, except it has not side-effects like plotting.
+     * This code is not exact, for example (a,b)= (1,2) is not supported.
+     * @param eval
+     * @return
+     */
+    public static String removeSideEffects( BufferedReader reader ) throws IOException {
+
+        String s = reader.readLine();
+
+        Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
+        Pattern defPattern= Pattern.compile("def .*");
+
+        boolean inDef= false;
+
+        StringBuilder result= new StringBuilder();
+
+        boolean haveResult = false;
+        while (s != null) {
+
+            boolean sideEffect= true;
+
+            if ( inDef==false ) {
+                Matcher defm= defPattern.matcher(s);
+                if ( defm.matches() ) {
+                    inDef= true;
+                    sideEffect= false;
+                }
+            } else {
+                if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
+                    Matcher defm= defPattern.matcher(s);
+                    inDef=  defm.matches();
+                    if ( inDef ) sideEffect= false;
+                }
+            }
+
+            if ( !inDef ) {
+                Matcher m= assignPattern.matcher(s);
+                if ( m.matches() ) {
+                    sideEffect= false;
+                }
+            }
+
+            if ( !sideEffect ) {
+                result.append( s ).append("\n");
+            }
+
+            s = reader.readLine();
+        }
+        reader.close();
+        return result.toString();
     }
 }
