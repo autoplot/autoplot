@@ -5,7 +5,6 @@
 
 package org.autoplot.tca;
 
-import org.das2.components.DasProgressPanel;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
