@@ -41,6 +41,7 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet error;
     QDataSet errorNoDs;
     QDataSet nonValueDs;
+    QDataSet nonMonoDs;
 
     public UriTcaSource( String uri ) throws Exception {
         if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
@@ -53,6 +54,7 @@ public class UriTcaSource extends AbstractQFunction {
         error= DataSetUtil.asDataSet( eu.createDatum("Error") );
         errorNoDs= DataSetUtil.asDataSet( eu.createDatum("No Data") );
         nonValueDs= DataSetUtil.asDataSet( eu.createDatum(" ") );
+        nonMonoDs= DataSetUtil.asDataSet( eu.create("Non Mono") );
     }
 
     private void doRead( ) throws Exception {
@@ -118,6 +120,11 @@ public class UriTcaSource extends AbstractQFunction {
 
             QDataSet dep0= SemanticOps.xtagsDataSet(ds);
             QDataSet d0= parm.slice(0);
+
+            if ( !SemanticOps.isMonotonic(dep0 ) ) {
+                System.err.println("dataset dependence is not monotonic");
+                return new JoinDataSet( nonMonoDs );
+            }
             QDataSet findex= Ops.findex( dep0, d0 ); // TODO: param.slice(0) does findex support rank 0?
 
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
@@ -151,6 +158,7 @@ public class UriTcaSource extends AbstractQFunction {
             //
 
         } catch ( Exception ex ) {
+            ex.printStackTrace();
             return new JoinDataSet( error );
         }
 
