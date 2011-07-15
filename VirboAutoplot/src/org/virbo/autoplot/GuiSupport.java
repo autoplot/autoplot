@@ -1112,6 +1112,33 @@ public class GuiSupport {
             }
         });
         connectorMenu.add(item);
+
+        if ( axis.getController().getDasAxis().isHorizontal() ) {
+            item= new JMenuItem( new AbstractAction("Add Additional Ticks from...") {
+                public void actionPerformed(ActionEvent e) {
+                    String uri= plot.getTicksURI();
+                    if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
+                        uri= uri.substring("class:org.autoplot.tca.UriTcaSource:".length());
+                    }
+                    TcaElementDialog dia= new TcaElementDialog( (JFrame)SwingUtilities.getWindowAncestor( controller.getDasCanvas().getParent()), true );
+                    dia.getPrimaryDataSetSelector().setValue(uri);
+                    dia.getPrimaryDataSetSelector().setRecent(AutoplotUtil.getUrls( controller.getApplicationModel().getRecent()));
+                    dia.setTitle( "Add additional ticks" );
+                    dia.setVisible(true);
+                    if (dia.isCancelled()) {
+                        return;
+                    }
+                    uri= dia.getPrimaryDataSetSelector().getValue();
+                    if ( uri.length()==0 ) {
+                        plot.setTicksURI("");
+                    } else {
+                        plot.setTicksURI(uri);
+                    }
+                }
+            });
+            mouseAdapter.addMenuItem(item);
+        }
+
     }
 
     static void addPlotContextMenuItems( final ApplicationController controller, final DasPlot plot, final PlotController plotController, final Plot domPlot) {
