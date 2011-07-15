@@ -302,6 +302,10 @@ public class MetadataPanel extends javax.swing.JPanel {
                     s = "";
                 }
                 map.put("Std Dev", s);
+
+                QDataSet range= AutoHistogram.simpleRange( hist );
+                map.put("min", range.slice(0) );
+                map.put("max", range.slice(1) );
             }
 
             QDataSet dep0 = (QDataSet) ds.property(QDataSet.DEPEND_0);
