@@ -180,7 +180,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             result.putProperty( QDataSet.METADATA_MODEL, QDataSet.VALUE_METADATA_MODEL_ISTP );
 
             String os1= (String)map.get(PARAM_SLICE1);
-            if ( os1!=null && os1.equals("") && result.rank()>1 ) {
+            if ( os1!=null && !os1.equals("") && result.rank()>1 ) {
                 int is= Integer.parseInt(os1);
                 result= DataSetOps.slice1(result,is);
             }
