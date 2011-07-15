@@ -308,6 +308,9 @@ public class PlotController extends DomNodeController {
                 if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) 
                         || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE )
                         || e.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
+                    if ( axis.getDrawTca() && axis.getLabel().length()==0 ) {
+                        axis.setLabel("%{RANGE}");
+                    }
                     if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
                         axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
                     } else {
