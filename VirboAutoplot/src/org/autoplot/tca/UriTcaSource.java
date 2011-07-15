@@ -53,7 +53,7 @@ public class UriTcaSource extends AbstractQFunction {
         error= DataSetUtil.asDataSet( eu.createDatum("Error") );
         errorNoDs= DataSetUtil.asDataSet( eu.createDatum("No Data") );
         nonValueDs= DataSetUtil.asDataSet( eu.createDatum(" ") );
-        nonMonoDs= DataSetUtil.asDataSet( eu.create("Non Mono") );
+        nonMonoDs= DataSetUtil.asDataSet( eu.createDatum("Non Mono") );
     }
 
     private void doRead( ) throws Exception {
