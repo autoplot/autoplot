@@ -7,6 +7,7 @@ package org.autoplot.tca;
 
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -83,6 +84,9 @@ public class UriTcaSource extends AbstractQFunction {
                 bundleDs= bds1;
             }
         }
+        if ( this.tsb==null ) { // jython scripts can get a TimeSeriesBrowse after the first read.
+            tsb= dss.getCapability( TimeSeriesBrowse.class );
+        }
 
     }
 
@@ -95,7 +99,7 @@ public class UriTcaSource extends AbstractQFunction {
         } else {
             DatumRange dr= tsb.getTimeRange();
 
-            if ( !dr.contains(d) ) {
+            if ( !DatumRangeUtil.sloppyContains( dr, d ) ) {
                 while ( d.ge( dr.max() ) ) {
                     dr= dr.next();
                     read= true;
@@ -104,7 +108,9 @@ public class UriTcaSource extends AbstractQFunction {
                     dr= dr.previous();
                     read= true;
                 }
-                if ( read ) tsb.setTimeRange(dr);
+                if ( read ) {
+                    tsb.setTimeRange(dr);
+                }
             }
         }
         
