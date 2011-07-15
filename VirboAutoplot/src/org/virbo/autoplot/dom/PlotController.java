@@ -4,6 +4,7 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -12,7 +13,10 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -34,6 +38,7 @@ import org.das2.graph.SpectrogramRenderer;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
+import org.virbo.autoplot.TcaElementDialog;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -162,9 +167,11 @@ public class PlotController extends DomNodeController {
                     String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + evt.getNewValue();
                     plot.getXaxis().getController().getDasAxis().setDataPath(dasAddress);
                     plot.getXaxis().getController().getDasAxis().setDrawTca(true);
+                    plot.getXaxis().setLabel("%{RANGE}");
                 } else {
                     plot.getXaxis().getController().getDasAxis().setDataPath("");
                     plot.getXaxis().getController().getDasAxis().setDrawTca(false);
+                    plot.getXaxis().setLabel("");
                 }
             }
          }
@@ -189,7 +196,7 @@ public class PlotController extends DomNodeController {
         } else {
             xaxis.setUserDatumFormatter(null);
         }
-        
+
         if (UnitsUtil.isTimeLocation(yaxis.getUnits())) {
             yaxis.setUserDatumFormatter(new DateTimeDatumFormatter(dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
         } else {
