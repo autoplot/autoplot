@@ -44,6 +44,7 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet nonMonoDs;
 
     public UriTcaSource( String uri ) throws Exception {
+        System.err.println("now tca source: "+uri );
         if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
             throw new IllegalArgumentException("pass a URI to this, not class:org.autoplot.tca.UriTcaSource");
         }
@@ -87,6 +88,7 @@ public class UriTcaSource extends AbstractQFunction {
         if ( this.tsb==null ) { // jython scripts can get a TimeSeriesBrowse after the first read.
             tsb= dss.getCapability( TimeSeriesBrowse.class );
         }
+        System.err.println("  doRead got: "+ds );
 
     }
 
@@ -132,6 +134,7 @@ public class UriTcaSource extends AbstractQFunction {
             }
             QDataSet findex= Ops.findex( dep0, d0 ); // TODO: param.slice(0) does findex support rank 0?
 
+            System.err.println("  getting ticks from: "+ds );
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
                 int ii= (int)( findex.value() + 0.5 ); // nearest neighbor
                 QDataSet result= ds.slice(ii);
