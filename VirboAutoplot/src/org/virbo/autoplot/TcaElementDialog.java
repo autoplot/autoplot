@@ -21,6 +21,7 @@ public class TcaElementDialog extends javax.swing.JDialog {
     public TcaElementDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setLocationRelativeTo(parent);
         primaryDataSetSelector.setPlotItButtonVisible(false);
     }
 
