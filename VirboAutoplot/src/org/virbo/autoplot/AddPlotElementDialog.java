@@ -23,6 +23,7 @@ public class AddPlotElementDialog extends javax.swing.JDialog {
     public AddPlotElementDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        setLocationRelativeTo(parent);
         secondaryDataSetSelector.setVisible(secondaryCheckBox.isSelected());
         tertiaryCheckBox.setVisible(secondaryCheckBox.isSelected());
         tertiaryDataSetSelector.setVisible(secondaryCheckBox.isSelected()&&tertiaryCheckBox.isSelected());
