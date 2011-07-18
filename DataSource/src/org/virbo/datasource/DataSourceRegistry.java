@@ -35,6 +35,7 @@ public class DataSourceRegistry {
     HashMap<String,Object> dataSourcesByExt;
     HashMap<String,Object> dataSourcesByMime;
     HashMap<String,Object> dataSourceFormatByExt;
+    HashMap<String,Object> dataSourceFormatEditorByExt;
     HashMap<String,Object> dataSourceEditorByExt;
     HashMap<String,String> extToDescription;
 
@@ -44,6 +45,7 @@ public class DataSourceRegistry {
         dataSourcesByMime = new HashMap<String,Object>();
         dataSourceFormatByExt= new HashMap<String,Object>();
         dataSourceEditorByExt= new HashMap<String,Object>();
+        dataSourceFormatEditorByExt= new HashMap<String,Object>();
         extToDescription= new HashMap<String,String>();
     }
 
@@ -54,6 +56,16 @@ public class DataSourceRegistry {
         return instance;
     }
 
+    public static Object getInstanceFromClassName( String o ) {
+        try {
+            Class clas = Class.forName((String) o);
+            Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
+            Object result = (DataSourceFactory) constructor.newInstance(new Object[]{});
+            return result;
+        } catch ( Exception e ) {
+            return null;
+        }
+    }
     /**
      * return a list of registered extensions the can format.  These will contain the dot prefix.
      * @return
@@ -289,6 +301,28 @@ public class DataSourceRegistry {
                 }
                 reader.close();
             }
+
+            if (loader == null) {
+                urls = ClassLoader.getSystemResources("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions");
+            } else {
+                urls = loader.getResources("META-INF/org.virbo.datasource.DataSourceFormatEditorPanel.extensions");
+            }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+                String s = reader.readLine();
+                while (s != null) {
+                    s = s.trim();
+                    if (s.length() > 0) {
+                        String[] ss = s.split("\\s");
+                        for (int i = 1; i < ss.length; i++) {
+                            registry.registerFormatEditor(ss[0], ss[i]);
+                        }
+                    }
+                    s = reader.readLine();
+                }
+                reader.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -396,7 +430,12 @@ public class DataSourceRegistry {
         extension= getExtension(extension);
         dataSourceEditorByExt.put(extension, className);
     }
-    
+
+    public void registerFormatEditor( String className, String extension ) {
+        extension= getExtension(extension);
+        dataSourceFormatByExt.put(extension, className);
+    }
+
     public void registerMimeType(String className, String mimeType) {
         dataSourcesByMime.put(mimeType, className);
     }
@@ -559,6 +598,10 @@ public class DataSourceRegistry {
      */
     public synchronized Object getDataSourceEditorByExt( String ext ) {
         return this.dataSourceEditorByExt.get(ext);
+    }
+
+    public synchronized Object getDataSourceFormatEditorByExt( String ext ) {
+        return this.dataSourceFormatEditorByExt.get(ext);
     }
 
     /**
