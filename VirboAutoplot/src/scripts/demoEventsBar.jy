@@ -38,12 +38,14 @@ bds.putProperty( 'NAME__0', 'Time' )
 bds.putProperty( 'UNITS__0', tu )
 bds.putProperty( 'NAME__1', 'Duration' )
 bds.putProperty( 'UNITS__1', dtu )
+bds.putProperty( 'NAME__2', 'Color' )
+bds.putProperty( 'FORMAT__2', '%08x' )  # format as hex
 bds.putProperty( 'NAME__3', 'Event' )
 bds.putProperty( 'UNITS__3', evu )
 
 ds.putProperty( QDataSet.BUNDLE_1, bds )
 
-plot( 1, ds )
+plot( 0, ds )
 
 
 
