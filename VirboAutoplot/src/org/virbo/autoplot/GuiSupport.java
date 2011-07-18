@@ -1121,8 +1121,8 @@ public class GuiSupport {
                         uri= uri.substring("class:org.autoplot.tca.UriTcaSource:".length());
                     }
                     TcaElementDialog dia= new TcaElementDialog( (JFrame)SwingUtilities.getWindowAncestor( controller.getDasCanvas().getParent()), true );
-                    dia.getPrimaryDataSetSelector().setValue(uri);
                     dia.getPrimaryDataSetSelector().setRecent(AutoplotUtil.getUrls( controller.getApplicationModel().getRecent()));
+                    dia.getPrimaryDataSetSelector().setValue(uri);
                     dia.setTitle( "Add additional ticks" );
                     dia.setVisible(true);
                     if (dia.isCancelled()) {
