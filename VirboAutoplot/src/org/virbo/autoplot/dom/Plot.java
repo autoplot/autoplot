@@ -199,6 +199,10 @@ public class Plot extends DomNode {
     public void setTicksURI( String ticksURI ) {
         String old= this.ticksURI;
         this.ticksURI = ticksURI;
+        System.err.println( String.format( "%s.setTicksURI %s->%s ", this.id, old, ticksURI ) );
+        if ( ticksURI.length()>0 && this.controller!=null ) {
+            System.err.println("here we are setting ticksURI");
+        }
         propertyChangeSupport.firePropertyChange(PROP_TICKS_URI, old, ticksURI );
     }
 
