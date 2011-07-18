@@ -338,7 +338,7 @@ public class GuiSupport {
                     edp.getFormatDL().setSelectedItem( "." + split.ext );
                     if ( currentFileString.contains("/") ) {
                         edp.setFile( currentFileString );
-                        if ( split.params!=null ) {
+                        if ( split.params!=null && edp.getDataSourceFormatEditorPanel()!=null ) {
                             edp.getDataSourceFormatEditorPanel().setURI(currentFileString);
                         }
                     }
