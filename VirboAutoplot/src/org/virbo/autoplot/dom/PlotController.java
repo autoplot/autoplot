@@ -296,6 +296,24 @@ public class PlotController extends DomNodeController {
     }
 
 
+    /**
+     * get the axis in the DOM for the dasAxis implementation.
+     * @return null if the axis is not from this plot.
+     */
+    private Axis getDomAxis( DasAxis axis ) {
+        Axis domAxis;
+        if ( plot.xaxis.controller.dasAxis == axis ) {
+            domAxis= plot.xaxis;
+        } else if ( plot.yaxis.controller.dasAxis==axis ) {
+            domAxis= plot.yaxis;
+        } else if ( plot.zaxis.controller.dasAxis==axis ) {
+            domAxis= plot.zaxis;
+        } else {
+            domAxis= null;
+        }
+        return domAxis;
+    }
+
     private PropertyChangeListener listener = new PropertyChangeListener() {
         @Override
         public String toString() {
@@ -304,13 +322,17 @@ public class PlotController extends DomNodeController {
         public void propertyChange(PropertyChangeEvent e) {
             if (e.getSource() instanceof DasAxis) {
                 DasAxis axis = (DasAxis) e.getSource();
-
+                Axis domAxis= getDomAxis(axis);
+                if ( domAxis==null ) return;
+                if ( e.getPropertyName().equals(DasAxis.PROP_UNITS)
+                        || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE ) ) {
+                    if ( axis.getDrawTca() && domAxis.getLabel().length()==0 ) {
+                        domAxis.setLabel("%{RANGE}");
+                    }
+                }
                 if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) 
                         || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE )
                         || e.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
-                    if ( axis.getDrawTca() && axis.getLabel().length()==0 ) {
-                        axis.setLabel("%{RANGE}");
-                    }
                     if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
                         axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
                     } else {
