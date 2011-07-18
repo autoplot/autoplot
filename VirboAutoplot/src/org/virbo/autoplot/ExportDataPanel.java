@@ -268,7 +268,16 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 editorPanel.setURI( getFilenameTF().getText() );
             }
         } else {
-            editorPanel= null;
+            editorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
+            if ( editorPanel!=null ) {
+                if ( editorPanel instanceof String ) {
+                    editorPanel= DataSourceRegistry.getInstanceFromClassName( editorPanel );
+                }
+                String t=  getFilenameTF().getText();
+                if ( t.contains("/" ) ) {
+                    editorPanel.setURI( getFilenameTF().getText() );
+                }
+            }
         }
 
         additionalOptionsButton.setEnabled(editorPanel!=null);
