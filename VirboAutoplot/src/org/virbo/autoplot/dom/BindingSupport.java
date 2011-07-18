@@ -50,6 +50,7 @@ public class BindingSupport {
             public void propertyChange(PropertyChangeEvent evt) {
                 Method m;
                 try {
+                    System.err.println( "propListener: "+p );
                     if (c == null) {
                         Object oldValue= getter.invoke( p );
                         if ( oldValue==null ) {
@@ -63,6 +64,10 @@ public class BindingSupport {
                             System.err.println("this is that bad state!");
                         }
                     } else {
+                        if ( Thread.currentThread().getStackTrace().length>70 ) {
+                            System.err.println("Problem detected in stack trace, circular call");
+                            return; // put an end to it so it doesn't crash
+                        }
                         if (forward) {
                             setter.invoke(p, c.convertForward(evt.getNewValue()));
                         } else {
