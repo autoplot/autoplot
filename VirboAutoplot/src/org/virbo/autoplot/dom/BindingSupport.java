@@ -50,7 +50,6 @@ public class BindingSupport {
             public void propertyChange(PropertyChangeEvent evt) {
                 Method m;
                 try {
-                    System.err.println( "propListener: "+p );
                     if (c == null) {
                         Object oldValue= getter.invoke( p );
                         if ( oldValue==null ) {
