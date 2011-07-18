@@ -268,16 +268,19 @@ public class BinaryDataSource extends AbstractDataSource {
             QDataSet dep0ds = BufferDataSet.makeDataSet( 1, recSizeBytes, dep0Offset, frecCount, 1, 1, buf, dep0Type );
             ds.putProperty(QDataSet.DEPEND_0, dep0ds);
         } else {
-            final int finalRecSizeBytes= recSizeBytes;
-            final int finalRecOffset= recOffset;
-            IndexGenDataSet dep0ds= new IndexGenDataSet(frecCount) {
-                @Override
-                public double value(int i) {
-                    return offset + finalRecOffset + i * finalRecSizeBytes;
-                }
-            };
-            dep0ds.putProperty( QDataSet.CADENCE, DataSetUtil.asDataSet((double)recSizeBytes) );
-            ds.putProperty(QDataSet.DEPEND_0, dep0ds);
+            boolean reportOffset= !( getParameter( "reportOffset", "no" ).equals("no") );
+            if ( reportOffset ) {
+                final int finalRecSizeBytes= recSizeBytes;
+                final int finalRecOffset= recOffset;
+                IndexGenDataSet dep0ds= new IndexGenDataSet(frecCount) {
+                    @Override
+                    public double value(int i) {
+                        return offset + finalRecOffset + i * finalRecSizeBytes;
+                    }
+                };
+                dep0ds.putProperty( QDataSet.CADENCE, DataSetUtil.asDataSet((double)recSizeBytes) );
+                ds.putProperty(QDataSet.DEPEND_0, dep0ds);
+            }
         }
 
         String s;
