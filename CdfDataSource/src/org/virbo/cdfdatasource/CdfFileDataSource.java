@@ -183,6 +183,7 @@ public class CdfFileDataSource extends AbstractDataSource {
             if ( os1!=null && !os1.equals("") && result.rank()>1 ) {
                 int is= Integer.parseInt(os1);
                 result= DataSetOps.slice1(result,is);
+                this.attributes= null; // they aren't relevant now.
             }
             
             return result;
@@ -551,6 +552,9 @@ public class CdfFileDataSource extends AbstractDataSource {
                 cdfFile = getFile(mon);
                 String fileName = cdfFile.toString();
                 Map map = getParams();
+                if ( map.containsKey( PARAM_SLICE1 ) ) {
+                    return null;
+                }
                 CDF cdf = CDF.open(fileName, CDF.READONLYoff);
                 String svariable = (String) map.get("id");
                 if (svariable == null) {
