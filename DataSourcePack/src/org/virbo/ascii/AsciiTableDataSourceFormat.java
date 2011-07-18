@@ -93,6 +93,7 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             //TODO: would be nice if we could verify formatter.  I had %f5.2 instead of %5.2f and it wasn't telling me.
             return new FormatStringFormatter( df, false );
         } catch ( RuntimeException ex ) {
+            ex.printStackTrace();
             return u.getDatumFormatterFactory().defaultFormatter();
         }
     }
@@ -186,7 +187,12 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             if (uu[jj] == null) uu[jj] = Units.dimensionless;
             if ( !( uu[jj] instanceof EnumerationUnits ) ) {
                 if ( df.equals("") ) {
-                    formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
+                    String ff= (String) bundleDesc.property(QDataSet.FORMAT,jj);
+                    if ( ff==null ) {
+                        formats[jj]= uu[jj].createDatum(data.value(0,jj)).getFormatter();
+                    } else {
+                        formats[jj]= getDataFormatter( ff, uu[jj] );
+                    }
                 } else {
                     formats[jj]= getDataFormatter( df, uu[jj] );
                 }
@@ -220,7 +226,10 @@ public class AsciiTableDataSourceFormat extends AbstractDataSourceFormat {
             for (  i = 0; i < bundleDesc.length(); i++) {
                 String l1= (String) bundleDesc.property(QDataSet.LABEL,i);
                 if ( l1==null ) {
-                    throw new IllegalArgumentException("unnamed dataset in bundle at index "+i);
+                    l1= (String) bundleDesc.property(QDataSet.NAME,i);
+                    if ( l1==null ) {
+                        throw new IllegalArgumentException("unnamed dataset in bundle at index "+i);
+                    }
                 }
                 if ( l1.trim().length()==0 ) {
                     Units u1=  (Units) bundleDesc.property(QDataSet.UNITS,i);
