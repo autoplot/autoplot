@@ -2522,9 +2522,17 @@ APSplash.checkTime("init -80");
         if ( myMess.length()>100 ) myMess= myMess.substring(0,100)+"...";
         myMess= myMess.replaceAll("\n","");
 
-        this.statusLabel.setIcon( icon );
-        this.statusTextField.setText(myMess);
-        this.statusTextField.setToolTipText(message);
+        final String fmyMess= myMess;
+        final String fmessage= message;
+        final Icon ficon= icon;
+
+        SwingUtilities.invokeLater( new Runnable() {  //TODO: we should be a little careful here, we don't want to post thousands of runnables to the event thread.
+            public void run() {
+                statusLabel.setIcon( ficon );
+                statusTextField.setText(fmyMess);
+                statusTextField.setToolTipText(fmessage);
+            }
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
