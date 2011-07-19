@@ -247,7 +247,12 @@ public class DodsAdapter {
     }
 
     private enum Type { spectrogram, vectors, scalars };
-                    
+
+    /**
+     * This is the code that converts the OpenDAP structures and data types into QDataSet
+     * @param attributes
+     * @return
+     */
     public QDataSet getDataSet(Map<String, Object> attributes) {
         DodsVarDataSet zds;
 
