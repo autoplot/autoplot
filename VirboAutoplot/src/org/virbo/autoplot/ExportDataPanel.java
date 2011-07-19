@@ -268,15 +268,20 @@ public class ExportDataPanel extends javax.swing.JPanel {
                 editorPanel.setURI( getFilenameTF().getText() );
             }
         } else {
-            editorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
-            if ( editorPanel!=null ) {
-                if ( editorPanel instanceof String ) {
-                    editorPanel= DataSourceRegistry.getInstanceFromClassName( editorPanel );
+            Object oeditorPanel= DataSourceRegistry.getInstance().getDataSourceFormatEditorByExt(ss);
+            if ( oeditorPanel!=null ) {
+                if ( oeditorPanel instanceof String ) {
+                    editorPanel= (DataSourceFormatEditorPanel)DataSourceRegistry.getInstanceFromClassName( (String)oeditorPanel );
+                    if ( editorPanel==null ) throw new IllegalArgumentException("unable to create instance: "+oeditorPanel);
+                } else {
+                    editorPanel= (DataSourceFormatEditorPanel)oeditorPanel;
                 }
                 String t=  getFilenameTF().getText();
                 if ( t.contains("/" ) ) {
                     editorPanel.setURI( getFilenameTF().getText() );
                 }
+            } else {
+                editorPanel= null;
             }
         }
 
