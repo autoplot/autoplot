@@ -161,7 +161,7 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
         if ( reclen>0 && fieldLen>reclen ) { // negative reclen supported 9-bit floats.
             System.err.println( String.format( "field length (%d) is greater than record length (%d) for len0=%d.", (int)fieldLen, (int)reclen, (int)len0 ) );
         }
-        if ( reclen>0 && ( back.remaining()< recoffs + ( reclen*len0 ) ) ) {
+        if ( reclen>0 && ( back.remaining()< ( reclen*len0 ) ) ) {
             System.err.println( String.format( "back buffer is too short (len=%d) for len0=%d.", back.remaining(), len0 ) );
         }
     }
