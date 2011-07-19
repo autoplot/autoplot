@@ -8,15 +8,14 @@
  *
  * Created on Jul 18, 2011, 4:43:42 PM
  */
-
 package org.virbo.binarydatasource;
 
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
-import org.virbo.datasource.DataSourceFormatEditorPanel;
 import org.virbo.datasource.URISplit;
 import java.lang.Short; // because of Short object in this package.
+import org.virbo.datasource.DataSourceFormatEditorPanel;
 
 /**
  *
@@ -113,7 +112,7 @@ public class BinaryDataSourceFormatEditorPanel extends javax.swing.JPanel implem
         s= getParam( args,"type","double");
         typeComboBox.setSelectedItem(s);
 
-        s= getParam( args, "byteOrder", "big" );
+        s= getParam( args, "byteOrder", "little" );
         endianComboBox.setSelectedItem(s);
 
         file= split.file;
