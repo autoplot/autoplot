@@ -233,10 +233,17 @@ public class InlineDataSource extends AbstractDataSource {
                 zz.putProperty( QDataSet.DEPEND_0, xx );
                 ds= zz;
             } else if ( bundle1==null && ds.rank()==2 && ds.length(1)==2 ) { //TODO: we should be able to use bundle dataset... kludge
-                MutablePropertyDataSet xx= DDataSet.copy(DataSetOps.slice1(ds,0));
-                MutablePropertyDataSet zz= DDataSet.copy(DataSetOps.slice1(ds,ds.length(0)-1));
-                zz.putProperty( QDataSet.DEPEND_0, xx );
-                ds= zz;
+                if ( Ops.isBundle(ds) ) {
+                    MutablePropertyDataSet xx= (MutablePropertyDataSet)DataSetOps.unbundle(ds,0) ;
+                    MutablePropertyDataSet zz= (MutablePropertyDataSet)DataSetOps.unbundle(ds,ds.length(0)-1);
+                    zz.putProperty( QDataSet.DEPEND_0, xx );
+                    ds= zz;   
+                } else {
+                    MutablePropertyDataSet xx= DDataSet.copy(DataSetOps.slice1(ds,0));
+                    MutablePropertyDataSet zz= DDataSet.copy(DataSetOps.slice1(ds,ds.length(0)-1));
+                    zz.putProperty( QDataSet.DEPEND_0, xx );
+                    ds= zz;
+                }
             }
         } else {
             for ( int idep=0; idep<4; idep++ ) {
