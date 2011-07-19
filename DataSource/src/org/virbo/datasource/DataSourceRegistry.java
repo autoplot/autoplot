@@ -60,9 +60,10 @@ public class DataSourceRegistry {
         try {
             Class clas = Class.forName((String) o);
             Constructor constructor = clas.getDeclaredConstructor(new Class[]{});
-            Object result = (DataSourceFactory) constructor.newInstance(new Object[]{});
+            Object result = constructor.newInstance(new Object[]{});
             return result;
         } catch ( Exception e ) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -433,7 +434,7 @@ public class DataSourceRegistry {
 
     public void registerFormatEditor( String className, String extension ) {
         extension= getExtension(extension);
-        dataSourceFormatByExt.put(extension, className);
+        dataSourceFormatEditorByExt.put(extension, className);
     }
 
     public void registerMimeType(String className, String mimeType) {
