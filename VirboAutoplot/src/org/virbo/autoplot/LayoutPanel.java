@@ -39,6 +39,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.autoplot.help.AutoplotHelpSystem;
 import org.das2.components.propertyeditor.PropertyEditor;
+import org.das2.datum.DatumRange;
+import org.das2.datum.DatumRangeUtil;
 import org.das2.graph.DasDevicePosition;
 import org.das2.graph.DasPlot;
 import org.virbo.autoplot.dom.Application;
@@ -591,6 +593,9 @@ public class LayoutPanel extends javax.swing.JPanel {
         if ( op==JOptionPane.OK_OPTION ) {
             final String lock = "Add hidden plot";
 
+            List<Plot> plots= getSelectedPlots();
+            if ( plots.size()==0 ) return;
+
             app.getController().registerPendingChange( this, lock);
             app.getController().performingChange( this, lock);
 
@@ -602,7 +607,6 @@ public class LayoutPanel extends javax.swing.JPanel {
             p.getXaxis().setVisible(false);
             p.getYaxis().setVisible(false);
 
-            List<Plot> plots= getSelectedPlots();
             Plot[] bottomTopPlots= DomOps.bottomAndTopMostPlot(app, plots);
 
             if ( dia.getCondenseColorBarsCB().isSelected() ) {
@@ -615,26 +619,47 @@ public class LayoutPanel extends javax.swing.JPanel {
                 p.getZaxis().setVisible(false);
             }
             if ( dia.getxAxisCB().isSelected() ) { // bind the xaxes
+                DatumRange range= getSelectedPlots().get(0).getXaxis().getRange();
+                boolean log= getSelectedPlots().get(0).getXaxis().isLog();
                 for ( Plot p1: getSelectedPlots() ) {
-                    p.getXaxis().setRange( p1.getXaxis().getRange());
+                    range= DatumRangeUtil.union( range, p1.getXaxis().getRange() );
+                    log= log && p1.getXaxis().isLog();
+                }
+                for ( Plot p1: getSelectedPlots() ) {
+                    p.getXaxis().setRange( range );
+                    if ( !log ) p1.getXaxis().setLog(log);
                     app.getController().bind( p.getXaxis(), "range", p1.getXaxis(), "range" );
-                    p.getXaxis().setLog( p1.getXaxis().isLog());
+                    p.getXaxis().setLog( log );
                     app.getController().bind( p.getXaxis(), "log", p1.getXaxis(), "log" );
                 }
             }
             if ( dia.getyAxisCB().isSelected() ) { // bind the xaxes
+                DatumRange range= getSelectedPlots().get(0).getYaxis().getRange();
+                boolean log= getSelectedPlots().get(0).getYaxis().isLog();
                 for ( Plot p1: getSelectedPlots() ) {
-                    p.getYaxis().setRange( p1.getYaxis().getRange());
+                    range= DatumRangeUtil.union( range, p1.getYaxis().getRange() );
+                    log= log && p1.getYaxis().isLog();
+                }
+                for ( Plot p1: getSelectedPlots() ) {
+                    p.getYaxis().setRange( range );
+                    if ( !log ) p1.getYaxis().setLog(log);
                     app.getController().bind( p.getYaxis(), "range", p1.getYaxis(), "range" );
-                    p.getYaxis().setLog( p1.getYaxis().isLog());
+                    p.getYaxis().setLog( log );
                     app.getController().bind( p.getYaxis(), "log", p1.getYaxis(), "log" );
                 }
             }
             if ( dia.getzAxisCB().isSelected() ) { // bind the xaxes
+                DatumRange range= getSelectedPlots().get(0).getZaxis().getRange();
+                boolean log= getSelectedPlots().get(0).getZaxis().isLog();
                 for ( Plot p1: getSelectedPlots() ) {
-                    p.getZaxis().setRange( p1.getZaxis().getRange());
+                    range= DatumRangeUtil.union( range, p1.getZaxis().getRange() );
+                    log= log && p1.getZaxis().isLog();
+                }
+                for ( Plot p1: getSelectedPlots() ) {
+                    p.getZaxis().setRange( range );
+                    if ( !log ) p1.getZaxis().setLog(log);
                     app.getController().bind( p.getZaxis(), "range", p1.getZaxis(), "range" );
-                    p.getZaxis().setLog( p1.getZaxis().isLog());
+                    p.getZaxis().setLog( log );
                     app.getController().bind( p.getZaxis(), "log", p1.getZaxis(), "log" );
                 }
             }
