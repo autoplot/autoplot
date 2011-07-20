@@ -97,7 +97,7 @@ public class UriTcaSource extends AbstractQFunction {
         if ( this.tsb==null ) { // jython scripts can get a TimeSeriesBrowse after the first read.
             tsb= dss.getCapability( TimeSeriesBrowse.class );
         }
-        System.err.println("  doRead got: "+ds );
+        logger.log(Level.FINE, "  doRead got: {0}", ds);
 
     }
 
