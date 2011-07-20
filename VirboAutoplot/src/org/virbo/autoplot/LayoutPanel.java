@@ -165,7 +165,11 @@ public class LayoutPanel extends javax.swing.JPanel {
                         new ImageIcon( AutoplotUtil.getAutoplotIcon() ) ) ) {
                     int nr= (Integer)dia.getNumberOfRowsTextField().getValue();
                     int nc= (Integer)dia.getNumberOfColumnsTextField().getValue();
-                    app.getController().addPlots( nr,nc, dia.isAbove() ? LayoutConstants.ABOVE : LayoutConstants.BELOW );
+                    if ( nr>5 || nc>5 ) {
+                        JOptionPane.showMessageDialog( LayoutPanel.this, "No more than 5 rows or columns can be added at once.");
+                    } else {
+                        app.getController().addPlots( nr,nc, dia.isAbove() ? LayoutConstants.ABOVE : LayoutConstants.BELOW );
+                    }
                 }
             }
         };
