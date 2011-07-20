@@ -35,6 +35,7 @@ public class AddPlotsDialog extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         numberOfColumnsTextField = new javax.swing.JFormattedTextField();
         numberOfRowsTextField = new javax.swing.JFormattedTextField();
+        aboveCB = new javax.swing.JCheckBox();
 
         jLabel1.setText("Number of plots per row:");
 
@@ -44,6 +45,9 @@ public class AddPlotsDialog extends javax.swing.JPanel {
 
         numberOfRowsTextField.setText("1");
 
+        aboveCB.setText("Add plots above current");
+        aboveCB.setToolTipText("Add the plots above instead of below the current plot.");
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -51,12 +55,15 @@ public class AddPlotsDialog extends javax.swing.JPanel {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1)
-                    .add(jLabel2))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(numberOfRowsTextField)
-                    .add(numberOfColumnsTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE))
+                    .add(layout.createSequentialGroup()
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel1)
+                            .add(jLabel2))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(numberOfRowsTextField)
+                            .add(numberOfColumnsTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)))
+                    .add(aboveCB))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -70,12 +77,18 @@ public class AddPlotsDialog extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel1)
                     .add(numberOfColumnsTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(aboveCB)
+                .addContainerGap(16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
-
+    public boolean isAbove() {
+        return aboveCB.isSelected();
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JCheckBox aboveCB;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel2;
     public javax.swing.JFormattedTextField numberOfColumnsTextField;
