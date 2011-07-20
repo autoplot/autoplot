@@ -104,6 +104,8 @@ public class UriTcaSource extends AbstractQFunction {
 
     public QDataSet value(QDataSet parm) {
         Datum d= DataSetUtil.asDatum( parm.slice(0) );
+        QDataSet context= (QDataSet) parm.property( QDataSet.CONTEXT_0 ); // should be a bins dimension
+
         boolean read= false;
         if ( tsb==null ) {
             read= false;
@@ -120,6 +122,7 @@ public class UriTcaSource extends AbstractQFunction {
                     read= true;
                 }
                 if ( read ) {
+                    if ( context!=null ) dr= DatumRangeUtil.union( dr, DataSetUtil.asDatumRange(context,true) );
                     tsb.setTimeRange(dr);
                 }
             }
