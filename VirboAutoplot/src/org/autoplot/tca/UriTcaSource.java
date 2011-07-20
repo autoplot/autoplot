@@ -5,6 +5,8 @@
 
 package org.autoplot.tca;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -43,14 +45,16 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet nonValueDs;
     QDataSet nonMonoDs;
 
+    Logger logger= Logger.getLogger( "virbo.autoplot.uritcasource" );
+
     public UriTcaSource( String uri ) throws Exception {
-        System.err.println("now tca source: "+uri );
+        logger.log(Level.FINE, "new tca source: {0}", uri);
         if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
             throw new IllegalArgumentException("pass a URI to this, not class:org.autoplot.tca.UriTcaSource");
         }
-        DataSource dss= DataSetURI.getDataSource(uri);
-        this.tsb= dss.getCapability( TimeSeriesBrowse.class );
-        this.dss= dss;
+        DataSource dss1= DataSetURI.getDataSource(uri);
+        this.tsb= dss1.getCapability( TimeSeriesBrowse.class );
+        this.dss= dss1;
         EnumerationUnits eu= new EnumerationUnits("UriTcaSource");
         error= DataSetUtil.asDataSet( eu.createDatum("Error") );
         errorNoDs= DataSetUtil.asDataSet( eu.createDatum("No Data") );
@@ -60,7 +64,12 @@ public class UriTcaSource extends AbstractQFunction {
 
     private void doRead( ) throws Exception {
         ProgressMonitor mon= new NullProgressMonitor(); // DasProgressPanel.createFramed("loading data");
-        System.err.println("reading TCAs from "+dss );
+
+        if ( this.tsb!=null ) {
+            logger.log(Level.FINE, "reading TCAs from TSB {0}", this.tsb.getURI());
+        } else {
+            logger.log(Level.FINE, "reading TCAs from {0}", dss);
+        }
         ds= dss.getDataSet( mon );
         bundleDs= (QDataSet)ds.property(QDataSet.BUNDLE_1);
         if ( bundleDs==null ) {
@@ -129,12 +138,11 @@ public class UriTcaSource extends AbstractQFunction {
             QDataSet d0= parm.slice(0);
 
             if ( !SemanticOps.isMonotonic(dep0 ) ) {
-                System.err.println("dataset dependence is not monotonic");
+                logger.fine("dataset dependence is not monotonic");
                 return new JoinDataSet( nonMonoDs );
             }
             QDataSet findex= Ops.findex( dep0, d0 ); // TODO: param.slice(0) does findex support rank 0?
 
-            System.err.println("  getting ticks from: "+ds );
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
                 int ii= (int)( findex.value() + 0.5 ); // nearest neighbor
                 QDataSet result= ds.slice(ii);
