@@ -32,7 +32,8 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="addPlotsBelowMenuItem">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Add Plots Below..."/>
+                <Property name="text" type="java.lang.String" value="Add Plots..."/>
+                <Property name="toolTipText" type="java.lang.String" value="Add a grid of plots below or above the selected plot"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addPlotsBelowMenuItemActionPerformed"/>

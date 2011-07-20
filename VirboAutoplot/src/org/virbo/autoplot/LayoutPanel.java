@@ -53,6 +53,7 @@ import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.autoplot.dom.PlotElementStyle;
 import org.virbo.autoplot.dom.Plot;
 import org.virbo.autoplot.dom.Row;
+import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.CanvasLayoutPanel;
 
 /**
@@ -162,9 +163,9 @@ public class LayoutPanel extends javax.swing.JPanel {
                         dia, "Add Plots", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE, 
                         new ImageIcon( AutoplotUtil.getAutoplotIcon() ) ) ) {
-                     int nr= (Integer)dia.getNumberOfRowsTextField().getValue();
-                     int nc= (Integer)dia.getNumberOfColumnsTextField().getValue();
-                     app.getController().addPlots( nr,nc );
+                    int nr= (Integer)dia.getNumberOfRowsTextField().getValue();
+                    int nc= (Integer)dia.getNumberOfColumnsTextField().getValue();
+                    app.getController().addPlots( nr,nc, dia.isAbove() ? LayoutConstants.ABOVE : LayoutConstants.BELOW );
                 }
             }
         };
@@ -429,7 +430,8 @@ public class LayoutPanel extends javax.swing.JPanel {
         deleteMenuItem.setText("Delete");
         plotMenu.add(deleteMenuItem);
 
-        addPlotsBelowMenuItem.setText("Add Plots Below...");
+        addPlotsBelowMenuItem.setText("Add Plots...");
+        addPlotsBelowMenuItem.setToolTipText("Add a grid of plots below or above the selected plot");
         addPlotsBelowMenuItem.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addPlotsBelowMenuItemActionPerformed(evt);
