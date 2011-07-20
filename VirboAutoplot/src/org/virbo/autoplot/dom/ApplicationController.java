@@ -863,9 +863,10 @@ public class ApplicationController extends DomNodeController implements RunLater
      * is added for each plot as well.
      * @param nrow
      * @param ncol
+     * @param LayoutConstants.ABOVE or LayoutConstants.BELOW
      * @return a list of the newly added plots.
      */
-    public List<Plot> addPlots( int nrow, int ncol ) {
+    public List<Plot> addPlots( int nrow, int ncol, Object dir ) {
         List<Plot> result= new ArrayList<Plot>(nrow*ncol);
         List<Column> cols;
         final CanvasController ccontroller = getCanvas().getController();
@@ -875,7 +876,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             cols = Collections.singletonList(getCanvas().getMarginColumn());
         }
         List<Row> rows;
-        rows = ccontroller.addRows(nrow);
+        rows = ccontroller.addRows(nrow,dir);
         for (int i = 0; i < nrow; i++) {
             for (int j = 0; j < ncol; j++) {
                 Plot p = addPlot(rows.get(i), cols.get(j));
