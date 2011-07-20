@@ -499,6 +499,15 @@ public class CanvasController extends DomNodeController {
      * @return
      */
     public List<Row> addRows(int count) {
+        return addRows( count, LayoutConstants.BELOW );
+    }
+
+    /**
+     * add rows below the current plot.
+     * @param count
+     * @return
+     */
+    public List<Row> addRows(int count, Object dir ) {
         Row trow;
         if (application.getController().getPlot() != null) {
             trow = getRowFor(application.getController().getPlot());
@@ -508,7 +517,7 @@ public class CanvasController extends DomNodeController {
 
         List<Row> rows = new ArrayList();
         for (int i = 0; i < count; i++) {
-            Row newRow= addInsertRow(trow,  LayoutConstants.BELOW );
+            Row newRow= addInsertRow(trow,  dir );
             rows.add(newRow);
             trow= newRow;
         }
