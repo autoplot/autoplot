@@ -285,6 +285,13 @@ public class PlotController extends DomNodeController {
             }
         });
 
+        if ( plot.getTicksURI().length()>0 ) {
+            String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + plot.getTicksURI();
+            dasPlot1.getXAxis().setDataPath(dasAddress);
+            dasPlot1.getXAxis().setDrawTca(true);
+            plot.getXaxis().setLabel("%{RANGE}"); //TODO: this is really only necessary for time locations.
+        }
+
         this.dasPlot = dasPlot1;
         this.dasColorBar = colorbar;
 
