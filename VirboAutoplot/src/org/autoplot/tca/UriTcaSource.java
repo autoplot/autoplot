@@ -104,8 +104,9 @@ public class UriTcaSource extends AbstractQFunction {
 
     public QDataSet value(QDataSet parm) {
         Datum d= DataSetUtil.asDatum( parm.slice(0) );
-        QDataSet context= (QDataSet) parm.property( QDataSet.CONTEXT_0 ); // should be a bins dimension
-
+        QDataSet context= (QDataSet) parm.property( QDataSet.CONTEXT_0, 0 ); // should be a bins dimension
+        QDataSet deltaMinus= (QDataSet)parm.property(QDataSet.DELTA_MINUS,0);
+        QDataSet deltaPlus= (QDataSet)parm.property(QDataSet.DELTA_PLUS,0);
         boolean read= false;
         if ( tsb==null ) {
             read= false;
@@ -146,34 +147,43 @@ public class UriTcaSource extends AbstractQFunction {
             }
             QDataSet findex= Ops.findex( dep0, d0 ); // TODO: param.slice(0) does findex support rank 0?
 
+            QDataSet result;
             if ( findex.value()>=-0.5 && findex.value()<dep0.length()-0.5 ) {
                 int ii= (int)( findex.value() + 0.5 ); // nearest neighbor
-                QDataSet result= ds.slice(ii);
-                if ( result.rank()==0 ) {
-                    result= new JoinDataSet( result );
-                }
-                ((MutablePropertyDataSet)result).putProperty( QDataSet.BUNDLE_0, bundleDs );
-                return result;
-            } else if ( findex.value()>-1 && findex.value()<0 ) { // class:org.autoplot.tca.UriTcaSource:vap+dat:file:/home/jbf/project/autoplot/data/dat/rockets/21139_E_field.txt?skipLines=1&depend0=field0&rank2=field3-field4  at 190
-                findex= Ops.findex( dep0, d0 );
-                QDataSet result= ds.slice(0);
-                if ( result.rank()==0 ) {
-                    result= new JoinDataSet( result );
-                }
-                ((MutablePropertyDataSet)result).putProperty( QDataSet.BUNDLE_0, bundleDs );
-                return result;
-
+                result= ds.slice(ii);
+                
             } else {
-                if ( tsb==null ) {
-                    JoinDataSet result=  new JoinDataSet( nonValueDs );
-                    for ( int i=1; i<ds.length(0); i++ ) {
-                        result.join(nonValueDs);
-                    }
-                    return result;
+
+                if ( findex.value()>dep0.length()-1 && ( Ops.ge( Ops.add( dep0.slice(dep0.length()-1), deltaMinus ), d0 ).value()==1 ) ) {
+                    result= ds.slice(dep0.length()-1);
+
+                } else if ( findex.value()<0 && ( Ops.le( Ops.subtract( dep0.slice(0), deltaPlus ), d0 ).value()==1 ) ) {
+                    result= ds.slice(0);
+
                 } else {
-                    return new JoinDataSet( error );
+                    if ( tsb==null ) {
+                        JoinDataSet result1=  new JoinDataSet( nonValueDs );
+                        for ( int i=1; i<ds.length(0); i++ ) {
+                            result1.join(nonValueDs);
+                        }
+                        result= result1;
+                    } else {
+                        JoinDataSet result1= new JoinDataSet( error );
+                        for ( int i=1; i<ds.length(0); i++ ) {
+                            result1.join(error);
+                        }
+                        result= result1;
+                    }
                 }
             }
+
+            if ( result.rank()==0 ) {
+                result= new JoinDataSet( result );
+            }
+
+            ((MutablePropertyDataSet)result).putProperty( QDataSet.BUNDLE_0, bundleDs );
+
+            return result;
             //
 
         } catch ( Exception ex ) {
