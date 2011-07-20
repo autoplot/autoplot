@@ -70,11 +70,13 @@
     <Component class="javax.swing.JFormattedTextField" name="numberOfColumnsTextField">
       <Properties>
         <Property name="text" type="java.lang.String" value="1"/>
+        <Property name="toolTipText" type="java.lang.String" value="Number of plots per row, up to 5"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JFormattedTextField" name="numberOfRowsTextField">
       <Properties>
         <Property name="text" type="java.lang.String" value="1"/>
+        <Property name="toolTipText" type="java.lang.String" value="Number of rows to add, up to 5"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="aboveCB">

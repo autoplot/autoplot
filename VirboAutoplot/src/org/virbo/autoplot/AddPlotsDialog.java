@@ -42,8 +42,10 @@ public class AddPlotsDialog extends javax.swing.JPanel {
         jLabel2.setText("Number of rows:");
 
         numberOfColumnsTextField.setText("1");
+        numberOfColumnsTextField.setToolTipText("Number of plots per row, up to 5");
 
         numberOfRowsTextField.setText("1");
+        numberOfRowsTextField.setToolTipText("Number of rows to add, up to 5");
 
         aboveCB.setText("Add plots above current");
         aboveCB.setToolTipText("Add the plots above instead of below the current plot.");
