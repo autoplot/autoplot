@@ -16,6 +16,7 @@ import org.virbo.autoplot.dom.Plot;
 import static org.virbo.autoplot.ScriptContext.*;
 import org.virbo.autoplot.dom.ApplicationController;
 import org.virbo.autoplot.dom.Axis;
+import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.dataset.SemanticOps;
 
 /**
@@ -112,7 +113,7 @@ public class Test018 {
         dom.getController().copyPlotAndPlotElements(dom.getPlots(0), null, true, false);
         writeToPng(testId + "_001.png");
         dom.getController().setPlot(dom.getPlots(1));
-        List<Plot> plots = dom.getController().addPlots(1, 3);
+        List<Plot> plots = dom.getController().addPlots(1, 3,LayoutConstants.BELOW);
         for (int i = 0; i < plots.size(); i++) {
             Plot pl = plots.get(i);
             PlotElement p = dom.getController().getPlotElementsFor(pl).get(0);
