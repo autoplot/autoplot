@@ -285,7 +285,7 @@ public class PlotController extends DomNodeController {
             }
         });
 
-        if ( plot.getTicksURI().length()>0 ) {
+        if ( plot.getTicksURI().length()>0 ) { //TODO: understand this better.  We don't have to set titles, right?  Maybe it's because implementation is handled here instead of in das2.
             String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + plot.getTicksURI();
             dasPlot1.getXAxis().setDataPath(dasAddress);
             dasPlot1.getXAxis().setDrawTca(true);
