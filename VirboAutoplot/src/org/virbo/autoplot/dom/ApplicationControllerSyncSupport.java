@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -20,6 +21,7 @@ import java.util.logging.Logger;
 public class ApplicationControllerSyncSupport {
     ApplicationController controller;
     Application application;
+    Logger logger= Logger.getLogger("virbo.autoplot");
     
     ApplicationControllerSyncSupport( ApplicationController controller ) {
         this.controller= controller;
@@ -118,6 +120,7 @@ public class ApplicationControllerSyncSupport {
                     col=  (Column) DomUtil.getElementById( application, p.getColumnId() );
                     if ( col==null ) col= application.controller.getCanvas().marginColumn;
                 }
+                logger.log( Level.FINE, "adding controller for new node {0}", p);
                 new PlotController( application, p ).createDasPeer( row.controller.getCanvas(), row, col );
             }
             nameMap.put( p.getId(), p.getId() );  //DANGER--this is intentionally the same.
