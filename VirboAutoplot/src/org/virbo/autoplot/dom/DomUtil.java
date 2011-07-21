@@ -384,7 +384,7 @@ public class DomUtil {
 
         for (int i = 0; i < deleteList.size(); i++) {
             int idx = indexOf(node2List, deleteList.get(i));
-            result.add(new ArrayNodeDiff(property, ArrayNodeDiff.Action.Delete, nodes2[idx], idx));
+            result.add(new ArrayNodeDiff(property, ArrayNodeDiff.Action.Delete, node2List.get(idx), idx));
             node2List.remove(idx);
         }
 

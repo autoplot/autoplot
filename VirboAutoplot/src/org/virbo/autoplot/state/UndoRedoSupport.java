@@ -317,4 +317,13 @@ public class UndoRedoSupport {
         return stateStackPos;
     }
 
+    /**
+     * allow scripts to peek into undo/redo stack for debugging.
+     * @param pos
+     * @return
+     */
+    public StateStackElement peekAt( int pos ) {
+        return stateStack.get(pos);
+    }
+
 }
