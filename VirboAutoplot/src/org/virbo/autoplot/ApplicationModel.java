@@ -799,7 +799,15 @@ public class ApplicationModel {
     }
 
     void doSave(File f) throws IOException {
-        StatePersistence.saveState(f, createState(true));
+        StatePersistence.saveState(f, createState(true), "");
+        setUseEmbeddedDataSet(false);
+
+        setVapFile( f.toString() );
+        addRecent( f.toString() );
+    }
+
+    void doSave(File f, String scheme ) throws IOException {
+        StatePersistence.saveState(f, createState(true), scheme);
         setUseEmbeddedDataSet(false);
 
         setVapFile( f.toString() );

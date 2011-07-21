@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerConfigurationException;
 import org.das2.util.AboutUtil;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.dom.Application;
@@ -67,7 +68,7 @@ public class StatePersistence {
     private StatePersistence() {
     }
 
-    public static void saveState( File f, Object state ) throws IOException {
+    public static void saveState( File f, Object state, String sscheme ) throws IOException {
         /* XMLEncoder e = new XMLEncoder( new BufferedOutputStream( new FileOutputStream(f) ) );
         
         e.setPersistenceDelegate( DatumRange.class, new DatumRangePersistenceDelegate() );
@@ -98,7 +99,14 @@ public class StatePersistence {
             throw new RuntimeException(ex);
         }
 
-        VapScheme scheme= new Vap1_07Scheme();
+        VapScheme scheme;
+        if ( sscheme.equals("") ) {
+            scheme= new Vap1_07Scheme();
+        } else if ( sscheme.equals("1.06") ) {
+            scheme= new Vap1_06Scheme();
+        } else {
+            throw new IllegalArgumentException("output scheme not supported: "+sscheme);
+        }
         Element element = SerializeUtil.getDomElement( document, (DomNode)state, scheme );
 
         Element vap= document.createElement("vap");
@@ -107,6 +115,16 @@ public class StatePersistence {
         vap.setAttribute( "appVersionTag", AboutUtil.getReleaseTag() );
 
         document.appendChild(vap);
+
+        if ( sscheme.length()>0 ) {
+            try {
+                doConvert( document, "1.07", sscheme );
+            } catch ( TransformerException ex ) {
+                ex.printStackTrace();
+                throw new IOException("Unable to export to version "+sscheme,ex);
+            }
+        }
+
         writeDocument( new File( f.toString() ), document);
 
     }
@@ -174,6 +192,41 @@ public class StatePersistence {
         Object result= restoreState( in );
         in.close();
         return result;
+    }
+
+    private static Document doConvert( Document document, String domVersion, String currentVersion ) throws TransformerConfigurationException, TransformerException {
+        double srcVersion= Double.parseDouble(domVersion);
+        double dstVersion= Double.parseDouble(currentVersion);
+
+        if (srcVersion > dstVersion) {
+            // downgrade future versions.  This is experimental, but slightly
+            // better than not allowing use.  This is intended to smooth
+            // transitions to new autoplot versions.  Future vap files
+            // that use future features will not load properly.
+            for ( double s=srcVersion; s>dstVersion; s=s-0.01 ) {
+                Source src = new DOMSource( document );
+
+                DOMResult res = new DOMResult( );
+
+                String fname= String.format( Locale.US, "Vap_%4.2f_to_%4.2f",
+                        s, s-0.01 );
+                fname= fname.replaceAll("\\.","_") + ".xsl";
+
+                InputStream xsl = StatePersistence.class.getResourceAsStream(fname);
+                if ( xsl==null ) {
+                    throw new RuntimeException("Unable to find "+fname+".");
+                }
+                TransformerFactory factory = TransformerFactory.newInstance();
+                Transformer tr = factory.newTransformer( new StreamSource(xsl) );
+
+                tr.transform(src, res);
+                document= ((Document)res.getNode());
+            }
+        }
+
+        return document;
+
+
     }
 
     /**

@@ -126,7 +126,7 @@ public class CreatePngWalk {
         }
 
 
-        StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2);
+        StatePersistence.saveState(new java.io.File( outputFolder, params.product + ".vap"), dom2, "");
 
         PrintWriter ff= new PrintWriter( new FileWriter( new java.io.File( outputFolder, params.product + ".pngwalk" ) ) );
         ff.println( "product=" + params.product );

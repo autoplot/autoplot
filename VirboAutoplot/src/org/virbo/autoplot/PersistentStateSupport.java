@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -196,6 +197,10 @@ public class PersistentStateSupport {
         JFileChooser chooser= new JFileChooser();
         if ( getDirectory()!=null ) chooser.setCurrentDirectory( new File( getDirectory() ) );
         if ( getCurrentFile()!=null ) chooser.setSelectedFile( new File( getCurrentFile() ) );
+
+        VapSchemeChooser vapVersion= new VapSchemeChooser();
+        chooser.setAccessory( vapVersion );
+        
         chooser.setFileFilter( simpleFilter("*"+ext ) );
         int result= chooser.showSaveDialog(this.component);
         if ( result==JFileChooser.APPROVE_OPTION ) {
@@ -206,7 +211,13 @@ public class PersistentStateSupport {
             if ( saveMenuItem!=null ) saveMenuItem.setText("Save");
             if ( currentFileLabel!=null ) currentFileLabel.setText( String.valueOf( getCurrentFile()) );
             addToRecent(getCurrentFile());
-            save( new File( getCurrentFile()) );
+
+            String v= vapVersion.getScheme();
+            if ( v.length()>0 ) {
+                save( new File( getCurrentFile()),v );
+            } else {
+                save( new File( getCurrentFile()), "" );
+            }
         }
         return result;
         
@@ -215,7 +226,7 @@ public class PersistentStateSupport {
     /**
      * override me
      */
-    protected void saveImpl( File f ) throws Exception {
+    protected void saveImpl( File f, String scheme ) throws Exception {
         OutputStream out= null;
         try {
             out= new FileOutputStream( f );
@@ -251,7 +262,7 @@ public class PersistentStateSupport {
         }
     }
     
-    private void save( final File file ) {
+    private void save( final File file, final String scheme ) {
         setSaving(true);
         Runnable run= new Runnable() {
             public void run() {
@@ -270,7 +281,7 @@ public class PersistentStateSupport {
                         }
                     }
                     
-                    saveImpl(f);
+                    saveImpl(f,scheme);
                     
                     Preferences prefs= Preferences.userNodeForPackage(PersistentStateSupport.class);
                     prefs.put( PREF_FILE+ext, new File( getCurrentFile() ).getAbsolutePath() );
@@ -299,7 +310,7 @@ public class PersistentStateSupport {
                 if ( getCurrentFile()==null ) {
                     saveAs();
                 } else {
-                    save( new File( getCurrentFile()) );
+                    save( new File( getCurrentFile()),"" );
                 }
             }
         };

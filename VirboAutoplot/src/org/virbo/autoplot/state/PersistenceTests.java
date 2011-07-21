@@ -39,7 +39,7 @@ public class PersistenceTests {
         my.setDatum( EnumerationUnits.create("animals").createDatum("squirrel" ) );
 
         File f = new File("enum.xml");
-        StatePersistence.saveState(f, my);
+        StatePersistence.saveState(f, my, "");
         //StatePersistence.saveState(f, my.getEnum());
 
     }
