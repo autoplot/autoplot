@@ -44,6 +44,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.das2.datum.DomainDivider;
 import org.das2.datum.DomainDividerUtil;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.TimeUtil;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasColorBar;
@@ -190,7 +191,14 @@ public class AutoplotUtil {
             if (max == null) max = Double.POSITIVE_INFINITY;
             if (units == null) units = Units.dimensionless;
         }
-        return new DatumRange(min.doubleValue(), max.doubleValue(), units);
+        if ( UnitsUtil.isTimeLocation(units) ) {
+            TimeLocationUnits tu= (TimeLocationUnits) units;
+            if ( ! tu.isValid(min.doubleValue() ) ) min= tu.validMin();
+            if ( ! tu.isValid(max.doubleValue() ) ) max= tu.validMax();
+            return new DatumRange( min.doubleValue(), max.doubleValue(), units );
+        } else {
+            return new DatumRange(min.doubleValue(), max.doubleValue(), units);
+        }
     }
 
     private static DatumRange makeDimensionless(DatumRange dr) {
