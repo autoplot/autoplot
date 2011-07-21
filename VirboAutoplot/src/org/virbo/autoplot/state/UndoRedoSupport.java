@@ -9,6 +9,7 @@
 package org.virbo.autoplot.state;
 
 import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import org.virbo.autoplot.ApplicationModel;
@@ -56,6 +58,7 @@ public class UndoRedoSupport {
                 }
             });
             item.setToolTipText(prevState.docString);
+            item.setIcon( new ImageIcon( stateStack.get(i-1).thumb ) ); // not sure why, but...
             undoMultipleMenu.add(item);
         }
     }
@@ -65,11 +68,13 @@ public class UndoRedoSupport {
         Application state;
         String deltaDesc;
         String docString; // verbose description
+        BufferedImage thumb;
 
-        public StateStackElement(Application state, String deltaDesc, String docString ) {
+        public StateStackElement(Application state, String deltaDesc, String docString, BufferedImage thumb ) {
             this.state = state;
             this.deltaDesc = deltaDesc;
             this.docString= docString;
+            this.thumb= thumb;
         }
 
         public String toString() {
@@ -231,7 +236,10 @@ public class UndoRedoSupport {
         }
 
         int oldDepth= stateStackPos;
-        stateStack.add(stateStackPos, new StateStackElement(state, labelStr,docString));
+
+        BufferedImage thumb= applicationModel.getThumbnail(50);
+
+        stateStack.add(stateStackPos, new StateStackElement(state, labelStr,docString,thumb));
 
         while (stateStack.size() > (1 + stateStackPos)) {
             stateStack.removeLast();
