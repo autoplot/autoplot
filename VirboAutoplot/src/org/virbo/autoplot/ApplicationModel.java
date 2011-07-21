@@ -680,26 +680,56 @@ public class ApplicationModel {
 
 
     /**
+     * resizes the image to fit within w,h in several iterations
+     * @param im
+     * @param w
+     * @param h
+     * @return
+     */
+    public static BufferedImage resizeImageTo( BufferedImage im, int hf ) {
+        int h0= im.getHeight();
+        double aspect= 1. * h0 / im.getWidth();
+        int h= h0/2;
+
+        BufferedImage thumb=null;
+
+        h= hf * (int) Math.pow( 2, ( (int) Math.ceil( Math.log10( 1. * h0 / hf ) / Math.log10(2) ) ) ); // first scale up.
+
+        if ( h==h0 ) {
+            h= h0/2;
+        }
+
+        while ( h>=hf ) {
+            thumb= new BufferedImage( (int)(h/aspect), h, BufferedImage.TYPE_INT_ARGB );
+            Graphics2D g= ((Graphics2D)thumb.getGraphics());
+            g.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
+
+            AffineTransform tx = new AffineTransform();
+            double scale= 1.0 * h / h0;
+            tx.scale(scale, scale);
+            g.drawImage( im, tx, null );
+
+            if ( h==hf ) break;
+
+            h0= h;
+            h= ( hf < h0/2 ) ? h0/2 : hf;
+
+            im= thumb;
+        }
+
+        return thumb;
+
+    }
+
+
+    /**
      * return a thumbnail for the state.  TODO: multiple steps produces better result.  See http://www.philreeve.com/java_high_quality_thumbnails.php
      * @return
      */
     public BufferedImage getThumbnail( int height ) {
         BufferedImage i= (BufferedImage) getCanvas().getImage( getCanvas().getWidth(), getCanvas().getHeight() );
-        double h0= getCanvas().getHeight();
-        double aspect= 1. * h0 / getCanvas().getWidth();
         
-        BufferedImage thumb= new BufferedImage( (int)( height / aspect ), height, BufferedImage.TYPE_INT_ARGB );
-        //BufferedImageOp resizeOp = new ScalePerspectiveImageOp( i.getWidth(), i.getHeight(), 0, 0, thumb.getWidth(), thumb.getHeight(), 0, -1, -1, 0.02, false );
-        //((Graphics2D)thumb.getGraphics()).drawImage( i, resizeOp, 0, 0 );
-        Graphics2D g= ((Graphics2D)thumb.getGraphics());
-        g.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
-        //g.drawImage( i, 0, 0, (int)( height / aspect ), height, null );
-
-        AffineTransform tx = new AffineTransform();
-        double scale= 50. / h0;
-	tx.scale(scale, scale);
-	g.drawImage( i, tx, null );
-
+        BufferedImage thumb= resizeImageTo( i, height );
         return thumb;
     }
 
