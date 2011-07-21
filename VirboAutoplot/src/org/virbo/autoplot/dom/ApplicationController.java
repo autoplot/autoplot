@@ -98,6 +98,9 @@ public class ApplicationController extends DomNodeController implements RunLater
                         && "ready".equals(evt.getNewValue() ) ) {
                     fireActionEvent( new ActionEvent(this,0,"ready") );
                 }
+                if ( evt.getPropertyName().equals(ChangesSupport.PROP_VALUEADJUSTING) && evt.getNewValue()==Boolean.FALSE ) { //put in state after automatic operation
+                    fireActionEvent( new ActionEvent(this,0,"ready") );
+                }
             }
         });
 
@@ -867,24 +870,30 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return a list of the newly added plots.
      */
     public List<Plot> addPlots( int nrow, int ncol, Object dir ) {
-        List<Plot> result= new ArrayList<Plot>(nrow*ncol);
-        List<Column> cols;
-        final CanvasController ccontroller = getCanvas().getController();
-        if (ncol > 1) {
-            cols = ccontroller.addColumns(ncol);
-        } else {
-            cols = Collections.singletonList(getCanvas().getMarginColumn());
-        }
-        List<Row> rows;
-        rows = ccontroller.addRows(nrow,dir);
-        for (int i = 0; i < nrow; i++) {
-            for (int j = 0; j < ncol; j++) {
-                Plot p = addPlot(rows.get(i), cols.get(j));
-                result.add(p);
-                addPlotElement(p, null);
+        Lock lock = mutatorLock();
+        lock.lock();
+        try {
+            List<Plot> result= new ArrayList<Plot>(nrow*ncol);
+            List<Column> cols;
+            final CanvasController ccontroller = getCanvas().getController();
+            if (ncol > 1) {
+                cols = ccontroller.addColumns(ncol);
+            } else {
+                cols = Collections.singletonList(getCanvas().getMarginColumn());
             }
+            List<Row> rows;
+            rows = ccontroller.addRows(nrow,dir);
+            for (int i = 0; i < nrow; i++) {
+                for (int j = 0; j < ncol; j++) {
+                    Plot p = addPlot(rows.get(i), cols.get(j));
+                    result.add(p);
+                    addPlotElement(p, null);
+                }
+            }
+            return result;
+        } finally {
+            lock.unlock();
         }
-        return result;
     }
 
     /**
