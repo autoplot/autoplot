@@ -1161,6 +1161,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         // look for orphaned parents
         List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
         for (DataSourceFilter pdf : parents) {
+            if ( pdf==null ) continue; // bad reference
             String dsfId = pdf.getId();
             List<DomNode> usages = DomUtil.dataSourceUsages(application, dsfId);
             usages.remove(dsf);
@@ -1209,6 +1210,7 @@ public class ApplicationController extends DomNodeController implements RunLater
         // look for orphaned parents
         List<DataSourceFilter> alsoRemove = new ArrayList<DataSourceFilter>();
         for (DataSourceFilter pdf : parents) {
+            if ( pdf==null ) continue;
             String dsfId = pdf.getId();
             List<DomNode> usages = DomUtil.dataSourceUsages(application, dsfId);
             usages.remove(dsf);
