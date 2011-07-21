@@ -23,6 +23,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import org.autoplot.pngwalk.ScalePerspectiveImageOp;
@@ -679,19 +680,26 @@ public class ApplicationModel {
 
 
     /**
-     * return a thumbnail for the state
+     * return a thumbnail for the state.  TODO: multiple steps produces better result.  See http://www.philreeve.com/java_high_quality_thumbnails.php
      * @return
      */
     public BufferedImage getThumbnail( int height ) {
         BufferedImage i= (BufferedImage) getCanvas().getImage( getCanvas().getWidth(), getCanvas().getHeight() );
-        double aspect= 1. * getCanvas().getHeight() / getCanvas().getWidth();
-
+        double h0= getCanvas().getHeight();
+        double aspect= 1. * h0 / getCanvas().getWidth();
+        
         BufferedImage thumb= new BufferedImage( (int)( height / aspect ), height, BufferedImage.TYPE_INT_ARGB );
         //BufferedImageOp resizeOp = new ScalePerspectiveImageOp( i.getWidth(), i.getHeight(), 0, 0, thumb.getWidth(), thumb.getHeight(), 0, -1, -1, 0.02, false );
         //((Graphics2D)thumb.getGraphics()).drawImage( i, resizeOp, 0, 0 );
         Graphics2D g= ((Graphics2D)thumb.getGraphics());
         g.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
-        g.drawImage( i, 0, 0, (int)( height / aspect ), height, null );
+        //g.drawImage( i, 0, 0, (int)( height / aspect ), height, null );
+
+        AffineTransform tx = new AffineTransform();
+        double scale= 50. / h0;
+	tx.scale(scale, scale);
+	g.drawImage( i, tx, null );
+
         return thumb;
     }
 
