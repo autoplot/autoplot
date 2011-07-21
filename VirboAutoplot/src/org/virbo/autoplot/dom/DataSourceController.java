@@ -481,6 +481,10 @@ public class DataSourceController extends DomNodeController {
     
     DataSourceFilter[] parentSources;
 
+    /**
+     * return the parent sources of data, which may contain null if the reference is not found.
+     * @return
+     */
     protected synchronized DataSourceFilter[] getParentSources() {
         if ( parentSources==null ) {
             return new DataSourceFilter[0];
