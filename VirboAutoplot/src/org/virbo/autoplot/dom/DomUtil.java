@@ -70,6 +70,7 @@ public class DomUtil {
         }
         for (DataSourceFilter dsf : app.getDataSourceFilters()) {
             for (DataSourceFilter dsfp : dsf.getController().getParentSources()) {
+                if ( dsfp==null ) continue;
                 if (dsfp.getId().equals(id)) {
                     result.add(dsf);
                 }
