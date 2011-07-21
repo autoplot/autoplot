@@ -20,6 +20,12 @@ import org.virbo.qstream.StreamException;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.awt.image.BufferedImageOp;
+import org.autoplot.pngwalk.ScalePerspectiveImageOp;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -669,6 +675,24 @@ public class ApplicationModel {
         Application state = (Application) dom.copy();
 
         return state;
+    }
+
+
+    /**
+     * return a thumbnail for the state
+     * @return
+     */
+    public BufferedImage getThumbnail( int height ) {
+        BufferedImage i= (BufferedImage) getCanvas().getImage( getCanvas().getWidth(), getCanvas().getHeight() );
+        double aspect= 1. * getCanvas().getHeight() / getCanvas().getWidth();
+
+        BufferedImage thumb= new BufferedImage( (int)( height / aspect ), height, BufferedImage.TYPE_INT_ARGB );
+        //BufferedImageOp resizeOp = new ScalePerspectiveImageOp( i.getWidth(), i.getHeight(), 0, 0, thumb.getWidth(), thumb.getHeight(), 0, -1, -1, 0.02, false );
+        //((Graphics2D)thumb.getGraphics()).drawImage( i, resizeOp, 0, 0 );
+        Graphics2D g= ((Graphics2D)thumb.getGraphics());
+        g.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
+        g.drawImage( i, 0, 0, (int)( height / aspect ), height, null );
+        return thumb;
     }
 
     /**
