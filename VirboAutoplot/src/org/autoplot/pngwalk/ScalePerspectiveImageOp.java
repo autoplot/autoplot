@@ -18,7 +18,7 @@ import java.awt.image.ColorModel;
  *
  * @author jbf
  */
-class ScalePerspectiveImageOp implements BufferedImageOp {
+public class ScalePerspectiveImageOp implements BufferedImageOp {
 
     final int w;
     final int h;
