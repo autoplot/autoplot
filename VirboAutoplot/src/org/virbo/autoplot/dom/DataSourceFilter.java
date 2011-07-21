@@ -22,7 +22,7 @@ public class DataSourceFilter extends DomNode {
     }
 
     public void setUri(String uri) {
-        if ( uri!=null ) {
+        if ( uri!=null && !uri.equals("") ) {
             URISplit split= URISplit.parse(uri);
             uri= URISplit.format(split); // make canonical
         }
