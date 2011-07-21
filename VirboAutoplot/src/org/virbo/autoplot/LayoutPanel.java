@@ -35,6 +35,7 @@ import javax.swing.JList;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.autoplot.help.AutoplotHelpSystem;
@@ -157,14 +158,14 @@ public class LayoutPanel extends javax.swing.JPanel {
 
             public void actionPerformed(ActionEvent e) {
                 AddPlotsDialog dia= new AddPlotsDialog();
-                dia.getNumberOfColumnsTextField().setValue(1);
-                dia.getNumberOfRowsTextField().setValue(1);
+                dia.getNumberOfColumnsSpinner().setModel( new SpinnerNumberModel(1,1,5,1) );
+                dia.getNumberOfRowsSpinner().setModel( new SpinnerNumberModel(1,1,5,1) );
                 if ( JOptionPane.OK_OPTION==JOptionPane.showConfirmDialog(panelListComponent, 
                         dia, "Add Plots", JOptionPane.OK_CANCEL_OPTION,
                         JOptionPane.PLAIN_MESSAGE, 
                         new ImageIcon( AutoplotUtil.getAutoplotIcon() ) ) ) {
-                    int nr= (Integer)dia.getNumberOfRowsTextField().getValue();
-                    int nc= (Integer)dia.getNumberOfColumnsTextField().getValue();
+                    int nr= (Integer)dia.getNumberOfRowsSpinner().getValue();
+                    int nc= (Integer)dia.getNumberOfColumnsSpinner().getValue();
                     if ( nr>5 || nc>5 ) {
                         JOptionPane.showMessageDialog( LayoutPanel.this, "No more than 5 rows or columns can be added at once.");
                     } else {
