@@ -26,6 +26,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.awt.image.Kernel;
 import org.autoplot.pngwalk.ScalePerspectiveImageOp;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
@@ -721,15 +722,67 @@ public class ApplicationModel {
 
     }
 
+    /**
+     * quick and dirty method for widening lines.
+     * @param im
+     */
+    public void thickenLines( BufferedImage im ) {
+        // thicken lines
+        int bc= im.getRGB(0,0);
+        for ( int i=0; i<im.getWidth()-4; i++ ) {
+            for ( int j=0; j<im.getHeight()-4; j++ ) {
+                int c0= im.getRGB( i,j );
+                if ( c0==bc ) {
+                    int c= im.getRGB(i+1,j);
+                    if ( c!=bc ) {
+                        im.setRGB( i,j,c );
+                    }
+                    c= im.getRGB(i+2,j);
+                    if ( c!=bc ) {
+                        im.setRGB( i,j,c );
+                    }
+                    c= im.getRGB(i+3,j);
+                    if ( c!=bc ) {
+                        im.setRGB( i,j,c );
+                    }
+                    c= im.getRGB(i+4,j);
+                    if ( c!=bc ) {
+                        im.setRGB( i,j,c );
+                    }
+                    c= im.getRGB(i,j+1);
+                    if ( c!=bc ) {
+                        im.setRGB( i,j,c );
+                    }
+                    c= im.getRGB(i,j+2);
+                    if ( c!=bc ) {
+                        im.setRGB( i,j,c );
+                    }
+                    c= im.getRGB(i,j+3);
+                    if ( c!=bc ) {
+                        im.setRGB( i,j,c );
+                    }
+                    c= im.getRGB(i,j+4);
+                    if ( c!=bc ) {
+                        im.setRGB( i,j,c );
+                    }
+                }
+            }
+        }
+
+    }
 
     /**
      * return a thumbnail for the state.  TODO: multiple steps produces better result.  See http://www.philreeve.com/java_high_quality_thumbnails.php
      * @return
      */
     public BufferedImage getThumbnail( int height ) {
-        BufferedImage i= (BufferedImage) getCanvas().getImage( getCanvas().getWidth(), getCanvas().getHeight() );
-        
-        BufferedImage thumb= resizeImageTo( i, height );
+        BufferedImage im= (BufferedImage) getCanvas().getImage( getCanvas().getWidth(), getCanvas().getHeight() );
+
+        if ( im.getHeight() / height > 3 ) {
+            thickenLines(im);
+        }
+
+        BufferedImage thumb= resizeImageTo( im, height );
         return thumb;
     }
 
