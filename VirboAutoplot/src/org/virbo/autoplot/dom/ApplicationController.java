@@ -826,6 +826,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         domPlot.setAutoLabel(true);
         domPlot.setAutoBinding(true);
 
+        domPlot.getZaxis().setVisible(false);
+        
         domPlot.setRowId( domRow.getId() );
         domPlot.setColumnId( domColumn.getId() );
 
