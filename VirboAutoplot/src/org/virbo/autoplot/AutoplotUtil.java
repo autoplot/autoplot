@@ -1021,6 +1021,11 @@ public class AutoplotUtil {
         return result;
     }
 
+    /**
+     * See DataSource org.virbo.datasource.DataSourceUtil.guessRenderType, which will become the official version.
+     * @param fillds
+     * @return
+     */
     public static RenderType guessRenderType(QDataSet fillds) {
         RenderType spec;
 
