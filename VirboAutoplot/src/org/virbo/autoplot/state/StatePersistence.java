@@ -121,7 +121,9 @@ public class StatePersistence {
                 doConvert( document, "1.07", sscheme );
             } catch ( TransformerException ex ) {
                 ex.printStackTrace();
-                throw new IOException("Unable to export to version "+sscheme,ex);
+                // throw new IOException("Unable to export to version "+sscheme,ex); //TODO: JAVA1.6 will set initial cause
+                IOException result= new IOException("Unable to export to version "+sscheme + " "+ ex.getMessage() );
+                throw result;
             }
         }
 
