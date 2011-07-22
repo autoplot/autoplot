@@ -4,6 +4,7 @@
  */
 package org.virbo.cdfdatasource;
 
+import org.virbo.datasource.DataSourceUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
@@ -36,6 +37,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
     CDF cdf;
     Attribute depend_0, depend_1, depend_2;
     Attribute unitsAttr, lablAxisAttr, catdescAttr, validmaxAttr, validminAttr, fillvalAttr, scalemaxAttr, scaleminAttr;
+    Attribute formatAttr, displayTypeAttr;
 
     Map<QDataSet,String> names;
 
@@ -77,11 +79,13 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         unitsAttr= Attribute.create( cdf, "UNITS", VARIABLE_SCOPE );
         lablAxisAttr= Attribute.create( cdf, "LABLAXIS", VARIABLE_SCOPE );
         catdescAttr= Attribute.create( cdf, "CATDESC", VARIABLE_SCOPE );
+        displayTypeAttr=  Attribute.create( cdf, "DISPLAY_TYPE", VARIABLE_SCOPE );
         validmaxAttr= Attribute.create( cdf, "VALIDMAX", VARIABLE_SCOPE );
         validminAttr= Attribute.create( cdf, "VALIDMIN", VARIABLE_SCOPE );
         fillvalAttr= Attribute.create( cdf, "FILLVAL", VARIABLE_SCOPE );
         scalemaxAttr= Attribute.create( cdf, "SCALEMAX", VARIABLE_SCOPE );
         scaleminAttr= Attribute.create( cdf, "SCALEMIN", VARIABLE_SCOPE );
+        formatAttr=  Attribute.create( cdf, "FORMAT", VARIABLE_SCOPE );
 
         QDataSet dep0 = (QDataSet) data.property(QDataSet.DEPEND_0);
 
@@ -274,6 +278,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         Number fillval= (Number) ds.property( QDataSet.FILL_VALUE );
         if ( fillval!=null ) {
             var.putEntry(fillvalAttr,CDF_DOUBLE,fillval.doubleValue());
+        } else {
+            var.putEntry(fillvalAttr,CDF_DOUBLE,-1e31);
         }
         Number smax= (Number) ds.property( QDataSet.TYPICAL_MAX );
         Number smin= (Number) ds.property( QDataSet.TYPICAL_MIN );
@@ -291,6 +297,24 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                 var.putEntry(scalemaxAttr, CDF_DOUBLE, smax.doubleValue() );
             }
         }
+        String format= (String) ds.property( QDataSet.FORMAT );
+        if ( format!=null ) {
+            var.putEntry(formatAttr,CDF_CHAR,format);
+        }
+
+        String displayType= (String)ds.property( QDataSet.RENDER_TYPE );
+        if ( displayType==null ) {
+            displayType= DataSourceUtil.guessRenderType(ds);
+        }
+        if ( displayType.equals("nnSpectrogram") || displayType.equals("spectrogram") ) {
+            displayType= "spectrogram";
+        } else if ( displayType.equals("image")) {
+            displayType= "image";
+        } else if ( displayType.equals("series") || displayType.equals("scatter") || displayType.equals("hugeScatter") ) {
+            displayType= "time_series";
+        }
+        var.putEntry( displayTypeAttr,CDF_CHAR,displayType);
+
     }
 
 
