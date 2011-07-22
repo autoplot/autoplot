@@ -91,7 +91,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         if (dep0 != null) {
             String name= nameFor(dep0);
-            addVariableRankN(dep0, name,mon);
+            addVariableRankN(dep0, name, new HashMap<String,String>(),mon);
             depend_0 = Attribute.create(cdf, "DEPEND_0", VARIABLE_SCOPE);
         }
         
@@ -99,7 +99,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         if (dep1 != null) {
             String name= nameFor(dep1);
-            addVariableRank1NoVary(dep1, name, new NullProgressMonitor() );
+            addVariableRank1NoVary(dep1, name, new HashMap<String,String>(), new NullProgressMonitor() );
             depend_1 = Attribute.create(cdf, "DEPEND_1", VARIABLE_SCOPE);
         }
 
@@ -107,11 +107,11 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
         if (dep2 != null) {
             String name= nameFor(dep2);
-            addVariableRank1NoVary(dep2, name, new NullProgressMonitor() );
+            addVariableRank1NoVary(dep2, name, new HashMap<String,String>(), new NullProgressMonitor() );
             depend_2 = Attribute.create(cdf, "DEPEND_2", VARIABLE_SCOPE);
         }
 
-        Variable var= addVariableRankN(data, nameFor(data), mon );
+        Variable var= addVariableRankN(data, nameFor(data), params, mon );
         
         if ( dep0!=null ) Entry.create( depend_0, var.getID(), CDF_CHAR, nameFor(dep0) );
         if ( dep1!=null ) Entry.create( depend_1, var.getID(), CDF_CHAR, nameFor(dep1) );
@@ -121,7 +121,7 @@ public class CdfDataSourceFormat implements DataSourceFormat {
 
     }
 
-    private Variable addVariableRank1NoVary( QDataSet ds, String name, org.das2.util.monitor.ProgressMonitor mon ) throws CDFException {
+    private Variable addVariableRank1NoVary( QDataSet ds, String name, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon ) throws CDFException {
         Units units = (Units) ds.property(QDataSet.UNITS);
         long type = CDF_DOUBLE;
 
@@ -157,9 +157,22 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         return var;
     }
     
-    private Variable addVariableRankN(QDataSet ds, String name, org.das2.util.monitor.ProgressMonitor mon) throws CDFException {
+    private Variable addVariableRankN(QDataSet ds, String name, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon) throws CDFException {
         Units units = (Units) ds.property(QDataSet.UNITS);
         long type = CDF_DOUBLE;
+
+        String t= params.get("type");
+        if ( t!=null ) {
+            if ( t.equals("float") ) {
+                type= CDF_FLOAT;
+            } else if ( t.equals("int4")) {
+                type= CDF_INT4;
+            } else if ( t.equals("int2")) {
+                type= CDF_INT2;
+            } else if ( t.equals("byte")) {
+                type= CDF_BYTE;
+            }
+        }
 
         UnitsConverter uc = UnitsConverter.IDENTITY;
 
@@ -200,6 +213,8 @@ public class CdfDataSourceFormat implements DataSourceFormat {
                     dexport[i][j]= uc.convert(ds.value(i,j));
                 }
             }
+
+             System.err.println( String.format( "%s %d %d %d %d", var.toString(), 1L,  0, ds.length(0), 1L ) );
 
             var.putHyperData( 0, ds.length(), 1L, 
                     new long[] { 0 }, 
