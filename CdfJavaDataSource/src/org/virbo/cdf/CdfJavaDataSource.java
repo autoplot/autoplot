@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.UnitsConverter;
 import org.das2.datum.UnitsUtil;
 import org.das2.util.monitor.NullProgressMonitor;
@@ -211,7 +212,11 @@ public class CdfJavaDataSource extends AbstractDataSource {
             } else if ( UnitsUtil.isOrdinalMeasurement(u) || UnitsUtil.isOrdinalMeasurement(pu) ) {
                 return;
             } else {
-                uc= UnitsConverter.getConverter( pu, u );
+                try {
+                    uc= UnitsConverter.getConverter( pu, u );
+                } catch ( InconvertibleUnitsException ex ) { // PlasmaWave group Polar H7 files
+                    uc= UnitsConverter.IDENTITY;
+                }
             }
         }
 
