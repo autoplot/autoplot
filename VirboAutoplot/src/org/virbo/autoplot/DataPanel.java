@@ -84,45 +84,29 @@ public class DataPanel extends javax.swing.JPanel {
                 }
             };
             sliceIndexSpinner.addMouseWheelListener(sliceIndexListener);
-        };
+        }
+
+        if ( sliceIndexListener2==null ) {
+            sliceIndexListener2= new MouseWheelListener() {
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    doIncrUp(-1 * e.getWheelRotation());
+                }
+            };
+            componentTextField.addMouseWheelListener(sliceIndexListener2);
+        }
 
         componentTextField.getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_UP,0), "INCREMENT_UP" );
         componentTextField.getInputMap().put( KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0), "INCREMENT_DOWN" );
         ActionMap am= componentTextField.getActionMap();
         am.put( "INCREMENT_UP", new AbstractAction("incr_up") {
             public void actionPerformed(ActionEvent e) {
-                String s= componentTextField.getText();
-                int cp= componentTextField.getCaretPosition();
-                String match= ".*\\|slice\\d\\(\\d*";
-                if ( cp<s.length() ) {
-                    Matcher m= Pattern.compile(match).matcher( s.substring(0,cp));
-                    if ( m.matches() ) {
-                        s= doAdjust( s, cp, 1 );
-                    }
-                } else {
-                    return;
-                }
-                componentTextField.setText(s);
-                applicationController.getPlotElement().setComponent( componentTextField.getText() );
-                componentTextField.setCaretPosition(cp);
+                doIncrUp(1);
             }
         } );
+        
         am.put( "INCREMENT_DOWN", new AbstractAction("incr_down") {
             public void actionPerformed(ActionEvent e) {
-                String s= componentTextField.getText();
-                int cp= componentTextField.getCaretPosition();
-                String match= ".*\\|slice\\d\\(\\d*";
-                if ( cp<s.length() ) {
-                    Matcher m= Pattern.compile(match).matcher( s.substring(0,cp));
-                    if ( m.matches() ) {
-                        s= doAdjust( s, cp, -1 );
-                    }
-                } else {
-                    return;
-                }
-                componentTextField.setText(s);
-                applicationController.getPlotElement().setComponent( componentTextField.getText() );
-                componentTextField.setCaretPosition(cp);
+                doIncrUp(-1);
             }
         } );
 
@@ -130,6 +114,24 @@ public class DataPanel extends javax.swing.JPanel {
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel1, "dataPanel_1");
         AutoplotHelpSystem.getHelpSystem().registerHelpID(this.jPanel2, "dataPanel_2");
     }
+
+    private void doIncrUp( int amount ) {
+            String s= componentTextField.getText();
+            int cp= componentTextField.getCaretPosition();
+            String match= ".*\\|slice\\d\\(\\d*";
+            if ( cp<s.length() ) {
+                Matcher m= Pattern.compile(match).matcher( s.substring(0,cp));
+                if ( m.matches() ) {
+                    s= doAdjust( s, cp, amount );
+                }
+            } else {
+                return;
+            }
+            componentTextField.setText(s);
+            applicationController.getPlotElement().setComponent( componentTextField.getText() );
+            componentTextField.setCaretPosition(cp);
+    }
+
 
     public void doBindings() {
         doElementBindings();
@@ -225,6 +227,7 @@ public class DataPanel extends javax.swing.JPanel {
         };
 
     transient MouseWheelListener sliceIndexListener=null;
+    transient MouseWheelListener sliceIndexListener2=null;
 
     private void updateSliceTypeComboBox( DataSourceFilter dsf, boolean immediately ) {
 
