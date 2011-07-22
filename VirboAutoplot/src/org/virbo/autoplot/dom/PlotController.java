@@ -236,8 +236,6 @@ public class PlotController extends DomNodeController {
         //dasPlot1.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(dasPlot1) ) ;
 
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
-        colorbar.setVisible(false);
-        this.plot.getZaxis().setVisible(false);
 
         MouseModule zoomPan = new ZoomPanMouseModule(dasPlot1, dasPlot1.getXAxis(), dasPlot1.getYAxis());
         dasPlot1.getDasMouseInputAdapter().setSecondaryModule(zoomPan);
