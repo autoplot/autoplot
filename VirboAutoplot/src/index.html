@@ -7,7 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Axis annotations are finally available in Autoplot.  Right-click on the xaxis and give it a URI.
+        <p><small>Undo submenu shows thumbnails approximating each state.  I needed this for debugging, and it turned out to be an easy to implement
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -24,8 +24,15 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 	<p>Bugfixes:</p>
 
         <ul>
+            <li>bugfix 3373948: add plots undo works properly</li>
             <li>bugfixes to the rich headers parsing</li>
+            <li>performance slightly improved for time axis annotations.  (loading still done on event thread)</li>
+            <li>bugfix 3370241: extra data source filter nodes cleaned up in DOM<li>
+            <li>long legend doesn't mess up autolayout.</li>
             <li>single-jar release works after new release method.</li>
+        </ul>
+        <p>Less Recent Bugfixes:</p>
+        <ul>
             <li>bugfix file size incorrectly reported by FTP filesystem after automatic .gz support added</li>
             <li>Clean up of CDAWeb plugin</li>
             <li>Excel formatter checks for enumerations in DEPEND_1 (E.g. Bx, By, Bz)</li>
@@ -37,18 +44,15 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>completion on dom.plots[0].c&lt;COMP&gt; fixed</li>
             <li>dimensions with just labels wouldn't be reported in CDF editor.</li>
         </ul>
-        <p>Less Recent Bugfixes:</p>
-        <ul>
-            <li>Bugfixes in Das2ServerDataSource when positional parameters are used</li>
-            <li>bugfixes to improve feedback for misformatted QStreams (Chris)</li>
-            <li>bugfixes for completion on pngwalk: and script:</li>
-            <li>Allow for pngwalk:file:///home/jbf/fun/camE/2011/06/23/10$(M;Y=2011;m=06;d=23;H=10)$S.jpg, check for ";Y=" as well as "$Y"</li>
-            <li>bugfixes in AsciiTableDataSourceFormat dialog.  Keep track of the arguments in preferences.</li>
-        </ul>
         <p>Features:</p>
         <ul>
+            <li>Save as... dialog supports exporting to v1.06.  It's messy now, but it should work (as long as you aren't using 1.07 features!)</li>
             <li>Improvements to completions in scripting</li>
             <li>"lint"-type check for symbols in python scripts to ensure symbols (e.g. str) are not overwritten</li>
+
+        </ul>
+        <p>Less Recent Features:</p>
+        <ul>
             <li>Time Axis annotations allows Autoplot URIs to add additional info to X axis.</li>
             <li>Improvements to Time Series Browse when timerange is not visible</li>
             <li>slice1=n in CDF readers allow slice of rank 2 to be loaded</li>
@@ -65,14 +69,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>initialize Python immediately in background</li>
             <li>v1.07 vap includes dom.plots[0].context property, which is essentially a fourth dimension for locating this plot on another.</li>
             <li>Introduce code to experiment with forward compatibility, so v1.07 could be read into old Autoplot when patch is released.</li>
-
-        </ul>
-        <p>Less Recent Features:</p>
-        <ul>
-            <li>Add hook to launch scripts like "script:http://autoplot.org/script/ReplaceFile.jy"</li>
-            <li>"script:&lt;url&gt;" and "pngwalk:&lt;url&gt;" logged to history and can be searched for and retrieved in history GUI</li>
-            <li>jython scripting gets dumpToQStream to replace dumpToDas2Stream.</li>
-            <li>improve formatting in tree view of dataset to support enumerated data and formatted data, using getStringValue.</li>
         </ul>
 
 <p>Known issues:</p>
