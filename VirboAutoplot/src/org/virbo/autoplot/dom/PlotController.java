@@ -23,6 +23,7 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
+import org.das2.event.AnnotatorMouseModule;
 import org.das2.event.BoxZoomMouseModule;
 import org.das2.event.MouseModule;
 import org.das2.event.ZoomPanMouseModule;
@@ -232,10 +233,11 @@ public class PlotController extends DomNodeController {
         BoxZoomMouseModule boxmm = (BoxZoomMouseModule) dasPlot1.getDasMouseInputAdapter().getModuleByLabel("Box Zoom");
         dasPlot1.getDasMouseInputAdapter().setPrimaryModule(boxmm);
 
-        //plotId.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(plotId) ) ;
+        //dasPlot1.getDasMouseInputAdapter().addMouseModule( new AnnotatorMouseModule(dasPlot1) ) ;
 
         dasCanvas.add(colorbar, dasPlot1.getRow(), DasColorBar.getColorBarColumn(dasPlot1.getColumn()));
         colorbar.setVisible(false);
+        this.plot.getZaxis().setVisible(false);
 
         MouseModule zoomPan = new ZoomPanMouseModule(dasPlot1, dasPlot1.getXAxis(), dasPlot1.getYAxis());
         dasPlot1.getDasMouseInputAdapter().setSecondaryModule(zoomPan);
