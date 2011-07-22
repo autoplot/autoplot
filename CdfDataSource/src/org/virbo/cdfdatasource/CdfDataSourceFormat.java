@@ -4,6 +4,7 @@
  */
 package org.virbo.cdfdatasource;
 
+import java.lang.reflect.Array;
 import org.virbo.datasource.DataSourceUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsConverter;
@@ -156,7 +157,107 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         copyMetadata(units, var, ds);
         return var;
     }
-    
+
+    private Object doIt1( QDataSet ds, UnitsConverter uc, long type ) {
+        Object export;
+        QubeDataSetIterator iter = new QubeDataSetIterator(ds);
+        if ( type==CDF_DOUBLE ) {
+            double[] dexport= new double[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                dexport[i++] = uc.convert(iter.getValue(ds));
+            }
+            export= dexport;
+        } else if ( type==CDF_FLOAT ) {
+            float[] fexport= new float[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                fexport[i++] = (float)uc.convert(iter.getValue(ds));
+            }
+            export= fexport;
+
+        } else if ( type==CDF_BYTE ) {
+            byte[] bexport= new byte[ ds.length() ];
+            int i = 0;
+            while (iter.hasNext()) {
+                iter.next();
+                bexport[i++] = (byte)uc.convert(iter.getValue(ds));
+            }
+            export= bexport;
+
+        } else {
+            throw new IllegalArgumentException("not supported: "+type);
+        }
+        return export;
+
+    }
+
+    /**
+     * cdf library needs array in double or triple arrays.  
+     * 
+     * @param ds
+     * @param uc UnitsConverter in case we need to handle times.
+     * @param type
+     * @return
+     */
+    private Object dataSetToArray( QDataSet ds, UnitsConverter uc, long type, ProgressMonitor mon ){
+        Object oexport;
+
+        if ( ds.rank()==1 ) {
+            return doIt1( ds, uc, type );
+        } else if ( ds.rank()==2 ) {
+
+            if ( type==CDF_DOUBLE ) {
+                oexport= new double[ds.length()][];
+            } else if ( type==CDF_FLOAT ) {
+                oexport= new float[ds.length()][];
+            } else if ( type==CDF_BYTE ) {
+                oexport= new byte[ds.length()][];
+            } else {
+                throw new IllegalArgumentException("type not supported"+type);
+            }
+            for ( int i=0; i<ds.length(); i++ ) {
+                Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+            }
+            return oexport;
+        } else if ( ds.rank()==3 ) {
+
+            if ( type==CDF_DOUBLE ) {
+                oexport= new double[ds.length()][][];
+            } else if ( type==CDF_FLOAT ) {
+                oexport= new float[ds.length()][][];
+            } else if ( type==CDF_BYTE ) {
+                oexport= new byte[ds.length()][][];
+            } else {
+                throw new IllegalArgumentException("type not supported"+type);
+            }
+            for ( int i=0; i<ds.length(); i++ ) {
+                Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+            }
+            return oexport;
+        } else if ( ds.rank()==4 ) {
+
+            if ( type==CDF_DOUBLE ) {
+                oexport= new double[ds.length()][][][];
+            } else if ( type==CDF_FLOAT ) {
+                oexport= new float[ds.length()][][][];
+            } else if ( type==CDF_BYTE ) {
+                oexport= new byte[ds.length()][][][];
+            } else {
+                throw new IllegalArgumentException("type not supported"+type);
+            }
+            for ( int i=0; i<ds.length(); i++ ) {
+                Array.set( oexport, i, dataSetToArray( ds.slice(i), uc, type, mon ) );
+            }
+            return oexport;
+        } else {
+            throw new IllegalArgumentException("rank 0 not supported");
+        }
+        
+    }
+
     private Variable addVariableRankN(QDataSet ds, String name, Map<String,String> params, org.das2.util.monitor.ProgressMonitor mon) throws CDFException {
         Units units = (Units) ds.property(QDataSet.UNITS);
         long type = CDF_DOUBLE;
@@ -165,12 +266,16 @@ public class CdfDataSourceFormat implements DataSourceFormat {
         if ( t!=null ) {
             if ( t.equals("float") ) {
                 type= CDF_FLOAT;
-            } else if ( t.equals("int4")) {
-                type= CDF_INT4;
-            } else if ( t.equals("int2")) {
-                type= CDF_INT2;
             } else if ( t.equals("byte")) {
                 type= CDF_BYTE;
+            } else if ( t.equals("double")) {
+                type= CDF_DOUBLE;
+            }
+        } else {
+            if ( ds.rank()<3 ) {
+                type= CDF_DOUBLE;
+            } else {
+                type= CDF_FLOAT;
             }
         }
 
@@ -188,64 +293,70 @@ public class CdfDataSourceFormat implements DataSourceFormat {
             var = Variable.create(cdf, name, type,
                 1L, 0L, new long[]{1}, VARY, new long[]{NOVARY});
 
-            double[] dexport = new double[ds.length()];
+            Object oexport= dataSetToArray( ds, uc, type, mon );
 
-            QubeDataSetIterator iter = new QubeDataSetIterator(ds);
-            int i = 0;
-            while (iter.hasNext()) {
-                iter.next();
-                dexport[i++] = uc.convert(iter.getValue(ds));
-            }
             var.putHyperData(0, ds.length(), 1L, 
                     new long[0], 
                     new long[0], 
                     new long[0], 
-                    dexport );
+                    oexport );
+            
         } else if ( ds.rank()==2 ) {
             var = Variable.create(cdf, name, type,
                 1L, 1L, new long[]{ds.length(0)}, VARY, new long[]{VARY});
 
-            double[][] dexport = new double[ds.length()][];
-
-            for ( int i=0; i<ds.length(); i++ ) {
-                dexport[i]= new double[ds.length(i)];
-                for ( int j=0; j<ds.length(i); j++ ) {
-                    dexport[i][j]= uc.convert(ds.value(i,j));
-                }
-            }
-
-             System.err.println( String.format( "%s %d %d %d %d", var.toString(), 1L,  0, ds.length(0), 1L ) );
+            Object oexport= dataSetToArray( ds, uc, type, mon );
 
             var.putHyperData( 0, ds.length(), 1L, 
                     new long[] { 0 }, 
                     new long[] { ds.length(0) },
                     new long[] { 1 }, 
-                    dexport );
+                    oexport );
             
         } else if ( ds.rank()==3 ) {
-            type = CDF_FLOAT;
+
             var = Variable.create(cdf, name, type,
                 1L, 2L, new long[]{ds.length(0),ds.length(0,0)}, VARY, new long[]{VARY,VARY});
 
-            float[][][] dexport = new float[1][ds.length(0)][ds.length(0,0)];
-
             mon.setTaskSize(ds.length());
+            mon.started();
 
             for ( int i=0; i<ds.length(); i++ ) {
-                for ( int j=0; j<ds.length(0); j++ ) {
-                    for ( int k=0; k<ds.length(i,j); k++ ) {
-                        dexport[0][j][k]= (float)uc.convert(ds.value(i,j,k));
-                    }
-                }
+
+                Object oexport= dataSetToArray( ds.slice(i), uc, type, mon );
+
                 var.putHyperData( i, 1L, 1L,
                     new long[] { 0,0 },
                     new long[] { ds.length(0), ds.length(0,0) },
                     new long[] { 1, 1 },
-                    dexport );
+                    oexport );
                 mon.setTaskProgress(i);
 
             }
             mon.finished();
+
+        } else if ( ds.rank()==4 ) {
+
+            var = Variable.create(cdf, name, type,
+                1L, 3L, new long[]{ds.length(0),ds.length(0,0),ds.length(0,0,0)}, VARY, new long[]{VARY,VARY,VARY});
+
+            mon.setTaskSize(ds.length());
+            mon.started();
+
+            for ( int i=0; i<ds.length(); i++ ) {
+
+                Object oexport= dataSetToArray( ds.slice(i), uc, type, mon );
+
+                var.putHyperData( i, 1L, 1L,
+                    new long[] { 0,0,0 },
+                    new long[] { ds.length(0), ds.length(0,0), ds.length(0,0,0) },
+                    new long[] { 1,1,1 },
+                    oexport );
+                mon.setTaskProgress(i);
+
+            }
+            mon.finished();
+
 
 
         } else {
