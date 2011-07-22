@@ -34,6 +34,10 @@ import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.TimeParser;
+import org.das2.datum.UnitsUtil;
+import org.virbo.dataset.QDataSet;
+import org.virbo.dataset.SemanticOps;
+import org.virbo.dsops.Ops;
 
 /**
  *
@@ -526,6 +530,84 @@ public class DataSourceUtil {
             }
             return result;
         }
+    }
+
+    /**
+     * See VirboAutoplot org.virbo.autoplot.AutoplotUtil.guessRenderType.
+     * @param fillds
+     * @return
+     */
+    public static String guessRenderType(QDataSet fillds) {
+        String spec;
+
+        String specPref= "spectrogram";
+
+        String srenderType= (String) fillds.property(QDataSet.RENDER_TYPE);
+        if ( srenderType!=null ) {
+            return srenderType;
+        }
+
+        QDataSet dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1);
+        QDataSet plane0 = (QDataSet) fillds.property(QDataSet.PLANE_0);
+        QDataSet bundle1= (QDataSet) fillds.property(QDataSet.BUNDLE_1);
+
+        if ( fillds.property( QDataSet.JOIN_0 )!=null ) {
+            if ( fillds.length()==0 ) {
+                return "series";
+            }
+            dep1 = (QDataSet) fillds.property(QDataSet.DEPEND_1,0);
+            plane0 = (QDataSet) fillds.property(QDataSet.PLANE_0,0);
+            bundle1= (QDataSet) fillds.property(QDataSet.BUNDLE_1,0);
+        }
+
+        if (fillds.rank() >= 2) {
+            if ( bundle1!=null || (dep1 != null && SemanticOps.isBundle(fillds) || Ops.isLegacyBundle(fillds) ) ) {
+                if (fillds.length() > 80000) {
+                    spec = "hugeScatter";
+                } else {
+                    spec = "series";
+                }
+                if ( bundle1!=null ) {
+                    if ( bundle1.length()==3 && bundle1.property(QDataSet.DEPEND_0,2)!=null ) { // bad kludge
+                        spec= "colorScatter";
+                    } else if ( bundle1.length()==3 || bundle1.length()==4 ) {
+                        Units u0= (Units) bundle1.property(QDataSet.UNITS,0);
+                        if ( u0==null ) u0= Units.dimensionless;
+                        Units u1= (Units) bundle1.property(QDataSet.UNITS,1);
+                        if ( u1==null ) u1= Units.dimensionless;
+                        Units u3= (Units) bundle1.property(QDataSet.UNITS,bundle1.length()-1);
+                        if ( u3!=null && UnitsUtil.isOrdinalMeasurement(u3) && u0.getOffsetUnits().isConvertableTo(u1) ) {
+                            spec= "eventsBar";
+                        }
+                    }
+                }
+            } else {
+                if ( dep1==null && fillds.rank()==2 && fillds.length()>3 && fillds.length(0)<4 ) { // Vector quantities without labels. [3x3] is a left a matrix.
+                    spec = "series";
+                } else {
+                    spec = specPref;
+                }
+            }
+        } else if ( fillds.rank()==0 || fillds.rank()==1 && SemanticOps.isBundle(fillds) ) {
+            spec= "digital";
+
+        } else {
+            if (fillds.length() > 80000) {
+                spec = "hugeScatter";
+            } else {
+                spec = "series";
+            }
+
+            if (plane0 != null) {
+                Units u = (Units) plane0.property(QDataSet.UNITS);
+                if (u==null) u= Units.dimensionless;
+                if (u != null && (UnitsUtil.isRatioMeasurement(u) || UnitsUtil.isIntervalMeasurement(u))) {
+                    spec = "colorScatter";
+                }
+            }
+        }
+
+        return spec;
     }
 
     public static void main(String[] args ) {
