@@ -617,7 +617,7 @@ public class PlotElementController extends DomNodeController {
         if ( newRenderType==RenderType.pitchAngleDistribution ) return true;
         if ( oldRenderType==RenderType.spectrogram && newRenderType==RenderType.nnSpectrogram ) {
             return false;
-        } else if ( newRenderType==RenderType.nnSpectrogram && oldRenderType==RenderType.spectrogram ) {
+        } else if ( oldRenderType==RenderType.nnSpectrogram && newRenderType==RenderType.spectrogram ) {
             return false;
         } else if ( newRenderType==RenderType.spectrogram || newRenderType==RenderType.nnSpectrogram ) {
             return true;
