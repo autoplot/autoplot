@@ -210,7 +210,7 @@ public class UndoRedoSupport {
                 labelStr = "unidentified change";
                 docString= "change was detected but could not be identified.";
                 return;
-            } else if (count > 6) {
+            } else if (count > 3) {
                 if ( label!=null ) {
                    labelStr = label;
                 } else {
