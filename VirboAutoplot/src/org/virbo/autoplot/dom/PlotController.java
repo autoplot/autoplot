@@ -4,7 +4,6 @@
  */
 package org.virbo.autoplot.dom;
 
-import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -13,17 +12,13 @@ import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractAction;
-import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
 import org.das2.datum.InconvertibleUnitsException;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
-import org.das2.event.AnnotatorMouseModule;
 import org.das2.event.BoxZoomMouseModule;
 import org.das2.event.MouseModule;
 import org.das2.event.ZoomPanMouseModule;
@@ -39,7 +34,6 @@ import org.das2.graph.SpectrogramRenderer;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
-import org.virbo.autoplot.TcaElementDialog;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -166,6 +160,7 @@ public class PlotController extends DomNodeController {
             if ( evt.getPropertyName().equals(Plot.PROP_TICKS_URI) ) {
                 if ( ((String)evt.getNewValue()).length()>0 ) {
                     String dasAddress= "class:org.autoplot.tca.UriTcaSource:" + evt.getNewValue();
+                    //TODO: check for time series browse here and set to time axis.
                     plot.getXaxis().getController().getDasAxis().setDataPath(dasAddress);
                     plot.getXaxis().getController().getDasAxis().setDrawTca(true);
                     plot.getXaxis().setLabel("%{RANGE}");
