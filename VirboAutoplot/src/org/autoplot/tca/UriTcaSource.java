@@ -44,6 +44,7 @@ public class UriTcaSource extends AbstractQFunction {
     QDataSet errorNoDs;
     QDataSet nonValueDs;
     QDataSet nonMonoDs;
+    QDataSet initialError;
 
     static final Logger logger= Logger.getLogger( "virbo.autoplot.uritcasource" );
 
@@ -52,14 +53,24 @@ public class UriTcaSource extends AbstractQFunction {
         if ( uri.startsWith("class:org.autoplot.tca.UriTcaSource:") ) {
             throw new IllegalArgumentException("pass a URI to this, not class:org.autoplot.tca.UriTcaSource");
         }
-        DataSource dss1= DataSetURI.getDataSource(uri);
-        this.tsb= dss1.getCapability( TimeSeriesBrowse.class );
-        this.dss= dss1;
+
         EnumerationUnits eu= new EnumerationUnits("UriTcaSource");
         error= DataSetUtil.asDataSet( eu.createDatum("Error") );
         errorNoDs= DataSetUtil.asDataSet( eu.createDatum("No Data") );
         nonValueDs= DataSetUtil.asDataSet( eu.createDatum(" ") );
         nonMonoDs= DataSetUtil.asDataSet( eu.createDatum("Non Mono") );
+
+        DataSource dss1;
+        try {
+            dss1= DataSetURI.getDataSource(uri);
+            initialError= null;
+            this.tsb= dss1.getCapability( TimeSeriesBrowse.class );
+            this.dss= dss1;
+        } catch ( Exception ex ) {
+            ex.printStackTrace();
+            initialError= DataSetUtil.asDataSet( eu.createDatum(ex.toString()) );
+        }
+        
     }
 
     private void doRead( ) throws Exception {
@@ -103,6 +114,13 @@ public class UriTcaSource extends AbstractQFunction {
 
 
     public QDataSet value(QDataSet parm) {
+
+        if ( initialError!=null ) {
+            if ( ds==null ) {
+                return new JoinDataSet( error );
+            }
+        }
+
         Datum d= DataSetUtil.asDatum( parm.slice(0) );
         QDataSet context= (QDataSet) parm.property( QDataSet.CONTEXT_0, 0 ); // should be a bins dimension
         QDataSet deltaMinus= (QDataSet)parm.property(QDataSet.DELTA_MINUS,0);
@@ -198,7 +216,12 @@ public class UriTcaSource extends AbstractQFunction {
         Datum t0;
         Units tu;
         String label;
-        if ( this.tsb!=null ) {
+
+        if ( initialError!=null ) {
+            label= "???";
+            tu= Units.us2000;
+            t0= tu.createDatum(0);
+        } else if ( this.tsb!=null ) {
             t0= this.tsb.getTimeRange().min();
             tu= t0.getUnits();
             label= "Time";
