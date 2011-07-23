@@ -68,6 +68,17 @@ public class StatePersistence {
     private StatePersistence() {
     }
 
+    public static void saveState( File f, Object state ) throws IOException {
+        saveState( f, state, "" );
+    }
+
+    /**
+     * Save the Object (DOM application) to a file.
+     * @param f the file target where the state is saved
+     * @param state the Object to be saved, in Autoplot's case it's the DOM.
+     * @param sscheme empty string or the name of a scheme to target, such as "1.06"
+     * @throws IOException
+     */
     public static void saveState( File f, Object state, String sscheme ) throws IOException {
         /* XMLEncoder e = new XMLEncoder( new BufferedOutputStream( new FileOutputStream(f) ) );
         
