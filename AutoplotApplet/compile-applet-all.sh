@@ -25,7 +25,7 @@ for i in \
   BinaryDataSource DataSourcePack TsdsDataSource  \
   VirboAutoplot \
   AutoplotApplet; do
-    cp -r ../${i}/src/* temp-src/
+    rsync -a ../${i}/src/ temp-src/
 done
 echo "done copy sources"
 
@@ -35,6 +35,7 @@ jar xvf ../../APLibs/lib/commons/commons-vfs-1.0.jar  # experiment with support 
 jar xvf ../../APLibs/lib/json-2011-01-27-gitrelease.jar
 #jar xvf ../../APLibs/lib/swing-layout-1.0.3.jar
 
+echo "Remove codes that are not used by the applet and cause problems, such as AutoplotUI.java and *EditorPanel.java"
 cd ../temp-src
 # set traps for things that ought not to be needed by the applet.
 rm org/virbo/autoplot/AutoplotUI.java
@@ -43,6 +44,7 @@ rm org/virbo/datasource/DataSetSelector.java
 rm org/virbo/datasource/DataSetSelector.form
 rm org/virbo/autoplot/scriptconsole/*
 find . -name '*EditorPanel.java' -exec rm {} \;
+rm org/virbo/autoplot/TcaElementDialog.java
 #rm -rf org/das2/stream/*
 rm -rf org/das2/dasml/*
 
