@@ -31,6 +31,21 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>long legend doesn't mess up autolayout.</li>
             <li>single-jar release works after new release method.</li>
             <li>export data panel makes export component insensitive if there was no process applied</li>
+            <li>bugfixes from the production branch</li>
+        </ul>
+        <p>Older bugfixes:</p>
+        <ul>
+            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3302430&group_id=199733&atid=970682">3302430</a>: python script editor should insert example scripts.</li>
+            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3302901&group_id=199733&atid=970682">3302901</a>: extraneous "vap:" qualifier confusing</li>
+            <li>bugfix: "Plot" action in file cache plots remote URL, not the file cache URL.</li>
+            <li>pngwalk default thumbnail size is 100 pixels across, was 200 pixels.</li>
+            <li>bugfix: check for cancel press when replacing script with example.</li>
+            <li>bugfix: remove tooltip on Edit that was misplaced</li>
+            <li>bugfix: raise the Autoplot window when "View in Autoplot" is pressed on pngwalk window.</li>
+            <li>bugfix: autoranging corrected when digital render mode is used.</li>
+            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3053620&group_id=199733&atid=970685">3053620</a>: remove extra flashes when just one plot is visible.</li>
+            <li>"monitor" should be available in any python context.  completions would fail if monitor was used.</li>
+            <li>print an error message for specs like "$Y$m$d_$H$m" (2 m's) in make pngwalk.  This was confusing.</li>
         </ul>
         <p>Less Recent Bugfixes:</p>
         <ul>
@@ -54,7 +69,7 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>add plots above in layout tab</li>
             <li>mouse wheel works above data tab's operations text field.</li>
             <li>"lint"-type check for symbols in python scripts to ensure symbols (e.g. str) are not overwritten</li>
-
+            <li>features from the production branch
         </ul>
         <p>Less Recent Features:</p>
         <ul>
@@ -101,8 +116,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <li>Wav audio files (.wav></li>
 	</ul>
 	<p>This is not complete, and limitations include:</p>
-	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
-	<li>Quantities of rank 4 dimensionality (e.g. flux(Time,Energy,azimuth,sector) are plotted by slicing twice.</li>
+        <ul>
+            <li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
+            <li>Quantities of rank 4 dimensionality (e.g. flux(Time,Energy,azimuth,sector) are plotted by slicing twice.</li>
+        </ul>
          
          <p><a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
          more information than this launch page.</p>
