@@ -1271,16 +1271,21 @@ public class ApplicationController extends DomNodeController implements RunLater
             for ( int i=application.getPlotElements().length-1; i>0; i-- ) {
                 deletePlotElement( application.getPlotElements(i) ); //may delete dsf and plots as well.
             }
-
-            String dsfId= application.getDataSourceFilters(0).getId();
-            application.getPlotElements(0).setDataSourceFilterId(dsfId);
+            
+            application.getDataSourceFilters(0).setId( "data_0" );//TODO: this should also reset the listening plotElement
+            application.getPlotElements(0).setDataSourceFilterId("data_0");
+            
             if ( p0!=application.getPlots(0) ) {
                 movePlotElement(application.getPlotElements(0),p0,application.getPlots(0));
             }
+            application.getPlots(0).setId("plot_0");//TODO: this should also reset the listening plotElement
+            application.getPlotElements(0).setPlotId("plot_0");
 
             for ( int i=application.getDataSourceFilters().length-1; i>0; i-- ) {
                 deleteDataSourceFilter( application.getDataSourceFilters(i) );
             }
+
+            application.getPlotElements(0).setId("plotElement_0");
 
             application.getPlots(0).getXaxis().setLog(false); // TODO kludge
             application.getPlots(0).getYaxis().setLog(false); // TODO kludge

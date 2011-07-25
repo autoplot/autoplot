@@ -54,7 +54,7 @@ public class ApplicationControllerSyncSupport {
             }
             controller.addPlotElement(p, dsf);
         }
-        while (application.plotElements.size() > elements.length) {
+        while (application.plotElements.size() > elements.length && elements.length>0 ) { // application cannot have zero plots.  Test elements.length, otherwise code would hang here.
             controller.deletePlotElement(application.plotElements.get(application.plotElements.size() - 1));
         }
         for (int i = 0; i < elements.length; i++) {
