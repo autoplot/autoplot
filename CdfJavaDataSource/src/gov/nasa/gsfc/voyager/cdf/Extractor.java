@@ -8,7 +8,8 @@ public class Extractor {
     static int MAX_ARRAY = 3;
     static String[] functions = new String[] {"Series" , "Element",
            "Point" , "Range" , "Elements", "RangeForElements",
-           "RangeForElement", "TimeSeries", "SampledTimeSeries"};
+           "RangeForElement", "TimeSeries", "SampledTimeSeries",
+           "TimeSeriesObject"};
     static Method[][][] methods =
         new Method[functions.length][MAX_ARRAY + 1][2];
     static Class[][][] args = new Class[functions.length][MAX_ARRAY + 1][];
@@ -17,6 +18,8 @@ public class Extractor {
             Class variableClass =
                 Class.forName("gov.nasa.gsfc.voyager.cdf.Variable");
             Class cdfClass = Class.forName("gov.nasa.gsfc.voyager.cdf.CDF");
+            Class timeSpecClass = Class.forName(
+                "gov.nasa.gsfc.voyager.cdf.TimeSpec");
             int[] ia = new int[0];
             double[] da = new double[0];
             args[0][0] = new Class[] {cdfClass, variableClass};
@@ -57,6 +60,11 @@ public class Extractor {
             args[8][1] = new Class[] {cdfClass, variableClass, Integer.class,
                          Boolean.class, da.getClass(), ia.getClass()};
             args[8][2] = null;
+            args[9][0] = new Class[] {cdfClass, variableClass, Boolean.class,
+                         da.getClass(), timeSpecClass};
+            args[9][1] = new Class[] {cdfClass, variableClass, Integer.class,
+                         Boolean.class, da.getClass(), timeSpecClass};
+            args[9][2] = null;
 
         } catch (ClassNotFoundException ex) {
         }
@@ -125,12 +133,20 @@ public class Extractor {
         return null;
     }
 
-    public static double [] getSeries0(CDF thisCDF, Variable var) throws 
+    public static Object getSeries0(CDF thisCDF, Variable var) throws 
         IllegalAccessException, InvocationTargetException {
         int numberOfValues = var.getNumberOfValues();
         if (numberOfValues == 0) return null;
-        double [] data = new double[numberOfValues];
         int type = var.getType();
+        long[] ldata = null;
+        double[] data = null;
+        boolean longType = false;
+        if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+            ldata = new long[numberOfValues];
+            longType = true;
+        } else {
+            data = new double[numberOfValues];
+        }
         Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
         for (int blk = 0; blk < locations.size(); blk++) {
             int [] loc = (int [])locations.elementAt(blk);
@@ -167,14 +183,28 @@ public class Extractor {
                     int x = num.intValue();
                     data[n] = (x >= 0)?(double)x:(double)(longInt + x);
                 }
+                break;
+            case 5:
+                LongBuffer bvl = bv.asLongBuffer();
+                for (int n = first; n <= last; n++) {
+                    ldata[n] = bvl.get();
+                }
+                break;
             }
 
         }
         if (!var.recordVariance()) {
-            for (int i = 1; i < numberOfValues; i++) {
-                data[i] = data[0];
+            if (!longType) {
+                for (int i = 1; i < numberOfValues; i++) {
+                    data[i] = data[0];
+                }
+            } else {
+                for (int i = 1; i < numberOfValues; i++) {
+                    ldata[i] = ldata[0];
+                }
             }
         }
+        if (longType) return ldata;
         return data;
     }
 
@@ -187,6 +217,24 @@ public class Extractor {
         throws Throwable {
         return getTimeSeries(thisCDF, var, which, ignoreFill, timeRange);
     }
+    static double[] castToDouble(Object o, boolean longType) {
+        double[] vdata;
+        if (!longType) {
+            vdata = (double[])o;
+        } else {
+            long[] ldata = (long[])o;
+            vdata = new double[ldata.length];
+            for (int i = 0; i < ldata.length; i++) {
+                vdata[i] = (double)ldata[i];
+            }
+        }
+        return vdata;
+    }
+    /**
+     * Loss of precision may occur if type of var is LONG
+     * times obtained are millisecond since 1970 regardless of the
+     * precision of time variable corresponding to variable var
+     */
     public static double [][] getTimeSeries(CDF thisCDF, Variable var,
         Integer which, Boolean ignoreFill, double[] timeRange) throws Throwable
         {
@@ -197,21 +245,28 @@ public class Extractor {
         double [] times = ((CDFImpl)thisCDF).getTimes(var, false);
         if (times == null) return null;
         double[] stimes;
+        boolean longType = false;
+        int type = var.getType();
+        if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+            longType = true;
+        }
+        Object o = null;
         if (timeRange == null) {
-            vdata = (which == null)?getSeries0(thisCDF, var):
-                                    getElement1(thisCDF, var, which);
+            o = (which == null)?getSeries0(thisCDF, var):
+                                getElement1(thisCDF, var, which);
         } else {
             recordRange = getRecordRange(thisCDF, var, timeRange); 
             if (recordRange == null) return null;
             if (which == null) {
-                vdata = getRange0(thisCDF, var, new Integer(recordRange[0]),
+                o = getRange0(thisCDF, var, new Integer(recordRange[0]),
                                   new Integer(recordRange[1]));
             } else {
-                vdata = getRangeForElement1(thisCDF, var,
+                o = getRangeForElement1(thisCDF, var,
                     new Integer(recordRange[0]), new Integer(recordRange[1]),
                     which);
             }
         }
+        vdata = castToDouble(o, longType);
         if (!ignore) {
             if (timeRange == null) return new double [][] {times, vdata};
             stimes = new double[vdata.length];
@@ -458,17 +513,25 @@ public class Extractor {
         return index;
     }
 
-    public static double [] getElement1(CDF thisCDF, Variable var, Integer idx) 
+    public static Object getElement1(CDF thisCDF, Variable var, Integer idx) 
         throws Throwable {
         int element = idx.intValue();
         int nv = var.getNumberOfValues();
         if (nv == 0) return null;
         if (!var.recordVariance()) nv = 1;
         if (!validElement(var, new int[] {element})) return null;
-        double [] data = new double[nv];
         int size = var.getDataItemSize();
 
         int type = var.getType();
+        long[] ldata = null;
+        double[] data = null;
+        boolean longType = false;
+        if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+            ldata = new long[nv];
+            longType = true;
+        } else {
+            data = new double[nv];
+        }
         int loff = element*DataTypes.size[type];
         Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
         for (int blk = 0; blk < locations.size(); blk++) {
@@ -498,9 +561,18 @@ public class Extractor {
             case 3:
                 doUnsignedInteger(bv, pos, type, size, first, last, data);
                 break;
+            case 5:
+                for (int n = first; n <= last; n++) {
+                    ldata[n] = bv.getLong(pos);
+                    pos += size;
+                }
+                break;
+            default:
+                throw new Throwable(var.getName() + " has unsupported type " +
+                "in this context.");
             }
-
         }
+        if (longType) return ldata;
         return data;
     }
 
@@ -809,14 +881,22 @@ public class Extractor {
         return null;
     }
 
-    public static double [] getRange0(CDF thisCDF, Variable var, Integer istart,
+    public static Object getRange0(CDF thisCDF, Variable var, Integer istart,
         Integer iend) throws Throwable {
         int start = istart.intValue();
         int end = iend.intValue();
         int numberOfValues = var.getNumberOfValues();
         int itemSize = var.getDataItemSize();
-        double [] data = new double[end - start + 1];
         int type = var.getType();
+        long[] ldata = null;
+        double[] data = null;
+        boolean longType = false;
+        if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+            ldata = new long[end - start + 1];
+            longType = true;
+        } else {
+            data = new double[end - start + 1];
+        }
         Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
         int [] blks =  
             getBlockRange(locations, var.recordVariance(), start, end);
@@ -858,13 +938,26 @@ public class Extractor {
                     int x = num.intValue();
                     data[index++] = (x >= 0)?(double)x:(double)(longInt + x);
                 }
+            case 5:
+                LongBuffer bvl = bv.asLongBuffer();
+                for (int n = first; n <= last; n++) {
+                    ldata[index++] = bvl.get();
+                }
+                break;
             }
         }
         if (!var.recordVariance()) {
-            for (int i = start; i <= end; i++) {
-                data[i - start] = data[0];
+            if (!longType) {
+                for (int i = start; i <= end; i++) {
+                    data[i] = data[0];
+                }
+            } else {
+                for (int i = start; i <= end; i++) {
+                    ldata[i] = ldata[0];
+                }
             }
         }
+        if (longType) return ldata;
         return data;
     }
 
@@ -948,7 +1041,7 @@ public class Extractor {
         return true;
     }
 
-    public static double [] getRangeForElement1(CDF thisCDF, Variable var,
+    public static Object getRangeForElement1(CDF thisCDF, Variable var,
         Integer istart, Integer iend, Integer ielement) throws Throwable {
         int element = ielement.intValue();
         if (!validElement(var, new int[] {element})) return null;
@@ -957,7 +1050,15 @@ public class Extractor {
         int numberOfValues = var.getNumberOfValues();
         int size = var.getDataItemSize();
         int type = var.getType();
-        double [] data = new double[end - start + 1];
+        long[] ldata = null;
+        double[] data = null;
+        boolean longType = false;
+        if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+            ldata = new long[end - start + 1];
+            longType = true;
+        } else {
+            data = new double[end - start + 1];
+        }
         int loff = element*DataTypes.size[type];
         Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
         int [] blks =  
@@ -993,13 +1094,26 @@ public class Extractor {
                 index = doUnsignedInteger(bv, pos, type, size, first, last,
                      data, index);
                 break;
+            case 5:
+                for (int n = first; n <= last; n++) {
+                    ldata[index++] = bv.getLong(pos);
+                    pos += size;
+                }
+                break;
             }
         }
         if (!var.recordVariance()) {
-            for (int i = start; i <= end; i++) {
-                data[i - start] = data[0];
+            if (!longType) {
+                for (int i = start; i <= end; i++) {
+                    data[i - start] = data[0];
+                }
+            } else {
+                for (int i = start; i <= end; i++) {
+                    ldata[i - start] = ldata[0];
+                }
             }
         }
+        if (longType) return ldata;
         return data;
     }
 
@@ -1009,7 +1123,7 @@ public class Extractor {
      * returns null if any of the specified elements is not valid.
      * throws UnsupportedFeatureException
      */
-    public static double [][] getRangeForElements1(CDF thisCDF, Variable var,
+    public static Object getRangeForElements1(CDF thisCDF, Variable var,
         Integer istart, Integer iend, int[] idx) throws Throwable {
         if (!validElement(var, idx)) return null;
         int start = istart.intValue();
@@ -1017,9 +1131,17 @@ public class Extractor {
         int numberOfValues = var.getNumberOfValues();
         int size = var.getDataItemSize();
         int ne = idx.length;
-        double [][] data = new double[end - start + 1][ne];
 
         int type = var.getType();
+        long[][] ldata = null;
+        double[][] data = null;
+        boolean longType = false;
+        if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+            ldata = new long[end - start + 1][ne];
+            longType = true;
+        } else {
+            data = new double[end - start + 1][ne];
+        }
         int[] loff = new int[ne];
         for (int i = 0; i < ne; i++) {
             loff[i] = idx[i]*DataTypes.size[type];
@@ -1066,15 +1188,33 @@ public class Extractor {
                 index = doUnsignedInteger(bv, pos, type, size, first, last,
                     loff,  data, index);
                 break;
+            case 5:
+                for (int n = first; n <= last; n++) {
+                    for (int e = 0; e < ne; e++) {
+                        ldata[index][e] = bv.getLong(pos + loff[e]);
+                    }
+                    pos += size;
+                    index++;
+                }
+                break;
             }
         }
         if (!var.recordVariance()) {
-            for (int i = start; i <= end; i++) {
-                for (int e = 0; e < ne; e++) {
-                    data[i - start][e] = data[0][e];
+            if (!longType) {
+                for (int i = start; i <= end; i++) {
+                    for (int e = 0; e < ne; e++) {
+                        data[i - start][e] = data[0][e];
+                    }
+                }
+            } else {
+                for (int i = start; i <= end; i++) {
+                    for (int e = 0; e < ne; e++) {
+                        ldata[i - start][e] = ldata[0][e];
+                    }
                 }
             }
         }
+        if (longType) return ldata;
         return data;
     }
 
@@ -1225,7 +1365,12 @@ public class Extractor {
         }
         return new Object[] {bv, new Integer(first), new Integer(last)};
     }
-    public static double [][][][] getSeries3(CDF thisCDF, Variable var) {
+    public static double [][][][] getSeries3(CDF thisCDF, Variable var) 
+        throws Throwable {
+        int type = var.getType();
+        int cat = DataTypes.typeCategory[type];
+        if (cat > 1) throw new Throwable("Type category " + cat +
+        " not supported in this context");
         int nv = var.getNumberOfValues();
         if (nv == 0) return null;
         if (!var.recordVariance()) nv = 1;
@@ -1233,7 +1378,6 @@ public class Extractor {
         int n1 = (((Integer)elementCount(var).elementAt(1))).intValue();
         int n2 = (((Integer)elementCount(var).elementAt(2))).intValue();
         double [][][][] data = new double[nv][n0][n1][n2];
-        int type = var.getType();
         Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
         for (int blk = 0; blk < locations.size(); blk++) {
             int [] loc = (int [])locations.elementAt(blk);
@@ -1415,7 +1559,12 @@ public class Extractor {
 
     public static double [] get1DSeries(CDF thisCDF, Variable var, int[] pt)
         throws IllegalAccessException, InvocationTargetException {
-        double [] data;
+        return (double[])get1DSeries(thisCDF, var, pt, false);
+    }
+
+    public static Object get1DSeries(CDF thisCDF, Variable var, int[] pt,
+        boolean preserve) throws IllegalAccessException,
+        InvocationTargetException {
         int end = -1;
         int begin = 0;
         int nv = 0;
@@ -1433,13 +1582,23 @@ public class Extractor {
             if (nv == 0) return null;
         }
         if (!var.recordVariance()) nv = 1;
+        long[] ldata = null;
+        double[] data = null;
+        boolean longType = false;
         int type = var.getType();
         int itemSize = var.getDataItemSize();
         int elements = itemSize/DataTypes.size[type];
-        data = new double[nv*elements];
+        if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+            if (preserve) ldata = new long[nv*elements];
+            if (!preserve) data = new double[nv*elements];
+            longType = true;
+        } else {
+            data = new double[nv*elements];
+        }
 
-        float[] tf = null;
-        if (DataTypes.typeCategory[type] == 0) tf = new float[nv*elements];
+        Object temp = null;
+        if (DataTypes.typeCategory[type] == 0) temp = new float[nv*elements];
+        if (longType && !preserve) temp = new long[nv*elements];
 
         Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
         ByteBuffer bv;
@@ -1461,111 +1620,48 @@ public class Extractor {
                 bv.position(pos);
             }
             if (end < 0) { // single point needed
-                do1D(bv, type, tf, data, 0, elements);
+                if (longType && preserve) {
+                    do1D(bv, type, temp, ldata, 0, elements, preserve);
+                } else {
+                    do1D(bv, type, temp, data, 0, elements);
+                }
                 offset += elements;
             } else {
                 int term = (end <= last)?end:last;
                 int init = (begin > first)?begin:first;
                 count = (term - init + 1);
-                do1D(bv, type, tf, data, offset, count*elements);
+                if (longType && preserve) {
+                    do1D(bv, type, temp, ldata, offset, count*elements,
+                    preserve);
+                } else {
+                    do1D(bv, type, temp, data, offset, count*elements);
+                }
                 offset += count*elements;
             }
             if (end <= last) break;
         }
         if (offset == 0) return null;
+        if (longType && preserve) return ldata;
         return data;
     }
 
-    public static ByteBuffer get1DSeriesNio(CDF thisCDF, Variable var, int[] pt)
-        throws IllegalAccessException, InvocationTargetException {
-
-        System.err.println("using java nio-based extractor");
-
-        int end = -1;
-        int begin = 0;
-        int nv = 0;
-        if (pt != null) {
-            if (var.recordVariance()) {
-                begin = pt[0];
-                nv = 1;
-                if (pt.length > 1) {
-                    end = pt[1];
-                    nv = end - begin + 1;
-                }
-            }
-        } else {
-            nv = var.getNumberOfValues();
-            if (nv == 0) return null;
-        }
-        if (!var.recordVariance()) nv = 1;
-        int type = var.getType();
-        int itemSize = var.getDataItemSize();
-        int elements = itemSize/DataTypes.size[type];
-
-        float[] tf = null;
-        if (DataTypes.typeCategory[type] == 0) tf = new float[nv*elements];
-
-        Vector locations = ((CDFImpl.DataLocator)var.getLocator()).locations;
-
-        if ( locations.size()==0 ) throw new RuntimeException("no locations");
-        ByteBuffer bv= null;
-        int blk = 0;
-        int offset = 0;
-        if (pt == null) {
-            begin = ((int [])locations.elementAt(0))[0];
-            end = ((int [])locations.elementAt(locations.size() - 1))[1];
-        }
-        for (; blk < locations.size(); blk++) {
-            int [] loc = (int [])locations.elementAt(blk);
-            int first = loc[0];
-            int last = loc[1];
-            if (last < begin) continue;  // what's this?
-            int count = (last - first + 1);
-            bv = positionBuffer((CDFImpl)thisCDF, var, loc[2], count);
-            if (begin > first) {
-                int pos = bv.position() + (begin - first)*itemSize;
-                bv.position(pos);
-            }
-            if (end < 0) { // single point needed
-                offset += elements;
-            } else {
-                int term = (end <= last)?end:last;
-                int init = (begin > first)?begin:first;
-                count = (term - init + 1);
-                offset += count*elements;
-            }
-            if (end <= last) break;
-        }
-        if (offset == 0) return null;
-        System.err.println("returning writable buffer, don't write on me!");
-
-        ByteOrder bo= bv.order();
-        System.err.println("order before slicing: " + bv.order());
-        bv= bv.slice();
-        bv.order(bo);
-        System.err.println("order after slicing: " + bv.order());
-
-
-        return bv.slice();
-    }
-
-    /**
-     * unpacks the byte buffer into doubles for data access.
-     * @param bv
-     * @param type
-     * @param tf
-     * @param data
-     * @param offset
-     * @param number
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     */
-    static void do1D(ByteBuffer bv, int type, float[] tf, double[] data,
+    static void do1D(ByteBuffer bv, int type, Object temp, Object result,
        int offset, int number) throws IllegalAccessException,
        InvocationTargetException {
+       do1D(bv, type, temp, result, offset, number, false);
+    }
+
+    static void do1D(ByteBuffer bv, int type, Object temp, Object result,
+       int offset, int number, boolean preserve) throws IllegalAccessException,
+       InvocationTargetException {
         Method method;
+        double[] data = null;
+        if (DataTypes.typeCategory[type] != DataTypes.LONG) {
+            data = (double[])result;
+        }
         switch (DataTypes.typeCategory[type]) {
         case 0:
+            float[] tf = (float[])temp;
             FloatBuffer bvf = bv.asFloatBuffer();
             bvf.get(tf, 0, number);
             for (int n = 0; n < number; n++) {
@@ -1592,6 +1688,19 @@ public class Extractor {
                 data[offset + e] = (x >= 0)?(double)x:(double)(longInt + x);
             }
             break;
+        case 5:
+            LongBuffer bvl = bv.asLongBuffer();
+            if (!preserve) {
+                long[] tl = (long[])temp;
+                data = (double[])result;
+                bvl.get(tl, offset, number);
+                for (int n = 0; n < number; n++) {
+                    data[offset + n] = (double)tl[n];
+                }
+                break;
+            }
+            long[] ldata = (long[])result;
+            bvl.get(ldata, offset, number);
         }
     }
     public static double [] get1DSeries(CDF thisCDF, Variable var, int[] pt,
@@ -1619,7 +1728,7 @@ public class Extractor {
         int _stride = strideObject.getStride(nv);
         if (_stride > 1) {
             nv = (nv/_stride);
-            if ((nv % _stride) != 0) nv++; // explain
+            if ((nv % _stride) != 0) nv++;
         }
         int type = var.getType();
         int itemSize = var.getDataItemSize();
@@ -1675,14 +1784,10 @@ public class Extractor {
                     do1D(bv, type, tf, data, offset, count*elements);
                 } else {
                     count = (term - init)/_stride;
-                    if ( term < init ) {
-                        throw new IllegalStateException("something went wrong, term<init");
-                    }
                     if (count*_stride < (term - init)) count++;
                     if (DataTypes.typeCategory[type] == 0) {
                         tf = new float[count*elements];
                     }
-                    //System.err.printf("do1D(bv,type,data,offset=%d,...  loc[2]=%d\noffset is never>0 for bad case.", offset, loc[2]);
                     // need to position to first desired element
                     do1D(bv, type, tf, data, offset, count,
                         elements, _stride);
@@ -1718,30 +1823,6 @@ public class Extractor {
                 offset += elements;
             }
             break;
-        case 2:
-            method = DataTypes.method[type];
-            for (int e = 0; e < count; e++) {
-                Number num = (Number)method.invoke(bv, new Object[] {});
-                data[offset + e] = num.doubleValue();
-                for ( int ii=1; ii<_stride;ii++ ) {
-                    Number x= (Number)method.invoke(bv, new Object[] {});
-                }
-            }
-            break;
-        case 3:
-            method = DataTypes.method[type];
-            long longInt = DataTypes.longInt[type];
-            for (int e = 0; e < count; e++) {
-                Number num = (Number)method.invoke(bv, new Object[] {});
-                int x = num.intValue();
-                data[offset + e] = (x >= 0)?(double)x:(double)(longInt + x);
-                for ( int ii=1; ii<_stride;ii++ ) {
-                    Number xx= (Number)method.invoke(bv, new Object[] {});
-                }
-            }
-            break;
-        default:
-            throw new RuntimeException("case not handled");
         }
     }
     public static double [][] getSampledTimeSeries0(CDF thisCDF, Variable var,
@@ -2207,5 +2288,84 @@ public class Extractor {
         }
         return index;
     }
+    /**
+     * Loss of precision may occur if type of var is LONG
+     * times obtained are millisecond since 1970 regardless of the
+     * precision of time variable corresponding to variable var
+     */
+    public static class GeneralTimeSeries implements TimeSeries {
+        double [] vdata;
+        double [] times;
+        TimeSpec tspec;
+        public GeneralTimeSeries(CDF thisCDF, Variable var, Integer which,
+            Boolean ignoreFill, double[] timeRange, TimeSpec ts) throws
+            Throwable {
+            boolean ignore = ignoreFill.booleanValue();
+            int [] recordRange = null;
+            synchronized (ts) {
+                tspec = (ts == null)?null:(TimeSpec)ts.clone();
+            }
+            times = ((CDFImpl)thisCDF).getTimes(var, tspec, false);
+            if (times == null) throw new Throwable("times not available for " +
+                var.getName());
+            double[] stimes;
+            boolean longType = false;
+            int type = var.getType();
+            if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+                longType = true;
+            }
+            Object o = null;
+            if (timeRange == null) {
+                o = (which == null)?getSeries0(thisCDF, var):
+                    getElement1(thisCDF, var, which);
+            } else {
+                recordRange = getRecordRange(thisCDF, var, timeRange); 
+                if (recordRange == null) throw new Throwable("no record range");
+                if (which == null) {
+                    o = getRange0(thisCDF, var, new Integer(recordRange[0]),
+                                  new Integer(recordRange[1]));
+                } else {
+                    o = getRangeForElement1(thisCDF, var,
+                    new Integer(recordRange[0]), new Integer(recordRange[1]),
+                    which);
+                }
+            }
+            vdata = castToDouble(o, longType);
+            if (!ignore) {
+                if (timeRange != null) {
+                    stimes = new double[vdata.length];
+                    System.arraycopy(times, recordRange[0], stimes, 0,
+                    vdata.length);
+                    times = stimes;
+                }
+            } else {
+                // fill values need to be filtered
+                double [] fill = getFillValue(thisCDF, var);
+                int first = (timeRange != null)?recordRange[0]:0;
+                if (fill[0] != 0) { // there is no fill value
+                    stimes = new double[vdata.length];
+                    System.arraycopy(times, first, stimes, 0, vdata.length);
+                    times = stimes;
+                } else {
+                    filterFill(times, vdata, fill[1], first);
+                }
+            }
+        }
+        public double[] getTimes() {return times;}
+        public double[] getValues() {return vdata;}
+        public TimeSpec getTimeSpec() {return tspec;}
+    }
 
+    public static TimeSeries getTimeSeriesObject0(CDF thisCDF, Variable var,
+        Boolean ignoreFill, double[] timeRange, TimeSpec ts) throws Throwable {
+        return new GeneralTimeSeries(thisCDF, var, null, ignoreFill, timeRange,
+           ts);
+    }
+
+    public static TimeSeries getTimeSeriesObject1(CDF thisCDF, Variable var,
+        Integer which, Boolean ignoreFill, double[] timeRange, TimeSpec ts)
+        throws Throwable {
+        return new GeneralTimeSeries(thisCDF, var, which, ignoreFill, timeRange,
+           ts);
+    }
 }

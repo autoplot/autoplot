@@ -47,6 +47,7 @@ public class CDF3Impl extends CDFImpl implements CDF3, java.io.Serializable {
         int numberOfRDims = buf.getInt();
         numberOfZVariables = buf.getInt();
         buf.getInt(); // skip UIRhead
+        buf.getInt(); // skip UIRhead
         rDimSizes = new int[numberOfRDims];
         if (numberOfRDims > 0) { // skip next 3 integer fields
             buf.getInt();

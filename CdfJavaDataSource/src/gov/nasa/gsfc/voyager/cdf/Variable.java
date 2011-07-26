@@ -63,6 +63,7 @@ public interface Variable {
      * attribute for the variable is used for this purpose.
      */
     public double[] getPadValue();
+    public Object getPadValue(boolean preservePrecision);
 
     /**
      * Gets the dimensions.

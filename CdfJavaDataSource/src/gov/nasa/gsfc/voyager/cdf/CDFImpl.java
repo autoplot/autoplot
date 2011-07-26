@@ -6,7 +6,9 @@ import java.lang.reflect.*;
 import java.util.zip.*;
 public abstract class CDFImpl implements java.io.Serializable {
     static final double JANUARY_1_1970;
+    static final double JANUARY_1_1970_TT;
     static final double JANUARY_1_1970_SECONDS;
+    
     static {
         int offset = 0;
         for (int year=0; year < 1970; year++) {
@@ -22,7 +24,33 @@ public abstract class CDFImpl implements java.io.Serializable {
         }
         JANUARY_1_1970 = offset*8.64e7;
         JANUARY_1_1970_SECONDS = offset*8.64e4;
+        offset = 0;
+        for (int year=1999; year >= 1970; year--) {
+            int days = 365;
+            if ((year%4 == 0)) {
+                days++;
+                if ((year%100 == 0)) {
+                    days--;
+                    if ((year%400 == 0)) days++;
+                }
+            }
+            offset -= days;
+        }
+        JANUARY_1_1970_TT = (offset - 0.5)*8.64e7;
     }
+    static final long JANUARY_1_1970_LONG = (long)JANUARY_1_1970;
+    /* If we assume that no data earlier than 1970 for TT, then
+       we can use epoch for UTC 1/1/1970 as base.
+       modification required to accomplish this is: 946727958816 msec
+       From spice 1970-01-01T00:00:00 UTC -> TDB (-946727958.816064)
+       The 41.184 difference from Date.UTC(100, 0, 1, 12, 0, 0) would imply
+       a 9sec value for TAI-UTC. The formula at
+       http://maia.usno.navy.mil/ser7/tai-utc.dat yields a value of 8 for
+       mjd 41317. naif appears to give the value of 9sec for both 1970 and
+       1971.
+    */
+    static final long TT2000_DATE = JANUARY_1_1970_LONG +
+        Date.UTC(100, 0, 1, 12, 0, 0) - 41184;
     /**
      * CDF constants
      */
@@ -371,7 +399,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         int nelement;
         String attribute;
         String stringValue;
-        double [] value;
+        Object value;
         public AttributeEntry(ByteBuffer buf, String name) {
             attribute = name;
             _buf = buf.duplicate();
@@ -394,6 +422,9 @@ public abstract class CDFImpl implements java.io.Serializable {
                 value = getNumberAttribute(type, nelement, _buf, byteOrder);
             }
         }
+        public boolean isLongType() {
+            return (DataTypes.typeCategory[type] == DataTypes.LONG);
+        }
     }
 
     /**
@@ -411,7 +442,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         protected int numberOfValues;
         public int [] dimensions;
         public boolean [] varies;
-        public double[] padValue;
+        public Object padValue;
         int offset;
         transient ByteBuffer _buf;
         int dataItemSize;
@@ -451,8 +482,6 @@ public abstract class CDFImpl implements java.io.Serializable {
             // PadValue immediately follows DimVarys
             if (padValueSpecified()) {
                 int padValueSize = getDataItemSize()/dataItemSize;
-                padValue = new double[padValueSize];
-                if (type == DataTypes.EPOCH16) padValue = new double[2];
                 padValue = getNumberAttribute(type, padValueSize, _buf,
                     byteOrder);
             }
@@ -516,8 +545,22 @@ public abstract class CDFImpl implements java.io.Serializable {
          * returns pad value
          */
         public double[] getPadValue() {
-            double [] da = new double[padValue.length];
-            System.arraycopy(padValue, 0, da, 0, padValue.length);
+            return (double[])getPadValue(false);
+        }
+
+        public Object getPadValue(boolean preservePrecision) {
+            if (padValue == null) return null;
+            if (padValue.getClass().getComponentType() == Long.TYPE) {
+                if (preservePrecision) {
+                    long [] ltemp = (long[]) padValue;
+                    long [] la = new long[ltemp.length];
+                    System.arraycopy(ltemp, 0, la, 0, ltemp.length);
+                    return la;
+                }
+            }
+            double [] dtemp = (double[]) padValue;
+            double [] da = new double[dtemp.length];
+            System.arraycopy(dtemp, 0, da, 0, dtemp.length);
             return da;
         }
 
@@ -832,22 +875,38 @@ public abstract class CDFImpl implements java.io.Serializable {
     }
 
     public double[] get1D(String varName) throws Throwable {
+        return (double[]) get1D(varName, false);
+    }
+
+    public Object get1D(String varName, boolean preserve) throws Throwable {
         Variable var = (Variable)variableTable.get(varName);
         if (var == null) throw new Throwable("No such variable " + varName);
-        return Extractor.get1DSeries(thisCDF, var, null);
+        return Extractor.get1DSeries(thisCDF, var, null, preserve);
     }
 
     public double[] get1D(String varName, int point) throws Throwable {
+        return (double[]) get1D(varName, point, false);
+    }
+
+    public Object get1D(String varName, int point, boolean preserve) throws
+        Throwable {
         Variable var = (Variable)variableTable.get(varName);
         if (var == null) throw new Throwable("No such variable " + varName);
-        return Extractor.get1DSeries(thisCDF, var, new int[] {point});
+        return Extractor.get1DSeries(thisCDF, var, new int[] {point},
+               preserve);
     }
 
     public double[] get1D(String varName, int first, int last) throws
         Throwable {
+        return (double[]) get1D(varName, first, last, false);
+    }
+
+    public Object get1D(String varName, int first, int last, boolean preserve)
+        throws Throwable {
         Variable var = (Variable)variableTable.get(varName);
         if (var == null) throw new Throwable("No such variable " + varName);
-        return Extractor.get1DSeries(thisCDF, var, new int[] {first, last});
+        return Extractor.get1DSeries(thisCDF, var, new int[] {first, last},
+               preserve);
     }
 
     public Object getTimeSeries(String varName) throws Throwable {
@@ -879,6 +938,17 @@ public abstract class CDFImpl implements java.io.Serializable {
             {thisCDF, var, new Boolean(ignoreFill), timeRange});
     }
 
+    public TimeSeries getTimeSeriesObject(String varName, boolean ignoreFill,
+        double[] timeRange, TimeSpec ts) throws Throwable {
+        Variable var = (Variable)variableTable.get(varName);
+        if (var == null) throw new Throwable("No such variable " + varName);
+        Method method = Extractor.getMethod(var, "TimeSeriesObject");
+        if (method == null) throw new Throwable("getTimeSeriesObject not " +
+           "implemented for " + varName);
+        return (TimeSeries)method.invoke(null, new Object [] 
+            {thisCDF, var, new Boolean(ignoreFill), timeRange, ts});
+    }
+
     public Object getTimeSeries(String vname, boolean ignoreFill,
         double startTime, double stopTime) throws Throwable {
         return getTimeSeries(vname, ignoreFill,
@@ -904,6 +974,19 @@ public abstract class CDFImpl implements java.io.Serializable {
             {thisCDF, var, new Integer(element), new Boolean(ignoreFill),
             timeRange});
     }
+
+    public TimeSeries getTimeSeriesObject(String varName, int element,
+        boolean ignoreFill, double[] timeRange, TimeSpec ts) throws Throwable {
+        Variable var = (Variable)variableTable.get(varName);
+        if (var == null) throw new Throwable("No such variable " + varName);
+        Method method = Extractor.getMethod(var, "TimeSeriesObject");
+        if (method == null) throw new Throwable("getTimeSeriesObject not " +
+           "implemented for " + varName);
+        return (TimeSeries)method.invoke(null, new Object [] 
+            {thisCDF, var, new Integer(element), new Boolean(ignoreFill),
+            timeRange, ts});
+    }
+
     public Object getTimeSeries(String vname, int element, boolean ignoreFill,
         double startTime, double stopTime) throws Throwable {
         return getTimeSeries(vname, element, ignoreFill,
@@ -945,23 +1028,35 @@ public abstract class CDFImpl implements java.io.Serializable {
         }
         return new String(ba, 0, i);
     }
-    public static double[] getNumberAttribute(int type, int nelement,
+    public static Object getNumberAttribute(int type, int nelement,
         ByteBuffer vbuf, ByteOrder byteOrder) {
-        double [] value = new double[nelement];        
         ByteBuffer vbufLocal = vbuf.duplicate();
         vbufLocal.order(byteOrder);
-     
+        int ne = nelement;
+        if (type == DataTypes.EPOCH16) ne = 2*nelement;
+        long[] lvalue = null;
+        double[] value = null;
         long longInt = DataTypes.longInt[type];
+        boolean longType = false;
         try {
             if ((type > 20) || (type < 10)) {
-                for (int i = 0; i < nelement; i++) {
-                    Number num = (Number)DataTypes.method[type].invoke(vbufLocal,
+                if (DataTypes.typeCategory[type] == DataTypes.LONG) {
+                    lvalue = new long[ne];
+                    longType = true;
+                } else {
+                    value = new double[ne];
+                }
+                for (int i = 0; i < ne; i++) {
+                    Number num =
+                        (Number)DataTypes.method[type].invoke(vbufLocal,
                         new Object [] {});
-                    value[i] = num.doubleValue();
+                    if (!longType) value[i] = num.doubleValue();
+                    if (longType) lvalue[i] = num.longValue();
                 }
             } else {
                 for (int i = 0; i < nelement; i++) {
-                    Number num = (Number)DataTypes.method[type].invoke(vbufLocal,
+                    Number num =
+                        (Number)DataTypes.method[type].invoke(vbufLocal,
                         new Object [] {});
                     int n = num.intValue();
                     value[i] = (n >= 0)?(double)n:(double)(longInt + n);
@@ -970,6 +1065,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         } catch(Exception ex) {
             return null;
         }
+        if (longType) return lvalue;
         return value;
     }
 
@@ -992,6 +1088,11 @@ public abstract class CDFImpl implements java.io.Serializable {
                     precision = PICOSECOND_PRECISION;
                 }
             }
+            if (tvar.getType() == DataTypes.CDF_TIME_TT2000) {
+                if (tvar.getNumberOfValues() > 0) {
+                    precision = NANOSECOND_PRECISION;
+                }
+            }
             if (precision < 0) {
                 precision = MILLISECOND_PRECISION;
                 if (tvar.getNumberOfValues() == 0) { //themis like
@@ -1003,7 +1104,7 @@ public abstract class CDFImpl implements java.io.Serializable {
         }
         TimeVariable tvar = (TimeVariable)timeVariableMap.get(tname);
         if (tvar == null) {
-            tvar = new CDFTimeVariable(tname, precision);
+            tvar = new CDFTimeVariableX(tname, precision);
             timeVariableMap.put(tname, tvar);
         }
         return tvar;
@@ -1017,6 +1118,13 @@ public abstract class CDFImpl implements java.io.Serializable {
         String vname = var.getName();
         if (!copy) return ((CDFTimeVariable)getCDFTimeVariable(vname)).times;
         return getCDFTimeVariable(vname).getTimes();
+    }
+
+    protected double [] getTimes(Variable var, TimeSpec ts, boolean copy)
+        throws Throwable {
+        String vname = var.getName();
+        TimeVariable tvar = getCDFTimeVariable(vname);
+        return tvar.getTimes(ts);
     }
 
     public double [] getTimes(String vname, int[] recordRange) throws
@@ -1049,21 +1157,32 @@ public abstract class CDFImpl implements java.io.Serializable {
         return getTimes(vname, new int[] {firstRecord, lastRecord});
     }
 
+    public double [] getAvailableTimeRange(String vname, TimeSpec ts) throws
+        Throwable {
+        CDFTimeVariableX tv = (CDFTimeVariableX)getCDFTimeVariable(vname);
+        double[] times = tv.getTimes(ts);
+        return new double[] {times[0], times[times.length - 1]};
+    }
+
     public double [] getAvailableTimeRange(String vname) throws Throwable {
-        CDFTimeVariable tv = (CDFTimeVariable)getCDFTimeVariable(vname);
-        int last = tv.times.length - 1;
-        return new double[] {tv.times[0], tv.times[last]};
+        CDFTimeVariableX tv = (CDFTimeVariableX)getCDFTimeVariable(vname);
+        double[] times = tv.getTimes();
+        return new double[] {times[0], times[times.length - 1]};
     }
 
     public static int MILLISECOND_PRECISION = 0;
     public static int MICROSECOND_PRECISION = 1;
-    public static int PICOSECOND_PRECISION = 2;
-    public class CDFTimeVariable implements TimeVariable, Serializable {
+    public static int NANOSECOND_PRECISION = 2;
+    public static int PICOSECOND_PRECISION = 3;
+    //public class CDFTimeVariable implements TimeVariable, Serializable {
+    public class CDFTimeVariable implements  Serializable {
         protected double[] times;
         protected double[] savedTimes;
         double[][] epoch16;
         int precision;
         String name;
+        public CDFTimeVariable() {
+        }
         public CDFTimeVariable(String tname, int precision) throws Throwable {
             name = tname;
             this.precision = precision;
@@ -1091,6 +1210,9 @@ public abstract class CDFImpl implements java.io.Serializable {
                     times[i] = 1000*(times[i] - JANUARY_1_1970_SECONDS) +
                                (pico[i]/1.0e9);
                 }
+            }
+            if (precision == NANOSECOND_PRECISION) {
+                times = UTC(tname);
             }
         }
 
@@ -1152,21 +1274,43 @@ public abstract class CDFImpl implements java.io.Serializable {
             if (rr == null) return null;
             return getTimes(rr);
         }
+
+        public double[] getTimes(TimeSpec tspec) throws Throwable {
+            if (isValid(tspec)) {
+                // compute appropriate times here
+                return getTimes();
+            } else {
+                throw new Throwable("Inconsistent unit spec");
+            }
+        }
+
+        public boolean isValid(TimeSpec tspec) {
+            return true;
+        }
     }
+
     public int[] getRecordRange(String vname, double[] timeRange) throws
         Throwable {
-        return getCDFTimeVariable(vname).getRecordRange(timeRange);
+        return getRecordRange(vname, timeRange, null);
     }
+
+    public int[] getRecordRange(String vname, double[] timeRange,
+        TimeSpec tspec) throws Throwable {
+        return getCDFTimeVariable(vname).getRecordRange(timeRange, tspec);
+    }
+
     public int[] getRecordRange(String vname, double startTime,
         double stopTime) throws Throwable {
         return getRecordRange(vname, new double[] {startTime, stopTime});
     }
+
     public int[] getRecordRange(String vname, Date startDate,
         Date stopDate) throws Throwable {
         long l1 = startDate.getTime();
         long l2 = stopDate.getTime();
         return getRecordRange(vname, new double[] {(double)l1, (double)l2});
     }
+
     void setByteOrder(ByteOrder bo) {
         bigEndian = bo.equals(ByteOrder.BIG_ENDIAN);
     }
@@ -1207,5 +1351,237 @@ public abstract class CDFImpl implements java.io.Serializable {
         if (var == null) throw new Throwable("No such variable " + varName);
         return Extractor.get1DSeries(thisCDF, var, new int[] {first, last},
             stride);
+    }
+
+    public double[] UTC(String varName) throws Throwable {
+        Variable var = (Variable)variableTable.get(varName);
+        if (var == null) throw new Throwable(varName + " not found");
+        int numberOfValues = var.getNumberOfValues();
+        if (numberOfValues == 0) return null;
+        double [] data = new double[numberOfValues];
+        int type = var.getType();
+        Vector locations = ((DataLocator)var.getLocator()).locations;
+        for (int blk = 0; blk < locations.size(); blk++) {
+            int [] loc = (int [])locations.elementAt(blk);
+            int first = loc[0];
+            int last = loc[1];
+            ByteBuffer bv = Extractor.positionBuffer(this, var, loc[2],
+                (last - first + 1));
+            LongBuffer bvl = bv.asLongBuffer();
+            for (int n = first; n <= last; n++) {
+                data[n] = (double)(bvl.get()/1000000) - JANUARY_1_1970_TT;
+            }
+        }
+        return data;
+    }
+
+    public TimeSpec getDefaultTimeSpec() {
+        return new DefaultTimeSpecImpl();
+    }
+
+    public class DefaultTimeSpecImpl implements TimeSpec {
+        double baseTime = JANUARY_1_1970;
+        int baseTimeUnits = MILLISECOND_PRECISION;
+        int offsetUnits = MILLISECOND_PRECISION;
+        public double getBaseTime() {return baseTime;}
+        public int getBaseTimeUnits() {return baseTimeUnits;}
+        public int getOffsetUnits() {return offsetUnits;}
+        public Object clone() {
+            try {
+                return super.clone();
+            } catch (java.lang.CloneNotSupportedException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+       }
+    }
+    public class CDFTimeVariableX extends CDFTimeVariable implements
+        TimeVariable, Serializable {
+        protected double[] times;
+        protected double[] pico;
+        protected long[] nano;
+        long offset;
+        double firstTime;
+        int recordCount;
+        public CDFTimeVariableX(String tname, int precision) throws Throwable {
+            name = tname;
+            this.precision = precision;
+            if (precision == MILLISECOND_PRECISION) {
+                times = (double[])get(tname);
+                firstTime = times[0];
+                recordCount = times.length;
+            }
+            if (precision == MICROSECOND_PRECISION) {
+                times = (double[])get(tname);
+                firstTime =
+                    (double)((long)(1000*times[0]) + JANUARY_1_1970_LONG);
+                recordCount = times.length;
+            }
+            if (precision == PICOSECOND_PRECISION) {
+                times = (double [])get(tname, 0);
+                pico = (double [])get(tname, 1);
+                firstTime = (double)((long)(1e3*times[0] + (pico[0]/1e9)));
+                recordCount = times.length;
+            }
+            if (precision == NANOSECOND_PRECISION) {
+                nano = (long[])get(tname);
+                firstTime = (double)((nano[0]/1000000) + TT2000_DATE);
+                recordCount = nano.length;
+            }
+        }
+        public double [] getTimes(int first, int last, TimeSpec ts) {
+            int offsetUnits = MILLISECOND_PRECISION;
+            long base = JANUARY_1_1970_LONG;
+            if (ts != null) {
+                base = (long)ts.getBaseTime();
+                offsetUnits = ts.getOffsetUnits();
+            }
+            double [] da = new double[last - first + 1];
+            if (precision == MILLISECOND_PRECISION) { // CDF_EPOCH
+                for (int i = first; i <= last; i++) {
+                    da[i - first] = times[i] - (double)base;
+                }
+            }
+            if (precision == MICROSECOND_PRECISION) { // unix time
+                if (offsetUnits == MILLISECOND_PRECISION) {
+                    if (base == JANUARY_1_1970_LONG) {
+                        for (int i = first; i <= last; i++) {
+                            da[i - first] = times[i]*1.0e3;
+                        }
+                    } else {
+                        offset = base - JANUARY_1_1970_LONG;
+                        for (int i = first; i <= last; i++) {
+                            long milli = ((long)times[i])*1000 - offset;
+                            da[i - first] = (double)(milli);
+                        }
+                    }
+                } else { // it must be micro second
+                    if (base == JANUARY_1_1970) {
+                        for (int i = first; i <= last; i++) {
+                            da[i - first] = times[i]*1.0e6;
+                        }
+                    } else {
+                        offset = 1000*(base - JANUARY_1_1970_LONG);
+                        for (int i = first; i <= last; i++) {
+                            long micro = ((long)times[i])*1000000 - offset;
+                            da[i - first] = (double)(micro);
+                        }
+                    }
+                }
+            }
+            if (precision == NANOSECOND_PRECISION) {
+                if (offsetUnits == MILLISECOND_PRECISION) {
+                    offset = base - TT2000_DATE;
+                    for (int i = first; i <= last; i++) {
+                        long milli = (nano[i]/1000000) - offset;
+                        double rem = ((double)(nano[i] % 1000000))/1.0e6;
+                        da[i - first] = (double)(milli) + rem;
+                    }
+                } else { 
+                    if (offsetUnits == MICROSECOND_PRECISION) {
+                        offset = 1000*(base - TT2000_DATE);
+                        for (int i = first; i <= last; i++) {
+                            long micro = (nano[i]/1000) - offset;
+                            double rem = ((double)(nano[i] % 1000))/1.0e3;
+                            da[i - first] = (double)(micro) + rem;
+                        }
+                    } else {
+                        offset = 1000000*(base - TT2000_DATE);
+                        for (int i = first; i <= last; i++) {
+                            da[i - first] = (double)(nano[i] - offset);
+                        }
+                    }
+                }
+            }
+            double d;
+            long mul;
+            if (precision == PICOSECOND_PRECISION) {
+                if (offsetUnits == MILLISECOND_PRECISION) {
+                    mul = 1000;
+                    for (int i = first; i <= last; i++) {
+                        d = (double)(((long)times[i])*mul - base);
+                        da[i - first] = d + (pico[i]/1.0e9);
+                    }
+                } else {
+                    if (offsetUnits == MICROSECOND_PRECISION) {
+                        offset = 1000*base;
+                        mul = 1000000;
+                        for (int i = first; i <= last; i++) {
+                            d = (double)(((long)times[i])*mul - offset);
+                            da[i - first] = d + (pico[i]/1.0e6);
+                        }
+                    } else {
+                        if (offsetUnits == NANOSECOND_PRECISION) {
+                            offset = 1000000*base;
+                            mul = 1000000000;
+                            for (int i = first; i <= last; i++) {
+                                d = (double)(((long)times[i])*mul - offset);
+                                da[i - first] = d + (pico[i]/1.0e3);
+                            }
+                        } else { // pico
+                        }
+                    }
+                }
+            }
+            return da; 
+        }
+
+        public double [] getTimes(int[] recordRange) {
+            return getTimes(recordRange, null);
+        }
+
+        public double [] getTimes(int[] recordRange, TimeSpec ts) {
+            return getTimes(recordRange[0], recordRange[1],  ts);
+        }
+
+        public double [] getTimes(TimeSpec ts) {
+            return getTimes(0, recordCount - 1, ts);
+        }
+
+        public double [] getTimes() {return getTimes(0, recordCount - 1, null);}
+
+        public int[] getRecordRange(double[] timeRange, TimeSpec ts) {
+            int offsetUnits = MILLISECOND_PRECISION;
+            long base = JANUARY_1_1970_LONG;
+            if (ts != null) {
+                base = (long)ts.getBaseTime();
+                offsetUnits = ts.getOffsetUnits();
+            }
+            double[] temp = getTimes(0, recordCount - 1, ts);
+            double start = timeRange[0];
+            double stop = timeRange[1];
+            int i = 0;
+            for (; i < temp.length; i++) {
+                if (start > temp[i]) continue;
+                break;
+            }
+            if (i == temp.length) return null;
+            int low = i;
+            for (; i < temp.length; i++) {
+                if (stop <= temp[i]) break;
+            }
+            if (i == 0) return null;
+            return new int[] {low, i - 1};
+        }
+
+        public int[] getRecordRange(double[] timeRange) {
+            return getRecordRange(timeRange, null);
+        }
+
+        public double [] getTimes(double[] timeRange) {
+            return getTimes(timeRange, null);
+        }
+
+        public double [] getTimes(double[] timeRange, TimeSpec ts) {
+            int [] rr = getRecordRange(timeRange, ts);
+            if (rr == null) return null;
+            return getTimes(rr[0], rr[1], ts);
+        }
+
+        public double getFirstTime() {return firstTime;}
+    }
+
+    public TimeVariable getXVar(String s, int p) throws Throwable {
+        return new CDFTimeVariableX(s, p);
     }
 }

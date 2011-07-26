@@ -22,11 +22,13 @@ public class DataTypes {
     }
 
     public static final int EPOCH16 = 32;
+    public static final int CDF_TIME_TT2000 = 33;
     public static final int FLOAT = 0;
     public static final int DOUBLE = 1;
     public static final int SIGNED_INTEGER = 2;
     public static final int UNSIGNED_INTEGER = 3;
     public static final int STRING = 4;
+    public static final int LONG = 5;
     public static int LAST_TYPE = 53;
     public static Method[] method = new Method[LAST_TYPE];
     public static int[] typeCategory = new int[LAST_TYPE];
@@ -62,6 +64,13 @@ public class DataTypes {
             method[14] = meth;
             typeCategory[14] = UNSIGNED_INTEGER;
             size[14] = 4;
+            meth = bb.getMethod("getLong", new Class[] {});
+            method[8] = meth;
+            typeCategory[8] = LONG;
+            size[8] = 8;
+            method[33] = meth;
+            typeCategory[33] = LONG;
+            size[33] = 8;
             meth = bb.getMethod("getFloat", new Class[] {});
             method[21] = meth;
             typeCategory[21] = FLOAT;

@@ -112,14 +112,16 @@ public interface CDF {
     /**
      * returns value of the named global attribute.
      * For a  character string attribute, a Vector of String is returned
-     * For a  numeric attribute, a double[] is returned
+     * For a  numeric attribute, a long[] is returned for long type;
+     * double[] is returned for all other numeric types.
      */
     public Object getAttribute(String atr);
 
     /**
      * returns value of the named attribute for specified variable.
      * For a  character string attribute, a String[] is returned
-     * For a  numeric attribute, a double[] is returned
+     * For a  numeric attribute, a long[] is returned for long type;
+     * double[] is returned for all other numeric types.
      */
     public Object getAttribute(String vname, String aname);
 
