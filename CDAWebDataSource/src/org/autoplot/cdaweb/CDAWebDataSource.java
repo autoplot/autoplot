@@ -129,18 +129,25 @@ public class CDAWebDataSource extends AbstractDataSource {
                 int nc=0;
                 List<QDataSet> comps= new ArrayList();
                 String function= (String)metadata.get( "FUNCTION" );
-                String comp= (String)metadata.get( "COMPONENT_"  + nc );
-                while ( comp!=null ) {
-                    DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
-                    ds1= dataSource.getDataSet( t1 );
-                    comps.add( ds1 );
-                    nc++;
-                    comp= (String) metadata.get( "COMPONENT_"  + nc );
+                if ( function==null ) {
+                    function= (String)metadata.get( "FUNCT" ); // THA_L2_ESA
                 }
-                try {
-                    ds1= CdfVirtualVars.execute( function, comps );
-                } catch (IllegalArgumentException ex ){
-                    throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                if ( function!=null ) {
+                    String comp= (String)metadata.get( "COMPONENT_"  + nc );
+                    while ( comp!=null ) {
+                        DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
+                        ds1= dataSource.getDataSet( t1 );
+                        comps.add( ds1 );
+                        nc++;
+                        comp= (String) metadata.get( "COMPONENT_"  + nc );
+                    }
+                    try {
+                        ds1= CdfVirtualVars.execute( function, comps );
+                    } catch (IllegalArgumentException ex ){
+                        throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                    }
+                } else {
+                    throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not identified" );
                 }
             } else {
                 Map<String,String> fileParams= getParams();
