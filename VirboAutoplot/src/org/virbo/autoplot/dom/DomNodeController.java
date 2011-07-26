@@ -149,7 +149,7 @@ public class DomNodeController {
      * @return
      */
     public boolean isValueAdjusting() {
-        return changesSupport.isValueAdjusting();
+        return changesSupport.isValueAdjusting()!=null;
     }
 
     protected DomLock mutatorLock() {
