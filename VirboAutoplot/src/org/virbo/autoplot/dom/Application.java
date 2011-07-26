@@ -280,7 +280,13 @@ public class Application extends DomNode {
             throw ex;
         }
     }
-            
+
+    /**
+     * List the differences between the two nodes.
+     * These should always be from this to that.
+     * @param node
+     * @return
+     */
     @Override
     public List<Diff> diffs(DomNode node) {
 
@@ -288,17 +294,17 @@ public class Application extends DomNode {
         
         List<Diff> result = new ArrayList<Diff>();
 
-        addArrayDiffs( "dataSourceFilters", that.getDataSourceFilters(), this.getDataSourceFilters(), result );
+        addArrayDiffs( "dataSourceFilters", this.getDataSourceFilters(), that.getDataSourceFilters(), result );
 
-        addArrayDiffs( "plotElements", that.getPlotElements(), this.getPlotElements(), result );
+        addArrayDiffs( "plotElements", this.getPlotElements(), that.getPlotElements(), result );
 
-        addArrayDiffs( "plots", that.getPlots(), this.getPlots(), result );
+        addArrayDiffs( "plots", this.getPlots(), that.getPlots(), result );
 
-        addArrayDiffs( "canvases", that.getCanvases(), this.getCanvases(), result );
+        addArrayDiffs( "canvases", this.getCanvases(), that.getCanvases(), result );
 
-        addArrayDiffs( "bindings", that.getBindings(), this.getBindings(), result );
+        addArrayDiffs( "bindings", this.getBindings(), that.getBindings(), result );
 
-        addArrayDiffs( "connectors", that.getConnectors(), this.getConnectors(), result );
+        addArrayDiffs( "connectors", this.getConnectors(), that.getConnectors(), result );
 
         for ( int i=0; i<Math.min(this.dataSourceFilters.size(),that.dataSourceFilters.size()); i++ ) {
             DataSourceFilter thisDataSourceFilter= this.dataSourceFilters.get(i);
