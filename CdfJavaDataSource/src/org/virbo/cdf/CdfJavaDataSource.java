@@ -117,8 +117,12 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 if ( attributes.get("COMPONENT_2")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_2"), constraint, false, true, mon ) );
                 if ( attributes.get("COMPONENT_3")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_3"), constraint, false, true, mon ) );
                 if ( attributes.get("COMPONENT_4")!=null ) attr.add( wrapDataSet( cdf, (String)attributes.get("COMPONENT_4"), constraint, false, true, mon ) );
-                //result= (MutablePropertyDataSet) CdfVirtualVars.execute( function, attr );
-                throw new IllegalArgumentException("virtual not supported");
+                try {
+                    result= (MutablePropertyDataSet) CdfVirtualVars.execute( function, attr );
+                } catch ( IllegalArgumentException ex ) {
+                    throw new IllegalArgumentException("virtual function "+function+" not supported");
+                }
+                
             } else { // typical route
                 result= wrapDataSet(cdf, svariable, constraint, false, true, mon );
             }
