@@ -8,6 +8,7 @@ package org.virbo.cdfdatasource;
 import java.util.Arrays;
 import java.util.List;
 import org.das2.datum.Units;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -119,6 +120,8 @@ public class CdfVirtualVars {
             return computeMagnitude( args.get(0) );
         } else if (function.equals("convert_log10")) {
             return convertLog10( args.get(0) );
+        } else if (function.equals("fftPower512")) {
+            return Ops.fftPower( args.get(0), 512, new NullProgressMonitor() );
         } else {
             throw new IllegalArgumentException("unimplemented function: "+function );
         }
