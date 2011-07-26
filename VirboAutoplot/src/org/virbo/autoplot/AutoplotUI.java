@@ -637,7 +637,12 @@ public class AutoplotUI extends javax.swing.JFrame {
                     //undoRedoSupport.pushState(evt,messages.get(0));
                     undoRedoSupport.pushState(evt,null); // TODO: named undo operations.  fix findbugs DB_DUPLICATE_BRANCHES
                 } else {
-                    undoRedoSupport.pushState(evt);
+                    if ( messages.get(0).contains(" from ") ) {
+                        undoRedoSupport.pushState(evt);
+                    } else {
+                        undoRedoSupport.pushState(evt,messages.get(0)); // named undo operation
+                    }
+                    
                 }
 
                 stateSupport.markDirty();
@@ -655,7 +660,11 @@ public class AutoplotUI extends javax.swing.JFrame {
                 if ( dom.getController().isValueAdjusting() ) return;
                 logger.log( Level.FINER, "state change: {0}", evt);
                 if (!stateSupport.isOpening() && !stateSupport.isSaving() && !applicationModel.isRestoringState()) { // TODO: list the props we want!
-                    tickleTimer.tickle( evt.getActionCommand() + " from " + evt.getSource() );
+                    if ( evt.getActionCommand().startsWith("label: ") ) {
+                        tickleTimer.tickle( evt.getActionCommand().substring("label: ".length()) );
+                    } else {
+                        tickleTimer.tickle( evt.getActionCommand() + " from " + evt.getSource() );
+                    }
                 }
             }
         } );

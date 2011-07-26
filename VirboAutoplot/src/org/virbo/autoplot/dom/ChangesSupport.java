@@ -137,6 +137,9 @@ public final class ChangesSupport {
     }
 
     public static final String PROP_VALUEADJUSTING = "valueAdjusting";
+
+    public static final String PROP_DESCRIPTION="description";
+
     /**
      * the bean state is rapidly changing.
      * @return
@@ -146,29 +149,49 @@ public final class ChangesSupport {
     }
     private boolean valueIsAdjusting = false;
 
-    private Lock mutatorLock = new ReentrantLock() {
-            @Override
-            public void lock() {
-                super.lock();
-                if (valueIsAdjusting) {
-                    //System.err.println("lock is already set!");
-                } else {
-                    propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, false, true );
-                    valueIsAdjusting = true;
-                }
-            }
+    private DomLock mutatorLock = new DomLock();
 
-            @Override
-            public void unlock() {
-                super.unlock();
-                if ( !super.isLocked() ) {
-                    valueIsAdjusting = false;
-                    propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, true, false );
-                } else {
-                    //System.err.println("lock is still set, neat!");
-                }
+    public class DomLock extends ReentrantLock {
+
+        String description;
+
+        public DomLock( ) {
+        }
+
+        public void lock( String description ) {
+            this.lock();
+            this.description= description;
+
+        }
+
+        @Override
+        public void lock() {
+            super.lock();
+            if (valueIsAdjusting) {
+                //System.err.println("lock is already set!");
+            } else {
+                propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, false, true );
+                valueIsAdjusting = true;
             }
-        };
+            this.description= "";
+        }
+
+        @Override
+        public void unlock() {
+            super.unlock();
+            if ( !super.isLocked() ) {
+                valueIsAdjusting = false;
+                if ( description.length()>0 ) {
+                    propertyChangeSupport.firePropertyChange( PROP_DESCRIPTION, this.description, "" );
+                    description= "";
+                } else {
+                    propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, true, false );
+                }
+            } else {
+                //System.err.println("lock is still set, neat!");
+            }
+        }
+    }
 
     /**
      * one client will have write access to the bean, and when unlock
@@ -178,7 +201,7 @@ public final class ChangesSupport {
      * clients should check the valueIsAdjusting property.
      * @return
      */
-    protected synchronized Lock mutatorLock() {
+    protected synchronized DomLock mutatorLock() {
         return mutatorLock;
     }
 

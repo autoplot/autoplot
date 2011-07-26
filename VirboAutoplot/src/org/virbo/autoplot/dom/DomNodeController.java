@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 
 /**
  * Base class for controller objects that are responsible for managing a node.
@@ -151,7 +152,7 @@ public class DomNodeController {
         return changesSupport.isValueAdjusting();
     }
 
-    protected Lock mutatorLock() {
+    protected DomLock mutatorLock() {
         return changesSupport.mutatorLock();
     }
 

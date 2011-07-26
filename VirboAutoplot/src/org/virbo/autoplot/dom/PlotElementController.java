@@ -42,6 +42,7 @@ import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.AutoplotUtil;
 import org.virbo.autoplot.RenderTypeUtil;
+import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.dataset.DataSetOps;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.JoinDataSet;
@@ -1931,8 +1932,8 @@ public class PlotElementController extends DomNodeController {
                 ch.getController().getRenderer().setDataSet(oldDs);
             }
         }
-        Lock lock= this.mutatorLock();
-        lock.lock();
+        DomLock lock= this.mutatorLock();
+        lock.lock("reset render type");
         try {
             plotElement.propertyChangeSupport.firePropertyChange( PlotElement.PROP_RENDERTYPE, null, renderType );
         } finally {

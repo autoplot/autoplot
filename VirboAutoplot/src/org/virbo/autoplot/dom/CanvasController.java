@@ -30,6 +30,7 @@ import org.das2.graph.DasRow;
 import org.das2.graph.Painter;
 import org.das2.graph.Renderer;
 import org.das2.graph.SelectionUtil;
+import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
 
 /**
@@ -352,8 +353,8 @@ public class CanvasController extends DomNodeController {
      * @param position LayoutUtil.BELOW or LayoutUtil.ABOVE.
      */
     void insertGapFor(Row row, Row trow, Object position) {
-        Lock lock = changesSupport.mutatorLock();
-        lock.lock();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock("Insert Gap For");
         try {
             List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
 
@@ -384,8 +385,8 @@ public class CanvasController extends DomNodeController {
      * @param position LayoutUtil.RIGHT or LayoutUtil.LEFT.
      */
     void insertGapFor(Column column, Column tcolumn, Object position) {
-        Lock lock = changesSupport.mutatorLock();
-        lock.lock();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock( "Insert Gap For");
         try {
             List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
 
@@ -417,8 +418,8 @@ public class CanvasController extends DomNodeController {
     protected Row addInsertRow(Row trow, Object position) {
         final Row row = new Row();
 
-        Lock lock = changesSupport.mutatorLock();
-        lock.lock();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock("Add Insert Row");
         try {
             row.setParent(canvas.getMarginRow().getId());
             new RowController(row).createDasPeer(this.canvas, canvas.getMarginRow().getController().getDasRow());
@@ -459,8 +460,8 @@ public class CanvasController extends DomNodeController {
     protected Column addInsertColumn(Column tcolumn, Object position) {
         final Column column = new Column();
 
-        Lock lock = changesSupport.mutatorLock();
-        lock.lock();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock( "Add Insert Column");
         try {
 
             column.setParent(canvas.getMarginColumn().getId());
@@ -532,8 +533,8 @@ public class CanvasController extends DomNodeController {
     public List<Column> addColumns(int count) {
         List<Column> result = new ArrayList();
 
-        Lock lock = changesSupport.mutatorLock();
-        lock.lock();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock( "Add Columns");
         try {
 
             List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
@@ -581,8 +582,8 @@ public class CanvasController extends DomNodeController {
     }
 
     protected void deleteRow(Row row) {
-        Lock lock = changesSupport.mutatorLock();
-        lock.lock();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock("Delete Row");
         try {
             List<Row> rows = new ArrayList<Row>(Arrays.asList(canvas.getRows()));
 
@@ -595,8 +596,8 @@ public class CanvasController extends DomNodeController {
     }
 
     protected void deleteColumn(Column column) {
-        Lock lock = changesSupport.mutatorLock();
-        lock.lock();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock("Delete Column");
         try {
             List<Column> columns = new ArrayList<Column>(Arrays.asList(canvas.getColumns()));
 

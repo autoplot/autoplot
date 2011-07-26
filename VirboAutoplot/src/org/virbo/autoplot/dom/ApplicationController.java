@@ -52,6 +52,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.ColumnColumnConnectorMouseModule;
 import org.virbo.autoplot.LayoutListener;
+import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.layout.LayoutConstants;
 import org.virbo.autoplot.util.RunLaterListener;
 
@@ -100,6 +101,8 @@ public class ApplicationController extends DomNodeController implements RunLater
                 }
                 if ( evt.getPropertyName().equals(ChangesSupport.PROP_VALUEADJUSTING) && evt.getNewValue()==Boolean.FALSE ) { //put in state after automatic operation
                     fireActionEvent( new ActionEvent(this,0,"ready") );
+                } else if ( evt.getPropertyName().equals(ChangesSupport.PROP_DESCRIPTION ) && evt.getNewValue().equals("") ) { //put in state after automatic operation)
+                    fireActionEvent( new ActionEvent(this,0,"label: "+(String)evt.getOldValue() ) );
                 }
             }
         });
@@ -872,8 +875,8 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @return a list of the newly added plots.
      */
     public List<Plot> addPlots( int nrow, int ncol, Object dir ) {
-        Lock lock = mutatorLock();
-        lock.lock();
+        DomLock lock = mutatorLock();
+        lock.lock( String.format("addPlots(%d,%d,%s)",nrow,ncol,dir) );
         try {
             List<Plot> result= new ArrayList<Plot>(nrow*ncol);
             List<Column> cols;
@@ -1982,8 +1985,8 @@ public class ApplicationController extends DomNodeController implements RunLater
     }
 
     protected synchronized void syncTo( Application that, List<String> exclude ) {
-        Lock lock = changesSupport.mutatorLock();
-        lock.lock();
+        DomLock lock = changesSupport.mutatorLock();
+        lock.lock( "sync to application" );
         Lock canvasLock = getCanvas().controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
 
