@@ -674,6 +674,8 @@ public class PlotController extends DomNodeController {
      * @returns the new plot which is the overview.
      */
     public Plot contextOverview( ) {
+        DomLock lock= changesSupport.mutatorLock();
+        lock.lock("Context Overview");
         Plot domPlot= this.plot;
         ApplicationController controller= dom.getController();
         Plot that = controller.copyPlotAndPlotElements(domPlot, null, false, false);
@@ -683,6 +685,7 @@ public class PlotController extends DomNodeController {
         controller.bind(domPlot.getZaxis(), Axis.PROP_LABEL, that.getZaxis(), Axis.PROP_LABEL);
         controller.addConnector(domPlot, that);
         that.getController().resetZoom(true, true, false);
+        lock.unlock();
         return that;
     }
 
