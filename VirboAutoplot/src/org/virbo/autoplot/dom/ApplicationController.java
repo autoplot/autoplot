@@ -99,10 +99,13 @@ public class ApplicationController extends DomNodeController implements RunLater
                         && "ready".equals(evt.getNewValue() ) ) {
                     fireActionEvent( new ActionEvent(this,0,"ready") );
                 }
-                if ( evt.getPropertyName().equals(ChangesSupport.PROP_VALUEADJUSTING) && evt.getNewValue()==Boolean.FALSE ) { //put in state after automatic operation
-                    fireActionEvent( new ActionEvent(this,0,"ready") );
-                } else if ( evt.getPropertyName().equals(ChangesSupport.PROP_DESCRIPTION ) && evt.getNewValue().equals("") ) { //put in state after automatic operation)
-                    fireActionEvent( new ActionEvent(this,0,"label: "+(String)evt.getOldValue() ) );
+                if ( evt.getPropertyName().equals(ChangesSupport.PROP_VALUEADJUSTING) && evt.getNewValue()==null ) { //put in state after atomtic operation
+                    String description= (String) evt.getOldValue();
+                    if ( description.length()>0 ) {
+                        fireActionEvent( new ActionEvent(this,0,"label: "+description ) );
+                    } else {
+                        fireActionEvent( new ActionEvent(this,0,"ready") );
+                    }
                 }
             }
         });
@@ -954,8 +957,8 @@ public class ApplicationController extends DomNodeController implements RunLater
         List<PlotElement> srcElements = getPlotElementsFor(domPlot);
         List<PlotElement> newElements;
         Plot newPlot;
-        Lock lock = mutatorLock();
-        lock.lock();
+        DomLock lock = mutatorLock();
+        lock.lock("Copy Plot and Plot Elements");
         try {
 
             newPlot= copyPlot(domPlot, bindx, bindy, false);
