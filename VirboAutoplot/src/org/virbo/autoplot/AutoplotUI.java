@@ -649,9 +649,9 @@ public class AutoplotUI extends javax.swing.JFrame {
 
                 List<String> messages= tickleTimer.getMessages();
 
-                for ( String s: messages ) {
-                    System.err.println("messages: "+s);
-                }
+                //for ( String s: messages ) {
+                //    System.err.println("messages: "+s);
+                //}
                 
                 if ( messages.size()>1 ) {
                     messages= cleanMessages(messages);
