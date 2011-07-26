@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Handler;
@@ -562,6 +563,21 @@ public class AutoplotUI extends javax.swing.JFrame {
     }
 
 
+    /**
+     * often one message causes another, so we can subsume these
+     * @param messages
+     * @return
+     */
+    private static List<String> cleanMessages( List<String> messages ) {
+        List<String> result= new LinkedList<String>(messages);
+        for ( String s: messages ) {
+            if ( s.equals("Delete Plot" ) ) {
+                result.remove("Delete Plot Element");
+            }
+        }
+        return result;
+    }
+
     private void addFeatures( ApplicationModel model ) {
         final LayoutPanel flui;
         final DataPanel fdp;
@@ -633,9 +649,18 @@ public class AutoplotUI extends javax.swing.JFrame {
 
                 List<String> messages= tickleTimer.getMessages();
 
+                for ( String s: messages ) {
+                    System.err.println("messages: "+s);
+                }
+                
                 if ( messages.size()>1 ) {
-                    //undoRedoSupport.pushState(evt,messages.get(0));
-                    undoRedoSupport.pushState(evt,null); // TODO: named undo operations.  fix findbugs DB_DUPLICATE_BRANCHES
+                    messages= cleanMessages(messages);
+                    if ( messages.size()==1 ) {
+                        undoRedoSupport.pushState(evt,messages.get(0)); // named undo operation
+                    } else {
+                        //undoRedoSupport.pushState(evt,messages.get(0));
+                        undoRedoSupport.pushState(evt,null); // TODO: named undo operations.  fix findbugs DB_DUPLICATE_BRANCHES
+                    }
                 } else {
                     if ( messages.get(0).contains(" from ") ) {
                         undoRedoSupport.pushState(evt);
