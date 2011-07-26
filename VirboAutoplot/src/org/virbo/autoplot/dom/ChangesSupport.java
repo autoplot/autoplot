@@ -4,6 +4,7 @@
 
 package org.virbo.autoplot.dom;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Collections;
@@ -133,9 +134,17 @@ public final class ChangesSupport {
      * someone has registered a pending change.
      */
     public boolean isPendingChanges() {
-        return changesPending.size() > 0;
+        if ( changesPending.size() > 0 ) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
+    /**
+     * null, "", or a description of the change
+     */
     public static final String PROP_VALUEADJUSTING = "valueAdjusting";
 
     public static final String PROP_DESCRIPTION="description";
@@ -144,49 +153,41 @@ public final class ChangesSupport {
      * the bean state is rapidly changing.
      * @return
      */
-    public boolean isValueAdjusting() {
+    public String isValueAdjusting() {
         return valueIsAdjusting;
     }
-    private boolean valueIsAdjusting = false;
+
+    private String valueIsAdjusting = null;
 
     private DomLock mutatorLock = new DomLock();
 
     public class DomLock extends ReentrantLock {
 
-        String description;
-
         public DomLock( ) {
         }
 
         public void lock( String description ) {
-            this.lock();
-            this.description= description;
-
+            super.lock();
+            if (valueIsAdjusting!=null) {
+                //System.err.println("lock is already set!");
+            } else {
+                valueIsAdjusting= description;
+                propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, null, description );
+            }
         }
 
         @Override
         public void lock() {
-            super.lock();
-            if (valueIsAdjusting) {
-                //System.err.println("lock is already set!");
-            } else {
-                propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, false, true );
-                valueIsAdjusting = true;
-            }
-            this.description= "";
+            this.lock("");
         }
 
         @Override
         public void unlock() {
             super.unlock();
             if ( !super.isLocked() ) {
-                valueIsAdjusting = false;
-                if ( description.length()>0 ) {
-                    propertyChangeSupport.firePropertyChange( PROP_DESCRIPTION, this.description, "" );
-                    description= "";
-                } else {
-                    propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, true, false );
-                }
+                String old= valueIsAdjusting;
+                valueIsAdjusting = null;
+                propertyChangeSupport.firePropertyChange( PROP_VALUEADJUSTING, old, valueIsAdjusting );
             } else {
                 //System.err.println("lock is still set, neat!");
             }
