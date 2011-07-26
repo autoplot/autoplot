@@ -1083,8 +1083,8 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param dsf
      */
     protected void copyDataSourceFilter(DataSourceFilter dsfsrc, DataSourceFilter dsfnew) {
-        Lock lock= dsfnew.getController().mutatorLock();
-        lock.lock();
+        DomLock lock= dsfnew.getController().mutatorLock();
+        lock.lock("Copy Data Source Filter");
         try {
             final boolean dataSetNeedsLoading = dsfsrc.controller.isDataSetNeedsLoading();
 
@@ -1269,8 +1269,8 @@ public class ApplicationController extends DomNodeController implements RunLater
      * resets the dom to the initial state by deleting added plotElements, plots and data sources.
      */
     public synchronized void reset() {
-        Lock lock= mutatorLock();
-        lock.lock();
+        DomLock lock= mutatorLock();
+        lock.lock("Reset");
         Lock canvasLock = canvas.controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
         try {
@@ -1996,7 +1996,7 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     protected synchronized void syncTo( Application that, List<String> exclude ) {
         DomLock lock = changesSupport.mutatorLock();
-        lock.lock( "sync to application" );
+        lock.lock( "Sync to Application" );
         Lock canvasLock = getCanvas().controller.getDasCanvas().mutatorLock();
         canvasLock.lock();
 

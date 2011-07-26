@@ -34,6 +34,7 @@ import org.das2.graph.SpectrogramRenderer;
 import org.jdesktop.beansbinding.Converter;
 import org.virbo.autoplot.RenderType;
 import org.virbo.autoplot.RenderTypeUtil;
+import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 import org.virbo.autoplot.util.DateTimeDatumFormatter;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
@@ -529,8 +530,8 @@ public class PlotController extends DomNodeController {
     }
 
     synchronized void moveToStackBottom( PlotElement p ) {
-        final Lock lock= dom.getController().mutatorLock();
-        lock.lock();
+        final DomLock lock= dom.getController().mutatorLock();
+        lock.lock("Move to Stack Bottom");
         try {
             if (!p.getPlotId().equals(this.plot.getId())) {
                 throw new IllegalArgumentException("this is not my plot");
@@ -584,8 +585,8 @@ public class PlotController extends DomNodeController {
      * @param p
      */
     synchronized void moveToStackTop( PlotElement p ) {
-        final Lock lock= dom.getController().mutatorLock();
-        lock.lock();
+        final DomLock lock= dom.getController().mutatorLock();
+        lock.lock("Move to Stack Top");
         try {
             if (!p.getPlotId().equals(this.plot.getId())) {
                 throw new IllegalArgumentException("this is not my plot");

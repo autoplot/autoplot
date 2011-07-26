@@ -888,8 +888,8 @@ public class PlotElementController extends DomNodeController {
             // add additional plotElements when it's a bundle of rank1 datasets.
             if ( weShallAddChildren ) {
 
-                Lock lock = dom.controller.mutatorLock();
-                lock.lock();
+                DomLock lock = dom.controller.mutatorLock();
+                lock.lock("Add Child Elements");
                 try {
                     Color c = plotElement.getStyle().getColor();
                     Color fc= plotElement.getStyle().getFillColor();
@@ -1933,7 +1933,7 @@ public class PlotElementController extends DomNodeController {
             }
         }
         DomLock lock= this.mutatorLock();
-        lock.lock("reset render type");
+        lock.lock("Reset Render Rype");
         try {
             plotElement.propertyChangeSupport.firePropertyChange( PlotElement.PROP_RENDERTYPE, null, renderType );
         } finally {

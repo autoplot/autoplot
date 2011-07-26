@@ -24,6 +24,7 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.datum.UnitsUtil;
 import org.jdesktop.beansbinding.Converter;
+import org.virbo.autoplot.dom.ChangesSupport.DomLock;
 
 /**
  *
@@ -561,11 +562,11 @@ public class DomUtil {
      */
     public static boolean validateDom( Application application, List<String> problems ) {
 
-        Lock lock=null;
+        DomLock lock=null;
 
         if ( application.getController()!=null ) {
            lock= application.getController().mutatorLock();
-           lock.lock();
+           lock.lock("Validate DOM");
         }
 
         try {
