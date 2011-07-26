@@ -510,6 +510,8 @@ public class ApplicationController extends DomNodeController implements RunLater
      */
     public void deletePlotElement(PlotElement pelement) {
         logger.log(Level.FINE, "deletePlotElement({0})", pelement);
+        DomLock lock= changesSupport.mutatorLock();
+        lock.lock("Delete Plot Element");
         int currentIdx = application.plotElements.indexOf(pelement);
         if (currentIdx == -1) {
             throw new IllegalArgumentException("deletePlotElement but plot element isn't part of application");
@@ -565,7 +567,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 p.setParent("");
             }
         }
-
+        lock.unlock();
     }
 
     /**
