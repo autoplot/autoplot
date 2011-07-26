@@ -192,8 +192,8 @@ public class UndoRedoSupport {
         String labelStr = "initial";
         String docString= "initial state of application";
         if (elephant != null) {
-            List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses
-            StringBuffer docBuf= new StringBuffer();
+            List<Diff> diffss = elephant.state.diffs(state); //TODO: documentation/getDescription seem to be inverses.  All state changes should be described in the forward direction.
+            StringBuilder docBuf= new StringBuilder();
 
             int count=0;
             for (Diff s : diffss) {
@@ -217,16 +217,16 @@ public class UndoRedoSupport {
                     labelStr = "" + count + " changes";
                 }
             } else {
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 for (Diff s : diffss) {
                     if ( s.getDescription().contains("plotDefaults") ) continue;
-                    buf.append(", " + s.getLabel());
+                    buf.append(", ").append(s.getLabel());
                 }
                 labelStr = buf.length() > 2 ? buf.substring(2) : "";
             }
             if (labelStr.length() > 30) {
                 StringTokenizer tok = new StringTokenizer(labelStr, ".,[", true);
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 while (tok.hasMoreTokens()) {
                     String ss = tok.nextToken();
                     buf.append(ss.substring(0, Math.min(ss.length(), 12)));
@@ -237,7 +237,9 @@ public class UndoRedoSupport {
 
         int oldDepth= stateStackPos;
 
+        //long t0= System.currentTimeMillis();
         BufferedImage thumb= applicationModel.getThumbnail(50);
+        //System.err.println( String.format( "time for thumbnail : %d ms", System.currentTimeMillis()- t0 ) );
 
         stateStack.add(stateStackPos, new StateStackElement(state, labelStr,docString,thumb));
 
