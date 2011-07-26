@@ -284,6 +284,7 @@ public class Application extends DomNode {
     /**
      * List the differences between the two nodes.
      * These should always be from this to that.
+     * TODO: somehow this ends up working, although PlotElement and Style don't follow this rule.
      * @param node
      * @return
      */
