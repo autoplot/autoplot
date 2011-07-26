@@ -765,6 +765,8 @@ public class ApplicationController extends DomNodeController implements RunLater
 
     public synchronized Plot addPlot( final Plot focus, Object direction ) {
         logger.fine("enter addPlot");
+        DomLock lock= changesSupport.mutatorLock();
+        lock.lock("Add Plot");
         final Plot domPlot = new Plot();
 
         CanvasController ccontroller=  ((CanvasController)canvas.controller);
@@ -858,6 +860,7 @@ public class ApplicationController extends DomNodeController implements RunLater
             bind(application, Application.PROP_TIMERANGE, domPlot.getXaxis(), Axis.PROP_RANGE);
         }
 
+        lock.unlock();
         return domPlot;
     }
 
@@ -1106,7 +1109,8 @@ public class ApplicationController extends DomNodeController implements RunLater
      * @param domPlot
      */
     public void deletePlot(Plot domPlot) {
-
+        DomLock lock= changesSupport.mutatorLock();
+        lock.lock("Delete Plot");
         if (!application.plots.contains(domPlot)) {
             throw new IllegalArgumentException("plot is not in this application");
         }
@@ -1164,6 +1168,7 @@ public class ApplicationController extends DomNodeController implements RunLater
                 cc.removeGaps();
             }
         }
+        lock.unlock();
 
     }
 
