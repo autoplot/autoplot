@@ -147,8 +147,6 @@ public final class ChangesSupport {
      */
     public static final String PROP_VALUEADJUSTING = "valueAdjusting";
 
-    public static final String PROP_DESCRIPTION="description";
-
     /**
      * the bean state is rapidly changing.
      * @return
