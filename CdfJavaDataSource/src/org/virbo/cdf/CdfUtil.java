@@ -154,18 +154,18 @@ public class CdfUtil {
         if ( rc==-1 ) rc= 1;  // -1 is used as a flag for a slice, we still really read one record.
 
         try {
-            int[] stride= new int[dims+1];
-            for ( int i=0; i<dims+1; i++ ) stride[i]= 1;
-            stride[0]= (int)recInterval;
-            //if ( recInterval>1 ) throw new IllegalArgumentException("stride not supported with this cdf reader");
             if ( recStart==0 && ( recCount==-1 || recCount==varRecCount ) && recInterval==1 ) {
                 if ( false && ( variable.getType()==44 || variable.getType()==21 ) ) {
-                    buf= Extractor.get1DSeriesNio( cdf, variable, null);
+                    //buf= Extractor.get1DSeriesNio( cdf, variable, null);
                     //odata= cdf.get1D( variable.getName() );
                 } else {
+                    System.err.println("reading variable "+variable.getName());
                     odata= cdf.get1D( variable.getName() ); // this is my hack
                 }
             } else {
+                int[] stride= new int[dims+1];
+                for ( int i=0; i<dims+1; i++ ) stride[i]= 1;
+                stride[0]= (int)recInterval;
                 odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+rc*recInterval), stride ); 
 //                odata= cdf.get1D( variable.getName(), (int)recStart, (int)(recStart+(rc-1)*recInterval), stride ); //TODO: I think an extra record is extracted.  Try this with stride sometime.
             }
