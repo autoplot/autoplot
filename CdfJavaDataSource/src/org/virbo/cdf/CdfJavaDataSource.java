@@ -272,6 +272,9 @@ public class CdfJavaDataSource extends AbstractDataSource {
 
                 } else if ( ipass==1 && !isDep ) {
                     Object val= ((Vector)attrv).get(0);
+                    if ( val==null ) {
+                        continue; // v0.9 version of CDF-Java returns null in Test032_016.
+                    }
                     if ( val.getClass().isArray() && Array.getLength(val)==1 ) {
                         val= Array.get(val, 0);
                     }
