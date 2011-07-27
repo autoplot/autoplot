@@ -16,6 +16,7 @@ import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.QubeDataSetIterator;
 import org.das2.dataset.VectorDataSetAdapter;
+import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 import org.virbo.qstream.SimpleStreamFormatter;
 import org.virbo.qstream.StreamException;
@@ -170,6 +171,12 @@ public class Test011 {
                 ff = new SimpleStreamFormatter();
                 ff.format(bds, new FileOutputStream("test011_002.qds"), true);
 
+            }
+
+            Units u= SemanticOps.lookupUnits("[foos]");
+            Units u2= SemanticOps.lookupUnits("foos");
+            if ( !u.isConvertableTo(u2) ) {
+                throw new IllegalArgumentException("[foos] is not convertable to foos");
             }
 
             if (true) {
