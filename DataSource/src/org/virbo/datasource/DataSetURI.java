@@ -623,22 +623,7 @@ public class DataSetURI {
      * for Windows where new URL( "file://c:/myfile.dat" ).getPath() -> "/myfile.dat".
      * @param allowHtml skip html test that tests for html content.
      */
-    public static File getFile( URI uri, boolean allowHtml, ProgressMonitor mon) throws IOException {
-
-        String suri= fromUri( uri );
-        return getFile(suri,mon);
-    }
-
-    /**
-     * retrieve the file specified in the URI, possibly using the VFS library to
-     * download the resource to a local cache.  The URI should be a downloadable
-     * file, and not the vap scheme URI.
-     * @param uri resource to download, such as "sftp://user@host/file.dat."
-     * @param mon
-     * @return
-     * @throws IOException
-     */
-    public static File getFile( String suri, ProgressMonitor mon) throws IOException {
+    public static File getFile( String suri, boolean allowHtml, ProgressMonitor mon) throws IOException {
         URISplit split = URISplit.parse( suri );
         try {
             FileSystem fs = FileSystem.create(toUri(split.path));
@@ -657,6 +642,20 @@ public class DataSetURI {
                 throw new IOException("Unsupported protocol: "+suri);
             }
         }
+    }
+
+    /**
+     * retrieve the file specified in the URI, possibly using the VFS library to
+     * download the resource to a local cache.  The URI should be a downloadable
+     * file, and not the vap scheme URI.
+     * @param uri resource to download, such as "sftp://user@host/file.dat."
+     * @param mon
+     * @return
+     * @throws IOException
+     */
+    public static File getFile( URI uri, ProgressMonitor mon) throws IOException {
+        String suri= fromUri( uri );
+        return getFile(suri,false,mon);
     }
 
 
@@ -712,7 +711,7 @@ public class DataSetURI {
      * @return
      * @throws IOException
      */
-    public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
+    public static File getFile( String uri, ProgressMonitor mon) throws IOException {
         return getFile( uri, false, mon );
     }
 
@@ -727,7 +726,7 @@ public class DataSetURI {
     public static File getHtmlFile( URL url, ProgressMonitor mon ) throws IOException {
         try {
             URI uri= url.toURI();
-            return getFile( uri, true, mon );
+            return getFile( url.toString(), true, mon );
         } catch ( URISyntaxException ex ) {
             throw new RuntimeException(ex);
         }

@@ -1,5 +1,5 @@
 /*
- * AutoPlotMatisse.java
+ * AutoplotUI.java
  *
  * Created on July 27, 2007, 6:32 AM
  */
@@ -79,7 +79,6 @@ import org.das2.DasApplication;
 import org.das2.components.propertyeditor.PropertyEditor;
 import org.das2.graph.DasCanvas;
 import org.das2.graph.DasPlot;
-import org.das2.graph.TickVDescriptor;
 import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
@@ -489,11 +488,12 @@ public class AutoplotUI extends javax.swing.JFrame {
         dom.getOptions().addPropertyChangeListener(optionsListener);
 
         APSplash.checkTime("init 100");
-        
-//        applicationModel.getCanvas().resizeAllComponents();
-//        applicationModel.getCanvas().repaint();
-//        applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
 
+        if ( AutoplotUtil.getProperty("os.name","").startsWith("Mac OS") ) {
+            applicationModel.getCanvas().resizeAllComponents();
+            applicationModel.getCanvas().repaint();
+            applicationModel.getCanvas().paintImmediately(0,0,1000,1000);
+        }
         APSplash.checkTime("init 110");
 
 
@@ -2460,6 +2460,7 @@ APSplash.checkTime("init -80");
                     logger.fine("UI.setVisible(true)");
                     SwingUtilities.invokeLater( new Runnable() {
                         public void run() {
+                            app.applicationModel.canvas.repaint();
                             app.setVisible(true);
                         }
                     } );
