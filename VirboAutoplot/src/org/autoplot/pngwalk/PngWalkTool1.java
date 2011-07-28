@@ -259,7 +259,8 @@ public class PngWalkTool1 extends javax.swing.JPanel {
         frame.addWindowListener( AppManager.getInstance().getWindowListener(tool) );
 
         frame.pack();
-
+        frame.setLocationRelativeTo(parent);
+        
         frame.setVisible(true);
 
         return tool;

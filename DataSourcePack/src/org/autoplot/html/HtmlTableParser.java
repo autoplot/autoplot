@@ -40,7 +40,7 @@ public class HtmlTableParser extends AbstractDataSource {
     }
 
     public QDataSet getTable( ProgressMonitor mon ) throws Exception {
-        File f= getFile(mon);
+        File f= getHtmlFile(resourceURI.toURL(),mon);
 
         BufferedReader reader = new BufferedReader( new FileReader(f));
 
@@ -73,7 +73,7 @@ public class HtmlTableParser extends AbstractDataSource {
     }
 
     public List<String> getTables() throws java.io.IOException {
-        File f= getFile( new NullProgressMonitor() );
+        File f= getHtmlFile( resourceURI.toURL(), new NullProgressMonitor() );
 
         BufferedReader reader = new BufferedReader( new FileReader(f));
 

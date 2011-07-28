@@ -8,12 +8,14 @@
  */
 package org.virbo.datasource;
 
+import java.util.logging.Level;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.filesystem.FileObject;
 import org.das2.util.filesystem.FileSystem;
 import ftpfs.FTPBeanFileSystemFactory;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -589,16 +591,40 @@ public class DataSetURI {
         }
     }
 
+    private static void checkNonHtml( File tfile, URL source ) throws HtmlResponseIOException, FileNotFoundException {
+        FileInputStream fi= null;
+        HtmlResponseIOException ex2=null;
+        try {
+            fi = new FileInputStream(tfile);
+            byte[] magic = new byte[5];
+            int bytes = fi.read(magic);
+            if ( bytes==5 ) {
+                String ss= new String(magic);
+                if ( ss.equals("<!DOC") || ss.toLowerCase().equals("<html")) {
+                    ex2= new HtmlResponseIOException( "file appears to be html: "+tfile, source );
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                fi.close();
+            } catch (IOException ex) {
+                Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        if ( ex2!=null ) throw ex2;
+        return;
+
+    }
+
     /**
-     * retrieve the file specified in the URI, possibly using the VFS library to
-     * download the resource to a local cache.  The URI should be a downloadable
-     * file, and not the vap scheme URI.
-     * @param uri resource to download, such as "sftp://user@host/file.dat."
-     * @param mon
-     * @return
-     * @throws IOException
+     * return a file reference for the url.  This is initially to fix the problem
+     * for Windows where new URL( "file://c:/myfile.dat" ).getPath() -> "/myfile.dat".
+     * @param allowHtml skip html test that tests for html content.
      */
-    public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
+    public static File getFile( URI uri, boolean allowHtml, ProgressMonitor mon) throws IOException {
+
         String suri= fromUri( uri );
         return getFile(suri,mon);
     }
@@ -619,6 +645,7 @@ public class DataSetURI {
             String filename = split.file.substring(split.path.length());
             FileObject fo = fs.getFileObject(filename);
             File tfile = fo.getFile(mon);
+            if ( !allowHtml ) checkNonHtml(tfile, new URL(split.file) );
             return tfile;
         } catch ( URIException ex ) {
             throw new IOException(ex.getMessage()); //Java1.6 will change this
@@ -631,6 +658,7 @@ public class DataSetURI {
             }
         }
     }
+
 
     /**
      * introduced when we needed access to a URL with arguments.  This allows us
@@ -675,6 +703,35 @@ public class DataSetURI {
         return result;
     }
 
+    /**
+     * retrieve the file specified in the URI, possibly using the VFS library to
+     * download the resource to a local cache.  The URI should be a downloadable
+     * file, and not the vap scheme URI.
+     * @param uri resource to download, such as "sftp://user@host/file.dat."
+     * @param mon
+     * @return
+     * @throws IOException
+     */
+    public static File getFile(URI uri, ProgressMonitor mon) throws IOException {
+        return getFile( uri, false, mon );
+    }
+
+    /**
+     * get the file, allowing it to have "<html>" in the front.  Normally this is not
+     * allowed because of http://sourceforge.net/tracker/?func=detail&aid=3379717&group_id=199733&atid=970682
+     * @param url
+     * @param mon
+     * @return
+     * @throws IOException
+     */
+    public static File getHtmlFile( URL url, ProgressMonitor mon ) throws IOException {
+        try {
+            URI uri= url.toURI();
+            return getFile( uri, true, mon );
+        } catch ( URISyntaxException ex ) {
+            throw new RuntimeException(ex);
+        }
+    }
     /**
      * get a URI from the string which is believed to be valid.  This was introduced
      * because a number of codes called getURI without checking for null, which could be

@@ -156,6 +156,22 @@ public abstract class AbstractDataSource implements DataSource {
     }
 
     /**
+     * get the file, allowing content to be html.
+     * @param url
+     * @param mon
+     * @return
+     * @throws IOException
+     */
+    protected File getHtmlFile( URL url, ProgressMonitor mon ) throws IOException {
+        File f = DataSetURI.getHtmlFile( url, mon );
+        if (params.containsKey("filePollUpdates")) {
+            pollingUpdater= new FilePollUpdating();
+            pollingUpdater.startPolling( f,(long)(1000*Double.parseDouble(params.get("filePollUpdates")) ) );
+            capabilities.put(Updating.class,pollingUpdater );
+        }
+        return f;
+    }
+    /**
      * return the parameters from the URL.
      */
     protected Map getParams() {

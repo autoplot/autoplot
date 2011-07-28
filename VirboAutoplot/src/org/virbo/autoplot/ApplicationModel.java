@@ -93,6 +93,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.BindingModel;
+import org.virbo.datasource.HtmlResponseIOException;
 /**
  * Internal model of the application to separate model from view.
  * @author jbf
@@ -326,6 +327,14 @@ public class ApplicationModel {
                     mon.setProgressMessage("done loading vap file");
                     mon.finished();
                     addRecent( surl );
+                } catch (HtmlResponseIOException ex ) {
+                    // we know the URL here, so rethrow it.
+                    URL url= ex.getURL();
+                    if ( url==null ) {
+                        url= new URL( DataSetURI.getURIValid(surl).getSchemeSpecificPart() );
+                    }
+                    HtmlResponseIOException neww= new HtmlResponseIOException(ex.getMessage(),url);
+                    throw new RuntimeException(neww);
                 } catch (IOException ex) {
                     mon.finished();
                     throw new RuntimeException(ex);

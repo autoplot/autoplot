@@ -35,19 +35,23 @@ public class IstpMetadataModel extends MetadataModel {
 
     public static final String USER_PROP_VIRTUAL_COMPONENT_= "COMPONENT_";
 
-    /**
-     * returns the Entry that is convertible to double as a double.
-     * @throws IllegalArgumentException for strings
-     */
-    private double doubleValue(Object o, Units units) {
-        return doubleValue(o, units, Double.NaN);
-    }
+    private static final Object VALUE_MIN= "MIN";
+    private static final Object VALUE_MAX= "MAX";
 
     /**
      * returns the Entry that is convertible to double as a double.
      * @throws IllegalArgumentException for strings
      */
-    private double doubleValue(Object o, Units units, double deflt) {
+    private double doubleValue(Object o, Units units, Object minmax ) {
+        return doubleValue(o, units, Double.NaN, minmax ); 
+    }
+
+    /**
+     * returns the Entry that is convertible to double as a double.
+     * When there is an array, throw IllegalArgumentException
+     * @throws IllegalArgumentException for strings
+     */
+    private double doubleValue(Object o, Units units, double deflt, Object minmax ) {
         if (o == null) {
             return deflt;
         }
@@ -91,7 +95,18 @@ public class IstpMetadataModel extends MetadataModel {
                     Units.cdfEpoch.createDatum(cdfEpoch);
                     return cdfEpoch;
                 } else {
-                    return Array.getDouble(o, 0);
+                    double v= Array.getDouble(o, 0);
+                    int n= Array.getLength(o);
+                    for ( int i=1; i<n; i++ ) {
+                        if ( minmax==VALUE_MAX ) {
+                            v= Math.max( v, Array.getDouble(o,i) );
+                        } else if ( minmax==VALUE_MIN ) {
+                            v= Math.min( v, Array.getDouble(o,i) );
+                        } else {
+                            throw new IllegalArgumentException("object is array: "+o+", and minmax is not set");
+                        }
+                    }
+                    return v;
                 }
             } else {
                 throw new RuntimeException("Unsupported Data Type: " + o.getClass().getName());
@@ -104,8 +119,8 @@ public class IstpMetadataModel extends MetadataModel {
      * Note QDataSet only allows times from 1000AD to 9000AD when Units are TimeLocationUnits.
      */
     private DatumRange getValidRange(Map attrs, Units units) {
-        double max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE );
-        double min = doubleValue(attrs.get("VALIDMIN"), units, -1e29 ); //TODO: remove limitation
+        double max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE, VALUE_MAX );
+        double min = doubleValue(attrs.get("VALIDMIN"), units, -1e29, VALUE_MIN ); //TODO: remove limitation
         if ( units.isFill(min) ) min= min / 100; // kludge because DatumRanges cannot contain fill.
         if ( UnitsUtil.isTimeLocation(units) ) {
             DatumRange vrange= new DatumRange( 3.15569952E13, 2.840126112E14, Units.cdfEpoch ); // approx 1000AD to 9000AD
@@ -126,15 +141,15 @@ public class IstpMetadataModel extends MetadataModel {
 
         double min, max;
         if (attrs.containsKey("SCALEMIN") && attrs.containsKey("SCALEMAX")) {
-            max = doubleValue(attrs.get("SCALEMAX"), units);
-            min = doubleValue(attrs.get("SCALEMIN"), units);
+            max = doubleValue(attrs.get("SCALEMAX"), units, VALUE_MAX );
+            min = doubleValue(attrs.get("SCALEMIN"), units, VALUE_MIN );
         } else {
             if (attrs.containsKey("SCALEMAX")) {
-                max = doubleValue(attrs.get("SCALEMAX"), units);
+                max = doubleValue(attrs.get("SCALEMAX"), units, VALUE_MAX );
                 min = 0;
             } else {
-                max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE );
-                min = doubleValue(attrs.get("VALIDMIN"), units, -1e29 );
+                max = doubleValue(attrs.get("VALIDMAX"), units, Double.MAX_VALUE, VALUE_MAX );
+                min = doubleValue(attrs.get("VALIDMIN"), units, -1e29, VALUE_MIN );
                 if ( min>0 && max/min>1e20 ) {
                     return null;
                 }

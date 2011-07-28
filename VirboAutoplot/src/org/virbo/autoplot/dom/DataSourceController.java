@@ -4,6 +4,8 @@
  */
 package org.virbo.autoplot.dom;
 
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
@@ -17,7 +19,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.das2.CancelledOperationException;
 import org.das2.dataset.NoDataInIntervalException;
 import org.das2.datum.Datum;
@@ -40,6 +46,7 @@ import org.virbo.dataset.RankZeroDataSet;
 import org.virbo.dataset.SemanticOps;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
+import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.capability.Caching;
 import org.virbo.datasource.capability.TimeSeriesBrowse;
@@ -1347,6 +1354,24 @@ public class DataSourceController extends DomNodeController {
                 model.showMessage( "warning: "+ e.getMessage(), title, JOptionPane.WARNING_MESSAGE );
             } else {
                 // do nothing.
+            }
+
+        } catch (HtmlResponseIOException ex ) {
+            HtmlResponseIOException htmlEx= (HtmlResponseIOException)ex;
+            if ( htmlEx.getURL()!=null ) {
+                final String link= htmlEx.getURL().toString();
+                JPanel p= new JPanel( new BorderLayout( ) );
+                p.add( new JLabel(  "<html>Unable to open URI: <br>" +  dsf.getUri()+"<br><br>Downloaded file appears to be HTML.<br><a href=\""+link+"\">"+link+"</a><br>" ), BorderLayout.CENTER );
+                JPanel p1= new JPanel( new BorderLayout() );
+                p1.add( new JButton( new AbstractAction("View Page") {
+                    public void actionPerformed( ActionEvent ev ) {
+                        AutoplotUtil.openBrowser(link);
+                    }
+                }), BorderLayout.EAST );
+                p.add( p1, BorderLayout.SOUTH );
+                JOptionPane.showMessageDialog( DataSourceController.this.model.getCanvas(), p );
+            } else {
+                JOptionPane.showMessageDialog( DataSourceController.this.model.getCanvas(), "<html>Unable to open URI: <br>" +  dsf.getUri()+"<br><br>"+ex );
             }
 
         } catch (IOException e ) {

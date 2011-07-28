@@ -5,6 +5,8 @@
  */
 package org.virbo.autoplot.bookmarks;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.net.MalformedURLException;
 import org.virbo.datasource.AutoplotSettings;
 import java.awt.event.ActionEvent;
@@ -775,6 +777,8 @@ private void mergeInDefaultMenuItemActionPerformed(java.awt.event.ActionEvent ev
         bookmarksMenu.add(new AbstractAction("Manage Bookmarks") {
 
             public void actionPerformed(ActionEvent e) {
+                Container parent= BookmarksManager.this.getParent();
+                BookmarksManager.this.setLocationRelativeTo( parent );
                 setVisible(true);
             }
         });
