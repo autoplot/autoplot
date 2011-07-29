@@ -642,7 +642,15 @@ public class ScriptContext extends PyJavaInstance {
      */
     public static void bind(Object src, String srcProp, Object dst, String dstProp) {
         if ( DasApplication.hasAllPermission() ) {
-            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, BeanProperty.create( srcProp ), dst, BeanProperty.create(dstProp));
+            BeanProperty srcbp= BeanProperty.create(srcProp);
+            Object value= srcbp.getValue(src);
+            if ( value==null ) {
+                System.err.println("warning: src property "+srcProp+ " of "+src+" is null");
+            }
+            BeanProperty dstbp= BeanProperty.create(dstProp);
+            dstbp.setValue(dst, value );
+            dstbp.getValue(dst);
+            Binding b= Bindings.createAutoBinding( UpdateStrategy.READ_WRITE, src, srcbp, dst, dstbp );
             b.bind();
         } else {
             System.err.println("bindings disabled in applet environment");

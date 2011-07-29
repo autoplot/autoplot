@@ -60,6 +60,7 @@ import javax.help.CSH;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -108,6 +109,7 @@ import org.virbo.datasource.DataSetSelector;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanelUtil;
 import org.virbo.datasource.DataSourceRegistry;
+import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.SourceTypesBrowser;
 import org.virbo.datasource.TimeRangeEditor;
 import org.virbo.datasource.URISplit;
@@ -1095,7 +1097,25 @@ APSplash.checkTime("init 52");
                 tickleTimer.tickle(); 
             }
         } catch (RuntimeException ex) {
-            if ( ex.getCause()!=null && ex.getCause() instanceof IOException ) {
+            if ( ex.getCause()!=null && ex.getCause() instanceof HtmlResponseIOException ) {
+                setStatus(ERROR_ICON,"Html response from URI: " + surl);
+                HtmlResponseIOException htmlEx= ((HtmlResponseIOException)ex.getCause());
+                if ( htmlEx.getURL()!=null ) {
+                    final String link= htmlEx.getURL().toString();
+                    JPanel p= new JPanel( new BorderLayout( ) );
+                    p.add( new JLabel(  "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause().getMessage()+ "<br><a href=\""+link+"\">"+link+"</a><br>" ), BorderLayout.CENTER );
+                    JPanel p1= new JPanel( new BorderLayout() );
+                    p1.add( new JButton( new AbstractAction("View qPage") {
+                        public void actionPerformed( ActionEvent ev ) {
+                            AutoplotUtil.openBrowser(link);
+                        }
+                    }), BorderLayout.EAST );
+                    p.add( p1, BorderLayout.SOUTH );
+                    JOptionPane.showMessageDialog( this, p );
+                } else {
+                    JOptionPane.showMessageDialog( this, "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause() );
+                }
+            } else if ( ex.getCause()!=null && ex.getCause() instanceof IOException ) {
                 setStatus(ERROR_ICON,"Unable to open URI: " + surl);
                 JOptionPane.showMessageDialog( this, "<html>Unable to open URI: <br>" + surl+"<br><br>"+ex.getCause() );
             } else {

@@ -393,6 +393,9 @@ public class PlotController extends DomNodeController {
         List<PlotElement> elements = dom.controller.getPlotElementsFor(plot);
         if ( elements.size()==0 ) return;
         Plot newSettings = null;
+
+        boolean haveTsb= false;
+
         for (PlotElement p : elements) {
             Plot plot1 = p.getPlotDefaults();
             if ( p.isActive() && plot1.getXaxis().isAutoRange() ) {  // we use autoRange to indicate these are real settings, not just the defaults.
@@ -410,6 +413,10 @@ public class PlotController extends DomNodeController {
                         logger.info("plot elements on the same plot have inconsistent units");
                     }
                 }
+                DataSourceFilter dsf= this.dom.controller.getDataSourceFilterFor(p);
+                if ( dsf.getController().tsb!=null ) {
+                    haveTsb= true;
+                }
             }
         }
         
@@ -425,6 +432,13 @@ public class PlotController extends DomNodeController {
             plot.getXaxis().setLog( newSettings.getXaxis().isLog() );
             plot.getXaxis().setRange(newSettings.getXaxis().getRange());
             plot.getXaxis().setAutoRange(true);
+
+            if ( haveTsb==true ) {
+                plot.getXaxis().getController().dasAxis.setScanRange( null );
+            } else {
+                plot.getXaxis().getController().dasAxis.setScanRange( plot.getXaxis().getRange() );
+            }
+
         }
         if ( y ) {
             logCheck(newSettings.getYaxis());
@@ -836,6 +850,9 @@ public class PlotController extends DomNodeController {
                 dom.setTimeRange( newSettings.getXaxis().getRange() );
                 shouldBindX= true;
                 shouldSetAxisRange= true;
+            }
+            if ( !plot.getXaxis().isAutoRange() ) {
+                plot.getXaxis().setAutoRange(true); // setting the time range would clear autoRange here.
             }
             DatumRange xrange= newSettings.getXaxis().getRange();
             if ( dom.timeRange.getUnits().isConvertableTo(xrange.getUnits()) &&
