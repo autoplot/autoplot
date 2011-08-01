@@ -530,7 +530,7 @@ public class CdfUtil {
             mon.setTaskSize(nread+1);
             for ( int i=0; i<nread; i++ ) {
                 mon.setTaskProgress(i);
-                CDFData cdfData= CDFData.get( variable, recStart + i*blockSize, blockSize, recInterval, dimIndeces, dimCounts, dimIntervals, false );
+                CDFData cdfData= variable.getHyperDataObject( recStart + i*blockSize, blockSize, recInterval, dimIndeces, dimCounts, dimIntervals );
                 float[] odata1= (float[])cdfData.getRawData(); // this is my hack
                 System.arraycopy( odata1, 0, (float[])odata, (int)(recSizeCount*i*blockSize), (int)(recSizeCount*blockSize) );
             }
@@ -538,13 +538,13 @@ public class CdfUtil {
             long nremain= rc - ( recStart + nread*blockSize );
             if ( nremain>0 ) {
                 mon.setTaskProgress(nread);
-                CDFData cdfData= CDFData.get( variable, recStart + nread*blockSize, nremain, recInterval, dimIndeces, dimCounts, dimIntervals, false );
+                CDFData cdfData= variable.getHyperDataObject( recStart + nread*blockSize, nremain, recInterval, dimIndeces, dimCounts, dimIntervals );
                 float[] odata1= (float[])cdfData.getRawData(); // this is my hack
                 System.arraycopy( odata1, 0, (float[])odata, (int)(recSizeCount*nread*blockSize), (int)(recSizeCount*nremain) );
             }
             mon.finished();
         } else {
-            CDFData cdfData= CDFData.get( variable, recStart, rc, recInterval, dimIndeces, dimCounts, dimIntervals, false );
+            CDFData cdfData= variable.getHyperDataObject( recStart, rc, recInterval, dimIndeces, dimCounts, dimIntervals );
             odata= cdfData.getRawData(); // this is my hack
 
             if ( ! odata.getClass().isArray() ) {
