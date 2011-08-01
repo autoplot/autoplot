@@ -13,6 +13,7 @@ package org.virbo.autoplot;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.PropertyChangeEvent;
@@ -24,6 +25,9 @@ import java.util.regex.Pattern;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
@@ -335,6 +339,40 @@ public class DataPanel extends javax.swing.JPanel {
 
     }
 
+    private JMenuItem createMenuItem( final String insert, String doc ) {
+        JMenuItem result= new JMenuItem( new AbstractAction( insert ) {
+            public void actionPerformed(ActionEvent e) {
+                String v= componentTextField.getText();
+                int i= componentTextField.getCaretPosition();
+                componentTextField.setText( v.substring(0,i) + insert + v.substring(i) );
+            }
+        });
+        result.setToolTipText(doc);
+        return result;
+    }
+
+    private JPopupMenu processMenu;
+    void initProcessMenu() {
+        processMenu= new JPopupMenu();
+        processMenu.add( createMenuItem( "|histogram()", "perform an \"auto\" histogram of the data that automatically sets bins. " ) );
+        processMenu.add( createMenuItem( "|logHistogram()", "perform the auto histogram in the log space." ) );
+        processMenu.add( createMenuItem( "|log10()", "take the base-10 log of the data." ) );
+        processMenu.add( createMenuItem( "|exp10()", "plot pow(10,ds)" ) );
+        processMenu.add( createMenuItem( "|slice0(0)", "slice the data on the zeroth dimension (often time) at the given index." ) );
+        processMenu.add( createMenuItem( "|slice1(0)", "slice the data on the first dimension at the given index." ) );
+        processMenu.add( createMenuItem( "|collapse0", "average over the zeroth dimension to reduce the dimensionality." ) );
+        processMenu.add( createMenuItem( "|collapse1", "average over the first dimension to reduce the dimensionality." ) );
+        processMenu.add( createMenuItem( "|transpose", "transpose the rank 2 dataset." ) );
+        processMenu.add( createMenuItem( "|fftWindow(128)", "plot power spectrum by breaking waveform data in windows of length size (experimental, not for publication)." ) );
+        processMenu.add( createMenuItem( "|fftPower(128)", "plot power spectrum by breaking waveform data in windows of length size (experimental, not for publication)." ) );
+        processMenu.add( createMenuItem( "|smooth(5)", "box car average over the rank 1 data" ) );
+        
+    }
+    void showProcessMenu( MouseEvent ev) {
+        initProcessMenu();
+        processMenu.show(ev.getComponent(), ev.getX(), ev.getY());
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -394,6 +432,14 @@ public class DataPanel extends javax.swing.JPanel {
 
         componentTextField.setText("jTextField1");
         componentTextField.setToolTipText("Process string that specifies component to plot, or how a data set's dimensionality should be reduced before display.");
+        componentTextField.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                componentTextFieldMousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                componentTextFieldMouseReleased(evt);
+            }
+        });
         componentTextField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 componentTextFieldActionPerformed(evt);
@@ -582,6 +628,18 @@ public class DataPanel extends javax.swing.JPanel {
         setAdjusting(false);
         componentChanged();
     }//GEN-LAST:event_componentTextFieldFocusLost
+
+    private void componentTextFieldMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_componentTextFieldMousePressed
+        if ( evt.isPopupTrigger() ) {
+            showProcessMenu(evt);
+        }
+    }//GEN-LAST:event_componentTextFieldMousePressed
+
+    private void componentTextFieldMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_componentTextFieldMouseReleased
+        if ( evt.isPopupTrigger() ) {
+            showProcessMenu(evt);
+        }
+    }//GEN-LAST:event_componentTextFieldMouseReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
