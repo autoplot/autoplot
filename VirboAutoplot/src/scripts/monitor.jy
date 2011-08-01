@@ -1,0 +1,15 @@
+# demo the usage the the 
+monitor.setTaskSize(100)
+
+monitor.started()
+
+for i in xrange(100):
+  if ( i>50 ):
+     if ( monitor.isCancelled() ):
+        raise Exception('Interrupted')
+  monitor.setTaskProgress(i)
+  if ( i==20 ):
+     monitor.setProgressMessage('at 20' )
+  if ( i==90 ):
+     monitor.setProgressMessage('almost done' )
+  java.lang.Thread.sleep(100)
