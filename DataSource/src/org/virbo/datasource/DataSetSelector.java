@@ -7,6 +7,7 @@ package org.virbo.datasource;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.Frame;
@@ -402,6 +403,7 @@ public class DataSetSelector extends javax.swing.JPanel {
      * This can be called from the event thread.
      */
     public void browseSourceType() {
+        setCursor( Cursor.getPredefinedCursor( Cursor.WAIT_CURSOR ) );
         String surl = ((String) dataSetSelector.getEditor().getItem()).trim();
 
         boolean wasRejected= false;
@@ -430,6 +432,7 @@ public class DataSetSelector extends javax.swing.JPanel {
                     boolean proceed;
                     try {
                         proceed = fedit.prepare(fsurl, window, getMonitor("download file", "downloading file to preparing editor"));
+                        setCursor( Cursor.getDefaultCursor() );
                         if ( !proceed ) return;
                     } catch ( java.io.InterruptedIOException ex ) {
                         setMessage( "download cancelled" );  //TODO: check FTP
@@ -489,6 +492,7 @@ public class DataSetSelector extends javax.swing.JPanel {
             thread.start();
 
         } else {
+            setCursor( Cursor.getDefaultCursor() );
             if ( !wasRejected ) {
                 if (!surl.contains("?")) {
                     surl += "?";
