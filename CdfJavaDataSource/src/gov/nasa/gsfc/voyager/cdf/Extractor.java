@@ -1704,7 +1704,8 @@ public class Extractor {
         }
     }
     public static double [] get1DSeries(CDF thisCDF, Variable var, int[] pt,
-        int[] stride) throws IllegalAccessException, InvocationTargetException {
+        int[] stride) throws IllegalAccessException, InvocationTargetException,
+        Throwable {
         double [] data;
         
         int end = -1;
@@ -1756,11 +1757,11 @@ public class Extractor {
             if (last < begin) continue;
             int count = (last - first + 1);
             bv = positionBuffer((CDFImpl)thisCDF, var, loc[2], count);
+            // position buffer at the first point desired
+            // init is the index of the first point desired
             int pos = 0;
             int init;
             if (begin > first) {
-                pos = bv.position() + (begin - first)*itemSize;
-                bv.position(pos);
                 init = begin;
             } else {
                 init = first;
@@ -1768,12 +1769,13 @@ public class Extractor {
                     int elapsed = first - begin;
                     if ((elapsed % _stride) != 0) {
                         init = first - (elapsed % _stride) + _stride;
-                        pos = bv.position() + 
-                            (_stride - (elapsed % _stride))*itemSize;
-                        bv.position(pos);
                     }
                 }
             }
+            pos = bv.position() + (init - first)*itemSize;
+            bv.position(pos);
+            // compute number of points to be extracted and
+            // allocate temporary storage if necessary
             if (end < 0) { // single point needed
                 do1D(bv, type, tf, data, 0, elements);
                 offset += elements;
@@ -1788,7 +1790,6 @@ public class Extractor {
                     if (DataTypes.typeCategory[type] == 0) {
                         tf = new float[count*elements];
                     }
-                    // need to position to first desired element
                     do1D(bv, type, tf, data, offset, count,
                         elements, _stride);
                 }
@@ -1799,11 +1800,13 @@ public class Extractor {
         if (offset == 0) return null;
         return data;
     }
+    // bv is positioned at the first point desired
     static void do1D(ByteBuffer bv, int type, float[] tf, double[] data,
        int offset, int count, int elements, int _stride) throws
-       IllegalAccessException, InvocationTargetException {
+       IllegalAccessException, InvocationTargetException, Throwable {
         Method method;
         int span = _stride*elements;
+        int pos = bv.position();
         switch (DataTypes.typeCategory[type]) {
         case 0:
             FloatBuffer bvf = bv.asFloatBuffer();
@@ -1823,8 +1826,37 @@ public class Extractor {
                 offset += elements;
             }
             break;
+        case 2:
+            method = DataTypes.method[type];
+            for (int n = 0; n < count; n++) {
+                bv.position(pos + n*span);
+                for (int e = 0; e < elements; e++) {
+                    Number num = 
+                        (Number)method.invoke(bv, new Object[] {});
+                    data[offset++] = num.doubleValue();
+                }
+            }
+            break;
+        case 3:
+            method = DataTypes.method[type];
+            long longInt = DataTypes.longInt[type];
+            for (int n = 0; n < count; n++) {
+                bv.position(n*span);
+                for (int e = 0; e < elements; e++) {
+                    Number num = (Number)method.invoke(bv,
+                        new Object[] {});
+                    int x = num.intValue();
+                    data[offset++] =
+                        (x >= 0)?(double)x:(double)(longInt + x);
+                }
+            }
+            break;
+        default:
+            throw new Throwable("Unsupported data type for this " +
+                "context");
         }
     }
+
     public static double [][] getSampledTimeSeries0(CDF thisCDF, Variable var,
         Boolean ignoreFill, double[] timeRange, int[] stride) throws Throwable
         {

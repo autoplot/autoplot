@@ -1054,6 +1054,7 @@ public abstract class CDFImpl implements java.io.Serializable {
                     if (longType) lvalue[i] = num.longValue();
                 }
             } else {
+                value = new double[ne];
                 for (int i = 0; i < nelement; i++) {
                     Number num =
                         (Number)DataTypes.method[type].invoke(vbufLocal,
@@ -1063,8 +1064,11 @@ public abstract class CDFImpl implements java.io.Serializable {
                 }
             }
         } catch(Exception ex) {
+            System.out.println("getNumberAttribute: " + vbuf);
+            ex.printStackTrace();
             return null;
         }
+
         if (longType) return lvalue;
         return value;
     }
