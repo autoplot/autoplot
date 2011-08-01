@@ -1,10 +1,14 @@
 # wdc_kp_ap.jyds
 #
-# Reads data from the World Data Center in a format that is beyond the specification of the AsciiTableParser.
+# Reads data from the World Data Center in a format that is beyond the abilities of the AsciiTableParser.
 # Example file: ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/1986
-
+#
+# This can be used as a reader for any of these files:
+# vap+jyds:ftp://ftp.ngdc.noaa.gov/STP/GEOMAGNETIC_DATA/INDICES/KP_AP/1989?script=file:/home/jbf/temp/autoplot2010/JythonDataSource/src/wdc_kp_ap.jyds
+#          \--------------- resourceURI ---------------------------------/
+#
 # getAp=1 read Ap, otherwise read Kp.
-getAp= getParam( 'getAp', 0 )
+getAp= getParam( 'getAp', 0, '0= read Kp data, 1= read Ap data' )
 
 # If not specified, assume Jeremy is testing.
 if ( resourceURI==None ):

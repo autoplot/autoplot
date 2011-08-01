@@ -1,13 +1,9 @@
+# shows very simple load datasets and take difference
 
-ds1= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.H.20080404.smooth/density.20080404.H.20080404.smooth.d2s" )
-ds2= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.water.20080404.smooth/density.20080404.water.20080404.smooth.d2s" )
+ds1= getDataSet( "http://autoplot.org/data/image/Capture_00158.jpg?channel=greyscale" )
+ds2= getDataSet( "http://autoplot.org/data/image/Capture_00159.jpg?channel=greyscale" )
 
-result= add( ds1, ds2 )
+result1= add( ds1, ds2 )
+result2= ds1 + ds2           # python operators are overloaded, this is the same
 
-ds3= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.H.20080404.out/density.20080404.H.20080404.out.d2s" )
-ds4= getDataSet( "file:///home/jbf/sun/cassini/ondrej/saturn_denmodel/20080404.water.20080404.out/density.20080404.water.20080404.out.d2s" )
-
-result2= add( ds3, ds4 )
-result3= ds3 + ds4
-
-result4= ds3 - ds4
+result= ds2 - ds1

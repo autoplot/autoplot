@@ -1,3 +1,5 @@
+# Here are some code fragments for testing and demonstrating slicing datasets.
+
 #a= randomn( 0, 2000, 30 )
 #result= a[:,:]
 #r2= result[9,:]

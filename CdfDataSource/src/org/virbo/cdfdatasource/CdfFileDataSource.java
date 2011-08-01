@@ -72,19 +72,29 @@ public class CdfFileDataSource extends AbstractDataSource {
     
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
         File cdfFile;
+
+        mon.started();
         cdfFile = getFile(mon);
 
+        mon.setProgressMessage("retrieving file...");
         String fileName = cdfFile.toString();
         //if (System.getProperty("os.name").startsWith("Windows")) {
         //    fileName = CdfUtil.win95Name(cdfFile);
         //}
         Map map = getParams();
 
+        mon.setProgressMessage("opening file...");
         CDF cdf = CDF.open(fileName, CDF.READONLYoff);
+
+        mon.setProgressMessage("done opening file");
+        
         String svariable = (String) map.get(PARAM_ID);
+
         if (svariable == null) {
             svariable = (String) map.get("arg_0");
         }
+
+        mon.setProgressMessage("reading "+svariable);
 
         if ( svariable==null ) {
             throw new IllegalArgumentException("CDF URI needs an argument");
@@ -193,6 +203,8 @@ public class CdfFileDataSource extends AbstractDataSource {
             return result;
         } catch (CDFException ex) {
             throw new IllegalArgumentException("no such variable: " + svariable);
+        } finally {
+            mon.finished();
         }
 
     }

@@ -1,3 +1,8 @@
+# demos use of the progress monitor which is provided to scripts
+# as the variable "monitor".  Note too that switching variables when
+# plotting, like from "?result" to "?h", doesn't reload--results 
+# are cached.
+
 from time import sleep;
 from java.lang import System;
 

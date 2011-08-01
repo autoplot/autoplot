@@ -414,7 +414,7 @@ public class PlotController extends DomNodeController {
                     }
                 }
                 DataSourceFilter dsf= this.dom.controller.getDataSourceFilterFor(p);
-                if ( dsf.getController().tsb!=null ) {
+                if ( dsf!=null && dsf.getController()!=null && dsf.getController().tsb!=null ) {
                     haveTsb= true;
                 }
             }

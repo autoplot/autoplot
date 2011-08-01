@@ -1,3 +1,5 @@
+# another demo of rank 2 interpolation
+
 AA= ones(2,2)
 AA[0,0]= 0
 AA[1,1]= 0

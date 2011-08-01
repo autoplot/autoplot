@@ -9,6 +9,8 @@
 
 package org.virbo.autoplot;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.components.DasProgressPanel;
 import org.das2.dasml.SerializeUtil;
@@ -43,6 +45,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 //import org.apache.xml.serialize.OutputFormat;
 //import org.apache.xml.serialize.XMLSerializer;
+import org.das2.util.filesystem.FileSystem;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -156,6 +159,7 @@ public class PersistentStateSupport {
     public PersistentStateSupport( Component parent, SerializationStrategy strategy, String extension ) {
         this.strategy= strategy;
         this.ext= "."+extension;
+        this.component= parent;
         Preferences prefs= Preferences.userNodeForPackage(PersistentStateSupport.class);
         String currentDirString= prefs.get( PREF_DIR+ext, "" );
         if ( !currentDirString.equals("") ) {
@@ -189,14 +193,25 @@ public class PersistentStateSupport {
     /**
      * Save the state to the file selected by a JFileChooser.
      * @return same as jFileChooser.showSaveDialog(), for example:
-     *    JFileChooser.CANCEL_OPTION   means the option was cancelled.
+     *    JFileChooser.CANCEL_OPTION   means the option was canceled.
      *    JFileChooser.APPROVE_OPTION  means the file was saved.
      *    Note this is not the same as  JOptionPane.CANCEL_OPTION!
      */
     public int saveAs() {
         JFileChooser chooser= new JFileChooser();
         if ( getDirectory()!=null ) chooser.setCurrentDirectory( new File( getDirectory() ) );
-        if ( getCurrentFile()!=null ) chooser.setSelectedFile( new File( getCurrentFile() ) );
+        if ( getCurrentFile()!=null ) {
+            File child= new File( getCurrentFile() );
+            File parent= FileSystem.settings().getLocalCacheDir();
+            try {
+                if ( child.getCanonicalPath().startsWith(parent.getCanonicalPath())) {
+                    child= new File( getDirectory(), child.getName() );
+                }
+                chooser.setSelectedFile( child );
+            } catch (IOException ex) {
+                Logger.getLogger(PersistentStateSupport.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
         VapSchemeChooser vapVersion= new VapSchemeChooser();
         chooser.setAccessory( vapVersion );
@@ -310,7 +325,19 @@ public class PersistentStateSupport {
                 if ( getCurrentFile()==null ) {
                     saveAs();
                 } else {
-                    save( new File( getCurrentFile()),"" );
+                    try {
+                        File child = new File(getCurrentFile());
+                        File parent = FileSystem.settings().getLocalCacheDir();
+                        if (child.getCanonicalPath().startsWith(parent.getCanonicalPath())) {
+                            child = new File(getDirectory(), child.getName());
+                            setCurrentFile(child.toString());
+                            saveAs();
+                        } else {
+                            save(new File(getCurrentFile()),"");
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(PersistentStateSupport.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         };

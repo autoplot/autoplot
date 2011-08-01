@@ -1,3 +1,6 @@
+# demos a few items of metadata that can be set.
+# see http://www.autoplot.org/QDataSet#DataSet_Attributes
+
 result= rand( 20,20,20 )
 result[:,0,0]= dindgen(20)
 result[:,3,6]= 0
@@ -6,3 +9,4 @@ result[0,14,:]= 0
 
 result.putProperty( QDataSet.TITLE, 'this is my data' )
 result.putProperty( QDataSet.FILL_VALUE, 0. )
+result.putProperty( QDataSet.RENDER_TYPE, 'nnSpectrogram' )

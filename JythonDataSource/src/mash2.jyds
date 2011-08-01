@@ -1,4 +1,14 @@
+# shows how to modify a dataset.  This used to be a much simpler script
+# but now we're more fussy about units.
+
+from org.virbo.dataset import ArrayDataSet
+from org.virbo.dataset.DataSetUtil import asDataSet
+
 data= getDataSet( 'http://cdaweb.gsfc.nasa.gov/cgi-bin/opendap/nph-dods/istp_public/data/genesis/3dl2_gim/2003/genesis_3dl2_gim_20030501_v01.cdf.dds?Proton_Density' )
-data= data+0   # convert to mutable dataset
-r= where( data < 3 )
+data= ArrayDataSet.copy(data)   # convert to mutable dataset
+#r= where( data .lt( 3 ) )  # units conversion error
+
+t= asDataSet( 3, data.property(QDataSet.UNITS) )
+r= where( data .lt( t ) ) 
+
 data[r]= 3

@@ -1,13 +1,16 @@
+# this shows the histogram function, and also times each operation.  
+# "print" commands are output to the script console.
+
 from java.lang.System import currentTimeMillis
 
 t0= currentTimeMillis()
 data= randn(3000000)
-print currentTimeMillis() - t0
+print 'make random dataset: %d ms' % ( currentTimeMillis() - t0 )
 
 #x= data[1:] - data[:-1]
 x= diff(data)
-print currentTimeMillis() - t0
+print 'do differences: %d ms' % ( currentTimeMillis() - t0 )
 
 result= histogram(x,-5,5,0.1 )
-print currentTimeMillis() - t0
+print 'finished histogram: %d ms' % ( currentTimeMillis() - t0 )
 

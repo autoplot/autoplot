@@ -90,107 +90,112 @@ public class CDAWebDataSource extends AbstractDataSource {
         CDAWebDB db= CDAWebDB.getInstance();
 
         mon.started();
-        mon.setProgressMessage("refreshing database");
-        db.maybeRefresh( new NullProgressMonitor() );
-
-        String tmpl= db.getNaming(ds.toUpperCase());
-        String base= db.getBaseUrl(ds.toUpperCase());
-
-        FileSystem fs= FileSystem.create( new URI( base ) );
-        FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
-
-        String[] files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
-
-        DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
         ArrayDataSet result = null;
 
-        mon.setTaskSize(files.length*10);
-        mon.started();
+        try {
+            mon.setProgressMessage("refreshing database");
+            db.maybeRefresh( new NullProgressMonitor() );
 
-        //we need to look in the file to see if it is virtual
-        mon.setProgressMessage("get metadata");
-        getMetadata(mon);
-        mon.started(); //kludge
+            String tmpl= db.getNaming(ds.toUpperCase());
+            String base= db.getBaseUrl(ds.toUpperCase());
 
-        String virtual= (String) metadata.get( "VIRTUAL" );
+            FileSystem fs= FileSystem.create( new URI( base ) );
+            FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
 
-        DatumRange range=null;
+            String[] files= fsm.getBestNamesFor( tr, new NullProgressMonitor() );
 
-        for ( int i=0; i<files.length; i++ ) {
-            if ( mon.isCancelled() ) break;
-            mon.setTaskProgress(i*10);
-            mon.setProgressMessage( "reading "+files[i] );
+            DataSourceFactory cdfFileDataSourceFactory= getDelegateFactory();
 
-            ProgressMonitor t1= SubTaskMonitor.create( mon, i*10, (i+1)*10 );
+            mon.setTaskSize(files.length*10);
+            mon.started();
 
-            QDataSet ds1;
-            if ( virtual!=null && !virtual.equals("") ) {
-                int nc=0;
-                List<QDataSet> comps= new ArrayList();
-                String function= (String)metadata.get( "FUNCTION" );
-                if ( function==null ) {
-                    function= (String)metadata.get( "FUNCT" ); // THA_L2_ESA
-                }
-                if ( function!=null ) {
-                    String comp= (String)metadata.get( "COMPONENT_"  + nc );
-                    while ( comp!=null ) {
-                        DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
-                        ds1= dataSource.getDataSet( t1 );
-                        comps.add( ds1 );
-                        nc++;
-                        comp= (String) metadata.get( "COMPONENT_"  + nc );
+            //we need to look in the file to see if it is virtual
+            mon.setProgressMessage("get metadata");
+            getMetadata(mon);
+            mon.started(); //kludge
+
+            String virtual= (String) metadata.get( "VIRTUAL" );
+
+            DatumRange range=null;
+
+            for ( int i=0; i<files.length; i++ ) {
+                if ( mon.isCancelled() ) break;
+                mon.setTaskProgress(i*10);
+                mon.setProgressMessage( "reading "+files[i] );
+
+                ProgressMonitor t1= SubTaskMonitor.create( mon, i*10, (i+1)*10 );
+
+                QDataSet ds1;
+                if ( virtual!=null && !virtual.equals("") ) {
+                    int nc=0;
+                    List<QDataSet> comps= new ArrayList();
+                    String function= (String)metadata.get( "FUNCTION" );
+                    if ( function==null ) {
+                        function= (String)metadata.get( "FUNCT" ); // THA_L2_ESA
                     }
-                    try {
-                        ds1= CdfVirtualVars.execute( function, comps );
-                    } catch (IllegalArgumentException ex ){
-                        throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
-                    }
-                } else {
+                    if ( function!=null ) {
+                        String comp= (String)metadata.get( "COMPONENT_"  + nc );
+                        while ( comp!=null ) {
+                            DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + comp ) );
+                            ds1= dataSource.getDataSet( t1 );
+                            comps.add( ds1 );
+                            nc++;
+                            comp= (String) metadata.get( "COMPONENT_"  + nc );
+                        }
+                        try {
+                            ds1= CdfVirtualVars.execute( function, comps );
+                        } catch (IllegalArgumentException ex ){
+                            throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not supported: "+function );
+                        }
+                    } else {
                     throw new IllegalArgumentException("The virtual variable " + param + " cannot be plotted because the function is not identified" );
-                }
-            } else {
-                Map<String,String> fileParams= getParams();
-                fileParams.remove( PARAM_TIMERANGE );
-                fileParams.remove( PARAM_DS );
-                DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
-                ds1= dataSource.getDataSet( t1 );
-            }
-
-            if (result == null) {
-                range= fsm.getRangeFor(files[i]);
-                if ( files.length==1 ) {
-                    result= ArrayDataSet.maybeCopy(ds1);
+                    }
                 } else {
-                    result = ArrayDataSet.maybeCopy(ds1);
-                    result.grow(result.length()*files.length*11/10);  //110%
+                    Map<String,String> fileParams= getParams();
+                    fileParams.remove( PARAM_TIMERANGE );
+                    fileParams.remove( PARAM_DS );
+                    DataSource dataSource= cdfFileDataSourceFactory.getDataSource( fs.getRootURI().resolve(files[i] + "?" + URISplit.formatParams(fileParams) ) );
+                    ds1= dataSource.getDataSet( t1 );
                 }
-            } else {
-                ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
-                if ( result.canAppend(ads1) ) {
-                    result.append( ads1 );
+
+                if (result == null) {
+                    range= fsm.getRangeFor(files[i]);
+                    if ( files.length==1 ) {
+                        result= ArrayDataSet.maybeCopy(ds1);
+                    } else {
+                        result = ArrayDataSet.maybeCopy(ds1);
+                        result.grow(result.length()*files.length*11/10);  //110%
+                    }
                 } else {
-                    result.grow( result.length() + ads1.length() * ( files.length-i) );
-                    result.append( ads1 );
+                    ArrayDataSet ads1= ArrayDataSet.maybeCopy(result.getComponentType(),ds1);
+                    if ( result.canAppend(ads1) ) {
+                        result.append( ads1 );
+                    } else {
+                        result.grow( result.length() + ads1.length() * ( files.length-i) );
+                        result.append( ads1 );
+                    }
+                    range= DatumRangeUtil.union( range,fsm.getRangeFor(files[i]) );
                 }
-                range= DatumRangeUtil.union( range,fsm.getRangeFor(files[i]) );
+
             }
 
-        }
+            // we know the ranges for timeseriesbrowse, klduge around autorange 10% bug.
+            if ( result!=null ) {
+                MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
+                if ( dep0!=null && range!=null ) {
+                    Units dep0units= (Units) dep0.property(QDataSet.UNITS);
+                    dep0.putProperty( QDataSet.TYPICAL_MIN, range.min().doubleValue(dep0units) );
+                    dep0.putProperty( QDataSet.TYPICAL_MAX, range.max().doubleValue(dep0units) );
+                }
 
-        // we know the ranges for timeseriesbrowse, klduge around autorange 10% bug.
-        if ( result!=null ) {
-            MutablePropertyDataSet dep0= (MutablePropertyDataSet) result.property(QDataSet.DEPEND_0);
-            if ( dep0!=null && range!=null ) {
-                Units dep0units= (Units) dep0.property(QDataSet.UNITS);
-                dep0.putProperty( QDataSet.TYPICAL_MIN, range.min().doubleValue(dep0units) );
-                dep0.putProperty( QDataSet.TYPICAL_MAX, range.max().doubleValue(dep0units) );
+                Map<String,String> user= new HashMap<String, String>();
+                user.put( "delegate", base + "/" + tmpl );
+
+                result.putProperty( QDataSet.USER_PROPERTIES, user );
             }
-
-            Map<String,String> user= new HashMap<String, String>();
-            user.put( "delegate", base + "/" + tmpl );
-
-            result.putProperty( QDataSet.USER_PROPERTIES, user );
+        } finally {
+            mon.finished();
         }
         
         return result;

@@ -1,6 +1,9 @@
+# demos writing a new function "smoothfit"  yy(xx) is a noisy 
+# function.  This smooths the function, and does a fit at the ends.
+
 m= 0.79
 b= 3.8
-sig= 0.1
+sig= 0.5
 
 nn= 100
 

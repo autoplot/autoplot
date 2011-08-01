@@ -1,3 +1,8 @@
+# this summaries data from the Hudson server used for building and testing.
+# On my system, it looks at '/var/local/hudson-rt/jobs/autoplot-test032/builds/' but 
+# the 'dir' parameter allows it to be pointed out a different directory.  
+# Note the script editor automatically creates a GUI to specify the location.
+
 from javax.xml.parsers import ParserConfigurationException
 from javax.xml.parsers import DocumentBuilderFactory
 from javax.xml.xpath import XPath
@@ -11,13 +16,13 @@ from java.io import File
 from java.io import FileInputStream
 from java.lang import Double
 
-dir= getParam( 'dir', '/home/jbf/temp/ap4/', 'Directory containing builds $Y-$m-$d_$H-$M-$S' )
+dir= getParam( 'dir', '/var/local/hudson-rt/jobs/autoplot-test032/builds/', 'Directory containing builds $Y-$m-$d_$H-$M-$S' )
 if ( dir[-1]!='/' ): dir=dir+'/'
 
 tp = TimeParser.create( '%Y-%m-%d_%H-%M-%S' )
 
 print 'listing directory '+dir +'*-*-*_*-*-*'
-files= list(dir+'*-*-*_*-*-*')
+files= listDirectory(dir+'*-*-*_*-*-*')
 
 from org.virbo.dsutil import DataSetBuilder
 build= DataSetBuilder(2,100,2)

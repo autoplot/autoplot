@@ -1,5 +1,4 @@
-import java
-
 xx= dindgen( 20 ) + randomn( 0, 20 ) / 5.0
-
 yy= applyLambda( xx, lambda x : x - java.lang.Math.floor(x) )
+
+result= yy

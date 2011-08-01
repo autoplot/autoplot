@@ -1,5 +1,0 @@
-import java
-
-xx= dindgen( 20 ) + randomn( 0, 20 ) / 10.0
-
-yy= applyUnary( xx, lambda x : x-java.lang.Math.floor(x) )

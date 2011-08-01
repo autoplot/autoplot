@@ -8,3 +8,8 @@ z= sqrt( x**2 + y**2 )
 y.putProperty( QDataSet.DEPEND_0, x )
 y.putProperty( QDataSet.PLANE_0, z )
 result= y
+
+x= randn( 10000 )
+y= randn( 10000 )
+z= sqrt( x**2 + y**2 )
+result2= link( x, y, z )  # this is the new way of doing this, but there's a bug so it's not handled properly.
