@@ -22,11 +22,11 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Component id="prevButton" min="-2" pref="46" max="-2" attributes="0"/>
+              <Component id="prevButton" linkSize="3" min="-2" pref="40" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="timeRangeTextField" pref="244" max="32767" attributes="0"/>
+              <Component id="timeRangeTextField" pref="256" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="nextButton" min="-2" pref="46" max="-2" attributes="0"/>
+              <Component id="nextButton" linkSize="3" min="-2" pref="34" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="browseButton" min="-2" pref="30" max="-2" attributes="0"/>
           </Group>
@@ -49,7 +49,9 @@
   <SubComponents>
     <Component class="javax.swing.JButton" name="prevButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;&lt;"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/org/virbo/datasource/skipBack1616.png"/>
+        </Property>
         <Property name="toolTipText" type="java.lang.String" value="Scan to the previous interval"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[34, 20]"/>
@@ -67,7 +69,9 @@
     </Component>
     <Component class="javax.swing.JButton" name="nextButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&gt;&gt;"/>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/org/virbo/datasource/skipForward1616.png"/>
+        </Property>
         <Property name="toolTipText" type="java.lang.String" value="Scan to the next interval"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[34, 24]"/>

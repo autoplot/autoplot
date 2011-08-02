@@ -135,7 +135,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
         setPreferredSize(new java.awt.Dimension(384, 39));
 
-        prevButton.setText("<<");
+        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/skipBack1616.png"))); // NOI18N
         prevButton.setToolTipText("Scan to the previous interval");
         prevButton.setMaximumSize(new java.awt.Dimension(34, 20));
         prevButton.setMinimumSize(new java.awt.Dimension(34, 20));
@@ -146,7 +146,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
-        nextButton.setText(">>");
+        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/skipForward1616.png"))); // NOI18N
         nextButton.setToolTipText("Scan to the next interval");
         nextButton.setMaximumSize(new java.awt.Dimension(34, 24));
         nextButton.setMinimumSize(new java.awt.Dimension(34, 24));
@@ -188,14 +188,17 @@ public class TimeRangeEditor extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(prevButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 46, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(prevButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 40, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                .add(timeRangeTextField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(nextButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 46, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(nextButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 34, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(browseButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 30, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
         );
+
+        layout.linkSize(new java.awt.Component[] {nextButton, prevButton}, org.jdesktop.layout.GroupLayout.HORIZONTAL);
+
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
