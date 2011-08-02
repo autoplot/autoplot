@@ -135,7 +135,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
 
         setPreferredSize(new java.awt.Dimension(384, 39));
 
-        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/skipBack1616.png"))); // NOI18N
+        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/skipBackSens1616.png"))); // NOI18N
         prevButton.setToolTipText("Scan to the previous interval");
         prevButton.setMaximumSize(new java.awt.Dimension(34, 20));
         prevButton.setMinimumSize(new java.awt.Dimension(34, 20));
@@ -146,7 +146,7 @@ public class TimeRangeEditor extends javax.swing.JPanel {
             }
         });
 
-        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/skipForward1616.png"))); // NOI18N
+        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/virbo/datasource/skipForwardSens1616.png"))); // NOI18N
         nextButton.setToolTipText("Scan to the next interval");
         nextButton.setMaximumSize(new java.awt.Dimension(34, 24));
         nextButton.setMinimumSize(new java.awt.Dimension(34, 24));
