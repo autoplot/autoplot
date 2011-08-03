@@ -187,6 +187,8 @@ public class JythonUtil {
 
         Pattern assignPattern= Pattern.compile("\\s*([_a-zA-Z][_a-zA-Z0-9]*)\\s*=.*(#(.*))?");
         Pattern defPattern= Pattern.compile("def .*");
+        Pattern importPattern1= Pattern.compile("from .*");
+        Pattern importPattern2= Pattern.compile("import .*");
 
         boolean inDef= false;
 
@@ -207,13 +209,17 @@ public class JythonUtil {
                 if ( s.length()>0 && !Character.isWhitespace(s.charAt(0)) ) {
                     Matcher defm= defPattern.matcher(s);
                     inDef=  defm.matches();
-                    if ( inDef ) sideEffect= false;
+                    if ( inDef ) sideEffect= false; //TODO: what about blank line, this isn't an "END"
                 }
             }
 
             if ( !inDef ) {
                 Matcher m= assignPattern.matcher(s);
                 if ( m.matches() ) {
+                    sideEffect= false;
+                } else if ( importPattern1.matcher(s).matches() ) {
+                    sideEffect= false;
+                } else if ( importPattern2.matcher(s).matches() ) {
                     sideEffect= false;
                 }
             }
