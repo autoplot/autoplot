@@ -444,7 +444,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
                         if (mon.isCancelled()) {
                             throw new RuntimeException(new InterruptedIOException("transfer cancelled by user"));
                         }
-                        long dt = System.currentTimeMillis() - t0;
+                        long dt = Math.max( 1, System.currentTimeMillis() - t0 );
                         mon.setTaskProgress(totalBytes);
                         mon.setProgressMessage(totalBytes / 1000 + "KB read at " + (totalBytes / dt) + " KB/sec");
                         
@@ -463,7 +463,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
                 if (ex.getCause() instanceof IOException) {
                     throw (IOException) ex.getCause();
                 } else {
-                    throw new IOException(ex.toString());
+                    IOException tex= new IOException(ex.toString()); // TODO Java 1.6 will fix this
+                    tex.initCause(ex);
+                    throw tex;
                 }
             } catch (FtpException ex) {
                 throw new IOException(ex.getMessage());

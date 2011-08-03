@@ -1336,7 +1336,7 @@ public class DataSourceController extends DomNodeController {
         //embedDsDirty = true;
         } catch (InterruptedIOException ex) {
             setException(ex);
-            setDataSet(null);
+            setDataSet(null); //TODO: maybe we should allow the old dataset to stay, in case TSB....
             setStatus("interrupted");
             if ( dsf.getUri()!=null ) this.model.addException( dsf.getUri(), ex );
         } catch (CancelledOperationException ex) {
