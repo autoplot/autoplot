@@ -131,7 +131,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     private synchronized void readData( ProgressMonitor mon ) throws IOException {
 
         String location;
-        boolean makeLocal= false;
+        boolean makeLocal= true;
         if ( makeLocal ) {
             File file= getFile(mon);
             location= file.toURI().toURL().toString();

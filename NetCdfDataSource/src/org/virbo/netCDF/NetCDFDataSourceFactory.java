@@ -9,8 +9,10 @@
 
 package org.virbo.netCDF;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import ucar.nc2.NetcdfFile;
@@ -86,7 +89,9 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
         try {
             URISplit split = URISplit.parse( surl );
             Map params= URISplit.parseParams( split.params );
-            
+
+            DataSetURI.getFile( new URI(surl), mon ); // check for non-ncml.  We always download now because ncml can be slow.
+
             NetcdfDataset dataset= getDataSet( split.file );
 
             int depCount=0; // number of dependent variables--If there's just one, then we needn't identify it
@@ -116,7 +121,10 @@ public class NetCDFDataSourceFactory implements DataSourceFactory {
             } else {
                 return !haveIt;
             }
-            
+        } catch ( URISyntaxException e ) {
+            return false;
+        } catch ( HtmlResponseIOException e ) {
+            return false;
         } catch ( IOException e ) {
             throw new RuntimeException(e);
         }

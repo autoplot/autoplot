@@ -610,6 +610,20 @@ public class DataSourceUtil {
         return spec;
     }
 
+    /**
+     * returns true if the stream appears to be html.  Right now the test is
+     * for "<htm" "<HTM" or "<!doc" "<!DOC".
+     *
+     * @param magic
+     */
+    public static boolean isHtmlStream( String magic ) {
+         if ( magic.toLowerCase().startsWith("<!doc") || magic.toLowerCase().startsWith("<html")) {
+            return true;
+         } else {
+             return false;
+         }
+    }
+
     public static void main(String[] args ) {
         String surl= "http://cdaweb.gsfc.nasa.gov/istp_public/data/polar/hyd_h0/2000/po_h0_hyd_20000109_v01.cdf?ELECTRON_DIFFERENTIAL_ENERGY_FLUX";
         System.err.println( makeAggregation(surl) );

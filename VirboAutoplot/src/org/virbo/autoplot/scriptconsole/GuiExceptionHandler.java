@@ -24,6 +24,7 @@
 package org.virbo.autoplot.scriptconsole;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
@@ -36,8 +37,10 @@ import java.util.logging.Logger;
 import org.das2.DasApplication;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -59,6 +62,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
@@ -68,6 +72,10 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.AboutUtil;
+import org.virbo.autoplot.ApplicationModel;
+import org.virbo.autoplot.dom.Application;
+import org.virbo.autoplot.state.StatePersistence;
+import org.virbo.autoplot.state.UndoRedoSupport;
 
 /**
  * This is the original das2 Exception handler dialog, but modified to
@@ -103,7 +111,11 @@ public final class GuiExceptionHandler implements ExceptionHandler {
     private static final String USER_ID= "USER_ID";
     private static final String EMAIL="EMAIL";
     private static final String FOCUS_URI="FOCUS_URI";
-    
+    private static final String INCLDOM= "INCLDOM";
+
+    private ApplicationModel appModel=null;
+    private UndoRedoSupport undoRedoSupport= null;
+
     public GuiExceptionHandler() {
     }
 
@@ -230,6 +242,22 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         diaDescriptor.dialog= dialog;
         return diaDescriptor;
+    }
+
+    public void setApplicationModel(ApplicationModel appModel ) {
+        this.appModel= appModel;
+    }
+
+    public void setUndoRedoSupport( UndoRedoSupport undoRedoSupport ) {
+        this.undoRedoSupport= undoRedoSupport;
+    }
+
+    String updateText( GuiExceptionHandlerSubmitForm form, String userComments ) {
+        map.put( INCLDOM, form.isAllowDom() );
+        map.put( EMAIL, form.getEmailTextField().getText() );
+        map.put( USER_ID, form.getUsernameTextField().getText() );
+
+        return formatReport( t, bis, recs, map, uncaught, userComments );
     }
 
     static class DiaDescriptor {
@@ -394,8 +422,18 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         buf.append("  </platform>\n");
     }
-    
-    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs , Map<String,String> data, boolean uncaught, String userComments ) {
+
+    private void formatUndos( StringBuffer buf, UndoRedoSupport undo ) {
+        buf.append("  <states>\n");
+        for ( int i= undo.getDepth()-1; i>0; i-- ) {
+            buf.append( String.format( "      <undo pos=%d>",i ) );
+            buf.append( undo.getLongUndoDescription(i) );
+            buf.append( "</undo>\n" );
+        }
+        buf.append("  </states>\n");
+    }
+
+    private String formatReport( Throwable t, List<String> bis, List<LogRecord> recs, Map<String,Object> data, boolean uncaught, String userComments ) {
         StringBuffer buf= new StringBuffer();
         buf.append("<?xml version=\"1.0\"");
 
@@ -415,28 +453,52 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         
         buf.append("  <userComments><![CDATA[\n").append(userComments).append("]]>\n</userComments>\n");
 
-        String id= data.get(USER_ID);
+        String id= (String)data.get(USER_ID);
         
         buf.append("  <userName>").append(safe(id)).append("</userName>\n");
 
-        String email= data.get(EMAIL);
+        String email= (String)data.get(EMAIL);
         buf.append("  <email>").append(safe(email)).append("</email>\n");
 
-        String focusUri= data.get(FOCUS_URI);
+        String focusUri= (String)data.get(FOCUS_URI);
         buf.append("  <focusUri>").append(safe(focusUri)).append("</focusUri>\n");
+
+        if ( data.get(INCLDOM)==null || (Boolean)data.get( INCLDOM ) ) {
+            if ( appModel!=null ) {
+                Application dom= (Application)appModel.getDocumentModel();
+                OutputStream vapout= new ByteArrayOutputStream();
+
+                try {
+                    StatePersistence.saveState( vapout, dom, "" );
+                    String vap= vapout.toString();
+                    String head= "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+                    if ( vap.startsWith(head) ) {
+                        vap= vap.substring(head.length());
+                    }
+                    buf.append("  <dom>\n"+vap+"\n</dom>\n");
+                } catch ( IOException ex ) {
+                    ex.printStackTrace();
+                }
+            }
+
+            if ( undoRedoSupport!=null ) {
+                formatUndos( buf, undoRedoSupport );
+            }
+        }
 
         formatBuildInfos( buf, bis );
 
         formatPlatform( buf );
         
-        if ( recs!=null ) {
-            buf.append( "  <log>\n");
-            XMLFormatter formatter= new XMLFormatter();
-            for ( LogRecord lr: recs ) {
-                buf.append( formatter.format(lr) );
-            }
-            buf.append( "  </log>\n");
-        }
+       //  this information takes lots of space and has never been useful.
+        //if ( recs!=null ) {
+        //    buf.append( "  <log>\n");
+        //    XMLFormatter formatter= new XMLFormatter();
+        //    for ( LogRecord lr: recs ) {
+        //        buf.append( formatter.format(lr) );
+        //    }
+        //    buf.append( "  </log>\n");
+        //}
         buf.append("</exceptionReport>\n");
         return buf.toString();
     }
@@ -463,6 +525,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         };
     }
 
+    List<LogRecord> recs;
+    List<String> bis;
+    Map<String,Object> map;
+    boolean uncaught;
+    Throwable t;
+
     public synchronized void submitRuntimeException( Throwable t, boolean uncaught ) {
         int rteHash;
         rteHash= hashCode( t );
@@ -471,18 +539,18 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String eventId= sdf.format( now );
 
-        List<String> bis= null;
+        bis= null;
         try {
              bis = AboutUtil.getBuildInfos();
         } catch (IOException ex) {
             Logger.getLogger(GuiExceptionHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        List<LogRecord> recs=null;
+        recs=null;
 
         if ( lc!=null ) recs= lc.records;
 
-        Map<String,String> map= new HashMap();
+        map=new HashMap();
 
         String id= "anon";
         id= System.getProperty("user.name");
@@ -491,12 +559,16 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         map.put( EMAIL, "" );
         map.put( FOCUS_URI, focusURI );
 
+        this.uncaught= uncaught;
+        this.t= t;
+
         String report= formatReport( t, bis, recs, map, uncaught, "USER COMMENTS" );
 
         String url =
          "http://papco.org:8080/RTEReceiver/LargeUpload.jsp";
 
         GuiExceptionHandlerSubmitForm form= new GuiExceptionHandlerSubmitForm();
+        form.setGuiExceptionHandler( this );
 
         boolean notsent= true;
 
@@ -504,11 +576,12 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
             form.getDataTextArea().setText( report );
 
-            form.getUsernameTextField().setText( map.get(USER_ID) );
-            form.getEmailTextField().setText( map.get(EMAIL) );
+            form.getUsernameTextField().setText( (String)map.get(USER_ID) );
+            form.getEmailTextField().setText( (String)map.get(EMAIL) );
 
             String[] choices= { "Copy to Clipboard", "Save to File", "Cancel", "OK" };
-            int option= JOptionPane.showOptionDialog( null, form, "Submit Exception Report", 
+            Component parent= appModel==null ? null : SwingUtilities.getWindowAncestor(appModel.getCanvas());
+            int option= JOptionPane.showOptionDialog( parent, form, "Submit Exception Report",
                     JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, choices, choices[3] )  ;
             if ( option==2 ) {
                 return;

@@ -67,6 +67,7 @@ public class RequestHandler {
                     interp.exec(s);
                 } catch ( RuntimeException ex ) {
                     ex.printStackTrace( new PrintStream( out ) );
+                    ex.printStackTrace();
                 }
                 try {
                     if ( echo ) out.write("autoplot> ".getBytes());

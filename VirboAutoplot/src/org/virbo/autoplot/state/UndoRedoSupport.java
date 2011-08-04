@@ -336,4 +336,23 @@ public class UndoRedoSupport {
         return stateStack.get(pos);
     }
 
+    /**
+     * used for feedback.
+     * @param i
+     * @return
+     */
+    public String getLongUndoDescription( int i ) {
+        //if (  stateStack.get(i).deltaDesc.matches("(\\d+) changes") ) {
+            List<Diff> diffss = stateStack.get(i).state.diffs(stateStack.get(i-1).state);
+            StringBuffer docBuf= new StringBuffer();
+            for ( int j=0; j<diffss.size(); j++ ) {
+                Diff s= diffss.get(j);
+                if ( s.getDescription().contains("plotDefaults" ) ) continue;
+                if ( j>0 ) docBuf.append(";\n");
+                docBuf.append(s.getDescription());
+                
+            }
+            return docBuf.toString();
+        //}
+    }
 }

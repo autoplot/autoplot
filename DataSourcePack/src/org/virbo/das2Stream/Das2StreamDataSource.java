@@ -29,6 +29,8 @@ import org.virbo.datasource.CompletionContext;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSource;
 import org.virbo.datasource.DataSourceFactory;
+import org.virbo.datasource.DataSourceUtil;
+import org.virbo.datasource.HtmlResponseIOException;
 import org.virbo.datasource.MetadataModel;
 import org.virbo.datasource.URISplit;
 import org.virbo.qstream.QDataSetStreamHandler;
@@ -51,29 +53,55 @@ public class Das2StreamDataSource extends AbstractDataSource {
         ReadableByteChannel channel = Channels.newChannel(in);
 
         URISplit split = URISplit.parse( uri );
-        
+
         if (split.ext.equals(".qds")) {
-            QDataSetStreamHandler h= new QDataSetStreamHandler();
-            org.virbo.qstream.StreamTool.readStream(channel, h);
-            
-            if ( params.get("arg_0")!=null ) {
-                return h.getDataSet(params.get("arg_0"));
-            } else {
-                return h.getDataSet();
+            try {
+                QDataSetStreamHandler h= new QDataSetStreamHandler();
+                org.virbo.qstream.StreamTool.readStream(channel, h);
+
+                if ( params.get("arg_0")!=null ) {
+                    return h.getDataSet(params.get("arg_0"));
+                } else {
+                    return h.getDataSet();
+                }
+            } catch ( org.virbo.qstream.StreamException se ) {
+                if ( se.toString().contains( "Expecting stream descriptor header" ) ) {
+                    int i= se.toString().indexOf("beginning \n'");
+                    if ( i>0 && se.toString().length()>i+12+5 ) {
+                        String resp= se.toString().substring(i+12,i+12+5); //TODO: will this have problems with two-byte newlines (windows)
+                        if ( DataSourceUtil.isHtmlStream(resp) ) {
+                            throw new HtmlResponseIOException( "Expected QStream but got html: "+resp, DataSetURI.getWebURL(uri) );
+                        } 
+                    }
+                }
+                throw se;
             }
-            
+
         } else {
+            try {
+                HashMap<String,String> props = new HashMap<String,String>();
+                props.put("file", DataSetURI.fromUri(uri) );
 
-            HashMap<String,String> props = new HashMap<String,String>();
-            props.put("file", DataSetURI.fromUri(uri) );
+                DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
 
-            DataSetStreamHandler handler = new DataSetStreamHandler(props, mon);
+                StreamTool.readStream(channel, handler);
 
-            StreamTool.readStream(channel, handler);
+                in.close();
 
-            in.close();
+                return DataSetAdapter.create(handler.getDataSet());
+            } catch ( StreamException se ) {
+                 if ( se.toString().contains( "Expecting stream descriptor header" ) ) {
+                    int i= se.toString().indexOf("beginning \n'");
+                    if ( i>0 && se.toString().length()>i+12+5 ) {
+                        String resp= se.toString().substring(i+12,i+12+5); //TODO: will this have problems with two-byte newlines (windows)
+                        if ( DataSourceUtil.isHtmlStream(resp) ) {
+                            throw new HtmlResponseIOException( "Expected das2Stream but got html: "+resp, DataSetURI.getWebURL(uri) );
+                        } 
+                    }
+                }
+                throw se; //TODO: check for HTML response
+            }
 
-            return DataSetAdapter.create(handler.getDataSet());
         }
 
     }

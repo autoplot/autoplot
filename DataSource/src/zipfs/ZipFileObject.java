@@ -76,7 +76,11 @@ public class ZipFileObject extends FileObject {
 
     @Override
     public InputStream getInputStream(ProgressMonitor monitor) throws IOException {
-        return zfs.getZipFile().getInputStream(zipEntry);
+        if ( !exists() ) {
+            throw new FileNotFoundException("file not found in zip: "+name );
+        } else {
+            return zfs.getZipFile().getInputStream(zipEntry);
+        }
     }
 
     @Override

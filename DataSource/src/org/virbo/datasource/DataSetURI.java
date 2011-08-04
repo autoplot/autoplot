@@ -600,7 +600,7 @@ public class DataSetURI {
             int bytes = fi.read(magic);
             if ( bytes==5 ) {
                 String ss= new String(magic);
-                if ( ss.equals("<!DOC") || ss.toLowerCase().equals("<html")) {
+                if ( DataSourceUtil.isHtmlStream(ss) ) {
                     ex2= new HtmlResponseIOException( "file appears to be html: "+tfile, source );
                 }
             }

@@ -11,6 +11,8 @@
 
 package org.das2.datasource;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,8 +36,13 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTree;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -343,7 +350,25 @@ public class Das2ServerDataSourceEditorPanel extends javax.swing.JPanel implemen
                         result+= "\n" + o.item(ii).getNodeName() + "  =  " +  o.item(ii).getNodeValue();
                     }
                     in.close();
-                    JOptionPane.showMessageDialog( this, result );
+
+                    JTextArea area= new JTextArea();
+                    area.setText(result);
+                    area.setEditable(false);
+                    final JPopupMenu copyMenu= new JPopupMenu();
+                    copyMenu.add( new DefaultEditorKit.CopyAction() ).setText("Copy");
+                    area.addMouseListener( new MouseAdapter() {
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+                            if ( e.isPopupTrigger() ) copyMenu.show(e.getComponent(), e.getX(), e.getY() );
+                        }
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+                            if ( e.isPopupTrigger() ) copyMenu.show(e.getComponent(), e.getX(), e.getY() );
+                        }
+                    });
+                    JScrollPane sp= new JScrollPane( area,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED );
+                    sp.setPreferredSize(new java.awt.Dimension( 480,480));
+                    JOptionPane.showMessageDialog( this, sp );
                     
 
                 } catch (XPathExpressionException ex) {

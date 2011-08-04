@@ -153,6 +153,7 @@ function kwToString, keywords
       kw1= strlowcase( t[i] )
       val1= keywords.(i)
       type= size( val1 )
+      if ( kw1 eq 'rendertype' ) then kw1='renderType'
       if ( type[0] eq 0 ) then begin
          sval= string(val1)
          if ( type[1] eq 7 ) then sval="'" + sval + "'"
@@ -173,7 +174,11 @@ function kwToString, keywords
    return, strmid( kw, 2 )
 end
 
-pro applot, x, y, z, _extra=e, respawn=respawn
+;
+; mimic plot command, but with Autoplot.  if x is an int, then
+; it is the position within autoplot.
+;
+pro applot, x, y, z, z4, _extra=e, respawn=respawn
 
    common applot_common, appid
 
@@ -224,19 +229,34 @@ pro applot, x, y, z, _extra=e, respawn=respawn
 
    ; serialize the data to a das2stream in a temporary file
    print, 'serialize the data to a das2stream in a temporary file'
-   if n_params() eq 3 then begin
-      data= { x: x, z:z }
-      das2stream, data, tmpfile, ytags=y, ascii=0
-   endif else if n_params() eq 2 then begin
-      data= { x:x, y:y }
+
+   np= n_params();
+   if ( size( x, /type ) eq 2   or  size( x, /type ) eq 3 ) then begin
+      pos= x
+      xx= y
+      if ( n_elements(z) gt 0 ) then yy= z
+      if ( n_elements(z4) gt 0 ) then zz= z4 ; TODO: sloppy, move y to x should clear y
+      np= np-1
+   endif else begin
+      pos= -1
+      xx= x
+      if ( n_elements(y) gt 0 ) then yy= y
+      if ( n_elements(z) gt 0 ) then zz= z
+   endelse
+
+   if np eq 3 then begin
+      data= { x:xx, z:zz }
+      das2stream, data, tmpfile, ytags=y, ascii=0   ; TODO: redo with qstreams
+   endif else if np eq 2 then begin
+      data= { x:xx, y:yy }
       das2stream, data, tmpfile, ascii=0
    endif else begin
-      s= size( x )
+      s= size( xx )
       if s[0] eq 2 then begin
-        data= { x:findgen(s[1]), z:x }
+        data= { x:findgen(s[1]), z:xx }
         das2stream, data, tmpfile, ytags=findgen(s[2]), ascii=0
       endif else begin
-        data= { x:findgen(s[1]), y:x }
+        data= { x:findgen(s[1]), y:xx }
         das2stream, data, tmpfile, ascii=0
       endelse
    endelse
@@ -261,12 +281,21 @@ pro applot, x, y, z, _extra=e, respawn=respawn
        ;cmd= 'plot( ''file:/'+tmpfile+'?depend0=field0&column=field1'' )'
        if ( !version.os_family eq 'Windows' ) then tmpfile= '/'+tmpfile
 
-       if n_elements( e ) gt 0 then begin
-          cmd= 'plotx( ''file:'+tmpfile+''', '+ex+ ');'  ; semicolon means no echo
+       if ( pos gt -1 ) then begin
+           if n_elements( e ) gt 0 then begin
+              cmd= 'plotx( '+strtrim(pos,2)+', ''file:'+tmpfile+''', '+ex+ ');'  ; semicolon means no echo
+           endif else begin
+              cmd= 'plotx( '+strtrim(pos,2)+', ''file:'+tmpfile+''' );'  ; semicolon means no echo
+           endelse
        endif else begin
-          cmd= 'plotx( ''file:'+tmpfile+''' );'  ; semicolon means no echo
+           if n_elements( e ) gt 0 then begin
+              cmd= 'plotx( ''file:'+tmpfile+''', '+ex+ ');'  ; semicolon means no echo
+           endif else begin
+              cmd= 'plotx( ''file:'+tmpfile+''' );'  ; semicolon means no echo
+           endelse
        endelse
 
+       print, 'sending command: ', cmd
        foo= sendCommand( unit, cmd )
 
        if n_elements( ytitle ) eq 1 then begin

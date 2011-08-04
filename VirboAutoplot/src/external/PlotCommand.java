@@ -28,6 +28,7 @@ import org.virbo.autoplot.dom.PlotElement;
 import org.virbo.dataset.DataSetUtil;
 import org.virbo.dataset.QDataSet;
 import org.virbo.jythonsupport.PyQDataSetAdapter;
+import org.virbo.jythonsupport.Util;
 
 /**
  * new implementation of the plot command allows for keywords.
@@ -41,6 +42,13 @@ public class PlotCommand extends PyObject {
             if (arg0.isNumberType()) {
                 double d = (Double) arg0.__tojava__(Double.class);
                 return DataSetUtil.asDataSet(d);
+            } else if (arg0 instanceof PyString ) {
+                try {
+                    return Util.getDataSet( (String)arg0.__tojava__(String.class) );
+                } catch ( Exception ex ) {
+                    ex.printStackTrace();
+                    return null;
+                }
             } else if (arg0.isSequenceType()) {
                 return PyQDataSetAdapter.adaptList((PyList) arg0);
             } else {
@@ -124,7 +132,8 @@ public class PlotCommand extends PyObject {
             }
         } else {
             for ( int i=0; i<nargs; i++ ) {
-                qargs[i]= coerceIt(args[i]);
+                QDataSet ds= coerceIt(args[i]);
+                qargs[i]= ds;
             }
 
             try {

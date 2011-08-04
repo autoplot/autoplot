@@ -101,7 +101,10 @@ public class StatePersistence {
         e.writeObject(state);
         e.close();
         */
+        saveState( new FileOutputStream(f), state, sscheme );
+    }
         
+    public static void saveState( OutputStream out, Object state, String sscheme ) throws IOException {
         Document document=null;
         try {
             document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -139,21 +142,20 @@ public class StatePersistence {
             }
         }
 
-        writeDocument( new File( f.toString() ), document);
-
+        writeDocument( out, document);
     }
+
 
     /**
      * write the document out to the file, hiding the details of the serializer.
-     * @param f
-     * @param document
+     * @param out outputStream
+     * @param document XML document object
      * @return
      * @throws LSException
      * @throws DOMException
      * @throws FileNotFoundException
      */
-    public static void writeDocument(File f, Document document) throws FileNotFoundException, IOException {
-        OutputStream out = new FileOutputStream( f );
+    public static void writeDocument( OutputStream out, Document document) throws IOException {
         DOMImplementation impl = document.getImplementation();
         DOMImplementationLS ls = (DOMImplementationLS) impl.getFeature("LS", "3.0");
         LSSerializer serializer = ls.createLSSerializer();
@@ -174,7 +176,20 @@ public class StatePersistence {
         serializer.write(document, output);
 
         out.close();
-        
+
+    }
+    /**
+     * write the document out to the file, hiding the details of the serializer.
+     * @param f
+     * @param document
+     * @return
+     * @throws LSException
+     * @throws DOMException
+     * @throws FileNotFoundException
+     */
+    public static void writeDocument(File f, Document document) throws FileNotFoundException, IOException {
+        OutputStream out = new FileOutputStream( f );
+        writeDocument( out, document );
     }
 
 

@@ -19,6 +19,8 @@ import javax.swing.JTextArea;
  */
 public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
 
+    GuiExceptionHandler guiExceptionHandler;
+
     /** Creates new form GuiExceptionHandlerSubmitForm */
     public GuiExceptionHandlerSubmitForm() {
         initComponents();
@@ -47,6 +49,10 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         return usernameTextField;
     }
 
+    public boolean isAllowDom() {
+        return submitDOMCB.isSelected();
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -66,8 +72,10 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         emailTextField = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         usernameTextField = new javax.swing.JTextField();
+        submitDOMCB = new javax.swing.JCheckBox();
+        updateButton = new javax.swing.JButton();
 
-        jLabel1.setText("<html>Press \"Submit\" to submit stack traces and log files to the server.  Optionally add text briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you'd like to be contacted.</html> ");
+        jLabel1.setText("<html>Press \"Submit\" to submit stack traces and log files to the server.  Optionally, add text briefly describing actions preceeding the event.  Your usename is automatically detected, and provide an email address if you'd like to be contacted.</html> ");
         jLabel1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
 
         jLabel2.setText("Data that will be submitted:");
@@ -77,12 +85,24 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
         jScrollPane1.setViewportView(userTextArea);
 
         dataTextArea.setColumns(20);
+        dataTextArea.setEditable(false);
         dataTextArea.setRows(5);
         jScrollPane2.setViewportView(dataTextArea);
 
         jLabel3.setText("Your Email Address (optional):");
 
         jLabel4.setText("Your Username (optional):");
+        jLabel4.setToolTipText("Your username is read from the system properties.");
+
+        submitDOMCB.setSelected(true);
+        submitDOMCB.setText("Submit DOM and Undo Info");
+
+        updateButton.setText("Update");
+        updateButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateButtonActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
         this.setLayout(layout);
@@ -99,18 +119,23 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
                     .add(layout.createSequentialGroup()
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(emailTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 349, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(18, Short.MAX_VALUE))
-            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
-            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
+                .addContainerGap(22, Short.MAX_VALUE))
+            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
+            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
+            .add(layout.createSequentialGroup()
+                .add(submitDOMCB)
+                .addContainerGap())
             .add(layout.createSequentialGroup()
                 .add(jLabel2)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 328, Short.MAX_VALUE)
+                .add(updateButton)
                 .addContainerGap())
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE)
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
                 .add(9, 9, 9)
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 115, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
@@ -121,12 +146,21 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel3)
                     .add(emailTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(18, 18, 18)
-                .add(jLabel2)
+                .add(4, 4, 4)
+                .add(submitDOMCB)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                    .add(jLabel2)
+                    .add(updateButton))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 215, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 157, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void updateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateButtonActionPerformed
+        dataTextArea.setText( guiExceptionHandler.updateText( this, userTextArea.getText() ) );
+    }//GEN-LAST:event_updateButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -138,9 +172,15 @@ public class GuiExceptionHandlerSubmitForm extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JCheckBox submitDOMCB;
+    private javax.swing.JButton updateButton;
     private javax.swing.JTextArea userTextArea;
     private javax.swing.JTextField usernameTextField;
     // End of variables declaration//GEN-END:variables
+
+    void setGuiExceptionHandler(GuiExceptionHandler h) {
+        this.guiExceptionHandler= h;
+    }
 
 
 }

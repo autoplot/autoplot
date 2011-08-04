@@ -93,6 +93,7 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.BindingModel;
+import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.datasource.HtmlResponseIOException;
 /**
  * Internal model of the application to separate model from view.
@@ -123,6 +124,9 @@ public class ApplicationModel {
         this.exceptionHandler= eh;
         DasApplication.getDefaultApplication().setExceptionHandler(exceptionHandler);
         FileSystem.setExceptionHandler(exceptionHandler);
+        if ( eh instanceof GuiExceptionHandler ) {
+            ((GuiExceptionHandler)eh).setApplicationModel(this);
+        }
     }
 
     /**
