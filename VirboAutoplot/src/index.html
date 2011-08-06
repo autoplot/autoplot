@@ -7,7 +7,8 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Undo submenu shows thumbnails approximating each state.  I needed this for debugging, and it turned out to be an easy to implement
+        <p><small>Named undo operations, like "addPlots(1,3,below)" are coming.  The next operation, "11 changes" still needs to be named.
+                Also, the progress bar is made more efficient.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -24,6 +25,10 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
 	<p>Bugfixes:</p>
 
         <ul>
+            <li>bugfixes from the production branch</li>
+        </ul>
+        <p>Older bugfixes:</p>
+        <ul>
             <li>bugfixes from production branch, including CDF valid range for vap+cdaweb:ds=AC_H0_SWE&id=V_GSE&timerange=2010-120</li>
             <li>Clean up of CDAWeb plugin</li>
             <li>Excel formatter checks for enumerations in DEPEND_1 (E.g. Bx, By, Bz)</li>
@@ -34,21 +39,6 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             <li>long legend doesn't mess up autolayout.</li>
             <li>single-jar release works after new release method.</li>
             <li>export data panel makes export component insensitive if there was no process applied</li>
-            <li>bugfixes from the production branch</li>
-        </ul>
-        <p>Older bugfixes:</p>
-        <ul>
-            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3302430&group_id=199733&atid=970682">3302430</a>: python script editor should insert example scripts.</li>
-            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3302901&group_id=199733&atid=970682">3302901</a>: extraneous "vap:" qualifier confusing</li>
-            <li>bugfix: "Plot" action in file cache plots remote URL, not the file cache URL.</li>
-            <li>pngwalk default thumbnail size is 100 pixels across, was 200 pixels.</li>
-            <li>bugfix: check for cancel press when replacing script with example.</li>
-            <li>bugfix: remove tooltip on Edit that was misplaced</li>
-            <li>bugfix: raise the Autoplot window when "View in Autoplot" is pressed on pngwalk window.</li>
-            <li>bugfix: autoranging corrected when digital render mode is used.</li>
-            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3053620&group_id=199733&atid=970685">3053620</a>: remove extra flashes when just one plot is visible.</li>
-            <li>"monitor" should be available in any python context.  completions would fail if monitor was used.</li>
-            <li>print an error message for specs like "$Y$m$d_$H$m" (2 m's) in make pngwalk.  This was confusing.</li>
         </ul>
         <p>Less Recent Bugfixes:</p>
         <ul>
@@ -65,6 +55,8 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         </ul>
         <p>Features:</p>
         <ul>
+            <li>progress bar size reduced by moving cancel button</li>
+            <li>Add quick-n-dirty popup menu to operations field of data tab.</li>
             <li>CDF export allows some control of storage type (double,float,byte). </li>
             <li>Export GUIs for binary and CDF export</li>
             <li>Save as... dialog supports exporting to v1.06.  It's messy now, but it should work (as long as you aren't using 1.07 features!)</li>
