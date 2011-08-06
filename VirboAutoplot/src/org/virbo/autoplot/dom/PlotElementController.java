@@ -31,6 +31,7 @@ import org.das2.graph.DigitalRenderer;
 import org.das2.graph.EventsRenderer;
 import org.das2.graph.ImageVectorDataSetRenderer;
 import org.das2.graph.PsymConnector;
+import org.das2.graph.RGBImageRenderer;
 import org.das2.graph.Renderer;
 import org.das2.graph.SeriesRenderer;
 import org.das2.graph.SpectrogramRenderer;
@@ -429,6 +430,14 @@ public class PlotElementController extends DomNodeController {
                 return true;
             } else if ( fillDs.rank()==2 ) {
                 return SemanticOps.isBundle(fillDs);
+            } else {
+                return false;
+            }
+        } else if ( getRenderer() instanceof RGBImageRenderer ) {
+            if ( fillDs.rank()==2 ) {
+                return !SemanticOps.isBundle(fillDs);
+            } else if ( fillDs.rank()==3 ) {
+                return fillDs.length(0,0) < 5;
             } else {
                 return false;
             }
@@ -831,6 +840,7 @@ public class PlotElementController extends DomNodeController {
                     && renderType != RenderType.nnSpectrogram
                     && renderType != RenderType.digital
                     && renderType != RenderType.eventsBar
+                    && renderType != RenderType.image
                     && renderType != RenderType.pitchAngleDistribution )
                     &&  fillDs.length(0) <= QDataSet.MAX_UNIT_BUNDLE_COUNT;
             //if ( joinOfBundle ) shouldHaveChildren= true;
@@ -1485,7 +1495,7 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getYaxis().setRange(ydesc.range);
             }
 
-        } else if ( spec==RenderType.digital ) {
+        } else if ( spec==RenderType.digital || spec==RenderType.eventsBar || spec==RenderType.image ) {
             QDataSet qube= DigitalRenderer.doAutorange( fillDs );
             if ( qube==null ) {
                 // nothing
@@ -1494,14 +1504,6 @@ public class PlotElementController extends DomNodeController {
                 peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
             }
 
-        } else if ( spec==RenderType.eventsBar ) {
-            QDataSet qube= EventsRenderer.doAutorange( fillDs );
-            if ( qube==null ) {
-                // nothing
-            } else {
-                peleCopy.getPlotDefaults().getXaxis().setRange( DataSetUtil.asDatumRange( qube.slice(0),true ) );
-                peleCopy.getPlotDefaults().getYaxis().setRange( DataSetUtil.asDatumRange( qube.slice(1),true ) );
-            }
         } else {
 
             QDataSet hist= null; //getDataSourceFilter().controller.getHistogram();
