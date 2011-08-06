@@ -23,6 +23,7 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.stream.ImageInputStream;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
+import org.virbo.dataset.DDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.AbstractDataSource;
 import org.virbo.datasource.DataSetURI;
@@ -118,6 +119,18 @@ class ImageDataSource extends AbstractDataSource {
                 c = Color.green;
             } else if (channel.equals("blue")) {
                 c = Color.blue;
+            } else if (channel.equals("alpha")) {
+                if ( image.getSampleModel().getNumBands()<4 ) {
+                    throw new IllegalArgumentException("this image has less than three bands, which is interpretted to mean no alpha");
+                }
+                DDataSet ds= DDataSet.createRank2(image.getWidth(), image.getHeight() );
+                for ( int i=0; i<ds.length(); i++ ) {
+                    for ( int j=0; j<ds.length(0); j++ ) {
+                        ds.putValue(i, j, image.getAlphaRaster().getSample( i,j,0 ) );
+                    }
+                }
+                ds.putProperty( QDataSet.LABEL, "alpha" );
+                return ds;
             } else if (channel.equals("greyscale")) {
                 op = new ImageDataSet.ColorOp() {
 
@@ -149,6 +162,8 @@ class ImageDataSource extends AbstractDataSource {
                         return toHSV(rgb, CHANNEL_VALUE);
                     }
                 };
+            } else {
+                throw new IllegalArgumentException("unsupported channel: "+channel );
             }
         }
 
