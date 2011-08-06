@@ -209,19 +209,16 @@ public class JythonScriptPanel extends javax.swing.JPanel {
                     PythonInterpreter interp = JythonUtil.createInterpreter(true, false);
                     interp.set("dom", model.getDocumentModel() );
                     interp.set("params", new PyDictionary());
-                    interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
+                    interp.set("resourceURI", Py.None );
                     return interp;
                 }
             });
         } else if (context == CONTEXT_DATA_SOURCE) {
             this.textArea.putClientProperty(JythonCompletionTask.CLIENT_PROPERTY_INTERPRETER_PROVIDER, new JythonInterpreterProvider() {
                 public PythonInterpreter createInterpreter() throws java.io.IOException {
-                    PythonInterpreter interp = org.virbo.jythonsupport.JythonUtil.createInterpreter(false);
-                    interp.set("monitor", new NullProgressMonitor());
+                    PythonInterpreter interp = JythonUtil.createInterpreter(false,false);
                     interp.set("params", new PyDictionary());
                     interp.set("resourceURI", Py.None );
-                    interp.exec("def getParam( x, default ):\n  if params.has_key(x):\n     return params[x]\n  else:\n     return default\n");
-
                     return interp;
                 }
             });

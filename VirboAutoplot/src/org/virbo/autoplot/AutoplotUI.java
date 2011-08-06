@@ -233,6 +233,10 @@ public class AutoplotUI extends javax.swing.JFrame {
             }
         });
         
+        if ( model.getExceptionHandler() instanceof GuiExceptionHandler ) {
+            ((GuiExceptionHandler)model.getExceptionHandler()).setUndoRedoSupport(undoRedoSupport);
+        }
+        
         initComponents();
 
         APSplash.checkTime("init 25");

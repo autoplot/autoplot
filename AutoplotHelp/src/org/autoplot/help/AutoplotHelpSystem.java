@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.help.HelpBroker;
 import javax.help.HelpSet;
@@ -34,11 +36,15 @@ public class AutoplotHelpSystem {
     private HelpSet mainHS;
     private HelpBroker broker;
     //private CSH.DisplayHelpFromSource helper;
-    
+
+    private Map<Component,String> helpIds;
+
     private AutoplotHelpSystem(Component uiBase) {
         // custom viewer supports external web links
         SwingHelpUtilities.setContentViewerUI("org.autoplot.help.AutoplotHelpViewer");
 
+        helpIds= new HashMap<Component, String>();
+        
         // First, load the main autoplot helpset.
         URL hsurl;
         try {
@@ -135,9 +141,8 @@ public class AutoplotHelpSystem {
      */
     public void registerHelpID( final Component c, final String helpID) {
      //  broker.enableHelp(c, helpID, mainHS);
-
         c.setFocusable(true);
-        
+        helpIds.put(c, helpID);
        c.addKeyListener( new KeyListener() {
 
             public void keyTyped(KeyEvent e) {
@@ -192,13 +197,42 @@ public class AutoplotHelpSystem {
         }
     }
 
+    private Component findRegisteredParent( Component c ) {
+        while ( c!=null ) {
+            String helpId =helpIds.get(c);
+            if ( helpId!=null ) {
+                return c;
+            }
+            c= c.getParent();
+        }
+        return null;
+    }
+
+    public void displayHelpFromEvent(ActionEvent e) {
+        displayHelpFromEvent( e, e.getSource() );
+    }
+
     /** A component action listener can pass the event here and the
      * help topic corresponding to the event source will be displayed, assuming an
      * appropriate call has been made to <code>registerHelpID</code>.
      */
-    public void displayHelpFromEvent(ActionEvent e) {
+    public void displayHelpFromEvent(ActionEvent e, Object focus ) {
         //helper.actionPerformed(e);
-        Util.openBrowser( "http://autoplot.org/help" );
+        if ( focus==null ) focus= e.getSource();
+        if ( focus instanceof Component ) {
+            Component c= (Component)focus;
+            c= findRegisteredParent(c);
+            if (c==null ) {
+                Util.openBrowser( "http://autoplot.org/help" );
+            } else {
+                String helpId =helpIds.get(c);
+                Util.openBrowser( "http://autoplot.org/help#"+helpId );
+            }
+        } else {
+            Util.openBrowser( "http://autoplot.org/help" );
+        }
+
+        
     }
 
     /** Display the help window with default page displayed */

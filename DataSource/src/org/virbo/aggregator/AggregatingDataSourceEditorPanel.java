@@ -244,7 +244,7 @@ public class AggregatingDataSourceEditorPanel extends javax.swing.JPanel impleme
     }//GEN-LAST:event_monthsComboBoxItemStateChanged
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        AutoplotHelpSystem.getHelpSystem().displayHelpFromEvent(evt);
+        AutoplotHelpSystem.getHelpSystem().displayHelpFromEvent(evt,this);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
