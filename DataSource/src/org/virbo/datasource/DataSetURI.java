@@ -783,7 +783,7 @@ public class DataSetURI {
             URISplit split2= URISplit.parse(surl);
             String vapScheme= URISplit.implicitVapScheme(split2);
             if ( vapScheme.contains("&") ) {
-                throw new IllegalArgumentException("Address contains ampersand in what looks like a filename: "+surl);
+                throw new IllegalArgumentException("Address contains ampersand in what looks like a filename: "+surl); 
             }
             if ( vapScheme.equals("") ) {
                 //one last hangout for generic "vap" type.  Better hope they don't use it...  Call it vap+X so it's easier to debug.
