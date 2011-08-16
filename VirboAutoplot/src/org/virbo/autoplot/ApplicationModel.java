@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -93,7 +94,6 @@ import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.virbo.autoplot.dom.BindingModel;
-import org.virbo.autoplot.scriptconsole.GuiExceptionHandler;
 import org.virbo.datasource.HtmlResponseIOException;
 /**
  * Internal model of the application to separate model from view.
@@ -124,8 +124,23 @@ public class ApplicationModel {
         this.exceptionHandler= eh;
         DasApplication.getDefaultApplication().setExceptionHandler(exceptionHandler);
         FileSystem.setExceptionHandler(exceptionHandler);
-        if ( eh instanceof GuiExceptionHandler ) {
-            ((GuiExceptionHandler)eh).setApplicationModel(this);
+        String cl= eh.getClass().getName();
+        if ( cl.equals("org.virbo.autoplot.scriptconsole.GuiExceptionHandler") ) { // support applet, which doesn't know about Gui...
+            try {
+                Method m= eh.getClass().getMethod("setApplicationModel", ApplicationModel.class);
+                m.invoke(eh, this);
+                //((GuiExceptionHandler)eh).setApplicationModel(this);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchMethodException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (SecurityException ex) {
+                Logger.getLogger(ApplicationModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
