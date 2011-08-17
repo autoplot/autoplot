@@ -289,15 +289,6 @@ public class StatePersistence {
             InputSource source = new InputSource(isr);
             Document document = builder.parse(source);
 
-//            Element root= document.getDocumentElement();
-//            if ( root.getNodeName().equals("exceptionReport") ) {
-//                NodeList maybeVap= root.getElementsByTagName("vap");
-//                if ( maybeVap.getLength()==1 ) {
-//                    root= (Element)maybeVap.item(0);
-//                } else {
-//                    throw new IllegalArgumentException("exception report doesn't have vap node");
-//                }
-//            }
             if ( document.getDocumentElement().getNodeName().equals("java") ) { // legacy support
 
                 domVersion= "0.99";
@@ -350,8 +341,17 @@ public class StatePersistence {
                     }
                 }
             } else {
-
-                domVersion= document.getDocumentElement().getAttribute("domVersion");
+                Element root= document.getDocumentElement();
+                if ( root.getNodeName().equals("exceptionReport") ) {
+                    NodeList maybeVap= root.getElementsByTagName("vap");
+                    if ( maybeVap.getLength()==1 ) {
+                        root= (Element)maybeVap.item(0);
+                    } else {
+                        throw new IllegalArgumentException("exception report doesn't have vap node");
+                    }
+                }
+                
+                domVersion= root.getAttribute("domVersion");
                 String currentVersion= "1.07";
 
                 if ( ! domVersion.equals(currentVersion) ) {
@@ -365,7 +365,7 @@ public class StatePersistence {
                         // transitions to new autoplot versions.  Future vap files
                         // that use future features will not load properly.
                         for ( double s=srcVersion; s>dstVersion; s=s-0.01 ) {
-                            Source src = new DOMSource( document );
+                            Source src = new DOMSource( root );
 
                             DOMResult res = new DOMResult( );
 
@@ -381,14 +381,14 @@ public class StatePersistence {
                             Transformer tr = factory.newTransformer(new StreamSource(xsl));
 
                             tr.transform(src, res);
-                            document= ((Document)res.getNode());
+                            root= (Element)res.getNode().getFirstChild();
                         }
 
                     } else {
 
                         // upgrade old vap file versions.
                         for ( double s=srcVersion; s<dstVersion; s=s+0.01 ) {
-                            Source src = new DOMSource( document );
+                            Source src = new DOMSource( root );
 
                             DOMResult res = new DOMResult( );
 
@@ -404,14 +404,14 @@ public class StatePersistence {
                             Transformer tr = factory.newTransformer(new StreamSource(xsl));
 
                             tr.transform(src, res);
-                            document= ((Document)res.getNode());
+                            root= (Element)res.getNode().getFirstChild();
 
                         }
                     }
                 }
 
-                Element dom= getChildElement( document.getDocumentElement(), "Application" );
-                state= (Application) SerializeUtil.getDomNode( dom, new Vap1_04Scheme() );
+                Element dom= getChildElement( root, "Application" );
+                state= (Application) SerializeUtil.getDomNode( dom, new Vap1_07Scheme() ); //TODO: I don't think this is used any more.
 
             }
 
