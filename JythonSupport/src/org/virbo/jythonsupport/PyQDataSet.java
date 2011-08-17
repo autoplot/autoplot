@@ -686,12 +686,12 @@ public class PyQDataSet extends PyJavaInstance {
 
             @Override
             public PyObject __iternext__() {
-                if (i < ds.length()) {
+                if (i < rods.length()) {
                     PyObject result;
-                    if (ds.rank() == 1) {
-                        result = new PyFloat(ds.value(i));
+                    if (rods.rank() == 1) {
+                        result = new PyFloat(rods.value(i));
                     } else {
-                        result = new PyQDataSet(DataSetOps.slice0(ds, i));
+                        result = new PyQDataSet(DataSetOps.slice0(rods, i));
                     }
                     i++;
                     return result;
