@@ -187,6 +187,7 @@ public class PlotElementController extends DomNodeController {
                         resetPlotElement(getDataSourceFilter().getController().getFillDataSet(), plotElement.getRenderType());
                     } else {
                         doResetRenderType(newRenderType);
+                        updateDataSet();
                     }
                     setResetPlotElement(false);
                 }
@@ -1945,8 +1946,9 @@ public class PlotElementController extends DomNodeController {
         maybeCreateDasPeer();
         if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
             //QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
-            QDataSet oldDs= getDataSet();  // TODO: what about sprocess?
-            getRenderer().setDataSet(oldDs);
+            //QDataSet oldDs= getDataSet();  // TODO: what about sprocess?
+            System.err.println("we used to setDataSet here");
+            //getRenderer().setDataSet(oldDs);
         }
     }
 
