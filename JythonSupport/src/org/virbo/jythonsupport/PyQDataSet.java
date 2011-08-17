@@ -691,7 +691,8 @@ public class PyQDataSet extends PyJavaInstance {
                     if (rods.rank() == 1) {
                         result = new PyFloat(rods.value(i));
                     } else {
-                        result = new PyQDataSet(DataSetOps.slice0(rods, i));
+                        System.err.println("__iternext__ @ "+i );
+                        result = new PyQDataSet( rods.slice(i) );
                     }
                     i++;
                     return result;
