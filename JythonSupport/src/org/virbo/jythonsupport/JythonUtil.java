@@ -178,8 +178,8 @@ public class JythonUtil {
     /**
      * return python code that is equivalent, except it has not side-effects like plotting.
      * This code is not exact, for example (a,b)= (1,2) is not supported.
-     * @param eval
-     * @return
+     * @param reader input to read.
+     * @return the script as a string, with side-effects removed.
      */
     public static String removeSideEffects( BufferedReader reader ) throws IOException {
 
