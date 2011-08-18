@@ -71,10 +71,10 @@ public class ApplicationControllerSupport {
     }
 
     void plot( Plot plot, PlotElement panel, String secondaryUri, String primaryUri) {
-        panel.getController().getDataSourceFilter().setUri(null);
         DataSourceFilter dsf1 = controller.addDataSourceFilter();
         DataSourceFilter dsf2 = controller.addDataSourceFilter();
         if ( panel==null ) panel = controller.addPlotElement(plot, null ); // timeseriesbrowse
+        panel.getController().getDataSourceFilter().setUri(null);
         panel.getController().getDataSourceFilter().setUri("vap+internal:" + dsf1.getId() + "," + dsf2.getId());
         dsf1.setUri(secondaryUri);
         dsf2.setUri(primaryUri);
