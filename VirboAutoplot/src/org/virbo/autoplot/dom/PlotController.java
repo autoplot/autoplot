@@ -13,6 +13,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
 import org.das2.datum.Datum;
 import org.das2.datum.DatumRange;
 import org.das2.datum.DatumRangeUtil;
@@ -78,6 +79,12 @@ public class PlotController extends DomNodeController {
         });
         this.plot.addPropertyChangeListener( Plot.PROP_TITLE, labelListener );
         this.plot.addPropertyChangeListener( Plot.PROP_TICKS_URI, ticksURIListener );
+        dom.options.addPropertyChangeListener( Options.PROP_DAY_OF_YEAR, new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                final DasAxis update= PlotController.this.plot.getXaxis().controller.dasAxis;
+                updateAxisFormatter(update);
+            }
+        });
 
         plot.controller= this;
     }
@@ -317,6 +324,15 @@ public class PlotController extends DomNodeController {
         return domAxis;
     }
 
+    private void updateAxisFormatter( DasAxis axis ) {
+        if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
+            axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
+        } else {
+            axis.setUserDatumFormatter(null);
+        }
+
+    }
+
     private PropertyChangeListener listener = new PropertyChangeListener() {
         @Override
         public String toString() {
@@ -336,11 +352,7 @@ public class PlotController extends DomNodeController {
                 if ( e.getPropertyName().equals(DasAxis.PROP_UNITS) 
                         || e.getPropertyName().equals(DasAxis.PROPERTY_DATUMRANGE )
                         || e.getPropertyName().equals(DasAxis.PROP_LABEL) ) {
-                    if ( UnitsUtil.isTimeLocation(axis.getUnits()) && !axis.getLabel().contains("%{RANGE}") ) {
-                        axis.setUserDatumFormatter(new DateTimeDatumFormatter(  dom.getController().getApplication().getOptions().isDayOfYear() ? DateTimeDatumFormatter.OPT_DOY : 0 ));
-                    } else {
-                        axis.setUserDatumFormatter(null);
-                    }
+                    updateAxisFormatter(axis);
                 }
 
                 // we can safely ignore these events.
