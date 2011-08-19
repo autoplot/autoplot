@@ -929,7 +929,7 @@ public class AutoplotUtil {
 
         Object v;
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < QDataSet.MAX_RANK; i++) {
             final String key = "DEPEND_" + i;
             if ((v = ds.property(key)) != null) {
                 result.put(key, extractProperties((QDataSet) v));
@@ -944,6 +944,21 @@ public class AutoplotUtil {
                 break;
             }
 
+        }
+
+        // grab at least the label and units from here
+        if ( SemanticOps.isJoin(ds) && ds.length()>0 && ds.rank()==3 ) {
+            QDataSet j1= (QDataSet)ds.slice(0).property(QDataSet.DEPEND_1);
+            if ( j1!=null ) {
+                Map<String,Object> h1= (Map<String, Object>) result.get(QDataSet.DEPEND_1);
+                if ( h1==null ) h1= new HashMap();
+                Object v1;
+                v1= j1.property(QDataSet.LABEL);
+                if ( v1!=null ) h1.put( QDataSet.LABEL, v1 );
+                v1= j1.property(QDataSet.UNITS);
+                if ( v1!=null ) h1.put( QDataSet.UNITS, v1 );
+                result.put( QDataSet.DEPEND_1, h1 );
+            }
         }
 
         return result;
