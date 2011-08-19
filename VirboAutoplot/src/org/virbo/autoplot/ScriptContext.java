@@ -791,6 +791,14 @@ public class ScriptContext extends PyJavaInstance {
     }
 
     /**
+     * wait until the application is idle.
+     *@see http://autoplot.org/data/tools/reloadAll.jy
+     */
+    public static void waitUntilIdle() throws InterruptedException {
+        model.waitUntilIdle(false);
+    }
+
+    /**
      * save the current state as a .vap file
      * @param filename
      */
