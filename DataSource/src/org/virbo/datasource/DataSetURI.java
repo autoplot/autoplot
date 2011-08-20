@@ -45,6 +45,7 @@ import org.das2.util.filesystem.LocalFileSystem;
 import org.das2.util.filesystem.URIException;
 import org.das2.util.filesystem.VFSFileSystemFactory;
 import org.virbo.aggregator.AggregatingDataSourceFactory;
+import org.virbo.dsops.Ops;
 
 /**
  *
@@ -685,9 +686,11 @@ public class DataSetURI {
         }
 
         String filename = new File( localCache, split.file.substring(split.path.length()) ).toString();
-        
+
         if ( split.params.length()>0 ) {
-            filename= filename+"__"+split.params.replaceAll("&", "_").replaceAll("=", "_");
+            String safe= split.params;
+            safe= Ops.safeName(safe); // create a Java identifier from this, that will be safe.
+            filename= filename+"__"+safe;
         }
 
         System.err.println( "reading URL "+url );
@@ -697,7 +700,7 @@ public class DataSetURI {
 
         File result= new File(filename);
         result.deleteOnExit();
-        
+
         new File(filename + "__").renameTo( result );
         return result;
     }
