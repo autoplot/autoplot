@@ -790,6 +790,7 @@ public class ScriptContext extends PyJavaInstance {
         return dom;
     }
 
+
     /**
      * wait until the application is idle.
      *@see http://autoplot.org/data/tools/reloadAll.jy
@@ -798,8 +799,9 @@ public class ScriptContext extends PyJavaInstance {
         model.waitUntilIdle(false);
     }
 
+
     /**
-     * save the current state as a .vap file
+     * save the current state as a vap file
      * @param filename
      */
     public static void save( String filename ) throws IOException {

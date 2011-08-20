@@ -152,6 +152,9 @@ public class FTPBeanFileSystem extends WebFileSystem {
         List<DirectoryEntry> result = new ArrayList<DirectoryEntry>(20);
         int lineNum = 1;
 
+        int sizePos= 31;
+        int modifiedPos= 42;
+
         while (!done) {
             //System.err.println(""+lineNum+": "+ aline);
             bytesRead = bytesRead + aline.length() + 1;
@@ -183,12 +186,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
                     DirectoryEntry item = new DirectoryEntry();
                     item.name = aline.substring(i + 1);
                     try {
-                        item.size = Long.parseLong(aline.substring(31, 31 + 11).trim());
+                        item.size = Long.parseLong(aline.substring(sizePos, sizePos + 11).trim());
                     } catch ( NumberFormatException ex ) {
-                        item.size = Long.parseLong(aline.substring(31, 31 + 10).trim());
+                        item.size = Long.parseLong(aline.substring(sizePos, sizePos + 10).trim());
                     }
                     item.type = type == 'd' ? 'd' : 'f';
-                    item.modified = parseTime1970(aline.substring(42, 54), Calendar.getInstance());
+                    item.modified = parseTime1970(aline.substring(modifiedPos, modifiedPos+12), Calendar.getInstance());
 
                     result.add(item);
 

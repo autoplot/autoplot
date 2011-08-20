@@ -7,8 +7,7 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Named undo operations, like "addPlots(1,3,below)" are coming.  The next operation, "11 changes" still needs to be named.
-                Also, the progress bar is made more space-efficient by moving the cancel button.
+        <p><small>Data from an HDF5 file is plotted.  I had to manually specify the fill value using the data tab.
             </small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
@@ -23,8 +22,11 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
         
 	<p>Bugfixes:</p>
-
         <ul>
+            <li>changing dayOfYear label options updates existing plots</li>
+            <li>bugfix 3390560: remove extraneous setDataSet in doResetRenderType.  There was one place where we needed to set the new dataset, and this seems cleaner</li>
+            <li>call native slice method on __iternext__<li>
+            <li>removeSideEffects for calculating completions in jython scripts no longer removes imports</li>
             <li>bugfixes from the production branch</li>
         </ul>
         <p>Older bugfixes:</p>
@@ -42,16 +44,12 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         </ul>
         <p>Features:</p>
         <ul>
-            <li>progress bar size reduced by moving cancel button</li>
-            <li>Add quick-n-dirty popup menu to operations field of data tab.</li>
-            <li>CDF export allows some control of storage type (double,float,byte). </li>
-            <li>Export GUIs for binary and CDF export</li>
-            <li>Save as... dialog supports exporting to v1.06.  It's messy now, but it should work (as long as you aren't using 1.07 features!)</li>
-            <li>Improvements to completions in scripting</li>
-            <li>add plots above in layout tab</li>
-            <li>mouse wheel works above data tab's operations text field.</li>
-            <li>"lint"-type check for symbols in python scripts to ensure symbols (e.g. str) are not overwritten</li>
-            <li>features from the production branch
+            <li>add Ops.copy so that ds+0 is avoided in scripts</li>
+            <li>check for ampersand in filename extension, when a user accidentally uses & instead of ? in URIs</li>
+            <li>support for reading vaps within RTE exception reports.</li>
+            <li>Ops.safename results in more legible names.  Was "30.0-45.0keV" to "_0_0_45_0ke_".  This may cause problems with old Ascii URIs that use these labels, let me know.</li>
+            <li>DataSetUtil.asArrayOfDoubles and DataSetUtil.asDataSet added to allow for formatting from Matlab and IDL</li>
+            <li>features from the production branch</li>
         </ul>
         <p>Less Recent Features:</p>
         <ul>
