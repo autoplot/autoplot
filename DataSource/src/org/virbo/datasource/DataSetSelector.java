@@ -67,6 +67,7 @@ import org.virbo.aggregator.AggregatingDataSourceFactory;
 import org.virbo.datasource.DataSetURI.CompletionResult;
 import org.virbo.datasource.ui.PromptComboBoxEditor;
 import org.virbo.datasource.ui.PromptTextField;
+import org.virbo.dsops.Ops;
 
 /**
  * Swing Component for selecting dataset URIs.  This provides hooks for completions.
@@ -520,6 +521,10 @@ public class DataSetSelector extends javax.swing.JPanel {
 
     }
 
+    /**
+     * remove "vap+X:" from the URI, if it exists.
+     * @param split
+     */
     private static void maybeClearVap( URISplit split ) {
         if ( split.vapScheme!=null && split.vapScheme.equals("vap") ) {
             split.vapScheme=null;
@@ -785,8 +790,23 @@ public class DataSetSelector extends javax.swing.JPanel {
 
                 String labelPrefix = surl.substring(0, carotpos);
 
+                String surll= surl;
+                int carotposl= carotpos;
+
                 try {
-                    completions = DataSetURI.getFileSystemCompletions(surl, carotpos, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                    String atrigger= checkActionTrigger( surl );
+                    if ( atrigger!=null ) {
+                        surll= surl.substring(atrigger.length()+1);
+                        carotposl= carotposl-atrigger.length()-1;
+                        completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                        for ( int i=0; i<completions.size(); i++ ) {
+                            completions.get(i).completable= atrigger + ":" + completions.get(i).completable;
+                            completions.get(i).completion= atrigger + ":" + completions.get(i).completion;
+                            completions.get(i).maybePlot= false;
+                        }
+                    } else {
+                        completions = DataSetURI.getFileSystemCompletions(surll, carotposl, suggestFsAgg, suggestFiles, acceptPattern, mon);
+                    }
                 } catch (UnknownHostException ex ) {
                     ex.printStackTrace();
                     setMessage("Unknown host: "+ex.getLocalizedMessage());
@@ -950,6 +970,27 @@ public class DataSetSelector extends javax.swing.JPanel {
             }
         });
     }
+
+    /**
+     * see if "script:" can be removed
+     * @param surl
+     * @return
+     */
+    private String checkActionTrigger(String surl) {
+        for ( String s: actionTriggers.keySet() ) {
+            if ( surl.matches(s) ) {
+                int i= s.indexOf(":");
+                if ( i>-1 ) {
+                    String tr= s.substring(0,i);
+                    if ( Ops.safeName(tr).equals(tr) ) {
+                        return tr;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     /** This method is called from within the constructor to
      * initialize the form.
