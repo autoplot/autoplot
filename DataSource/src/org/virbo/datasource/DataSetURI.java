@@ -689,6 +689,8 @@ public class DataSetURI {
 
         if ( split.params.length()>0 ) {
             String safe= split.params;
+            safe= safe.replaceAll("\\+","_"); // 2011 safeName uses "plus" for this
+            safe= safe.replaceAll("-","."); // 2011 safeName uses "_" for this, but it should be different than "+"
             safe= Ops.safeName(safe); // create a Java identifier from this, that will be safe.
             filename= filename+"__"+safe;
         }
