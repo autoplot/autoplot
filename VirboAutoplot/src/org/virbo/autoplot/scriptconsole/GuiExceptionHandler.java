@@ -376,8 +376,8 @@ public final class GuiExceptionHandler implements ExceptionHandler {
 
         StackTraceElement ste = th.getStackTrace()[0];
         sb.append("    <location>\n");
-        sb.append("       <class>").append(ste.getClassName()).append("</class>\n");
-        sb.append("       <method>").append(ste.getMethodName()).append("</method>\n");
+        sb.append("       <class>").append(safe(ste.getClassName())).append("</class>\n");
+        sb.append("       <method>").append(safe(ste.getMethodName())).append("</method>\n");
         sb.append("       <file>").append(safe(ste.getFileName())).append("</file>\n");
         sb.append("       <lineNumber>").append(ste.getLineNumber()).append("</lineNumber>\n");
         sb.append("    </location>\n");
