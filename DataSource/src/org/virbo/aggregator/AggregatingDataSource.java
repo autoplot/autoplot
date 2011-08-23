@@ -50,6 +50,8 @@ public class AggregatingDataSource extends AbstractDataSource {
 
     private FileStorageModelNew fsm;
     DataSourceFactory delegateDataSourceFactory;
+    AggregationPollUpdating upd; // allow a group of files to be watched.  This is experimental.
+    
     /**
      * metadata from the last read.
      */
@@ -101,6 +103,11 @@ public class AggregatingDataSource extends AbstractDataSource {
         if ( stimeRange==null ) throw new IllegalArgumentException("timeRange not found");
         stimeRange= stimeRange.replaceAll("\\+"," " );        
         viewRange= DatumRangeUtil.parseTimeRange( stimeRange );
+
+        //FileStorageModelNew fsm = AggregatingDataSourceFactory.getFileStorageModel(surl);
+        //upd= new AggregationPollUpdating(fsm, viewRange);
+        //addCability( Updating.class, upd );
+
     }
 
 
