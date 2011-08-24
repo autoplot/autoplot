@@ -123,7 +123,7 @@
         <Component class="javax.swing.JTree" name="jTree1">
           <Properties>
             <Property name="model" type="javax.swing.tree.TreeModel" editor="org.netbeans.modules.form.editors2.TreeModelEditor">
-              <TreeModel code="loading DataSets list"/>
+              <TreeModel code="Loading DataSets List...&#xa;"/>
             </Property>
           </Properties>
           <Events>
