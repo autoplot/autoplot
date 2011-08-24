@@ -15,5 +15,5 @@ print safeName('i<>3')
 print safeName('i!=3')
 print safeName('i==3')
 print safeName('|Bfn_gsm|')
-
+print safeName('|Bfn_gsm|-|Bfm_gse|')  
 
