@@ -1548,7 +1548,7 @@ private void dataSetSelectorPopupMenuCanceled(javax.swing.event.PopupMenuEvent e
         fontMenu.add( new AbstractAction( "Small" ) {
             public void actionPerformed(ActionEvent ev) {
                 Font f= getEditor().getFont();
-                int size= 7;
+                int size= 8;
                 if ( size>4 && size<18 ) {
                     Font nf= f.deriveFont( (float)size );
                     dataSetSelector.setFont(nf);
