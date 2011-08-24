@@ -91,7 +91,7 @@ public class AutoplotUtil {
      */
     public final static int DS_LENGTH_LIMIT = 10000000;
 
-    private static final Logger logger= Logger.getLogger( AutoplotUtil.class.getName() );
+    private static final Logger logger= Logger.getLogger( "virbo.autoplot.AutoplotUtil" );
     
     /**
      * this is not used.  It is called from createIcon, which is not used.
