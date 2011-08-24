@@ -1,6 +1,6 @@
 ;; for rank 2, ytags must be specified
 ; ascii, boolean, use ascii transfer types
-pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii
+pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii, xunits=xunits
    streamHeader= [ '[00]xxxxxx<stream>', '</stream>' ]
    contentLength= -10 ; don't include the packet tag and content length
    for i=0,n_elements( streamHeader )-1 do begin
@@ -18,7 +18,7 @@ pro das2stream, dataStruct, filename, ytags=ytags, ascii=ascii
    packetDescriptor= [ '[01]xxxxxx<packet>' ]
    t= tag_names( dataStruct )
    nt= n_elements(t)
-   packetDescriptor= [ packetDescriptor, '   <x type="'+xdatatype+'" name="'+t[0]+'" />' ]
+   packetDescriptor= [ packetDescriptor, '   <x type="'+xdatatype+'" name="'+t[0]+'" units="'+xunits+'" />' ]
 
    totalItems=1
 
@@ -174,15 +174,27 @@ function kwToString, keywords
    return, strmid( kw, 2 )
 end
 
+function getStructTag, struct, tag, def
+  t= tag_names(struct)
+  ry = where( strmatch( t, tag, /fold) )
+  if ( ry[0] eq -1 ) then return, def
+  return, struct.(ry[0])
+end
+ 
 ;
 ; mimic plot command, but with Autoplot.  if x is an int, then
 ; it is the position within autoplot.
 ;
-pro applot, x, y, z, z4, _extra=e, respawn=respawn
+pro applot, x_in, y_in, z_in, z4_in, xunits=xunits, _extra=e, respawn=respawn
 
+   x= x_in
+   if ( n_elements(y_in) gt 0 ) then y= y_in
+   if ( n_elements(z_in) gt 0 ) then z= z_in
+   if ( n_elements(z4_in) gt 0 ) then z4= z4_in
+   
    common applot_common, appid
 
-   on_error, 2
+  ; on_error, 2
 
    if n_elements( x ) eq 0 then begin
       message, 'x is undefined'
@@ -225,13 +237,71 @@ pro applot, x, y, z, z4, _extra=e, respawn=respawn
    tmpfile= getenv('IDL_TMPDIR') + 'autoplot.d2s'
    tmpfile= strjoin( str_sep( tmpfile, '\' ), '/' )
 
-   print, 'data transfer file is '+tmpfile
-
-   ; serialize the data to a das2stream in a temporary file
-   print, 'serialize the data to a das2stream in a temporary file'
-
    np= n_params();
-   if ( size( x, /type ) eq 2   or  size( x, /type ) eq 3 ) then begin
+
+   ; check for papco data structures
+   if ( size( x, /type ) eq 8 ) then begin
+       rank= size( x.data, /n_dimensions )
+       t= tag_names( x )
+       
+       vmin= -1e38
+       r= where( strmatch( t, 'validmin', /fold) )
+       if ( r[0] ne -1 ) then begin
+          vmin= x.(r)
+       endif
+       vmax= 1e38
+       r= where( strmatch( t, 'validmax', /fold) )
+       if ( r[0] ne -1 ) then begin
+          vmax= x.(r)
+       endif
+       
+       if ( rank eq 2 ) then begin
+           z= double(x.data)
+           ry = where( strmatch( t, 'depend_1', /fold) )
+           if ( ry eq -1 ) then begin
+              y= findgen( (size(x.data))[2] )
+           endif else begin
+              ry = where( strmatch( t, x.(ry[0]), /fold) )
+              y= double( (x.(ry[0])).data )
+           endelse 
+           rx = where( strmatch( t, 'depend_0', /fold) )
+           if ( rx eq -1 ) then begin
+              x= findgen( (size(z))[1] )
+           endif else begin
+              rx = where( strmatch( t, x.(rx[0]), /fold) )
+              xds= (x.(rx[0]))
+              x= double( xds.data )
+              xunits= getStructTag( xds, 'units', '' )
+           endelse 
+           np= 3
+           r= where( z le vmin or z ge vmax ) ; papco_ds is exclusive of vmin and vmax (for now).
+           if ( r[0] ne -1 ) then begin
+               z[r]= !values.f_nan
+           endif
+
+       endif else if ( rank eq 1 ) then begin
+           y= double(x.data)
+           rx = where( strmatch( t, 'depend_0', /fold) )
+           if ( rx eq -1 ) then begin
+              x= findgen( (size(y))[1] )
+           endif else begin
+              rx = where( strmatch( t, x.(rx[0]), /fold) )
+              xds= (x.(rx[0]))
+              x= double( xds.data )
+              xunits= getStructTag( xds, 'units', '' )
+           endelse 
+           np= 2
+           
+       endif else begin
+           message, 'papco ds rank not supported'
+       endelse
+       if ( xunits eq 'mjd2000' ) then begin
+          xunits= 'days since 2000-001T00:00'  ; verified by comparing conversion to cdf epoch in papco_ds_units.pro
+       endif
+   endif
+   
+   ; serialize the data to a das2stream in a temporary file
+   if ( size( x, /type ) eq 2   or  size( x, /type ) eq 3  ) then begin
       pos= x
       xx= y
       if ( n_elements(z) gt 0 ) then yy= z
@@ -244,20 +314,22 @@ pro applot, x, y, z, z4, _extra=e, respawn=respawn
       if ( n_elements(z) gt 0 ) then zz= z
    endelse
 
+   if n_elements(xunits) eq 0 then xunits=''
+   
    if np eq 3 then begin
       data= { x:xx, z:zz }
-      das2stream, data, tmpfile, ytags=y, ascii=0   ; TODO: redo with qstreams
+      das2stream, data, tmpfile, ytags=y, xunits=xunits, ascii=0   ; TODO: redo with qstreams  ; TODO: redo with PAPCO's old version of QDataSet
    endif else if np eq 2 then begin
       data= { x:xx, y:yy }
-      das2stream, data, tmpfile, ascii=0
+      das2stream, data, tmpfile, ascii=0, xunits=xunits
    endif else begin
       s= size( xx )
       if s[0] eq 2 then begin
         data= { x:findgen(s[1]), z:xx }
-        das2stream, data, tmpfile, ytags=findgen(s[2]), ascii=0
+        das2stream, data, tmpfile, ytags=findgen(s[2]), ascii=0, xunits=''
       endif else begin
         data= { x:findgen(s[1]), y:xx }
-        das2stream, data, tmpfile, ascii=0
+        das2stream, data, tmpfile, ascii=0, xunits=''
       endelse
    endelse
 
@@ -295,7 +367,6 @@ pro applot, x, y, z, z4, _extra=e, respawn=respawn
            endelse
        endelse
 
-       print, 'sending command: ', cmd
        foo= sendCommand( unit, cmd )
 
        if n_elements( ytitle ) eq 1 then begin
