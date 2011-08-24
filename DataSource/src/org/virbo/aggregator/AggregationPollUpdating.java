@@ -39,7 +39,7 @@ public class AggregationPollUpdating implements Updating {
     boolean polling= false; //true indicates we are polling.
 
     private final static int LIMIT_SHORT_CYCLE_PERIOD= 1;
-    private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD= 30;
+    private final static int LIMIT_SHORT_REMOTE_CYCLE_PERIOD= 10;
 
     public AggregationPollUpdating( FileStorageModelNew fsm, DatumRange dr, final long pollCyclePeriodSeconds ) {
         this.fsm= fsm;
@@ -80,9 +80,10 @@ public class AggregationPollUpdating implements Updating {
         long hash= 1;
         for ( int i=0; i<ss.length; i++ ) {
             FileObject fo= fsm.getFileSystem().getFileObject(ss[i]);
-            Date lm= fo.lastModified();
+            //Date lm= fo.lastModified(); //HTML FS doesn't give good dates.
             long sz= fo.getSize();
-            hash= hash + 17 * lm.hashCode() + 31 * sz;
+            //hash= hash + 17 * lm.hashCode() + 31 * sz + 31 * ss[i].hashCode();
+            hash= hash + 31 * sz + 31 * ss[i].hashCode();
         }
 
         return hash;
@@ -105,7 +106,7 @@ public class AggregationPollUpdating implements Updating {
                     }
                     try {
                         long dirHash1= dirHash(dr);
-                        //System.err.printf("old: %d   new: %d   %s \n",dirHash,dirHash1, Thread.currentThread().getName()  );
+                        System.err.printf("old: %d   new: %d   %s \n",dirHash,dirHash1, Thread.currentThread().getName()  );
                         if ( dirHash!=0 && dirHash1!=dirHash ) {
                             dirty= true;
                             dirHash= dirHash1;
