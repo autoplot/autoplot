@@ -657,7 +657,7 @@ public class AutoplotUtil {
                         range= DatumRangeUtil.rescaleLog( range, 0, 2 );
                         d2= d2/2;
                         d1= d1/2;
-                        logger.fine("adjusting TYPICAL_MAX from metadata");
+                        logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
                     }
                 } else {
                     try {
@@ -673,7 +673,7 @@ public class AutoplotUtil {
                         range= DatumRangeUtil.rescale( range, 0, 2 );
                         d2= d2/2;
                         d1= d1/2;
-                        logger.fine("adjusting TYPICAL_MAX from metadata");
+                        logger.fine("adjusting TYPICAL_MAX from metadata, multiply by 2.0");
                     }
                 }
                 if (d2 - d1 > 0.1    // the stats range occupies 10% of the typical range
