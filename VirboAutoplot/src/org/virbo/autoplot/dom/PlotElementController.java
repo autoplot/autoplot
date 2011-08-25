@@ -1947,7 +1947,6 @@ public class PlotElementController extends DomNodeController {
         if ( getRenderer()!=null && getRenderer()!=oldRenderer ) {
             //QDataSet oldDs= oldRenderer==null ? null : oldRenderer.getDataSet();
             //QDataSet oldDs= getDataSet();  // TODO: what about sprocess?
-            System.err.println("we used to setDataSet here");
             //getRenderer().setDataSet(oldDs);
         }
     }
