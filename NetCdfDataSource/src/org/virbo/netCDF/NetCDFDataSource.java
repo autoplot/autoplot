@@ -91,7 +91,7 @@ public class NetCDFDataSource extends AbstractDataSource {
     
     public QDataSet getDataSet( ProgressMonitor mon) throws IOException {
         mon.started();
-        readData( new NullProgressMonitor() );
+        readData( mon );
         NetCdfVarDataSet result= NetCdfVarDataSet.create( variable , ncfile, mon );
         QDataSet qresult= checkLatLon(result);
         mon.finished();
