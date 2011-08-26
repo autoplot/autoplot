@@ -153,6 +153,14 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         }
         return data[index];
     }
+
+    public double value( int i, int j, int k, int l ) {
+        int index= l + shape[3] * k  + shape[3] * shape[2] * j + shape[3] * shape[2] * shape[1] * i;
+        if ( index>=data.length) {
+            throw new IllegalArgumentException("how");
+        }
+        return data[index];
+    }
     
     public int length() {
         return shape[0];
@@ -166,5 +174,8 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         return shape[2];
     }
     
+    public int length( int dim0, int dim1, int dim2 ) {
+        return shape[3];
+    }
     
 }
