@@ -25,7 +25,6 @@ import org.virbo.dataset.SemanticOps;
 import org.virbo.dsops.Ops;
 import ucar.nc2.Variable;
 import ucar.nc2.Attribute;
-import ucar.nc2.NetcdfFile;
 import ucar.nc2.dataset.NetcdfDataset;
 
 /**
@@ -60,7 +59,11 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         mon.setProgressMessage( "reading "+v.getNameAndDimensions() );
         ucar.ma2.Array a = v.read();
 
-        data= (double[])a.get1DJavaArray( Double.class );
+        try {
+            data= (double[])a.get1DJavaArray( Double.class );
+        } catch ( ClassCastException ex ) {
+            throw new IllegalArgumentException("data cannot be converted to numbers",ex);
+        }
        
         shape= v.getShape();
         properties.put( QDataSet.NAME, Ops.safeName(variable.getName()) );
@@ -136,15 +139,18 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         return v.getRank();
     }
     
+    @Override
     public double value(int i) {
         return data[i];
     }
     
+    @Override
     public double value( int i, int j ) {
         int index= j + shape[1] * i;
         return data[ index ];
     }
     
+    @Override
     public double value( int i, int j, int k ) {
         //int index= i + shape[0] * j + shape[0] * shape[1] * k;
         int index= k + shape[2] * j + shape[2] * shape[1] * i;
@@ -154,6 +160,7 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         return data[index];
     }
 
+    @Override
     public double value( int i, int j, int k, int l ) {
         int index= l + shape[3] * k  + shape[3] * shape[2] * j + shape[3] * shape[2] * shape[1] * i;
         if ( index>=data.length) {
@@ -162,18 +169,22 @@ public class NetCdfVarDataSet extends AbstractDataSet {
         return data[index];
     }
     
+    @Override
     public int length() {
         return shape[0];
     }
     
+    @Override
     public int length( int dim ) {
         return shape[1];
     }
     
+    @Override
     public int length( int dim0, int dim1 ) {
         return shape[2];
     }
     
+    @Override
     public int length( int dim0, int dim1, int dim2 ) {
         return shape[3];
     }
