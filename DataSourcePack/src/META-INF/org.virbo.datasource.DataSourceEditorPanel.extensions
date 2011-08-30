@@ -1,2 +1,3 @@
-org.virbo.ascii.AsciiTableDataSourceEditorPanel dat txt csv
+org.virbo.ascii.AsciiTableDataSourceEditorPanel dat txt
 org.autoplot.html.HtmlTableDataSourceEditorPanel htm html
+org.autoplot.csv.CsvDataSourceEditorPanel csv
