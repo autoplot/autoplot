@@ -464,7 +464,7 @@ private void importUrlMenuItemActionPerformed(java.awt.event.ActionEvent evt) {/
 
 private void resetToDefaultMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetToDefaultMenuItemActionPerformed
     String surl = AutoplotUtil.getProperty("autoplot.default.bookmarks", "http://www.autoplot.org/data/demos.xml");
-    int r = JOptionPane.showConfirmDialog(this, "Reset your bookmarks to " + surl + "?");
+    int r = JOptionPane.showConfirmDialog(this, "Reset your bookmarks to " + surl + "?", "Reset Bookmarks", JOptionPane.OK_CANCEL_OPTION );
     if (r == JOptionPane.OK_OPTION) {
         try {
             URL url = new URL(surl);
