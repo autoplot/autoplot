@@ -463,6 +463,7 @@ public abstract class Bookmark {
             if (obj instanceof Bookmark.Folder) {
                 Bookmark.Folder that= (Bookmark.Folder) obj;
                 return that.bookmarks.equals(this.bookmarks)
+                        && ( that.getTitle().equals(this.getTitle()) )
                         && ( that.getParent()==null || that.getParent().getTitle().equals(this.getParent().getTitle()) );
             } else {
                 return false;
@@ -515,7 +516,7 @@ public abstract class Bookmark {
             if (obj instanceof Bookmark.Item) {
                 Bookmark.Item that= (Bookmark.Item)obj;
                 return that.url.equals(this.url)
-                        && (that.getParent()==null || that.getParent().getTitle().equals(this.getParent().getTitle()) );
+                        && (that.getParent()==null || this.getParent()==null || that.getParent().getTitle().equals(this.getParent().getTitle()) );
             } else {
                 return false;
             }
