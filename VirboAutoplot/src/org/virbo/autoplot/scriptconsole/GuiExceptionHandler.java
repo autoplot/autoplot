@@ -427,7 +427,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         buf.append("  <states>\n");
         for ( int i= undo.getDepth()-1; i>0; i-- ) {
             buf.append( String.format( "      <undo pos=%d>",i ) );
-            buf.append( undo.getLongUndoDescription(i) );
+            buf.append( safe( undo.getLongUndoDescription(i) ) );
             buf.append( "</undo>\n" );
         }
         buf.append("  </states>\n");
