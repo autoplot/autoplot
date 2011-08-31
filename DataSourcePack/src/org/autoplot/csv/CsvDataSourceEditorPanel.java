@@ -243,6 +243,7 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         jLabel4.setText("Depends On:");
 
+        dep0Columns.setEditable(true);
         dep0Columns.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         dep0Columns.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -336,14 +337,6 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
         URISplit split= URISplit.parse(uri);
         Map<String,String> params= URISplit.parseParams(split.params);
 
-        QDataSet tds;
-        HtmlTableParser parser;
-        try {
-            parser=  new HtmlTableParser(DataSetURI.getURIValid(uri));
-
-        } catch ( Exception ex ) {
-            ex.printStackTrace();
-        }
     }
 
     private void resetTable( ) {
@@ -386,13 +379,13 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             headers.addAll( Arrays.asList(reader.getHeaders()) );
 
             columnsComboBox.setModel( new DefaultComboBoxModel( headers.toArray() ) );
-            String column= params.get("column");
-            if ( column!=null ) this.columnsComboBox.setSelectedItem(params.get("column"));
+            String column= params.get(PROP_COLUMN);
+            if ( column!=null ) this.columnsComboBox.setSelectedItem(params.get(PROP_COLUMN));
 
 
             dep0Columns.setModel( new DefaultComboBoxModel( headers.toArray() ) );
-            String depend0column= params.get("depend0column");
-            if ( depend0column!=null ) this.dep0Columns.setSelectedItem(params.get("depend0column"));
+            String depend0column= params.get(PROP_DEP0);
+            if ( depend0column!=null ) this.dep0Columns.setSelectedItem(params.get(PROP_DEP0));
 
         } catch (Exception ex) {
             columnsComboBox.setModel( new DefaultComboBoxModel( new String[] { "(no records found)" } ) );
@@ -458,7 +451,7 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
     
     public static final String PROP_FIRST_ROW = "firstRow";
     public static final String PROP_COLUMN = "column";
-    public static final String PROP_DEP0 = "depend0column";
+    public static final String PROP_DEP0 = "depend0";
 
     public JPanel getPanel() {
         return this;
