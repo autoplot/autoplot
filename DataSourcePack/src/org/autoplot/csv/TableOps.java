@@ -1,0 +1,107 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.autoplot.csv;
+
+import java.util.regex.Pattern;
+
+/**
+ * I'd still like to refactor all the table-type sources to get the common codes.
+ * These include:
+ *   * html tables
+ *   * xls, csv
+ *   * dat
+ *
+ * @author jbf
+ */
+public class TableOps {
+
+    /**
+     * returns the index of the field.  Supports the name, or field0, or 0, etc.
+     * @return the field index, or -1 if the column doesn't exist.
+     */
+    public static int getFieldIndex(String string, String[] fieldNames) {
+        for (int i = 0; i < fieldNames.length; i++) {
+            if (fieldNames[i].equalsIgnoreCase(string)) {
+                return i;
+            }
+        }
+        int icol= -1;
+        if (Pattern.matches("field[0-9]+", string )) {
+            icol= Integer.parseInt(string.substring(5));
+        } else if (Pattern.matches("[0-9]+", string )) {
+            icol= Integer.parseInt(string);
+        }
+        if ( icol>=fieldNames.length ) {
+            throw new IllegalArgumentException("bad column parameter: the record parser only expects "+fieldNames.length +" columns");
+        }
+
+        return icol;
+    }
+
+   /**
+     * returns the field index of the name, which can be:
+     *   a column name
+     *   an implicit column name "field1"
+     *   a column index (0 is the first column)
+     *   a negative column index (-1 is the last column)
+     * @param name
+     * @param count
+     * @return the index of the field, or -1 if the column doesn't exist.
+     */
+    public static int columnIndex( String name, String[] fieldNames ) {
+        if ( Pattern.matches( "\\d+", name) ) {
+            return Integer.parseInt(name);
+        } else if ( Pattern.matches( "-\\d+", name) ) {
+            return fieldNames.length + Integer.parseInt(name);
+        } else if ( Pattern.matches( "field\\d+", name) ) {
+            return Integer.parseInt( name.substring(5) );
+        } else {
+            int idx= getFieldIndex(name,fieldNames);
+            return idx;
+        }
+    }
+
+    /**
+     * parse range strings like "3:6", "3:-5", and "Bx_gsm-Bz_gsm"
+     * if the delimiter is colon, then the end is exclusive.  If it is "-",
+     * then it is inclusive.
+     * @param o
+     * @param columnCount
+     * @return
+     * @throws java.lang.NumberFormatException
+     */
+    public static int[] parseRangeStr(String o, String[] fieldNames ) throws NumberFormatException {
+        String s = o;
+        int first = 0;
+        int last = fieldNames.length;
+        if (s.contains(":")) {
+            String[] ss = s.split(":",-2);
+            if ( ss[0].length() > 0 ) {
+                first = columnIndex(ss[0],fieldNames);
+            }
+            if ( ss[1].length() > 0 ) {
+                last = columnIndex(ss[1],fieldNames);
+            }
+        } else if ( s.contains("--") ) {
+            int isplit= s.indexOf("--",1);
+            if ( isplit > 0 ) {
+                first = columnIndex( s.substring(0,isplit),fieldNames);
+            }
+            if ( isplit < s.length()-2 ) {
+                last = 1 + columnIndex( s.substring(isplit+1),fieldNames);
+            }
+        } else if ( s.contains("-") ) {
+            String[] ss = s.split("-",-2);
+            if ( ss[0].length() > 0 ) {
+                first = columnIndex(ss[0],fieldNames);
+            }
+            if ( ss[1].length() > 0 ) {
+                last = 1 + columnIndex(ss[1],fieldNames);
+            }
+        }
+        return new int[]{first, last};
+    }
+}
