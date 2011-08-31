@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.net.URI;
 import java.text.ParseException;
 import org.das2.datum.EnumerationUnits;
+import org.das2.datum.TimeLocationUnits;
 import org.das2.datum.Units;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.dataset.DDataSet;
@@ -64,22 +65,27 @@ public class CsvDataSource extends AbstractDataSource {
         if ( column==null ) {
             icolumn= ncol==-1 ? -1 : ncol-1;
         } else {
-            if ( column.startsWith("field") ) {
-                icolumn= Integer.parseInt(column.substring(5));
-            } else {
-                icolumn= reader.getIndex(column);
-            }
+            icolumn= TableOps.columnIndex( column, headers );
             if ( icolumn==-1 ) {
                 throw new IllegalArgumentException("column not found: "+column);
             }
         }
 
-        String dep0column= getParam( "depend0column", null );
+        String bundle= getParam( "bundle", null );
+        int[] cols;
+        if ( bundle==null ) {
+            cols= null;
+        } else {
+            cols= TableOps.parseRangeStr( column, headers );
+            //TODO finish this!!!
+        }
+
+        String dep0column= getParam( "depend0", null );
         int idep0column;
         if ( dep0column==null ) {
             idep0column= -1;
         } else {
-            idep0column= reader.getIndex(dep0column);
+            idep0column= TableOps.columnIndex( dep0column, headers );
             if ( idep0column==-1 ) {
                 throw new IllegalArgumentException("column not found: "+dep0column);
             }
@@ -93,8 +99,12 @@ public class CsvDataSource extends AbstractDataSource {
 
         boolean init= true;
 
+        int hline=2; // allow top two lines to be header lines.
+
+        double tb=0, cb=0;
+
         while ( reader.readRecord() ) {
-            if ( init ) {
+            if ( hline>0 ) {
                 if ( icolumn==-1 ) {
                     icolumn= reader.getColumnCount()-1;
                     headers= new String[reader.getColumnCount()];
@@ -102,28 +112,48 @@ public class CsvDataSource extends AbstractDataSource {
                         headers[i]= "column_"+i;
                     }
                 }
-                if ( idep0column>=0 ) dep0u= getUnits( reader.getHeader(idep0column),reader.get(idep0column) );
-                u= getUnits( reader.getHeader(icolumn),reader.get(icolumn) );
-                init= false;
+                Units oldDep0u= dep0u;
+                Units oldU= u;
+
+                if ( idep0column>=0 && !(dep0u instanceof TimeLocationUnits) ) dep0u= getUnits( reader.getHeader(idep0column),reader.get(idep0column) );
+                if ( !( u instanceof TimeLocationUnits ) ) u= getUnits( reader.getHeader(icolumn),reader.get(icolumn) );
+                hline= hline-1;
+
+                if ( hline==0 ) {
+                    if ( oldDep0u != dep0u || oldU!=u ) {
+                        builder= new DataSetBuilder( 1, 100 );
+                        tbuilder= new DataSetBuilder( 1, 100 );
+                    }
+                }
             }
+
+
             try {
                 if ( idep0column>=0 ) {
                     if ( dep0u instanceof EnumerationUnits ) {
-                        tbuilder.putValue( -1, 0, ((EnumerationUnits)dep0u).createDatum( reader.get(idep0column) ).doubleValue(dep0u) ) ;
+                        tb= ((EnumerationUnits)dep0u).createDatum( reader.get(idep0column) ).doubleValue(dep0u) ;
                     } else {
-                        tbuilder.putValue( -1, 0, dep0u.parse(reader.get(idep0column)).doubleValue(dep0u) );
+                        tb= dep0u.parse(reader.get(idep0column)).doubleValue(dep0u);
                     }
-                    tbuilder.nextRecord();
                 }
                 if ( u instanceof EnumerationUnits ) {
-                    builder.putValue( -1, 0, ((EnumerationUnits)u).createDatum( reader.get(icolumn) ).doubleValue(u) ) ;
+                    cb= ((EnumerationUnits)u).createDatum( reader.get(icolumn) ).doubleValue(u);
                 } else {
-                    builder.putValue( -1, 0, u.parse(reader.get(icolumn)).doubleValue(u) );
+                    cb= u.parse(reader.get(icolumn)).doubleValue(u);
                 }
-                builder.nextRecord();
+
             } catch ( ParseException ex ) {
-                System.err.println("skipping line: "+reader.get(idep0column));
+                System.err.println("skipping line: "+reader.getRawRecord() );
+                continue;
             }
+
+            if ( idep0column>=0 ) {
+                tbuilder.putValue( -1, 0, tb );
+                tbuilder.nextRecord();
+            }
+            builder.putValue(-1,0,cb);
+            builder.nextRecord();
+
         }
 
         DDataSet ds= builder.getDataSet();
