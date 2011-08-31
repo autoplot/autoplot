@@ -200,15 +200,15 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
      * @return
      * @throws CDFException
      */
-    synchronized protected static CDF getCDFFile( String cdfFile ) throws CDFException {
-        if ( currentFile!=null && currentFile.equals(cdfFile) ) {
-            System.err.println("caching open CDF file satisfies");
-            return currentCDF;
-        }
+    protected static CDF getCDFFile( String cdfFile ) throws CDFException {
+        //if ( currentFile!=null && currentFile.equals(cdfFile) ) {
+        //    System.err.println("caching open CDF file satisfies");
+        //    return currentCDF;
+        //}
 
         System.err.println("opening "+cdfFile);
         currentCDF= CDF.open(cdfFile);
-        currentFile= cdfFile;
+        //currentFile= cdfFile;
         return currentCDF;
     }
 
@@ -217,9 +217,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
      * we just leave it open.
      * @param cdf
      */
-    synchronized protected static void closeCDF( CDF cdf ) {
+    protected static void closeCDF( CDF cdf ) throws CDFException {
         // do nothing
-        // cdf.close();
+        cdf.close();
     }
     
 }
