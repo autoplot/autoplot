@@ -100,13 +100,13 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
             logger.finest("opening cdf file "+fileName);
-            CDF cdf= CDF.open( fileName, CDF.READONLYoff );
+            CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
             
             logger.finest("inspect cdf for plottable parameters");
             Map<String,String> result= CdfUtil.getPlottable( cdf, true , 4);
             
             logger.finest("close cdf");
-            cdf.close();
+            CdfFileDataSourceFactory.closeCDF(cdf);
             
             List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
             for ( String key:result.keySet() ) {
@@ -129,9 +129,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 String fileName= cdfFile.toString();
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
-                CDF cdf= CDF.open( fileName, CDF.READONLYoff );
+                CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
                 Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4);
-                cdf.close();
+                CdfFileDataSourceFactory.closeCDF(cdf);
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
                 for ( String key:result.keySet() ) {
@@ -173,9 +173,9 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             if (!file.isFile()) {
                 return true;
             } else {
-                CDF cdf= CDF.open( file.getPath(), CDF.READONLYoff );
+                CDF cdf= CdfFileDataSourceFactory.getCDFFile( file.getPath() );
                 Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4);
-                cdf.close();
+                CdfFileDataSourceFactory.closeCDF(cdf);
                 int i= param.indexOf("[");
                 if ( i>-1 ) {
                     param= param.substring(0,i);
@@ -190,5 +190,36 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
         }
     }
     
+    //  new caching stuff.
+    private static CDF currentCDF=null;
+    private static String currentFile= null;
+
+    /**
+     * cache one open CDF, because tha_l2_esa_20080907_v01.cdf has lots of variables and it's expensive to open.
+     * @param cdfFile
+     * @return
+     * @throws CDFException
+     */
+    synchronized protected static CDF getCDFFile( String cdfFile ) throws CDFException {
+        if ( currentFile!=null && currentFile.equals(cdfFile) ) {
+            System.err.println("caching open CDF file satisfies");
+            return currentCDF;
+        }
+
+        System.err.println("opening "+cdfFile);
+        currentCDF= CDF.open(cdfFile);
+        currentFile= cdfFile;
+        return currentCDF;
+    }
+
+    /**
+     * this will allow for multiple files to be opened in the future.  Right now
+     * we just leave it open.
+     * @param cdf
+     */
+    synchronized protected static void closeCDF( CDF cdf ) {
+        // do nothing
+        // cdf.close();
+    }
     
 }

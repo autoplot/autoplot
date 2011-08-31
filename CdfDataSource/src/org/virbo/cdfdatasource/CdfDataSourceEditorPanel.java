@@ -300,7 +300,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             String fileName= cdfFile.toString();
 
             logger.fine("opening cdf file "+fileName);
-            CDF cdf= CDF.open( fileName, CDF.READONLYoff );
+            CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
 
             logger.finest("inspect cdf for plottable parameters");
             parameterDescriptions= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, false );
@@ -310,7 +310,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             }
 
             logger.finest("close cdf");
-            cdf.close();
+            CdfFileDataSourceFactory.closeCDF(cdf);
 
             DefaultListModel model= new DefaultListModel();
             DefaultComboBoxModel cbmodel= new DefaultComboBoxModel();

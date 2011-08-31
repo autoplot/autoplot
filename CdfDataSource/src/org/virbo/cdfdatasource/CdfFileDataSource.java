@@ -69,7 +69,7 @@ public class CdfFileDataSource extends AbstractDataSource {
     public CdfFileDataSource(URI uri) {
         super(uri);
     }
-    
+
     public synchronized QDataSet getDataSet(ProgressMonitor mon) throws IOException, CDFException, ParseException {
         File cdfFile;
 
@@ -84,7 +84,7 @@ public class CdfFileDataSource extends AbstractDataSource {
         Map map = getParams();
 
         mon.setProgressMessage("opening file...");
-        CDF cdf = CDF.open(fileName, CDF.READONLYoff);
+        CDF cdf = CdfFileDataSourceFactory.getCDFFile( fileName );
 
         mon.setProgressMessage("done opening file");
         
@@ -137,7 +137,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 result= wrapDataSet(cdf, svariable, constraint, false, true, mon );
             }
 
-            cdf.close();
+            CdfFileDataSourceFactory.closeCDF(cdf);
 
             boolean doDep= !"no".equals( map.get(PARAM_DODEP) );
             if ( !doDep ) {
@@ -575,7 +575,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 if ( map.containsKey( PARAM_SLICE1 ) ) {
                     return null;
                 }
-                CDF cdf = CDF.open(fileName, CDF.READONLYoff);
+                CDF cdf = CdfFileDataSourceFactory.getCDFFile(fileName);
                 String svariable = (String) map.get("id");
                 if (svariable == null) {
                     svariable = (String) map.get("arg_0");
@@ -590,6 +590,7 @@ public class CdfFileDataSource extends AbstractDataSource {
                 }
                 Variable variable = cdf.getVariable(svariable);
                 attributes= readAttributes(cdf, variable, 0);
+                CdfFileDataSourceFactory.closeCDF(cdf);
                 return attributes; // transient state
             } catch (CDFException ex) {
                 throw new IOException(ex.getMessage());
