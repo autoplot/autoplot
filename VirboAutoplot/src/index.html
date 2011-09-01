@@ -7,79 +7,69 @@
         <p><a href="autoplot.jnlp"><img src="launch.png"></a></p>
 
 	<img src="screen.png">
-        <p><small>Data from an HDF5 file is plotted.  I had to manually specify the fill value using the data tab.
-            </small></p>
+        <p><small>Data from HDF5 file.  I found this when looking for HDF5s to plot.</small></p>
 
 	<p>Autoplot attempts to allow plotting of data from many data sources, including local files and OpenDAP servers.
 	Datasets are identified with URIs, and by the URI's extension a module is used to load the data into the internal data model.  Data is then
 displayed by guessing the rendering method and axis ranges to provide a reasonable, useful view of the data.
 	</p>
 
-        <p>This is the development branch of Autoplot2011.
+        <p>This is the new production branch.
         </p>
 
         <p>Single-jar version, <a href="autoplot.jar">autoplot.jar</a>, can be run without network access and from the command line.  Note CDFs are only supported
             via the Java-based reader and Autoplot will attempt to use it when the C-based version is not available.  </p>
         
-	<p>Bugfixes:</p>
+        <p>Bugfixes:</p>
         <ul>
-            <li>changing dayOfYear label options updates existing plots</li>
-            <li>bugfix 3390560: remove extraneous setDataSet in doResetRenderType.  There was one place where we needed to set the new dataset, and this seems cleaner</li>
-            <li>call native slice method on __iternext__<li>
-            <li>removeSideEffects for calculating completions in jython scripts no longer removes imports</li>
-            <li>bugfixes from the production branch</li>
+            <li>bugfix: digitizing script works again</li>
+            <li>bugfix: use Ops.safeName to create a filename for a temporary download.</li>
         </ul>
         <p>Older bugfixes:</p>
         <ul>
-            <li>bugfixes from production branch, including CDF valid range for vap+cdaweb:ds=AC_H0_SWE&id=V_GSE&timerange=2010-120</li>
-            <li>Clean up of CDAWeb plugin</li>
-            <li>Excel formatter checks for enumerations in DEPEND_1 (E.g. Bx, By, Bz)</li>
-            <li>bugfix 3373948: add plots undo works properly</li>
-            <li>bugfixes to the rich headers parsing</li>
-            <li>performance slightly improved for time axis annotations.  (loading still done on event thread)</li>
-            <li>bugfix 3370241: extra data source filter nodes cleaned up in DOM</li>
-            <li>long legend doesn't mess up autolayout.</li>
-            <li>single-jar release works after new release method.</li>
-            <li>export data panel makes export component insensitive if there was no process applied</li>
+            <li>bugfix: help system focus</li>
+            <li>bugfix: completions after getParam(x,default,label)</li>
+            <li>bugfix: runtime error when time location units are y axis</li>
+            <li>bugfix:<a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3377088&group_id=199733&atid=970682">3377088</a>: need to reset ID's in reset method.</li>
+            <li>bugfix: switch from NNspectrogram to spectrogram would result in runtime error</li>
+            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3373948&group_id=199733&atid=970682">3373948</a>: undo after add three below fails</li>
+            <li>improve transparency by adding progress bar to getMasterFile in CDAWeb</li>
+            <li>bug 3349316: never allow autoranging=false to persist between sessions.</li>
+            <li>rte_1482456189_20110627_214119: check for null param.  There must be some datasets with no plottable parameters (in CDAWeb)</li>
+            <li>rte_1959777447_20110623_144934: don't give runtime error when the uri cannot be resolved.  This doesn't help the user.  Now we give them a more informative screen</li>
+            <li>bugfix <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3302003&group_id=199733&atid=970682">3302003</a>: problems with noaa08_meped1mins_sem_....cdf CDF_UCHAR</li>
         </ul>
+
         <p>Features:</p>
         <ul>
-            <li>add Ops.copy so that ds+0 is avoided in scripts</li>
-            <li>check for ampersand in filename extension, when a user accidentally uses & instead of ? in URIs</li>
-            <li>support for reading vaps within RTE exception reports.</li>
-            <li>Ops.safename results in more legible names.  Was "30.0-45.0keV" to "_0_0_45_0ke_".  This may cause problems with old Ascii URIs that use these labels, let me know.</li>
-            <li>DataSetUtil.asArrayOfDoubles and DataSetUtil.asDataSet added to allow for formatting from Matlab and IDL</li>
-            <li>features from the production branch</li>
+            <li>scripting waitUntilIdle command</li>
+            <li>scripting getParam improvements and downloadResourceAsTempFile brought over from 2011 branch.</li>
+            <li>improve filesystem completions for action triggers like "pngwalk:/home/jbf/COMP"</li>
+            <li>applot.pro includes code to plot papco dataset model</li>
+            <li>add xunits keyword, so you can say xunits='seconds since 2000-001T00:00'</li>
+            <li>remove extraneous feedback in applot</li>
         </ul>
-        <p>Less Recent Features:</p>
-        <ul>
-            <li>Time Axis annotations allows Autoplot URIs to add additional info to X axis.</li>
-            <li>Improvements to Time Series Browse when timerange is not visible</li>
-            <li>slice1=n in CDF readers allow slice of rank 2 to be loaded</li>
-            <li>resize to the size indicated in the vap file</li>
-            <li>minor improvements to JythonDataSource editor, and completions see getParam</li>
-            <li>CDAWeb uses Java-based CDF reader to support single-jar mode</li>
-            <li>RFE 3347826: new folder icon has magnifying glass for inspect button</li>
-            <li>New two-jar release method speeds up initial download</li>
-            <li>All ascii types support rich headers in format to some degree</li>
-            <li>.txt is default output format, not .png</li>
-            <li>Delay creation of axis, style and other tabs until initial GUI is displayed to improve startup</li>
-            <li>ctrl-D and ctrl-T accelerators for time range selector switch.</li>
-            <li>Python editor completions use <em>fancier code</em> to render html</li>
-            <li>initialize Python immediately in background</li>
-            <li>v1.07 vap includes dom.plots[0].context property, which is essentially a fourth dimension for locating this plot on another.</li>
-            <li>Introduce code to experiment with forward compatibility, so v1.07 could be read into old Autoplot when patch is released.</li>
+        <p>Less recent features:</p>
+        <ul>      
+            <li>add getParam to completions in jython editor</li>
+            <li>minor enhancements to applot in IDL, including position and renderType bugfix.</li>
+            <li>rfe <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=2981338&group_id=199733&atid=970685">2981338</a>: submit runtime can submit vap and undo info, which can be disabled.  log info no longer submitted.</li>
+            <li>check returned content for html code when data or vap was expected, for example with typos and mediawiki or in a hotel room</li>
+            <li>logic limiting scan buttons changed to limit scanning to range within dataset initial range, instead of by unit type.</li>
+            <li>add negate, cos, sin, toRadians, toDegrees, and smooth to sprocess.  negate handles units.</li>
+            <li>add fts extension to Fits reader.</li>
+            <li>rfe <a href="https://sourceforge.net/tracker/index.php?func=detail&aid=3377224&group_id=199733&atid=970685">3377224</a> autorange, autolayout, and autolabelling should not persist
+            <li>introduce forward compatibility.  Where autoplot2011 files can be read in because it has conversion from v1.07 vap file to v1.06</li>
         </ul>
 
 <p>Known issues:</p>
 <ul>
 <li> <a href="https://sourceforge.net/tracker/?func=browse&group_id=199733&atid=970682">see Source Forge</a>
 </ul>
-<p>This is the development branch.  Feedback on the function and quality of this release is greatly appreciated!</p>
+<p>This completes the feature set for the new production branch. No major features will be added before branching this version. A production branch will be started in a couple of weeks, and the "Start Autoplot" link at the top of www.autoplot.org will run this version. <b>Feedback on the function and quality of this release is greatly appreciated!</b></p>
 
-	<p>Data is input from:
-        <ul>
-        <li>ASCII files (.dat,.txt)</li>
+	<p>data is input from:
+	<li>ASCII files (.dat,.txt)</li>
         <li>Binary files (.bin)</li>
         <li>CDF files(.cdf)</li>
 	<li>Excel spread sheets (.xls)</li>
@@ -89,17 +79,15 @@ displayed by guessing the rendering method and axis ranges to provide a reasonab
         <li>Plasma Wave Group das2 Server</li>
 	<li>NetCDF files (.nc,.ncml)</li>
         <li>HDF5 files</li>
-	<li>DODs servers (.dds,.dods)</li>
+	<li>DODs servers (.dds)</li>
         <li>Cluster Exchange Format files (.cef)</li>
-        <li>Fits Format Files (.fts,.fits)</li>
+        <li>Fits Format Files</li>
         <li>Images (.jpg, .png, .gif)</li>
-        <li>Wav audio files (.wav></li>
-	</ul>
+        <li>Wav audio files</li>
+	</p>
 	<p>This is not complete, and limitations include:</p>
-        <ul>
-            <li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
-            <li>Quantities of rank 4 dimensionality (e.g. flux(Time,Energy,azimuth,sector) are plotted by slicing twice.</li>
-        </ul>
+	<li>Quantities of rank 3 dimensionality (e.g. flux(Time,Energy,pitch) are plotted by slicing.</li>
+	<li>Quantities of rank 4 dimensionality (e.g. flux(Time,Energy,azimuth,sector) are plotted by slicing twice.</li>
          
          <p><a href="http://autoplot.org">autoplot.org</a> is the wiki website, and contains
          more information than this launch page.</p>

@@ -57,7 +57,7 @@ import org.virbo.dsops.Ops;
  */
 public class DataSetURI {
 
-    private static Logger logger = Logger.getLogger("virbo.datasource");
+    private static final Logger logger = Logger.getLogger("virbo.datasource");
 
 
     static {
@@ -438,7 +438,7 @@ public class DataSetURI {
                 filename = DataSourceUtil.unescape(filename);
             FileObject fo = fs.getFileObject(split.file.substring(split.path.length()));
             if (!fo.isLocal()) {
-                Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
+                logger.log(Level.INFO, "downloading file {0}", fo.getNameExt());
             }
             return fo.getInputStream(mon);
 
@@ -456,7 +456,7 @@ public class DataSetURI {
             filename = DataSourceUtil.unescape(filename);
         FileObject fo = fs.getFileObject(filename);
         if (!fo.isLocal()) {
-            Logger.getLogger("virbo.dataset").info("downloading file " + fo.getNameExt());
+            logger.log(Level.INFO, "downloading file {0}", fo.getNameExt());
         }
         return fo.getInputStream(mon);
 
@@ -566,9 +566,9 @@ public class DataSetURI {
                 filename = DataSourceUtil.unescape(filename);
             FileObject fo = fs.getFileObject(filename);
             if (!fo.isLocal()) {
-                logger.fine("downloading file " + fo.getNameExt());
+                logger.log(Level.FINE, "downloading file {0}", fo.getNameExt());
             } else {
-                logger.fine("using local copy of " + fo.getNameExt());
+                logger.log(Level.FINE, "using local copy of {0}", fo.getNameExt());
             }
             File tfile;
             if ( fo.exists() ) {
@@ -609,7 +609,7 @@ public class DataSetURI {
             Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
-                fi.close();
+                if ( fi!=null ) fi.close();
             } catch (IOException ex) {
                 Logger.getLogger(DataSetURI.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -631,7 +631,7 @@ public class DataSetURI {
             String filename = split.file.substring(split.path.length());
             FileObject fo = fs.getFileObject(filename);
             File tfile = fo.getFile(mon);
-            if ( !allowHtml ) checkNonHtml(tfile, new URL(split.file) );
+            if ( !allowHtml && tfile.exists() ) checkNonHtml(tfile, new URL(split.file) );
             return tfile;
         } catch ( URIException ex ) {
             throw new IOException(ex.getMessage()); //Java1.6 will change this
@@ -1101,7 +1101,7 @@ public class DataSetURI {
             }
         });
 
-        boolean foldCase = Boolean.TRUE.equals(fs.getProperty(fs.PROP_CASE_INSENSITIVE));
+        boolean foldCase = Boolean.TRUE.equals(fs.getProperty(FileSystem.PROP_CASE_INSENSITIVE));
         if (foldCase) {
             prefix = prefix.toLowerCase();
         }

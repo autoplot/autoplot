@@ -8,16 +8,15 @@ ant -quiet do-tag | grep -v  "Trying to override old definition of task " #TODO:
 cd ../VirboAutoplot
 ant -quiet do-tag | grep -v  "Trying to override old definition of task "
 
-export AP_VERSION=20110815  # Note this is not used in the Hudson task, $TAG sets the version.
+export AP_VERSION=v2010b_17
 
-# TODO: these are already in another script, but should probably clean this up.  Right now the keystore file is the security...
-export KEYPASS=virbo1
-export STOREPASS=dolphin
+ant jar -Ddefault_release_tag=$AP_VERSION
+ant jnlp-release -Ddefault_release_tag=$AP_VERSION
 
 #SINGLE JAR RELEASE
 #sh ./jumbojar.sh
-#mv dist/autoplot.jar dist/jnlp/
-#rsync -e ssh -av dist/jnlp/ root@aurora.gmu.edu:/var/www/autoplot/jnlp/$AP_VERSION/
+mv dist/autoplot.jar dist/jnlp/
+rsync -e ssh -av dist/jnlp/ root@aurora.gmu.edu:/var/www/autoplot/jnlp/$AP_VERSION/
 
 #STANDARD TWO-JAR (volatile and stable) RELEASE
 sh ./compile-application.sh
