@@ -76,8 +76,8 @@ public class CsvDataSource extends AbstractDataSource {
         if ( bundle==null ) {
             cols= null;
         } else {
-            cols= TableOps.parseRangeStr( column, headers );
-            //TODO finish this!!!
+            cols= TableOps.parseRangeStr( bundle, headers );
+            icolumn= cols[0]; // get the units from this column
         }
 
         String dep0column= getParam( "depend0", null );
@@ -91,9 +91,6 @@ public class CsvDataSource extends AbstractDataSource {
             }
         }
 
-        DataSetBuilder builder= new DataSetBuilder( 1, 100 );
-        DataSetBuilder tbuilder= new DataSetBuilder( 1, 100 );
-
         Units dep0u= Units.dimensionless;
         Units u= Units.dimensionless;
 
@@ -101,7 +98,19 @@ public class CsvDataSource extends AbstractDataSource {
 
         int hline=2; // allow top two lines to be header lines.
 
-        double tb=0, cb=0;
+        double tb=0, cb=0;  // temporary holders for data
+        double[] bundleb=null;
+        if ( cols!=null ) {
+            bundleb= new double[ cols[1]-cols[0] ];
+        }
+
+        DataSetBuilder builder;
+        if ( bundleb!=null ) {
+            builder= new DataSetBuilder( 2, 100, bundleb.length );
+        } else {
+            builder= new DataSetBuilder( 1, 100 );
+        }
+        DataSetBuilder tbuilder= new DataSetBuilder( 1, 100 );
 
         while ( reader.readRecord() ) {
             if ( hline>0 ) {
@@ -121,7 +130,11 @@ public class CsvDataSource extends AbstractDataSource {
 
                 if ( hline==0 ) {
                     if ( oldDep0u != dep0u || oldU!=u ) {
-                        builder= new DataSetBuilder( 1, 100 );
+                        if ( bundleb!=null ) {
+                            builder= new DataSetBuilder( 2, 100, bundleb.length );
+                        } else {
+                            builder= new DataSetBuilder( 1, 100 );
+                        }
                         tbuilder= new DataSetBuilder( 1, 100 );
                     }
                 }
@@ -136,11 +149,22 @@ public class CsvDataSource extends AbstractDataSource {
                         tb= dep0u.parse(reader.get(idep0column)).doubleValue(dep0u);
                     }
                 }
-                if ( u instanceof EnumerationUnits ) {
-                    cb= ((EnumerationUnits)u).createDatum( reader.get(icolumn) ).doubleValue(u);
+                if ( bundleb!=null ) {
+                    for ( int j=0; j<bundleb.length; j++ ) {
+                        if ( u instanceof EnumerationUnits ) {
+                            bundleb[j]= ((EnumerationUnits)u).createDatum( reader.get(icolumn+j) ).doubleValue(u);
+                        } else {
+                            bundleb[j]= u.parse(reader.get(icolumn+j)).doubleValue(u);
+                        }
+                    }
                 } else {
-                    cb= u.parse(reader.get(icolumn)).doubleValue(u);
+                    if ( u instanceof EnumerationUnits ) {
+                        cb= ((EnumerationUnits)u).createDatum( reader.get(icolumn) ).doubleValue(u);
+                    } else {
+                        cb= u.parse(reader.get(icolumn)).doubleValue(u);
+                    }
                 }
+
 
             } catch ( ParseException ex ) {
                 System.err.println("skipping line: "+reader.getRawRecord() );
@@ -148,11 +172,18 @@ public class CsvDataSource extends AbstractDataSource {
             }
 
             if ( idep0column>=0 ) {
-                tbuilder.putValue( -1, 0, tb );
+                tbuilder.putValue( -1, tb );
                 tbuilder.nextRecord();
             }
-            builder.putValue(-1,0,cb);
-            builder.nextRecord();
+            if ( bundleb!=null ) {
+                for ( int j=0; j<bundleb.length; j++ ) {
+                    builder.putValue(-1,j,bundleb[j]);
+                }
+                builder.nextRecord();
+            } else {
+                builder.putValue(-1,cb);
+                builder.nextRecord();
+            }
 
         }
 

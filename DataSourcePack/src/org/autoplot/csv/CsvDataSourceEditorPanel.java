@@ -6,21 +6,17 @@
 package org.autoplot.csv;
 
 import com.csvreader.CsvReader;
-import org.autoplot.html.*;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -33,17 +29,14 @@ import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.DefaultTableModel;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
-import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
 import org.virbo.datasource.ui.TableRowHeader;
-import org.virbo.dsutil.QDataSetTableModel;
 
 /**
  *
@@ -150,11 +143,10 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             if (currentTool == Tool.DEPEND_0) {
                 params.put(PROP_DEP0, name);
                 dep0Columns.setSelectedItem(name);
-
             } else if (currentTool == Tool.COLUMN) {
                 params.put(PROP_COLUMN, name);
                 columnsComboBox.setSelectedItem(name);
-
+                params.remove(PROP_BUNDLE);
             }
 
         } else {
@@ -175,10 +167,12 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             if (currentTool == Tool.DEPEND_0) {
             } else if (currentTool == Tool.COLUMN) {
                 if (haveColumnNames) {
-                    params.put(PROP_COLUMN, sfirst + "-" + slast);
+                    params.put(PROP_BUNDLE, sfirst + "-" + slast);
                 } else {
-                    params.put(PROP_COLUMN, "" + first + ":" + (last + 1));
+                    params.put(PROP_BUNDLE, "" + first + ":" + (last + 1));
                 }
+                params.remove(PROP_COLUMN);
+                columnsComboBox.setSelectedItem(params.get(PROP_BUNDLE) );
             }
         }
         clearTool();
@@ -451,6 +445,7 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
     
     public static final String PROP_FIRST_ROW = "firstRow";
     public static final String PROP_COLUMN = "column";
+    public static final String PROP_BUNDLE = "bundle";
     public static final String PROP_DEP0 = "depend0";
 
     public JPanel getPanel() {
@@ -474,9 +469,11 @@ private void columnsComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FI
             setFile(f);
 
             if ( "".equals( params.get(PROP_COLUMN) ) ) params.remove(PROP_COLUMN);
+            if ( "".equals( params.get(PROP_BUNDLE) ) ) params.remove(PROP_BUNDLE);
             if ( "".equals( params.get(PROP_DEP0 ) ) ) params.remove(PROP_DEP0);
 
             if ( params.get(PROP_COLUMN)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_COLUMN) );
+            if ( params.get(PROP_BUNDLE)!=null ) columnsComboBox.setSelectedItem( params.get(PROP_BUNDLE) );
             if ( params.get(PROP_DEP0)!=null ) dep0Columns.setSelectedItem( params.get(PROP_DEP0) );
 
             resetFile();
