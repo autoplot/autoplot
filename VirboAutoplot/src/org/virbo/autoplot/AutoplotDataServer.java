@@ -206,6 +206,8 @@ public class AutoplotDataServer {
             for ( DatumRange dr: drs ) {
                 System.err.printf( "time read start read of %s= %d\n", dr.toString(), System.currentTimeMillis()-t0 );
 
+                //make sure URIs with time series browse have a timerange in the URI.  Otherwise we often crash on the above line...
+                //TODO: find a way to test for this and give a good error message.
                 QDataSet ds1 = org.virbo.jythonsupport.Util.getDataSet(suri, dr.toString(), SubTaskMonitor.create( mon, i*10, (i+1)*10 ) );
                 if ( ds1!=null ) {
                     QDataSet range= DataSetOps.dependBounds( ds1 );
