@@ -566,12 +566,12 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace min="12" pref="12" max="12" attributes="0"/>
-                      <Component id="timeRangePanel" pref="692" max="32767" attributes="0"/>
+                      <Component id="timeRangePanel" pref="700" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="statusLabel" min="-2" pref="16" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
-                      <Component id="statusTextField" pref="684" max="32767" attributes="0"/>
+                      <Component id="statusTextField" pref="692" max="32767" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -586,7 +586,7 @@
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="timeRangePanel" min="-2" pref="31" max="-2" attributes="0"/>
-              <EmptySpace pref="570" max="32767" attributes="0"/>
+              <EmptySpace pref="578" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="statusLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="statusTextField" alignment="3" min="-2" max="-2" attributes="0"/>

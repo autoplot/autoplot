@@ -84,6 +84,7 @@ import org.das2.system.RequestProcessor;
 import org.das2.util.ExceptionHandler;
 import org.das2.util.filesystem.FileSystem;
 import org.das2.util.filesystem.FileSystemSettings;
+import org.das2.util.filesystem.KeyChain;
 import org.jdesktop.beansbinding.AutoBinding.UpdateStrategy;
 import org.jdesktop.beansbinding.BeanProperty;
 import org.jdesktop.beansbinding.Binding;
@@ -239,6 +240,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         
         initComponents();
 
+        KeyChain.getDefault().setParentGUI(this);
+        
         APSplash.checkTime("init 25");
 
         timeRangeEditor = new TimeRangeEditor();
