@@ -296,7 +296,7 @@ public class JythonCompletionTask implements CompletionTask {
                 "for component in targetComponents[1:]:\n" +
                 "    module = getattr(module, component)\n" +
                 "list = dir(module)\n" +
-                "list.remove('__name__')\n" +
+                "if ( '__name__' in list ): list.remove('__name__')\n" +
                 "list.append('*')\n" +
                 "list";
         interp.exec(eval);
