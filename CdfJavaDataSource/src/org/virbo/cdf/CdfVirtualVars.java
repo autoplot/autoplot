@@ -115,6 +115,13 @@ public class CdfVirtualVars {
 //         endcase
 //      endif ;if function defined for this virtual variable
 
+    /**
+     *
+     * @param function
+     * @param args
+     * @see isSupported
+     * @return
+     */
     public static QDataSet execute( String function, List<QDataSet> args ) {
         if ( function.equals("compute_magnitude") ) {
             return computeMagnitude( args.get(0) );
@@ -150,8 +157,8 @@ public class CdfVirtualVars {
         return result;
     }
 
-    protected static boolean isSupported(String function) {
-        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10" );
+    public static boolean isSupported(String function) {
+        List<String> functions= Arrays.asList( "compute_magnitude", "convert_log10", "fftPower512" );
         return functions.contains(function);
     }
 }
