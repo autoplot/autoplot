@@ -921,7 +921,7 @@ public class CdfUtil {
 //            }
 
             if ( var.getName().equals("Time_PB5") ) {
-                logger.fine("skipping "+var.getName()+" because we always skip Time_PB5");
+                logger.log(Level.FINE, "skipping {0} because we always skip Time_PB5", var.getName());
                 continue;
             }
 
@@ -942,7 +942,7 @@ public class CdfUtil {
 
                 try {
                     if ( virtual!=null ) {
-                        logger.fine("get attribute " + virtual.getName() + " entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{virtual.getName(), var.getName()});
                         Entry entry = virtual.getEntry(var);
                         if ( String.valueOf(entry.getData()).equals("TRUE") ) {
                             if ( !isVirtual ) { // maybe some virtual functions are not supported.
@@ -955,7 +955,7 @@ public class CdfUtil {
                 }
                 try {
                     if (aAttr != null) {  // check for metadata for DEPEND_0
-                        logger.fine("get attribute " + aAttr.getName() + " entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{aAttr.getName(), var.getName()});
                         Entry xEntry = aAttr.getEntry(var);
                         xDependVariable = cdf.getVariable(String.valueOf(xEntry.getData()));
                         xMaxRec = xDependVariable.getMaxWrittenRecord();
@@ -973,7 +973,7 @@ public class CdfUtil {
 
                 try {
                     if (bAttr != null) {  // check for metadata for DEPEND_1
-                        logger.fine("get attribute " + bAttr.getName() + " entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{bAttr.getName(), var.getName()});
                         Entry yEntry = bAttr.getEntry(var);
                         yDependVariable = cdf.getVariable(String.valueOf(yEntry.getData()));
                         yMaxRec = yDependVariable.getMaxWrittenRecord();
@@ -995,7 +995,7 @@ public class CdfUtil {
 
                 try {
                     if ( yMaxRec==-1 && blAttr != null) {  // check for metadata for LABL_PTR_1
-                        logger.fine("get attribute " + blAttr.getName() + " entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{blAttr.getName(), var.getName()});
                         Entry yEntry = blAttr.getEntry(var);
                         yDependVariable = cdf.getVariable(String.valueOf(yEntry.getData()));
                         yMaxRec = yDependVariable.getMaxWrittenRecord();
@@ -1016,7 +1016,7 @@ public class CdfUtil {
 
                 try {
                     if (cAttr != null) { // check for existence of DEPEND_2, dimensionality too high
-                        logger.fine("get attribute " + cAttr.getName() + " entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{cAttr.getName(), var.getName()});
                         Entry zEntry = cAttr.getEntry(var);
                         zDependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
                         zMaxRec = zDependVariable.getMaxWrittenRecord();
@@ -1030,7 +1030,7 @@ public class CdfUtil {
 
                 try {
                     if ( zMaxRec==-1 && clAttr != null) {  // check for metadata for LABL_PTR_1
-                        logger.fine("get attribute " + clAttr.getName() + " entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{clAttr.getName(), var.getName()});
                         Entry zEntry = clAttr.getEntry(var);
                         zDependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
                         zMaxRec = zDependVariable.getMaxWrittenRecord();
@@ -1044,7 +1044,7 @@ public class CdfUtil {
 
                 try {
                     if (dAttr != null) { // check for existence of DEPEND_2, dimensionality too high
-                        logger.fine("get attribute " + dAttr.getName() + " entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{dAttr.getName(), var.getName()});
                         Entry zEntry = dAttr.getEntry(var);
                         z1DependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
                         z1MaxRec = z1DependVariable.getMaxWrittenRecord();
@@ -1058,7 +1058,7 @@ public class CdfUtil {
 
                 try {
                     if ( z1MaxRec==-1 && dlAttr != null) {  // check for metadata for LABL_PTR_1
-                        logger.fine("get attribute " + dlAttr.getName() + " entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{dlAttr.getName(), var.getName()});
                         Entry zEntry = dlAttr.getEntry(var);
                         z1DependVariable = cdf.getVariable(String.valueOf(zEntry.getData()));
                         z1MaxRec = z1DependVariable.getMaxWrittenRecord();
@@ -1073,12 +1073,12 @@ public class CdfUtil {
                 if (deep) {
                     try {
                         if (catDesc != null) {
-                            logger.fine("get attribute " + catDesc.getName() + " entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{catDesc.getName(), var.getName()});
                             Entry entry = catDesc.getEntry(var);
                             scatDesc = String.valueOf(entry.getData());
                         }
                         if (varNotes!=null ) {
-                            logger.fine("get attribute " + varNotes.getName() + " entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute {0} entry for {1}", new Object[]{varNotes.getName(), var.getName()});
                             Entry entry = varNotes.getEntry(var);
                             svarNotes = String.valueOf(entry.getData());
                         }
@@ -1107,23 +1107,23 @@ public class CdfUtil {
                     desc += ")";
                 }
                 if (deep) {
-                    StringBuffer descbuf = new StringBuffer("<html><b>" + desc + "</b><br>");
+                    StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
-                    StringBuffer sdims= new StringBuffer();
+                    StringBuilder sdims= new StringBuilder();
                     String recDesc= CDFUtils.getStringDataType(var);
                     if ( dims!=null ) {
                         recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
                     }
                     if (maxRec != xMaxRec)
-                        descbuf.append("" + (maxRec + 1) + " records of "+recDesc+"<br>");
+                        descbuf.append("").append(maxRec + 1).append(" records of ").append(recDesc).append("<br>");
                     if (scatDesc != null)
-                        descbuf.append("" + scatDesc + "<br>");
+                        descbuf.append("").append(scatDesc).append("<br>");
                     if (svarNotes !=null ) {
-                        descbuf.append("<br><p><small>" + svarNotes + "<small></p>");
+                        descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
                     }
 
                     for ( String s: warn ) {
-                        descbuf.append("<br>WARNING: "+s);
+                        descbuf.append("<br>WARNING: ").append(s);
                     }
                     
                     descbuf.append("</html>");
