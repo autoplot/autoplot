@@ -34,6 +34,7 @@ import org.das2.datum.TimeUtil;
 import org.das2.datum.Units;
 import org.das2.fsm.FileStorageModelNew;
 import org.das2.util.filesystem.FileSystem;
+import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.das2.util.monitor.SubTaskMonitor;
 import org.virbo.datasource.DataSetURI;
@@ -182,6 +183,9 @@ public class CDAWebDB {
             if ( url.startsWith("/tower3/public/pub/istp/") ) {
                 url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/public/".length() );
             }
+            if ( url.startsWith("/tower3/private/cdaw_data/cluster_private/st/edi") ) {  //cl_sp_edi
+                url= "ftp://cdaweb.gsfc.nasa.gov/" + url.substring("/tower3/private/".length() );
+            }
             return url;
 
         } catch (XPathExpressionException ex) {
@@ -202,10 +206,34 @@ public class CDAWebDB {
             String last = getTimeRange(spid);
             int i = last.indexOf(" to ");
             last = last.substring(i + 4);
+
+            String tmpl= getNaming( spid );
+            String base= getBaseUrl( spid );
+
+            Datum width= null;
+            FileSystem fs;
+            try {
+                fs = FileSystem.create(new URI(base));
+                FileStorageModelNew fsm= FileStorageModelNew.create( fs, tmpl );
+                String ff= fsm.getRepresentativeFile( new NullProgressMonitor() );
+                if ( ff!=null ) {
+                    return fsm.getRangeFor(ff).toString();
+                } else {
+                    width= Units.hours.createDatum(24);
+                }
+
+            } catch (URISyntaxException ex) {
+                Logger.getLogger(CDAWebDB.class.getName()).log(Level.SEVERE, null, ex);
+                width= Units.hours.createDatum(24);
+
+            }
+
             Datum d = TimeUtil.prevMidnight(TimeUtil.create(last)); // TODO: getFilename, when $v is handled
-            Datum d1= d.add( 24, Units.hours );
+            d= d.subtract( width );
+            Datum d1= d.add( width );
             DatumRange dr= new DatumRange( d, d1 );
             return dr.toString();
+            
         } catch (ParseException ex) {
             throw new IOException(ex.toString());
         }
@@ -352,7 +380,7 @@ public class CDAWebDB {
                             //&& nssdc_ID.contains("None") ) {
                              ) {
                         String url= getURL(node);
-                        if ( url!=null && url.startsWith("/") ) {
+                        if ( url!=null && url.startsWith("/") && !url.startsWith("/tower3/private" )) {
                             String desc= getDescription(node);
                             String s=attrs.getNamedItem("serviceprovider_ID").getTextContent();
                             //String sid=attrs.getNamedItem("ID").getTextContent();
