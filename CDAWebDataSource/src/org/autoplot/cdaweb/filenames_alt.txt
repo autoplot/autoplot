@@ -26,27 +26,27 @@ AC_H3_CRIS ftp://cdaweb.gsfc.nasa.gov/pub/istp/ace/cris_h3 %Y/ac_h3_cris_%Y0101_
 #huh?  ERROR: /tower3/private/cdaw_data/cluster_private/st/edi
 #huh?  CL_SP_ASP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/cl/sp/asp %Y/cl_sp_asp_%Y%m%d_?%v.cdf
 #huh?  ERROR: /tower3/private/cdaw_data/cluster_private/st/aux
-#CL_JP_PGP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/cl/jp/pgp %Y/cl_jp_pgp_%Y%m%d_?%v.cdf
+CL_JP_PGP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/cl/jp/pgp %Y/cl_jp_pgp_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#huh?  C1_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c1/jp/pmp %Y/c1_jp_pmp_%Y%m%d_?%v.cdf
+C1_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c1/jp/pmp %Y/c1_jp_pmp_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#C2_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c2/jp/pmp %Y/c2_jp_pmp_%Y%m%d_?%v.cdf
+C2_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c2/jp/pmp %Y/c2_jp_pmp_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#C3_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c3/jp/pmp %Y/c3_jp_pmp_%Y%m%d_?%v.cdf
+C3_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c3/jp/pmp %Y/c3_jp_pmp_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#C4_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c4/jp/pmp %Y/c4_jp_pmp_%Y%m%d_?%v.cdf
+C4_JP_PMP ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c4/jp/pmp %Y/c4_jp_pmp_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#C1_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c1/jp/pse %Y/c1_jp_pse_%Y%m%d_?%v.cdf
+C1_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c1/jp/pse %Y/c1_jp_pse_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#C2_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c2/jp/pse %Y/c2_jp_pse_%Y%m%d_?%v.cdf
+C2_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c2/jp/pse %Y/c2_jp_pse_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#C3_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c3/jp/pse %Y/c3_jp_pse_%Y%m%d_?%v.cdf
+C3_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c3/jp/pse %Y/c3_jp_pse_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#C4_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c4/jp/pse %Y/c4_jp_pse_%Y%m%d_?%v.cdf
+C4_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/c4/jp/pse %Y/c4_jp_pse_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#CT_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/ct/jp/pse %Y/ct_jp_pse_%Y%m%d_?%v.cdf
+CT_JP_PSE ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/ct/jp/pse %Y/ct_jp_pse_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2014-12-31
-#CL_JP_PCY ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/cl/jp/pcy %Y/cl_jp_pcy_%Y%m%d_?%v.cdf
+CL_JP_PCY ftp://cdaweb.gsfc.nasa.gov/pub/istp/cluster/cl/jp/pcy %Y/cl_jp_pcy_%Y%m01_?%v.cdf
 #FILE NOT FOUND: 2015-02-01
 #ok CRRES_H0_MEA ftp://cdaweb.gsfc.nasa.gov/pub/istp/crres/mea %Y/crres_h0_mea_%Y%m%d_?%v.cdf
 #FILE NOT FOUND: 1991-10-12
