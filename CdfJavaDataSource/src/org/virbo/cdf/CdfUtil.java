@@ -10,8 +10,8 @@ package org.virbo.cdf;
 
 import gov.nasa.gsfc.voyager.cdf.Attribute;
 import gov.nasa.gsfc.voyager.cdf.CDF;
-import gov.nasa.gsfc.voyager.cdf.Extractor;
 import gov.nasa.gsfc.voyager.cdf.Variable;
+import java.util.logging.Level;
 import org.das2.datum.DatumRange;
 import org.das2.datum.EnumerationUnits;
 import org.das2.datum.Units;
@@ -324,7 +324,7 @@ public class CdfUtil {
             
             //pop off the 2 from the end of the qube.
             int[] qube1= new int[qube.length-1];
-            for ( int i=0; i<qube.length-1; i++ ) qube1[i]= qube[i];
+            System.arraycopy(qube, 0, qube1, 0, qube.length - 1);
 
             result = DDataSet.wrap(dresult, qube1);
             result.putProperty(QDataSet.UNITS, Units.us2000);
@@ -448,7 +448,7 @@ public class CdfUtil {
 
         logger.fine("getting CDF variables");
         String[] v = cdf.getVariableNames();
-        logger.fine("got " + v.length + " variables");
+        logger.log(Level.FINE, "got {0} variables", v.length);
 
         Attribute aAttr = null, bAttr = null, cAttr = null, dAttr = null;
         Attribute blAttr = null, clAttr = null, dlAttr = null;
@@ -539,7 +539,7 @@ public class CdfUtil {
           //  }
 
             if ( var.getName().equals("Time_PB5") ) {
-                logger.fine("skipping "+var.getName()+" because we always skip Time_PB5");
+                logger.log(Level.FINE, "skipping {0} because we always skip Time_PB5", var.getName());
                 continue;
             }
 
@@ -562,7 +562,7 @@ public class CdfUtil {
                     if ( true || virtual!=null ) {
                         Object att= getAttribute( cdf, var.getName(), "VIRTUAL" );
                         if ( att!=null ) {
-                            logger.fine("get attribute VIRTUAL entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute VIRTUAL entry for {0}", var.getName());
                             if ( String.valueOf(att).toUpperCase().equals("TRUE") ) {
                                 String funct= (String)getAttribute( cdf, var.getName(), "FUNCTION" );
                                 if ( funct==null ) funct= (String) getAttribute( cdf, var.getName(), "FUNCT" ) ; // in alternate_view in IDL: 11/5/04 - TJK - had to change FUNCTION to FUNCT for IDL6.* compatibili
@@ -579,7 +579,7 @@ public class CdfUtil {
                     if (true || aAttr != null) {  // check for metadata for DEPEND_0
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_0" );
                         if ( att!=null ) {
-                            logger.fine("get attribute DEPEND_0 entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute DEPEND_0 entry for {0}", var.getName());
                             xDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             xMaxRec = xDependVariable.getNumberOfValues();
                             if ( xMaxRec!=maxRec ) {
@@ -598,7 +598,7 @@ public class CdfUtil {
                     if ( true || bAttr != null) {  // check for metadata for DEPEND_1
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_1" );
                         if ( att!=null ) {
-                            logger.fine("get attribute DEPEND_1 entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute DEPEND_1 entry for {0}", var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             yMaxRec = yDependVariable.getNumberOfValues();
                             if (yMaxRec == 1) {
@@ -617,7 +617,7 @@ public class CdfUtil {
                     if ( yMaxRec==-1 ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_1" );
                         if ( att!=null ) {
-                            logger.fine("get attribute LABL_PTR_1 entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute LABL_PTR_1 entry for {0}", var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             yMaxRec = yDependVariable.getNumberOfValues();
                             if (yMaxRec == 1) {
@@ -636,7 +636,7 @@ public class CdfUtil {
                     if ( true || cAttr != null) { 
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_2" );
                         if ( att!=null ) {
-                            logger.fine("get attribute DEPEND_2 entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute DEPEND_2 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             zMaxRec = zDependVariable.getNumberOfValues();
                             if (zMaxRec == 1) {
@@ -652,7 +652,7 @@ public class CdfUtil {
                     if ( zMaxRec==-1 ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_2" );
                         if ( att!=null ) {
-                            logger.fine("get attribute LABL_PTR_2 entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute LABL_PTR_2 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             zMaxRec = zDependVariable.getNumberOfValues();
                             if (zMaxRec == 0) {
@@ -667,7 +667,7 @@ public class CdfUtil {
                     if ( true || dAttr != null) {
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_3" );
                         if ( att!=null ) {
-                            logger.fine("get attribute DEPEND_3 entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute DEPEND_3 entry for {0}", var.getName());
                             z1DependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             z1MaxRec = z1DependVariable.getNumberOfValues();
                             if (z1MaxRec == 1) {
@@ -683,7 +683,7 @@ public class CdfUtil {
                     if ( z1MaxRec==-1 ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_3" );
                         if ( att!=null ) {
-                            logger.fine("get attribute LABL_PTR_3 entry for " + var.getName());
+                            logger.log(Level.FINE, "get attribute LABL_PTR_3 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             z1MaxRec = zDependVariable.getNumberOfValues();
                             if (z1MaxRec == 0) {
@@ -698,12 +698,12 @@ public class CdfUtil {
                 if (deep) {
                     Object o= (Object) getAttribute( cdf, var.getName(), "CATDESC" );
                     if ( o != null && o instanceof String ) {
-                        logger.fine("get attribute CATDESC entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute CATDESC entry for {0}", var.getName());
                         scatDesc = (String)o ;
                     }
                     o=  getAttribute( cdf, var.getName(), "VAR_NOTES" );
                     if ( o!=null  && o instanceof String ) {
-                        logger.fine("get attribute VAR_NOTES entry for " + var.getName());
+                        logger.log(Level.FINE, "get attribute VAR_NOTES entry for {0}", var.getName());
                         svarNotes = (String)o ;
                     }
                 }
@@ -726,23 +726,23 @@ public class CdfUtil {
                 }
 
                 if (deep) {
-                    StringBuffer descbuf = new StringBuffer("<html><b>" + desc + "</b><br>");
+                    StringBuilder descbuf = new StringBuilder("<html><b>" + desc + "</b><br>");
 
-                    StringBuffer sdims= new StringBuffer();
+                    StringBuilder sdims= new StringBuilder();
                     String recDesc= ""+ CdfUtil.getStringDataType(var.getType());
                     if ( dims!=null ) {
                         recDesc= recDesc+"["+ DataSourceUtil.strjoin( dims, ",") + "]";
                     }
                     if (maxRec != xMaxRec)
-                        descbuf.append("" + (maxRec) + " records of "+recDesc+"<br>");
+                        descbuf.append("").append(maxRec).append(" records of ").append(recDesc).append("<br>");
                     if (scatDesc != null)
-                        descbuf.append("" + scatDesc + "<br>");
+                        descbuf.append("").append(scatDesc).append("<br>");
                     if (svarNotes !=null ) {
-                        descbuf.append("<br><p><small>" + svarNotes + "<small></p>");
+                        descbuf.append("<br><p><small>").append(svarNotes).append("<small></p>");
                     }
 
                     for ( String s: warn ) {
-                        descbuf.append("<br>WARNING: "+s);
+                        descbuf.append("<br>WARNING: ").append(s);
                     }
                     
                     descbuf.append("</html>");
