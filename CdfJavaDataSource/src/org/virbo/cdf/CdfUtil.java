@@ -533,10 +533,10 @@ public class CdfUtil {
                 continue;
             }
 
-            if ( maxRec==0 && ( dims==null || dims.length<1 || dims[0]==1 ) ) {
-                logger.fine("skipping "+var.getName()+" because maxWrittenRecord is 0");
-                continue;
-            }
+          //  if ( maxRec==0 && ( dims==null || dims.length<1 || dims[0]==1 ) ) {
+          //      logger.fine("skipping "+var.getName()+" because maxWrittenRecord is 0");
+          //      continue;
+          //  }
 
             if ( var.getName().equals("Time_PB5") ) {
                 logger.fine("skipping "+var.getName()+" because we always skip Time_PB5");
