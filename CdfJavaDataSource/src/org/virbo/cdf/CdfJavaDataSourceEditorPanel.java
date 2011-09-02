@@ -40,6 +40,7 @@ import org.virbo.datasource.URISplit;
  * @author jbf
  */
 public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements DataSourceEditorPanel {
+    public static final String NO_PLOTTABLE_PARAMETERS_MSG = "<html><em>No plottable parameters</em></html>";
     private final static Logger logger= Logger.getLogger( CdfJavaDataSourceEditorPanel.class.getCanonicalName() );
 
     /** Creates new form AggregatingDataSourceEditorPanel */
@@ -317,10 +318,6 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             } catch ( Exception ex ) {
                 throw new RuntimeException(ex);
             }
-            
-            if ( parameterDescriptions.isEmpty() ) {
-                throw new IllegalArgumentException("no plottable parameters in cdf file!");
-            }
 
             logger.finest("close cdf");
             //cdf.close();
@@ -330,6 +327,10 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
             for ( String p: parameterDescriptions.keySet() ) {
                 model.addElement(p);
                 cbmodel.addElement(p);
+            }
+            if ( parameterDescriptions.isEmpty() ) {
+                model.addElement(NO_PLOTTABLE_PARAMETERS_MSG);
+                cbmodel.addElement(NO_PLOTTABLE_PARAMETERS_MSG);
             }
             parameterList.setModel( model );
 
@@ -344,10 +345,14 @@ public class CdfJavaDataSourceEditorPanel extends javax.swing.JPanel implements 
                 }
                 parameterList.setSelectedValue(param, true);
             } else {
-                parameter= parameterDescriptions.entrySet().iterator().next().getKey();
-                parameterList.setSelectedValue( parameter, true );
-                subsetComboBox.setSelectedItem("");
-                param= parameter;
+                if ( parameterDescriptions.isEmpty() ) {
+                    param= "";
+                } else {
+                    parameter= parameterDescriptions.entrySet().iterator().next().getKey();
+                    parameterList.setSelectedValue( parameter, true );
+                    subsetComboBox.setSelectedItem("");
+                    param= parameter;
+                }
             }
             parameter= param.replaceAll("%3D", "=");
 
