@@ -915,10 +915,10 @@ public class CdfUtil {
                 }
             }
 
-            if ( maxRec==0 && ( dims==null || dims.length<1 || dims[0]==1 ) && !isVirtual ) {
-                logger.fine("skipping "+var.getName()+" because maxWrittenRecord is 0");
-                continue;
-            }
+//            if ( maxRec==0 && ( dims==null || dims.length<1 || dims[0]==1 ) && !isVirtual ) {
+//                logger.fine("skipping "+var.getName()+" because maxWrittenRecord is 0");
+//                continue;
+//            }
 
             if ( var.getName().equals("Time_PB5") ) {
                 logger.fine("skipping "+var.getName()+" because we always skip Time_PB5");
@@ -967,6 +967,7 @@ public class CdfUtil {
                     }
                 } catch (CDFException e) {
                     //e.printStackTrace();
+                    warn.add( "problem with " + aAttr.getName() + ": " + e.getMessage() );
                 }
 
 
@@ -989,6 +990,7 @@ public class CdfUtil {
                     }
                 } catch (CDFException e) {
                     //e.printStackTrace();
+                    warn.add( "problem with " + bAttr.getName() + ": " + e.getMessage() );
                 }
 
                 try {
@@ -1009,7 +1011,7 @@ public class CdfUtil {
                         }
                     }
                 } catch (CDFException e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with " + blAttr.getName() + ": " + e.getMessage() );
                 }
 
                 try {
@@ -1023,7 +1025,7 @@ public class CdfUtil {
                         }
                     }
                 } catch (CDFException e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with " + cAttr.getName() + ": " + e.getMessage() );
                 }
 
                 try {
@@ -1037,7 +1039,7 @@ public class CdfUtil {
                         }
                     }
                 } catch (CDFException e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with " + clAttr.getName() + ": " + e.getMessage() );
                 }
 
                 try {
@@ -1051,7 +1053,7 @@ public class CdfUtil {
                         }
                     }
                 } catch (CDFException e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with " + dAttr.getName() + ": " + e.getMessage() );
                 }
 
                 try {
@@ -1065,7 +1067,7 @@ public class CdfUtil {
                         }
                     }
                 } catch (CDFException e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with " + dlAttr.getName() + ": " + e.getMessage() );
                 }
 
                 if (deep) {
@@ -1081,7 +1083,7 @@ public class CdfUtil {
                             svarNotes = String.valueOf(entry.getData());
                         }
                     } catch (CDFException e) {
-                        //e.printStackTrace();
+                        warn.add( e.getMessage() );
                     }
                 }
 
