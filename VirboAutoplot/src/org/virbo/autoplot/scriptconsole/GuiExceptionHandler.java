@@ -308,7 +308,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         dia1.textArea.setText(errorMessage);
         
         dialog.pack();
-        dialog.setLocationRelativeTo(null);
+        dialog.setLocationRelativeTo( DasApplication.getDefaultApplication().getMainFrame() );
         dialog.setVisible(true);
 
 
