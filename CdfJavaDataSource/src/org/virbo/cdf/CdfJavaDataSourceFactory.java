@@ -33,7 +33,7 @@ import org.virbo.datasource.URISplit;
  */
 public class CdfJavaDataSourceFactory implements DataSourceFactory {
     
-    private static Logger logger = Logger.getLogger("virbo.cdfdatasource");
+    private static final Logger logger = Logger.getLogger("virbo.cdfdatasource");
     
     /** Creates a new instance of CdfFileDataSourceFactory */
     public CdfJavaDataSourceFactory() {
@@ -56,7 +56,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             String fileName= cdfFile.toString();
             //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
-            logger.finest("opening cdf file "+fileName);
+            logger.log(Level.FINEST, "opening cdf file {0}", fileName);
 
             CDF cdf;
             try {
@@ -147,7 +147,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 } catch ( Throwable ex ) {
                     throw new RuntimeException(ex);
                 }
-                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4 );
+                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 4 );
                 //cdf.close();
                 int i= param.indexOf("[");
                 if ( i>-1 ) {
