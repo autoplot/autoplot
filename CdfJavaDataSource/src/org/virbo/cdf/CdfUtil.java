@@ -436,7 +436,7 @@ public class CdfUtil {
     /**
      * keys are the names of the variables. values are descriptions.
      * @param cdf
-     * @param dataOnly
+     * @param dataOnly show only the DATA and not SUPPORT_DATA.  Note I reclaimed this parameter because I wasn't using it.
      * @param rankLimit
      * @return map of parameter name to short description
      * @throws gsfc.nssdc.cdf.CDFException
@@ -543,9 +543,16 @@ public class CdfUtil {
                 continue;
             }
 
-            if (!dataOnly) {
+            if ( false ) {
                 result.put(var.getName(), null);
             } else {
+
+                if ( dataOnly ) {
+                    Object varType= getAttribute( cdf, var.getName(), "VAR_TYPE" );
+                    if ( varType==null || !varType.equals("data") ) {
+                        continue;
+                    }
+                }
 
                 Variable xDependVariable = null;
                 long xMaxRec = -1;
