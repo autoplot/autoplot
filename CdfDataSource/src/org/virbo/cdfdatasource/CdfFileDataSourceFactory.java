@@ -103,7 +103,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
             
             logger.finest("inspect cdf for plottable parameters");
-            Map<String,String> result= CdfUtil.getPlottable( cdf, true , 4);
+            Map<String,String> result= CdfUtil.getPlottable( cdf, false , 4 );
             
             logger.finest("close cdf");
             CdfFileDataSourceFactory.closeCDF(cdf);
@@ -130,7 +130,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
                 
                 CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
-                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4);
+                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 4 );
                 CdfFileDataSourceFactory.closeCDF(cdf);
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
@@ -174,7 +174,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
                 return true;
             } else {
                 CDF cdf= CdfFileDataSourceFactory.getCDFFile( file.getPath() );
-                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 4);
+                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 4 );
                 CdfFileDataSourceFactory.closeCDF(cdf);
                 int i= param.indexOf("[");
                 if ( i>-1 ) {
