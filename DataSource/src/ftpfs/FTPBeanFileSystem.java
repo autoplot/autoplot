@@ -114,7 +114,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
     }
 
     private boolean copyFile(File partFile, File targetFile) throws IOException {
-        logger.finer( "ftpBeanFilesystem copyFile(" + partFile + ","+ targetFile );
+        logger.log( Level.FINER, "ftpBeanFilesystem copyFile({0},{1}", new Object[]{partFile, targetFile});
         WritableByteChannel dest = Channels.newChannel(new FileOutputStream(targetFile));
         ReadableByteChannel src = Channels.newChannel(new FileInputStream(partFile));
         DataSourceUtil.transfer(src, dest);
@@ -224,12 +224,12 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
     Map<String,String[]> listings= Collections.synchronizedMap( new HashMap() );
 
-    public synchronized String[] listDirectory(String directory) throws IOException {
+    public synchronized final String[] listDirectory(String directory) throws IOException {
         directory = toCanonicalFolderName(directory);
 
         String[] result= listings.get(directory);
         if ( result!=null ) {
-            logger.fine("using cached listing for "+directory);
+            logger.log(Level.FINE, "using cached listing for {0}", directory);
             return result;
         }
 
@@ -263,7 +263,10 @@ public class FTPBeanFileSystem extends WebFileSystem {
                         bean.setDirectory( cwd + getRootURL().getPath() + directory.substring(1) );
 
                     } catch (NullPointerException ex) {
-                        throw new IOException("Unable to make connection to " + getRootURL().getHost());
+                        ex.printStackTrace();
+                        IOException ex2= new IOException("Unable to make connection to " + getRootURL().getHost());
+                        ex2.initCause(ex);
+                        throw ex2;
                     } catch (CancelledOperationException ex ) {
                         successOrCancel= true;
                         continue;
@@ -308,7 +311,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
     }
 
     protected void uploadFile( String filename, File srcFile, final ProgressMonitor mon ) throws IOException {
-        logger.fine("ftpfs uploadFile(" + filename + ")");
+        logger.log(Level.FINE, "ftpfs uploadFile({0})", filename);
 
         FileOutputStream out = null;
         InputStream is = null;
@@ -400,7 +403,7 @@ public class FTPBeanFileSystem extends WebFileSystem {
 
         if ( lock==null ) return;
 
-        logger.fine("ftpfs downloadFile(" + filename + ")");
+        logger.log(Level.FINE, "ftpfs downloadFile({0})", filename);
         
         FileOutputStream out = null;
         InputStream is = null;
