@@ -638,7 +638,8 @@ public class AutoplotUI extends javax.swing.JFrame {
         });
 
         if (model.getDocumentModel().getOptions().isScriptVisible()) {
-            tabs.addTab( "script", null, new JythonScriptPanel(applicationModel, this.dataSetSelector),
+            scriptPanel= new JythonScriptPanel(applicationModel, this.dataSetSelector);
+            tabs.addTab( "script", null, scriptPanel,
                   String.format(  TAB_TOOLTIP_SCRIPT, TABS_TOOLTIP )  );
             scriptPanelMenuItem.setSelected(true);
         }
