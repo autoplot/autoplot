@@ -34,7 +34,7 @@ import org.virbo.datasource.URISplit;
  */
 public class CdfFileDataSourceFactory implements DataSourceFactory {
     
-    private static Logger logger = Logger.getLogger("virbo.cdfdatasource");
+    private static final Logger logger = Logger.getLogger("virbo.cdfdatasource");
     
     static {
         loadCdfLibraries();
@@ -99,7 +99,7 @@ public class CdfFileDataSourceFactory implements DataSourceFactory {
             String fileName= cdfFile.toString();
             //if ( System.getProperty("os.name").startsWith("Windows") ) fileName= CdfUtil.win95Name( cdfFile );
             
-            logger.finest("opening cdf file "+fileName);
+            logger.log(Level.FINEST, "opening cdf file {0}", fileName);
             CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
             
             logger.finest("inspect cdf for plottable parameters");
