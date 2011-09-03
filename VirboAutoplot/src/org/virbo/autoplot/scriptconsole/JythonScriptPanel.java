@@ -441,4 +441,18 @@ private void interruptButtonActionPerformed(java.awt.event.ActionEvent evt) {//G
         firePropertyChange(PROP_DIRTY, oldDirty, dirty);
     }
 
+    /**
+     * allow clients to tell this to load a file.  
+     * @param file
+     * @return
+     */
+    public boolean loadFile( File file ) throws IOException {
+        if ( isDirty() ) {
+            return false;
+        } else {
+            support.loadFile(file);
+            return true;
+        }
+    }
+
 }
