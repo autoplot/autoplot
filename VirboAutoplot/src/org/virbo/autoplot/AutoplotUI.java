@@ -328,6 +328,11 @@ public class AutoplotUI extends javax.swing.JFrame {
                                     setStatus("warning: file is already in tools");
                                 }
                             }
+                            if ( scriptPanel!=null ) {
+                                if ( ! scriptPanel.isDirty() ) {
+                                    scriptPanel.loadFile(ff);
+                                }
+                            }
                             RunScriptPanel.runScript( applicationModel, ff, new NullProgressMonitor() );
                         }
                         applicationModel.addRecent(dataSetSelector.getValue());
