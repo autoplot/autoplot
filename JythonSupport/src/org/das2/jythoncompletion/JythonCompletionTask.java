@@ -139,6 +139,9 @@ public class JythonCompletionTask implements CompletionTask {
         for (int i = 0; i < po2.__len__(); i++) {
             PyString s = (PyString) po2.__getitem__(i);
             String ss = s.toString();
+            if ( ss.equals("Action") ) {
+                System.err.println("here action");
+            }
             if (ss.startsWith(cc.completable)) {
                 PyObject po;
                 try {
@@ -168,6 +171,8 @@ public class JythonCompletionTask implements CompletionTask {
                             signature= constructorSignature( constructor );
                             args= argsList( constructor.getParameterTypes() );
                             signature= signature+args;
+                        } else {
+                            signature= dc.getCanonicalName().replaceAll("\\.","/")+".html";
                         }
                         //Method m = new PyJavaClassPeeker((PyJavaClass)po).getMethod(0);
                         //signature = methodSignature(m);
@@ -243,8 +248,8 @@ public class JythonCompletionTask implements CompletionTask {
                 }
                 String link = null;
                 if ( signature != null) {
-                    if ( signature.startsWith("javax") || signature.startsWith("java") ) {
-                        link= "http://java.sun.com/j2se/1.5.0/docs/api/" + signature.replaceAll(",", ", ");
+                    if ( signature.startsWith("javax") || signature.startsWith("java") || signature.startsWith("org.w3c.dom") || signature.startsWith("org.xml.sax") ) {
+                        link= "http://download.oracle.com/javase/1.5.0/docs/api/" + signature.replaceAll(",", ", ");
                     } else if ( signature.startsWith("org/das2/")) {
                         link= "http://www-pw.physics.uiowa.edu/das2/javadoc/" + signature;
                     } else {
