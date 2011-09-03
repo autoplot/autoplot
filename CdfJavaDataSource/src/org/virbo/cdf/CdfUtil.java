@@ -433,6 +433,12 @@ public class CdfUtil {
         return att;
     }
 
+
+    public static boolean hasAttribute( CDF cdf, String var, String attrname ) {
+        Object att= cdf.getAttribute( var,attrname );
+        return !( att==null );
+    }
+    
     /**
      * keys are the names of the variables. values are descriptions.
      * @param cdf
@@ -583,7 +589,7 @@ public class CdfUtil {
                     //e.printStackTrace();
                 }
                 try {
-                    if (true || aAttr != null) {  // check for metadata for DEPEND_0
+                    if ( hasAttribute( cdf, var.getName(), "DEPEND_0" )) {  // check for metadata for DEPEND_0
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_0" );
                         if ( att!=null ) {
                             logger.log(Level.FINE, "get attribute DEPEND_0 entry for {0}", var.getName());
@@ -597,14 +603,14 @@ public class CdfUtil {
                         }
                     }
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with DEPEND_0: " + e.getMessage() );//e.printStackTrace();
                 }
 
 
                 try {
-                    if ( true || bAttr != null) {  // check for metadata for DEPEND_1
+                    if ( hasAttribute( cdf, var.getName(), "DEPEND_1" ) ) {  // check for metadata for DEPEND_1
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_1" );
-                        if ( att!=null ) {
+                        if ( att!=null && rank>1 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_1 entry for {0}", var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             yMaxRec = yDependVariable.getNumberOfValues();
@@ -617,13 +623,13 @@ public class CdfUtil {
                         }
                     }
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with DEPEND_1: " + e.getMessage() );//e.printStackTrace();
                 }
 
                 try {
-                    if ( yMaxRec==-1 ) {  // check for metadata for LABL_PTR_1
+                    if ( yMaxRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_1" ) ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_1" );
-                        if ( att!=null ) {
+                        if ( att!=null && rank>1  ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_1 entry for {0}", var.getName());
                             yDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             yMaxRec = yDependVariable.getNumberOfValues();
@@ -636,13 +642,13 @@ public class CdfUtil {
                         }
                     }
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with LABL_PTR_1: " + e.getMessage() );//e.printStackTrace();
                 }
 
                 try {
-                    if ( true || cAttr != null) { 
+                    if ( hasAttribute( cdf, var.getName(), "DEPEND_2" )  ) {
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_2" );
-                        if ( att!=null ) {
+                        if ( att!=null && rank>2 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_2 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             zMaxRec = zDependVariable.getNumberOfValues();
@@ -652,13 +658,13 @@ public class CdfUtil {
                         }
                     }
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with DEPEND_2: " + e.getMessage() );//e.printStackTrace();
                 }
 
                 try {
-                    if ( zMaxRec==-1 ) {  // check for metadata for LABL_PTR_1
+                    if ( zMaxRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_2" ) ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_2" );
-                        if ( att!=null ) {
+                        if ( att!=null && rank>2 ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_2 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             zMaxRec = zDependVariable.getNumberOfValues();
@@ -668,12 +674,12 @@ public class CdfUtil {
                         }
                     }
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with LABL_PTR_2: " + e.getMessage() );//e.printStackTrace();
                 }
                 try {
-                    if ( true || dAttr != null) {
+                    if ( hasAttribute( cdf, var.getName(), "DEPEND_3" ) ) {
                         Object att= getAttribute( cdf, var.getName(), "DEPEND_3" );
-                        if ( att!=null ) {
+                        if ( att!=null && rank>3 ) {
                             logger.log(Level.FINE, "get attribute DEPEND_3 entry for {0}", var.getName());
                             z1DependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             z1MaxRec = z1DependVariable.getNumberOfValues();
@@ -683,13 +689,13 @@ public class CdfUtil {
                         }
                     }
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with DEPEND_3: " + e.getMessage() );//e.printStackTrace();
                 }
 
                 try {
-                    if ( z1MaxRec==-1 ) {  // check for metadata for LABL_PTR_1
+                    if ( z1MaxRec==-1 && hasAttribute( cdf, var.getName(), "LABL_PTR_3" ) ) {  // check for metadata for LABL_PTR_1
                         Object att= getAttribute( cdf, var.getName(), "LABL_PTR_3" );
-                        if ( att!=null ) {
+                        if ( att!=null && rank>3 ) {
                             logger.log(Level.FINE, "get attribute LABL_PTR_3 entry for {0}", var.getName());
                             zDependVariable = cdf.getVariable(String.valueOf(String.valueOf(att)));
                             z1MaxRec = zDependVariable.getNumberOfValues();
@@ -699,7 +705,7 @@ public class CdfUtil {
                         }
                     }
                 } catch (Exception e) {
-                    //e.printStackTrace();
+                    warn.add( "problem with LABL_PTR_3: " + e.getMessage() );//e.printStackTrace();
                 }
 
                 if (deep) {
