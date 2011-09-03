@@ -66,7 +66,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
             }
 
             logger.finest("inspect cdf for plottable parameters");
-            Map<String,String> result= CdfUtil.getPlottable( cdf, true , 3);
+            Map<String,String> result= CdfUtil.getPlottable( cdf, false, 4 );
             
             logger.finest("close cdf");
             //cdf.close();
@@ -98,7 +98,7 @@ public class CdfJavaDataSourceFactory implements DataSourceFactory {
                 } catch (Throwable ex) {
                     throw new RuntimeException(ex);
                 }
-                Map<String,String> result= CdfUtil.getPlottable( cdf, true, 3);
+                Map<String,String> result= CdfUtil.getPlottable( cdf, false, 4 );
                 //cdf.close();
                 
                 List<CompletionContext> ccresult= new ArrayList<CompletionContext>();
