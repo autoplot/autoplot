@@ -75,6 +75,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         interpretMetadataLabel = new javax.swing.JLabel();
         noInterpMeta = new javax.swing.JCheckBox();
         noDep = new javax.swing.JCheckBox();
+        showAllVarTypeCB = new javax.swing.JCheckBox();
         jPanel2 = new javax.swing.JPanel();
         paramInfo = new javax.swing.JLabel();
 
@@ -112,6 +113,14 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         noDep.setText("no dependencies");
         noDep.setToolTipText("Ignore connections between variables like \"DEPEND_0\"\n");
 
+        showAllVarTypeCB.setText("show all");
+        showAllVarTypeCB.setToolTipText("show all parameters, even if ISTP VAR_TYPE is not \"data\"");
+        showAllVarTypeCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showAllVarTypeCBActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -124,7 +133,8 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                         .add(12, 12, 12)
                         .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(noDep)
-                            .add(noInterpMeta)))
+                            .add(noInterpMeta)
+                            .add(showAllVarTypeCB)))
                     .add(jLabel3)
                     .add(jPanel3Layout.createSequentialGroup()
                         .add(12, 12, 12)
@@ -143,7 +153,9 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
                 .add(noInterpMeta)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(noDep)
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(showAllVarTypeCB)
+                .addContainerGap(45, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
@@ -209,6 +221,10 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
         updateMetadata();
     }//GEN-LAST:event_parameterListValueChanged
 
+    private void showAllVarTypeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showAllVarTypeCBActionPerformed
+        setURI( getURI() );
+    }//GEN-LAST:event_showAllVarTypeCBActionPerformed
+
     private void updateMetadata() {
        String longName= parameterInfo.get(parameter);
        paramInfo.setText( longName );
@@ -226,6 +242,7 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
     private javax.swing.JCheckBox noInterpMeta;
     private javax.swing.JLabel paramInfo;
     private javax.swing.JList parameterList;
+    private javax.swing.JCheckBox showAllVarTypeCB;
     private javax.swing.JComboBox subsetComboBox;
     // End of variables declaration//GEN-END:variables
 
@@ -303,8 +320,8 @@ public class CdfDataSourceEditorPanel extends javax.swing.JPanel implements Data
             CDF cdf= CdfFileDataSourceFactory.getCDFFile( fileName );
 
             logger.finest("inspect cdf for plottable parameters");
-            parameterDescriptions= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, false );
-            parameterInfo= CdfUtil.getPlottable( cdf, true, QDataSet.MAX_RANK, true );
+            parameterDescriptions= CdfUtil.getPlottable( cdf, !showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, false );
+            parameterInfo= CdfUtil.getPlottable( cdf, !showAllVarTypeCB.isSelected(), QDataSet.MAX_RANK, true );
             if ( parameterDescriptions.isEmpty() ) {
                 throw new IllegalArgumentException("no plottable parameters in cdf file!");
             }

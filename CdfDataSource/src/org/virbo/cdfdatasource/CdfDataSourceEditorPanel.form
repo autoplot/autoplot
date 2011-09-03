@@ -124,6 +124,7 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="noDep" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="noInterpMeta" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="showAllVarTypeCB" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                           <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -148,7 +149,9 @@
                       <Component id="noInterpMeta" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="noDep" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="73" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="showAllVarTypeCB" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="45" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -191,6 +194,15 @@
                 <Property name="text" type="java.lang.String" value="no dependencies"/>
                 <Property name="toolTipText" type="java.lang.String" value="Ignore connections between variables like &quot;DEPEND_0&quot;&#xa;"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="showAllVarTypeCB">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="show all"/>
+                <Property name="toolTipText" type="java.lang.String" value="show all parameters, even if ISTP VAR_TYPE is not &quot;data&quot;"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showAllVarTypeCBActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>
