@@ -321,7 +321,7 @@ public final class GuiExceptionHandler implements ExceptionHandler {
         for ( int i=0; i<ee.length && i<5; i++ ) {
             rteHash= 31*rteHash + hashCode(ee[i]);
         }
-        rteHash= Math.abs(rteHash) + ee[0].getLineNumber();
+        rteHash= Math.abs(rteHash) + ee.length>0 ? ee[0].getLineNumber() : 0;
         return rteHash;
     }
 
