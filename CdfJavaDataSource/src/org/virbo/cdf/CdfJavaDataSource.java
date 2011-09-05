@@ -385,11 +385,12 @@ public class CdfJavaDataSource extends AbstractDataSource {
                 }
                 if (dep != null && ( qubeDims[idep]>6 || labl == null) ) {
                     try {
-                        boolean reformDep= idep > 0;
-                        if ( reformDep && cdf.getVariable( (String)dep.get("NAME") ).recordVariance() ) {
+                        String depName= (String)dep.get("NAME");
+                        boolean reformDep= idep > 0;  // make a rank 2 [1,ny] into rank 1 [ny]
+                        if ( reformDep && cdf.getVariable( depName ).recordVariance() ) {
                             reformDep= false;
                         }
-                        MutablePropertyDataSet depDs = wrapDataSet(cdf, (String) dep.get("NAME"), idep == 0 ? constraints : null, reformDep, false, null);
+                        MutablePropertyDataSet depDs = wrapDataSet(cdf, depName, idep == 0 ? constraints : null, reformDep, false, null);
 
                         if ( idep>0 && reformDep==false && depDs.length()==1 && qubeDims[0]>depDs.length() ) { //bugfix https://sourceforge.net/tracker/?func=detail&aid=3058406&group_id=199733&atid=970682
                             depDs= (MutablePropertyDataSet)depDs.slice(0);
@@ -432,7 +433,7 @@ public class CdfJavaDataSource extends AbstractDataSource {
 //                            }
                         }
 
-                        if ( "Data_No".equals( dep.get("NAME") ) ) {
+                        if ( "Data_No".equals( depName ) ) {
                             // kludge for UIowa Radio and Plasma Wave Group.
                             // They have a variable "DELTA_T" that gives time between measurements,
                             // and "Translation" gives offset for the waveform (e.g. 500KHz-525KHz)
