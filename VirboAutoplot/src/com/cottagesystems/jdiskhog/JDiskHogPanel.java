@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
+import org.das2.util.filesystem.FileSystem;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.virbo.autoplot.AutoplotUI;
 import org.virbo.datasource.AutoplotSettings;
@@ -133,9 +134,11 @@ public class JDiskHogPanel extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
                 chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                if (chooser.showOpenDialog(jtree) == JFileChooser.APPROVE_OPTION) {
+                chooser.setCurrentDirectory( new File("foo").getParentFile() ); //http://www.rgagnon.com/javadetails/java-0370.html
+                chooser.setAcceptAllFileFilterUsed(false);
+                if (chooser.showSaveDialog(jtree) == JFileChooser.APPROVE_OPTION) {
                     File destdir = chooser.getSelectedFile();
-
+                    
                     FSTreeModel model = (FSTreeModel) jtree.getModel();
 
                     TreePath[] paths = jtree.getSelectionPaths();
