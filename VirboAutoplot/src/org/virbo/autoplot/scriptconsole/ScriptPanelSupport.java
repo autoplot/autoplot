@@ -128,6 +128,13 @@ public class ScriptPanelSupport {
         if (file != null && !file.getCanonicalPath().startsWith(WebFileSystem.getDownloadDirectory().toString())) {
             chooser.setSelectedFile(file);
         }
+        if ( file==null ) {
+            Preferences prefs = Preferences.userNodeForPackage(ScriptPanelSupport.class);
+            String openFile = prefs.get(PREFERENCE_OPEN_FILE, "");
+            if ( !openFile.equals("") ) {
+                chooser.setCurrentDirectory( new File(openFile).getParentFile() );
+            }
+        }
         int r = chooser.showSaveDialog(panel);
         if (r == JFileChooser.APPROVE_OPTION) {
             file = chooser.getSelectedFile();
