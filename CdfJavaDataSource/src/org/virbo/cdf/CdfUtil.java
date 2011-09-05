@@ -28,7 +28,9 @@ import java.util.logging.Logger;
 import org.das2.util.monitor.NullProgressMonitor;
 import org.das2.util.monitor.ProgressMonitor;
 import org.virbo.binarydatasource.BufferDataSet;
+import org.virbo.dataset.ArrayDataSet;
 import org.virbo.dataset.DDataSet;
+import org.virbo.dataset.FDataSet;
 import org.virbo.dataset.QDataSet;
 import org.virbo.dataset.MutablePropertyDataSet;
 import org.virbo.datasource.DataSourceUtil;
@@ -96,7 +98,7 @@ public class CdfUtil {
             CDF cdf, Variable variable, long recStart, long recCount, long recInterval ) throws Exception {
         return wrapCdfHyperDataHacked( cdf, variable, recStart, recCount, recInterval, new NullProgressMonitor() );
     }
-    
+
     public static MutablePropertyDataSet wrapCdfHyperDataHacked(
             CDF cdf, Variable variable, long recStart, long recCount, long recInterval, ProgressMonitor mon ) throws Exception {
 
@@ -243,7 +245,7 @@ public class CdfUtil {
                     throw new IllegalArgumentException("internal error unimplemented: "+variable.getType() );
                 }
             } else {
-                result = DDataSet.wrap((double[]) odata, qube);
+                result= ArrayDataSet.wrap( odata, qube, false );
             }
         } else {
             if ( recCount==-1 ) {
@@ -261,7 +263,7 @@ public class CdfUtil {
                 int [] qqube= new int[qube.length+1];
                 qqube[0]= 1;
                 System.arraycopy(qube, 0, qqube, 1, qube.length);
-                result= (MutablePropertyDataSet) TrDDataSet.wrap((double[]) odata, qqube).slice(0);
+                result= TrArrayDataSet.wrap( odata, qqube, false );
             } else {
                 if ( qube.length==3 ) {
                     int tr= qube[2];
@@ -274,7 +276,7 @@ public class CdfUtil {
                 } else if ( qube.length>4 ) {
                     throw new IllegalArgumentException("rank limit");
                 }
-                result = TrDDataSet.wrap((double[]) odata, qube);
+                result= ArrayDataSet.wrap( odata, qube, false );
             }
         }
 
@@ -302,14 +304,14 @@ public class CdfUtil {
             for (int i = 0; i < sdata.length; i++) {
                 back[i] = units.createDatum(sdata[i]).doubleValue(units);
             }
-            result = DDataSet.wrap(back, qube);
+            result= ArrayDataSet.wrap( back, qube, false );
             result.putProperty(QDataSet.UNITS, units);
 
         } else if ( varType == CDFConstants.CDF_EPOCH ) {
             if ( qube.length==2 && qube[1]==1 ) {// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
                 qube= new int[] { qube[0] };
             }
-            result = DDataSet.wrap((double[]) odata, qube);
+            result= ArrayDataSet.wrap( odata, qube, false );
             result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
             result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
         } else if ( varType==CDFConstants.CDF_EPOCH16 ) {
@@ -326,63 +328,11 @@ public class CdfUtil {
             int[] qube1= new int[qube.length-1];
             System.arraycopy(qube, 0, qube1, 0, qube.length - 1);
 
-            result = DDataSet.wrap(dresult, qube1);
+            result= ArrayDataSet.wrap( dresult, qube1, false );
             result.putProperty(QDataSet.UNITS, Units.us2000);
 
         }
 
-//        if (varType == CDFConstants.CDF_REAL4 || varType == CDFConstants.CDF_FLOAT) {
-//            result = FDataSet.wrap((float[]) odata, qube );
-//
-//        } else if (varType == CDFConstants.CDF_REAL8 || varType == CDFConstants.CDF_DOUBLE) {
-//            result = DDataSet.wrap((double[]) odata, qube);
-//
-//        } else if (varType == CDFConstants.CDF_UINT4 ) {
-//            result = LDataSet.wrap((long[]) odata, qube);
-//
-//        } else if (varType == CDFConstants.CDF_INT4 || varType == CDFConstants.CDF_UINT2) {
-//            result = IDataSet.wrap((int[]) odata, qube);
-//
-//        } else if (varType == CDFConstants.CDF_INT2 || varType == CDFConstants.CDF_UINT1) {
-//            result = SDataSet.wrap((short[]) odata, qube);
-//
-//        } else if (varType == CDFConstants.CDF_INT1 || varType == CDFConstants.CDF_BYTE) {
-//            result = BDataSet.wrap((byte[]) odata, qube);
-//
-//        } else if (varType == CDFConstants.CDF_CHAR) {
-//            EnumerationUnits units = EnumerationUnits.create(variable.getName());
-//            String[] sdata = (String[]) odata;
-//            double[] back = new double[sdata.length];
-//            for (int i = 0; i < sdata.length; i++) {
-//                back[i] = units.createDatum(sdata[i]).doubleValue(units);
-//            }
-//            result = DDataSet.wrap(back, qube);
-//            result.putProperty(QDataSet.UNITS, units);
-//
-//        } else if (varType == CDFConstants.CDF_EPOCH) {
-//            if ( qube.length==2 && qube[1]==1 ) {// kludge for c4_cp_fgm_spin_20030102_v01.cdf?B_vec_xyz_gse__C4_CP_FGM_SPIN
-//                qube= new int[] { qube[0] };
-//            }
-//            result = DDataSet.wrap((double[]) odata, qube);
-//            result.putProperty(QDataSet.UNITS, Units.cdfEpoch);
-//            result.putProperty(QDataSet.VALID_MIN, 1.); // kludge for Timas, which has zeros.
-//
-//        } else if (varType == CDFConstants.CDF_EPOCH16) {
-//            // adapt to das2 by translating to Units.us2000, which should be good enough.
-//            // note when this is not good enough, new units types can be introduced, along with conversions.
-//            double[] data = (double[]) odata;
-//            double[] dresult = new double[data.length / 2];
-//            for (int i = 0; i < dresult.length; i++) {
-//                double t2000 = data[i * 2] - 6.3113904e+10; // seconds since midnight 2000
-//                dresult[i] = t2000 * 1e6 + data[i * 2 + 1] / 1000000.;
-//            }
-//            result = DDataSet.wrap(dresult, qube);
-//            result.putProperty(QDataSet.UNITS, Units.us2000);
-//
-//        } else {
-//
-//            throw new RuntimeException("Unsupported Data Type " + variable.getType() + " java type " + odata.getClass());
-//        }
         return result;
     }
     
