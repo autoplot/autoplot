@@ -29,9 +29,9 @@ import org.virbo.dataset.WritableDataSet;
  *
  * @author jbf
  */
-public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet, RankZeroDataSet {
+public final class TrFDataSet extends TrArrayDataSet implements WritableDataSet, RankZeroDataSet {
 
-    double[] back;
+    float[] back;
     int rank;
     int len0;
     int len1;
@@ -41,20 +41,20 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
     private static final boolean RANGE_CHECK = false;
     public static final String version = "20090605";
 
-    public static TrDDataSet createRank1(int len0) {
-        return new TrDDataSet(1, len0, 1, 1, 1);
+    public static TrFDataSet createRank1(int len0) {
+        return new TrFDataSet(1, len0, 1, 1, 1);
     }
 
-    public static TrDDataSet createRank2(int len0, int len1) {
-        return new TrDDataSet(2, len0, len1, 1, 1);
+    public static TrFDataSet createRank2(int len0, int len1) {
+        return new TrFDataSet(2, len0, len1, 1, 1);
     }
 
-    public static TrDDataSet createRank3(int len0, int len1, int len2) {
-        return new TrDDataSet(3, len0, len1, len2, 1);
+    public static TrFDataSet createRank3(int len0, int len1, int len2) {
+        return new TrFDataSet(3, len0, len1, len2, 1);
     }
 
-    public static TrDDataSet createRank4(int len0, int len1, int len2, int len3) {
-        return new TrDDataSet(4, len0, len1, len2, len3);
+    public static TrFDataSet createRank4(int len0, int len1, int len2, int len3) {
+        return new TrFDataSet(4, len0, len1, len2, len3);
     }
 
     /**
@@ -63,17 +63,17 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * @param qube array specifying the rank and size of each dimension
      * @return DDataSet
      */
-    public static TrDDataSet create(int[] qube) {
+    public static TrFDataSet create(int[] qube) {
         if ( qube.length==0 ) {
-            return new TrDDataSet( 0, 1, 1, 1, 1 );
+            return new TrFDataSet( 0, 1, 1, 1, 1 );
         } else if (qube.length == 1) {
-            return TrDDataSet.createRank1(qube[0]);
+            return TrFDataSet.createRank1(qube[0]);
         } else if (qube.length == 2) {
-            return TrDDataSet.createRank2(qube[0], qube[1]);
+            return TrFDataSet.createRank2(qube[0], qube[1]);
         } else if (qube.length == 3) {
-            return TrDDataSet.createRank3(qube[0], qube[1], qube[2]);
+            return TrFDataSet.createRank3(qube[0], qube[1], qube[2]);
         } else if (qube.length == 4) {
-            return TrDDataSet.createRank4(qube[0], qube[1], qube[2], qube[3]);
+            return TrFDataSet.createRank4(qube[0], qube[1], qube[2], qube[3]);
         } else {
             throw new IllegalArgumentException("bad qube");
         }
@@ -86,17 +86,17 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * @param qube array specifying the rank and size of each dimension
      * @return DDataSet
      */
-    public static TrDDataSet wrap( double[] data, int[] qube ) {
+    public static TrFDataSet wrap( float[] data, int[] qube ) {
         if (qube.length == 0 ) {
-            return new TrDDataSet( 1, 1, 1, 1, 1, data );
+            return new TrFDataSet( 1, 1, 1, 1, 1, data );
         } else if (qube.length == 1) {
-            return new TrDDataSet( 1, qube[0], 1, 1, 1, data );
+            return new TrFDataSet( 1, qube[0], 1, 1, 1, data );
         } else if (qube.length == 2) {
-            return new TrDDataSet( 2, qube[0], qube[1], 1, 1, data );
+            return new TrFDataSet( 2, qube[0], qube[1], 1, 1, data );
         } else if (qube.length == 3) {
-            return new TrDDataSet( 3, qube[0], qube[1], qube[2], 1, data );
+            return new TrFDataSet( 3, qube[0], qube[1], qube[2], 1, data );
         } else if (qube.length == 4) {
-            return new TrDDataSet( 4, qube[0], qube[1], qube[2], qube[3], data);
+            return new TrFDataSet( 4, qube[0], qube[1], qube[2], qube[3], data);
         } else {
             throw new IllegalArgumentException("bad qube");
         }
@@ -104,11 +104,11 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
 
         
     /** Creates a new instance of DDataSet */
-    private TrDDataSet(int rank, int len0, int len1, int len2, int len3) {
-        this(rank, len0, len1, len2, len3, new double[len0 * len1 * len2 * len3]);
+    private TrFDataSet(int rank, int len0, int len1, int len2, int len3) {
+        this(rank, len0, len1, len2, len3, new float[len0 * len1 * len2 * len3]);
     }
 
-    private TrDDataSet(int rank, int len0, int len1, int len2, int len3, double[] back) {
+    private TrFDataSet(int rank, int len0, int len1, int len2, int len3, float[] back) {
         if ( back==null ) throw new NullPointerException("back was null");
         this.back = back;
         this.rank = rank;
@@ -207,7 +207,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
     }
 
     public void putValue(double value) {
-        back[0]= value;
+        back[0]= (float)value;
     }
 
     public void putValue(int i0, double value) {
@@ -216,7 +216,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
                 throw new IndexOutOfBoundsException("i0=" + i0 + " " + this);
             }
         }
-        back[i0] = value;
+        back[i0] = (float)value;
     }
 
     public void putValue(int i0, int i1, double value) {
@@ -228,7 +228,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
                 throw new IndexOutOfBoundsException("i1=" + i1 + " " + this);
             }
         }
-        back[i0 * len1 + i1] = value;
+        back[i0 * len1 + i1] = (float)value;
     }
 
     public void putValue(int i0, int i1, int i2, double value) {
@@ -243,7 +243,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
                 throw new IndexOutOfBoundsException("i2=" + i2 + " " + this);
             }
         }
-        back[i0 * len1 * len2 + i2 * len1 + i1] = value;
+        back[i0 * len1 * len2 + i2 * len1 + i1] = (float)value;
     }
 
     public void putValue(int i0, int i1, int i2, int i3, double value) {
@@ -261,7 +261,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
                 throw new IndexOutOfBoundsException("i3=" + i3 + " " + this);
             }
         }
-        back[i0 *len1  *len2   *len3 + i3 *len1  *len2 +  i2*len1 +i1]= value;
+        back[i0 *len1  *len2   *len3 + i3 *len1  *len2 +  i2*len1 +i1]= (float)value;
         
     }
 
@@ -314,14 +314,14 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
         return result;
     }
 
-    private static TrDDataSet ddcopy(TrDDataSet ds) {
+    private static TrFDataSet ddcopy(TrFDataSet ds) {
         int dsLength = ds.len0 * ds.len1 * ds.len2 * ds.len3;
 
-        double[] newback = new double[dsLength];
+        float[] newback = new float[dsLength];
 
         System.arraycopy(ds.back, 0, newback, 0, dsLength);
 
-        TrDDataSet result = new TrDDataSet(ds.rank, ds.len0, ds.len1, ds.len2, ds.len3, newback);
+        TrFDataSet result = new TrFDataSet(ds.rank, ds.len0, ds.len1, ds.len2, ds.len3, newback);
         result.properties.putAll(copyProperties(ds)); // TODO: problems... 
 
         return result;
@@ -332,9 +332,9 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * @param ds
      * @return
      */
-    public static TrDDataSet maybeCopy( QDataSet ds ) {
-        if ( ds instanceof TrDDataSet ) {
-            return (TrDDataSet)ds;
+    public static TrFDataSet maybeCopy( QDataSet ds ) {
+        if ( ds instanceof TrFDataSet ) {
+            return (TrFDataSet)ds;
         } else {
             return copy(ds);
         }
@@ -344,12 +344,12 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * copies the dataset into a writeable dataset, and all of its depend datasets as well.
      * An optimized copy is used when the argument is a DDataSet.
      */
-    public static TrDDataSet copy(QDataSet ds) {
-        if (ds instanceof TrDDataSet) {
-            return ddcopy((TrDDataSet) ds);
+    public static TrFDataSet copy(QDataSet ds) {
+        if (ds instanceof TrFDataSet) {
+            return ddcopy((TrFDataSet) ds);
         }
         int rank = ds.rank();
-        TrDDataSet result;
+        TrFDataSet result;
         int len1,len2,len3;
         if ( !DataSetUtil.isQube(ds) ) {
             //throw new IllegalArgumentException("copy non-qube");
@@ -410,8 +410,8 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
     /**
      * creates a DDataSet by wrapping an existing double array.
      */
-    public static TrDDataSet wrap(double[] back) {
-        return new TrDDataSet(1, back.length, 1, 1, 1, back);
+    public static TrFDataSet wrap(float[] back) {
+        return new TrFDataSet(1, back.length, 1, 1, 1, back);
     }
 
     /**
@@ -419,8 +419,8 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * Note the last index is packed closest in memory.
      * @param n1 the size of the second dimension.
      */
-    public static TrDDataSet wrapRank2(double[] back, int n1) {
-        return new TrDDataSet(2, back.length / n1, n1, 1, 1, back);
+    public static TrFDataSet wrapRank2(float[] back, int n1) {
+        return new TrFDataSet(2, back.length / n1, n1, 1, 1, back);
     }
 
     /**
@@ -430,36 +430,36 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * @param n1 the size of the second index.
      * @param n2 the size of the third index.
      */
-    public static TrDDataSet wrapRank3(double[] back, int n1, int n2) {
-        return new TrDDataSet(3, back.length / (n1 * n2), n1, n2, 1, back);
+    public static TrFDataSet wrapRank3(float[] back, int n1, int n2) {
+        return new TrFDataSet(3, back.length / (n1 * n2), n1, n2, 1, back);
     }
 
     /**
      * creates a DDataSet by wrapping an existing array, aliasing it to rank 2.
      */
-    public static TrDDataSet wrap(double[] back, int nx, int ny) {
-        return new TrDDataSet(2, nx, ny, 1, 1, back);
+    public static TrFDataSet wrap(float[] back, int nx, int ny) {
+        return new TrFDataSet(2, nx, ny, 1, 1, back);
     }
 
-    public static TrDDataSet wrap( double[] back, int rank, int len0, int len1, int len2 ) {
-        return new TrDDataSet( rank, len0, len1, len2, 1, back );
+    public static TrFDataSet wrap( float[] back, int rank, int len0, int len1, int len2 ) {
+        return new TrFDataSet( rank, len0, len1, len2, 1, back );
     }
 
-    public static TrDDataSet wrap( double[] back, int rank, int len0, int len1, int len2, int len3) {
-        return new TrDDataSet( rank, len0, len1, len2, len3, back);
+    public static TrFDataSet wrap( float[] back, int rank, int len0, int len1, int len2, int len3) {
+        return new TrFDataSet( rank, len0, len1, len2, len3, back);
     }
     
     /**
      * join dep0 if found, join auxillary planes if found.
      */
-    private void joinProperties(TrDDataSet ds) {
+    private void joinProperties(TrFDataSet ds) {
         Map result = new HashMap();
         for (int i = 0; i < 1; i++) {
             QDataSet dep1 = (QDataSet) ds.property("DEPEND_" + i);
             if (dep1 != null) {
                 QDataSet dep0 = (QDataSet) this.property("DEPEND_" + i);
-                TrDDataSet djoin = TrDDataSet.copy(dep0);
-                TrDDataSet ddep1 = dep1 instanceof TrDDataSet ? (TrDDataSet) dep1 : TrDDataSet.copy(dep1);
+                TrFDataSet djoin = TrFDataSet.copy(dep0);
+                TrFDataSet ddep1 = dep1 instanceof TrFDataSet ? (TrFDataSet) dep1 : TrFDataSet.copy(dep1);
                 djoin.append(ddep1);
                 result.put("DEPEND_" + i, djoin);
             }
@@ -469,8 +469,8 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
             QDataSet dep1 = (QDataSet) ds.property("PLANE_" + i);
             if (dep1 != null) {
                 QDataSet dep0 = (QDataSet) this.property("PLANE_" + i);
-                TrDDataSet djoin = TrDDataSet.copy(dep0); 
-                TrDDataSet dd1 = dep1 instanceof TrDDataSet ? (TrDDataSet) dep1 : TrDDataSet.copy(dep1);
+                TrFDataSet djoin = TrFDataSet.copy(dep0); 
+                TrFDataSet dd1 = dep1 instanceof TrFDataSet ? (TrFDataSet) dep1 : TrFDataSet.copy(dep1);
                 djoin.append(dd1);  
                 result.put("PLANE_" + i, djoin);
             } else {
@@ -489,7 +489,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * @throws IllegalArgumentException if the higher rank geometry doesn't match
      * @throws IndexOutOfBoundsException
      */
-    public static void copyElements(TrDDataSet src, int srcpos, TrDDataSet dest, int destpos, int len) {
+    public static void copyElements(TrFDataSet src, int srcpos, TrFDataSet dest, int destpos, int len) {
         if ( src.len1 != dest.len1 || src.len2 != dest.len2 ) {
             throw new IllegalArgumentException("src and dest geometry don't match");
         }
@@ -509,7 +509,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * @throws IllegalArgumentException if the higher rank geometry doesn't match
      * @throws IndexOutOfBoundsException
      */
-    public static void copyElements( TrDDataSet src, int srcpos, TrDDataSet dest, int destpos, int len, boolean checkAlias ) {
+    public static void copyElements( TrFDataSet src, int srcpos, TrFDataSet dest, int destpos, int len, boolean checkAlias ) {
         if ( checkAlias && ( src.len1*src.len2 != dest.len1*dest.len2 ) ) {
             throw new IllegalArgumentException("src and dest geometry don't match");
         }
@@ -525,7 +525,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * TODO: this will be renamed "concatenate" or "append" since "join" is the anti-slice.
      * @deprecated use append instead.
      */
-    public void join(TrDDataSet ds) {
+    public void join(TrFDataSet ds) {
         append(ds);
     }
     
@@ -533,7 +533,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
      * append the second dataset onto this dataset.  Not thread safe!!!
      * TODO: this really should return a new dataset.  Presumably this is to avoid copies, but currently it copies anyway!
      */
-    public void append( TrDDataSet ds ) {
+    public void append( TrFDataSet ds ) {
         if (ds.rank() != rank) {
             throw new IllegalArgumentException("rank mismatch");
         }
@@ -550,7 +550,7 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
         int myLength = len0 * len1 * len2 * len3;
         int dsLength = ds.len0 * ds.len1 * ds.len2 * ds.len3;
 
-        double[] newback = new double[myLength + dsLength];
+        float[] newback = new float[myLength + dsLength];
 
         System.arraycopy(this.back, 0, newback, 0, myLength);
         System.arraycopy(ds.back, 0, newback, myLength, dsLength);
@@ -586,9 +586,9 @@ public final class TrDDataSet extends TrArrayDataSet implements WritableDataSet,
         int nrank = this.rank;
         int noff1= start * len1 * len2 * len3;
         int noff2= end * len1 * len2 * len3;
-        double[] newback = new double[noff2-noff1];
+        float[] newback = new float[noff2-noff1];
         System.arraycopy( this.back, noff1, newback, 0, noff2-noff1 );
-        TrDDataSet result= new TrDDataSet( nrank, end-start, len1, len2, len3, newback );
+        TrFDataSet result= new TrFDataSet( nrank, end-start, len1, len2, len3, newback );
         DataSetUtil.putProperties( DataSetUtil.getProperties(this), result );
         QDataSet dep0= (QDataSet) property(QDataSet.DEPEND_0);
         if ( dep0!=null ) result.putProperty( QDataSet.DEPEND_0, dep0.trim(start, end) );

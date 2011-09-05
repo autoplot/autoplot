@@ -1,0 +1,47 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package org.virbo.cdf;
+
+import java.lang.reflect.Array;
+import org.virbo.dataset.AbstractDataSet;
+
+/**
+ * echo ArrayDataSet, but [0,3,2,1] transpose
+ * @author jbf
+ */
+public abstract class TrArrayDataSet extends AbstractDataSet {
+    
+    /**
+     * return the array as ArrayDataSet  The array must be a 1-D array and the
+     * dimensions of the result are provided in qube.
+     * @param array 1-D array
+     * @param qube dimensions of the dataset
+     * @param copy copy the data so that original data is not modified with putValue
+     * @return ArrayDataSet
+     */
+    public static TrArrayDataSet wrap( Object array, int[] qube, boolean copy ) {
+        Object arr;
+        //check type
+        if ( !array.getClass().isArray() ) throw new IllegalArgumentException("input must be an array");
+        Class c= array.getClass().getComponentType();
+        if ( c.isArray() ) throw new IllegalArgumentException("input must be 1-D array");
+        if ( copy ) {
+            arr= Array.newInstance( c, Array.getLength(array) );
+            System.arraycopy( array, 0, arr, 0, Array.getLength(array) );
+        } else {
+            arr= array;
+        }
+        if ( c==double.class ) return TrDDataSet.wrap( (double[])array, qube );
+        if ( c==float.class ) return TrFDataSet.wrap( (float[])array, qube );
+        //if ( c==long.class ) return LDataSet.wrap( (long[])array, qube );
+        //if ( c==int.class ) return IDataSet.wrap( (int[])array, qube );
+        //if ( c==short.class ) return SDataSet.wrap( (short[])array, qube );
+        //if ( c==byte.class ) return BDataSet.wrap( (byte[])array, qube );
+
+        throw new IllegalArgumentException("component type not supported: "+c );
+
+    }
+}
