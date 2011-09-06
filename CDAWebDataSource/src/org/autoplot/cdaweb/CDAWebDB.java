@@ -104,9 +104,6 @@ public class CDAWebDB {
             mon.setProgressMessage("parsing file "+dbloc );
             document = builder.parse(source);
 
-            Element element = document.getDocumentElement();
-            System.out.println(element.getTagName());
-
             XPath xp = XPathFactory.newInstance().newXPath();
             version= xp.evaluate( "/sites/datasite/@version", document );
 
