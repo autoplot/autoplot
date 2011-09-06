@@ -329,7 +329,6 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
 
         String uri= getURI();
         URISplit split= URISplit.parse(uri);
-        Map<String,String> params= URISplit.parseParams(split.params);
 
     }
 
@@ -375,7 +374,8 @@ public class CsvDataSourceEditorPanel extends javax.swing.JPanel implements Data
             columnsComboBox.setModel( new DefaultComboBoxModel( headers.toArray() ) );
             String column= params.get(PROP_COLUMN);
             if ( column!=null ) this.columnsComboBox.setSelectedItem(params.get(PROP_COLUMN));
-
+            String bundle= params.get(PROP_BUNDLE);
+            if ( bundle!=null ) this.columnsComboBox.setSelectedItem(params.get(PROP_BUNDLE));
 
             dep0Columns.setModel( new DefaultComboBoxModel( headers.toArray() ) );
             String depend0column= params.get(PROP_DEP0);
@@ -409,8 +409,15 @@ private void columnsComboBoxItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     String v= (String) columnsComboBox.getSelectedItem();
     if ( v.equals("") ) {
         params.put(PROP_COLUMN, null );
+        params.put(PROP_BUNDLE, null );
     } else {
-        params.put(PROP_COLUMN, v );
+        if ( v.contains("-") || v.contains(":") ) {
+            params.put(PROP_BUNDLE, v );
+            params.put(PROP_COLUMN, null );
+        } else {
+            params.put(PROP_COLUMN, v );
+            params.put(PROP_BUNDLE, null );
+        }
     }
 }//GEN-LAST:event_columnsComboBoxItemStateChanged
 
