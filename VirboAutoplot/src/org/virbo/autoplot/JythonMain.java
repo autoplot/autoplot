@@ -12,6 +12,8 @@ package org.virbo.autoplot;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
 
 
@@ -35,6 +37,9 @@ public class JythonMain {
 
         System.err.println("org.virbo.autoplot.JythonMain "+APSplash.getVersion());
         interp = JythonUtil.createInterpreter(true,false);
+        interp.set("dom", ScriptContext.getDocumentModel() );
+        interp.set("params", new PyDictionary()); //TODO: mimic autoplotUI, which allows arguments to script.
+        interp.set("resourceURI", Py.None );
 
         InputStream in;
         String inIdentifier;
