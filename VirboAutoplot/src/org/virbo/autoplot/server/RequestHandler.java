@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.python.core.Py;
+import org.python.core.PyDictionary;
 import org.python.util.PythonInterpreter;
 import org.virbo.autoplot.ApplicationModel;
 import org.virbo.autoplot.AutoplotUI;
@@ -53,6 +55,9 @@ public class RequestHandler {
 
             interp.execfile(AutoplotUI.class.getResource("appContextImports.py").openStream(), "appContextImports.py");
             interp.setOut( out );
+            interp.set("dom", model.getDocumentModel() );
+            interp.set("params", new PyDictionary());
+            interp.set("resourceURI", Py.None );
             
             ScriptContext._setOutputStream(out); // TODO: this is very kludgy and will surely cause problems
             
