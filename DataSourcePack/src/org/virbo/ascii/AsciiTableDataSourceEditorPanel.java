@@ -50,6 +50,7 @@ import org.virbo.dataset.QDataSet;
 import org.virbo.datasource.DataSetURI;
 import org.virbo.datasource.DataSourceEditorPanel;
 import org.virbo.datasource.URISplit;
+import org.virbo.dsutil.AsciiHeadersParser;
 import org.virbo.dsutil.AsciiParser;
 import org.virbo.dsutil.AutoHistogram;
 import org.virbo.dsutil.DataSetBuilder;
@@ -1018,6 +1019,7 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
 
             jTabbedPane1.setSelectedIndex(tab);
             update();
+            checkHeaders();
 
         } catch (IOException ex) {
             Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -1151,6 +1153,36 @@ private void guessTimeFormatToggleButtonActionPerformed(java.awt.event.ActionEve
         }
         jTable1.getTableHeader().repaint();
 
+    }
+
+    private void checkHeaders() {
+        try {
+            AsciiParser.DelimParser p = parser.guessSkipAndDelimParser(file.toString());
+            if (p == null) {
+                //               throw new IllegalArgumentException("no records found");
+                return;
+            }
+            model.setRecParser(p);
+            columns = getColumnNames();
+            ParseException richHeaderWarn = null;
+            boolean isRichHeader = AsciiParser.isRichHeader(p.header);
+            if (isRichHeader) {
+                try {
+                    AsciiHeadersParser.parseMetadata(p.header, new String[p.fieldCount()]);
+                } catch (ParseException ex) {
+                    Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+                    richHeaderWarn = ex;
+                }
+            }
+            if (richHeaderWarn != null) {
+                JOptionPane.showMessageDialog( this.jTable1,
+                        "<html>Rich headers are JSON headers that provide additional information about the parameters in the text file.<br>"
+                        + "There was an error when parsing the headers.<br><br>"+richHeaderWarn.toString()+"</html>", "Rich Headers parser error detected",
+                        JOptionPane.OK_OPTION );
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(AsciiTableDataSourceEditorPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void update() {
