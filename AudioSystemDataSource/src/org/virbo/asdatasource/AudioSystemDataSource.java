@@ -88,7 +88,7 @@ public class AudioSystemDataSource extends AbstractDataSource implements Updatin
 
         //startUpdateTimer();
         
-        QDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, dataBuffer, BufferDataSet.SHORT );
+        QDataSet ds= BufferDataSet.makeDataSet( 1, 2, 0, nsamples, 1, 1, 1, dataBuffer, BufferDataSet.SHORT );
         if ( spec>-1 ) {
             ds= Ops.fftWindow(ds, spec);
         }
