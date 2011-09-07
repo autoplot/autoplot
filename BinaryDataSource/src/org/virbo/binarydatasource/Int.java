@@ -25,6 +25,10 @@ public class Int extends BufferDataSet implements WritableDataSet {
         return back.getInt(offset(i0, i1, i2));
     }
 
+    public double value(int i0, int i1, int i2, int i3) {
+        return back.getInt(offset(i0, i1, i2, i3));
+    }
+    
     public void putValue(double d) {
         ensureWritable();
         back.putInt( offset(), (int)d );
@@ -43,5 +47,10 @@ public class Int extends BufferDataSet implements WritableDataSet {
     public void putValue(int i0, int i1, int i2, double d) {
         ensureWritable();
         back.putInt( offset(i0, i1, i2), (int)d );
+    }
+
+    public void putValue(int i0, int i1, int i2, int i3, double d) {
+        ensureWritable();
+        back.putInt( offset(i0, i1, i2, i3), (int)d );
     }
 }

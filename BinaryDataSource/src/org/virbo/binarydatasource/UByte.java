@@ -32,6 +32,11 @@ public class UByte extends BufferDataSet {
         return b < 0 ? b + 256 : b;
     }
     
+    public double value(int i0, int i1, int i2, int i3) {
+        byte b= back.get(offset(i0, i1, i2, i3));
+        return b < 0 ? b + 256 : b;
+    }
+
     public void putValue(double d) {
         ensureWritable();
         back.put( offset(), (byte)( d > 128 ? d - 256 : d ) );
@@ -50,5 +55,10 @@ public class UByte extends BufferDataSet {
     public void putValue(int i0, int i1, int i2, double d) {
         ensureWritable();
         back.put( offset(i0, i1, i2), (byte)( d > 128 ? d - 256 : d ) );
-    }        
+    }
+
+    public void putValue(int i0, int i1, int i2, int i3, double d) {
+        ensureWritable();
+        back.put( offset(i0, i1, i2, i3), (byte)( d > 128 ? d - 256 : d ) );
+    }
 }

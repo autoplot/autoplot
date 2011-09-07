@@ -24,6 +24,10 @@ public class Short extends BufferDataSet {
         return back.getShort(offset(i0, i1, i2));
     }
 
+    public double value(int i0, int i1, int i2, int i3) {
+        return back.getShort(offset(i0, i1, i2, i3) );
+    }
+    
     public void putValue(double d) {
         ensureWritable();
         back.putShort( offset(), (short)d );
@@ -42,5 +46,10 @@ public class Short extends BufferDataSet {
     public void putValue(int i0, int i1, int i2, double d) {
         ensureWritable();
         back.putShort( offset(i0, i1, i2), (short)d );
+    }
+
+    public void putValue(int i0, int i1, int i2, int i3, double d) {
+        ensureWritable();
+        back.putShort( offset(i0, i1, i2, i3), (short)d );
     }
 }

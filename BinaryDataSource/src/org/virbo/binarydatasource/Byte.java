@@ -24,6 +24,10 @@ public class Byte extends BufferDataSet {
         return back.get(offset(i0, i1, i2));
     }
 
+    public double value(int i0, int i1, int i2, int i3) {
+        return back.get(offset(i0, i1, i2,i3));
+    }
+
     public void putValue(double d) {
         ensureWritable();
         back.put( offset(), (byte)d );
@@ -42,5 +46,10 @@ public class Byte extends BufferDataSet {
     public void putValue(int i0, int i1, int i2, double d) {
         ensureWritable();
         back.put( offset(i0, i1, i2), (byte)d );
-    }    
+    }
+
+    public void putValue(int i0, int i1, int i2, int i3, double d) {
+        ensureWritable();
+        back.put( offset(i0, i1, i2, i3), (byte)d );
+    }
 }

@@ -24,6 +24,10 @@ public class Long extends BufferDataSet {
         return back.getLong(offset(i0, i1, i2));
     }
 
+    public double value(int i0, int i1, int i2, int i3) {
+        return back.getLong(offset(i0, i1, i2, i3));
+    }
+
     public void putValue(double d) {
         ensureWritable();
         back.putLong( offset(), (long)d );
@@ -43,5 +47,9 @@ public class Long extends BufferDataSet {
         ensureWritable();
         back.putLong( offset(i0, i1, i2), (long)d );
     }
-        
+
+    public void putValue(int i0, int i1, int i2, int i3, double d) {
+        ensureWritable();
+        back.putLong( offset(i0, i1, i2, i3), (long)d );
+    }
 }

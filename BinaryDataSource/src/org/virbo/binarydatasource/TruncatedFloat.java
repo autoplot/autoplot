@@ -34,6 +34,10 @@ public class TruncatedFloat extends BufferDataSet implements WritableDataSet {
         return java.lang.Float.intBitsToFloat( back.getShort(offset(i0, i1, i2)) << 16 );
     }
 
+    public double value(int i0, int i1, int i2, int i3) {
+        return java.lang.Float.intBitsToFloat( back.getShort(offset(i0, i1, i2, i3 )) << 16 );
+    }
+
     private final short truncate( double d ) {
         return (short)((java.lang.Float.floatToIntBits((float)d)>>16) & 0xffff );
     }
@@ -58,4 +62,8 @@ public class TruncatedFloat extends BufferDataSet implements WritableDataSet {
         back.putShort( offset(i0, i1, i2), truncate(d) );
     }
 
+    public void putValue(int i0, int i1, int i2, int i3, double d) {
+        ensureWritable();
+        back.putShort( offset(i0, i1, i2, i3), truncate(d) );
+    }
 }

@@ -309,9 +309,8 @@ public abstract class BufferDataSet extends AbstractDataSet implements WritableD
     @Override
     public abstract double value(int i0, int i1, int i2);
 
-    public void putValue(int i0, int i1, int i2, int i3, double d) {
-        throw new IllegalArgumentException("rank limit");
-    }
+    @Override
+    public abstract double value(int i0, int i1, int i2, int i3);
 
     /**
      * provide a subset of the dataset.  Note that writes to the result dataset
