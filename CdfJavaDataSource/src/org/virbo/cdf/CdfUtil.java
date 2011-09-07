@@ -285,7 +285,8 @@ public class CdfUtil {
                 int [] qqube= new int[qube.length+1];
                 qqube[0]= 1;
                 System.arraycopy(qube, 0, qqube, 1, qube.length);
-                result= TrArrayDataSet.wrap( odata, qqube, false );
+                //result= TrArrayDataSet.wrap( odata, qqube, false );
+                result= (MutablePropertyDataSet) TrDDataSet.wrap( (double[]) odata, qqube).slice(0);
             } else {
                 if ( qube.length==3 ) {
                     int tr= qube[2];
